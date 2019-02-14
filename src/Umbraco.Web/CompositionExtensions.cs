@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Components;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;

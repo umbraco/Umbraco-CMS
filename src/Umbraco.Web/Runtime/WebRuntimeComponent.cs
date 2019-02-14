@@ -13,7 +13,6 @@ using System.Web.Routing;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;

@@ -115,12 +115,12 @@
     <Compile Include="Cache\IDistributedCacheBinder.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
-    <Compile Include="Components\BackOfficeUserAuditEventsComposer.cs" />
-    <Compile Include="Components\NotificationsComposer.cs" />
-    <Compile Include="Components\PublicAccessComposer.cs" />
-    <Compile Include="Composing\Composers\InstallerComposer.cs" />
+    <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
+    <Compile Include="Compose\NotificationsComposer.cs" />
+    <Compile Include="Compose\PublicAccessComposer.cs" />
+    <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
-    <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
+    <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Dashboards\ContentDashboard.cs" />
     <Compile Include="Dashboards\DashboardCollection.cs" />
@@ -333,13 +333,13 @@
     <Compile Include="HybridEventMessagesAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Cache\RelationTypeCacheRefresher.cs" />
-    <Compile Include="Composing\Composers\WebMappingProfilesComposer.cs" />
+    <Compile Include="Composing\CompositionExtensions\WebMappingProfiles.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Install\InstallStepCollection.cs" />
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="IPublishedContentQuery.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
-    <Compile Include="Composing\Composers\ControllersComposer.cs" />
+    <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Macros\MacroContent.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
@@ -887,7 +887,7 @@
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
     <Compile Include="Migrations\PostMigrations\ClearCsrfCookies.cs" />
-    <Compile Include="Components\NotificationsComponent.cs" />
+    <Compile Include="Compose\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
@@ -1044,7 +1044,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="JavaScript\ServerVariablesParser.cs" />
-    <Compile Include="Components\PublicAccessComponent.cs" />
+    <Compile Include="Compose\PublicAccessComponent.cs" />
     <Compile Include="CdfLogger.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
@@ -1123,7 +1123,7 @@
     <Compile Include="Routing\UrlProvider.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineComponent.cs" />
-    <Compile Include="Components\DatabaseServerRegistrarAndMessengerComponent.cs" />
+    <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Configuration;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.Composers;
+using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;

@@ -4,10 +4,11 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Composing.CompositionExtensions;
+using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.Scoping
 {
