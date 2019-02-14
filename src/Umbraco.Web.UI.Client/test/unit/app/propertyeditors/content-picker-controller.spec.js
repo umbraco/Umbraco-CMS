@@ -52,11 +52,15 @@ describe('Content picker controller tests', function () {
 
     describe('content edit controller save and publish', function () {
         
-        var item = {
-            name: "meh",
-            id: 666,
-            icon: "woop"
-        };
+        var item;
+
+        beforeEach(function () {
+            item = {
+                name: "meh",
+                id: 666,
+                icon: "woop"
+            };
+        });
 
         it('should define the default properties on construction', function () {
             expect(scope.model.value).not.toBeUndefined();            
