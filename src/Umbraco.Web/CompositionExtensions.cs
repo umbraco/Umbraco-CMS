@@ -10,6 +10,7 @@ using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Search;
 using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
@@ -116,6 +117,15 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static TreeCollectionBuilder Trees(this Composition composition)
             => composition.WithCollectionBuilder<TreeCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the back office searchable tree collection builder
+        /// </summary>
+        /// <param name="composition"></param>
+        /// <returns></returns>
+        public static SearchableTreeCollectionBuilder SearchableTrees(this Composition composition)
+            => composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
+
         #endregion
 
         #region Uniques
