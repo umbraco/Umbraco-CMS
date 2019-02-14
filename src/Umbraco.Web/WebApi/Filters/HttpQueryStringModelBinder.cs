@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
+using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -24,7 +25,7 @@ namespace Umbraco.Web.WebApi.Filters
                 {
                     var queryStringKeys = queryStrings.Select(kvp => kvp.Key).ToArray();
                     var additionalParameters = new Dictionary<string, string>();
-                    if(queryStringKeys.Contains("culture") == false) {
+                    if(queryStringKeys.InvariantContains("culture") == false) {
                         additionalParameters["culture"] = actionContext.Request.ClientCulture();
                     }
 
