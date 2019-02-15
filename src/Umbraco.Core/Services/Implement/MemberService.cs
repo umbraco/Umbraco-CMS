@@ -1212,21 +1212,21 @@ namespace Umbraco.Core.Services.Implement
                 Id = --identity,
                 Key = identity.ToGuid()
             });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, Constants.Conventions.Member.LastLockoutDate)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Date, Constants.Conventions.Member.LastLockoutDate)
             {
                 Name = Constants.Conventions.Member.LastLockoutDateLabel,
                 SortOrder = 5,
                 Id = --identity,
                 Key = identity.ToGuid()
             });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, Constants.Conventions.Member.LastLoginDate)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Date, Constants.Conventions.Member.LastLoginDate)
             {
                 Name = Constants.Conventions.Member.LastLoginDateLabel,
                 SortOrder = 6,
                 Id = --identity,
                 Key = identity.ToGuid()
             });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, Constants.Conventions.Member.LastPasswordChangeDate)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Date, Constants.Conventions.Member.LastPasswordChangeDate)
             {
                 Name = Constants.Conventions.Member.LastPasswordChangeDateLabel,
                 SortOrder = 7,

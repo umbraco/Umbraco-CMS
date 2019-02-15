@@ -46,18 +46,15 @@
             };
 
             function onInit() {
-
-                // hide navigation if there is only 1 item
-                if (scope.navigation.length <= 1) {
-                    scope.showNavigation = false;
-                }
-                
-                $timeout(function(){
-                    if($window && $window.innerWidth) {
-                        calculateVisibleItems($window.innerWidth);
-                    }
-                });
-
+                var firstRun = true;
+                scope.$watch("navigation.length",
+                    (newVal, oldVal) => {
+                        if (firstRun || newVal !== undefined && newVal !== oldVal) {
+                            firstRun = false;
+                            scope.showNavigation = newVal > 1;
+                            calculateVisibleItems($window.innerWidth);
+                        }
+                    });
             }
 
             function calculateVisibleItems(windowWidth) {

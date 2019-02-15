@@ -17,7 +17,9 @@
             onSelectVariant: "&",
             onOpenSplitView: "&",
             onSelectApp: "&",
-            onSelectAppAnchor: "&"
+            onSelectAppAnchor: "&",
+            onBack: "&?",
+            showBack: "<?"
         },
         controllerAs: 'vm',
         controller: umbVariantContentController
@@ -37,6 +39,7 @@
         vm.openSplitView = openSplitView;
         vm.selectApp = selectApp;
         vm.selectAppAnchor = selectAppAnchor;
+        vm.showBackButton = showBackButton;
 
         function onInit() {
             // disable the name field if the active content app is not "Content"
@@ -46,6 +49,10 @@
                     vm.nameDisabled = true;
                 }
             });
+        }
+        
+        function showBackButton() {
+            return vm.page.listViewPath !== null && vm.showBack;
         }
         
         /** Called when the component has linked all elements, this is when the form controller is available */

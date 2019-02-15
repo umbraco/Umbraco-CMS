@@ -9,7 +9,8 @@
 (function () {
     "use strict";
 
-    function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper) {
+    function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, 
+        listViewHelper, mediaTypeHelper, editorService) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -116,8 +117,29 @@
             listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
         }
 
-        function goToItem(item, $event, $index) {
-            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
+        function goToItem(node, $event, $index) {
+            $event.stopPropagation();
+            
+            var contentEditor = {
+                id: node.id,
+                submit: function (model) {
+                    // update the node
+                    node.name = model.contentNode.name;
+                    // TODO: node.description = model.contentNode.description;
+                    node.published = model.contentNode.hasPublishedVersion;
+                    if (entityType !== "Member") {
+                        entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
+                            node.url = data;
+                        });
+                    }
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+            editorService.contentEditor(contentEditor);
+            
         }
 
         activate();
