@@ -22,7 +22,7 @@ namespace Umbraco.Core.Logging
         public void Stop(bool discardResults = false)
         { }
 
-        private class VoidDisposable : DisposableObject
+        private class VoidDisposable : DisposableObjectSlim
         {
             protected override void DisposeResources()
             { }

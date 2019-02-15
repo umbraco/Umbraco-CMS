@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Routing;
 using Moq;
+using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;

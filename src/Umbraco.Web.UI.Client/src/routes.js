@@ -157,6 +157,7 @@ app.config(function ($routeProvider) {
                     return;
                 }
 
+                //TODO: Fix this special case by using components, the packager should be a component and then we just have a view for each route like normal rendering the component with the correct parameters
                 //special case for the package section
                 var packagePages = ["edit", "options"];
                 if ($routeParams.section.toLowerCase() === "packages" && $routeParams.tree.toLowerCase() === "packages" && packagePages.indexOf($routeParams.method.toLowerCase()) === -1) {
@@ -164,6 +165,7 @@ app.config(function ($routeProvider) {
                     return;
                 }
 
+                //TODO: Fix this special case by using components, the users section should be a component and then we just have a view for each route like normal rendering the component with the correct parameters
                 //special case for the users section
                 var usersPages = ["user", "group"];
                 if ($routeParams.section.toLowerCase() === "users" && $routeParams.tree.toLowerCase() === "users" && usersPages.indexOf($routeParams.method.toLowerCase()) === -1) {

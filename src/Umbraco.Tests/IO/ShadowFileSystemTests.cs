@@ -473,7 +473,7 @@ namespace Umbraco.Tests.IO
             scope.Dispose();
             scopedFileSystems = false;
             Assert.IsTrue(phy.FileExists("sub/f5.txt"));
-            Assert.IsFalse(Directory.Exists(shadowfs + "/" + id));
+            TestHelper.TryAssert(() => Assert.IsFalse(Directory.Exists(shadowfs + "/" + id)));
         }
 
         [Test]

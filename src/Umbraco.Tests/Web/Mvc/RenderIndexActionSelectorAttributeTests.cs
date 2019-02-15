@@ -63,19 +63,20 @@ namespace Umbraco.Tests.Web.Mvc
             var globalSettings = TestObjects.GetGlobalSettings();
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
-            //var appCtx = new ApplicationContext(
-            //    CacheHelper.CreateDisabledCacheHelper(),
-            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            var umbCtx = UmbracoContext.EnsureContext(
+
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
-                Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true);
+                new TestDefaultCultureAccessor(),
+                TestObjects.GetUmbracoSettings(),
+                globalSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
+            var umbCtx = umbracoContextReference.UmbracoContext;
+
             var ctrl = new MatchesDefaultIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
             var result = attr.IsValidForRequest(controllerCtx,
@@ -90,16 +91,20 @@ namespace Umbraco.Tests.Web.Mvc
             var globalSettings = TestObjects.GetGlobalSettings();
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
-            var umbCtx = UmbracoContext.EnsureContext(
+
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
-                Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true);
+                new TestDefaultCultureAccessor(),
+                TestObjects.GetUmbracoSettings(),
+                globalSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
+            var umbCtx = umbracoContextReference.UmbracoContext;
+
             var ctrl = new MatchesOverriddenIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
             var result = attr.IsValidForRequest(controllerCtx,
@@ -114,16 +119,20 @@ namespace Umbraco.Tests.Web.Mvc
             var globalSettings = TestObjects.GetGlobalSettings();
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
-            var umbCtx = UmbracoContext.EnsureContext(
+
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
-                Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true);
+                new TestDefaultCultureAccessor(),
+                TestObjects.GetUmbracoSettings(),
+                globalSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
+            var umbCtx = umbracoContextReference.UmbracoContext;
+
             var ctrl = new MatchesCustomIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
             var result = attr.IsValidForRequest(controllerCtx,
@@ -138,16 +147,20 @@ namespace Umbraco.Tests.Web.Mvc
             var globalSettings = TestObjects.GetGlobalSettings();
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
-            var umbCtx = UmbracoContext.EnsureContext(
+
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
-                Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true);
+                new TestDefaultCultureAccessor(),
+                TestObjects.GetUmbracoSettings(),
+                globalSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
+            var umbCtx = umbracoContextReference.UmbracoContext;
+
             var ctrl = new MatchesAsyncIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
             var result = attr.IsValidForRequest(controllerCtx,

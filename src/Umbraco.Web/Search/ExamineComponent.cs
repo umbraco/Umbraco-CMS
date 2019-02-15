@@ -6,7 +6,6 @@ using System.Threading;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
@@ -19,6 +18,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
 using Examine.LuceneEngine.Directories;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Search
 {

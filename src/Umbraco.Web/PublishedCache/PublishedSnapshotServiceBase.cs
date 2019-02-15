@@ -33,6 +33,9 @@ namespace Umbraco.Web.PublishedCache
         public abstract void Notify(DataTypeCacheRefresher.JsonPayload[] payloads);
         public abstract void Notify(DomainCacheRefresher.JsonPayload[] payloads);
 
+        public virtual void Rebuild()
+        { }
+
         public virtual void Dispose()
         { }
     }

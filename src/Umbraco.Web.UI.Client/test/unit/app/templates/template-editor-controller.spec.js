@@ -102,43 +102,6 @@
             it("has ace editor", function () {
                 expect(controller.editor).toBe(ace);
             });
-
-            it("sets masterpage on template", function () {
-                controller.setLayout = function() {};
-
-                controller.openMasterTemplateOverlay();
-                setTimeout(function(){
-                    controller.masterTemplateOverlay.submit({
-                        selectedItem: {
-                            alias: "NewMasterPage"
-                        }
-                    });
-                    expect(controller.template.masterTemplateAlias).toBe("NewMasterPage");
-                }, 1000);
-            });
-
-            //// TODO: THIS FAILED
-            //it("changes layout value when masterpage is selected", function() {
-            //    var newTemplate;
-            //    ace.clearSelection = nada;
-            //    ace.navigateFileStart = nada;
-            //    ace.getValue = function () {
-            //        return "@{ Layout = null; }";
-            //    }
-            //    ace.setValue = function (value) {
-            //        newTemplate = value;
-            //    }
-
-            //    controller.openMasterTemplateOverlay();
-            //    setTimeout(function(){
-            //        controller.masterTemplateOverlay.submit({
-            //            selectedItem: {
-            //                alias: "NewMasterPage"
-            //            }
-            //        });
-            //        expect(newTemplate).toBe("@{ Layout = \"NewMasterPage.cshtml\"; }");
-            //    }, 1000);
-            //});
             
         });
 

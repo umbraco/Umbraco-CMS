@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Models.Mapping
             Mapper.Initialize(configuration =>
             {
                 //initialize our content type mapper
-                var profile1 = new ContentTypeMapperProfile(_editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>());
+                var profile1 = new ContentTypeMapperProfile(_editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>(), Mock.Of<ILogger>());
                 configuration.AddProfile(profile1);
                 var profile2 = new EntityMapperProfile();
                 configuration.AddProfile(profile2);
@@ -311,6 +311,8 @@ namespace Umbraco.Tests.Models.Mapping
         public void IMemberType_To_MemberTypeDisplay()
         {
             //Arrange
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             // setup the mocks to return the data we want to test against...
 
@@ -369,6 +371,8 @@ namespace Umbraco.Tests.Models.Mapping
         public void IMediaType_To_MediaTypeDisplay()
         {
             //Arrange
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             // setup the mocks to return the data we want to test against...
 
@@ -422,6 +426,8 @@ namespace Umbraco.Tests.Models.Mapping
         public void IContentType_To_ContentTypeDisplay()
         {
             //Arrange
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             // setup the mocks to return the data we want to test against...
 
@@ -687,6 +693,8 @@ namespace Umbraco.Tests.Models.Mapping
         public void IMediaTypeComposition_To_MediaTypeDisplay()
         {
             //Arrange
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             // setup the mocks to return the data we want to test against...
 
@@ -778,6 +786,8 @@ namespace Umbraco.Tests.Models.Mapping
         public void IContentTypeComposition_To_ContentTypeDisplay()
         {
             //Arrange
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             // setup the mocks to return the data we want to test against...
 

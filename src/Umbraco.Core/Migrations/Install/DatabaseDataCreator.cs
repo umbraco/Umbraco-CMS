@@ -271,12 +271,12 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -88, EditorAlias = Constants.PropertyEditors.Aliases.TextBox, DbType = "Nvarchar" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -89, EditorAlias = Constants.PropertyEditors.Aliases.TextArea, DbType = "Ntext" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -90, EditorAlias = Constants.PropertyEditors.Aliases.UploadField, DbType = "Nvarchar" });
-            InsertDataTypeDto(Constants.DataTypes.LabelString, Constants.PropertyEditors.Aliases.NoEdit, "Nvarchar", "{\"umbracoDataValueType\":\"STRING\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelInt, Constants.PropertyEditors.Aliases.NoEdit, "Integer", "{\"umbracoDataValueType\":\"INT\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelBigint, Constants.PropertyEditors.Aliases.NoEdit, "Nvarchar", "{\"umbracoDataValueType\":\"BIGINT\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelDateTime, Constants.PropertyEditors.Aliases.NoEdit, "Date", "{\"umbracoDataValueType\":\"DATETIME\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelDecimal, Constants.PropertyEditors.Aliases.NoEdit, "Decimal", "{\"umbracoDataValueType\":\"DECIMAL\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelTime, Constants.PropertyEditors.Aliases.NoEdit, "Date", "{\"umbracoDataValueType\":\"TIME\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelString, Constants.PropertyEditors.Aliases.Label, "Nvarchar", "{\"umbracoDataValueType\":\"STRING\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelInt, Constants.PropertyEditors.Aliases.Label, "Integer", "{\"umbracoDataValueType\":\"INT\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelBigint, Constants.PropertyEditors.Aliases.Label, "Nvarchar", "{\"umbracoDataValueType\":\"BIGINT\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelDateTime, Constants.PropertyEditors.Aliases.Label, "Date", "{\"umbracoDataValueType\":\"DATETIME\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelDecimal, Constants.PropertyEditors.Aliases.Label, "Decimal", "{\"umbracoDataValueType\":\"DECIMAL\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelTime, Constants.PropertyEditors.Aliases.Label, "Date", "{\"umbracoDataValueType\":\"TIME\"}");
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -36, EditorAlias = Constants.PropertyEditors.Aliases.DateTime, DbType = "Date" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -37, EditorAlias = Constants.PropertyEditors.Aliases.ColorPicker, DbType = "Nvarchar" });
             InsertDataTypeDto(Constants.DataTypes.DropDownSingle, Constants.PropertyEditors.Aliases.DropDownListFlexible, "Nvarchar", "{\"multiple\":false}");
@@ -321,7 +321,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             // on install, initialize the umbraco migration plan with the final state
 
-            var upgrader = new UmbracoUpgrader();
+            var upgrader = new Upgrader(new UmbracoPlan());
             var stateValueKey = upgrader.StateValueKey;
             var finalState = upgrader.Plan.FinalState;
 

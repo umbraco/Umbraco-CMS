@@ -69,7 +69,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Exposes the UmbracoContext
         /// </summary>
-        protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = UmbracoContext.Current);
+        protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = Current.UmbracoContext);
 
         // TODO: try lazy property injection?
         private IPublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<IPublishedRouter>();
@@ -84,13 +84,13 @@ namespace Umbraco.Web.Mvc
             base.OnActionExecuted(filterContext);
 
             // First we need to check if the published content request has been set, if it has we're going to ignore this and not actually do anything
-            if (UmbracoContext.Current.PublishedRequest != null)
+            if (Current.UmbracoContext.PublishedRequest != null)
             {
                 return;
             }
 
-            UmbracoContext.Current.PublishedRequest = PublishedRouter.CreateRequest(UmbracoContext.Current);
-            ConfigurePublishedContentRequest(UmbracoContext.Current.PublishedRequest, filterContext);
+            Current.UmbracoContext.PublishedRequest = PublishedRouter.CreateRequest(Current.UmbracoContext);
+            ConfigurePublishedContentRequest(Current.UmbracoContext.PublishedRequest, filterContext);
         }
 
         /// <summary>

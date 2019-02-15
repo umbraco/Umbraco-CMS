@@ -1,4 +1,4 @@
-function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeout) {
+function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelper, localizationService, overlayService) {
 
     var vm = this;
 
@@ -25,14 +25,18 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
 
     function showSearchResultDialog(values) {
         if (vm.searchResults) {
-            vm.searchResults.overlay = {
-                title: "Field values",
-                searchResultValues: values,
-                view: "views/dashboard/settings/examinemanagementresults.html",
-                close: function () {
-                    vm.searchResults.overlay = null;
-                }
-            };
+
+            localizationService.localize("examineManagement_fieldValues").then(function (value) {
+
+                vm.searchResults.overlay = {
+                    title: value,
+                    searchResultValues: values,
+                    view: "views/dashboard/settings/examinemanagementresults.html",
+                    close: function () {
+                        vm.searchResults.overlay = null;
+                    }
+                };
+            });
         }
     }
 
@@ -132,28 +136,46 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
         }
     }
 
-    function rebuildIndex(index) {
-        if (confirm("This will cause the index to be rebuilt. " +
-            "Depending on how much content there is in your site this could take a while. " +
-            "It is not recommended to rebuild an index during times of high website traffic " +
-            "or when editors are editing content.")) {
+    function rebuildIndex(index, event) {
 
-            index.isProcessing = true;
-            index.processingAttempts = 0;
+        const dialog = {
+            view: "views/dashboard/settings/overlays/examinemanagement.rebuild.html",
+            index: index,
+            submitButtonLabelKey: "general_ok",
+            submit: function (model) {
+                performRebuild(model.index);
+                overlayService.close();
+            },
+            close: function () {
+                overlayService.close();
+            }
+        };
 
-            umbRequestHelper.resourcePromise(
-                    $http.post(umbRequestHelper.getApiUrl("examineMgmtBaseUrl",
-                        "PostRebuildIndex",
-                        { indexName: index.name })),
-                    'Failed to rebuild index')
-                .then(function() {
+        localizationService.localize("examineManagement_rebuildIndex").then(value => {
+            dialog.title = value;
+            overlayService.open(dialog);
+        });
 
-                    // rebuilding has started, nothing is returned accept a 200 status code.
-                    // lets poll to see if it is done.
-                    $timeout(() => { checkProcessing(index, "PostCheckRebuildIndex"), 1000 });
+        event.preventDefault()
+        event.stopPropagation();
+    }
 
-                });
-        }
+    function performRebuild(index) {
+        index.isProcessing = true;
+        index.processingAttempts = 0;
+
+        umbRequestHelper.resourcePromise(
+            $http.post(umbRequestHelper.getApiUrl("examineMgmtBaseUrl",
+                "PostRebuildIndex",
+                { indexName: index.name })),
+            'Failed to rebuild index')
+            .then(function () {
+
+                // rebuilding has started, nothing is returned accept a 200 status code.
+                // lets poll to see if it is done.
+                $timeout(() => { checkProcessing(index, "PostCheckRebuildIndex"), 1000 });
+
+            });
     }
 
     function init() {

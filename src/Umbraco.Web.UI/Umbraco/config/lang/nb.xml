@@ -686,14 +686,12 @@ Vennlig hilsen Umbraco roboten
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardmal</key>
-    <key alias="dictionary editor egenskab">Ordboksnøkkel</key>
     <key alias="importDocumentTypeHelp">For å importere en dokumenttype, finn ".udt" filen på datamaskinen din ved å klikke "Utforsk" knappen og klikk "Importer" (du vil bli spurt om bekreftelse i det neste skjermbildet)</key>
     <key alias="newtabname">Ny tittel på arkfane</key>
     <key alias="nodetype">Nodetype</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Stilark</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Stilark-egenskap</key>
     <key alias="tab">Arkfane</key>
     <key alias="tabname">Tittel på arkfane</key>
     <key alias="tabs">Arkfaner</key>

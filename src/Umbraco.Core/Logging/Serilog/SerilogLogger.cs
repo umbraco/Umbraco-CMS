@@ -41,8 +41,6 @@ namespace Umbraco.Core.Logging.Serilog
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
                 .MinimalConfiguration()
-                .OutputDefaultTextFile(LogEventLevel.Debug)
-                .OutputDefaultJsonFile()
                 .ReadFromConfigFile()
                 .ReadFromUserConfigFile();
 

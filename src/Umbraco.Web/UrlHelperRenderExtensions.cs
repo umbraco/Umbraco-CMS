@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -294,9 +295,9 @@ namespace Umbraco.Web
             if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
             if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
 
-            var encryptedRoute = UmbracoHelper.CreateEncryptedRouteString(controllerName, action, area, additionalRouteVals);
+            var encryptedRoute = CreateEncryptedRouteString(controllerName, action, area, additionalRouteVals);
 
-            var result = UmbracoContext.Current.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
+            var result = Current.UmbracoContext.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
             return result;
         }
 
@@ -337,9 +338,9 @@ namespace Umbraco.Web
                 area = metaData.AreaName;
             }
 
-            var encryptedRoute = UmbracoHelper.CreateEncryptedRouteString(metaData.ControllerName, action, area, additionalRouteVals);
+            var encryptedRoute = CreateEncryptedRouteString(metaData.ControllerName, action, area, additionalRouteVals);
 
-            var result = UmbracoContext.Current.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
+            var result = Current.UmbracoContext.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
             return result;
         }
 
@@ -387,6 +388,42 @@ namespace Umbraco.Web
                 return string.Format("{0}{1}", requestUrl, mediaItem.Url);
             }
             return null;
+        }
+
+        /// <summary>
+        /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
+        /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
+        /// </summary>
+        /// <param name="controllerName"></param>
+        /// <param name="controllerAction"></param>
+        /// <param name="area"></param>
+        /// <param name="additionalRouteVals"></param>
+        /// <returns></returns>
+        internal static string CreateEncryptedRouteString(string controllerName, string controllerAction, string area, object additionalRouteVals = null)
+        {
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerAction)) throw new ArgumentNullOrEmptyException(nameof(controllerAction));
+            if (area == null) throw new ArgumentNullException(nameof(area));
+
+            //need to create a params string as Base64 to put into our hidden field to use during the routes
+            var surfaceRouteParams = $"c={HttpUtility.UrlEncode(controllerName)}&a={HttpUtility.UrlEncode(controllerAction)}&ar={area}";
+
+            //checking if the additional route values is already a dictionary and convert to querystring
+            string additionalRouteValsAsQuery;
+            if (additionalRouteVals != null)
+            {
+                if (additionalRouteVals is Dictionary<string, object> additionalRouteValsAsDictionary)
+                    additionalRouteValsAsQuery = additionalRouteValsAsDictionary.ToQueryString();
+                else
+                    additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
+            }
+            else
+                additionalRouteValsAsQuery = null;
+
+            if (additionalRouteValsAsQuery.IsNullOrWhiteSpace() == false)
+                surfaceRouteParams += "&" + additionalRouteValsAsQuery;
+
+            return surfaceRouteParams.EncryptWithMachineKey();
         }
     }
 }

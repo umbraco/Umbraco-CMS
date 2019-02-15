@@ -834,14 +834,12 @@
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">預設範本</key>
-    <key alias="dictionary editor egenskab">字典鍵</key>
     <key alias="importDocumentTypeHelp">要導入文檔類型，請點擊“流覽”按鈕，再點擊“導入”，然後在您電腦上查找 ".udt"檔導入（下一頁中需要您再次確認）</key>
     <key alias="newtabname">新建選項卡標題</key>
     <key alias="nodetype">節點類型</key>
     <key alias="objecttype">類型</key>
     <key alias="stylesheet">樣式表</key>
     <key alias="script">腳本</key>
-    <key alias="stylesheet editor egenskab">樣式表屬性</key>
     <key alias="tab">選項卡</key>
     <key alias="tabname">選項卡標題</key>
     <key alias="tabs">選項卡</key>
@@ -1243,7 +1241,6 @@
     <key alias="redirectedTo">轉址成</key>
     <key alias="noRedirects">沒有任何轉址</key>
     <key alias="noRedirectsDescription">當發佈後的頁面改名或移動時，會自動轉址至新網頁。</key>
-    <key alias="removeButton">移除</key>
     <key alias="confirmRemove">您確定要移除從 %0% 到 %1% 的轉址嗎？</key>
     <key alias="redirectRemoved">轉址已移除。</key>
     <key alias="redirectRemoveError">移除轉址錯誤。

@@ -21,9 +21,9 @@ namespace Umbraco.Web.Security
     /// <summary>
     /// A utility class used for dealing with USER security in Umbraco
     /// </summary>
-    public class WebSecurity : DisposableObjectSlim
+    public class WebSecurity
     {
-        private HttpContextBase _httpContext;
+        private readonly HttpContextBase _httpContext;
         private readonly IUserService _userService;
         private readonly IGlobalSettings _globalSettings;
 
@@ -263,10 +263,6 @@ namespace Umbraco.Web.Security
         {
             return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
         }
-
-        protected override void DisposeResources()
-        {
-            _httpContext = null;
-        }
+        
     }
 }
