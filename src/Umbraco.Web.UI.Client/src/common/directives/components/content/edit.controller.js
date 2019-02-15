@@ -818,14 +818,15 @@
                     previewWindow.location.href = redirect;
                 }
                 else {
-                    var selectedVariant;
-                    if (!$scope.culture) {
-                        selectedVariant = $scope.content.variants[0];
-                    }
-                    else {
-                        selectedVariant = _.find($scope.content.variants, function (v) {
-                            return v.language.culture === $scope.culture;
+                    var selectedVariant = $scope.content.variants[0];
+                    if ($scope.culture) {
+                        var found = _.find($scope.content.variants, function (v) {
+                            return (v.language && v.language.culture === $scope.culture);
                         });
+
+                        if(found){
+                            selectedVariant = found;
+                        }
                     }
 
                     //ensure the save flag is set
