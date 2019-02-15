@@ -135,6 +135,8 @@ namespace Umbraco.Core.Migrations.Upgrade
                 .To<RadioAndCheckboxAndDropdownPropertyEditorsMigration>("{940FD19A-00A8-4D5C-B8FF-939143585726}")
             .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
 
+
+            To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}");
             //FINAL
 
 

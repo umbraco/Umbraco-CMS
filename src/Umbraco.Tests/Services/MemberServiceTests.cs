@@ -895,7 +895,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Less_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Date, ValueStorageType.Date, "number")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.DateTime, ValueStorageType.Date, "number")
             {
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything

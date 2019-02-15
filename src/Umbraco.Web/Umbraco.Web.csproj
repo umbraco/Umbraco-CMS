@@ -455,9 +455,7 @@
     <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ContentPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ContentPickerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DateConfiguration.cs" />
     <Compile Include="PropertyEditors\DateValueEditor.cs" />
-    <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="PropertyEditors\DecimalConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DropDownFlexiblePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DropDownFlexibleConfigurationEditor.cs" />
@@ -666,7 +664,6 @@
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="PropertyEditors\DateConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
     <Compile Include="Routing\RedirectTrackingComponent.cs" />
@@ -861,7 +858,6 @@
     <Compile Include="Models\Mapping\DataTypeConfigurationFieldDisplayResolver.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
