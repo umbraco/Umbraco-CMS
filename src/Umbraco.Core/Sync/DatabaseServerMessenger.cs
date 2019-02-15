@@ -534,27 +534,7 @@ namespace Umbraco.Core.Sync
         {
             var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
 
-            string distCacheFilePath;
-            switch (globalSettings.LocalTempStorageLocation)
-            {
-                case LocalTempStorage.AspNetTemp:
-                    distCacheFilePath = Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData", fileName);
-                    break;
-                case LocalTempStorage.EnvironmentTemp:
-                    var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
-                    var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
-                        //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-                        // utilizing an old path
-                        appDomainHash);
-                    distCacheFilePath = Path.Combine(cachePath, fileName);
-                    break;
-                case LocalTempStorage.Default:
-                default:
-                    var tempFolder = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "DistCache");
-                    distCacheFilePath = Path.Combine(tempFolder, fileName);
-                    break;
-            }
+            var distCacheFilePath = Path.Combine(globalSettings.LocalTempPath, "DistCache", fileName);
 
             //ensure the folder exists
             var folder = Path.GetDirectoryName(distCacheFilePath);
