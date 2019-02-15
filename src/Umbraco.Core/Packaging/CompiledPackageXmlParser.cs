@@ -43,6 +43,7 @@ namespace Umbraco.Core.Packaging
                 Name = package.Element("name")?.Value,
                 Author = author.Element("name")?.Value,
                 AuthorUrl = author.Element("website")?.Value,
+                Contributors = info.Element("contributors")?.Elements("contributor").Select(x => x.Value).ToList() ?? new List<string>(),
                 Version = package.Element("version")?.Value,
                 Readme = info.Element("readme")?.Value,
                 License = package.Element("license")?.Value,

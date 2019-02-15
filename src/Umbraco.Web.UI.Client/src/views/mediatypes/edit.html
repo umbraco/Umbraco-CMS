@@ -41,20 +41,21 @@
 
                     <umb-button
                         ng-if="model.infiniteMode"
-                        action="vm.close()"
+                        type="button"
                         button-style="link"
                         label-key="general_close"
-                        type="button">
+                        shortcut="esc"
+                        action="vm.close()">
                     </umb-button>
 
                     <umb-button
                         ng-if="!vm.page.modelsBuilder"
                         type="button"
-                        action="vm.save()"
-                        state="vm.page.saveButtonState"
                         button-style="success"
+                        state="vm.page.saveButtonState"
+                        label-key="{{vm.saveButtonKey}}"
                         shortcut="ctrl+s"
-                        label-key="{{vm.saveButtonKey}}">
+                        action="vm.save()">
                     </umb-button>
 
                     <umb-button-group

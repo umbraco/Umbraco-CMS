@@ -72,12 +72,12 @@
         </umb-editor-sub-header>
 
 
-        <div class="umb-healthcheck-group__details">
+        <div class="umb-panel-group__details">
 
-            <div class="umb-healthcheck-group__details-group">
+            <div class="umb-panel-group__details-group">
 
-                <div class="umb-healthcheck-group__details-group-title">
-                    <div class="umb-healthcheck-group__details-group-name">{{ vm.selectedGroup.name }}</div>
+                <div class="umb-panel-group__details-group-title">
+                    <div class="umb-panel-group__details-group-name">{{ vm.selectedGroup.name }}</div>
                     <umb-button
                         type="button" 
                         action="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks)"
@@ -85,33 +85,33 @@
                     </umb-button>
                 </div>
 
-                <div class="umb-healthcheck-group__details-checks">
+                <div class="umb-panel-group__details-checks">
 
-                    <div class="umb-healthcheck-group__details-check" ng-repeat="check in vm.selectedGroup.checks">
+                    <div class="umb-panel-group__details-check" ng-repeat="check in vm.selectedGroup.checks">
 
-                        <div class="umb-healthcheck-group__details-check-title">
-                            <div class="umb-healthcheck-group__details-check-name">{{ check.name }}</div>
-                            <div class="umb-healthcheck-group__details-check-description">{{ check.description }}</div>
+                        <div class="umb-panel-group__details-check-title">
+                            <div class="umb-panel-group__details-check-name">{{ check.name }}</div>
+                            <div class="umb-panel-group__details-check-description">{{ check.description }}</div>
                         </div>
 
-                        <div class="umb-healthcheck-group__details-status" ng-repeat="status in check.status">
+                        <div class="umb-panel-group__details-status" ng-repeat="status in check.status">
 
-                            <div class="umb-healthcheck-group__details-status-icon-container">
+                            <div class="umb-panel-group__details-status-icon-container">
                                 <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0"></i>
                                 <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1"></i>
                                 <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2"></i>
                                 <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType === 3"></i>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status-content">
+                            <div class="umb-panel-group__details-status-content">
 
-                                <div class="umb-healthcheck-group__details-status-text">
+                                <div class="umb-panel-group__details-status-text">
                                     <div ng-bind-html="status.message"></div>
                                     <div ng-if="status.description" ng-bind-html="status.description"></div>
                                 </div>
 
-                                <div class="umb-healthcheck-group__details-status-actions" ng-if="status.actions">
-                                    <div class="umb-healthcheck-group__details-status-action" ng-repeat="action in status.actions">
+                                <div class="umb-panel-group__details-status-actions" ng-if="status.actions">
+                                    <div class="umb-panel-group__details-status-action" ng-repeat="action in status.actions">
                                         <ng-form name="healthCheckAction">
 
                                             <div ng-if="action.valueRequired">
@@ -130,7 +130,7 @@
 
                                         </ng-form>
 
-                                        <div class="umb-healthcheck-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
+                                        <div class="umb-panel-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
                                     </div>
                                 </div>
 
@@ -139,7 +139,7 @@
                         </div>
 
                         <div ng-show="check.loading">
-                            <div class="umb-healthcheck-group__details-status-overlay"></div>
+                            <div class="umb-panel-group__details-status-overlay"></div>
                             <umb-load-indicator></umb-load-indicator>
                         </div>
 

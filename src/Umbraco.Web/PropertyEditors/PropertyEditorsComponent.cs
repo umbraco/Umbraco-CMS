@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services.Implement;

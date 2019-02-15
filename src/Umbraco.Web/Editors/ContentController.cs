@@ -2055,7 +2055,7 @@ namespace Umbraco.Web.Editors
         private ContentItemDisplay MapToDisplay(IContent content)
         {
             var display = Mapper.Map<ContentItemDisplay>(content);
-            display.AllowPreview = display.AllowPreview && content.Trashed == false;
+            display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }
 

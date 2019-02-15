@@ -48,18 +48,20 @@
     .form-search {
         flex: 1;
 
-        &__toggle{
+        &__toggle {
             margin: 10px 0;
             display: flex;
             align-items: center;
 
-            input {
-                margin: 0;
-            }
-    
             label {
+                display: flex;
+                align-items: center;
                 margin-left: 5px;
                 margin-bottom: 0;
+
+                input[type="checkbox"] {
+                    margin: 0 5px 0 0;
+                }
             }
         }
     }
@@ -142,9 +144,7 @@
 /* tab buttons */
 .umb-bottom-bar {
     background: @white;
-    -webkit-box-shadow: 0px -18px 20px rgba(255, 255, 255, 1);
-    -moz-box-shadow: 0px -18px 20px rgba(255, 255, 255, 1);
-    box-shadow: 0px -18px 20px rgba(255, 255, 255, 1);
+    box-shadow: 0 -18px 20px rgba(255, 255, 255, 1);
     border-top: 1px solid @gray-10;
     padding: 10px 0 10px 0;
     position: fixed;

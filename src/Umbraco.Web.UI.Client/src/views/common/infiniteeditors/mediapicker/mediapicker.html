@@ -32,8 +32,8 @@
                                no-dirty-check />
 
                         <div class="form-search__toggle">
-                            <input type="checkbox" ng-model="showChilds" ng-change="toggle()" />
                             <label>
+                                <input type="checkbox" ng-model="showChilds" ng-change="toggle()" />
                                 <localize key="general_includeFromsubFolders">Include subfolders in search</localize>
                             </label>
                         </div>
@@ -172,13 +172,13 @@
                 action="close()"
                 button-style="link"
                 shortcut="esc"
-                label="Close"
+                label-key="general_close"
                 type="button">
             </umb-button>
 
             <umb-button
                 button-style="success"
-                label="Select image"
+                label-key="buttons_select"
                 type="button"
                 disabled="model.selection.length === 0"
                 action="submit(model)">

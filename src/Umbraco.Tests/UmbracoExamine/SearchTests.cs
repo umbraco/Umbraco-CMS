@@ -5,6 +5,7 @@ using Examine;
 using Examine.Search;
 using NUnit.Framework;
 using Moq;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
