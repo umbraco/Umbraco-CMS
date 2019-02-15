@@ -189,6 +189,44 @@ namespace Umbraco.Web
             private set => _previewing = value;
         }
 
+        #region Urls
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(int contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, culture);
+        }
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="mode">The mode.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(int contentId, UrlProviderMode mode, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, mode, culture);
+        }
+
+        /// <summary>
+        /// Gets the absolute url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The absolute url for the content.</returns>
+        public string UrlAbsolute(int contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, true, culture);
+        }
+
+        #endregion
+
         private string PreviewToken
         {
             get

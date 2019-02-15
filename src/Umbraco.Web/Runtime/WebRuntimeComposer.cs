@@ -108,7 +108,14 @@ namespace Umbraco.Web.Runtime
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
             // so inject a "void" helper (not exactly pretty but...)
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
-                composition.Register<UmbracoHelper>();
+                composition.Register<UmbracoHelper>(factory =>
+                {
+                    var umbCtx = factory.GetInstance<UmbracoContext>();
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null,
+                        factory.GetInstance<ITagQuery>(), factory.GetInstance<ICultureDictionaryFactory>(),
+                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>(),
+                        factory.GetInstance<MembershipHelper>());
+                });
             else
                 composition.Register(_ => new UmbracoHelper());
 

@@ -15,7 +15,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Security
 {
@@ -24,7 +23,6 @@ namespace Umbraco.Web.Security
     /// </summary>
     public class MembershipHelper
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly MembershipProvider _membershipProvider;
         private readonly RoleProvider _roleProvider;
         private readonly IMemberService _memberService;
@@ -38,7 +36,8 @@ namespace Umbraco.Web.Security
 
         public MembershipHelper
         (
-            IUmbracoContextAccessor accessor,
+            HttpContextBase httpContext,
+            IPublishedMemberCache memberCache,
             MembershipProvider membershipProvider,
             RoleProvider roleProvider,
             IMemberService memberService,
@@ -49,8 +48,8 @@ namespace Umbraco.Web.Security
             ILogger logger
         )
         {
-            _umbracoContextAccessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
-
+            HttpContext = httpContext;
+            MemberCache = memberCache;
             _memberService = memberService;
             _memberTypeService = memberTypeService;
             _userService = userService;
@@ -64,9 +63,8 @@ namespace Umbraco.Web.Security
 
         #endregion
 
-        protected UmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext ?? throw new InvalidOperationException("No UmbracoContext.");
-        protected HttpContextBase HttpContext => UmbracoContext.HttpContext ?? throw new InvalidOperationException("No UmbracoContext.HttpContext.");
-        protected IPublishedMemberCache MemberCache => UmbracoContext.PublishedSnapshot.Members ?? throw new InvalidOperationException("No UmbracoContext.PUblishedSnapshot.Members.");
+        protected HttpContextBase HttpContext { get; }
+        protected IPublishedMemberCache MemberCache { get; }
 
         /// <summary>
         /// Check if a document object is protected by the "Protect Pages" functionality in umbraco
@@ -103,17 +101,9 @@ namespace Umbraco.Web.Security
         /// <param name="path"></param>
         /// <param name="roleProvider"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// This is essentially the same as the PublicAccessServiceExtensions.HasAccess however this will use the PCR cache
-        /// of the already looked up roles for the member so this doesn't need to happen more than once.
-        /// This does a safety check in case of things like unit tests where there is no PCR and if that is the case it will use
-        /// lookup the roles directly.
-        /// </remarks>
         private bool HasAccess(string path, RoleProvider roleProvider)
         {
-            return UmbracoContext.PublishedRequest == null
-                ? _publicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser)
-                : _publicAccessService.HasAccess(path, CurrentUserName, GetUserRoles);
+            return _publicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser);
         }
 
         /// <summary>
@@ -703,7 +693,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            var passwordChanger = new PasswordChanger(_logger, _userService, UmbracoContext.HttpContext);
+            var passwordChanger = new PasswordChanger(_logger, _userService, HttpContext);
             return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
 
