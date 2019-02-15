@@ -312,7 +312,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 		 */
         defaultPrevalues: function () {
             var cfg = {};
-            cfg.toolbar = ["code", "bold", "italic", "styleselect", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link", "image", "umbmediapicker", "umbembeddialog", "umbmacro"];
+            cfg.toolbar = ["ace", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link", "umbmediapicker", "umbmacro", "umbembeddialog"];
             cfg.stylesheets = [];
             cfg.maxImageSize = 500;
             return cfg;

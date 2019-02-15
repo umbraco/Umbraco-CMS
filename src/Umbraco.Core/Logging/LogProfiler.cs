@@ -41,7 +41,7 @@ namespace Umbraco.Core.Logging
         }
 
         // a lightweight disposable timer
-        private class LightDisposableTimer : DisposableObject
+        private class LightDisposableTimer : DisposableObjectSlim
         {
             private readonly Action<long> _callback;
             private readonly Stopwatch _stopwatch = Stopwatch.StartNew();

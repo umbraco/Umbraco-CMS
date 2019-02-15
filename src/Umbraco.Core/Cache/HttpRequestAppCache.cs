@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 
 namespace Umbraco.Core.Cache
@@ -110,7 +111,7 @@ namespace Umbraco.Core.Cache
 
         #region Lock
 
-        private bool _entered;
+        private const string ContextItemsLockKey = "Umbraco.Core.Cache.HttpRequestCache::LockEntered";
 
         protected override void EnterReadLock() => EnterWriteLock();
 
@@ -118,7 +119,13 @@ namespace Umbraco.Core.Cache
         {
             if (HasContextItems)
             {
-                System.Threading.Monitor.Enter(ContextItems.SyncRoot, ref _entered);
+                // note: cannot keep 'entered' as a class variable here,
+                // since there is one per request - so storing it within
+                // ContextItems - which is locked, so this should be safe
+
+                var entered = false;
+                Monitor.Enter(ContextItems.SyncRoot, ref entered);
+                ContextItems[ContextItemsLockKey] = entered;
             }
         }
 
@@ -126,11 +133,10 @@ namespace Umbraco.Core.Cache
 
         protected override void ExitWriteLock()
         {
-            if (_entered)
-            {
-                _entered = false;
-                System.Threading.Monitor.Exit(ContextItems.SyncRoot);
-            }
+            var entered = (bool?) ContextItems[ContextItemsLockKey] ?? false;
+            if (entered)
+                Monitor.Exit(ContextItems.SyncRoot);
+            ContextItems.Remove(ContextItemsLockKey);
         }
 
         #endregion

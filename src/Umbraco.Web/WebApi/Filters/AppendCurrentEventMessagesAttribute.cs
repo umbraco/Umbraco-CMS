@@ -18,7 +18,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (context.Response == null) return;
             if (context.Request.Method == HttpMethod.Get) return;
-            if (UmbracoContext.Current == null) return;
+            if (Current.UmbracoContext == null) return;
 
             var obj = context.Response.Content as ObjectContent;
             if (obj == null) return;

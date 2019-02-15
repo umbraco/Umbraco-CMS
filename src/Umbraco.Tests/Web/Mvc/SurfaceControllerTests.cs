@@ -40,16 +40,19 @@ namespace Umbraco.Tests.Web.Mvc
         public void Can_Construct_And_Get_Result()
         {
             var globalSettings = TestObjects.GetGlobalSettings();
-            var umbracoContext = UmbracoContext.EnsureContext(
+
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
-                new Mock<HttpContextBase>().Object,
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true);
+                new TestDefaultCultureAccessor(),
+                TestObjects.GetUmbracoSettings(),
+                globalSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
+            var umbracoContext = umbracoContextReference.UmbracoContext;
 
             var ctrl = new TestSurfaceController(umbracoContext);
 
@@ -62,22 +65,25 @@ namespace Umbraco.Tests.Web.Mvc
         public void Umbraco_Context_Not_Null()
         {
             var globalSettings = TestObjects.GetGlobalSettings();
-            var umbCtx = UmbracoContext.EnsureContext(
+
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
-                new Mock<HttpContextBase>().Object,
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true);
+                new TestDefaultCultureAccessor(),
+                TestObjects.GetUmbracoSettings(),
+                globalSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
+            var umbCtx = umbracoContextReference.UmbracoContext;
 
             var ctrl = new TestSurfaceController(umbCtx);
 
             Assert.IsNotNull(ctrl.UmbracoContext);
         }
-        
+
         [Test]
         public void Can_Lookup_Content()
         {
@@ -88,16 +94,18 @@ namespace Umbraco.Tests.Web.Mvc
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             var globalSettings = TestObjects.GetGlobalSettings();
 
-            var umbracoContext = UmbracoContext.EnsureContext(
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
-                new Mock<HttpContextBase>().Object,
                 publishedSnapshotService.Object,
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true);
+                new TestDefaultCultureAccessor(),
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
+                globalSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
+            var umbracoContext = umbracoContextReference.UmbracoContext;
 
             var helper = new UmbracoHelper(
                 umbracoContext,
@@ -121,16 +129,18 @@ namespace Umbraco.Tests.Web.Mvc
             var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "Auto");
             var globalSettings = TestObjects.GetGlobalSettings();
 
-            var umbracoContext = UmbracoContext.EnsureContext(
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
-                new Mock<HttpContextBase>().Object,
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true);
+                new TestDefaultCultureAccessor(),
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
+                globalSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
+            var umbracoContext = umbracoContextReference.UmbracoContext;
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 

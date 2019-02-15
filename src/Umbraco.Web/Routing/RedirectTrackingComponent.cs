@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -10,7 +10,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Routing
 {
@@ -38,9 +38,9 @@ namespace Umbraco.Web.Routing
         {
             get
             {
-                var oldRoutes = (Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>) UmbracoContext.Current.HttpContext.Items[ContextKey3];
+                var oldRoutes = (Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>) Current.UmbracoContext.HttpContext.Items[ContextKey3];
                 if (oldRoutes == null)
-                    UmbracoContext.Current.HttpContext.Items[ContextKey3] = oldRoutes = new Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>();
+                    Current.UmbracoContext.HttpContext.Items[ContextKey3] = oldRoutes = new Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>();
                 return oldRoutes;
             }
         }
@@ -58,27 +58,27 @@ namespace Umbraco.Web.Routing
 
         private static bool LockedEvents
         {
-            get => Moving && UmbracoContext.Current.HttpContext.Items[ContextKey2] != null;
+            get => Moving && Current.UmbracoContext.HttpContext.Items[ContextKey2] != null;
             set
             {
                 if (Moving && value)
-                    UmbracoContext.Current.HttpContext.Items[ContextKey2] = true;
+                    Current.UmbracoContext.HttpContext.Items[ContextKey2] = true;
                 else
-                    UmbracoContext.Current.HttpContext.Items.Remove(ContextKey2);
+                    Current.UmbracoContext.HttpContext.Items.Remove(ContextKey2);
             }
         }
 
         private static bool Moving
         {
-            get => UmbracoContext.Current.HttpContext.Items[ContextKey1] != null;
+            get => Current.UmbracoContext.HttpContext.Items[ContextKey1] != null;
             set
             {
                 if (value)
-                    UmbracoContext.Current.HttpContext.Items[ContextKey1] = true;
+                    Current.UmbracoContext.HttpContext.Items[ContextKey1] = true;
                 else
                 {
-                    UmbracoContext.Current.HttpContext.Items.Remove(ContextKey1);
-                    UmbracoContext.Current.HttpContext.Items.Remove(ContextKey2);
+                    Current.UmbracoContext.HttpContext.Items.Remove(ContextKey1);
+                    Current.UmbracoContext.HttpContext.Items.Remove(ContextKey2);
                 }
             }
         }
@@ -164,14 +164,19 @@ namespace Umbraco.Web.Routing
         {
             if (LockedEvents) return;
 
-            var contentCache = UmbracoContext.Current.ContentCache;
+            var contentCache = Current.UmbracoContext.ContentCache;
             foreach (var entity in args.PublishedEntities)
             {
                 var entityContent = contentCache.GetById(entity.Id);
                 if (entityContent == null) continue;
+
+                // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures) 
+                var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Select(c => c.Key).ToArray()
+                    ?? new[] {(string) null};
                 foreach (var x in entityContent.DescendantsOrSelf())
                 {
-                    var cultures = x.Cultures.Any() ? x.Cultures.Select(c => c.Key) : new[] {(string) null};
+                    // if this entity defines specific cultures, use those instead of the default ones
+                    var cultures = x.Cultures.Any() ? x.Cultures.Select(c => c.Key) : defaultCultures;
 
                     foreach (var culture in cultures)
                     {
@@ -205,7 +210,7 @@ namespace Umbraco.Web.Routing
 
         private static void CreateRedirect(int contentId, string culture, Guid contentKey, string oldRoute)
         {
-            var contentCache = UmbracoContext.Current.ContentCache;
+            var contentCache = Current.UmbracoContext.ContentCache;
             var newRoute = contentCache.GetRouteById(contentId, culture);
             if (IsNotRoute(newRoute) || oldRoute == newRoute) return;
             var redirectUrlService = Current.Services.RedirectUrlService;

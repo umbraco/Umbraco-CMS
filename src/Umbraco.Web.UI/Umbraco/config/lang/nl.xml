@@ -1397,7 +1397,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="redirectedTo">Doorgestuurd naar</key>
     <key alias="noRedirects">Er zijn geen redirects</key>
     <key alias="noRedirectsDescription">Er wordt automatisch een redirect aangemaakt als een gepubliceerde pagina hernoemd of verplaatst wordt.</key>
-    <key alias="removeButton">Verwijder</key>
     <key alias="confirmRemove">Weet je zeker dat je de redirect van '%0%' naar '%1%' wilt verwijderen?</key>
     <key alias="redirectRemoved">Redirect URL verwijderd.</key>
     <key alias="redirectRemoveError">Fout bij verwijderen redirect URL.</key>

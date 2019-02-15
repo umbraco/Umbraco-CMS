@@ -75,7 +75,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     // get the content properties to build the anchor name list
                     contentResource.getById(id).then(function (resp) {
                         $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-                        $scope.model.target.url = resp.urls[0];
+                        $scope.model.target.url = resp.urls[0].text;
                     });
                 }
             } else if ($scope.model.target.url.length) {

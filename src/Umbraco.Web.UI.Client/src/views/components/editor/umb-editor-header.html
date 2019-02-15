@@ -1,4 +1,4 @@
-﻿<div data-element="editor-header" class="umb-editor-header">
+﻿<div data-element="editor-header" class="umb-editor-header" ng-class="{'-split-view-active': splitViewOpen === true}">
 
     <div class="flex items-center" style="height: 100%;">
 
@@ -20,7 +20,7 @@
                 </div>
             </ng-form>
 
-            <div id="nameField" style="flex: 1 1 auto;">
+            <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1 1 auto;">
                 <div class="umb-editor-header__name-wrapper">
                     <ng-form name="headerNameForm">
                         <input data-element="editor-name-field"
@@ -69,7 +69,7 @@
 
         </div>
 
-        <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
+        <div ng-if="navigation && splitViewOpen !== true">
             <umb-editor-navigation
                 data-element="editor-sub-views"
                 navigation="navigation"

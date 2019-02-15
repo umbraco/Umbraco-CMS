@@ -88,6 +88,9 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "author")]
         public string Author { get; set; }
 
+        [DataMember(Name = "contributors")]
+        public IList<string> Contributors { get; set; }
+
         [DataMember(Name = "iconUrl")]
         public string IconUrl { get; set; }
     }

@@ -5,7 +5,6 @@ using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
@@ -16,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Composing.CompositionExtensions;
 
 namespace Umbraco.Tests.Packaging
 {

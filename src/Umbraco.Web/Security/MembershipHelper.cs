@@ -703,7 +703,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            var passwordChanger = new PasswordChanger(_logger, _userService, Web.Composing.Current.UmbracoContext.HttpContext);
+            var passwordChanger = new PasswordChanger(_logger, _userService, UmbracoContext.HttpContext);
             return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
 

@@ -158,7 +158,7 @@
                                 ng-model="node.template"
                                 ng-options="key as value for (key, value) in availableTemplates"
                                 ng-change="updateTemplate(node.template)">
-                            <option value=""><localize key="general_choose">Choose</localize>...</option>
+                            <option value="">{{chooseLabel}}...</option>
                         </select>
                         <a href="" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
                             <localize key="general_open">Open</localize>

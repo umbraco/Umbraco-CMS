@@ -60,9 +60,9 @@
                         shortcut="ctrl+s"
                         add-ellipsis="{{page.saveButtonEllipsis}}">
                     </umb-button>
-
-                    <umb-button-group
-                        ng-if="defaultButton && !content.trashed"
+                    
+                    <umb-button-group 
+                        ng-if="defaultButton && !content.trashed && !content.isElement && !infiniteModel.infiniteMode" 
                         button-style="success"
                         default-button="defaultButton"
                         sub-buttons="subButtons"
