@@ -95,6 +95,7 @@ namespace Umbraco.Web
 
             // ok, process
 
+            // TODO: should we move this to after we've ensured we are processing a routable page?
             // ensure there's an UmbracoContext registered for the current request
             // registers the context reference so its disposed at end of request
             var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext(httpContext);

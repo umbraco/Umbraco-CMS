@@ -293,7 +293,6 @@ namespace Umbraco.Core.Configuration
                     case LocalTempStorage.AspNetTemp:
                         return System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
                     case LocalTempStorage.EnvironmentTemp:
-                        // TODO: why has this to be repeated everywhere?!
                         // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
                         // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
                         // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
