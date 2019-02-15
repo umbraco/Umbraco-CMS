@@ -169,9 +169,14 @@ namespace Umbraco.Web.Routing
             {
                 var entityContent = contentCache.GetById(entity.Id);
                 if (entityContent == null) continue;
+
+                // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures) 
+                var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Select(c => c.Key).ToArray()
+                    ?? new[] {(string) null};
                 foreach (var x in entityContent.DescendantsOrSelf())
                 {
-                    var cultures = x.Cultures.Any() ? x.Cultures.Select(c => c.Key) : new[] {(string) null};
+                    // if this entity defines specific cultures, use those instead of the default ones
+                    var cultures = x.Cultures.Any() ? x.Cultures.Select(c => c.Key) : defaultCultures;
 
                     foreach (var culture in cultures)
                     {

@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -260,7 +261,7 @@ namespace Umbraco.Tests.Web
                 .Setup(x => x.GetInstance(typeof(TypeLoader)))
                 .Returns(new TypeLoader(
                     NoAppCache.Instance,
-                    LocalTempStorage.Default,
+                    IOHelper.MapPath("~/App_Data/TEMP"),
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
                     )
                 );

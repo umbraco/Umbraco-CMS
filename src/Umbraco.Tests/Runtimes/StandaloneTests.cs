@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Runtimes
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = new AppCaches(); // FIXME: has HttpRuntime stuff?
             var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
-            var typeLoader = new TypeLoader(appCaches.RuntimeCache, LocalTempStorage.Default, profilingLogger);
+            var typeLoader = new TypeLoader(appCaches.RuntimeCache, IOHelper.MapPath("~/App_Data/TEMP"), profilingLogger);
             var mainDom = new SimpleMainDom();
             var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()));
 
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.Runtimes
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
             var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
-            var typeLoader = new TypeLoader(appCaches.RuntimeCache, LocalTempStorage.Default, profilingLogger);
+            var typeLoader = new TypeLoader(appCaches.RuntimeCache, IOHelper.MapPath("~/App_Data/TEMP"), profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();
             Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);
             var mainDom = Mock.Of<IMainDom>();

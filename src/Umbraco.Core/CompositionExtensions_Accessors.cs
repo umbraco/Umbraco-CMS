@@ -11,12 +11,12 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 
-namespace Umbraco.Core.Compose
+namespace Umbraco.Core
 {
     /// <summary>
     /// Provides extension methods to the <see cref="Composition"/> class.
     /// </summary>
-    public static class CompositionExtensions
+    public static partial class CompositionExtensions
     {
         #region FileSystems
 
