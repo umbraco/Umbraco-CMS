@@ -203,6 +203,17 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Gets the url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(Guid contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, culture);
+        }
+
+        /// <summary>
         /// Gets the url of a content identified by its identifier, in a specified mode.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
@@ -215,12 +226,35 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="mode">The mode.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(Guid contentId, UrlProviderMode mode, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, mode, culture);
+        }
+
+        /// <summary>
         /// Gets the absolute url of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
         /// <returns>The absolute url for the content.</returns>
         public string UrlAbsolute(int contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, true, culture);
+        }
+
+        /// <summary>
+        /// Gets the absolute url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The absolute url for the content.</returns>
+        public string UrlAbsolute(Guid contentId, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, true, culture);
         }
