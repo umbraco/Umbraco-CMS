@@ -234,12 +234,7 @@ namespace Umbraco.Web.Runtime
             // location to be there
             if (globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
             {
-                var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
-                var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
-                    //include the AppDomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-                    // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-                    // utilizing an old path
-                    appDomainHash);
+                var cachePath = globalSettings.LocalTempPath;
 
                 //set the file map and composite file default location to the %temp% location
                 BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder

@@ -112,8 +112,7 @@ namespace Umbraco.Core.Runtime
                 var configs = GetConfigs();
 
                 // type loader
-                var localTempStorage = configs.Global().LocalTempStorageLocation;
-                var typeLoader = new TypeLoader(appCaches.RuntimeCache, localTempStorage, ProfilingLogger);
+                var typeLoader = new TypeLoader(appCaches.RuntimeCache, configs.Global().LocalTempPath, ProfilingLogger);
 
                 // runtime state
                 // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'

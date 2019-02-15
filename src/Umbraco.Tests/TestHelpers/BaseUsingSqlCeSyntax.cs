@@ -8,6 +8,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.Components;
 
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var typeLoader = new TypeLoader(NoAppCache.Instance,
-                LocalTempStorage.Default,
+                IOHelper.MapPath("~/App_Data/TEMP"),
                 logger,
                 false);
 
