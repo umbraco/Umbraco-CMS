@@ -15,12 +15,12 @@ namespace Umbraco.Web.Models
     [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-
         protected PublishedContentBase(IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
+            UmbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
         }
+
+        protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
         #region ContentType
 
@@ -86,50 +86,52 @@ namespace Umbraco.Web.Models
         /// </remarks>
         public virtual string GetUrl(string culture = null) // TODO: consider .GetCulture("fr-FR").Url
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-                switch (ItemType)
-                {
-                    case PublishedItemType.Content:
-                        if (umbracoContext == null)
-                            throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext is null.");
-                        if (umbracoContext.UrlProvider == null)
-                            throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.UrlProvider is null.");
-                        return umbracoContext.UrlProvider.GetUrl(this, culture);
+            switch (ItemType)
+            {
+                case PublishedItemType.Content:
+                    var umbracoContext = UmbracoContextAccessor.UmbracoContext;
 
-                    case PublishedItemType.Media:
-                        var prop = GetProperty(Constants.Conventions.Media.File);
-                        if (prop?.GetValue() == null)
-                        {
-                            return string.Empty;
-                        }
+                    if (umbracoContext == null)
+                        throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext is null.");
+                    if (umbracoContext.UrlProvider == null)
+                        throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.UrlProvider is null.");
 
-                        var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
+                    return umbracoContext.UrlProvider.GetUrl(this, culture);
 
-                        // TODO: consider implementing media url providers
-                        // note: that one does not support variations
-                        //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
-                        // want to return the normal URL and the cropper stores data as json
-                        switch (propType.EditorAlias)
-                        {
-                            case Constants.PropertyEditors.Aliases.UploadField:
-                                return prop.GetValue().ToString();
-                                break;
-                            case Constants.PropertyEditors.Aliases.ImageCropper:
-                                //get the url from the json format
-
-                                var stronglyTyped = prop.GetValue() as ImageCropperValue;
-                                if (stronglyTyped != null)
-                                {
-                                    return stronglyTyped.Src;
-                                }
-                                return prop.GetValue()?.ToString();
-                        }
-
+                case PublishedItemType.Media:
+                    var prop = GetProperty(Constants.Conventions.Media.File);
+                    if (prop?.GetValue() == null)
+                    {
                         return string.Empty;
+                    }
 
-                    default:
-                        throw new NotSupportedException();
-                }
+                    var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
+
+                    // TODO: consider implementing media url providers
+                    // note: that one does not support variations
+                    //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
+                    // want to return the normal URL and the cropper stores data as json
+                    switch (propType.EditorAlias)
+                    {
+                        case Constants.PropertyEditors.Aliases.UploadField:
+
+                            return prop.GetValue().ToString();
+                        case Constants.PropertyEditors.Aliases.ImageCropper:
+                            //get the url from the json format
+
+                            var stronglyTyped = prop.GetValue() as ImageCropperValue;
+                            if (stronglyTyped != null)
+                            {
+                                return stronglyTyped.Src;
+                            }
+                            return prop.GetValue()?.ToString();
+                    }
+
+                    return string.Empty;
+
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
         /// <inheritdoc />
