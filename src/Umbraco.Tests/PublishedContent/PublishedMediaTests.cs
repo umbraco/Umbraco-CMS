@@ -23,6 +23,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
+using Umbraco.Tests.Testing.Objects.Accessors;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -44,6 +45,8 @@ namespace Umbraco.Tests.PublishedContent
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
+
+            Composition.RegisterUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
         }
 
         private IMediaType MakeNewMediaType(IUser user, string text, int parentId = -1)
@@ -126,7 +129,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -156,7 +159,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
 
                 //ensure it is found
                 var publishedMedia = cache.GetById(3113);
@@ -203,7 +206,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -231,7 +234,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -259,7 +262,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -288,7 +291,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(3113);
@@ -314,7 +317,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(3113);
