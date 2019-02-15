@@ -232,7 +232,7 @@ angular.module("umbraco.directives")
 					var throttledResizing = _.throttle(function(){
 						resizeImageToScale(scope.dimensions.scale.current);
 						calculateCropBox();
-					}, 100);
+					}, 15);
 
 
 					//happens when we change the scale

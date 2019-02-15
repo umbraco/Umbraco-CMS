@@ -12,10 +12,10 @@
 
             <div class="imagecropper clearfix">
 
-                <div ng-if="currentCrop" style="float:left; max-width: 100%;" class="clearfix">
+                <div ng-if="currentCrop || pendingCrop" style="float:left; max-width: 100%;" class="clearfix">
                     <div class="umb-cropper__container">
 
-                        <div>
+                        <div ng-if="currentCrop">
                             <umb-image-crop height="{{currentCrop.height}}"
                                             width="{{currentCrop.width}}"
                                             crop="currentCrop.coordinates"
@@ -25,7 +25,7 @@
                             </umb-image-crop>
                         </div>
 
-                        <div class="button-drawer">
+                        <div class="button-drawer" ng-if="currentCrop">
                             <button class="btn btn-link" ng-click="reset()"><localize key="imagecropper_reset">Reset this crop</localize></button>
                             <button class="btn" ng-click="close()"><localize key="imagecropper_undoEditCrop">Undo edits</localize></button>
                             <button class="btn btn-success" ng-click="done()"><localize key="imagecropper_updateEditCrop">Done</localize></button>
@@ -34,7 +34,7 @@
                     </div>
                 </div>
 
-                <div ng-if="!currentCrop" class="umb-cropper-imageholder clearfix">
+                <div ng-if="!currentCrop && !pendingCrop" class="umb-cropper-imageholder clearfix">
                     <umb-image-gravity src="imageSrc"
                                        center="model.value.focalPoint"
                                        on-value-changed="focalPointChanged(left, top)"

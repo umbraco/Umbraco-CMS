@@ -1,6 +1,6 @@
 angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
-    function ($scope, fileManager) {
+    function ($scope, fileManager, $timeout) {
 
         var config = angular.copy($scope.model.config);
 
@@ -97,7 +97,7 @@ angular.module('umbraco')
                 if (angular.isString($scope.model.value)) {
                     setModelValueWithSrc($scope.model.value);
                 }
-                else if ($scope.model.value.crops) {
+                else {
                     //sync any config changes with the editor and drop outdated crops
                     _.each($scope.model.value.crops, function (saved) {
                         var configured = _.find(config.crops, function (item) { return item.alias === saved.alias });
@@ -127,15 +127,32 @@ angular.module('umbraco')
 
         /**
          * crop a specific crop
-         * @param {any} crop
+         * @param {any} targetCrop
          */
-        function crop(crop) {
-            // clone the crop so we can discard the changes
-            $scope.currentCrop = angular.copy(crop);
-            $scope.currentPoint = null;
+        function crop(targetCrop) {
+            if (!$scope.currentCrop) {
+                // clone the crop so we can discard the changes
+                $scope.currentCrop = angular.copy(targetCrop);
+                $scope.currentPoint = null;
 
-            //set form to dirty to track changes
-            $scope.imageCropperForm.$setDirty();
+                //set form to dirty to track changes
+                $scope.imageCropperForm.$setDirty();
+            }
+            else {
+                // we have a crop open already - close the crop (this will discard any changes made)
+                close();
+
+                // the crop editor needs a digest cycle to close down properly, otherwise its state 
+                // is reused for the new crop... and that's really bad
+                $timeout(function () {
+                    crop(targetCrop);
+                    $scope.pendingCrop = false;
+                });
+
+                // this is necessary to keep the screen from flickering too badly while we wait for the new crop to open
+                // - check the view for its usage (basically it makes sure we keep the space reserved for the new crop)
+                $scope.pendingCrop = true;
+            }
         };
 
         /** done cropping */

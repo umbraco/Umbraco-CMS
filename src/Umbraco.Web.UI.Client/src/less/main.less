@@ -98,10 +98,6 @@ h5.-black {
   display: block;
   color: @gray-8;
   text-decoration: none;
-  -webkit-transition: all 0.3s ease-in-out;
-  -moz-transition: all 0.3s ease-in-out;
-  -ms-transition: all 0.3s ease-in-out;
-  -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
 }
 
@@ -379,8 +375,6 @@ table thead a {
   height: 100%;
   z-index: 5999;
   opacity: .6;
-  filter: alpha(opacity=6);
-  -webkit-box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,0.2),inset 0 0 20px 41px rgba(0,0,0,0.2);
   box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,0.2),inset 0 0 20px 41px rgba(0,0,0,0.2);
 }
 
@@ -495,95 +489,32 @@ table thead a {
 // ------------------------
 
 .umb-loader{
-background-color: @blue;
-margin-top:0;
-margin-left:-100%;
--moz-animation-name:bounce_loadingProgressG;
--moz-animation-duration:1s;
--moz-animation-iteration-count:infinite;
--moz-animation-timing-function:linear;
--webkit-animation-name:bounce_loadingProgressG;
--webkit-animation-duration:1s;
--webkit-animation-iteration-count:infinite;
--webkit-animation-timing-function:linear;
--ms-animation-name:bounce_loadingProgressG;
--ms-animation-duration:1s;
--ms-animation-iteration-count:infinite;
--ms-animation-timing-function:linear;
--o-animation-name:bounce_loadingProgressG;
--o-animation-duration:1s;
--o-animation-iteration-count:infinite;
--o-animationtiming-function:linear;
-animation-name:bounce_loadingProgressG;
-animation-duration:1s;
-animation-iteration-count:infinite;
-animation-timing-function:linear;
-width:100%;
-height:2px;
+    background-color: @blue;
+    margin-top:0;
+    margin-left:-100%;
+    animation-name:bounce_loadingProgressG;
+    animation-duration:1s;
+    animation-iteration-count:infinite;
+    animation-timing-function:linear;
+    width:100%;
+    height:2px;
 }
 
-
-    @-moz-keyframes bounce_loadingProgressG{
+@keyframes bounce_loadingProgressG{
     0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @-webkit-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @-ms-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @-o-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
+        margin-left:-100%;
     }
     100%{
-    margin-left:100%;
+        margin-left:100%;
     }
 }
 
 .umb-loader-wrapper {
-
     position: absolute;
     right: 0;
     left: 0;
     margin: 10px 0;
     overflow: hidden;
-
 }
 
 .umb-loader-wrapper.-bottom {
@@ -663,7 +594,6 @@ input[type=checkbox]:checked + .input-label--small {
 
 .visuallyhidden{
     position: absolute !important;
-	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
 	clip: rect(1px, 1px, 1px, 1px);
 	padding:0 !important;
 	border:0 !important;

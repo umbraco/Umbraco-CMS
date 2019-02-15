@@ -96,6 +96,11 @@ namespace Umbraco.Web.Security
 
             await EnsureValidSessionId(context);
 
+            if (context?.Identity == null)
+            {
+                context?.OwinContext.Authentication.SignOut(context.Options.AuthenticationType);
+                return;
+            }
             await base.ValidateIdentity(context);
         }
 

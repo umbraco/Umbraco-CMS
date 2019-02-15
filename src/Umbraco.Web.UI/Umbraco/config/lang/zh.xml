@@ -1262,7 +1262,6 @@
     <key alias="redirectedTo">已重定向至</key>
     <key alias="noRedirects">未进行重定向</key>
     <key alias="noRedirectsDescription">当已发布的页重命名或移动时, 将自动对新页进行重定向。</key>
-    <key alias="removeButton">删除</key>
     <key alias="confirmRemove">确实要删除 "%0%" 到 "%1%" 的重定向吗？</key>
     <key alias="redirectRemoved">重定向URL已删除。</key>
     <key alias="redirectRemoveError">删除重定向 url 时出错.</key>

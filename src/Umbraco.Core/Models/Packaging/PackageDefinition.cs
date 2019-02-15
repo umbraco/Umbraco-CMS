@@ -25,6 +25,7 @@ namespace Umbraco.Core.Models.Packaging
                 Actions = compiled.Actions,
                 Author = compiled.Author,
                 AuthorUrl = compiled.AuthorUrl,
+                Contributors = compiled.Contributors,
                 PackageView = compiled.PackageView,
                 IconUrl = compiled.IconUrl,
                 License = compiled.License,
@@ -78,6 +79,9 @@ namespace Umbraco.Core.Models.Packaging
         [Required]
         [Url]
         public string AuthorUrl { get; set; } = string.Empty;
+
+        [DataMember(Name = "contributors")]
+        public IList<string> Contributors { get; set; } = new List<string>();
 
         [DataMember(Name = "license")]
         public string License { get; set; } = "MIT License";

@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Components;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
@@ -10,6 +10,7 @@ using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Search;
 using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
@@ -108,6 +109,22 @@ namespace Umbraco.Web
         /// <param name="composition">The composition.</param>
         public static EmbedProvidersCollectionBuilder OEmbedProviders(this Composition composition)
             => composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the back office tree collection builder
+        /// </summary>
+        /// <param name="composition"></param>
+        /// <returns></returns>
+        public static TreeCollectionBuilder Trees(this Composition composition)
+            => composition.WithCollectionBuilder<TreeCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the back office searchable tree collection builder
+        /// </summary>
+        /// <param name="composition"></param>
+        /// <returns></returns>
+        public static SearchableTreeCollectionBuilder SearchableTrees(this Composition composition)
+            => composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
 
         #endregion
 
