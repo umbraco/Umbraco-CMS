@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Routing
 
             response.Clear();
 
-            var frequest = UmbracoContext.Current.PublishedRequest;
+            var frequest = Current.UmbracoContext.PublishedRequest;
             var reason = "Cannot render the page at url '{0}'.";
             if (frequest.HasPublishedContent == false)
                 reason = "No umbraco document matches the url '{0}'.";
@@ -37,7 +38,7 @@ namespace Umbraco.Web.Routing
 
             response.Write("<html><body><h1>Page not found</h1>");
             response.Write("<h3>");
-            response.Write(string.Format(reason, HttpUtility.HtmlEncode(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery)));
+            response.Write(string.Format(reason, HttpUtility.HtmlEncode(Current.UmbracoContext.OriginalRequestUrl.PathAndQuery)));
             response.Write("</h3>");
             if (string.IsNullOrWhiteSpace(_message) == false)
                 response.Write("<p>" + _message + "</p>");

@@ -22,6 +22,7 @@
         vm.openViewPicker = openViewPicker;
         vm.removePackageView = removePackageView;
         vm.downloadFile = downloadFile;
+        vm.contributorsEditor = null;
 
         vm.buttonLabel = "";
 
@@ -34,6 +35,9 @@
                 //pre populate package with some values
                 packageResource.getEmpty().then(scaffold => {
                     vm.package = scaffold;
+
+                    buildContributorsEditor(vm.package);
+
                     vm.loading = false;
                 });
 
@@ -44,6 +48,9 @@
                 // load package
                 packageResource.getCreatedById(packageId).then(createdPackage => {
                     vm.package = createdPackage;
+
+                    buildContributorsEditor(vm.package);
+
                     vm.loading = false;
                     // get render model for content node
                     if(vm.package.contentNodeId) {
@@ -143,6 +150,10 @@
 
         function createOrUpdatePackage(editPackageForm) {
 
+            let contributors = vm.contributorsEditor.value.map(o => o.value);
+
+            vm.package.contributors = contributors;
+
             if (formHelper.submitForm({ formCtrl: editPackageForm, scope: $scope })) {
 
                 vm.buttonState = "busy";
@@ -235,6 +246,13 @@
                 treeAlias: "files",
                 entityType: "file",
                 onlyInitialized: false,
+                filter: function (i) {
+                    if (i.name.indexOf(".html") === -1 &&
+                        i.name.indexOf(".htm") === -1) {
+                        return true;
+                    }
+                },
+                filterCssClass: "not-allowed",
                 select: function(node) {
                     const id = unescape(node.id);
                     vm.package.packageView = id;
@@ -249,6 +267,35 @@
 
         function removePackageView() {
             vm.package.packageView = null;
+        }
+
+        function buildContributorsEditor(pkg) {
+            
+            vm.contributorsEditor = {
+                alias: "contributors",
+                editor: "Umbraco.MultipleTextstring",
+                label: "Contributors",
+                description: "",
+                hideLabel: true,
+                view: "views/propertyeditors/multipletextbox/multipletextbox.html",
+                value: getVals(pkg.contributors),
+                validation: {
+                    mandatory: false,
+                    pattern: null
+                },
+                config: {
+                    min: 0,
+                    max: 0
+                }
+            };
+        }
+
+        function getVals(array) {
+            var vals = [];
+            for (var i = 0; i < array.length; i++) {
+                vals.push({ value: array[i] });
+            }
+            return vals;
         }
 
         onInit();

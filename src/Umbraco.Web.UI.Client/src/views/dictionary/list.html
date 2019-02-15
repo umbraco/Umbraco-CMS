@@ -1,4 +1,5 @@
 ﻿<div ng-controller="Umbraco.Editors.Dictionary.ListController as vm">
+
     <umb-load-indicator ng-if="vm.loading">
     </umb-load-indicator>
 
@@ -12,12 +13,22 @@
         </umb-editor-header>
         <umb-editor-container>
 
-            <table class="table table-hover" ng-if="vm.items">
+            <umb-box ng-if="vm.items.length === 0">
+                <umb-box-content class="block-form">
+
+                    <umb-empty-state size="small">
+                        <localize key="dictionary_noItems">There are no dictionary items.</localize>
+                    </umb-empty-state>
+
+                </umb-box-content>
+            </umb-box>
+
+            <table class="table table-hover" ng-if="vm.items.length > 0">
                 <thead>
                     <tr>
                         <th><localize key="general_name">Name</localize></th>
                         <th ng-repeat="column in vm.items[0].translations">{{column.displayName}}</th>
-                    </th>
+                    </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="item in vm.items track by item.id" ng-click="vm.clickItem(item.id)" style="cursor: pointer;">
@@ -31,7 +42,7 @@
                     </tr>
                 </tbody>
             </table>
-                
+
         </umb-editor-container>
     </umb-editor-view>
 </div>

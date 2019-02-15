@@ -6,6 +6,7 @@ using System.Web.WebPages;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Macros
 {
@@ -28,9 +29,9 @@ namespace Umbraco.Web.Macros
 
             _getUmbracoContext = () =>
             {
-                if (UmbracoContext.Current == null)
+                if (Current.UmbracoContext == null)
                     throw new InvalidOperationException($"The {GetType()} cannot execute with a null UmbracoContext.Current reference.");
-                return UmbracoContext.Current;
+                return Current.UmbracoContext;
             };
         }
 

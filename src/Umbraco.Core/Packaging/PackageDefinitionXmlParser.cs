@@ -39,6 +39,7 @@ namespace Umbraco.Core.Packaging
                 LicenseUrl = xml.Element("license")?.AttributeValue<string>("url") ?? string.Empty,
                 Author = xml.Element("author")?.Value ?? string.Empty,
                 AuthorUrl = xml.Element("author")?.AttributeValue<string>("url") ?? string.Empty,
+                Contributors = xml.Element("contributors")?.Elements("contributor").Select(x => x.Value).ToList() ?? new List<string>(),
                 Readme = xml.Element("readme")?.Value ?? string.Empty,
                 Actions = xml.Element("actions")?.ToString(SaveOptions.None) ?? "<actions></actions>", //take the entire outer xml value
                 ContentNodeId = xml.Element("content")?.AttributeValue<string>("nodeId") ?? string.Empty,
@@ -86,6 +87,8 @@ namespace Umbraco.Core.Packaging
                 new XElement("author",
                     new XCData(def.Author ?? string.Empty),
                     new XAttribute("url", def.AuthorUrl ?? string.Empty)),
+
+                new XElement("contributors", (def.Contributors ?? Array.Empty<string>()).Where(x => !x.IsNullOrWhiteSpace()).Select(x => new XElement("contributor", x))),
 
                 new XElement("readme", new XCData(def.Readme ?? string.Empty)),
                 actionsXml,

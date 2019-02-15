@@ -75,7 +75,7 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrEmpty(key))
                 return Request
-                    .CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO: translate
+                    .CreateNotificationValidationErrorResponse("Key can not be empty."); // TODO: translate
 
             if (Services.LocalizationService.DictionaryItemExists(key))
             {

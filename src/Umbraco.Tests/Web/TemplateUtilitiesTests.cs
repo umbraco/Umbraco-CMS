@@ -96,20 +96,19 @@ namespace Umbraco.Tests.Web
             var snapshotService = Mock.Of<IPublishedSnapshotService>();
             Mock.Get(snapshotService).Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot);
 
-            using (var umbCtx = UmbracoContext.EnsureContext(
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor,
-                Mock.Of<HttpContextBase>(),
                 snapshotService,
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                //setup a quick mock of the WebRouting section
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
-                //pass in the custom url provider
-                new[]{ testUrlProvider.Object },
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true))
+                new TestDefaultCultureAccessor(),
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
+                globalSettings,
+                new[] { testUrlProvider.Object },
+                Mock.Of<IUserService>());
+
+            using (var reference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>()))
             {
-                var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider);
+                var output = TemplateUtilities.ParseInternalLinks(input, reference.UmbracoContext.UrlProvider);
 
                 Assert.AreEqual(result, output);
             }

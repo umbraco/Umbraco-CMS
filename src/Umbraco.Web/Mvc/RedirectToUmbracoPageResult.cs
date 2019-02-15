@@ -56,7 +56,7 @@ namespace Umbraco.Web.Mvc
                 if (_publishedContent != null) return _publishedContent;
 
                 //need to get the URL for the page
-                _publishedContent = UmbracoContext.Current.ContentCache.GetById(_pageId);
+                _publishedContent = Current.UmbracoContext.ContentCache.GetById(_pageId);
 
                 return _publishedContent;
             }
@@ -124,7 +124,7 @@ namespace Umbraco.Web.Mvc
         /// Creates a new RedirectToUmbracoResult
         /// </summary>
         /// <param name="pageId"></param>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         public RedirectToUmbracoPageResult(int pageId, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _pageId = pageId;
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="pageId"></param>
         /// <param name="queryStringValues"></param>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         public RedirectToUmbracoPageResult(int pageId, NameValueCollection queryStringValues, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _pageId = pageId;
@@ -149,7 +149,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="pageId"></param>
         /// <param name="queryString"></param>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         public RedirectToUmbracoPageResult(int pageId, string queryString, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _pageId = pageId;
@@ -161,7 +161,7 @@ namespace Umbraco.Web.Mvc
         /// Creates a new RedirectToUmbracoResult
         /// </summary>
         /// <param name="publishedContent"></param>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         public RedirectToUmbracoPageResult(IPublishedContent publishedContent, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedContent = publishedContent;
@@ -174,7 +174,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="publishedContent"></param>
         /// <param name="queryStringValues"></param>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         public RedirectToUmbracoPageResult(IPublishedContent publishedContent, NameValueCollection queryStringValues, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedContent = publishedContent;
@@ -188,7 +188,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="publishedContent"></param>
         /// <param name="queryString"></param>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         public RedirectToUmbracoPageResult(IPublishedContent publishedContent, string queryString, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedContent = publishedContent;

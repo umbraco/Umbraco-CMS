@@ -14,11 +14,6 @@
     a, a:hover {
         outline: none;
         text-decoration: none;
-        
-        // TODO: => confirm not in use
-//        &.noSpr {
-//            background-position: 0
-//        }
     }
 
     ins {
@@ -31,7 +26,6 @@
         transition: color 120ms;
 
         &:hover {
-            //opacity: .7;
             color: @ui-option-type-hover;
         }
     }
@@ -171,8 +165,8 @@ body.touch .umb-tree {
     }
 }
 
-.umb-tree .umb-tree-node-checked i[class^="icon-"],
-.umb-tree .umb-tree-node-checked i[class*=" icon-"] {
+.umb-tree .umb-tree-node-checked > .umb-tree-item__inner > i[class^="icon-"],
+.umb-tree .umb-tree-node-checked > .umb-tree-item__inner > i[class*=" icon-"] {
     font-family: 'icomoon' !important;
     color: @green !important;
 
@@ -219,15 +213,15 @@ body.touch .umb-tree {
 // Tree item states
 // -------------------------
 .not-published {
-    > i.icon,
-    a {
+    > .umb-tree-item__inner > i.icon,
+    > .umb-tree-item__inner > a {
         opacity: 0.6;
     }
 }
 
 .not-allowed {
-    > i.icon,
-    a {
+    > .umb-tree-item__inner > i.icon,
+    > .umb-tree-item__inner > a {
         cursor: not-allowed;
     }
 }

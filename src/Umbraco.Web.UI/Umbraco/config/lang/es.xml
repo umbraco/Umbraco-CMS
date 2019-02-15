@@ -1643,10 +1643,9 @@
     <key alias="redirectedTo">Redirigido a To</key>
     <key alias="noRedirects">No se ha creado ninguna redirección</key>
     <key alias="noRedirectsDescription">Cuando una página es renombrada o movida, una redirección a la nueva página es automáticamente creada.</key>
-    <key alias="removeButton">Eliminar</key>
     <key alias="confirmRemove">¿Estás seguro que quieres eliminar la redirección de '%0%' a '%1%'?</key>
     <key alias="redirectRemoved">Redirección URL eliminada.</key>
-        <key alias="redirectRemoveError">Error borrando la redirección URL.</key>
+    <key alias="redirectRemoveError">Error borrando la redirección URL.</key>
     <key alias="confirmDisable">¿Seguro que quieres desactivar URL tracker?</key>
     <key alias="disabledConfirm">URL tracker ha sido desactivado.</key>
     <key alias="disableError">Error desactivando URL tracker, más información se puede encontrar en los logs.</key>

@@ -51,10 +51,13 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return new ForcedPreviewObject();
         }
 
-        private class ForcedPreviewObject : DisposableObject
+        private class ForcedPreviewObject : DisposableObjectSlim
         {
             protected override void DisposeResources()
             { }
         }
+
+        public void Dispose()
+        { }
     }
 }

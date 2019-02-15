@@ -174,8 +174,8 @@
          */
         function createButtons(content) {
 
-            // for trashed items, the save button is the primary action - otherwise it's a secondary action
-            $scope.page.saveButtonStyle = content.trashed ? "primary" : "info";
+            // for trashed and element type items, the save button is the primary action - otherwise it's a secondary action
+            $scope.page.saveButtonStyle = content.trashed || content.isElement ? "primary" : "info";
 
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
@@ -818,14 +818,15 @@
                     previewWindow.location.href = redirect;
                 }
                 else {
-                    var selectedVariant;
-                    if (!$scope.culture) {
-                        selectedVariant = $scope.content.variants[0];
-                    }
-                    else {
-                        selectedVariant = _.find($scope.content.variants, function (v) {
-                            return v.language.culture === $scope.culture;
+                    var selectedVariant = $scope.content.variants[0];
+                    if ($scope.culture) {
+                        var found = _.find($scope.content.variants, function (v) {
+                            return (v.language && v.language.culture === $scope.culture);
                         });
+
+                        if(found){
+                            selectedVariant = found;
+                        }
                     }
 
                     //ensure the save flag is set

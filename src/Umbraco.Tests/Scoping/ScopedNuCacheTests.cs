@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = GetUmbracoContextNu("http://example.com/", setSingleton: true);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
             _distributedCacheBinder.BindEvents(true);
 
             // create document type, document

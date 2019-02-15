@@ -88,8 +88,8 @@
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
     <PackageReference Include="Examine" Version="1.0.0-beta079" />
-    <PackageReference Include="ImageProcessor.Web" Version="4.9.3.25" />
-    <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.1.19" />
+    <PackageReference Include="ImageProcessor.Web" Version="4.10.0.100" />
+    <PackageReference Include="ImageProcessor.Web.Config" Version="2.5.0.100" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
@@ -105,7 +105,7 @@
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.37</Version>
+      <Version>8.0.0-alpha.38</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -189,15 +189,15 @@
       <SubType>Designer</SubType>
     </Content>
     <None Include="Config\serilog.user.Release.config">
-        <DependentUpon>serilog.user.config</DependentUpon>
-        <SubType>Designer</SubType>
+      <DependentUpon>serilog.user.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <Content Include="Config\serilog.config">
       <SubType>Designer</SubType>
     </Content>
     <None Include="Config\serilog.Release.config">
-        <DependentUpon>serilog.config</DependentUpon>
-        <SubType>Designer</SubType>
+      <DependentUpon>serilog.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <Content Include="Config\logviewer.searches.config.js" />
     <None Include="Config\umbracoSettings.Release.config">

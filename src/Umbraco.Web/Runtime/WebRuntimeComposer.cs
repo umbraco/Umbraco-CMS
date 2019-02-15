@@ -4,7 +4,6 @@ using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
@@ -18,7 +17,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing.Composers;
+using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
 using Umbraco.Web.Dictionary;
@@ -76,6 +75,9 @@ namespace Umbraco.Web.Runtime
             // we have no http context, eg when booting Umbraco or in background threads, so instead
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
             composition.RegisterUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
+
+            // register the umbraco context factory
+            composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
 
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request

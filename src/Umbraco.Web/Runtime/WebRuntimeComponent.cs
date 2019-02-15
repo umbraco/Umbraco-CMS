@@ -13,7 +13,6 @@ using System.Web.Routing;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -69,7 +68,7 @@ namespace Umbraco.Web.Runtime
         }
 
         public void Initialize()
-        { 
+        {
             // setup mvc and webapi services
             SetupMvcAndWebApi();
 
@@ -87,23 +86,6 @@ namespace Umbraco.Web.Runtime
 
             // set routes
             CreateRoutes(_umbracoContextAccessor, _globalSettings, _surfaceControllerTypes, _apiControllerTypes);
-
-            // get an http context
-            // at that moment, HttpContext.Current != null but its .Request property is null
-            var httpContext = new HttpContextWrapper(HttpContext.Current);
-
-            // ensure there is an UmbracoContext
-            // (also sets the accessor)
-            // this is a *temp* UmbracoContext
-            UmbracoContext.EnsureContext(
-                _umbracoContextAccessor,
-                new HttpContextWrapper(HttpContext.Current),
-                _publishedSnapshotService,
-                new WebSecurity(httpContext, _userService, _globalSettings),
-                _umbracoSettings,
-                _urlProviders,
-                _globalSettings,
-                _variationContextAccessor);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
