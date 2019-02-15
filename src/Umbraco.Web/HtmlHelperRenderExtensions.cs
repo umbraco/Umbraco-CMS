@@ -63,12 +63,12 @@ namespace Umbraco.Web
         /// </remarks>
         public static MvcHtmlString PreviewBadge(this HtmlHelper helper)
         {
-            if (UmbracoContext.Current.InPreviewMode)
+            if (Current.UmbracoContext.InPreviewMode)
             {
                 var htmlBadge =
                     String.Format(Current.Configs.Settings().Content.PreviewBadge,
                                   IOHelper.ResolveUrl(SystemDirectories.Umbraco),
-                                  UmbracoContext.Current.HttpContext.Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
+                                  Current.UmbracoContext.HttpContext.Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Path));
                 return new MvcHtmlString(htmlBadge);
             }
             return new MvcHtmlString("");
@@ -88,11 +88,11 @@ namespace Umbraco.Web
             var cacheKey = new StringBuilder(partialViewName);
             if (cacheByPage)
             {
-                if (UmbracoContext.Current == null)
+                if (Current.UmbracoContext == null)
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
                 }
-                cacheKey.AppendFormat("{0}-", UmbracoContext.Current.PublishedRequest?.PublishedContent?.Id ?? 0);
+                cacheKey.AppendFormat("{0}-", Current.UmbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0);
             }
             if (cacheByMember)
             {
@@ -690,7 +690,7 @@ namespace Umbraco.Web
             if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
             if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
 
-            var formAction = UmbracoContext.Current.OriginalRequestUrl.PathAndQuery;
+            var formAction = Current.UmbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);
         }
 

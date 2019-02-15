@@ -11,14 +11,16 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly IRuntimeState _runtime;
         private readonly IContentService _contentService;
+        private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly ILogger _logger;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IContentService contentService, ILogger logger)
+            IRuntimeState runtime, IContentService contentService, IUmbracoContextFactory umbracoContextFactory, ILogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _contentService = contentService;
+            _umbracoContextFactory = umbracoContextFactory;
             _logger = logger;
         }
 
@@ -62,7 +64,7 @@ namespace Umbraco.Web.Scheduling
                 //    but then what should be its "scope"? could we attach it to scopes?
                 // - and we should definitively *not* have to flush it here (should be auto)
                 //
-                using (var tempContext = UmbracoContext.EnsureContext())
+                using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
                 {
                     try
                     {
@@ -74,7 +76,7 @@ namespace Umbraco.Web.Scheduling
                     finally
                     {
                         // if running on a temp context, we have to flush the messenger
-                        if (tempContext != null && Composing.Current.ServerMessenger is BatchedDatabaseServerMessenger m)
+                        if (contextReference.IsRoot && Composing.Current.ServerMessenger is BatchedDatabaseServerMessenger m)
                             m.FlushBatch();
                     }
                 }

@@ -100,6 +100,7 @@ namespace Umbraco.Tests.Runtimes
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>().Append<DefaultUrlProvider>();
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             composition.RegisterUnique<IExamineManager>(f => ExamineManager.Instance);
+            composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
 
             // initialize some components only/individually
             composition.WithCollectionBuilder<ComponentCollectionBuilder>()
@@ -178,8 +179,9 @@ namespace Umbraco.Tests.Runtimes
             // need an UmbracoCOntext to access the cache
             // FIXME: not exactly pretty, should not depend on HttpContext
             var httpContext = Mock.Of<HttpContextBase>();
-            var withUmbracoContext = UmbracoContext.EnsureContext(httpContext);
-            var umbracoContext = Umbraco.Web.Composing.Current.UmbracoContext;
+            var umbracoContextFactory = factory.GetInstance<IUmbracoContextFactory>();
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(httpContext);
+            var umbracoContext = umbracoContextReference.UmbracoContext;
 
             // assert that there is no published document
             var pcontent = umbracoContext.ContentCache.GetById(content.Id);
@@ -217,7 +219,7 @@ namespace Umbraco.Tests.Runtimes
             // and the published document has a url
             Assert.AreEqual("/test/", pcontent.GetUrl());
 
-            withUmbracoContext.Dispose();
+            umbracoContextReference.Dispose();
             mainDom.Stop();
             components.Terminate();
 

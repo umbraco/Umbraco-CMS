@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http.Filters;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Editors.Filters
@@ -14,7 +15,7 @@ namespace Umbraco.Web.Editors.Filters
         {
             if (actionExecutedContext.Response == null) return;
 
-            var user = UmbracoContext.Current.Security.CurrentUser;
+            var user = Current.UmbracoContext.Security.CurrentUser;
             if (user == null) return;
 
             var objectContent = actionExecutedContext.Response.Content as ObjectContent;

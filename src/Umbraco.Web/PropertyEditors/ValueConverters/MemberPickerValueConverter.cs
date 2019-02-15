@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 
@@ -44,7 +45,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (source == null)
                 return null;
 
-            if (UmbracoContext.Current != null)
+            if (Current.UmbracoContext != null)
             {
                 IPublishedContent member;
                 if (source is int id)

@@ -47,6 +47,7 @@ namespace Umbraco.Web
         private readonly ILogger _logger;
         private readonly IPublishedRouter _publishedRouter;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IUmbracoContextFactory _umbracoContextFactory;
 
         public UmbracoInjectedModule(
             IGlobalSettings globalSettings,
@@ -57,7 +58,8 @@ namespace Umbraco.Web
             IRuntimeState runtime,
             ILogger logger,
             IPublishedRouter publishedRouter,
-            IVariationContextAccessor variationContextAccessor)
+            IVariationContextAccessor variationContextAccessor,
+            IUmbracoContextFactory umbracoContextFactory)
         {
             _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
 
@@ -70,6 +72,7 @@ namespace Umbraco.Web
             _logger = logger;
             _publishedRouter = publishedRouter;
             _variationContextAccessor = variationContextAccessor;
+            _umbracoContextFactory = umbracoContextFactory;
         }
 
         #region HttpModule event handlers
@@ -92,18 +95,10 @@ namespace Umbraco.Web
 
             // ok, process
 
-            // create the UmbracoContext singleton, one per request, and assign
-            // replace existing if any (eg during app startup, a temp one is created)
-            UmbracoContext.EnsureContext(
-                _umbracoContextAccessor,
-                httpContext,
-                _publishedSnapshotService,
-                new WebSecurity(httpContext, _userService, _globalSettings),
-                Current.Configs.Settings(),
-                _urlProviders,
-                _globalSettings,
-                _variationContextAccessor,
-                true);
+            // ensure there's an UmbracoContext registered for the current request
+            // registers the context reference so its disposed at end of request
+            var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext(httpContext);
+            httpContext.DisposeOnPipelineCompleted(umbracoContextReference);
         }
 
         /// <summary>
@@ -124,10 +119,10 @@ namespace Umbraco.Web
             if (httpContext.Request.Url.IsClientSideRequest())
                 return;
 
-            if (UmbracoContext.Current == null)
-                throw new InvalidOperationException("The UmbracoContext.Current is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
+            if (Current.UmbracoContext == null)
+                throw new InvalidOperationException("The Current.UmbracoContext is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
 
-            var umbracoContext = UmbracoContext.Current;
+            var umbracoContext = Current.UmbracoContext;
 
             // re-write for the default back office path
             if (httpContext.Request.Url.IsDefaultBackOfficeRequest(_globalSettings))
@@ -491,14 +486,14 @@ namespace Umbraco.Web
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
+                if (Current.UmbracoContext != null && Current.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId);
 
-                    _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
+                    _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(Current.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
-                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));
+                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext, new HttpContextWrapper(httpContext)));
 
                 DisposeHttpContextItems(httpContext);
             };

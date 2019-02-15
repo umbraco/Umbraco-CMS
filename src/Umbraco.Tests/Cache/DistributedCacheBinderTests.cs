@@ -4,11 +4,14 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -148,8 +151,18 @@ namespace Umbraco.Tests.Cache
 
             };
 
+            var umbracoContextFactory = new UmbracoContextFactory(
+                new TestUmbracoContextAccessor(),
+                Mock.Of<IPublishedSnapshotService>(),
+                new TestVariationContextAccessor(),
+                new TestDefaultCultureAccessor(),
+                TestObjects.GetUmbracoSettings(),
+                TestObjects.GetGlobalSettings(),
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
             // just assert it does not throw
-            var refreshers = new DistributedCacheBinder(null, null);
+            var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);
             refreshers.HandleEvents(definitions);
         }
     }

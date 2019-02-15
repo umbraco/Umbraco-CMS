@@ -46,11 +46,11 @@ namespace Umbraco.Web
             switch (content.ItemType)
             {
                 case PublishedItemType.Content:
-                    if (UmbracoContext.Current == null)
-                        throw new InvalidOperationException("Cannot resolve a Url for a content item when UmbracoContext.Current is null.");
-                    if (UmbracoContext.Current.UrlProvider == null)
-                        throw new InvalidOperationException("Cannot resolve a Url for a content item when UmbracoContext.Current.UrlProvider is null.");
-                    return UmbracoContext.Current.UrlProvider.GetUrl(content.Id, true);
+                    if (Current.UmbracoContext == null)
+                        throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
+                    if (Current.UmbracoContext.UrlProvider == null)
+                        throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
+                    return Current.UmbracoContext.UrlProvider.GetUrl(content.Id, true);
                 case PublishedItemType.Media:
                     throw new NotSupportedException("AbsoluteUrl is not supported for media types.");
                 default:
@@ -267,7 +267,7 @@ namespace Umbraco.Web
                 .And()
                 .ManagedQuery(term);
 
-            return query.Execute().ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
+            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.ContentCache);
         }
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, string indexName = null)
@@ -288,7 +288,7 @@ namespace Umbraco.Web
                 .And()
                 .ManagedQuery(term);
 
-            return query.Execute().ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
+            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.ContentCache);
         }
 
         #endregion

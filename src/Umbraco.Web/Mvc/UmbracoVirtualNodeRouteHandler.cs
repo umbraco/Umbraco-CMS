@@ -40,7 +40,7 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         protected virtual UmbracoContext GetUmbracoContext(RequestContext requestContext)
         {
-            return UmbracoContext.Current;
+            return Composing.Current.UmbracoContext;
         }
 
         public IHttpHandler GetHttpHandler(RequestContext requestContext)

@@ -76,6 +76,9 @@ namespace Umbraco.Web.Runtime
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
             composition.RegisterUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
+            // register the umbraco context factory
+            composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
+
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
             composition.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), Lifetime.Request);
