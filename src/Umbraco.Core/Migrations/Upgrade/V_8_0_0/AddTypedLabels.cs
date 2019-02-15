@@ -53,7 +53,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 var dataTypeDto = new DataTypeDto
                 {
                     NodeId = id,
-                    EditorAlias = Constants.PropertyEditors.Aliases.NoEdit,
+                    EditorAlias = Constants.PropertyEditors.Aliases.Label,
                     DbType = dbType
                 };
 

@@ -101,9 +101,9 @@ namespace Umbraco.Core
                 public const string MultipleTextstring = "Umbraco.MultipleTextstring";
 
                 /// <summary>
-                /// NoEdit.
+                /// Label.
                 /// </summary>
-                public const string NoEdit = "Umbraco.NoEdit";
+                public const string Label = "Umbraco.Label";
 
                 /// <summary>
                 /// Picker Relations.
@@ -138,7 +138,7 @@ namespace Umbraco.Core
                 /// <summary>
                 /// TinyMCE
                 /// </summary>
-                public const string TinyMce = "Umbraco.TinyMCEv3";
+                public const string TinyMce = "Umbraco.TinyMCE";
 
                 /// <summary>
                 /// Boolean.
