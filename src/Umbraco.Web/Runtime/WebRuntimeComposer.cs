@@ -69,7 +69,7 @@ namespace Umbraco.Web.Runtime
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
-            composition.RegisterUnique<IVariationContextAccessor, HttpContextVariationContextAccessor>();
+            composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
