@@ -573,11 +573,24 @@ namespace Umbraco.Core.Packaging
             package.Add(requirements);
             info.Add(package);
 
-            //Author
+            // Author
             var author = new XElement("author", "");
             author.Add(new XElement("name", definition.Author));
             author.Add(new XElement("website", definition.AuthorUrl));
             info.Add(author);
+
+            // Contributors
+            var contributors = new XElement("contributors", "");
+
+            if (definition.Contributors != null && definition.Contributors.Any())
+            {
+                foreach (var contributor in definition.Contributors)
+                {
+                    contributors.Add(new XElement("contributor", contributor));
+                }
+            }
+            
+            info.Add(contributors);
 
             info.Add(new XElement("readme", new XCData(definition.Readme)));
 
@@ -608,10 +621,5 @@ namespace Umbraco.Core.Packaging
             var packagesXml = XDocument.Load(packagesFile);
             return packagesXml;
         }
-
-        
-
-        
-
     }
 }

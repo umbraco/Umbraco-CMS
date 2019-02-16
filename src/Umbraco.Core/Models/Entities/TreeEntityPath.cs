@@ -14,14 +14,5 @@
         /// Gets or sets the path of the entity.
         /// </summary>
         public string Path { get; set; }
-
-        /// <summary>
-        /// Proxy of the Id
-        /// </summary>
-        public int NodeId
-        {
-            get => Id;
-            set => Id = value;
-        }
     }
 }

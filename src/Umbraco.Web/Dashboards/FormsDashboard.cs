@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 
@@ -9,7 +10,7 @@ namespace Umbraco.Web.Dashboards
     {
         public string Alias => "formsInstall";
 
-        public string[] Sections => new [] { "forms" };
+        public string[] Sections => new [] { Constants.Applications.Forms };
 
         public string View => "views/dashboard/forms/formsdashboardintro.html";
 

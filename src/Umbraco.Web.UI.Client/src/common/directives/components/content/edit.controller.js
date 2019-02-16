@@ -4,7 +4,7 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, treeService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, relationResource, overlayService) {
+        editorState, $http, eventsService, relationResource, overlayService, $location) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -22,7 +22,7 @@
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
-        $scope.page.hideChangeVariant = infiniteMode ? true : false;
+        $scope.page.hideChangeVariant = false;
         $scope.allowOpen = true;
         $scope.app = null;
 
@@ -174,8 +174,8 @@
          */
         function createButtons(content) {
 
-            // for trashed items, the save button is the primary action - otherwise it's a secondary action
-            $scope.page.saveButtonStyle = content.trashed ? "primary" : "info";
+            // for trashed and element type items, the save button is the primary action - otherwise it's a secondary action
+            $scope.page.saveButtonStyle = content.trashed || content.isElement ? "primary" : "info";
 
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
@@ -213,24 +213,7 @@
             $scope.page.showPreviewButton = true;
 
         }
-
-        // create infinite editing buttons
-        function createInfiniteModeButtons(content) {
-
-            $scope.page.allowInfinitePublishAndClose = false;
-            $scope.page.allowInfiniteSaveAndClose = false;
-
-            // check for publish rights
-            if (_.contains(content.allowedActions, "U")) {
-                $scope.page.allowInfinitePublishAndClose = true;
-
-                // check for save rights
-            } else if (_.contains(content.allowedActions, "A")) {
-                $scope.page.allowInfiniteSaveAndClose = true;
-            }
-
-        }
-
+        
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(content, path, initialLoad) {
 
@@ -818,14 +801,15 @@
                     previewWindow.location.href = redirect;
                 }
                 else {
-                    var selectedVariant;
-                    if (!$scope.culture) {
-                        selectedVariant = $scope.content.variants[0];
-                    }
-                    else {
-                        selectedVariant = _.find($scope.content.variants, function (v) {
-                            return v.language.culture === $scope.culture;
+                    var selectedVariant = $scope.content.variants[0];
+                    if ($scope.culture) {
+                        var found = _.find($scope.content.variants, function (v) {
+                            return (v.language && v.language.culture === $scope.culture);
                         });
+
+                        if(found){
+                            selectedVariant = found;
+                        }
                     }
 
                     //ensure the save flag is set
@@ -871,17 +855,37 @@
             
             $scope.app = app;
             
-            if (infiniteMode) {
-                createInfiniteModeButtons($scope.content);
-            } else {
-                createButtons($scope.content);
-            }
+            $scope.$broadcast("editors.apps.appChanged", { app: app });
+            
+            createButtons($scope.content);
+            
+        };
+
+        /**
+         * Call back when a content app changes
+         * @param {any} app
+         */
+        $scope.appAnchorChanged = function (app, anchor) {
+            //send an event downwards
+            $scope.$broadcast("editors.apps.appAnchorChanged", { app: app, anchor: anchor });
         };
 
         // methods for infinite editing
         $scope.close = function () {
             if ($scope.infiniteModel.close) {
                 $scope.infiniteModel.close($scope.infiniteModel);
+            }
+        };
+        
+        /**
+         * Call back when user click the back-icon
+         */
+        $scope.onBack = function() {
+            if ($scope.infiniteModel && $scope.infiniteModel.close) {
+                $scope.infiniteModel.close($scope.infiniteModel);
+            } else {
+                // navigate backwards if content has a parent.
+                $location.path('/' + $routeParams.section + '/' + $routeParams.tree + '/' + $routeParams.method + '/' + $scope.content.parentId);
             }
         };
 

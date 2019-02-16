@@ -206,7 +206,7 @@ namespace Umbraco.Web.Mvc
             // filter / add preview banner
             if (Response.ContentType.InvariantEquals("text/html")) // ASP.NET default value
             {
-                if (UmbracoContext.Current.IsDebug || UmbracoContext.Current.InPreviewMode)
+                if (Current.UmbracoContext.IsDebug || Current.UmbracoContext.InPreviewMode)
                 {
                     var text = value.ToString();
                     var pos = text.IndexOf("</body>", StringComparison.InvariantCultureIgnoreCase);
@@ -215,13 +215,13 @@ namespace Umbraco.Web.Mvc
                     {
                         string markupToInject;
 
-                        if (UmbracoContext.Current.InPreviewMode)
+                        if (Current.UmbracoContext.InPreviewMode)
                         {
                             // creating previewBadge markup
                             markupToInject =
                                 string.Format(Current.Configs.Settings().Content.PreviewBadge,
                                     IOHelper.ResolveUrl(SystemDirectories.Umbraco),
-                                    Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Url?.PathAndQuery));
+                                    Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Url?.PathAndQuery));
                         }
                         else
                         {

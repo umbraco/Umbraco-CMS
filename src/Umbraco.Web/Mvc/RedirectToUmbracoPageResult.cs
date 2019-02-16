@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -55,7 +56,7 @@ namespace Umbraco.Web.Mvc
                 if (_publishedContent != null) return _publishedContent;
 
                 //need to get the URL for the page
-                _publishedContent = UmbracoContext.Current.ContentCache.GetById(_pageId);
+                _publishedContent = Current.UmbracoContext.ContentCache.GetById(_pageId);
 
                 return _publishedContent;
             }
@@ -66,7 +67,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="pageId"></param>
         public RedirectToUmbracoPageResult(int pageId)
-            : this(pageId, UmbracoContext.Current)
+            : this(pageId, Current.UmbracoContext)
         {
         }
 
@@ -76,7 +77,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="pageId"></param>
         /// <param name="queryStringValues"></param>
         public RedirectToUmbracoPageResult(int pageId, NameValueCollection queryStringValues)
-            : this(pageId, queryStringValues, UmbracoContext.Current)
+            : this(pageId, queryStringValues, Current.UmbracoContext)
         {
         }
 
@@ -86,7 +87,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="pageId"></param>
         /// <param name="queryString"></param>
         public RedirectToUmbracoPageResult(int pageId, string queryString)
-            : this(pageId, queryString, UmbracoContext.Current)
+            : this(pageId, queryString, Current.UmbracoContext)
         {
         }
 
@@ -95,7 +96,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="publishedContent"></param>
         public RedirectToUmbracoPageResult(IPublishedContent publishedContent)
-            : this(publishedContent, UmbracoContext.Current)
+            : this(publishedContent, Current.UmbracoContext)
         {
         }
 
@@ -105,7 +106,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="publishedContent"></param>
         /// <param name="queryStringValues"></param>
         public RedirectToUmbracoPageResult(IPublishedContent publishedContent, NameValueCollection queryStringValues)
-            : this(publishedContent, queryStringValues, UmbracoContext.Current)
+            : this(publishedContent, queryStringValues, Current.UmbracoContext)
         {
         }
 
@@ -115,7 +116,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="queryString"></param>
         /// <param name="queryStringValues"></param>
         public RedirectToUmbracoPageResult(IPublishedContent publishedContent, string queryString)
-            : this(publishedContent, queryString, UmbracoContext.Current)
+            : this(publishedContent, queryString, Current.UmbracoContext)
         {
         }
 

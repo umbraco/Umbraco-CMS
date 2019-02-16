@@ -124,7 +124,7 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
                     Label = _localizedTextService.Localize("content/membertype"),
                     Value = _localizedTextService.UmbracoDictionaryTranslate(member.ContentType.Name),
-                    View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].GetValueEditor().View
+                    View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
                 },
                 GetLoginProperty(_memberService, member, _localizedTextService),
                 new ContentPropertyDisplay

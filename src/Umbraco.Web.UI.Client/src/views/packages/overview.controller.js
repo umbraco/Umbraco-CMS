@@ -72,7 +72,7 @@
                     },
                     {
                         "name": vm.page.labels.install,
-                        "icon": "icon-add",
+                        "icon": "icon-cloud-upload",
                         "view": "views/packages/views/install-local.html",
                         "active": packageUri === "local",
                         "alias": "umbInstallLocal",
@@ -82,7 +82,7 @@
                     },
                     {
                         "name": vm.page.labels.created,
-                        "icon": "icon-add",
+                        "icon": "icon-files",
                         "view": "views/packages/views/created.html",
                         "active": packageUri === "created",
                         "alias": "umbCreatedPackages",

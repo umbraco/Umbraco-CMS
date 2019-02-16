@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 
@@ -21,7 +22,7 @@ namespace Umbraco.Tests.Composing
         {
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
-            TypeLoader = new TypeLoader(NoAppCache.Instance, LocalTempStorage.Default, ProfilingLogger, detectChanges: false)
+            TypeLoader = new TypeLoader(NoAppCache.Instance, IOHelper.MapPath("~/App_Data/TEMP"), ProfilingLogger, detectChanges: false)
             {
                 AssembliesToScan = AssembliesToScan
             };

@@ -617,13 +617,11 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="contentTypeEnabled">Tipo di contenuto master abilitato</key>
     <key alias="contentTypeUses">Questo tipo di contenuto usa</key>
     <key alias="defaulttemplate"><![CDATA[Template di base]]></key>
-    <key alias="dictionary editor egenskab"><![CDATA[Dictionary Key]]></key>
     <key alias="importDocumentTypeHelp"><![CDATA[Importa  un tipo di documento, trova il file con estensione ".udt" sul tuo computer dopo aver cliccato il pulsante "Sfoglia" e poi clicca  "Importa" (potrebbe chiederti una conferma nella prossima schermata)]]></key>
     <key alias="newtabname"><![CDATA[Titolo nuova tab]]></key>
     <key alias="nodetype"><![CDATA[Tipo di nodo]]></key>
     <key alias="objecttype">Tipo</key>
     <key alias="stylesheet">Foglio di stile</key>
-    <key alias="stylesheet editor egenskab"><![CDATA[Proprietà del foglio di stile]]></key>
     <key alias="tab">Tab</key>
     <key alias="tabname">Titolo tab</key>
     <key alias="tabs">Tabs</key>

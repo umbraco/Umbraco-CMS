@@ -988,21 +988,19 @@
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Plantilla por defecto</key>
-    <key alias="dictionary editor egenskab">Clave de diccionario</key>
-        <key alias="importDocumentTypeHelp">Para importar un tipo de documento encuentra el fichero ".udt" en tu ordenador haciendo clic sobre el botón "Navegar" y pulsando "Importar" (se te solicitará confirmación en la siguiente pantalla)</key>
+    <key alias="importDocumentTypeHelp">Para importar un tipo de documento encuentra el fichero ".udt" en tu ordenador haciendo clic sobre el botón "Navegar" y pulsando "Importar" (se te solicitará confirmación en la siguiente pantalla)</key>
     <key alias="newtabname">Nuevo nombre de la pestaña</key>
     <key alias="nodetype">Tipo de nodo</key>
     <key alias="objecttype">Tipo</key>
     <key alias="stylesheet">Hoja de estilos</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Propiedades de la hoja de estilos</key>
     <key alias="tab">Pestaña</key>
     <key alias="tabname">Nombre de la pestaña</key>
     <key alias="tabs">Pestañas</key>
     <key alias="contentTypeEnabled">Tipo de Contenido Maestro activado</key>
     <key alias="contentTypeUses">Este Tipo de Contenido usa</key>
     <key alias="asAContentMasterType">como Tipo de Contenido Maestro. Las pestañas para los Tipos de Contenido Maestros no se muestran y solo se pueden modificar desde el Tipo de Contenido Maestro</key>
-        <key alias="noPropertiesDefinedOnTab">No existen propiedades para esta pestaña. Haz clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.</key>
+    <key alias="noPropertiesDefinedOnTab">No existen propiedades para esta pestaña. Haz clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.</key>
     <key alias="addIcon">Añadir icono</key>
   </area>
   <area alias="sort">
@@ -1645,10 +1643,9 @@
     <key alias="redirectedTo">Redirigido a To</key>
     <key alias="noRedirects">No se ha creado ninguna redirección</key>
     <key alias="noRedirectsDescription">Cuando una página es renombrada o movida, una redirección a la nueva página es automáticamente creada.</key>
-    <key alias="removeButton">Eliminar</key>
     <key alias="confirmRemove">¿Estás seguro que quieres eliminar la redirección de '%0%' a '%1%'?</key>
     <key alias="redirectRemoved">Redirección URL eliminada.</key>
-        <key alias="redirectRemoveError">Error borrando la redirección URL.</key>
+    <key alias="redirectRemoveError">Error borrando la redirección URL.</key>
     <key alias="confirmDisable">¿Seguro que quieres desactivar URL tracker?</key>
     <key alias="disabledConfirm">URL tracker ha sido desactivado.</key>
     <key alias="disableError">Error desactivando URL tracker, más información se puede encontrar en los logs.</key>

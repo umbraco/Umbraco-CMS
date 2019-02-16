@@ -13,7 +13,6 @@ using System.Web.Routing;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -69,7 +68,7 @@ namespace Umbraco.Web.Runtime
         }
 
         public void Initialize()
-        { 
+        {
             // setup mvc and webapi services
             SetupMvcAndWebApi();
 
@@ -87,23 +86,6 @@ namespace Umbraco.Web.Runtime
 
             // set routes
             CreateRoutes(_umbracoContextAccessor, _globalSettings, _surfaceControllerTypes, _apiControllerTypes);
-
-            // get an http context
-            // at that moment, HttpContext.Current != null but its .Request property is null
-            var httpContext = new HttpContextWrapper(HttpContext.Current);
-
-            // ensure there is an UmbracoContext
-            // (also sets the accessor)
-            // this is a *temp* UmbracoContext
-            UmbracoContext.EnsureContext(
-                _umbracoContextAccessor,
-                new HttpContextWrapper(HttpContext.Current),
-                _publishedSnapshotService,
-                new WebSecurity(httpContext, _userService, _globalSettings),
-                _umbracoSettings,
-                _urlProviders,
-                _globalSettings,
-                _variationContextAccessor);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
@@ -252,12 +234,7 @@ namespace Umbraco.Web.Runtime
             // location to be there
             if (globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
             {
-                var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
-                var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
-                    //include the AppDomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-                    // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-                    // utilizing an old path
-                    appDomainHash);
+                var cachePath = globalSettings.LocalTempPath;
 
                 //set the file map and composite file default location to the %temp% location
                 BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder
@@ -278,7 +255,10 @@ namespace Umbraco.Web.Runtime
                 { "compositeFileHandlerPath", ClientDependencySettings.Instance.CompositeFileHandlerPath }
             });
 
-            ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
+            // When using a non-web runtime and this component is loaded ClientDependency explodes because it'll
+            // want to access HttpContext.Current, which doesn't exist
+            if (IOHelper.IsHosted)
+                ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
         }
     }
 }

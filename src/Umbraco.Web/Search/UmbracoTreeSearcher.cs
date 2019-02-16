@@ -419,11 +419,11 @@ namespace Umbraco.Web.Search
                     //if it varies by culture, return the default language URL
                     if (result.Values.TryGetValue(UmbracoContentIndex.VariesByCultureFieldName, out var varies) && varies == "y")
                     {
-                        entity.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result, defaultLang);
+                        entity.AdditionalData["Url"] = _umbracoContext.Url(intId.Result, defaultLang);
                     }
                     else
                     {
-                        entity.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result);
+                        entity.AdditionalData["Url"] = _umbracoContext.Url(intId.Result);
                     }
                 }
 

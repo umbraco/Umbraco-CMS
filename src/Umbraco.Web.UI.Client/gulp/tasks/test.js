@@ -11,7 +11,7 @@ var runSequence = require('run-sequence');
 
  // Karma test
 gulp.task('runTests', function(cb) {
-    runSequence(["js"], "test:unit", cb);
+    runSequence("js", "test:unit", cb);
 });
 
 gulp.task('test:unit', function () {

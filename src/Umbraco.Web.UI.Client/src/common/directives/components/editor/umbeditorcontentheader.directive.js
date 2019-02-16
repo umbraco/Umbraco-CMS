@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader($location, $routeParams) {
+    function EditorContentHeader() {
 
         function link(scope, el, attr, ctrl) {
 
@@ -11,17 +11,25 @@
             if (!scope.serverValidationAliasField) {
                 scope.serverValidationAliasField = "Alias";
             }
-
+            
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
 
             function onInit() {
+                
                 setCurrentVariant();
+                
+                angular.forEach(scope.content.apps, (app) => {
+                    if (app.alias === "umbContent") {
+                        app.anchors = scope.content.tabs;
+                    }
+                });
+                
             }
 
             function setCurrentVariant() {
-                angular.forEach(scope.variants, function (variant) {
+                angular.forEach(scope.content.variants, function (variant) {
                     if (variant.active) {
                         scope.vm.currentVariant = variant;
                     }
@@ -29,7 +37,9 @@
             }
 
             scope.goBack = function () {
-                $location.path('/' + $routeParams.section + '/' + $routeParams.tree + '/' + $routeParams.method + '/' + scope.menu.currentNode.parentId);
+                if (scope.onBack) {
+                    scope.onBack();
+                }
             };
 
             scope.selectVariant = function (event, variant) {
@@ -43,6 +53,12 @@
             scope.selectNavigationItem = function(item) {
                 if(scope.onSelectNavigationItem) {
                     scope.onSelectNavigationItem({"item": item});
+                }
+            }
+
+            scope.selectAnchorItem = function(item, anchor) {
+                if(scope.onSelectAnchorItem) {
+                    scope.onSelectAnchorItem({"item": item, "anchor": anchor});
                 }
             }
 
@@ -72,10 +88,10 @@
             onInit();
 
             //watch for the active culture changing, if it changes, update the current variant
-            if (scope.variants) {
+            if (scope.content.variants) {
                 scope.$watch(function () {
-                    for (var i = 0; i < scope.variants.length; i++) {
-                        var v = scope.variants[i];
+                    for (var i = 0; i < scope.content.variants.length; i++) {
+                        var v = scope.content.variants[i];
                         if (v.active) {
                             return v.language.culture;
                         }
@@ -99,13 +115,14 @@
                 name: "=",
                 nameDisabled: "<?",
                 menu: "=",
-                hideMenu: "<?",
-                variants: "=",
+                hideActionsMenu: "<?",
+                content: "=",
                 openVariants: "<",
                 hideChangeVariant: "<?",
-                navigation: "=",
                 onSelectNavigationItem: "&?",
+                onSelectAnchorItem: "&?",
                 showBackButton: "<?",
+                onBack: "&?",
                 splitViewOpen: "=?",
                 onOpenInSplitView: "&?",
                 onCloseSplitView: "&?",

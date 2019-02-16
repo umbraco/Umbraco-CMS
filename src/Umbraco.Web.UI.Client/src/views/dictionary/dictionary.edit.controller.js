@@ -84,8 +84,7 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
 
                     formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
-                        bindDictionary(data);       
-                       
+                        bindDictionary(data);
 
                         vm.page.saveButtonState = "success";
                     },

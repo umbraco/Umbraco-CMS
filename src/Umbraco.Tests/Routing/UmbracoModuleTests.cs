@@ -45,7 +45,8 @@ namespace Umbraco.Tests.Routing
                 runtime,
                 logger,
                 null, // FIXME: PublishedRouter complexities...
-                Mock.Of<IVariationContextAccessor>()
+                Mock.Of<IVariationContextAccessor>(),
+                Mock.Of<IUmbracoContextFactory>()
             );
 
             runtime.Level = RuntimeLevel.Run;

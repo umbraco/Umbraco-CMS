@@ -51,11 +51,11 @@
 
         <!-- Show in custom help dashboard -->
         <div class="umb-help-section" data-element="help-custom-dashboard" ng-if="vm.customDashboard.length > 0">
-            <div ng-repeat="tab in vm.customDashboard">
-                <div ng-repeat="property in tab.properties">
+            <div ng-repeat="dashboard in vm.customDashboard">
+                <h5 ng-show="dashboard.label">{{dashboard.label}}</h5>
+                <div ng-repeat="property in dashboard.properties">
                     <div>
-                        <h5 ng-if="property.caption">{{property.caption}}</h5>
-                        <div ng-include="property.path"></div>
+                        <div ng-include="property.view"></div>
                     </div>
                 </div>
             </div>

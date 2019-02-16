@@ -194,7 +194,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
 
                     contentEditingHelper.handleSaveError({
                         err: err,
-                        redirectOnError: !infiniteMode,
+                        redirectOnFailure: !infiniteMode,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
                     

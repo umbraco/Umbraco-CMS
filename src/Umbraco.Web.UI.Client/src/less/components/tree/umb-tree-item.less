@@ -46,11 +46,7 @@
 }
 
 // active is equivilant to selected, its the item that is begin affected by the actions performed in the right-click-dialog.
-.umb-tree-item.active {
-    
-}
 .umb-tree-item.active > .umb-tree-item__inner {
-    //background: @ui-selected;
     color: @ui-selected-type;
     a {
         color: @ui-selected-type;
@@ -68,8 +64,6 @@
         border: 2px solid fade(white, 80%);
     }
     &:hover {
-        //background: @ui-selected-hover;
-        //border-color: @ui-selected-border-hover;// dont hover border, cause its cant be deselected in current code.
         color: @ui-selected-type-hover;
         a {
             color: @ui-selected-type-hover;
@@ -95,7 +89,6 @@
 
         i {
             background: @ui-active-type;
-            //border-color: @ui-active;
             transition: opacity 120ms ease;
         }
     }
@@ -104,14 +97,10 @@
     .umb-tree-icon,
     .umb-tree-item__arrow {
         color: @ui-active-type !important;
-        //background-color: @ui-active;
-        //border-color: @ui-active;
     }
 }
 
 .umb-tree-item.current-not-active > .umb-tree-item__inner {
-    
     background: @ui-active-blur;
-    color:@ui-active-type;
-    
+    color:@ui-active-type;    
 }

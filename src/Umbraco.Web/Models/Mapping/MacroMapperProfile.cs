@@ -45,8 +45,15 @@ namespace Umbraco.Web.Models.Mapping
                     }
 
                     parameter.View = paramEditor.GetValueEditor().View;
-                    //set the config
-                    parameter.Configuration = paramEditor.DefaultConfiguration;
+
+                    // sets the parameter configuration to be the default configuration editor's configuration,
+                    // ie configurationEditor.DefaultConfigurationObject, prepared for the value editor, ie
+                    // after ToValueEditor - important to use DefaultConfigurationObject here, because depending
+                    // on editors, ToValueEditor expects the actual strongly typed configuration - not the
+                    // dictionary thing returned by DefaultConfiguration
+
+                    var configurationEditor = paramEditor.GetConfigurationEditor();
+                    parameter.Configuration = configurationEditor.ToValueEditor(configurationEditor.DefaultConfigurationObject);
                 });
         }
     }

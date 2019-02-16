@@ -61,7 +61,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            if (UmbracoContext.Current.Security.CurrentUser == null)
+            if (Current.UmbracoContext.Security.CurrentUser == null)
             {
                 //not logged in
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);

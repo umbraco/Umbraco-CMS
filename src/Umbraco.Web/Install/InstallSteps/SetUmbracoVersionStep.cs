@@ -46,11 +46,6 @@ namespace Umbraco.Web.Install.InstallSteps
                 security.PerformLogin(-1);
             }
 
-            // Some upgrade scripts "may modify the database (cmsContentXml...) tables directly" - not sure
-            // that is still true but the idea is that after an upgrade we want to reset the local published snapshot, on
-            // all LB nodes of course, so we need to use the distributed cache, and refresh everything.
-            _distributedCache.RefreshAllPublishedSnapshot();
-
             // Update configurationStatus
             _globalSettings.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
 

@@ -4,15 +4,8 @@ using System.Linq;
 using System.Net.Configuration;
 using System.Web;
 using System.Web.Configuration;
-using System.Web.Hosting;
-using System.Web.Security;
-using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Configuration
 {
@@ -291,12 +284,7 @@ namespace Umbraco.Core.Configuration
             }
         }
         
-        /// <summary>
-        /// This is the location type to store temporary files such as cache files or other localized files for a given machine
-        /// </summary>
-        /// <remarks>
-        /// Currently used for the xml cache file and the plugin cache files
-        /// </remarks>
+        /// <inheritdoc />
         public LocalTempStorage LocalTempStorageLocation
         {
             get
@@ -308,6 +296,30 @@ namespace Umbraco.Core.Configuration
                 return LocalTempStorage.Default;
             }
         }
+
+        /// <inheritdoc />
+        public string LocalTempPath
+        {
+            get
+            {
+                switch (LocalTempStorageLocation)
+                {
+                    case LocalTempStorage.AspNetTemp:
+                        return System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
+                    case LocalTempStorage.EnvironmentTemp:
+                        // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
+                        var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
+                        return System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash);
+                    //case LocalTempStorage.Default:
+                    //case LocalTempStorage.Unknown:
+                    default:
+                        return IOHelper.MapPath("~/App_Data/TEMP");
+                }
+            }
+        }
+
 
         /// <summary>
         /// Gets the default UI language.
@@ -362,10 +374,5 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
-
     }
-
-
-
-
 }

@@ -395,7 +395,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetNiceUrl(int id)
         {
-            var url = Umbraco.Url(id);
+            var url = UmbracoContext.Url(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
@@ -408,7 +408,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetNiceUrl(Guid id)
         {
-            var url = Umbraco.UrlProvider.GetUrl(id);
+            var url = UmbracoContext.Url(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
@@ -464,6 +464,16 @@ namespace Umbraco.Web.Editors
         {
             long totalChildren;
             List<IContent> children;
+
+            // Sets the culture to the only existing culture if we only have one culture.
+            if (string.IsNullOrWhiteSpace(cultureName))
+            {
+                if (_allLangs.Value.Count == 1)
+                {
+                    cultureName = _allLangs.Value.First().Key;
+                }
+            }
+
             if (pageNumber > 0 && pageSize > 0)
             {
                 IQuery<IContent> queryFilter = null;
@@ -1200,7 +1210,7 @@ namespace Umbraco.Web.Editors
             if (canPublish)
             {
                 var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
-                
+
                 //proceed to publish if all validation still succeeds
                 var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
@@ -2045,7 +2055,7 @@ namespace Umbraco.Web.Editors
         private ContentItemDisplay MapToDisplay(IContent content)
         {
             var display = Mapper.Map<ContentItemDisplay>(content);
-            display.AllowPreview = display.AllowPreview && content.Trashed == false;
+            display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }
 

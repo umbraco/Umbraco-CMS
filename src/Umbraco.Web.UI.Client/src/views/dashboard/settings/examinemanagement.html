@@ -1,4 +1,4 @@
-<div id="examineManagement" ng-controller="Umbraco.Dashboard.ExamineManagementController as vm">
+<div id="examineManagement" class="examine-management" ng-controller="Umbraco.Dashboard.ExamineManagementController as vm">
 
     <div ng-if="vm.viewState === 'list'">
         <umb-box>
@@ -13,30 +13,30 @@
     </div>
 
     <div ng-hide="vm.loading">
-        <div ng-if="vm.viewState === 'list'" class="umb-healthcheck-group__details">
+        <div ng-if="vm.viewState === 'list'" class="umb-panel-group__details">
 
-            <div class="umb-healthcheck-group__details-group">
+            <div class="umb-panel-group__details-group">
 
-                <div class="umb-healthcheck-group__details-group-title">
-                    <div class="umb-healthcheck-group__details-group-name">Indexers</div>
+                <div class="umb-panel-group__details-group-title">
+                    <div class="umb-panel-group__details-group-name"><localize key="examineManagement_indexers">Indexers</localize></div>
                 </div>
 
-                <div class="umb-healthcheck-group__details-checks">
-                    <div class="umb-healthcheck-group__details-check">
-                        <div class="umb-healthcheck-group__details-check-title">
-                            <div class="umb-healthcheck-group__details-check-name">Manage Examine's indexes</div>
-                            <div class="umb-healthcheck-group__details-check-description">Allows you to view the details of each index and provides some tools for managing the indexes</div>
+                <div class="umb-panel-group__details-checks">
+                    <div class="umb-panel-group__details-check">
+                        <div class="umb-panel-group__details-check-title">
+                            <div class="umb-panel-group__details-check-name"><localize key="examineManagement_manageIndexes">Manage Examine's indexes</localize></div>
+                            <div class="umb-panel-group__details-check-description"><localize key="examineManagement_manageIndexesDescription">Allows you to view the details of each index and provides some tools for managing the indexes</localize></div>
                         </div>
 
-                        <div class="umb-healthcheck-group__details-status" ng-repeat="indexer in vm.indexerDetails">
+                        <div class="umb-panel-group__details-status" ng-repeat="indexer in vm.indexerDetails">
 
-                            <div class="umb-healthcheck-group__details-status-icon-container">
-                                <i class="umb-healthcheck-status-icon"
+                            <div class="umb-panel-group__details-status-icon-container">
+                                <i class="umb-panel-status-icon"
                                    ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}"></i>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status-content">
-                                <div class="umb-healthcheck-group__details-status-text">
+                            <div class="umb-panel-group__details-status-content">
+                                <div class="umb-panel-group__details-status-text">
                                     <a class="btn-link -underline" href="" ng-click="vm.showIndexInfo(indexer)">
                                         {{indexer.name}}
                                     </a>
@@ -51,27 +51,27 @@
 
             <br />
 
-            <div class="umb-healthcheck-group__details-group">
+            <div class="umb-panel-group__details-group">
 
-                <div class="umb-healthcheck-group__details-group-title">
-                    <div class="umb-healthcheck-group__details-group-name">Searchers</div>
+                <div class="umb-panel-group__details-group-title">
+                    <div class="umb-panel-group__details-group-name"><localize key="examineManagement_searchers">Searchers</localize></div>
                 </div>
 
-                <div class="umb-healthcheck-group__details-checks">
-                    <div class="umb-healthcheck-group__details-check">
-                        <div class="umb-healthcheck-group__details-check-title">
-                            <div class="umb-healthcheck-group__details-check-name">Configured Searchers</div>
-                            <div class="umb-healthcheck-group__details-check-description">Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)</div>
+                <div class="umb-panel-group__details-checks">
+                    <div class="umb-panel-group__details-check">
+                        <div class="umb-panel-group__details-check-title">
+                            <div class="umb-panel-group__details-check-name"><localize key="examineManagement_configuredSearchers">Configured Searchers</localize></div>
+                            <div class="umb-panel-group__details-check-description"><localize key="examineManagement_configuredSearchersDescription">Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)</localize></div>
                         </div>
 
-                        <div class="umb-healthcheck-group__details-status" ng-repeat="searcher in vm.searcherDetails">
+                        <div class="umb-panel-group__details-status" ng-repeat="searcher in vm.searcherDetails">
 
-                            <div class="umb-healthcheck-group__details-status-icon-container">
-                                <i class="umb-healthcheck-status-icon icon-info"></i>
+                            <div class="umb-panel-group__details-status-icon-container">
+                                <i class="umb-panel-status-icon icon-info"></i>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status-content">
-                                <div class="umb-healthcheck-group__details-status-text">
+                            <div class="umb-panel-group__details-status-content">
+                                <div class="umb-panel-group__details-status-text">
                                     <a class="btn-link -underline" href="" ng-click="vm.showSearcherInfo(searcher)">
                                         {{searcher.name}}
                                     </a>
@@ -89,40 +89,44 @@
 
             <umb-editor-sub-header>
                 <umb-editor-sub-header-content-left>
-                    <a class="umb-healthcheck-back-link" href="" ng-click="vm.setViewState('list');">&larr; Back to overview</a>
+                    <a class="umb-panel-back-link" href="" ng-click="vm.setViewState('list');">&larr; Back to overview</a>
                 </umb-editor-sub-header-content-left>
             </umb-editor-sub-header>
 
-            <div class="umb-healthcheck-group__details">
+            <div class="umb-panel-group__details">
 
-                <div class="umb-healthcheck-group__details-group">
+                <div class="umb-panel-group__details-group">
 
-                    <div class="umb-healthcheck-group__details-group-title">
-                        <div class="umb-healthcheck-group__details-group-name">{{ vm.selectedSearcher.name }}</div>
+                    <div class="umb-panel-group__details-group-title">
+                        <div class="umb-panel-group__details-group-name">{{ vm.selectedSearcher.name }}</div>
                     </div>
 
-                    <div class="umb-healthcheck-group__details-checks">
+                    <div class="umb-panel-group__details-checks">
 
                         <!-- Search Tool -->
 
-                        <div class="umb-healthcheck-group__details-check">
+                        <div class="umb-panel-group__details-check">
 
-                            <div class="umb-healthcheck-group__details-check-title">
-                                <div class="umb-healthcheck-group__details-check-name">Search</div>
-                                <div class="umb-healthcheck-group__details-check-description">Search the index and view the results</div>
+                            <div class="umb-panel-group__details-check-title">
+                                <div class="umb-panel-group__details-check-name">Search</div>
+                                <div class="umb-panel-group__details-check-description">Search the index and view the results</div>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status">
+                            <div class="umb-panel-group__details-status">
 
-                                <div class="umb-healthcheck-group__details-status-content">
+                                <div class="umb-panel-group__details-status-content">
 
-                                    <div class="umb-healthcheck-group__details-status-actions">
-                                        <div class="umb-healthcheck-group__details-status-action">
+                                    <div class="umb-panel-group__details-status-actions">
+                                        <div class="umb-panel-group__details-status-action">
                                             <ng-form name="searchTools">
 
                                                 <div class="row form-search">
-                                                    <div>
+                                                    <div class="inner-addon left-addon flex">
+                                                        <i class="icon icon-search"></i>
+
                                                         <input type="text" class="search-query"
+                                                               placeholder="@placeholders_search"
+                                                               localize="placeholder"
                                                                ng-model="vm.searchText" no-dirty-check
                                                                ng-keypress="vm.search(vm.selectedSearcher, $event)" />
 
@@ -130,7 +134,8 @@
                                                                     type="button"
                                                                     button-style="success"
                                                                     action="vm.search(vm.selectedSearcher)"
-                                                                    label="Search">
+                                                                    label="Search"
+                                                                    label-key="general_search">
                                                         </umb-button>
 
                                                     </div>
@@ -144,7 +149,7 @@
                                                             <tr>
                                                                 <th class="score">Score</th>
                                                                 <th class="id">Id</th>
-                                                                <th>Name</th>
+                                                                <th><localize key="general_name">Name</localize></th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -193,40 +198,40 @@
 
             <umb-editor-sub-header>
                 <umb-editor-sub-header-content-left>
-                    <a class="umb-healthcheck-back-link" href="" ng-click="vm.setViewState('list');">&larr; Back to overview</a>
+                    <a class="umb-panel-back-link" href="" ng-click="vm.setViewState('list');">&larr; <localize key="general_backToOverview">Back to overview</localize></a>
                 </umb-editor-sub-header-content-left>
             </umb-editor-sub-header>
 
 
-            <div class="umb-healthcheck-group__details">
+            <div class="umb-panel-group__details">
 
-                <div class="umb-healthcheck-group__details-group">
+                <div class="umb-panel-group__details-group">
 
-                    <div class="umb-healthcheck-group__details-group-title">
-                        <div class="umb-healthcheck-group__details-group-name">{{ vm.selectedIndex.name }}</div>
+                    <div class="umb-panel-group__details-group-title">
+                        <div class="umb-panel-group__details-group-name">{{ vm.selectedIndex.name }}</div>
                     </div>
 
-                    <div class="umb-healthcheck-group__details-checks">
+                    <div class="umb-panel-group__details-checks">
 
                         <!-- Health Status -->
 
-                        <div class="umb-healthcheck-group__details-check">
+                        <div class="umb-panel-group__details-check">
 
-                            <div class="umb-healthcheck-group__details-check-title">
-                                <div class="umb-healthcheck-group__details-check-name">Health status</div>
-                                <div class="umb-healthcheck-group__details-check-description">The health status of the index and if it can be read</div>
+                            <div class="umb-panel-group__details-check-title">
+                                <div class="umb-panel-group__details-check-name"><localize key="examineManagement_healthStatus">Health status</localize></div>
+                                <div class="umb-panel-group__details-check-description"><localize key="examineManagement_healthStatusDescription">The health status of the index and if it can be read</localize></div>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status">
+                            <div class="umb-panel-group__details-status">
 
-                                <div class="umb-healthcheck-group__details-status-icon-container">
-                                    <i class="umb-healthcheck-status-icon"
+                                <div class="umb-panel-group__details-status-icon-container">
+                                    <i class="umb-panel-status-icon"
                                        ng-class="{'icon-check color-green' : vm.selectedIndex.isHealthy, 'icon-delete color-red' : !vm.selectedIndex.isHealthy}"></i>
                                 </div>
 
-                                <div class="umb-healthcheck-group__details-status-content">
+                                <div class="umb-panel-group__details-status-content">
 
-                                    <div class="umb-healthcheck-group__details-status-text">
+                                    <div class="umb-panel-group__details-status-text">
                                         <div>{{vm.selectedIndex.healthStatus}}</div>
                                         <div ng-show="!vm.selectedIndex" class="color-red">
                                             The index cannot be read and will need to be rebuilt
@@ -241,24 +246,28 @@
 
                         <!-- Search Tool -->
 
-                        <div class="umb-healthcheck-group__details-check">
+                        <div class="umb-panel-group__details-check">
 
-                            <div class="umb-healthcheck-group__details-check-title">
-                                <div class="umb-healthcheck-group__details-check-name">Search</div>
-                                <div class="umb-healthcheck-group__details-check-description">Search the index and view the results</div>
+                            <div class="umb-panel-group__details-check-title">
+                                <div class="umb-panel-group__details-check-name"><localize key="general_search">Search</localize></div>
+                                <div class="umb-panel-group__details-check-description"><localize key="examineManagement_searchDescription">Search the index and view the results</localize></div>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status">
+                            <div class="umb-panel-group__details-status">
 
-                                <div class="umb-healthcheck-group__details-status-content">
+                                <div class="umb-panel-group__details-status-content">
 
-                                    <div class="umb-healthcheck-group__details-status-actions">
-                                        <div class="umb-healthcheck-group__details-status-action">
+                                    <div class="umb-panel-group__details-status-actions">
+                                        <div class="umb-panel-group__details-status-action">
                                             <ng-form name="searchTools">
 
                                                 <div class="row form-search">
-                                                    <div>
+                                                    <div class="inner-addon left-addon flex">
+                                                        <i class="icon icon-search"></i>
+
                                                         <input type="text" class="search-query"
+                                                               placeholder="@placeholders_search"
+                                                               localize="placeholder"
                                                                ng-model="vm.searchText" no-dirty-check
                                                                ng-keypress="vm.search(vm.selectedIndex, $event)" />
 
@@ -266,7 +275,8 @@
                                                                     type="button"
                                                                     button-style="success"
                                                                     action="vm.search(vm.selectedIndex)"
-                                                                    label="Search">
+                                                                    label="Search"
+                                                                    label-key="general_search">
                                                         </umb-button>
 
                                                     </div>
@@ -280,7 +290,7 @@
                                                             <tr>
                                                                 <th class="score">Score</th>
                                                                 <th class="id">Id</th>
-                                                                <th>Name</th>
+                                                                <th><localize key="general_name">Name</localize></th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -320,16 +330,16 @@
 
                         <!-- Index Stats -->
 
-                        <div class="umb-healthcheck-group__details-check">
+                        <div class="umb-panel-group__details-check">
 
-                            <div class="umb-healthcheck-group__details-check-title">
-                                <div class="umb-healthcheck-group__details-check-name">Index info</div>
-                                <div class="umb-healthcheck-group__details-check-description">Lists the properties of the index</div>
+                            <div class="umb-panel-group__details-check-title">
+                                <div class="umb-panel-group__details-check-name"><localize key="examineManagement_indexInfo">Index info</localize></div>
+                                <div class="umb-panel-group__details-check-description"><localize key="examineManagement_indexInfoDescription">Lists the properties of the index</localize></div>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status">
+                            <div class="umb-panel-group__details-status">
 
-                                <div class="umb-healthcheck-group__details-status-content">
+                                <div class="umb-panel-group__details-status-content">
 
                                     <table class="table table-bordered table-condensed">
                                         <caption>&nbsp;</caption>
@@ -347,31 +357,32 @@
 
                         <!-- Rebuild -->
 
-                        <div class="umb-healthcheck-group__details-check">
+                        <div class="umb-panel-group__details-check">
 
-                            <div class="umb-healthcheck-group__details-check-title">
-                                <div class="umb-healthcheck-group__details-check-name">Tools</div>
-                                <div class="umb-healthcheck-group__details-check-description">Tools to manage the index</div>
+                            <div class="umb-panel-group__details-check-title">
+                                <div class="umb-panel-group__details-check-name"><localize key="examineManagement_tools">Tools</localize></div>
+                                <div class="umb-panel-group__details-check-description"><localize key="examineManagement_toolsDescription">Tools to manage the index</localize></div>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status">
+                            <div class="umb-panel-group__details-status">
 
-                                <div class="umb-healthcheck-group__details-status-content">
+                                <div class="umb-panel-group__details-status-content">
 
-                                    <div class="umb-healthcheck-group__details-status-actions">
-                                        <div class="umb-healthcheck-group__details-status-action">
+                                    <div class="umb-panel-group__details-status-actions">
+                                        <div class="umb-panel-group__details-status-action">
                                             <ng-form name="indexTools">
 
                                                 <umb-button ng-show="!vm.selectedIndex.isProcessing && (!vm.selectedIndex.processingAttempts || vm.selectedIndex.processingAttempts < 100)"
                                                             disabled="!vm.selectedIndex.canRebuild"
                                                             type="button"
                                                             button-style="success"
-                                                            action="vm.rebuildIndex(vm.selectedIndex)"
-                                                            label="Rebuild index">
+                                                            action="vm.rebuildIndex(vm.selectedIndex, $event)"
+                                                            label="Rebuild index"
+                                                            label-key="examineManagement_rebuildIndex">
                                                 </umb-button>
 
                                                 <div ng-show="vm.selectedIndex.isProcessing">
-                                                    <div class="umb-healthcheck-group__details-status-overlay"></div>
+                                                    <div class="umb-panel-group__details-status-overlay"></div>
                                                     <umb-load-indicator></umb-load-indicator>
                                                 </div>
 
@@ -381,7 +392,7 @@
 
                                             </ng-form>
 
-                                            <div class="umb-healthcheck-group__details-status-action-description" ng-show="!vm.selectedIndex.canRebuild">
+                                            <div class="umb-panel-group__details-status-action-description" ng-show="!vm.selectedIndex.canRebuild">
                                                 This index cannot be rebuilt because it has no assigned <code>IIndexPopulator</code>
                                             </div>
                                         </div>

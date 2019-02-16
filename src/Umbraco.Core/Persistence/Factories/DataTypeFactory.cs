@@ -2,6 +2,7 @@
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
@@ -10,10 +11,14 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class DataTypeFactory
     {
-        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors)
+        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger logger)
         {
             if (!editors.TryGet(dto.EditorAlias, out var editor))
-                throw new InvalidOperationException($"Could not find an editor with alias \"{dto.EditorAlias}\".");
+            {
+                logger.Warn(typeof(DataTypeFactory), "Could not find an editor with alias {dto.EditorAlias}, converting to label", dto.EditorAlias);
+                //convert to label
+                editor = new LabelPropertyEditor(logger);
+            }
 
             var dataType = new DataType(editor);
 
