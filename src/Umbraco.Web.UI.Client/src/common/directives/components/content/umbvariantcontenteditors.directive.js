@@ -11,7 +11,9 @@
             content: "<", // TODO: Not sure if this should be = since we are changing the 'active' property of a variant
             culture: "<",
             onSelectApp: "&?",
-            onSelectAppAnchor: "&?"
+            onSelectAppAnchor: "&?",
+            onBack: "&?",
+            showBack: "<?"
         },
         controllerAs: 'vm',
         controller: umbVariantContentEditorsController

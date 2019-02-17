@@ -5,6 +5,7 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -27,8 +28,8 @@ namespace Umbraco.Web.Models.Mapping
         {
             // TODO: We can resolve the UmbracoContext from the IValueResolver options!
             // OMG
-            if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
-                && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+            if (HttpContext.Current != null && Current.UmbracoContext != null && Current.UmbracoContext.Security.CurrentUser != null
+                && Current.UmbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
             {
                 var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
                 var contentTypeBasic =  Mapper.Map<IContentTypeComposition, ContentTypeBasic>(contentType);

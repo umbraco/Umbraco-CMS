@@ -219,7 +219,7 @@ namespace Umbraco.Core
                             },
                             {
                                 FailedPasswordAttempts,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Integer, true, FailedPasswordAttempts)
+                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Integer, true, FailedPasswordAttempts)
                                     {
                                         Name = FailedPasswordAttemptsLabel
                                     }
@@ -240,35 +240,35 @@ namespace Umbraco.Core
                             },
                             {
                                 LastLockoutDate,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, true, LastLockoutDate)
+                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLockoutDate)
                                     {
                                         Name = LastLockoutDateLabel
                                     }
                             },
                             {
                                 LastLoginDate,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, true, LastLoginDate)
+                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLoginDate)
                                     {
                                         Name = LastLoginDateLabel
                                     }
                             },
                             {
                                 LastPasswordChangeDate,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, true, LastPasswordChangeDate)
+                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastPasswordChangeDate)
                                     {
                                         Name = LastPasswordChangeDateLabel
                                     }
                             },
                             {
                                 PasswordAnswer,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Nvarchar, true, PasswordAnswer)
+                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordAnswer)
                                     {
                                         Name = PasswordAnswerLabel
                                     }
                             },
                             {
                                 PasswordQuestion,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Nvarchar, true, PasswordQuestion)
+                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordQuestion)
                                     {
                                         Name = PasswordQuestionLabel
                                     }

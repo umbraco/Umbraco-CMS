@@ -344,7 +344,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(definitionUpdated, Is.Not.Null);
                 Assert.That(definitionUpdated.Name, Is.EqualTo("AgeDataType Updated"));
-                Assert.That(definitionUpdated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.NoEdit));
+                Assert.That(definitionUpdated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.Label));
             }
         }
 

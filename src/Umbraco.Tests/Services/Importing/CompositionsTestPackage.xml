@@ -324,7 +324,7 @@
         <GenericProperty>
           <Name>AboutText</Name>
           <Alias>aboutText</Alias>
-          <Type>Umbraco.TinyMCEv3</Type>
+          <Type>Umbraco.TinyMCE</Type>
           <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
           <Tab>About</Tab>
           <Mandatory>False</Mandatory>
@@ -472,7 +472,7 @@
         <GenericProperty>
           <Name>Content</Name>
           <Alias>bodyText</Alias>
-          <Type>Umbraco.TinyMCEv3</Type>
+          <Type>Umbraco.TinyMCE</Type>
           <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
           <Tab>Content</Tab>
           <Mandatory>False</Mandatory>
@@ -593,7 +593,7 @@
         <GenericProperty>
           <Name>Content</Name>
           <Alias>bodyText</Alias>
-          <Type>Umbraco.TinyMCEv3</Type>
+          <Type>Umbraco.TinyMCE</Type>
           <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
           <Tab>Content</Tab>
           <Mandatory>False</Mandatory>
@@ -721,8 +721,8 @@
         <![CDATA[@inherits UmbracoTemplatePage
 @{
     Layout = "umbLayout.cshtml";
-    
-    // If the editor has not explicitly provided the "Page title" property page 
+
+    // If the editor has not explicitly provided the "Page title" property page
     // then just show the name of the page otherwise show the provided title
     var pageTitle = string.IsNullOrWhiteSpace(CurrentPage.Title)
         ? CurrentPage.Name
@@ -745,7 +745,7 @@
                             }
 
                             @CurrentPage.BodyText
-                        </section>                           
+                        </section>
                     </article>
                     <!-- /Content -->
                 </div>
@@ -777,7 +777,7 @@
 @{
     Layout = "umbLayout.cshtml";
 
-    // If the editor has not explicitly provided the "Page title" property page 
+    // If the editor has not explicitly provided the "Page title" property page
     // then just show the name of the page otherwise show the provided title
     var pageTitle = string.IsNullOrWhiteSpace(CurrentPage.Title)
         ? CurrentPage.Name
@@ -787,8 +787,8 @@
     // AncestorsOrSelf is all of the ancestors this page has in the tree
     // (1) means: go up to level 1 and stop looking for more ancestors when you get there
     // First() gets the first ancestor found (the home page, on level 1)
-    var homePage = CurrentPage.AncestorsOrSelf(1).First();    
-    
+    var homePage = CurrentPage.AncestorsOrSelf(1).First();
+
     // Find all pages with document type alias umbNewsOverview
     // We do that using the plural, umbNewsOverviews (note the extra "s" in the end)
     // Then take the first one, as we know there will only be on news overview page
@@ -815,18 +815,18 @@
                         @foreach (var item in newsItems)
                         {
 
-                            // If the editor has not explicitly provided the "Page title" property page 
+                            // If the editor has not explicitly provided the "Page title" property page
                             // then just show the name of the page otherwise show the provided title
-                            var title = string.IsNullOrWhiteSpace(item.Title) 
-                                ? item.Name 
+                            var title = string.IsNullOrWhiteSpace(item.Title)
+                                ? item.Name
                                 : item.Title;
 
 
                             // If the editor has not explicitly set the publishDate property then show the create date
-                            var dateTime = item.PublishDate == default(DateTime) 
-                                ? item.CreateDate 
+                            var dateTime = item.PublishDate == default(DateTime)
+                                ? item.CreateDate
                                 : item.PublishDate;
-                            
+
                             <section>
                                 <h3><a href="@item.Url">@title</a></h3>
                                 <span class="byline">@item.SubHeader</span>
@@ -869,11 +869,11 @@
 @{
     Layout = "umbLayout.cshtml";
 
-    // If the editor has not explicitly provided the "Page title" property page 
+    // If the editor has not explicitly provided the "Page title" property page
     // then just show the name of the page otherwise show the provided title
     var pageTitle = string.IsNullOrWhiteSpace(CurrentPage.Title)
         ? CurrentPage.Name
-        : CurrentPage.Title;    
+        : CurrentPage.Title;
 }
 <div id="main-wrapper">
     <div id="main" class="container">
@@ -892,7 +892,7 @@
                             }
 
                             @CurrentPage.BodyText
-                        </section>                           
+                        </section>
                     </article>
                     <!-- /Content -->
                 </div>

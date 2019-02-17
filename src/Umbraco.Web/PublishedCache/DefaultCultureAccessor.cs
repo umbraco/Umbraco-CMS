@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Services;
+﻿using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PublishedCache
 {
@@ -8,17 +9,20 @@ namespace Umbraco.Web.PublishedCache
     public class DefaultCultureAccessor : IDefaultCultureAccessor
     {
         private readonly ILocalizationService _localizationService;
+        private readonly RuntimeLevel _runtimeLevel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultCultureAccessor"/> class.
         /// </summary>
-        /// <param name="localizationService"></param>
-        public DefaultCultureAccessor(ILocalizationService localizationService)
+        public DefaultCultureAccessor(ILocalizationService localizationService, IRuntimeState runtimeState)
         {
             _localizationService = localizationService;
+            _runtimeLevel = runtimeState.Level;
         }
 
         /// <inheritdoc />
-        public string DefaultCulture => _localizationService.GetDefaultLanguageIsoCode() ?? ""; // fast 
+        public string DefaultCulture => _runtimeLevel == RuntimeLevel.Run
+            ? _localizationService.GetDefaultLanguageIsoCode() ?? "" // fast
+            : "en-US"; // default for install and upgrade, when the service is n/a
     }
 }

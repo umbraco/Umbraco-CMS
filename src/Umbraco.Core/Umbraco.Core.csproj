@@ -161,7 +161,7 @@
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
-    <Compile Include="Compose\CompositionExtensions.cs" />
+    <Compile Include="CompositionExtensions_Accessors.cs" />
     <Compile Include="Composing\DisableAttribute.cs" />
     <Compile Include="Composing\DisableComposerAttribute.cs" />
     <Compile Include="Composing\EnableAttribute.cs" />
@@ -186,7 +186,7 @@
     <Compile Include="Composing\CompositionExtensions\FileSystems.cs" />
     <Compile Include="Composing\CompositionExtensions\Repositories.cs" />
     <Compile Include="Composing\CompositionExtensions\Services.cs" />
-    <Compile Include="CompositionExtensions.cs" />
+    <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -205,6 +205,7 @@
     <Compile Include="Composing\TypeFinder.cs" />
     <Compile Include="Composing\TypeHelper.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Composing\WeightAttribute.cs" />
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
@@ -561,7 +562,6 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
-    <Compile Include="DisposableObject.cs" />
     <Compile Include="Logging\DisposableTimer.cs" />
     <Compile Include="EmailSender.cs" />
     <Compile Include="Enum.cs" />

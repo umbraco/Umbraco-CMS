@@ -10,6 +10,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Deploy;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
@@ -26,7 +27,7 @@ namespace Umbraco.Tests.CoreThings
             var container = new Mock<IFactory>();
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
             container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(NoAppCache.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+                new TypeLoader(NoAppCache.Instance, IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             Current.Factory = container.Object;
 
             Udi.ResetUdiTypes();

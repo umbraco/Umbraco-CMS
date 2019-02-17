@@ -39,6 +39,9 @@ namespace Umbraco.Tests.PublishedContent
         public IAppCache SnapshotCache => null;
 
         public IAppCache ElementsCache => null;
+
+        public void Dispose()
+        { }
     }
 
     class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache

@@ -276,27 +276,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private string GetLocalFilesPath()
         {
-            string path;
-            var tempLocation = _globalSettings.LocalTempStorageLocation;
-            switch (tempLocation)
-            {
-                case LocalTempStorage.AspNetTemp:
-                    path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "NuCache");
-                    break;
-                case LocalTempStorage.EnvironmentTemp:
-                    // TODO: why has this to be repeated everywhere?!
-                    // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-                    // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-                    // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
-                    var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
-                    path = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash, "NuCache");
-                    break;
-                //case LocalTempStorage.Default:
-                //case LocalTempStorage.Unknown:
-                default:
-                    path = IOHelper.MapPath("~/App_Data/TEMP/NuCache");
-                    break;
-            }
+            var path = Path.Combine(_globalSettings.LocalTempPath, "NuCache");
 
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);

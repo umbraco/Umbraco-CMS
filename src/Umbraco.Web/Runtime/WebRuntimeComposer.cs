@@ -64,17 +64,21 @@ namespace Umbraco.Web.Runtime
             // register membership stuff
             composition.Register(factory => Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider());
             composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
-            composition.Register<MembershipHelper>();
+            composition.Register<MembershipHelper>(Lifetime.Request);
+            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<UmbracoContext>().PublishedSnapshot.Members);
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
-            composition.RegisterUnique<IVariationContextAccessor, HttpContextVariationContextAccessor>();
+            composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
             composition.RegisterUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
+
+            // register the umbraco context factory
+            composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
 
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
@@ -104,7 +108,14 @@ namespace Umbraco.Web.Runtime
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
             // so inject a "void" helper (not exactly pretty but...)
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
-                composition.Register<UmbracoHelper>();
+                composition.Register<UmbracoHelper>(factory =>
+                {
+                    var umbCtx = factory.GetInstance<UmbracoContext>();
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null,
+                        factory.GetInstance<ITagQuery>(), factory.GetInstance<ICultureDictionaryFactory>(),
+                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>(),
+                        factory.GetInstance<MembershipHelper>());
+                });
             else
                 composition.Register(_ => new UmbracoHelper());
 

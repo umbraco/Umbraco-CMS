@@ -70,7 +70,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         /// <param name="appCache"></param>
         /// <param name="contentTypeCache"></param>
         /// <param name="entitySerializer"></param>
-        internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ISearcher searchProvider, IAppCache appCache, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer)
+        internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ISearcher searchProvider, IAppCache appCache, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer, IUmbracoContextAccessor umbracoContextAccessor)
             : base(false)
         {
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
@@ -79,6 +79,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _appCache = appCache;
             _contentTypeCache = contentTypeCache;
             _entitySerializer = entitySerializer;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         static PublishedMediaCache()

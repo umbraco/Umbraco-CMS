@@ -135,24 +135,24 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             var umbracoContextAccessor = Umbraco.Web.Composing.Current.UmbracoContextAccessor;
 
-            var umbCtx = UmbracoContext.EnsureContext(
-                umbracoContextAccessor,
-                httpContext,
+            var umbCtx = new UmbracoContext(httpContext,
                 publishedSnapshotService.Object,
                 webSecurity.Object,
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                new TestVariationContextAccessor(),
-                true); //replace it
+                new TestVariationContextAccessor());
+
+            //replace it
+            umbracoContextAccessor.UmbracoContext = umbCtx;
 
             var urlHelper = new Mock<IUrlProvider>();
             urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/hello/world/1234"));
 
-            var membershipHelper = new MembershipHelper(new TestUmbracoContextAccessor(umbCtx), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>());
+            var membershipHelper = new MembershipHelper(umbCtx.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>());
 
-            var umbHelper = new UmbracoHelper(umbCtx,                
+            var umbHelper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
                 Mock.Of<ITagQuery>(),
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),

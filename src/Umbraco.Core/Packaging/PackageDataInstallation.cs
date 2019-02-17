@@ -735,7 +735,7 @@ namespace Umbraco.Core.Packaging
                         property.Element("Name").Value, dataTypeDefinitionId, property.Element("Type").Value.Trim());
 
                     //convert to a label!
-                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.NoEdit).FirstOrDefault();
+                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.Label).FirstOrDefault();
                     //if for some odd reason this isn't there then ignore
                     if (dataTypeDefinition == null) continue;
                 }

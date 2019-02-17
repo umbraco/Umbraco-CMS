@@ -69,7 +69,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return new ForcedPreviewObject(this, preview, callback);
         }
 
-        private class ForcedPreviewObject : DisposableObject
+        private class ForcedPreviewObject : DisposableObjectSlim
         {
             private readonly PublishedSnapshot _publishedSnapshot;
             private readonly bool _origPreview;
