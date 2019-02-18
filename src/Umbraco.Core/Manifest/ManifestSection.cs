@@ -1,10 +1,10 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Core.Models.Trees;
+using Umbraco.Core.Models.Sections;
 
 namespace Umbraco.Core.Manifest
 {
     [DataContract(Name = "section", Namespace = "")]
-    public class ManifestBackOfficeSection : IBackOfficeSection
+    public class ManifestSection : ISection
     {
         [DataMember(Name = "alias")]
         public string Alias { get; set; }

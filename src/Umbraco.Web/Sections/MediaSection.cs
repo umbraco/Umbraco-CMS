@@ -1,12 +1,12 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Models.Trees;
+using Umbraco.Core.Models.Sections;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.Sections
 {
     /// <summary>
     /// Defines the back office media section
     /// </summary>
-    public class MediaBackOfficeSection : IBackOfficeSection
+    public class MediaSection : ISection
     {
         public string Alias => Constants.Applications.Media;
         public string Name => "Media";
