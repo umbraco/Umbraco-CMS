@@ -2199,6 +2199,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
         <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
         <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
+
+        <key alias="tls12HealthCheckSuccess">Your site can use the TLS 1.2 security protocol when making outbound connections to HTTPS endpoints.</key>
+        <key alias="tls12HealthCheckWarn">Your site isn't configured to allow the TLS 1.2 security protocol when making outbound connections: some HTTPS endpoints might not be reachable using a less secure protocol.</key>
     </area>
     <area alias="redirectUrls">
         <key alias="disableUrlTracker">Disable URL tracker</key>

@@ -35,7 +35,7 @@ angular.module("umbraco.directives")
                     var $overlay = element.find(".overlay");
 
 				    scope.style = function () {
-                        if (scope.dimensions.width <= 0) {
+                        if (scope.dimensions.width <= 0 || scope.dimensions.height <= 0) {
 							setDimensions();
 						}
 

@@ -16,17 +16,17 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourtee
         public override void Up()
         {
             // move the data for all member group properties from the NVarchar to the NText column and clear the NVarchar column
-            Execute.Sql(@"UPDATE cmsPropertyData SET dataNtext = dataNvarchar, dataNvarchar = NULL
+            Execute.Sql($@"UPDATE cmsPropertyData SET dataNtext = dataNvarchar, dataNvarchar = NULL
                 WHERE dataNtext IS NULL AND id IN (
 	                SELECT id FROM cmsPropertyData WHERE propertyTypeId in (
 		                SELECT id from cmsPropertyType where dataTypeID IN (
-			                SELECT nodeId FROM cmsDataType WHERE propertyEditorAlias = 'Umbraco.MemberGroupPicker'
+			                SELECT nodeId FROM cmsDataType WHERE propertyEditorAlias = '{Constants.PropertyEditors.MemberGroupPickerAlias}'
 		                )
 	                )
                 )");
 
             // ensure that all exising member group properties are defined as NText
-            Execute.Sql("UPDATE cmsDataType SET dbType = 'Ntext' WHERE propertyEditorAlias = 'Umbraco.MemberGroupPicker'");
+            Execute.Sql($"UPDATE cmsDataType SET dbType = 'Ntext' WHERE propertyEditorAlias = '{Constants.PropertyEditors.MemberGroupPickerAlias}'");
         }
 
         public override void Down()

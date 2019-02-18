@@ -43,7 +43,7 @@ namespace Umbraco.Tests
                     // AutoPublishedContentType will auto-generate other properties
                     new PublishedPropertyType("content", 0, "?"), 
                 };
-            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            var type = new AutoPublishedContentType(0, "anything", "anything", "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
             Debug.Print("INIT LIB {0}",
                 PublishedContentType.Get(PublishedItemType.Content, "anything")

@@ -1458,9 +1458,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="macros">Makroer</key>
     <key alias="mediaTypes">Medietyper</key>
     <key alias="member">Medlemmer</key>
-    <key alias="memberGroups">Medlemsgruppe</key>
+    <key alias="memberGroups">Medlemsgrupper</key>
     <key alias="memberRoles">Roller</key>
-    <key alias="memberTypes">Medlemstype</key>
+    <key alias="memberTypes">Medlemstyper</key>
     <key alias="documentTypes">Dokumenttyper</key>
     <key alias="relationTypes">Relationstyper</key>
     <key alias="packager">Pakker</key>
