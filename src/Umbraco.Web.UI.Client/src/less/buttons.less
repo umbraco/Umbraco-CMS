@@ -206,6 +206,11 @@ input[type="button"] {
 .btn-white {
   .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType, @btnWhiteTypeHover);
 }
+// Made for Umbraco, 2019, used for buttons on grey background.
+.btn-white-shadow {
+  .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType, @btnWhiteTypeHover);
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,.16);
+}
 // Inverse appears as dark gray
 .btn-inverse {
   .buttonBackground(@btnInverseBackground, @btnInverseBackgroundHighlight);

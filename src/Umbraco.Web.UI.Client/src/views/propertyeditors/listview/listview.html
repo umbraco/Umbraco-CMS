@@ -13,13 +13,13 @@
                <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && (selection.length == 0)) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
 
                    <div class="btn-group" ng-show="createAllowedButtonSingle">
-                       <a class="btn btn-white" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
+                       <a class="btn btn-white-shadow" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
                            <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                        </a>
                    </div>
 
                    <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints">
-                       <a class="btn btn-white dropdown-toggle" data-toggle="dropdown" ng-href="">
+                       <a class="btn btn-white-shadow dropdown-toggle" data-toggle="dropdown" ng-href="">
                            <span ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
                                <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                            </span>
@@ -37,7 +37,7 @@
                    </div>
 
                    <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints">
-                       <a class="btn btn-white dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="page.createDropdownOpen = !page.createDropdownOpen">
+                       <a class="btn btn-white-shadow dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="page.createDropdownOpen = !page.createDropdownOpen">
                            <localize key="actions_create">Create</localize>
                            <span class="caret"></span>
                        </a>
