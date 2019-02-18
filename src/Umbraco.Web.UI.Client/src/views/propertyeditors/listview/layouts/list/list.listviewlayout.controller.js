@@ -54,26 +54,33 @@
 
         function clickItem(node) {
             
-            var contentEditor = {
-                id: node.id,
-                submit: function (model) {
-                    // update the node
-                    node.name = model.contentNode.name;
-                    // TODO: node.description = model.contentNode.description;
-                    node.published = model.contentNode.hasPublishedVersion;
-                    if (entityType !== "Member") {
-                        entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
-                            node.url = data;
-                        });
+            if ($scope.entityType === "content") {
+                
+                var contentEditor = {
+                    id: node.id,
+                    submit: function (model) {
+                        // update the node
+                        node.name = model.contentNode.name;
+                        // TODO: node.description = model.contentNode.description;
+                        node.published = model.contentNode.hasPublishedVersion;
+                        if (entityType !== "Member") {
+                            entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
+                                node.url = data;
+                            });
+                        }
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
                     }
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.contentEditor(contentEditor);
-            
+                };
+                editorService.contentEditor(contentEditor);
+                
+            } else {
+                // if node.id is 2147483647 (int.MaxValue) use node.key
+                $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + (node.id === 2147483647 ? node.key : node.id));
+
+            }
         }
 
 
