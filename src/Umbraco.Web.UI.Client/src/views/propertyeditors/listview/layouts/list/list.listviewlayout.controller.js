@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ListViewListLayoutController($scope, listViewHelper, mediaHelper, mediaTypeHelper, editorService) {
+    function ListViewListLayoutController($scope, listViewHelper, mediaHelper, mediaTypeHelper, editorService, $location) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
