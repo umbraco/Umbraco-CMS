@@ -34,11 +34,7 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string ContentPicker = "Umbraco.ContentPicker";
 
-                /// <summary>
-                /// Date.
-                /// </summary>
-                public const string Date = "Umbraco.Date";
-
+   
                 /// <summary>
                 /// DateTime.
                 /// </summary>

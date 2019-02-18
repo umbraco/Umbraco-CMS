@@ -35,7 +35,7 @@ namespace Umbraco.Web.Editors.Filters
 
         private UmbracoContext GetUmbracoContext()
         {
-            return _umbracoContextAccessor.UmbracoContext ?? Composing.Current.UmbracoContext;
+            return _umbracoContextAccessor?.UmbracoContext ?? Composing.Current.UmbracoContext;
         }
 
         protected override bool IsAuthorized(HttpActionContext actionContext)

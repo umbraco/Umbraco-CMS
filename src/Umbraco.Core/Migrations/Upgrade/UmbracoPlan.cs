@@ -136,7 +136,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
 
             To<RenameLabelAndRichTextPropertyEditorAliases>("{E0CBE54D-A84F-4A8F-9B13-900945FD7ED9}");
-
+            To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}");
             //FINAL
 
 
