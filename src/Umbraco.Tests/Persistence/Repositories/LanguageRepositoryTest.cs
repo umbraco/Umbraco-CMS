@@ -79,7 +79,39 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Can_Perform_Get_By_Invariant_Code_On_LanguageRepository()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
 
+                var es = new CultureInfo("es");
+                var esSpecific = new CultureInfo("es-ES");
+
+                var language = (ILanguage)new Language(es.Name)
+                {
+                    CultureName = es.DisplayName,
+                    FallbackLanguageId = 1
+                };
+                repository.Save(language);
+
+                language = repository.GetByIsoCode(es.Name);
+                var languageSpecific = repository.GetByIsoCode(esSpecific.Name);
+                
+                // Assert
+                Assert.That(language, Is.Not.Null);
+                Assert.That(language.HasIdentity, Is.True);
+                Assert.That(language.IsoCode, Is.EqualTo(es.Name));
+
+                Assert.That(languageSpecific, Is.Not.Null);
+                Assert.That(languageSpecific.HasIdentity, Is.True);
+                Assert.That(languageSpecific.Id, Is.EqualTo(language.Id));
+                Assert.That(language.IsoCode, Is.EqualTo(language.IsoCode));
+            }
+        }
+        
         [Test]
         public void Get_When_Id_Doesnt_Exist_Returns_Null()
         {

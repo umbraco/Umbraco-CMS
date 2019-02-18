@@ -227,7 +227,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to save</param>
         /// <param name="userId">Optional id of the user saving the dictionary item</param>
-        public void Save(IDictionaryItem dictionaryItem, int userId = 0)
+        public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -256,7 +256,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-        public void Delete(IDictionaryItem dictionaryItem, int userId = 0)
+        public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -356,7 +356,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to save</param>
         /// <param name="userId">Optional id of the user saving the language</param>
-        public void Save(ILanguage language, int userId = 0)
+        public void Save(ILanguage language, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -409,7 +409,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the language</param>
-        public void Delete(ILanguage language, int userId = 0)
+        public void Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {

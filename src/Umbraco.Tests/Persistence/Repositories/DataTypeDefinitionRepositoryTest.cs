@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository();
                 // Act
-                var dataTypeDefinition = repository.Get(-42);
+                var dataTypeDefinition = repository.Get(Constants.DataTypes.DropDownSingle);
 
                 // Assert
                 Assert.That(dataTypeDefinition, Is.Not.Null);
@@ -344,7 +344,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(definitionUpdated, Is.Not.Null);
                 Assert.That(definitionUpdated.Name, Is.EqualTo("AgeDataType Updated"));
-                Assert.That(definitionUpdated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.NoEdit));
+                Assert.That(definitionUpdated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.Label));
             }
         }
 

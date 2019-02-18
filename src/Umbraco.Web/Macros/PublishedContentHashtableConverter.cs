@@ -30,14 +30,13 @@ namespace Umbraco.Web.Macros
         /// </remarks>
         internal PublishedContentHashtableConverter(PublishedRequest frequest)
         {
-
             if (!frequest.HasPublishedContent)
-                throw new ArgumentException("Document request has no node.", "frequest");
+                throw new ArgumentException("Document request has no node.", nameof(frequest));
 
             PopulatePageData(frequest.PublishedContent.Id,
                 frequest.PublishedContent.Name, frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
                 frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
-                frequest.PublishedContent.Path, frequest.PublishedContent.Parent == null ? -1 : frequest.PublishedContent.Parent.Id);
+                frequest.PublishedContent.Path, frequest.PublishedContent.Parent?.Id ?? -1);
 
             if (frequest.HasTemplate)
             {
@@ -54,12 +53,12 @@ namespace Umbraco.Web.Macros
         /// <param name="doc"></param>
         internal PublishedContentHashtableConverter(IPublishedContent doc)
         {
-            if (doc == null) throw new ArgumentNullException("doc");
+            if (doc == null) throw new ArgumentNullException(nameof(doc));
 
             PopulatePageData(doc.Id,
                 doc.Name, doc.ContentType.Id, doc.ContentType.Alias,
                 doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
-                doc.Path, doc.Parent == null ? -1 : doc.Parent.Id);
+                doc.Path, doc.Parent?.Id ?? -1);
 
             if (doc.TemplateId.HasValue)
             {
@@ -132,6 +131,7 @@ namespace Umbraco.Web.Macros
         /// </summary>
         public Hashtable Elements { get; } = new Hashtable();
 
+
         #region PublishedContent
 
         private class PagePublishedProperty : PublishedPropertyBase
@@ -199,11 +199,11 @@ namespace Umbraco.Web.Macros
                 Key = _inner.Key;
 
                 // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
-                CreatorName = _inner.GetCreatorProfile().Name;
-                WriterName = _inner.GetWriterProfile().Name;
+                CreatorName = _inner.GetCreatorProfile()?.Name;
+                WriterName = _inner.GetWriterProfile()?.Name;
 
-                var contentTypeService = Current.Services.ContentTypeBaseServices.For(_inner);
-                ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentTypeService.Get(_inner.ContentTypeId));
+                var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(_inner);
+                ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentType);
 
                 _properties = ContentType.PropertyTypes
                     .Select(x =>
@@ -252,8 +252,8 @@ namespace Umbraco.Web.Macros
                     if (_cultureInfos != null)
                         return _cultureInfos;
 
-                    return _cultureInfos = _inner.PublishCultureInfos
-                        .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date));
+                    return _cultureInfos = _inner.PublishCultureInfos.Values
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, x.Date));
                 }
             }
 

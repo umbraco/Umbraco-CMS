@@ -1,42 +1,36 @@
-<div ng-controller="Umbraco.Dashboard.FormsDashboardController" class="umb-dashboards-forms-install">
-	<div style="max-width: 800px; text-align: center; margin: auto; padding: 20px; min-height: 800px;">
+<div ng-controller="Umbraco.Dashboard.FormsDashboardController as vm" class="umb-dashboards-forms-install">
+	<div class="installer-wrapper">
 
-		<div class="installer-top"> <!-- ADDED -->
+		<div class="installer-intro">
 			<i class="icon icon-umb-contour"></i>
 			<h3>Umbraco Forms</h3>
-		</div> <!-- ADDED -->
+		</div>
 
-		<div class="step-one" ng-hide="state"> <!-- STEP one -->
+        <!-- STEP one -->
+		<div class="step-one" ng-hide="vm.state">
 
-			<div id="video_1" class="video_player" style="margin-bottom: 40px">
-				<video autoplay loop>
-					<!-- <source src="videos/gif.webm" type="video/webm"> -->
-					<source src="https://player.vimeo.com/external/110229004.hd.mp4?s=823f701836260bd08fb783d38389f628" type="video/mp4">
-					Sorry, you don't have HTML5 video and we didn't catch this properly in javascript.
-				</video>
-			</div>
-
-			<p style="font-size: 16px; line-height: 1.5; color: #4c4c4c; margin-bottom: 20px;">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</p>
+			<p class="step-text">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</p>
 
 			<umb-button
 				class="forms-install-button"
 				type="button"
 				button-style="success"
 				label="Install"
-				action="installForms()">
+				action="vm.installForms()">
 			</umb-button>
 
 		</div>
 
-		<div class="step-two" ng-if="state"> <!-- STEP two -->
-			<p id="installer" style="font-size: 16px; line-height: 1.5; color: #4c4c4c;">Installing...</p>
+        <!-- STEP two -->
+		<div class="step-two" ng-if="vm.state">
+			<p id="installer" class="step-text">Installing...</p>
 
-			<div class="installing">
-				<div style="width: 99%; overflow: hidden" ng-if="state">
-					<div class="umb-loader"></div>
-					<small>{{state}}</small>
-				</div>
-			</div>
+            <div class="installing">
+
+                <umb-load-indicator ng-if="vm.state">
+                </umb-load-indicator>
+
+            </div>
 		</div>
 	</div>
 </div>

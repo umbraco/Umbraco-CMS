@@ -21,15 +21,19 @@ namespace Umbraco.Web
     {
         private UrlHelper _url;
 
-        protected UmbracoWebService()
+        protected UmbracoWebService(IProfilingLogger profilingLogger, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper umbraco, ServiceContext services, IGlobalSettings globalSettings)
         {
-            UmbracoContext = Current.UmbracoContext;
-            Umbraco = new UmbracoHelper(UmbracoContext, Current.Services);
+            Logger = profilingLogger;
+            ProfilingLogger = profilingLogger;
+            UmbracoContextAccessor = umbracoContextAccessor;
+            Umbraco = umbraco;
+            Services = services;
+            GlobalSettings = globalSettings;
+        }
 
-            Logger = Current.Logger;
-            ProfilingLogger = Current.ProfilingLogger;
-            Services = Current.Services;
-            GlobalSettings = Current.Configs.Global();
+        protected UmbracoWebService()
+        : this(Current.ProfilingLogger, Current.UmbracoContextAccessor, Current.UmbracoHelper, Current.Services, Current.Configs.Global())
+        {
         }
 
         /// <summary>
@@ -45,7 +49,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public UmbracoContext UmbracoContext { get; }
+        public UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+
+        /// <summary>
+        /// Gets the Umbraco context accessor.
+        /// </summary>
+        public IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
         /// <summary>
         /// Gets the Umbraco helper.

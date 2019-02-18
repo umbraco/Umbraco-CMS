@@ -8,152 +8,100 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
-using Umbraco.Core.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
 {
-    using Examine = global::Examine;
-
     /// <summary>
     /// A helper class that provides many useful methods and functionality for using Umbraco in templates
     /// </summary>
-    public class UmbracoHelper : IUmbracoComponentRenderer
+    /// <remarks>
+    /// This object is a request based lifetime
+    /// </remarks>
+    public class UmbracoHelper
     {
-        private static readonly HtmlStringUtilities StringUtilities = new HtmlStringUtilities();
+        private readonly IPublishedContentQuery _publishedContentQuery;
+        private readonly ITagQuery _tagQuery;
+        private readonly MembershipHelper _membershipHelper;
+        private readonly IUmbracoComponentRenderer _componentRenderer;
+        private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
 
-        private readonly UmbracoContext _umbracoContext;
-        private readonly IPublishedContent _currentPage;
-        private readonly ServiceContext _services;
-        
-        private IUmbracoComponentRenderer _componentRenderer;
-        private IPublishedContentQuery _query;
-        private MembershipHelper _membershipHelper;
-        private ITagQuery _tag;
+        private IPublishedContent _currentPage;
         private ICultureDictionary _cultureDictionary;
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class.
+        /// Initializes a new instance of <see cref="UmbracoHelper"/>.
         /// </summary>
-        /// <remarks>For tests.</remarks>
-        internal UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content,
+        /// <param name="currentPage">The <see cref="IPublishedContent"/> item assigned to the helper.</param>
+        /// <param name="tagQuery"></param>
+        /// <param name="cultureDictionary"></param>
+        /// <param name="componentRenderer"></param>
+        /// <param name="publishedContentQuery"></param>
+        /// <param name="membershipHelper"></param>
+        /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
+        public UmbracoHelper(IPublishedContent currentPage,
             ITagQuery tagQuery,
-            ICultureDictionary cultureDictionary,
+            ICultureDictionaryFactory cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
-            MembershipHelper membershipHelper,
-            ServiceContext services)
+            IPublishedContentQuery publishedContentQuery,
+            MembershipHelper membershipHelper)
         {
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            _tag = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
-            _cultureDictionary = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
+            _tagQuery = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
+            _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
             _membershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
-            _currentPage = content ?? throw new ArgumentNullException(nameof(content));
-            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _publishedContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
+            _currentPage = currentPage;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class.
+        /// Initializes a new empty instance of <see cref="UmbracoHelper"/>.
         /// </summary>
         /// <remarks>For tests - nothing is initialized.</remarks>
         internal UmbracoHelper()
         { }
 
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class with an Umbraco context
-        /// and a specific content item.
-        /// </summary>
-        /// <param name="umbracoContext">An Umbraco context.</param>
-        /// <param name="content">A content item.</param>
-        /// <param name="services">A services context.</param>
-        /// <remarks>Sets the current page to the supplied content item.</remarks>
-        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services, IPublishedContent content)
-            : this(umbracoContext, services)
-        {
-            _currentPage = content ?? throw new ArgumentNullException(nameof(content));
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class with an Umbraco context.
-        /// </summary>
-        /// <param name="umbracoContext">An Umbraco context.</param>
-        /// <param name="services">A services context.</param>
-        /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
-        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services)
-        {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            if (_umbracoContext.IsFrontEndUmbracoRequest)
-                _currentPage = _umbracoContext.PublishedRequest.PublishedContent;
-        }
-
         #endregion
+
+        // ensures that we can return the specified value
+        T Ensure<T>(T o) where T : class => o ?? throw new InvalidOperationException("This UmbracoHelper instance has not been initialized.");
+
+        private IUmbracoComponentRenderer ComponentRenderer => Ensure(_componentRenderer);
+        private ICultureDictionaryFactory CultureDictionaryFactory => Ensure(_cultureDictionaryFactory);
 
         /// <summary>
         /// Gets the tag context.
         /// </summary>
-        public ITagQuery TagQuery => _tag ??
-            (_tag = new TagQuery(_services.TagService, ContentQuery));
+        public ITagQuery TagQuery => Ensure(_tagQuery);
 
         /// <summary>
         /// Gets the query context.
         /// </summary>
-        public IPublishedContentQuery ContentQuery => _query ??
-            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache, UmbracoContext.VariationContextAccessor));
-
-        /// <summary>
-        /// Gets the Umbraco context.
-        /// </summary>
-        public UmbracoContext UmbracoContext
-        {
-            get
-            {
-                if (_umbracoContext == null)
-                    throw new NullReferenceException("UmbracoContext has not been set.");
-                return _umbracoContext;
-            }
-        }
+        public IPublishedContentQuery ContentQuery => Ensure(_publishedContentQuery);
 
         /// <summary>
         /// Gets the membership helper.
         /// </summary>
-        public MembershipHelper MembershipHelper => _membershipHelper
-            ?? (_membershipHelper = Current.Factory.GetInstance<MembershipHelper>());
+        public MembershipHelper MembershipHelper => Ensure(_membershipHelper);
 
         /// <summary>
-        /// Gets the url provider.
-        /// </summary>
-        public UrlProvider UrlProvider => UmbracoContext.UrlProvider;
-
-        /// <summary>
-        /// Gets the component renderer.
-        /// </summary>
-        public IUmbracoComponentRenderer UmbracoComponentRenderer => _componentRenderer
-            ?? (_componentRenderer = new UmbracoComponentRenderer(UmbracoContext));
-
-        /// <summary>
-        /// Returns the current <seealso cref="IPublishedContent"/> item
-        /// assigned to the UmbracoHelper.
+        /// Gets (or sets) the current <see cref="IPublishedContent"/> item assigned to the UmbracoHelper.
         /// </summary>
         /// <remarks>
         /// <para>
         /// Note that this is the assigned IPublishedContent item to the
         /// UmbracoHelper, this is not necessarily the Current IPublishedContent
-        /// item being rendered. This IPublishedContent object is contextual to
-        /// the current UmbracoHelper instance.
+        /// item being rendered that is assigned to the UmbracoContext.
+        /// This IPublishedContent object is contextual to the current UmbracoHelper instance.
         /// </para>
         ///<para>
         /// In some cases accessing this property will throw an exception if
         /// there is not IPublishedContent assigned to the Helper this will
-        /// only ever happen if the Helper is constructed with an UmbracoContext
-        /// and it is not a front-end request.
+        /// only ever happen if the Helper is constructed via DI during a non front-end request.
         /// </para>
         /// </remarks>
         /// <exception cref="InvalidOperationException">Thrown if the
@@ -169,21 +117,22 @@ namespace Umbraco.Web
                 }
 
                 throw new InvalidOperationException(
-                    $"Cannot return the {nameof(IPublishedContent)} because the {nameof(UmbracoHelper)} was constructed with an {nameof(UmbracoContext)} and the current request is not a front-end request."
+                    $"Cannot return the {nameof(IPublishedContent)} because the {nameof(UmbracoHelper)} was not constructed with an {nameof(IPublishedContent)}."
                     );
 
             }
+            set => _currentPage = value;
         }
 
         /// <summary>
         /// Renders the template for the specified pageId and an optional altTemplateId
         /// </summary>
-        /// <param name="pageId"></param>
+        /// <param name="contentId"></param>
         /// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
         /// <returns></returns>
-        public IHtmlString RenderTemplate(int pageId, int? altTemplateId = null)
+        public IHtmlString RenderTemplate(int contentId, int? altTemplateId = null)
         {
-            return UmbracoComponentRenderer.RenderTemplate(pageId, altTemplateId);
+            return ComponentRenderer.RenderTemplate(contentId, altTemplateId);
         }
 
         #region RenderMacro
@@ -195,7 +144,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias)
         {
-            return UmbracoComponentRenderer.RenderMacro(alias, new { });
+            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, new { });
         }
 
         /// <summary>
@@ -206,7 +155,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, object parameters)
         {
-            return UmbracoComponentRenderer.RenderMacro(alias, parameters.ToDictionary<object>());
+            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters.ToDictionary<object>());
         }
 
         /// <summary>
@@ -217,7 +166,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
-            return UmbracoComponentRenderer.RenderMacro(alias, parameters);
+            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
         }
 
         #endregion
@@ -254,7 +203,7 @@ namespace Umbraco.Web
         /// Returns the ICultureDictionary for access to dictionary items
         /// </summary>
         public ICultureDictionary CultureDictionary => _cultureDictionary
-            ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
+            ?? (_cultureDictionary = CultureDictionaryFactory.CreateDictionary());
 
         #endregion
 
@@ -281,40 +230,7 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Urls
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <returns>The url for the content.</returns>
-        public string Url(int contentId, string culture = null)
-        {
-            return UrlProvider.GetUrl(contentId, culture);
-        }
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="mode">The mode.</param>
-        /// <returns>The url for the content.</returns>
-        public string Url(int contentId, UrlProviderMode mode, string culture = null)
-        {
-            return UrlProvider.GetUrl(contentId, mode, culture);
-        }
-
-        /// <summary>
-        /// Gets the absolute url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <returns>The absolute url for the content.</returns>
-        public string UrlAbsolute(int contentId, string culture = null)
-        {
-            return UrlProvider.GetUrl(contentId, true, culture);
-        }
-
-        #endregion
+       
 
         #region Member/Content/Media from Udi
 
@@ -454,11 +370,9 @@ namespace Umbraco.Web
         private IEnumerable<IPublishedContent> ContentForObjects(IEnumerable<object> ids)
         {
             var idsA = ids.ToArray();
-            IEnumerable<int> intIds;
-            if (ConvertIdsObjectToInts(idsA, out intIds))
+            if (ConvertIdsObjectToInts(idsA, out var intIds))
                 return ContentQuery.Content(intIds);
-            IEnumerable<Guid> guidIds;
-            if (ConvertIdsObjectToGuids(idsA, out guidIds))
+            if (ConvertIdsObjectToGuids(idsA, out var guidIds))
                 return ContentQuery.Content(guidIds);
             return Enumerable.Empty<IPublishedContent>();
         }
@@ -638,12 +552,7 @@ namespace Umbraco.Web
 
         public IPublishedContent Media(Guid id)
         {
-            // TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and
-            // currently there won't be any way to add this method correctly to `ITypedPublishedContentQuery` without breaking an interface and adding GUID support for media
-
-            var entityService = Current.Services.EntityService; // TODO: inject
-            var mediaAttempt = entityService.GetId(id, UmbracoObjectTypes.Media);
-            return mediaAttempt.Success ? ContentQuery.Media(mediaAttempt.Result) : null;
+            return ContentQuery.Media(id);
         }
 
         /// <summary>
@@ -696,12 +605,10 @@ namespace Umbraco.Web
         private IEnumerable<IPublishedContent> MediaForObjects(IEnumerable<object> ids)
         {
             var idsA = ids.ToArray();
-            IEnumerable<int> intIds;
-            if (ConvertIdsObjectToInts(idsA, out intIds))
+            if (ConvertIdsObjectToInts(idsA, out var intIds))
                 return ContentQuery.Media(intIds);
-            //IEnumerable<Guid> guidIds;
-            //if (ConvertIdsObjectToGuids(idsA, out guidIds))
-            //    return ContentQuery.Media(guidIds);
+            if (ConvertIdsObjectToGuids(idsA, out var guidIds))
+                return ContentQuery.Media(guidIds);
             return Enumerable.Empty<IPublishedContent>();
         }
 
@@ -767,218 +674,10 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Strings
+       
 
-        /// <summary>
-        /// Replaces text line breaks with HTML line breaks
-        /// </summary>
-        /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with HTML line breaks (<br/>)</returns>
-        public IHtmlString ReplaceLineBreaksForHtml(string text)
-        {
-            return StringUtilities.ReplaceLineBreaksForHtml(text);
-        }
+        
 
-        /// <summary>
-        /// Generates a hash based on the text string passed in.  This method will detect the
-        /// security requirements (is FIPS enabled) and return an appropriate hash.
-        /// </summary>
-        /// <param name="text">The text to create a hash from</param>
-        /// <returns>Hash of the text string</returns>
-        public string CreateHash(string text)
-        {
-            return text.GenerateHash();
-        }
-
-        /// <summary>
-        /// Strips all HTML tags from a given string, all contents of the tags will remain.
-        /// </summary>
-        public HtmlString StripHtml(IHtmlString html, params string[] tags)
-        {
-            return StripHtml(html.ToHtmlString(), tags);
-        }
-
-        /// <summary>
-        /// Strips all HTML tags from a given string, all contents of the tags will remain.
-        /// </summary>
-        public HtmlString StripHtml(string html, params string[] tags)
-        {
-            return StringUtilities.StripHtmlTags(html, tags);
-        }
-
-        /// <summary>
-        /// Will take the first non-null value in the collection and return the value of it.
-        /// </summary>
-        public string Coalesce(params object[] args)
-        {
-            return StringUtilities.Coalesce(args);
-        }
-
-        /// <summary>
-        /// Joins any number of int/string/objects into one string
-        /// </summary>
-        public string Concatenate(params object[] args)
-        {
-            return StringUtilities.Concatenate(args);
-        }
-
-        /// <summary>
-        /// Joins any number of int/string/objects into one string and separates them with the string separator parameter.
-        /// </summary>
-        public string Join(string separator, params object[] args)
-        {
-            return StringUtilities.Join(separator, args);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString Truncate(IHtmlString html, int length)
-        {
-            return Truncate(html.ToHtmlString(), length, true, false);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis)
-        {
-            return Truncate(html.ToHtmlString(), length, addElipsis, false);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis, bool treatTagsAsContent)
-        {
-            return Truncate(html.ToHtmlString(), length, addElipsis, treatTagsAsContent);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString Truncate(string html, int length)
-        {
-            return Truncate(html, length, true, false);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString Truncate(string html, int length, bool addElipsis)
-        {
-            return Truncate(html, length, addElipsis, false);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
-        {
-            return StringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
-        }
-
-        #region Truncate by Words
-
-        /// <summary>
-        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString TruncateByWords(string html, int words)
-        {
-            int length = StringUtilities.WordsToLength(html, words);
-
-            return Truncate(html, length, true, false);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString TruncateByWords(string html, int words, bool addElipsis)
-        {
-            int length = StringUtilities.WordsToLength(html, words);
-
-            return Truncate(html, length, addElipsis, false);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString TruncateByWords(IHtmlString html, int words)
-        {
-            int length = StringUtilities.WordsToLength(html.ToHtmlString(), words);
-
-            return Truncate(html, length, true, false);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis)
-        {
-            int length = StringUtilities.WordsToLength(html.ToHtmlString(), words);
-
-            return Truncate(html, length, addElipsis, false);
-        }
-
-        #endregion
-
-        #endregion
-
-        #region If
-
-        /// <summary>
-        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
-        /// </summary>
-        public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
-        {
-            return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
-        }
-
-        /// <summary>
-        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
-        /// </summary>
-        public HtmlString If(bool test, string valueIfTrue)
-        {
-            return test ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
-        }
-
-        #endregion
-
-        /// <summary>
-        /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
-        /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
-        /// </summary>
-        /// <param name="controllerName"></param>
-        /// <param name="controllerAction"></param>
-        /// <param name="area"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <returns></returns>
-        internal static string CreateEncryptedRouteString(string controllerName, string controllerAction, string area, object additionalRouteVals = null)
-        {
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
-            if (string.IsNullOrEmpty(controllerAction)) throw new ArgumentNullOrEmptyException(nameof(controllerAction));
-            if (area == null) throw new ArgumentNullException(nameof(area));
-
-            //need to create a params string as Base64 to put into our hidden field to use during the routes
-            var surfaceRouteParams = $"c={HttpUtility.UrlEncode(controllerName)}&a={HttpUtility.UrlEncode(controllerAction)}&ar={area}";
-
-            //checking if the additional route values is already a dictionary and convert to querystring
-            string additionalRouteValsAsQuery;
-            if (additionalRouteVals != null)
-            {
-                var additionalRouteValsAsDictionary = additionalRouteVals as Dictionary<string, object>;
-                if (additionalRouteValsAsDictionary != null)
-                    additionalRouteValsAsQuery = additionalRouteValsAsDictionary.ToQueryString();
-                else
-                    additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
-            }
-            else
-                additionalRouteValsAsQuery = null;
-
-            if (additionalRouteValsAsQuery.IsNullOrWhiteSpace() == false)
-                surfaceRouteParams += "&" + additionalRouteValsAsQuery;
-
-            return surfaceRouteParams.EncryptWithMachineKey();
-        }
+        
     }
 }

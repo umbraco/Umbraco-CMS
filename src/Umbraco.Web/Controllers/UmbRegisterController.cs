@@ -14,11 +14,13 @@ namespace Umbraco.Web.Controllers
     public class UmbRegisterController : SurfaceController
     {
         public UmbRegisterController()
-        { }
+        {
+        }
 
-        public UmbRegisterController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
-            : base(umbracoContext, databaseFactory, services, appCaches, logger, profilingLogger)
-        { }
+        public UmbRegisterController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+        {
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

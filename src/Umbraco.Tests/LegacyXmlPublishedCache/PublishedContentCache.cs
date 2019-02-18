@@ -546,11 +546,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _contentTypeCache.Get(PublishedItemType.Content, alias);
         }
 
-        public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
     }
 }

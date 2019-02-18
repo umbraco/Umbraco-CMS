@@ -21,8 +21,6 @@ namespace Umbraco.Web.WebApi
     [FeatureAuthorize]
     public abstract class UmbracoApiControllerBase : ApiController
     {
-        private UmbracoHelper _umbracoHelper;
-
         // note: all Umbraco controllers have two constructors: one with all dependencies, which should be used,
         // and one with auto dependencies, ie no dependencies - and then dependencies are automatically obtained
         // here from the Current service locator - this is obviously evil, but it allows us to add new dependencies
@@ -35,27 +33,29 @@ namespace Umbraco.Web.WebApi
         protected UmbracoApiControllerBase()
             : this(
                 Current.Factory.GetInstance<IGlobalSettings>(),
-                Current.Factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext,
+                Current.Factory.GetInstance<IUmbracoContextAccessor>(),
                 Current.Factory.GetInstance<ISqlContext>(),
                 Current.Factory.GetInstance<ServiceContext>(),
                 Current.Factory.GetInstance<AppCaches>(),
                 Current.Factory.GetInstance<IProfilingLogger>(),
-                Current.Factory.GetInstance<IRuntimeState>()
+                Current.Factory.GetInstance<IRuntimeState>(),
+                Current.Factory.GetInstance<UmbracoHelper>()
             )
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
         {
+            UmbracoContextAccessor = umbracoContextAccessor;
             GlobalSettings = globalSettings;
             SqlContext = sqlContext;
             Services = services;
             AppCaches = appCaches;
             Logger = logger;
             RuntimeState = runtimeState;
-            UmbracoContext = umbracoContext;
+            Umbraco = umbracoHelper;
         }
 
         /// <summary>
@@ -72,8 +72,14 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public virtual UmbracoContext UmbracoContext { get; }
-    
+        public virtual UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+
+        /// <summary>
+        /// Gets the Umbraco context accessor.
+        /// </summary>
+        public virtual IUmbracoContextAccessor UmbracoContextAccessor { get; }
+
+
         /// <summary>
         /// Gets the sql context.
         /// </summary>
@@ -112,8 +118,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
-        public UmbracoHelper Umbraco => _umbracoHelper
-            ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services));
+        public UmbracoHelper Umbraco { get; }
 
         /// <summary>
         /// Gets the web security helper.

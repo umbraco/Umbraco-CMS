@@ -2,6 +2,7 @@
 using System.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Security;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -11,10 +12,10 @@ namespace Umbraco.Web
     public abstract class UmbracoAuthorizedHttpHandler : UmbracoHttpHandler
     {
         protected UmbracoAuthorizedHttpHandler()
-        { }
+        {
+        }
 
-        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext, ServiceContext services)
-            : base(umbracoContext, services)
+        protected UmbracoAuthorizedHttpHandler(IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper umbracoHelper, ServiceContext service, IProfilingLogger plogger) : base(umbracoContextAccessor, umbracoHelper, service, plogger)
         {
         }
 
@@ -25,7 +26,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         protected bool ValidateUserContextId(string currentUmbracoUserContextId)
         {
-            return UmbracoContext.Security.ValidateCurrentUser();
+            return Security.ValidateCurrentUser();
         }
 
         /// <summary>
@@ -36,7 +37,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         protected bool ValidateCredentials(string username, string password)
         {
-            return UmbracoContext.Security.ValidateBackOfficeCredentials(username, password);
+            return Security.ValidateBackOfficeCredentials(username, password);
         }
 
         /// <summary>

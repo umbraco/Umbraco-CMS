@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading;
 using System.Web;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
@@ -113,8 +112,7 @@ namespace Umbraco.Core.Runtime
                 var configs = GetConfigs();
 
                 // type loader
-                var localTempStorage = configs.Global().LocalTempStorageLocation;
-                var typeLoader = new TypeLoader(appCaches.RuntimeCache, localTempStorage, ProfilingLogger);
+                var typeLoader = new TypeLoader(appCaches.RuntimeCache, configs.Global().LocalTempPath, ProfilingLogger);
 
                 // runtime state
                 // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
@@ -271,7 +269,7 @@ namespace Umbraco.Core.Runtime
                 {
                     _state.Level = RuntimeLevel.BootFailed;
                     _state.Reason = RuntimeLevelReason.BootFailedOnException;
-                    timer.Fail();
+                    timer?.Fail();
                     throw;
                 }
             }
@@ -287,7 +285,7 @@ namespace Umbraco.Core.Runtime
                 }
                 catch
                 {
-                    timer.Fail();
+                    timer?.Fail();
                     throw;
                 }
             }

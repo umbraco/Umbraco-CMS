@@ -7,168 +7,85 @@
 
             var evts = [];
             var allowedNumberOfVisibleEditors = 3;
-            var editorIndent = 60;
-
+            
             scope.editors = [];
-
+            
             function addEditor(editor) {
                 
+                editor.inFront = true;
+                editor.moveRight = true;
+                editor.level = 0;
+                editor.styleIndex = 0;
                 
-                if (!editor.style)
-                    editor.style = {};
-                
-                editor.animating = true;
-                
-                showOverlayOnPrevEditor();
-                
-                var i = allowedNumberOfVisibleEditors;
-                var len = scope.editors.length;
-                while(i<len) {
-                    
-                    var animeConfig = {
-                        target: scope.editors[i].style,
-                        easing: 'easeInOutQuint',
-                        duration: 300
-                    }
-                    
-                    if(scope.editors[i].size !== "small") {
-                        animeConfig.width = "100%";
-                    }
-                    
-                    if(len >= allowedNumberOfVisibleEditors) {
-                        animeConfig.left = i * editorIndent;
-                    } else {
-                        animeConfig.left = (i + 1) * editorIndent;
-                    }
-                    
-                    anime(animeConfig);
-                    
-                    i++;
-                }
-                
+                editor.infinityMode = true;
                 
                 // push the new editor to the dom
                 scope.editors.push(editor);
                 
-                
-                
-                var indentValue = scope.editors.length * editorIndent;
-
-                // don't allow indent larger than what 
-                // fits the max number of visible editors
-                if(scope.editors.length >= allowedNumberOfVisibleEditors) {
-                    indentValue = allowedNumberOfVisibleEditors * editorIndent;
-                }
-
-                // indent all large editors
-                if(editor.size !== "small") {
-                    editor.style.left = indentValue + "px";
-                }
-                
-                editor.style._tx = 100;
-                //editor.style.opacity = 0;
-                editor.style.transform = "translateX("+editor.style._tx+"%)";
-                
-                // animation config
-                anime({
-                    targets: editor.style,
-                    _tx: [100, 0],
-                    //opacity: [0, 1],
-                    easing: 'easeOutExpo',
-                    duration: 480,
-                    update: () => {
-                        editor.style.transform = "translateX("+editor.style._tx+"%)";
-                        scope.$digest();
-                    },
-                    complete: function() {
-                        //$timeout(function(){
-                            editor.animating = false;
-                            scope.$digest();
-                        //});
-                    }
-                });
-                
-
-            }
-
-            function removeEditor(editor) {
+                $timeout(() => {
+                    editor.moveRight = false;
+                })
                 
                 editor.animating = true;
+                setTimeout(revealEditorContent.bind(this, editor), 400);
                 
-                editor.style._tx = 0;
-                editor.style.transform = "translateX("+editor.style._tx+"%)";
+                updateEditors();
+
+            }
+            
+            function removeEditor(editor) {
                 
-                // animation config
-                anime({
-                    targets: editor.style,
-                    _tx: [0, 100],
-                    //opacity: [1, 0],
-                    easing: 'easeInExpo',
-                    duration: 360,
-                    update: () => {
-                        editor.style.transform = "translateX("+editor.style._tx+"%)";
-                        scope.$digest();
-                    },
-                    complete: function() {
-                        //$timeout(function(){
-                        scope.editors.splice(-1,1);
-                        removeOverlayFromPrevEditor();
-                        scope.$digest();
-                        //})
-                    }
-                });
+                editor.moveRight = true;
                 
+                editor.animating = true;
+                setTimeout(removeEditorFromDOM.bind(this, editor), 400);
                 
-                expandEditors();
-                
+                updateEditors(-1);
                 
             }
-
-            function expandEditors() {
+            
+            function revealEditorContent(editor) {
                 
-                var i = allowedNumberOfVisibleEditors + 1;
-                var len = scope.editors.length-1;
+                editor.animating = false;
+                
+                scope.$digest();
+                
+            }
+            
+            function removeEditorFromDOM(editor) {
+                
+                // push the new editor to the dom
+                var index = scope.editors.indexOf(editor);
+                if (index !== -1) {
+                    scope.editors.splice(index, 1);
+                }
+                
+                updateEditors();
+                
+                scope.$digest();
+                
+            }
+            
+            /** update layer positions. With ability to offset positions, needed for when an item is moving out, then we dont want it to influence positions */
+            function updateEditors(offset) {
+                
+                offset = offset || 0;// fallback value.
+                
+                var len = scope.editors.length;
+                var calcLen = len + offset;
+                var ceiling = Math.min(calcLen, allowedNumberOfVisibleEditors);
+                var origin = Math.max(calcLen-1, 0)-ceiling;
+                var i = 0;
                 while(i<len) {
-                    
-                    var animeConfig = {
-                        target: scope.editors[i].style,
-                        easing: 'easeInOutQuint',
-                        duration: 300
-                    }
-                    
-                    if(scope.editors[i].size !== "small" && i === len) {
-                        animeConfig.width = "500px";
-                    }
-                    
-                    if(scope.editors[i].size !== "small" && i === len) {
-                        animeConfig.left = editorWidth - 500;
-                    } else {
-                        animeConfig.left = (index + 1) * editorIndent;
-                    }
-                    
-                    anime(animeConfig);
-                    
+                    var iEditor = scope.editors[i];
+                    iEditor.styleIndex = Math.min(i+1, allowedNumberOfVisibleEditors);
+                    iEditor.level = Math.max(i-origin, -1);
+                    iEditor.inFront = iEditor.level >= ceiling;
                     i++;
                 }
-                
-                
-            }
 
-            // show backdrop on previous editor
-            function showOverlayOnPrevEditor() {
-                var numberOfEditors = scope.editors.length;
-                if(numberOfEditors > 0) {
-                    scope.editors[numberOfEditors - 1].showOverlay = true;
-                }
             }
-
-            function removeOverlayFromPrevEditor() {
-                var numberOfEditors = scope.editors.length;
-                if(numberOfEditors > 0) {
-                    scope.editors[numberOfEditors - 1].showOverlay = false;
-                }
-            }
-
+            
             evts.push(eventsService.on("appState.editors.open", function (name, args) {
                 addEditor(args.editor);
             }));

@@ -33,15 +33,20 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         {
             if (_enabled == false) return;
 
-            MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
-            MiniProfiler.Settings.StackMaxLength = 5000;
-            MiniProfiler.Start();
+            //see https://miniprofiler.com/dotnet/AspDotNet
+            MiniProfiler.Configure(new MiniProfilerOptions
+            {
+                SqlFormatter = new SqlServerFormatter(),
+                StackMaxLength = 5000,
+            });
+            
+            MiniProfiler.StartNew();
         }
 
         public void Stop(bool discardResults = false)
         {
             if (_enabled)
-                MiniProfiler.Stop(discardResults);
+                MiniProfiler.Current.Stop(discardResults);
         }
     }
 }

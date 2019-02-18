@@ -41,17 +41,7 @@ namespace Umbraco.Web.Trees
         /// Gets the usage of the tree.
         /// </summary>
         public TreeUse TreeUse { get; set; } = TreeUse.Main | TreeUse.Dialog;
-
-        /// <summary>
-        /// Gets or sets the tree icon when closed.
-        /// </summary>
-        public string IconClosed { get; set; } = "icon-folder";
-
-        /// <summary>
-        /// Gets or sets the tree icon when open.
-        /// </summary>
-        public string IconOpen { get; set; } = "icon-folder-open";
-
+        
         /// <summary>
         /// Gets or sets the tree sort order.
         /// </summary>

@@ -33,16 +33,10 @@ namespace Umbraco.Web.Editors
         private readonly IDashboardService _dashboardService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DashboardController"/> with auto dependencies.
-        /// </summary>
-        public DashboardController()
-        { }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _dashboardService = dashboardService;
         }
@@ -158,7 +152,7 @@ namespace Umbraco.Web.Editors
             }
 
 
-            //Make remote call to fetch videos or remote dashboard feed data            
+            //Make remote call to fetch videos or remote dashboard feed data
             var key = $"umbraco-XML-feed-{site}-{url.ToCleanString(Core.Strings.CleanStringType.UrlSegment)}";
 
             var content = AppCaches.RuntimeCache.GetCacheItem<string>(key);

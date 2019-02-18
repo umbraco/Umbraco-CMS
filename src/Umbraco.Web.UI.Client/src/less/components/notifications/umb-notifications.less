@@ -1,35 +1,31 @@
 .umb-notifications {
-   z-index: 1000;
-   position: absolute;
-   bottom: @editorFooterHeight;
-   left: 0;
-   right: 0;
-   border-bottom: none;
-   margin: auto;
-   padding: 0px;
-   border: none;
-   background: none;
-   border-radius: 0;
+    z-index: 1000;
+    position: absolute;
+    bottom: @editorFooterHeight;
+    left: 0;
+    right: 0;
+
+    @media (min-width: 1101px) {
+        left: 360px;
+    }
 }
 
 .umb-notifications__notifications {
-   list-style: none;
-   margin: 0;
-   position: relative;
-}
-
+    list-style: none;
+    margin: 0;
+    position: relative;
+} 
 
 .umb-notifications__notification {
-   padding: 5px 20px;
-   text-shadow: none;
-   font-size: 14px;
-   border: none;
-   border-radius: 0;
-   position: relative;
-   margin-bottom: 0;
+    padding: 5px 20px;
+    text-shadow: none;
+    font-size: 14px;
+    border: none;
+    position: relative;
+    margin-bottom: 0;
 }
 
 .umb-notifications__notification.-extra-padding {
-   padding-top: 20px;
-   padding-bottom: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }

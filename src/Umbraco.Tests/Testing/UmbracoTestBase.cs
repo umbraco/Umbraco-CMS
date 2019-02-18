@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using Examine;
@@ -8,9 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
@@ -26,7 +23,6 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Components;
@@ -36,12 +32,15 @@ using Umbraco.Web;
 using Umbraco.Web.Services;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.PublishedCache;
-using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
+using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Web.Composing.CompositionExtensions;
+using Umbraco.Web.Sections;
+using Current = Umbraco.Core.Composing.Current;
+using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.Testing
 {
@@ -155,7 +154,7 @@ namespace Umbraco.Tests.Testing
 
             // etc
             ComposeWeb();
-            ComposeWtf();
+            ComposeMisc();
 
             // not sure really
             Compose(Composition);
@@ -220,17 +219,19 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
 
             // register back office sections in the order we want them rendered
-            Composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>().Append<ContentBackOfficeSection>()
-                .Append<MediaBackOfficeSection>()
-                .Append<SettingsBackOfficeSection>()
-                .Append<PackagesBackOfficeSection>()
-                .Append<UsersBackOfficeSection>()
-                .Append<MembersBackOfficeSection>()
-                .Append<TranslationBackOfficeSection>();
+            Composition.WithCollectionBuilder<SectionCollectionBuilder>().Append<ContentSection>()
+                .Append<MediaSection>()
+                .Append<SettingsSection>()
+                .Append<PackagesSection>()
+                .Append<UsersSection>()
+                .Append<MembersSection>()
+                .Append<FormsSection>()
+                .Append<TranslationSection>();
             Composition.RegisterUnique<ISectionService, SectionService>();
+
         }
 
-        protected virtual void ComposeWtf()
+        protected virtual void ComposeMisc()
         {
             // what else?
             var runtimeStateMock = new Mock<IRuntimeState>();
@@ -280,7 +281,7 @@ namespace Umbraco.Tests.Testing
         // common to all tests = cannot be overriden
         private static TypeLoader CreateCommonTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return new TypeLoader(runtimeCache, globalSettings.LocalTempStorageLocation, logger, false)
+            return new TypeLoader(runtimeCache, globalSettings.LocalTempPath, logger, false)
             {
                 AssembliesToScan = new[]
                 {

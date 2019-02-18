@@ -13,7 +13,6 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class ContentFinderByConfigured404 : IContentLastChanceFinder
     {
-
         private readonly ILogger _logger;
         private readonly IEntityService _entityService;
         private readonly IContentSection _contentConfigSection;
@@ -63,7 +62,7 @@ namespace Umbraco.Web.Routing
             var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentConfigSection.Error404Collection.ToArray(),
                 _entityService,
-                new PublishedContentQuery(frequest.UmbracoContext.ContentCache, frequest.UmbracoContext.MediaCache, frequest.UmbracoContext.VariationContextAccessor),
+                new PublishedContentQuery(frequest.UmbracoContext.PublishedSnapshot, frequest.UmbracoContext.VariationContextAccessor),
                 errorCulture);
 
             IPublishedContent content = null;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -23,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
         public IEnumerable<string> Resolve(IContent source)
         {
             //cannot check permissions without a context
-            if (UmbracoContext.Current == null)
+            if (Current.UmbracoContext == null)
                 return Enumerable.Empty<string>();
 
             string path;
@@ -38,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
             // TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
             // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
             // reference exception :(
-            return UserService.GetPermissionsForPath(UmbracoContext.Current.Security.CurrentUser, path).GetAllPermissions();
+            return UserService.GetPermissionsForPath(Current.UmbracoContext.Security.CurrentUser, path).GetAllPermissions();
         }
     }
 }

@@ -4,11 +4,12 @@ using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.Migrations.PostMigrations;
+using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -16,23 +17,26 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing.Composers;
+using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Macros;
 using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
+using Umbraco.Web.Sections;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Services;
 using Umbraco.Web.SignalR;
+using Umbraco.Web.Templates;
 using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
@@ -61,17 +65,21 @@ namespace Umbraco.Web.Runtime
             // register membership stuff
             composition.Register(factory => Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider());
             composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
-            composition.Register<MembershipHelper>();
+            composition.Register<MembershipHelper>(Lifetime.Request);
+            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<UmbracoContext>().PublishedSnapshot.Members);
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
-            composition.RegisterUnique<IVariationContextAccessor, HttpContextVariationContextAccessor>();
+            composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
             composition.RegisterUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
+
+            // register the umbraco context factory
+            composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
 
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
@@ -86,8 +94,31 @@ namespace Umbraco.Web.Runtime
             // TODO: stop doing this
             composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
 
-            // register the umbraco helper
-            composition.RegisterUnique<UmbracoHelper>();
+            composition.Register<IPublishedContentQuery>(factory =>
+            {
+                var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
+                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetInstance<IVariationContextAccessor>());
+            }, Lifetime.Request);
+            composition.Register<ITagQuery, TagQuery>(Lifetime.Request);
+
+            composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
+            composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
+            composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
+
+            // register the umbraco helper - this is Transient! very important!
+            // also, if not level.Run, we cannot really use the helper (during upgrade...)
+            // so inject a "void" helper (not exactly pretty but...)
+            if (composition.RuntimeState.Level == RuntimeLevel.Run)
+                composition.Register<UmbracoHelper>(factory =>
+                {
+                    var umbCtx = factory.GetInstance<UmbracoContext>();
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null,
+                        factory.GetInstance<ITagQuery>(), factory.GetInstance<ICultureDictionaryFactory>(),
+                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>(),
+                        factory.GetInstance<MembershipHelper>());
+                });
+            else
+                composition.Register(_ => new UmbracoHelper());
 
             // register distributed cache
             composition.RegisterUnique(f => new DistributedCache());
@@ -195,14 +226,15 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentInfoContentAppFactory>();
 
             // register back office sections in the order we want them rendered
-            composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>()
-                .Append<ContentBackOfficeSection>()
-                .Append<MediaBackOfficeSection>()
-                .Append<SettingsBackOfficeSection>()
-                .Append<PackagesBackOfficeSection>()
-                .Append<UsersBackOfficeSection>()
-                .Append<MembersBackOfficeSection>()
-                .Append<TranslationBackOfficeSection>();
+            composition.WithCollectionBuilder<SectionCollectionBuilder>()
+                .Append<ContentSection>()
+                .Append<MediaSection>()
+                .Append<SettingsSection>()
+                .Append<PackagesSection>()
+                .Append<UsersSection>()
+                .Append<MembersSection>()
+                .Append<FormsSection>()
+                .Append<TranslationSection>();
 
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
             composition.WithCollectionBuilder<DashboardCollectionBuilder>()
@@ -230,6 +262,9 @@ namespace Umbraco.Web.Runtime
                 .Append<Soundcloud>()
                 .Append<Issuu>()
                 .Append<Hulu>();
+
+            // replace with web implementation
+            composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();
         }
     }
 }

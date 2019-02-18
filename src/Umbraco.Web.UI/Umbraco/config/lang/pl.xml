@@ -981,14 +981,12 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Domyślny szablon</key>
-    <key alias="dictionary editor egenskab">Klucz słownika</key>
     <key alias="importDocumentTypeHelp">By zaimportować typ dokumentu, wskaż plik ".udt" na swoim komputerze, klikając przycisk "Przeglądaj" i kliknij "Importuj" (zostaniesz poproszony o potwierdzenie w następnym kroku)</key>
     <key alias="newtabname">Nazwa nowej zakładki</key>
     <key alias="nodetype">Typ węzła</key>
     <key alias="objecttype">Typ</key>
     <key alias="stylesheet">Arkusz styli</key>
     <key alias="script">Skrypt</key>
-    <key alias="stylesheet editor egenskab">Właściwości arkusza styli</key>
     <key alias="tab">Zakładka</key>
     <key alias="tabname">Nazwa zakładki</key>
     <key alias="tabs">Zakładki</key>
@@ -1479,7 +1477,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="redirectedTo">Przekierowane do</key>
     <key alias="noRedirects">Nie stworzono żadnych przekierowań</key>
     <key alias="noRedirectsDescription">Kiedy nazwa opublikowanej strony zostanie zmieniona lub zostanie ona przeniesiona, zostanie stworzone automatyczne przekierowanie na nową stronę.</key>
-    <key alias="removeButton">Usuń</key>
     <key alias="confirmRemove">Czy jesteś pewien, że chcesz usunąć przekierowanie z '%0%' do '%1%'?</key>
     <key alias="redirectRemoved">Przekierowanie URL zostało usunięte.</key>
     <key alias="redirectRemoveError">Wystąpił błąd podczas usuwania przekierowania URL.</key>

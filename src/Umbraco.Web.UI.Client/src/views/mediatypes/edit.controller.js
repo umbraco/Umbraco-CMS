@@ -12,7 +12,7 @@
     function MediaTypesEditController($scope, $routeParams, mediaTypeResource, 
         dataTypeResource, editorState, contentEditingHelper, formHelper, 
         navigationService, iconHelper, contentTypeHelper, notificationsService, 
-        $filter, $q, localizationService, overlayHelper, eventsService) {
+        $filter, $q, localizationService, overlayHelper, eventsService, angularHelper) {
 
         var vm = this;
         var evts = [];
@@ -418,6 +418,15 @@
             for (var e in evts) {
                 eventsService.unsubscribe(evts[e]);
             }
+        });
+
+        // changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty 
+        $scope.$watch("vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.isContainer + vm.contentType.compositeContentTypes.length", function (newVal, oldVal) {
+            if (oldVal === undefined) {
+                // still initializing, ignore
+                return;
+            }
+            angularHelper.getCurrentForm($scope).$setDirty();
         });
     }
 

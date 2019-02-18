@@ -99,7 +99,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.LastLockoutDate, opt => opt.Ignore())
                 .ForMember(dest => dest.FailedPasswordAttempts, opt => opt.Ignore())
                 //all invited users will not be approved, completing the invite will approve the user
-                .ForMember(user => user.IsApproved, opt => opt.UseValue(false))
+                .ForMember(user => user.IsApproved, opt => opt.MapFrom(_ => false))
                 .AfterMap((invite, user) =>
                 {
                     user.ClearGroups();
@@ -119,7 +119,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 .ForMember(dest => dest.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .AfterMap((group, display) =>
@@ -134,7 +134,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 .ForMember(dest => dest.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .AfterMap((group, display) =>
@@ -148,9 +148,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(group => group.Id))
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 .ForMember(dest => dest.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
-                .ForMember(dest => dest.DefaultPermissions, opt => opt.ResolveUsing(src => userGroupDefaultPermissionsResolver.Resolve(src)))
+                .ForMember(dest => dest.DefaultPermissions, opt => opt.MapFrom(src => userGroupDefaultPermissionsResolver.Resolve(src)))
                 //these will be manually mapped and by default they are null
                 .ForMember(dest => dest.AssignedPermissions, opt => opt.Ignore())
                 .AfterMap((group, display) =>
@@ -182,11 +182,11 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 .ForMember(dest => dest.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.Users, opt => opt.Ignore())
-                .ForMember(dest => dest.DefaultPermissions, opt => opt.ResolveUsing(src => userGroupDefaultPermissionsResolver.Resolve(src)))
+                .ForMember(dest => dest.DefaultPermissions, opt => opt.MapFrom(src => userGroupDefaultPermissionsResolver.Resolve(src)))
                 .ForMember(dest => dest.AssignedPermissions, opt => opt.Ignore())
                 .AfterMap((group, display) =>
                 {
@@ -276,7 +276,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dest => dest.EmailHash,
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().GenerateHash()))
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 .ForMember(dest => dest.Path, opt => opt.MapFrom(user => "-1," + user.Id))
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
@@ -302,7 +302,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dest => dest.EmailHash,
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 .ForMember(dest => dest.Path, opt => opt.MapFrom(user => "-1," + user.Id))
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.IsCurrentUser, opt => opt.Ignore())

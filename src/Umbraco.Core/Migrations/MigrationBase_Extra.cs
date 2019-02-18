@@ -96,6 +96,12 @@ namespace Umbraco.Core.Migrations
             return tables.Any(x => x.InvariantEquals(tableName));
         }
 
+        protected bool IndexExists(string indexName)
+        {
+            var indexes = SqlSyntax.GetDefinedIndexes(Context.Database);
+            return indexes.Any(x => x.Item2.InvariantEquals(indexName));
+        }
+
         protected bool ColumnExists(string tableName, string columnName)
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -33,13 +32,15 @@ namespace Umbraco.Web.Trees
     public class ApplicationTreeController : UmbracoAuthorizedApiController
     {
         private readonly ITreeService _treeService;
+        private readonly ISectionService _sectionService;
 
-        public ApplicationTreeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
+        public ApplicationTreeController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
-            IRuntimeState runtimeState, ITreeService treeService)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+            IRuntimeState runtimeState, ITreeService treeService, ISectionService sectionService, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
+            _sectionService = sectionService;
         }
 
         /// <summary>
@@ -50,12 +51,15 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="use">Tree use.</param>
         /// <returns></returns>
-        [HttpQueryStringFilter("queryStrings")]
-        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, TreeUse use = TreeUse.Main)
+        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, [System.Web.Http.ModelBinding.ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings, TreeUse use = TreeUse.Main)
         {
             application = application.CleanForXss();
 
             if (string.IsNullOrEmpty(application))
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var section = _sectionService.GetByAlias(application);
+            if (section == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             //find all tree definitions that have the current application alias
@@ -63,7 +67,12 @@ namespace Umbraco.Web.Trees
             var allTrees = groupedTrees.Values.SelectMany(x => x).ToList();
 
             if (allTrees.Count == 0)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+            {
+                //if there are no trees defined for this section but the section is defined then we can have a simple
+                //full screen section without trees
+                var name = Services.TextService.Localize("sections/" + application);
+                return TreeRootNode.CreateSingleTreeRoot(Constants.System.Root.ToInvariantString(), null, null, name, TreeNodeCollection.Empty, true);
+            }
 
             // handle request for a specific tree / or when there is only one tree
             if (!tree.IsNullOrWhiteSpace() || allTrees.Count == 1)
@@ -103,8 +112,8 @@ namespace Umbraco.Web.Trees
                     return treeRootNode;
                 }
 
-                // otherwise it's a section with no tree, aka a fullscreen section
-                // todo is this true? what if we just failed to TryGetRootNode on all of them?
+                // otherwise it's a section with all empty trees, aka a fullscreen section
+                // todo is this true? what if we just failed to TryGetRootNode on all of them? SD: Yes it's true but we should check the result of TryGetRootNode and throw?
                 return TreeRootNode.CreateSingleTreeRoot(Constants.System.Root.ToInvariantString(), null, null, name, TreeNodeCollection.Empty, true);
             }
 

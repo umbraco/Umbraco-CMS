@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Security;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -17,12 +18,16 @@ using Umbraco.Web.WebApi;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Runtime;
+using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Routing
@@ -98,7 +103,8 @@ namespace Umbraco.Tests.Routing
             frequest.PublishedContent = umbracoContext.ContentCache.GetById(1174);
             frequest.TemplateModel = template;
 
-            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>()));
 
             handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
             Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
@@ -133,10 +139,21 @@ namespace Umbraco.Tests.Routing
             frequest.PublishedContent = umbracoContext.ContentCache.GetById(1172);
             frequest.TemplateModel = template;
 
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var type = new AutoPublishedContentType(22, "CustomDocument", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
-            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
+            {
+                var membershipHelper = new MembershipHelper(
+                    umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>());
+               return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContextAccessor,
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper));
+            }));
 
             handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
             Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
@@ -172,8 +189,8 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
-            public CustomDocumentController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
-                : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger)
+            public CustomDocumentController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+                : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
             {
             }
 

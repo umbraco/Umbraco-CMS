@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Web;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -25,6 +27,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
+using File = System.IO.File;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -140,8 +143,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (registered)
                 {
-                    var localContentDbPath = IOHelper.MapPath("~/App_Data/NuCache.Content.db");
-                    var localMediaDbPath = IOHelper.MapPath("~/App_Data/NuCache.Media.db");
+                    var path = GetLocalFilesPath();
+                    var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+                    var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
                     _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
 
                     // if both local databases exist then GetTree will open them, else new databases will be created
@@ -165,10 +169,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             LoadCaches();
 
+            Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
+            int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
+
             if (idkMap != null)
             {
-                idkMap.SetMapper(UmbracoObjectTypes.Document, id => _contentStore.LiveSnapshot.Get(id).Uid, uid => _contentStore.LiveSnapshot.Get(uid).Id);
-                idkMap.SetMapper(UmbracoObjectTypes.Media, id => _mediaStore.LiveSnapshot.Get(id).Uid, uid => _mediaStore.LiveSnapshot.Get(uid).Id);
+                idkMap.SetMapper(UmbracoObjectTypes.Document, id => GetUid(_contentStore, id), uid => GetId(_contentStore, uid));
+                idkMap.SetMapper(UmbracoObjectTypes.Media, id => GetUid(_mediaStore, id), uid => GetId(_mediaStore, uid));
             }
         }
 
@@ -265,13 +272,49 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #endregion
 
+        #region Local files
+
+        private string GetLocalFilesPath()
+        {
+            var path = Path.Combine(_globalSettings.LocalTempPath, "NuCache");
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            return path;
+        }
+
+        private void DeleteLocalFilesForContent()
+        {
+            if (_isReady && _localContentDb != null)
+                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
+
+            var path = GetLocalFilesPath();
+            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+            if (File.Exists(localContentDbPath))
+                File.Delete(localContentDbPath);
+        }
+
+        private void DeleteLocalFilesForMedia()
+        {
+            if (_isReady && _localMediaDb != null)
+                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
+
+            var path = GetLocalFilesPath();
+            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
+            if (File.Exists(localMediaDbPath))
+                File.Delete(localMediaDbPath);
+        }
+
+        #endregion
+
         #region Environment
 
         public override bool EnsureEnvironment(out IEnumerable<string> errors)
         {
             // must have app_data and be able to write files into it
-            var ok = FilePermissionHelper.TryCreateDirectory(SystemDirectories.Data);
-            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local DB files." };
+            var ok = FilePermissionHelper.TryCreateDirectory(GetLocalFilesPath());
+            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local files." };
             return ok;
         }
 
@@ -530,10 +573,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
-            // no cache, nothing we can do
+            // no cache, trash everything
             if (_isReady == false)
             {
-                draftChanged = publishedChanged = false;
+                DeleteLocalFilesForContent();
+                draftChanged = publishedChanged = true;
                 return;
             }
 
@@ -625,10 +669,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
-            // no cache, nothing we can do
+            // no cache, trash everything
             if (_isReady == false)
             {
-                anythingChanged = false;
+                DeleteLocalFilesForMedia();
+                anythingChanged = true;
                 return;
             }
 
@@ -1204,9 +1249,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cultureData = new Dictionary<string, CultureVariation>();
 
             // sanitize - names should be ok but ... never knows
-            var contentTypeService = _contentTypeBaseServiceProvider.For(content);
-            var contentType = contentTypeService.Get(content.ContentTypeId);
-            if (contentType.VariesByCulture())
+            if (content.ContentType.VariesByCulture())
             {
                 var infos = content is IContent document
                     ? (published
@@ -1214,10 +1257,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         : document.CultureInfos)
                     : content.CultureInfos;
 
-                foreach (var (culture, info) in infos)
+                // ReSharper disable once UseDeconstruction
+                foreach (var cultureInfo in infos)
                 {
-                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(culture);
-                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
+                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
+                    cultureData[cultureInfo.Culture] = new CultureVariation { Name = cultureInfo.Name, Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
                 }
             }
 
@@ -1247,6 +1291,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #endregion
 
         #region Rebuild Database PreCache
+
+        public override void Rebuild()
+        {
+            _logger.Debug<PublishedSnapshotService>("Rebuilding...");
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                scope.ReadLock(Constants.Locks.MediaTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
+                RebuildContentDbCacheLocked(scope, 5000, null);
+                RebuildMediaDbCacheLocked(scope, 5000, null);
+                RebuildMemberDbCacheLocked(scope, 5000, null);
+                scope.Complete();
+            }
+        }
 
         public void RebuildContentDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {

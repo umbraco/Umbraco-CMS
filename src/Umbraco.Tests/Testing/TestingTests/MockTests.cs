@@ -16,6 +16,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.Testing.TestingTests
         public void Can_Mock_Umbraco_Context()
         {
             var umbracoContext = TestObjects.GetUmbracoContextMock(Current.UmbracoContextAccessor);
-            Assert.AreEqual(umbracoContext, UmbracoContext.Current);
+            Assert.AreEqual(umbracoContext, Current.UmbracoContext);
         }
 
         [Test]
@@ -60,13 +61,12 @@ namespace Umbraco.Tests.Testing.TestingTests
             Composition.Register<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
-            var helper = new UmbracoHelper(umbracoContext,
-                Mock.Of<IPublishedContent>(),
+            var helper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
                 Mock.Of<ITagQuery>(),
-                Mock.Of<ICultureDictionary>(),
+                Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>()),
-                ServiceContext.CreatePartial());
+                Mock.Of<IPublishedContentQuery>(),
+                new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>()));
             Assert.Pass();
         }
 

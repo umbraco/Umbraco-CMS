@@ -9,6 +9,7 @@ using System.Linq;
 using HtmlAgilityPack;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -21,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class RteMacroRenderingValueConverter : TinyMceValueConverter
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly ServiceContext _services;
+        private readonly IMacroRenderer _macroRenderer;
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
         {
@@ -30,10 +31,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return PropertyCacheLevel.Snapshot;
         }
 
-        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services)
+        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
-            _services = services;
+            _macroRenderer = macroRenderer;
         }
 
         // NOT thread-safe over a request because it modifies the
@@ -47,14 +48,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 var sb = new StringBuilder();
 
-                var umbracoHelper = new UmbracoHelper(umbracoContext, _services);
                 MacroTagParser.ParseMacros(
                     source,
                     //callback for when text block is found
                     textBlock => sb.Append(textBlock),
                     //callback for when macro syntax is found
-                    (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
+                    (macroAlias, macroAttributes) => sb.Append(_macroRenderer.Render(
                         macroAlias,
+                        umbracoContext.PublishedRequest?.PublishedContent,
                         //needs to be explicitly casted to Dictionary<string, object>
                         macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
 
@@ -72,7 +73,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, UmbracoContext.Current);
+            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, Current.UmbracoContext);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly

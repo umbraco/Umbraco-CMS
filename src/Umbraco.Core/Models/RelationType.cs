@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -36,25 +34,14 @@ namespace Umbraco.Core.Models
             Name = name;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<RelationType, string>(x => x.Name);
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<RelationType, string>(x => x.Alias);
-            public readonly PropertyInfo IsBidirectionalSelector = ExpressionHelper.GetPropertyInfo<RelationType, bool>(x => x.IsBidirectional);
-            public readonly PropertyInfo ParentObjectTypeSelector = ExpressionHelper.GetPropertyInfo<RelationType, Guid>(x => x.ParentObjectType);
-            public readonly PropertyInfo ChildObjectTypeSelector = ExpressionHelper.GetPropertyInfo<RelationType, Guid>(x => x.ChildObjectType);
-        }
-
         /// <summary>
         /// Gets or sets the Name of the RelationType
         /// </summary>
         [DataMember]
         public string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -63,8 +50,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Alias
         {
-            get { return _alias; }
-            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -73,8 +60,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool IsBidirectional
         {
-            get { return _isBidrectional; }
-            set { SetPropertyValueAndDetectChanges(value, ref _isBidrectional, Ps.Value.IsBidirectionalSelector); }
+            get => _isBidrectional;
+            set => SetPropertyValueAndDetectChanges(value, ref _isBidrectional, nameof(IsBidirectional));
         }
 
         /// <summary>
@@ -84,8 +71,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public Guid ParentObjectType
         {
-            get { return _parentObjectType; }
-            set { SetPropertyValueAndDetectChanges(value, ref _parentObjectType, Ps.Value.ParentObjectTypeSelector); }
+            get => _parentObjectType;
+            set => SetPropertyValueAndDetectChanges(value, ref _parentObjectType, nameof(ParentObjectType));
         }
 
         /// <summary>
@@ -95,8 +82,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public Guid ChildObjectType
         {
-            get { return _childObjectType; }
-            set { SetPropertyValueAndDetectChanges(value, ref _childObjectType, Ps.Value.ChildObjectTypeSelector); }
+            get => _childObjectType;
+            set => SetPropertyValueAndDetectChanges(value, ref _childObjectType, nameof(ChildObjectType));
         }
 
     }

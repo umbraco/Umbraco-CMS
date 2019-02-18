@@ -30,19 +30,14 @@ namespace Umbraco.Web.WebApi
     {
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoAuthorizedApiController"/> with auto dependencies.
-        /// </summary>
-        /// <remarks>Dependencies are obtained from the <see cref="Current"/> service locator.</remarks>
         protected UmbracoAuthorizedApiController()
-        { }
+        {
+        }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoAuthorizedApiController"/> class with all its dependencies.
-        /// </summary>
-        protected UmbracoAuthorizedApiController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
-        { }
+        protected UmbracoAuthorizedApiController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
 
         /// <summary>
         /// Gets the user manager.

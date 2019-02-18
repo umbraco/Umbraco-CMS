@@ -12,7 +12,7 @@
                      ng-model="filesHolder"
                      ngf-change="handleFiles($files, $event)"
                      class="umb-upload-local__dropzone"
-                     ngf-drag-over-class="drag-over"
+                     ngf-drag-over-class="'drag-over'"
                      ngf-multiple="false"
                      ngf-allow-dir="false"
                      ngf-pattern="*.zip"
@@ -105,17 +105,21 @@
                             <img ng-if="vm.localPackage.iconUrl" ng-src="{{vm.localPackage.iconUrl}}" alt="" />
                         </div>
 
-
                         <div class="umb-package-info">
                             <h4 class="umb-info-local-item"><strong>{{ vm.localPackage.name }}</strong></h4>
 
                             <div class="umb-info-local-item">
-                                <strong><localize key="packager_packageAuthor">Author</localize></strong>
+                                <strong><localize key="packager_packageAuthor">Author</localize></strong><br>
                                 <a href="{{ vm.localPackage.authorUrl }}" target="_blank">{{ vm.localPackage.author }}</a>
                             </div>
 
+                            <div class="umb-info-local-item" ng-if="vm.localPackage.contributors && vm.localPackage.contributors.length > 0">
+                                <strong><localize key="packager_packageContrib">Contributors</localize></strong><br>
+                                <span>{{ vm.localPackage.contributors.join(', ')}}</span>
+                            </div>
+
                             <div class="umb-info-local-item">
-                                <strong><localize key="packager_packageVersion">Version</localize></strong>
+                                <strong><localize key="packager_packageVersion">Version</localize></strong><br>
                                 {{ vm.localPackage.version }}
                                 <p ng-if="vm.localPackage.originalVersion">
                                     <small>
@@ -128,13 +132,12 @@
                             </div>
 
                             <div class="umb-info-local-item">
-                                <strong><localize key="packager_packageLicense">License</localize></strong>
+                                <strong><localize key="packager_packageLicense">License</localize></strong><br>
                                 <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">{{ vm.localPackage.license }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
-                                <strong><localize key="packager_packageReadme">Read me</localize></strong>
-                                <br>
+                                <strong><localize key="packager_packageReadme">Read me</localize></strong><br>
                                 <small ng-bind-html="vm.localPackage.readme"></small>
                             </div>
 

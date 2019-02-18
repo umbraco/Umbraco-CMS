@@ -5,7 +5,13 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -28,6 +34,11 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class DictionaryController : BackOfficeNotificationsController
     {
+        public DictionaryController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
+
         /// <summary>
         /// Deletes a data type with a given ID
         /// </summary>
@@ -41,7 +52,7 @@ namespace Umbraco.Web.Editors
 
             if (foundDictionary == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+
             Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -64,7 +75,7 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrEmpty(key))
                 return Request
-                    .CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO: translate
+                    .CreateNotificationValidationErrorResponse("Key can not be empty."); // TODO: translate
 
             if (Services.LocalizationService.DictionaryItemExists(key))
             {
@@ -127,7 +138,7 @@ namespace Umbraco.Web.Editors
         /// </param>
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>.
-        /// </returns>      
+        /// </returns>
         public DictionaryDisplay PostSave(DictionarySave dictionary)
         {
             var dictionaryItem =

@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditorController",
-    function ($scope, gridService) {
+    function ($scope, gridService, editorService) {
 
         var emptyModel = {
             styles:[
@@ -89,28 +89,23 @@ angular.module("umbraco")
               };
               $scope.model.value.templates.push(template);
            }
+            
+            var layoutConfigOverlay = {
+                currentLayout: template,
+                rows: $scope.model.value.layouts,
+                columns: $scope.model.value.columns,
+                view: "views/propertyEditors/grid/dialogs/layoutconfig.html",
+                size: "small",
+                submit: function(model) {
+                    editorService.close();
+                },
+                close: function(model) {
+                    editorService.close();
+                }
+            };
 
-           $scope.layoutConfigOverlay = {};
-           $scope.layoutConfigOverlay.view = "views/propertyEditors/grid/dialogs/layoutconfig.html";
-           $scope.layoutConfigOverlay.currentLayout = template;
-           $scope.layoutConfigOverlay.rows = $scope.model.value.layouts;
-           $scope.layoutConfigOverlay.columns = $scope.model.value.columns;
-           $scope.layoutConfigOverlay.show = true;
-
-           $scope.layoutConfigOverlay.submit = function(model) {
-              $scope.layoutConfigOverlay.show = false;
-              $scope.layoutConfigOverlay = null;
-           };
-
-           $scope.layoutConfigOverlay.close = function(oldModel) {
-
-              //reset templates
-              $scope.model.value.templates = templatesCopy;
-
-              $scope.layoutConfigOverlay.show = false;
-              $scope.layoutConfigOverlay = null;
-           }
-
+            editorService.open(layoutConfigOverlay);
+           
         };
 
         $scope.deleteTemplate = function(index){
@@ -135,50 +130,44 @@ angular.module("umbraco")
                 };
                 $scope.model.value.layouts.push(layout);
            }
-
-           $scope.rowConfigOverlay = {};
-           $scope.rowConfigOverlay.view = "views/propertyEditors/grid/dialogs/rowconfig.html";
-           $scope.rowConfigOverlay.currentRow = layout;
-           $scope.rowConfigOverlay.editors = $scope.editors;
-           $scope.rowConfigOverlay.columns = $scope.model.value.columns;
-           $scope.rowConfigOverlay.show = true;
-
-           $scope.rowConfigOverlay.submit = function(model) {
-             $scope.rowConfigOverlay.show = false;
-             $scope.rowConfigOverlay = null;
+           
+           var rowConfigOverlay = {
+               currentRow: layout,
+               editors: $scope.editors,
+               columns: $scope.model.value.columns,
+               view: "views/propertyEditors/grid/dialogs/rowconfig.html",
+               size: "small",
+               submit: function(model) {
+                   editorService.close();
+               },
+               close: function(model) {
+                   editorService.close();
+               }
            };
 
-           $scope.rowConfigOverlay.close = function(oldModel) {
-             $scope.model.value.layouts = layoutsCopy;
-             $scope.rowConfigOverlay.show = false;
-             $scope.rowConfigOverlay = null;
-           };
-
+           editorService.open(rowConfigOverlay);
+           
         };
 
         //var rowDeletesPending = false;
         $scope.deleteLayout = function(index) {
+            
+            var rowDeleteOverlay = {
+                dialogData: {
+                  rowName: $scope.model.value.layouts[index].name
+                },
+                view: "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html",
+                size: "small",
+                submit: function(model) {
+                    $scope.model.value.layouts.splice(index, 1);
+                    editorService.close();
+                },
+                close: function(model) {
+                    editorService.close();
+                }
+            };
 
-           $scope.rowDeleteOverlay = {};
-           $scope.rowDeleteOverlay.view = "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html";
-           $scope.rowDeleteOverlay.dialogData = {
-             rowName: $scope.model.value.layouts[index].name
-           };
-           $scope.rowDeleteOverlay.show = true;
-
-           $scope.rowDeleteOverlay.submit = function(model) {
-
-             $scope.model.value.layouts.splice(index, 1);
-
-             $scope.rowDeleteOverlay.show = false;
-             $scope.rowDeleteOverlay = null;
-           };
-
-           $scope.rowDeleteOverlay.close = function(oldModel) {
-             $scope.rowDeleteOverlay.show = false;
-             $scope.rowDeleteOverlay = null;
-           };
-
+            editorService.open(rowDeleteOverlay);
         };
 
 
@@ -210,26 +199,22 @@ angular.module("umbraco")
         };
 
         var editConfigCollection = function(configValues, title, callback) {
+            
+            var editConfigCollectionOverlay = {
+                config: configValues,
+                title: title,
+                view: "views/propertyeditors/grid/dialogs/editconfig.html",
+                size: "small",
+                submit: function(model) {
+                    callback(model.config);
+                    editorService.close();
+                },
+                close: function(model) {
+                    editorService.close();
+                }
+            };
 
-           $scope.editConfigCollectionOverlay = {};
-           $scope.editConfigCollectionOverlay.view = "views/propertyeditors/grid/dialogs/editconfig.html";
-           $scope.editConfigCollectionOverlay.config = configValues;
-           $scope.editConfigCollectionOverlay.title = title;
-           $scope.editConfigCollectionOverlay.show = true;
-
-           $scope.editConfigCollectionOverlay.submit = function(model) {
-
-              callback(model.config)
-
-              $scope.editConfigCollectionOverlay.show = false;
-              $scope.editConfigCollectionOverlay = null;
-           };
-
-           $scope.editConfigCollectionOverlay.close = function(oldModel) {
-              $scope.editConfigCollectionOverlay.show = false;
-              $scope.editConfigCollectionOverlay = null;
-           };
-
+            editorService.open(editConfigCollectionOverlay);
         };
 
         $scope.editConfig = function() {

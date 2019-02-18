@@ -1,19 +1,19 @@
-﻿namespace Umbraco.Core.Models
+﻿using Umbraco.Core.Models.Entities;
+
+namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents a simplified view of a content type.
     /// </summary>
-    public interface ISimpleContentType
+    public interface ISimpleContentType : IUmbracoEntity
     {
+        new int Id { get; }
+        new string Name { get; }
+
         /// <summary>
         /// Gets the alias of the content type.
         /// </summary>
         string Alias { get; }
-
-        /// <summary>
-        /// Gets the identifier of the content type.
-        /// </summary>
-        int Id { get; }
 
         /// <summary>
         /// Gets the default template of the content type.
@@ -34,11 +34,6 @@
         /// Gets a value indicating whether the content type is a container.
         /// </summary>
         bool IsContainer { get; }
-
-        /// <summary>
-        /// Gets the name of the content type.
-        /// </summary>
-        string Name { get; }
 
         /// <summary>
         /// Gets a value indicating whether content of that type can be created at the root of the tree.

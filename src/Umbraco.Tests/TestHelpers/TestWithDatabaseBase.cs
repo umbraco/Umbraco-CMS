@@ -307,6 +307,13 @@ namespace Umbraco.Tests.TestHelpers
                     var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger);
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
+
+                    //Special case, we need to create the xml cache tables manually since they are not part of the default
+                    //setup.
+                    //TODO: Remove this when we update all tests to use nucache
+                    schemaHelper.CreateTable<ContentXmlDto>();
+                    schemaHelper.CreateTable<PreviewXmlDto>();
+
                     scope.Complete();
                 }
 

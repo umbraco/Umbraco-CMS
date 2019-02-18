@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {
@@ -210,7 +211,7 @@ namespace Umbraco.Web.Routing
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
-                : provider.GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
+                : provider.GetUrlFromRoute(route, Current.UmbracoContext, id, _umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
             return url ?? "#";
         }
 
@@ -245,7 +246,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
-            return _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current));
+            return _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current) ?? Enumerable.Empty<UrlInfo>());
         }
 
         #endregion

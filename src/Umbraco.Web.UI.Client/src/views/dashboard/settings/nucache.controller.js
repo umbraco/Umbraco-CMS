@@ -1,57 +1,112 @@
-﻿function nuCacheController($scope, umbRequestHelper, $log, $http, $q, $timeout) {
+﻿function nuCacheController($scope, $http, umbRequestHelper, localizationService, overlayService) {
 
-    $scope.reload = function () {
-        if ($scope.working) return;
-        if (confirm("Trigger a in-memory and local file cache reload on all servers.")) {
-            $scope.working = true;
-            umbRequestHelper.resourcePromise(
-                $http.post(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "ReloadCache")),
-                    'Failed to trigger a cache reload')
-            .then(function (result) {
-                $scope.working = false;
-            });
-        }
-    };
+    var vm = this;
 
-    $scope.collect = function () {
-        if ($scope.working) return;
-        $scope.working = true;
+    vm.collect = collect;
+    vm.reload = reload;
+    vm.verify = verify;
+    vm.rebuild = rebuild;
+
+    function reload(event) {
+        if (vm.working) return;
+
+        const dialog = {
+            view: "views/dashboard/settings/overlays/nucache.reload.html",
+            submitButtonLabelKey: "general_ok",
+            submit: function (model) {
+                performReload();
+                overlayService.close();
+            },
+            close: function () {
+                overlayService.close();
+            }
+        };
+
+        localizationService.localize("general_reload").then(value => {
+            dialog.title = value;
+            overlayService.open(dialog);
+        });
+
+        event.preventDefault()
+        event.stopPropagation();
+    }
+
+    function collect() {
+        if (vm.working) return;
+        vm.working = true;
         umbRequestHelper.resourcePromise(
                 $http.get(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "Collect")),
                     'Failed to verify the cache.')
             .then(function (result) {
-                $scope.working = false;
-                $scope.status = result;
+                vm.working = false;
+                vm.status = result;
             });
-    };
+    }
 
-    $scope.verify = function () {
-        if ($scope.working) return;
-        $scope.working = true;
+    function verify() {
+        if (vm.working) return;
+        vm.working = true;
         umbRequestHelper.resourcePromise(
                 $http.get(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "GetStatus")),
                     'Failed to verify the cache.')
             .then(function (result) {
-                $scope.working = false;
-                $scope.status = result;
+                vm.working = false;
+                vm.status = result;
             });
-    };
+    }
 
-    $scope.rebuild = function () {
-        if ($scope.working) return;
-        if (confirm("Rebuild cmsContentNu table content. Expensive.")) {
-            $scope.working = true;
-            umbRequestHelper.resourcePromise(
-                    $http.post(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "RebuildDbCache")),
-                        'Failed to rebuild the cache.')
-                .then(function (result) {
-                    $scope.working = false;
-                    $scope.status = result;
-                });
-        }
-    };
+    function rebuild(event) {
+        if (vm.working) return;
 
-    $scope.working = false;
-    $scope.verify();
+        const dialog = {
+            view: "views/dashboard/settings/overlays/nucache.rebuild.html",
+            submitButtonLabelKey: "general_ok",
+            submit: function (model) {
+                performRebuild();
+                overlayService.close();
+            },
+            close: function () {
+                overlayService.close();
+            }
+        };
+
+        localizationService.localize("general_rebuild").then(value => {
+            dialog.title = value;
+            overlayService.open(dialog);
+        });
+
+        event.preventDefault()
+        event.stopPropagation();
+    }
+
+    function performReload() {
+        vm.working = true;
+
+        umbRequestHelper.resourcePromise(
+            $http.post(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "ReloadCache")),
+            'Failed to trigger a cache reload')
+            .then(function (result) {
+                vm.working = false;
+            });
+    }
+
+    function performRebuild() {
+        vm.working = true;
+
+        umbRequestHelper.resourcePromise(
+            $http.post(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "RebuildDbCache")),
+            'Failed to rebuild the cache.')
+            .then(function (result) {
+                vm.working = false;
+                vm.status = result;
+            });
+    }
+
+    function init() {
+        vm.working = false;
+        verify();
+    }
+
+    init();
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.NuCacheController", nuCacheController);

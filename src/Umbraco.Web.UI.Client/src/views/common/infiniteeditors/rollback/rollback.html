@@ -40,7 +40,7 @@
                             ng-model="vm.selectedVersion"
                             ng-options="version.displayValue for version in vm.previousVersions track by version.versionId"
                             ng-change="vm.changeVersion(vm.selectedVersion)">
-                            <option value=""><localize key="general_choose">Choose</localize>...</option>
+                            <option value="">{{vm.labels.choose}}...</option>
                         </select>
                     </div>
 

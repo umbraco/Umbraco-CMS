@@ -25,7 +25,7 @@
                    class="typeahead tags-{{vm.htmlId}}"
                    ng-model="vm.tagToAdd"
                    ng-keydown="vm.addTagOnEnter($event)"
-                   on-blur="vm.addTag()"
+                   ng-blur="vm.addTag()"
                    localize="placeholder"
                    placeholder="@placeholders_enterTags" />
 

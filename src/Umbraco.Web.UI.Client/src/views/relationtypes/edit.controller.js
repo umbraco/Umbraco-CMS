@@ -71,26 +71,52 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     }
 
     function getRelationNames(relationType) {
-        if(relationType.relations) {
-            angular.forEach(relationType.relations, function(relation){
-                entityResource.getById(relation.parentId, relationType.parentObjectTypeName).then(function(entity) {
-                    relation.parentName = entity.name;
+        if (relationType.relations) {
+            // can we grab app entity types in one go?
+            if (relationType.parentObjectType === relationType.childObjectType) {
+                // yep, grab the distinct list of parent and child entities
+                var entityIds = _.uniq(_.union(_.pluck(relationType.relations, "parentId"), _.pluck(relationType.relations, "childId")));
+                entityResource.getByIds(entityIds, relationType.parentObjectTypeName).then(function (entities) {
+                    updateRelationNames(relationType, entities);
                 });
-                entityResource.getById(relation.childId, relationType.childObjectTypeName).then(function(entity) {
-                    relation.childName = entity.name;
+            } else {
+                // nope, grab the parent and child entities individually
+                var parentEntityIds = _.uniq(_.pluck(relationType.relations, "parentId"));
+                var childEntityIds = _.uniq(_.pluck(relationType.relations, "childId"));
+                entityResource.getByIds(parentEntityIds, relationType.parentObjectTypeName).then(function (entities) {
+                    updateRelationNames(relationType, entities);
                 });
-            });
+                entityResource.getByIds(childEntityIds, relationType.childObjectTypeName).then(function (entities) {
+                    updateRelationNames(relationType, entities);
+                });
+            }
         }
     }
 
+    function updateRelationNames(relationType, entities) {
+        var entitiesById = _.indexBy(entities, "id");
+        _.each(relationType.relations, function(relation) {
+            if (entitiesById[relation.parentId]) {
+                relation.parentName = entitiesById[relation.parentId].name;
+            }
+            if (entitiesById[relation.childId]) {
+                relation.childName = entitiesById[relation.childId].name;
+            }
+        });
+    }
+
     function saveRelationType() {
-        vm.page.saveButtonState = "busy";
 
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+
+            vm.page.saveButtonState = "busy";
+
             relationTypeResource.save(vm.relationType).then(function (data) {
                 formHelper.resetForm({ scope: $scope, notifications: data.notifications });
                 bindRelationType(data);
+
                 vm.page.saveButtonState = "success";
+
             }, function (error) {
                 contentEditingHelper.handleSaveError({
                     redirectOnFailure: false,
@@ -98,6 +124,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
                 });
 
                 notificationsService.error(error.data.message);
+
                 vm.page.saveButtonState = "error";
             });
         }

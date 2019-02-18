@@ -95,6 +95,11 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
 
     function bindMacro(data) {
         vm.macro = data;
+
+        if (vm.macro && vm.macro.view) {
+            vm.macro.node = { icon: 'icon-article', name: vm.macro.view };
+        }
+
         editorState.set(vm.macro);
 
         navigationService.syncTree({ tree: "macros", path: vm.macro.path, forceReload: true }).then(function (syncArgs) {
@@ -109,21 +114,24 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
         vm.promises['parameterEditors'] = getParameterEditors();
         vm.promises['macro'] = getMacro();
 
+        vm.views = [];
+        vm.node = null;
+
         $q.all(vm.promises).then(function (values) {
             var keys = Object.keys(values);
 
             for (var i = 0; i < keys.length; i++) {
                 var key = keys[i];
 
-                if (keys[i] === 'partialViews') {
+                if (key === 'partialViews') {
                     vm.views = values[key];
                 }
 
-                if (keys[i] === 'parameterEditors') {
+                if (key === 'parameterEditors') {
                     vm.parameterEditors = values[key];                    
                 }
 
-                if (keys[i] === 'macro') {
+                if (key === 'macro') {
                     bindMacro(values[key]);
                 }
             }

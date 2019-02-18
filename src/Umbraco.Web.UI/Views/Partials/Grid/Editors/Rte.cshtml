@@ -1,4 +1,5 @@
 ﻿@model dynamic
+@using Umbraco.Web.Composing
 @using Umbraco.Web.Templates
 
-@Html.Raw(TemplateUtilities.ParseInternalLinks(Model.value.ToString(), UmbracoContext.Current.UrlProvider))
+@Html.Raw(TemplateUtilities.ParseInternalLinks(Model.value.ToString(), Current.UmbracoContext.UrlProvider))
