@@ -320,8 +320,6 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
 
-            scope.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, content.ContentType.Alias, parent));
-
             if (withIdentity == false)
                 return;
 
@@ -2280,15 +2278,6 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IContentService, ContentSavedEventArgs> Saved;
-
-        /// <summary>
-        /// Occurs after Create
-        /// </summary>
-        /// <remarks>
-        /// Please note that the Content object has been created, but might not have been saved
-        /// so it does not have an identity yet (meaning no Id has been set).
-        /// </remarks>
-        public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Created;
 
         /// <summary>
         /// Occurs before Copy
