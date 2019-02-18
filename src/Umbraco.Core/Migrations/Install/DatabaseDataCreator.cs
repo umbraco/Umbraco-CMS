@@ -281,7 +281,7 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -37, EditorAlias = Constants.PropertyEditors.Aliases.ColorPicker, DbType = "Nvarchar" });
             InsertDataTypeDto(Constants.DataTypes.DropDownSingle, Constants.PropertyEditors.Aliases.DropDownListFlexible, "Nvarchar", "{\"multiple\":false}");
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -40, EditorAlias = Constants.PropertyEditors.Aliases.RadioButtonList, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -41, EditorAlias = Constants.PropertyEditors.Aliases.Date, DbType = "Date" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -41, EditorAlias = "Umbraco.Date", DbType = "Date" });
             InsertDataTypeDto(Constants.DataTypes.DropDownMultiple, Constants.PropertyEditors.Aliases.DropDownListFlexible, "Nvarchar", "{\"multiple\":true}");
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -43, EditorAlias = Constants.PropertyEditors.Aliases.CheckBoxList, DbType = "Nvarchar" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1041, EditorAlias = Constants.PropertyEditors.Aliases.Tags, DbType = "Ntext",
