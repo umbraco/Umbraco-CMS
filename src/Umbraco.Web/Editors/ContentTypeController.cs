@@ -51,11 +51,11 @@ namespace Umbraco.Web.Editors
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionaryFactory cultureDictionaryFactory,
             IGlobalSettings globalSettings,
-            UmbracoContext umbracoContext,
+            IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
             ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _serializer = serializer;
             _propertyEditors = propertyEditors;

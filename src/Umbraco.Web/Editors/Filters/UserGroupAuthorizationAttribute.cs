@@ -14,18 +14,18 @@ namespace Umbraco.Web.Editors.Filters
     internal class UserGroupAuthorizationAttribute : AuthorizeAttribute
     {
         private readonly string _paramName;
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
         /// <param name="paramName"></param>
-        /// <param name="umbracoContext"></param>
-        public UserGroupAuthorizationAttribute(string paramName, UmbracoContext umbracoContext)
+        /// <param name="umbracoContextAccessor"></param>
+        public UserGroupAuthorizationAttribute(string paramName, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _paramName = paramName;
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         public UserGroupAuthorizationAttribute(string paramName)
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Editors.Filters
 
         private UmbracoContext GetUmbracoContext()
         {
-            return _umbracoContext ?? Composing.Current.UmbracoContext;
+            return _umbracoContextAccessor.UmbracoContext ?? Composing.Current.UmbracoContext;
         }
 
         protected override bool IsAuthorized(HttpActionContext actionContext)

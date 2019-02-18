@@ -27,7 +27,8 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class RelationTypeController : BackOfficeNotificationsController
     {
-        public RelationTypeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public RelationTypeController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
         }
 
@@ -44,7 +45,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-                        
+
             var relations = Services.RelationService.GetByRelationTypeId(relationType.Id);
 
             var display = Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
