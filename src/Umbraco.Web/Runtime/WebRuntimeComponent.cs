@@ -72,8 +72,12 @@ namespace Umbraco.Web.Runtime
             // setup mvc and webapi services
             SetupMvcAndWebApi();
 
-            // client dependency
-            ConfigureClientDependency(_globalSettings);
+            // When using a non-web runtime and this component is loaded ClientDependency explodes because it'll
+            // want to access HttpContext.Current, which doesn't exist
+            if (IOHelper.IsHosted)
+            {
+                ConfigureClientDependency(_globalSettings);
+            }
 
             // Disable the X-AspNetMvc-Version HTTP Header
             MvcHandler.DisableMvcResponseHeader = true;
@@ -255,10 +259,7 @@ namespace Umbraco.Web.Runtime
                 { "compositeFileHandlerPath", ClientDependencySettings.Instance.CompositeFileHandlerPath }
             });
 
-            // When using a non-web runtime and this component is loaded ClientDependency explodes because it'll
-            // want to access HttpContext.Current, which doesn't exist
-            if (IOHelper.IsHosted)
-                ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
+            ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
         }
     }
 }
