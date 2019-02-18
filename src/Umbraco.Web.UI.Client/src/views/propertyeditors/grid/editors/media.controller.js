@@ -8,13 +8,7 @@ angular.module("umbraco")
                 $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
             });
         }
-
-        function onInit() {
-            if($scope.control.value){
-                $scope.setUrl();
-            }
-        }
-
+        
         $scope.setImage = function(){
             var startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
             var startNodeIsVirtual = startNodeId ? $scope.model.config.startNodeIsVirtual : undefined;
@@ -34,10 +28,8 @@ angular.module("umbraco")
                         id: selectedImage.id,
                         udi: selectedImage.udi,
                         image: selectedImage.image,
-                        altText: selectedImage.altText
-                    };   
-
-                    $scope.setUrl();
+                        caption: selectedImage.altText
+                    };
                     
                     editorService.close();
                 },
@@ -49,7 +41,7 @@ angular.module("umbraco")
             editorService.mediaPicker(mediaPicker);
         };
 
-        $scope.setUrl = function(){
+        $scope.getThumbnailUrl = function(){
 
             if($scope.control.value.image){
                 var url = $scope.control.value.image;
@@ -70,10 +62,10 @@ angular.module("umbraco")
                 {
                     url += "?width=800&upscale=false&animationprocessmode=false"
                 }
-                $scope.url = url;
+                return url;
             }
+            
+            return "";
         };
-
-        onInit();
 
 });

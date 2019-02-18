@@ -7,9 +7,9 @@
 
 	<div ng-if="control.value">
 		<img
-			ng-if="url"
+			ng-if="getThumbnailUrl()"
 			ng-click="setImage()"
-			ng-src="{{url}}"
+			ng-src="{{getThumbnailUrl()}}"
 			class="fullSizeImage" />
         <input type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
  	</div>
