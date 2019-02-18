@@ -240,9 +240,6 @@ angular.module("umbraco")
                 }, 500, false);
 
                 $scope.$apply(function () {
-                    
-                    console.log("$apply function called...")
-                    
                     var cell = $(e.target).scope().area;
                     
                     if(hasActiveChild(cell, cell.controls)) {
@@ -319,7 +316,6 @@ angular.module("umbraco")
         // *********************************************
 
         $scope.clickRow = function(index, rows, $event) {
-            console.log("clickRow")
             //rows[index].active = true;
             $scope.currentRowWithActiveChild = null;
             $scope.active = rows[index];
@@ -549,8 +545,6 @@ angular.module("umbraco")
         // Control management functions
         // *********************************************
         $scope.clickControl = function (index, controls, cell, $event) {
-            
-            console.log("clickControl");
             
             $scope.active = controls[index];
             $scope.currentCellWithActiveChild = cell;
