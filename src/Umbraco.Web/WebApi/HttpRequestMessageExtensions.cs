@@ -161,9 +161,9 @@ namespace Umbraco.Web.WebApi
             return msg;
         }
 
-        public static string ClientCulture(this HttpRequestMessage request)
+        internal static string ClientCulture(this HttpRequestMessage request)
         {
-            return request.Headers.Contains("X-UMB-CULTURE") ? request.Headers.GetValues("X-UMB-CULTURE").First() : null;
+            return request.Headers.TryGetValues("X-UMB-CULTURE", out var values) ? values.FirstOrDefault() : null;
         }
     }
 
