@@ -345,7 +345,7 @@
     <Compile Include="Logging\Viewer\MessageTemplateFilter.cs" />
     <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
-    <Compile Include="Manifest\ManifestBackOfficeSection.cs" />
+    <Compile Include="Manifest\ManifestSection.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
     <Compile Include="Manifest\ManifestDashboard.cs" />
@@ -452,7 +452,7 @@
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\SimpleContentType.cs" />
-    <Compile Include="Models\Trees\IBackOfficeSection.cs" />
+    <Compile Include="Models\Sections\ISection.cs" />
     <Compile Include="PackageActions\AllowDoctype.cs" />
     <Compile Include="PackageActions\PublishRootDocument.cs" />
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />

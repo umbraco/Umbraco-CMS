@@ -101,7 +101,7 @@ namespace Umbraco.Core.Manifest
             var gridEditors = new List<GridEditor>();
             var contentApps = new List<ManifestContentAppDefinition>();
             var dashboards = new List<ManifestDashboard>();
-            var sections = new List<ManifestBackOfficeSection>();
+            var sections = new List<ManifestSection>();
 
             foreach (var manifest in manifests)
             {
