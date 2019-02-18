@@ -27,7 +27,7 @@ namespace Umbraco.Web.Install
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private UmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext ?? Current.UmbracoContext;
+        private UmbracoContext UmbracoContext => _umbracoContextAccessor?.UmbracoContext ?? Current.UmbracoContext;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
