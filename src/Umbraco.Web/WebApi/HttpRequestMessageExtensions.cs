@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web;
@@ -157,6 +159,11 @@ namespace Umbraco.Web.WebApi
             var msg = request.CreateErrorResponse(HttpStatusCode.BadRequest, modelState);
             msg.Headers.Add("X-Status-Reason", "Validation failed");
             return msg;
+        }
+
+        public static string ClientCulture(this HttpRequestMessage request)
+        {
+            return request.Headers.Contains("X-UMB-CULTURE") ? request.Headers.GetValues("X-UMB-CULTURE").First() : null;
         }
     }
 
