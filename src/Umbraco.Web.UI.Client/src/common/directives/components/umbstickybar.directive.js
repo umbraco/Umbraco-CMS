@@ -133,7 +133,9 @@ Use this directive make an element sticky and follow the page when scrolling.
                 clonedBar.addClass('-umb-sticky-bar');
                 clonedBar.css({
                     'position': 'fixed',
-                    'z-index': 500,
+                    // if you change this z-index value, make sure the sticky editor sub headers do not 
+                    // clash with umb-dropdown (e.g. the content actions dropdown in content list view)
+                    'z-index': 99, 
                     'visibility': 'hidden'
                 });
 

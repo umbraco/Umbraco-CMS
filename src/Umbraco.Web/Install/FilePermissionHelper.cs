@@ -21,22 +21,23 @@ namespace Umbraco.Web.Install
         {
             report = new Dictionary<string, IEnumerable<string>>();
 
-            IEnumerable<string> errors;
+            using (ChangesMonitor.Suspended()) // hack: ensure this does not trigger a restart
+            {
+                if (EnsureDirectories(PermissionDirs, out var errors) == false)
+                    report["Folder creation failed"] = errors.ToList();
 
-            if (EnsureDirectories(PermissionDirs, out errors) == false)
-                report["Folder creation failed"] = errors.ToList();
+                if (EnsureDirectories(PackagesPermissionsDirs, out errors) == false)
+                    report["File writing for packages failed"] = errors.ToList();
 
-            if (EnsureDirectories(PackagesPermissionsDirs, out errors) == false)
-                report["File writing for packages failed"] = errors.ToList();
+                if (EnsureFiles(PermissionFiles, out errors) == false)
+                    report["File writing failed"] = errors.ToList();
 
-            if (EnsureFiles(PermissionFiles, out errors) == false)
-                report["File writing failed"] = errors.ToList();
+                if (TestPublishedSnapshotService(out errors) == false)
+                    report["Published snapshot environment check failed"] = errors.ToList();
 
-            if (TestPublishedSnapshotService(out errors) == false)
-                report["Published snapshot environment check failed"] = errors.ToList();
-
-            if (EnsureCanCreateSubDirectory(SystemDirectories.Media, out errors) == false)
-                report["Media folder creation failed"] = errors.ToList();
+                if (EnsureCanCreateSubDirectory(SystemDirectories.Media, out errors) == false)
+                    report["Media folder creation failed"] = errors.ToList();
+            }
 
             return report.Count == 0;
         }

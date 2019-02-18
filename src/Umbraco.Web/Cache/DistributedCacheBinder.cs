@@ -16,17 +16,17 @@ namespace Umbraco.Web.Cache
     {
         private static readonly ConcurrentDictionary<string, MethodInfo> FoundHandlers = new ConcurrentDictionary<string, MethodInfo>();
         private readonly DistributedCache _distributedCache;
+        private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
         /// </summary>
-        /// <param name="distributedCache"></param>
-        /// <param name="logger"></param>
-        public DistributedCacheBinder(DistributedCache distributedCache, ILogger logger)
+        public DistributedCacheBinder(DistributedCache distributedCache, IUmbracoContextFactory umbracoContextFactory, ILogger logger)
         {
             _distributedCache = distributedCache;
             _logger = logger;
+            _umbracoContextFactory = umbracoContextFactory;
         }
 
         // internal for tests
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Cache
         {
             // ensure we run with an UmbracoContext, because this may run in a background task,
             // yet developers may be using the 'current' UmbracoContext in the event handlers
-            using (UmbracoContext.EnsureContext())
+            using (_umbracoContextFactory.EnsureUmbracoContext())
             {
                 foreach (var e in events)
                 {

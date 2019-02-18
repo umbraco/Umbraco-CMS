@@ -73,7 +73,6 @@
         templateHelper.getTemplateEditorShortcuts().then(function(data){
             vm.page.keyboardShortcutsOverview.push(data);
         });
-
         
         vm.save = function (suppressNotification) {
             vm.page.saveButtonState = "busy";
@@ -84,7 +83,7 @@
                 saveMethod: templateResource.save,
                 scope: $scope,
                 content: vm.template,
-                //We do not redirect on failure for templates - this is because it is not possible to actually save the template
+                // We do not redirect on failure for templates - this is because it is not possible to actually save the template
                 // type when server side validation fails - as opposed to content where we are capable of saving the content
                 // item if server side validation fails
                 redirectOnFailure: false,
@@ -160,10 +159,10 @@
 
         vm.init = function () {
 
-            //we need to load this somewhere, for now its here.
+            // we need to load this somewhere, for now its here.
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
 
-            //load templates - used in the master template picker
+            // load templates - used in the master template picker
             templateResource.getAll()
                 .then(function(templates) {
                     vm.templates = templates;
@@ -186,22 +185,21 @@
         	vm.page.loading = false;
             vm.template = template;
 
-						// if this is a new template, bind to the blur event on the name
-						if (create) {
-							$timeout(function() {
-								var nameField = angular.element(document.querySelector('[data-element="editor-name-field"]'));
-								if (nameField) {
-									nameField.on('blur', function(event) {
-										if (event.target.value) {
-											vm.save(true);
-										}
-									});
-								}
-							});
-						}
+			// if this is a new template, bind to the blur event on the name
+			if (create) {
+				$timeout(function() {
+					var nameField = angular.element(document.querySelector('[data-element="editor-name-field"]'));
+					if (nameField) {
+						nameField.on('blur', function(event) {
+							if (event.target.value) {
+								vm.save(true);
+							}
+						});
+					}
+				});
+			}	
 					
-					
-            //sync state
+            // sync state
             if(!infiniteMode) {
                 editorState.set(vm.template);
                 navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
@@ -229,19 +227,19 @@
                     //Update the auto-complete method to use ctrl+alt+space
                     _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
                     
-                    //Unassigns the keybinding (That was previously auto-complete)
-                    //As conflicts with our own tree search shortcut
+                    // Unassigns the keybinding (That was previously auto-complete)
+                    // As conflicts with our own tree search shortcut
                     _editor.commands.bindKey("ctrl-space", null);
 
                     // Assign new keybinding
                     _editor.commands.addCommands([
-                        //Disable (alt+shift+K)
-                        //Conflicts with our own show shortcuts dialog - this overrides it
+                        // Disable (alt+shift+K)
+                        // Conflicts with our own show shortcuts dialog - this overrides it
                         {
                             name: 'unSelectOrFindPrevious',
                             bindKey: 'Alt-Shift-K',
                             exec: function() {
-                                //Toggle the show keyboard shortcuts overlay
+                                // Toggle the show keyboard shortcuts overlay
                                 $scope.$apply(function(){
                                     vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
                                 });
@@ -333,7 +331,7 @@
                         });
                     }
 
-                    //change on blur, focus
+                    // change on blur, focus
                     vm.editor.on("blur", persistCurrentLocation);
                     vm.editor.on("focus", persistCurrentLocation);
                     vm.editor.on("change", changeAceEditor);

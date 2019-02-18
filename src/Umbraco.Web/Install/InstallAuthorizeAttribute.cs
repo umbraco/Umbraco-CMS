@@ -14,23 +14,23 @@ namespace Umbraco.Web.Install
     internal class InstallAuthorizeAttribute : AuthorizeAttribute
     {
         // see note in HttpInstallAuthorizeAttribute
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtimeState;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
+        private UmbracoContext UmbracoContext => _umbracoContextAccessor?.UmbracoContext ?? Current.UmbracoContext;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         /// <param name="runtimeState"></param>
-        public InstallAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
+        public InstallAuthorizeAttribute(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtimeState)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _runtimeState = runtimeState;
         }
 

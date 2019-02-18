@@ -12,7 +12,7 @@
                     ng-if="vm.dashboard.urlTrackerDisabled === false"
                     type="button"
                     size="s"
-                    action="vm.disableUrlTracker()"
+                    action="vm.disableUrlTracker($event)"
                     label-key="redirectUrls_disableUrlTracker">
                 </umb-button>
 
@@ -63,13 +63,13 @@
 
         <div class="umb-table-body">
 
-            <div class="umb-table-row -solid" ng-repeat="redirectUrl in vm.redirectUrls">
+            <div class="umb-table-row -solid" ng-repeat="redirect in vm.redirectUrls">
 
                 <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b1">
-                   {{redirectUrl.culture ||'*'}}
+                    {{redirect.culture ||'*'}}
                 </div>
                 <div class="umb-table-cell flx-s1 flx-g1 flx-b4">
-                    <a class="umb-table-body__link" href="{{redirectUrl.originalUrl}}" target="_blank" title="{{redirectUrl.originalUrl}}">{{redirectUrl.originalUrl}}</a>
+                    <a class="umb-table-body__link" href="{{redirect.originalUrl}}" target="_blank" title="{{redirect.originalUrl}}">{{redirect.originalUrl}}</a>
                 </div>
 
                 <div class="umb-table-cell flx-s0 flx-g0" style="flex-basis: 20px;">
@@ -78,14 +78,15 @@
 
                 <div class="umb-table-cell flx-s1 flx-g1 flx-b5 items-center">
                     <div class="flx-s1 flx-g1 flx-b0" style="margin-right: 20px;">
-                        <a class="umb-table-body__link" href="{{redirectUrl.destinationUrl}}" target="_blank" title="{{redirectUrl.destinationUrl}}">{{redirectUrl.destinationUrl}}</a>
+                        <a class="umb-table-body__link" href="{{redirect.destinationUrl}}" target="_blank" title="{{redirect.destinationUrl}}">{{redirect.destinationUrl}}</a>
                     </div>
                     <umb-button
                         type="button"
                         button-style="danger"
                         size="xs"
-                        action="vm.removeRedirect(redirectUrl)"
-                        label-key="redirectUrls_removeButton">
+                        state="redirect.deleteButtonState"
+                        action="vm.removeRedirect(redirect, $event)"
+                        label-key="general_remove">
                     </umb-button>
                 </div>
 

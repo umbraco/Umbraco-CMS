@@ -250,6 +250,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             lock (_codeIdMap)
             {
                 if (_codeIdMap.TryGetValue(isoCode, out var id)) return id;
+                if (isoCode.Contains('-') && _codeIdMap.TryGetValue(isoCode.Split('-').First(), out var invariantId)) return invariantId;
             }
             if (throwOnNotFound)
                 throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));

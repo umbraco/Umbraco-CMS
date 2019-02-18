@@ -47,9 +47,9 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly SearchableTreeCollection _searchableTreeCollection;
 
-        public EntityController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
+        public EntityController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
             ITreeService treeService, UmbracoHelper umbracoHelper, SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;
@@ -213,7 +213,7 @@ namespace Umbraco.Web.Editors
 
             if (type == UmbracoEntityTypes.Document)
             {
-                var foundUrl = Umbraco.Url(id);
+                var foundUrl = UmbracoContext.Url(id);
                 if (string.IsNullOrEmpty(foundUrl) == false && foundUrl != "#")
                 {
                     returnUrl = foundUrl;

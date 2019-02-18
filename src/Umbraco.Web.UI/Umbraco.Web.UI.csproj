@@ -21,13 +21,13 @@
     </NuGetPackageImportStamp>
     <Use64BitIISExpress />
     <TargetFrameworkProfile />
-    <!-- 
+    <!--
       for some weird reason, and because Web.config is created only during BeforeBuild,
       the web.config configuration file would not be picked, and the build system would
       try to use a traditional app.config, thus missing all the binding redirects.
-      
+
       this ensures that the build system things that the config file is web.config.
-      
+
       (see FindAppConfigFile target in detailed build output)
     -->
     <AppConfig>Web.config</AppConfig>
@@ -88,8 +88,8 @@
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
     <PackageReference Include="Examine" Version="1.0.0-beta079" />
-    <PackageReference Include="ImageProcessor.Web" Version="4.9.3.25" />
-    <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.1.19" />
+    <PackageReference Include="ImageProcessor.Web" Version="4.10.0.100" />
+    <PackageReference Include="ImageProcessor.Web.Config" Version="2.5.0.100" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
@@ -105,7 +105,7 @@
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.37</Version>
+      <Version>8.0.0-alpha.38</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -188,18 +188,18 @@
     <Content Include="Config\serilog.user.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\serilog.user.Release.config">
-        <DependentUpon>serilog.user.config</DependentUpon>
-        <SubType>Designer</SubType>
-    </Content>
+    <None Include="Config\serilog.user.Release.config">
+      <DependentUpon>serilog.user.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="Config\serilog.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\serilog.Release.config">
-        <DependentUpon>serilog.config</DependentUpon>
-        <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Config\logviewer.searches.config.js" />    
+    <None Include="Config\serilog.Release.config">
+      <DependentUpon>serilog.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="Config\logviewer.searches.config.js" />
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -372,6 +372,11 @@
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
     <Message Text="Copy ClientDependency.$(Configuration).config to ClientDependency.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
+    <!-- Create Serilog.config & serilog.user.config file from Templates if it doesn't exist -->
+    <Message Text="Copy serilog.$(Configuration).config to serilog.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />
+    <Copy SourceFiles="$(ProjectDir)Config\serilog.Release.config" DestinationFiles="$(ProjectDir)Config\serilog.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />
+    <Message Text="Copy serilog.user.$(Configuration).config to serilog.user.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\serilog.user.config')" />
+    <Copy SourceFiles="$(ProjectDir)Config\serilog.user.Release.config" DestinationFiles="$(ProjectDir)Config\serilog.user.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\serilog.user.config')" />
     <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
     <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip Belle because $(ProjectDir)Umbraco\lib exists." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib')" />

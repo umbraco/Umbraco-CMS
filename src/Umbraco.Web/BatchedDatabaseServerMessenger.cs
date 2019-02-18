@@ -12,6 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {
@@ -102,7 +103,7 @@ namespace Umbraco.Web
             // try get the http context from the UmbracoContext, we do this because in the case we are launching an async
             // thread and we know that the cache refreshers will execute, we will ensure the UmbracoContext and therefore we
             // can get the http context from it
-            var httpContext = (UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext)
+            var httpContext = (Current.UmbracoContext == null ? null : Current.UmbracoContext.HttpContext)
                 // if this is null, it could be that an async thread is calling this method that we weren't aware of and the UmbracoContext
                 // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be
                 // the case if the asp.net synchronization context has kicked in

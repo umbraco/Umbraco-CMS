@@ -10,7 +10,7 @@
     <div ng-show="item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
 </a>
 
-<ul class="dropdown-menu umb-sub-views-nav-item__anchor_dropdown" ng-class="{'show': vm.showDropdown}">
+<ul class="dropdown-menu umb-sub-views-nav-item__anchor_dropdown" ng-if="vm.item.anchors && vm.item.anchors.length > 1">
     <li ng-repeat="anchor in vm.item.anchors" ng-class="{'is-active': vm.item.active && anchor.active}">
         <a href="" ng-click="vm.anchorClicked(anchor, $event)">
             {{anchor.label}}

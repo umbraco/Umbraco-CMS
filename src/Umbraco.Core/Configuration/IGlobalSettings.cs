@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Core.Configuration
+﻿namespace Umbraco.Core.Configuration
 {
     /// <summary>
     /// Contains general settings information for the entire Umbraco instance based on information from  web.config appsettings 
@@ -61,11 +59,13 @@ namespace Umbraco.Core.Configuration
         int VersionCheckPeriod { get; }
 
         /// <summary>
-        /// This is the location type to store temporary files such as cache files or other localized files for a given machine
+        /// Gets the configuration for the location of temporary files.
         /// </summary>
-        /// <remarks>
-        /// Used for some cache files and for specific environments such as Azure
-        /// </remarks>
         LocalTempStorage LocalTempStorageLocation { get; }
+
+        /// <summary>
+        /// Gets the location of temporary files.
+        /// </summary>
+        string LocalTempPath { get; }
     }
 }

@@ -9,6 +9,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -67,7 +68,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
 
             // TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
-            if (UmbracoContext.Current != null)
+            if (Current.UmbracoContext != null)
             {
                 if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
                 {

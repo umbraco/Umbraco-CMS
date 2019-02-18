@@ -1850,7 +1850,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="redirectedTo">Redirigé Vers</key>
     <key alias="noRedirects">Aucune redirection n'a été créée</key>
     <key alias="noRedirectsDescription">Lorsqu'une page publiée est renommée ou déplacée, une redirection sera automatiquement créée vers la nouvelle page.</key>
-    <key alias="removeButton">Supprimer</key>
     <key alias="confirmRemove">Etes-vous certain(e) de vouloir supprimer la redirection de '%0%' vers '%1%'?</key>
     <key alias="redirectRemoved">Redirection d'URL supprimée.</key>
     <key alias="redirectRemoveError">Erreur lors de la suppression de la redirection d'URL.</key>

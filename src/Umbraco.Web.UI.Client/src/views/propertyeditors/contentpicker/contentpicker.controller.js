@@ -191,7 +191,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         //if we have a query for the startnode, we will use that.
         var rootId = $routeParams.id;
         entityResource.getByQuery($scope.model.config.startNode.query, rootId, "Document").then(function (ent) {
-            dialogOptions.startNodeId = $scope.model.config.idType === "udi" ? ent.udi : ent.id;
+            dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
         });
     }
     else {
@@ -261,7 +261,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.add = function (item) {
         var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
-        var itemId = $scope.model.config.idType === "udi" ? item.udi : item.id;
+        var itemId = ($scope.model.config.idType === "udi" ? item.udi : item.id).toString();
 
         if (currIds.indexOf(itemId) < 0) {
             currIds.push(itemId);
