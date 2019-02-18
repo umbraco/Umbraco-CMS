@@ -490,7 +490,7 @@
     <key alias="blue">蓝色</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">添加选项卡</key>
+    <key alias="addGroup">添加选项卡</key>
     <key alias="addProperty">添加属性</key>
     <key alias="addEditor">添加编辑器</key>
     <key alias="addTemplate">添加模板</key>

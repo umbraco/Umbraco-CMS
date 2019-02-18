@@ -733,7 +733,7 @@
     <key alias="blue">Blue</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Add group</key>
+    <key alias="addGroup">Add group</key>
     <key alias="addProperty">Add property</key>
     <key alias="addEditor">Add editor</key>
     <key alias="addTemplate">Add template</key>

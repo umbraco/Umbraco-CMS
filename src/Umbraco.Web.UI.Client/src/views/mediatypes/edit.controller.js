@@ -51,7 +51,7 @@
 
             "main_sections",
             "shortcuts_navigateSections",
-            "shortcuts_addTab",
+            "shortcuts_addGroup",
             "shortcuts_addProperty",
             "shortcuts_addEditor",
             "shortcuts_editDataType",
@@ -68,7 +68,7 @@
             // keyboard shortcuts
             vm.labels.sections = values[3];
             vm.labels.navigateSections = values[4];
-            vm.labels.addTab = values[5];
+            vm.labels.addGroup = values[5];
             vm.labels.addProperty = values[6];
             vm.labels.addEditor = values[7];
             vm.labels.editDataType = values[8];
@@ -113,8 +113,8 @@
                     "name": vm.labels.design,
                     "shortcuts": [
                     {
-                        "description": vm.labels.addTab,
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                        "description": vm.labels.addGroup,
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "g" }]
                     },
                     {
                         "description": vm.labels.addProperty,

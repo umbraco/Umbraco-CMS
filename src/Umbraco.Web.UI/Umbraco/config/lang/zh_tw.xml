@@ -482,7 +482,7 @@
     <key alias="blue">藍</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">增加標籤頁</key>
+    <key alias="addGroup">增加標籤頁</key>
     <key alias="addProperty">增加屬性</key>
     <key alias="addEditor">增加編輯器</key>
     <key alias="addTemplate">增加範本</key>

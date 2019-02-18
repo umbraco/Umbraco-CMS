@@ -505,7 +505,7 @@
     <key alias="blue">Blauw</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Tab toevoegen</key>
+    <key alias="addGroup">Groep toevoegen</key>
     <key alias="addProperty">Property toevoegen</key>
     <key alias="addEditor">Editor toevoegen</key>
     <key alias="addTemplate">Template toevoegen</key>

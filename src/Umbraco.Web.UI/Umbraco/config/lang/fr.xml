@@ -612,7 +612,7 @@
     <key alias="blue">Bleu</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Ajouter un onglet</key>
+    <key alias="addGroup">Ajouter un onglet</key>
     <key alias="addProperty">Ajouter une propriété</key>
     <key alias="addEditor">Ajouter un éditeur</key>
     <key alias="addTemplate">Ajouter un modèle</key>

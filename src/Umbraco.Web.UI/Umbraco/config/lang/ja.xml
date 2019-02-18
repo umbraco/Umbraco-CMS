@@ -466,7 +466,7 @@
     <key alias="blue">ブルー</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">タブの追加</key>
+    <key alias="addGroup">タブの追加</key>
     <key alias="addProperty">プロパティの追加</key>
     <key alias="addEditor">エディターの追加</key>
     <key alias="addTemplate">テンプレートの追加</key>

@@ -702,7 +702,7 @@
     <key alias="blue">Blå</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Tilføj fane</key>
+    <key alias="addGroup">Tilføj fane</key>
     <key alias="addProperty">Tilføj egenskab</key>
     <key alias="addEditor">Tilføj editor</key>
     <key alias="addTemplate">Tilføj skabelon</key>

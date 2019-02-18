@@ -597,7 +597,7 @@
     <key alias="blue">Azul</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Añadir pestaña</key>
+    <key alias="addGroup">Añadir pestaña</key>
     <key alias="addProperty">Añadir propiedad</key>
     <key alias="addEditor">Añadir editor</key>
     <key alias="addTemplate">Añadir platilla</key>

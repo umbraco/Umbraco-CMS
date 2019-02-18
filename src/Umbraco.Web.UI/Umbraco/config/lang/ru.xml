@@ -1355,7 +1355,7 @@
     <key alias="tabs">Вкладки</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Добавить вкладку</key>
+    <key alias="addGroup">Добавить вкладку</key>
     <key alias="addProperty">Добавить свойство</key>
     <key alias="addEditor">Добавить редактор</key>
     <key alias="addTemplate">Добавить шаблон</key>
