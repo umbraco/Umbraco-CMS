@@ -41,7 +41,7 @@
             "treeHeaders_templates",
             "main_sections",
             "shortcuts_navigateSections",
-            "shortcuts_addTab",
+            "shortcuts_addGroup",
             "shortcuts_addProperty",
             "shortcuts_addEditor",
             "shortcuts_editDataType",
@@ -74,7 +74,7 @@
             // keyboard shortcuts
             vm.labels.sections = values[4];
             vm.labels.navigateSections = values[5];
-            vm.labels.addTab = values[6];
+            vm.labels.addGroup = values[6];
             vm.labels.addProperty = values[7];
             vm.labels.addEditor = values[8];
             vm.labels.editDataType = values[9];
@@ -127,8 +127,8 @@
                     "name": vm.labels.design,
                     "shortcuts": [
                         {
-                            "description": vm.labels.addTab,
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                            "description": vm.labels.addGroup,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "g" }]
                         },
                         {
                             "description": vm.labels.addProperty,
