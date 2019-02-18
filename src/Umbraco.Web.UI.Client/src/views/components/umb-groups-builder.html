@@ -41,7 +41,7 @@
         <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{tab.name}}">
 
             <!-- TAB INIT STATE -->
-            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
+            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+g" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
                 <localize key="contentTypeEditor_addGroup"></localize>
             </a>
 
