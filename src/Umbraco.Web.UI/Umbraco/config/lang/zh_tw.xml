@@ -967,7 +967,7 @@
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">組合</key>
-    <key alias="noTabs">您沒有增加任何選項卡</key>
+    <key alias="noGroups">您沒有增加任何選項卡</key>
     <key alias="inheritedFrom">繼承的表格</key>
     <key alias="addProperty">增加屬性</key>
     <key alias="requiredLabel">必要標籤</key>

@@ -1542,7 +1542,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
-    <key alias="noTabs">You have not added any tabs</key>
+    <key alias="noGroups">You have not added any groups</key>
     <key alias="addGroup">Add group</key>
     <key alias="inheritedFrom">Inherited from</key>
     <key alias="addProperty">Add property</key>

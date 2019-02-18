@@ -968,7 +968,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Composities</key>
-    <key alias="noTabs">Er zijn nog geen tabs toegevoegd</key>
+    <key alias="noGroups">Er zijn nog geen groepen toegevoegd</key>
+    <key alias="addGroup">Voeg groep toe</key>
     <key alias="inheritedFrom">Inherited van</key>
     <key alias="addProperty">Voeg property toe</key>
     <key alias="requiredLabel">Verplicht label</key>

@@ -1200,7 +1200,7 @@
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Composiciones</key>
-        <key alias="noTabs">No has añadido ninguna pestaña</key>
+        <key alias="noGroups">No has añadido ninguna pestaña</key>
     <key alias="inheritedFrom">Heredado de</key>
     <key alias="addProperty">Añadir propiedad</key>
     <key alias="requiredLabel">Etiqueta requerida</key>

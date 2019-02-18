@@ -932,7 +932,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">構成</key>
-    <key alias="noTabs">タブが追加されていません</key>
+    <key alias="noGroups">タブが追加されていません</key>
     <key alias="inheritedFrom">次から継承:</key>
     <key alias="addProperty">プロパティの追加</key>
     <key alias="requiredLabel">必要なラベル</key>
