@@ -64,11 +64,12 @@ namespace Umbraco.Web.Runtime
             // register membership stuff
             composition.Register(factory => Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider());
             composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
-            composition.Register<MembershipHelper>();
+            composition.Register<MembershipHelper>(Lifetime.Request);
+            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<UmbracoContext>().PublishedSnapshot.Members);
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
-            composition.RegisterUnique<IVariationContextAccessor, HttpContextVariationContextAccessor>();
+            composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
@@ -107,7 +108,14 @@ namespace Umbraco.Web.Runtime
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
             // so inject a "void" helper (not exactly pretty but...)
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
-                composition.Register<UmbracoHelper>();
+                composition.Register<UmbracoHelper>(factory =>
+                {
+                    var umbCtx = factory.GetInstance<UmbracoContext>();
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null,
+                        factory.GetInstance<ITagQuery>(), factory.GetInstance<ICultureDictionaryFactory>(),
+                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>(),
+                        factory.GetInstance<MembershipHelper>());
+                });
             else
                 composition.Register(_ => new UmbracoHelper());
 

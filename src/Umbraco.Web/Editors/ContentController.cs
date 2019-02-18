@@ -396,7 +396,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetNiceUrl(int id)
         {
-            var url = Umbraco.Url(id);
+            var url = UmbracoContext.Url(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
@@ -409,7 +409,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetNiceUrl(Guid id)
         {
-            var url = Umbraco.UrlProvider.GetUrl(id);
+            var url = UmbracoContext.Url(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;

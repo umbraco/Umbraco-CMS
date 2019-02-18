@@ -94,7 +94,7 @@ namespace Umbraco.Web.Editors
         public DataTypeDisplay GetEmpty(int parentId)
         {
             // cannot create an "empty" data type, so use something by default.
-            var editor = _propertyEditors[Constants.PropertyEditors.Aliases.NoEdit];
+            var editor = _propertyEditors[Constants.PropertyEditors.Aliases.Label];
             var dt = new DataType(editor, parentId);
             return Mapper.Map<IDataType, DataTypeDisplay>(dt);
         }
