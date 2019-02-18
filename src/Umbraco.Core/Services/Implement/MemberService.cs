@@ -331,9 +331,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
             }
-
-            scope.Events.Dispatch(Created, this, new NewEventArgs<IMember>(member, false, member.ContentType.Alias, -1));
-
+            
             if (withIdentity == false)
                 return;
 
@@ -1109,15 +1107,6 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs before Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
-
-        /// <summary>
-        /// Occurs after Create
-        /// </summary>
-        /// <remarks>
-        /// Please note that the Member object has been created, but might not have been saved
-        /// so it does not have an identity yet (meaning no Id has been set).
-        /// </remarks>
-        public static event TypedEventHandler<IMemberService, NewEventArgs<IMember>> Created;
 
         /// <summary>
         /// Occurs after Save

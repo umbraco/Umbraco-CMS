@@ -289,9 +289,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
-
-            scope.Events.Dispatch(Created, this, new NewEventArgs<IMedia>(media, false, media.ContentType.Alias, parent));
-
+            
             if (withIdentity == false)
                 return;
 
@@ -1214,15 +1212,6 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMediaService, SaveEventArgs<IMedia>> Saved;
-
-        /// <summary>
-        /// Occurs after Create
-        /// </summary>
-        /// <remarks>
-        /// Please note that the Media object has been created, but might not have been saved
-        /// so it does not have an identity yet (meaning no Id has been set).
-        /// </remarks>
-        public static event TypedEventHandler<IMediaService, NewEventArgs<IMedia>> Created;
 
         /// <summary>
         /// Occurs before Media is moved to Recycle Bin
