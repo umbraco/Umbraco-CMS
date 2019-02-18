@@ -76,7 +76,7 @@ function ColorPickerController($scope, angularHelper) {
 
     $scope.onSelect = function (color) {
         // did the value change?
-        if ($scope.model.value.value === color) {
+        if ($scope.model.value != null && $scope.model.value.value === color) {
             // User clicked the currently selected color
             // to remove the selection, they don't want
             // to select any color after all.
