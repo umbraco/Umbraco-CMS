@@ -38,7 +38,7 @@
                 <tbody>
                     <tr ng-repeat="language in vm.languages track by language.id" ng-click="vm.editLanguage(language)" style="cursor: pointer;">
                         <td>
-                            <i class="icon-globe" style="color: #BBBABF; margin-right: 5px;"></i>
+                            <umb-icon icon-name="icon-globe" class="icon-globe" style="color: #BBBABF; margin-right: 5px;"></umb-icon>
                             <span ng-class="{'bold': language.isDefault}">{{ language.name }}</span>
                         </td>
                         <td>

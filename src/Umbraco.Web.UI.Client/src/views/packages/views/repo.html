@@ -42,10 +42,10 @@
 
                                 <div class="umb-package-numbers">
                                     <small class="umb-package-downloads">
-                                        <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
+                                        <umb-icon icon-name="icon-download-alt" class="icon-download-alt"></umb-icon> <strong>{{ package.downloads }}</strong>
                                     </small>
                                     <small class="umb-package-likes">
-                                        <i class="icon-hearts"></i> <strong>{{ package.likes }}</strong>
+                                        <umb-icon icon-name="icon-hearts" class="icon-hearts"></umb-icon> <strong>{{ package.likes }}</strong>
                                     </small>
                                 </div>
 
@@ -76,10 +76,10 @@
 
                                 <div class="umb-package-numbers">
                                     <small class="umb-package-downloads">
-                                        <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
+                                        <umb-icon icon-name="icon-download-alt" class="icon-download-alt"></umb-icon> <strong>{{ package.downloads }}</strong>
                                     </small>
                                     <small class="umb-package-likes">
-                                        <i class="icon-hearts"></i> <strong>{{ package.likes }}</strong>
+                                        <umb-icon icon-name="icon-hearts" class="icon-hearts"></umb-icon> <strong>{{ package.likes }}</strong>
                                     </small>
                                 </div>
 
@@ -185,7 +185,7 @@
                                     img-src="{{ 'https://our.umbraco.org' + vm.package.ownerInfo.ownerAvatar }}">
                                 </umb-avatar>
                                 </div>
-    
+
                                 <div>
                                     <div class="umb-package-details__owner-profile-name">{{ vm.package.ownerInfo.owner }}</div>
                                     <div class="umb-package-details__owner-profile-karma">
@@ -269,7 +269,7 @@
                             <div>
                                 <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
                                     <a class="umb-package-details__link" target="_blank" href="{{ externalSource.url }}">
-                                        <i class="icon-out"></i>
+                                        <umb-icon icon-name="icon-out" class="icon-out"></umb-icon>
                                         {{ externalSource.name }}
                                     </a>
                                 </div>
@@ -299,7 +299,7 @@
 
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.icon" class="icon-box"></i>
+                            <umb-icon icon-name="icon-box" ng-if="!vm.localPackage.icon" class="icon-box"></umb-icon>
                             <img ng-if="vm.localPackage.icon" ng-src="{{vm.localPackage.icon}}" alt="" />
                         </div>
 

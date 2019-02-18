@@ -5,10 +5,10 @@
         <div class="umb-pane" ng-if="!model.creatingFolder">
             <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
-            <ul class="umb-actions umb-actions-child">           
+            <ul class="umb-actions umb-actions-child">
                 <li class="umb-action">
                     <a href="" class="umb-action-link" ng-click="createMediaType()" umb-auto-focus>
-                        <i class="large icon icon-item-arrangement"></i>
+                        <umb-icon icon-name="icon-item-arrangement" class="large icon icon-item-arrangement"></umb-icon>
                         <span class="menu-label">
                             <localize key="general_new">New</localize>
                             <localize key="content_mediatype">Media type</localize>
@@ -17,7 +17,7 @@
                 </li>
                 <li class="umb-action">
                     <a href="" class="umb-action-link" ng-click="showCreateFolder()">
-                        <i class="large icon icon-folder"></i>
+                        <umb-icon icon-name="icon-folder" class="large icon icon-folder"></umb-icon>
                         <span class="menu-label"><localize key="general_folder"></localize>...</span>
                     </a>
                 </li>

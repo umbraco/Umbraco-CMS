@@ -40,10 +40,10 @@
                                        on-value-changed="focalPointChanged(left, top)"
                                        on-image-loaded="imageLoaded(isCroppable, hasDimensions)">
                     </umb-image-gravity>
-                    <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
+                    <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><umb-icon icon-name="icon-delete" class="icon-delete red"></umb-icon> <localize key="content_uploadClear">Remove file</localize></a>
                 </div>
 
-                
+
                 <ul ng-if="isCroppable" class="umb-sortable-thumbnails cropList clearfix">
                     <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
 

@@ -12,25 +12,25 @@
                 <ul class="umb-actions umb-actions-child">
                     <li class="umb-action">
                         <a href="" class="umb-action-link" ng-click="vm.createFile()" umb-auto-focus>
-                            <i class="large icon-article"></i>
+                            <umb-icon icon-name="icon-article" class="large icon-article"></umb-icon>
                             <span class="menu-label"><localize key="create_newPartialViewMacro">New partial view macro</localize></span>
                         </a>
                     </li>
                     <li class="umb-action">
                         <a href="" class="umb-action-link" ng-click="vm.createFileWithoutMacro()">
-                            <i class="large icon icon-article"></i>
+                            <umb-icon icon-name="icon-article" class="large icon icon-article"></umb-icon>
                             <span class="menu-label"><localize key="create_newPartialViewMacroNoMacro">New partial view macro (without macro)</localize></span>
                         </a>
                     </li>
                     <li class="umb-action">
                         <a href="" class="umb-action-link" ng-click="vm.showCreateFromSnippet()">
-                            <i class="large icon icon-article"></i>
+                            <umb-icon icon-name="icon-article" class="large icon icon-article"></umb-icon>
                             <span class="menu-label"><localize key="create_newPartialViewMacroFromSnippet">>New partial view macro from snippet</localize>...</span>
                         </a>
                     </li>
                     <li class="umb-action">
                         <a href="" class="umb-action-link" ng-click="vm.showCreateFolder()">
-                            <i class="large icon icon-folder"></i>
+                            <umb-icon icon-name="icon-folder" class="large icon icon-folder"></umb-icon>
                             <span class="menu-label"><localize key="general_folder"></localize>...</span>
                         </a>
                     </li>
@@ -45,7 +45,7 @@
                 <ul class="umb-actions umb-actions-child">
                     <li class="umb-action" ng-repeat="snippet in vm.snippets">
                         <a href="" class="umb-action-link" ng-click="vm.createFileFromSnippet(snippet)" style="padding-top: 6px; padding-bottom: 6px;">
-                            <i class="icon-article icon" style="font-size: 20px;"></i>
+                            <umb-icon icon-name="icon-article" class="icon-article icon" style="font-size: 20px;"></umb-icon>
                             <span class="menu-label" style="margin-left: 0; padding-left: 5px;">{{ snippet.name }}</span>
                         </a>
                     </li>

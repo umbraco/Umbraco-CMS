@@ -1,7 +1,7 @@
 <div class="umb-layout-selector" ng-show="vm.showLayoutSelector">
 
    <div class="umb-layout-selector__active-layout" ng-click="vm.toggleLayoutDropdown()">
-      <i class="{{ vm.activeLayout.icon }}"></i>
+      <umb-icon icon-name="{{ vm.activeLayout.icon }}" class="{{ vm.activeLayout.icon }}"></umb-icon>
    </div>
 
    <div ng-if="vm.layoutDropDownIsOpen"
@@ -14,7 +14,7 @@
             ng-class="{'-active': layout.active }"
             ng-attr-title="{{layout.name}}">
 
-           <i class="{{ layout.icon }} umb-layout-selector__dropdown-item-icon"></i>
+           <umb-icon icon-name="{{ layout.icon }}" class="{{ layout.icon }} umb-layout-selector__dropdown-item-icon"></umb-icon>
        </div>
 
    </div>

@@ -11,7 +11,7 @@
       <div class="umb-content-grid__content">
 
         <div class="umb-content-grid__item-name" ng-click="clickItemName(item, $event, $index)" ng-class="{'-light': !item.published && item.updater != null}">
-            <i class="umb-content-grid__icon {{ item.icon }}"></i>
+            <umb-icon icon-name="{{ item.icon }}" class="umb-content-grid__icon {{ item.icon }}"></umb-icon>
             <span>{{ item.name }}</span>
         </div>
 

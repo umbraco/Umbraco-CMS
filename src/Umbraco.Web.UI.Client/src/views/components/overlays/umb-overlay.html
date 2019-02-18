@@ -15,7 +15,7 @@
         <div class="umb-overlay__item-details" ng-if="model.itemDetails">
 
             <div class="umb-overlay__item-details-title-wrapper" ng-if="model.itemDetails.icon || model.itemDetails.title">
-                <i class="{{ model.itemDetails.icon }} umb-overlay__item-details-icon" ng-if="model.itemDetails.icon"></i>
+                <umb-icon icon-name="{{ model.itemDetails.icon }}" class="{{ model.itemDetails.icon }} umb-overlay__item-details-icon" ng-if="model.itemDetails.icon"></umb-icon>
                 <h5 class="umb-overlay__item-details-title" ng-if="model.itemDetails.title">{{ model.itemDetails.title }}</h5>
             </div>
 
@@ -27,7 +27,7 @@
 
             <div ng-if="model.confirmSubmit.show">
 
-                <h5 class="red" ng-if="model.confirmSubmit.title"><i class="icon-alert"></i> {{ model.confirmSubmit.title }}</h5>
+                <h5 class="red" ng-if="model.confirmSubmit.title"><umb-icon icon-name="icon-alert" class="icon-alert"></umb-icon> {{ model.confirmSubmit.title }}</h5>
                 <p ng-if="model.confirmSubmit.description">{{ model.confirmSubmit.description }}</p>
 
                 <label class="checkbox no-indent">

@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.PropertyEditors.Grid.MediaController">
 
 	<div class="umb-editor-placeholder" ng-click="setImage()" ng-if="control.value === null">
-		<i class="icon icon-picture"></i>
+		<umb-icon icon-name="icon-picture" class="icon icon-picture"></umb-icon>
         <div ng-id="!control.$inserted" class="help-text"><localize key="grid_clickToInsertImage">Click to insert image</localize></div>
 	</div>
 

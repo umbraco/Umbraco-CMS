@@ -59,7 +59,7 @@
 						id="{{login.authType}}"
 						onclick="document.forms.oauthloginform.submit();">
 
-					<i class="fa" ng-class="login.properties.SocialIcon"></i>
+					<umb-icon icon-name="{{login.properties.SocialIcon}}" class="fa" ng-class="login.properties.SocialIcon"></umb-icon>
 					<localize key="defaultdialogs_linkYour">Link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
 				</button>
 			</form>
@@ -71,7 +71,7 @@
                     id="{{login.authType}}"
                     name="provider"
                     value="{{login.authType}}">
-                <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                <umb-icon icon-name="{{login.properties.SocialIcon}}" class="fa" ng-class="login.properties.SocialIcon"></umb-icon>
                 <localize key="defaultdialogs_unLinkYour">Un-link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
             </button>
         </div>
@@ -84,7 +84,7 @@
         <ul class="umb-tree">
             <li ng-repeat="item in history | orderBy:'time':true">
                 <a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
-                    <i class="{{item.icon}}"></i> {{item.name}}
+                    <umb-icon icon-name="{{item.icon}}" class="{{item.icon}}"></umb-icon> {{item.name}}
                 </a>
             </li>
         </ul>

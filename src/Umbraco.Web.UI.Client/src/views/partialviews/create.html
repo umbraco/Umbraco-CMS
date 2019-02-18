@@ -3,7 +3,7 @@
     <div class="umbracoDialog umb-dialog-body with-footer">
 
         <div class="umb-pane" ng-if="!vm.creatingFolder">
-            
+
             <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
             <!-- Main options -->
@@ -11,19 +11,19 @@
                 <ul class="umb-actions umb-actions-child">
                     <li class="umb-action">
                         <a href="" class="umb-action-link" ng-click="vm.createPartialView()" umb-auto-focus>
-                            <i class="large icon icon-article"></i>
+                            <umb-icon icon-name="icon-article" class="large icon icon-article"></umb-icon>
                             <span class="menu-label"><localize key="create_newEmptyPartialView">New empty partial view</localize></span>
                         </a>
                     </li>
                     <li class="umb-action">
                         <a href="" class="umb-action-link" ng-click="vm.showCreateFromSnippet()">
-                            <i class="large icon icon-article"></i>
+                            <umb-icon icon-name="icon-article" class="large icon icon-article"></umb-icon>
                             <span class="menu-label"><localize key="create_newPartialViewFromSnippet">New partial view from snippet</localize>...</span>
                         </a>
                     </li>
                     <li class="umb-action">
                         <a href="" class="umb-action-link" ng-click="vm.showCreateFolder()">
-                            <i class="large icon icon-folder"></i>
+                            <umb-icon icon-name="icon-folder" class="large icon icon-folder"></umb-icon>
                             <span class="menu-label"><localize key="general_folder"></localize>...</span>
                         </a>
                     </li>
@@ -35,7 +35,7 @@
                 <ul class="umb-actions umb-actions-child">
                     <li class="umb-action" ng-repeat="snippet in vm.snippets">
                         <a href="" class="umb-action-link" ng-click="vm.createPartialView(snippet)" style="padding-top: 6px; padding-bottom: 6px;">
-                            <i class="icon-article icon" style="font-size: 20px;"></i>
+                            <umb-icon icon-name="icon-article" class="icon-article icon" style="font-size: 20px;"></umb-icon>
                             <span class="menu-label" style="margin-left: 0; padding-left: 5px;">{{ snippet.name }}</span>
                         </a>
                     </li>
@@ -49,7 +49,7 @@
             <form novalidate name="createFolderForm"
                     ng-submit="vm.createFolder(createFolderForm)"
                     val-form-manager>
-                
+
                 <div ng-show="vm.createFolderError">
                     <div class="alert alert-error">
                         <div>{{vm.createFolderError.data.message}}</div>

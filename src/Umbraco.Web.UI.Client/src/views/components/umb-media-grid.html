@@ -5,7 +5,7 @@
             <a ng-if="allowOnClickEdit === 'true'" ng-click="clickEdit(item, $event)" ng-href="" class="icon-edit umb-media-grid__edit"></a>
 
             <div data-element="media-grid-item-edit" class="umb-media-grid__item-overlay" ng-class="{'-locked': item.selected || !item.file}" ng-click="clickItemName(item, $event, $index)">
-                <i ng-if="onDetailsHover" class="icon-info umb-media-grid__info" ng-mouseover="hoverItemDetails(item, $event, true)" ng-mouseleave="hoverItemDetails(item, $event, false)"></i>
+                <umb-icon icon-name="icon-info" ng-if="onDetailsHover" class="icon-info umb-media-grid__info" ng-mouseover="hoverItemDetails(item, $event, true)" ng-mouseleave="hoverItemDetails(item, $event, false)"></umb-icon>
                 <div class="umb-media-grid__item-name">{{item.name}}</div>
             </div>
 
@@ -23,7 +23,7 @@
 
             <!-- Icon for files -->
             <span class="umb-media-grid__item-file-icon" ng-if="!item.thumbnail && item.extension != 'svg'">
-                <i class="umb-media-grid__item-icon {{item.icon}}"></i>
+                <umb-icon icon-name="{{item.icon}}" class="umb-media-grid__item-icon {{item.icon}}"></umb-icon>
                 <span ng-if="item.extension">.{{item.extension}}</span>
             </span>
         </div>

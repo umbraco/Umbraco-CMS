@@ -24,7 +24,7 @@
             <tbody ui-sortable="sortableOptions" ng-model="model.value">
                 <tr ng-repeat="val in model.value">
                     <td>
-                        <i class="icon icon-navigation handle"></i>
+                        <umb-icon icon-name="icon-navigation" class="icon icon-navigation handle"></umb-icon>
                     </td>
                     <td>
                         <span class="alias-value" ng-if="!val.isSystem">{{val.alias}}</span>
@@ -40,7 +40,7 @@
                                 <span class="help-inline" ng-message="required">Required</span>
                             </span>
                         </ng-form>
-                        
+
                         <span ng-if="val.isSystem">
                             <localize key="{{getLocalizedKey(val.alias)}}">{{val.alias}}</localize>
                         </span>

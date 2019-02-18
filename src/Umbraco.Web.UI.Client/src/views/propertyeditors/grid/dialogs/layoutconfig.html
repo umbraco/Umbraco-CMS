@@ -48,7 +48,7 @@
                   <a class="td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
                      ng-click="configureSection(undefined, currentLayout)"
                      ng-style="{width: percentage(availableLayoutSpace) + '%'}">
-                      <i class="icon icon-add"></i>
+                      <umb-icon icon-name="icon-add" class="icon icon-add"></umb-icon>
                   </a>
 
              </div>
@@ -60,17 +60,17 @@
           <umb-control-group label="@general_width">
              <div class="grid-size-scaler">
                   <a href ng-click="scaleDown(currentSection)">
-                      <i class="icon icon-remove"></i>
+                      <umb-icon icon-name="icon-remove" class="icon icon-remove"></umb-icon>
                   </a>
                       {{currentSection.grid}}
                   <a href ng-click="scaleUp(currentSection, availableLayoutSpace)">
-                      <i class="icon icon-add"></i>
+                      <umb-icon icon-name="icon-add" class="icon icon-add"></umb-icon>
                   </a>
              </div>
           </umb-control-group>
 
 		  <umb-control-group hide-label="true">
-			<i class="icon-delete red"></i>
+			<umb-icon icon-name="icon-delete" class="icon-delete red"></umb-icon>
 	  		<a class="btn btn-small btn-link" href="" ng-click="deleteSection(currentSection, currentLayout)">
 			  <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
 			</a>

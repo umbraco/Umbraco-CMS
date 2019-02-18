@@ -22,7 +22,7 @@
                         <li ng-repeat="section in vm.sections" class="umb-tree-item">
                             <div style="padding: 5px 10px;" ng-class="{'umb-tree-node-checked': section.selected }">
                                 <a href="" ng-click="vm.selectSection(section)">
-                                    <i class="icon umb-tree-icon {{section.icon}}"></i>
+                                    <umb-icon icon-name="{{section.icon}}" class="icon umb-tree-icon {{section.icon}}"></umb-icon>
                                     <span>{{ section.name }}</span>
                                 </a>
                             </div>

@@ -37,11 +37,11 @@
                             <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
                             <span class="help-inline" ng-message="valCompare"><localize key="user_passwordMismatch">The confirmed password doesn't match the new password!</localize></span>
                         </span>
-                        
+
                     </div>
 
                     <div class="flex justify-between items-center">
-                        <umb-button 
+                        <umb-button
                             type="submit"
                             button-style="success"
                             state="vm.invitedUserPasswordModel.buttonState"
@@ -58,7 +58,7 @@
 
                     <ng-form name="vm.avatarForm">
 
-                        <umb-progress-bar 
+                        <umb-progress-bar
                             style="max-width: 100px; margin-bottom: 5px;"
                             ng-show="vm.avatarFile.uploadStatus === 'uploading'"
                             progress="{{ vm.avatarFile.uploadProgress }}"
@@ -77,7 +77,7 @@
                             ngf-pattern="{{vm.avatarFile.acceptedFileTypes}}"
                             ngf-max-size="{{ vm.avatarFile.maxFileSize }}">
 
-                            <umb-avatar 
+                            <umb-avatar
                                 color="gray"
                                 size="xl"
                                 unknown-char="+"
@@ -94,7 +94,7 @@
                     <localize key="user_userinviteAvatarMessage"></localize>
                 </p>
                 <div class="flex justify-center items-center">
-                    <umb-button 
+                    <umb-button
                         type="button"
                         button-style="success"
                         label="Done"
@@ -102,7 +102,7 @@
                     </umb-button>
                 </div>
             </div>
-            
+
         </div>
         <div ng-show="vm.invitedUser == null && vm.inviteStep === 3" ng-if="vm.inviteStep === 3" class="umb-login-container">
             <div class="form">
@@ -137,7 +137,7 @@
                                         ng-class="login.properties.SocialStyle"
                                         id="{{login.authType}}" name="provider" value="{{login.authType}}"
                                         title="Log in using your {{login.caption}} account">
-                                    <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                                    <umb-icon icon-name="{{login.properties.SocialIcon}}" class="fa" ng-class="login.properties.SocialIcon"></umb-icon>
                                     <localize key="login_signInWith">Sign in with</localize> {{login.caption}}
                                 </button>
 
@@ -169,7 +169,7 @@
                         </div>
 
                         <div class="flex justify-between items-center">
-                            <umb-button 
+                            <umb-button
                                 button-style="success"
                                 size="m"
                                 label-key="general_login"
@@ -261,4 +261,4 @@
             </div>
         </div>
     </div>
-</div>    
+</div>

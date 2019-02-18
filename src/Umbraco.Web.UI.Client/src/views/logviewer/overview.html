@@ -33,13 +33,13 @@
                             <table>
                                 <tr>
                                     <td>
-                                        <a ng-click="vm.searchLogQuery()" title="View all Logs" class="btn btn-link">All Logs <i class="icon-search"></i></a>
+                                        <a ng-click="vm.searchLogQuery()" title="View all Logs" class="btn btn-link">All Logs <umb-icon icon-name="icon-search" class="icon-search"></umb-icon></a>
                                     </td>
                                 </tr>
                                 <!-- Fetch saved searches  -->
                                 <tr ng-repeat="search in vm.searches">
                                     <td>
-                                        <a ng-click="vm.searchLogQuery(search.query)" title="{{search.name}}" class="btn btn-link">{{search.name}} <i class="icon-search"></i></a>
+                                        <a ng-click="vm.searchLogQuery(search.query)" title="{{search.name}}" class="btn btn-link">{{search.name}} <umb-icon icon-name="icon-search" class="icon-search"></umb-icon></a>
                                     </td>
                                 </tr>
                             </table>

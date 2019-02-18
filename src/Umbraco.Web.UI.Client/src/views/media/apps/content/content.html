@@ -3,7 +3,7 @@
 
         <div class="umb-expansion-panel__header" ng-click="group.open = !group.open">
             <div>{{ group.label }}</div>
-            <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !group.open, 'icon-navigation-up': group.open}">&nbsp;</ins>
+            <umb-icon icon-name="{{group.open ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !group.open, 'icon-navigation-up': group.open}">&nbsp;</umb-icon>
         </div>
 
         <div class="umb-expansion-panel__content" ng-show="group.open">

@@ -31,7 +31,7 @@
 
                     <a ng-if="content.variants.length > 0 && hideChangeVariant !== true" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
                         <span>{{vm.currentVariant.language.name}}</span>
-                        <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
+                        <umb-icon icon-name="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</umb-icon>
                     </a>
 
                     <span ng-if="hideChangeVariant" class="umb-variant-switcher__toggle">
@@ -56,7 +56,7 @@
 
         <div ng-if="splitViewOpen">
             <a class="umb-editor-header__close-split-view" href="" ng-click="closeSplitView()">
-                <i class="icon-delete"></i>
+                <umb-icon icon-name="icon-delete" class="icon-delete"></umb-icon>
             </a>
         </div>
 

@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.Editors.Media.SortController as vm" ng-cloak>
-    
+
     <div class="umb-dialog-body with-footer">
-        
+
         <div class="umb-pane">
 
             <div ng-if="vm.error">
@@ -23,8 +23,8 @@
                                 <a ng-href="#" ng-click="vm.sort('name')" prevent-default>
                                     <localize key="general_name"></localize>
                                     <span ng-if="vm.sortOrder.column === 'name'">
-                                        <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
-                                        <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
+                                        <umb-icon icon-name="icon-navigation-up" ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></umb-icon>
+                                        <umb-icon icon-name="icon-navigation-down" ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></umb-icon>
                                     </span>
                                 </a>
                             </th>
@@ -32,8 +32,8 @@
                                 <a ng-href="#" ng-click="vm.sort('createDate')" prevent-default>
                                     <localize key="sort_sortCreationDate"></localize>
                                     <span ng-if="vm.sortOrder.column === 'createDate'">
-                                        <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
-                                        <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
+                                        <umb-icon icon-name="icon-navigation-up" ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></umb-icon>
+                                        <umb-icon icon-name="icon-navigation-down" ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></umb-icon>
                                     </span>
                                 </a>
                             </th>
@@ -41,8 +41,8 @@
                                 <a ng-href="#" ng-click="vm.sort('sortOrder')" prevent-default>
                                     <localize key="sort_sortOrder"></localize>
                                     <span ng-if="vm.sortOrder.column === 'sortOrder'">
-                                        <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
-                                        <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
+                                        <umb-icon icon-name="icon-navigation-up" ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></umb-icon>
+                                        <umb-icon icon-name="icon-navigation-down" ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></umb-icon>
                                     </span>
                                 </a>
                             </th>
@@ -77,7 +77,7 @@
         </umb-button>
         <umb-button
             ng-if="vm.children"
-            type="button" 
+            type="button"
             action="vm.save()"
             state="vm.saveButtonState"
             button-style="success"

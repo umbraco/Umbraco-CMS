@@ -4,16 +4,16 @@
 
       <div class="list-view-layout" ng-repeat="layout in model.value">
 
-         <i class="icon-navigation list-view-layout__sort-handle"></i>
+         <umb-icon icon-name="icon-navigation" class="icon-navigation list-view-layout__sort-handle"></umb-icon>
 
          <div>
 
             <a ng-if="layout.isSystem !== 1" href="" ng-click="vm.openIconPicker(layout)" class="list-view-layout__icon" umb-auto-focus>
-               <i class="{{ layout.icon }}"></i>
+               <umb-icon icon-name="{{layout.icon}}" class="{{ layout.icon }}"></umb-icon>
             </a>
 
             <div ng-if="layout.isSystem === 1" class="list-view-layout__icon">
-               <i class="{{ layout.icon }}"></i>
+               <umb-icon icon-name="{{layout.icon}}" class="{{ layout.icon }}"></umb-icon>
             </div>
 
          </div>
@@ -31,7 +31,7 @@
          <div>
             <input ng-if="layout.isSystem === 1" type="checkbox" ng-model="layout.selected" />
             <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
-                <i class="icon-trash" ng-click="vm.showPrompt(layout)"></i>
+                <umb-icon icon-name="icon-trash" class="icon-trash" ng-click="vm.showPrompt(layout)"></umb-icon>
                 <umb-confirm-action
                     ng-if="layout.deletePrompt"
                     direction="left"

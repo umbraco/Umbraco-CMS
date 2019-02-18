@@ -9,9 +9,9 @@
             hide-icon="true"
             hide-description="true">
         </umb-editor-header>
-        
+
         <umb-editor-container>
-            
+
             <umb-load-indicator
                 ng-if="vm.loading">
             </umb-load-indicator>
@@ -19,7 +19,7 @@
             <umb-box>
                 <umb-box-content>
                     <div class="form-search" style="margin-bottom: 15px;">
-                        <i class="icon-search"></i>
+                        <umb-icon icon-name="icon-search" class="icon-search"></umb-icon>
                         <input type="text"
                             ng-model="vm.usersOptions.filter"
                             ng-change="vm.searchUsers()"
@@ -34,7 +34,7 @@
                         <a href="" class="umb-user-picker-list-item" ng-repeat="user in vm.users" ng-click="vm.selectUser(user)">
                             <div class="umb-user-picker-list-item__avatar">
                                 <umb-checkmark
-                                    class="umb-user-picker-list-item__checkmark" 
+                                    class="umb-user-picker-list-item__checkmark"
                                     ng-if="user.selected"
                                     checked="user.selected">
                                 </umb-checkmark>
@@ -54,7 +54,7 @@
                             </div>
                         </a>
                     </div>
-            
+
                     <div class="flex justify-center">
                         <umb-pagination
                             ng-if="vm.usersOptions.totalPages"

@@ -8,14 +8,9 @@
 // 	font-style: normal;
 // }
 
-[class^="icon-"],
-[class*=" icon-"] {
-//   font-family: icomoon;
-//   font-weight: normal;
-//   font-style: normal;
-//   text-decoration: inherit;
-//   -webkit-font-smoothing: antialiased;
-    display: block;
+span[class^="icon-"],
+span[class*=" icon-"] {
+    display: inline-block;
     width: 1em;
     height: 1em;
     *margin-right: .3em;
@@ -42,10 +37,30 @@
 
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
-  text-decoration: inherit;
-  display: inline-block;
-  speak: none;
+    text-decoration: inherit;
+    display: inline-block;
+    speak: none;
 }
+
+i.large{
+	font-size: 32px;
+}
+i.medium{
+	font-size: 24px;
+}
+i.small{
+	font-size: 14px;
+}
+
+
+// i[class^="icon-"],
+// i[class*=" icon-"] {
+//   font-family: icomoon;
+//   font-weight: normal;
+//   font-style: normal;
+//   text-decoration: inherit;
+//   -webkit-font-smoothing: antialiased;
+// }
 
 /*
 [class^="icon-"]:before, [class*=" icon-"]:before {
@@ -59,15 +74,6 @@
   	-webkit-font-smoothing: antialiased;
 }*/
 
-// i.large{
-// 	font-size: 32px;
-// }
-// i.medium{
-// 	font-size: 24px;
-// }
-// i.small{
-// 	font-size: 14px;
-// }
 
 // .icon-zoom-out:before {
 // 	content: "\e000";

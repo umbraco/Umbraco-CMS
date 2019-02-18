@@ -1,18 +1,18 @@
 <div class="umb-minilistview">
 
-    <div class="umb-mini-list-view umb-animated" 
-        ng-class="{'umb-mini-list-view--forward': listViewAnimation === 'in', 'umb-mini-list-view--backwards': listViewAnimation === 'out'}" 
+    <div class="umb-mini-list-view umb-animated"
+        ng-class="{'umb-mini-list-view--forward': listViewAnimation === 'in', 'umb-mini-list-view--backwards': listViewAnimation === 'out'}"
         ng-repeat="miniListView in miniListViews">
 
         <div class="umb-mini-list-view__title">
-            <i class="umb-mini-list-view__title-icon {{ miniListView.node.icon }}"></i>
+            <umb-icon icon-name="{{ miniListView.node.icon }}" class="umb-mini-list-view__title-icon {{ miniListView.node.icon }}"></umb-icon>
             <h4 class="umb-mini-list-view__title-text">{{ miniListView.node.name }}</h4>
         </div>
 
         <div class="flex" style="margin-bottom: 10px;">
 
             <a ng-if="showBackButton()" href="" class="umb-mini-list-view__back" ng-click="exitMiniListView()">
-                <i class="icon-arrow-left umb-mini-list-view__back-icon"></i>
+                <umb-icon icon-name="icon-arrow-left" class="icon-arrow-left umb-mini-list-view__back-icon"></umb-icon>
                 <span class="umb-mini-list-view__back-text"><localize key="general_back">Back</localize></span> /
             </a>
 
@@ -34,7 +34,7 @@
                     <div class="umb-table-cell" style="padding-top: 8px; padding-bottom: 8px;">
                         <form class="form-search -no-margin-bottom" style="width: 100%; margin-right: 0;" novalidate>
                             <div class="inner-addon left-addon">
-                                <i class="icon icon-search" style="font-size: 14px;"></i>
+                                <umb-icon icon-name="icon-search" class="icon icon-search" style="font-size: 14px;"></umb-icon>
                                 <input
                                     style="width: 100%;"
                                     class="form-control search-input"
@@ -66,9 +66,9 @@
                     ng-class="{'umb-table-row--selected':child.selected, 'not-allowed':!child.allowed}">
                     <div class="umb-table-cell umb-table-cell--auto-width" ng-class="{'umb-table-cell--faded':child.published === false}">
                         <div class="flex items-center">
-                            <ins class="icon-navigation-right umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</ins>
-                            <i class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></i>
-                            <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                            <umb-icon icon-name="icon-navigation-right" class="icon-navigation-right umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</umb-icon>
+                            <umb-icon icon-name="{{child.icon}}" class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></umb-icon>
+                            <umb-icon icon-name="icon-check" class="umb-table-body__icon umb-table-body__checkicon icon-check"></umb-icon>
                         </div>
                     </div>
                     <div class="umb-table-cell black" ng-class="{'umb-table-cell--faded':child.published === false}">{{ child.name }}</div>

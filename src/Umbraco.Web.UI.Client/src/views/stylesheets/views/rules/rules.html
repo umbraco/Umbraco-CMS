@@ -9,7 +9,7 @@
                 <div class="umb-property-editor umb-stylesheet-rules form-horizontal" ng-controller="Umbraco.Editors.StyleSheets.RulesController">
                     <div ui-sortable="sortableOptions" ng-model="model.stylesheet.rules">
                         <div class="umb-stylesheet-rules__listitem" ng-repeat="rule in model.stylesheet.rules track by $id(rule)">
-                            <i class="icon icon-navigation handle"></i>
+                            <umb-icon icon-name="icon-navigation" class="icon icon-navigation handle"></umb-icon>
                             <div class="umb-stylesheet-rules__left">
                                 {{rule.name}}
                             </div>

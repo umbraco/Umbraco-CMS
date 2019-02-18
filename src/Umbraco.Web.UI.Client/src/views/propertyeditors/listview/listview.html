@@ -29,7 +29,7 @@
                        <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                            <umb-dropdown-item ng-repeat="blueprint in listViewAllowedTypes[0].blueprints | orderBy:'name':false">
                                <a ng-click="createFromBlueprint(entityType, listViewAllowedTypes[0].alias, blueprint.id)">
-                                   <i class="{{::listViewAllowedTypes[0].icon}}"></i>
+                                   <umb-icon icon-name="{{::listViewAllowedTypes[0].icon}}" class="{{::listViewAllowedTypes[0].icon}}"></umb-icon>
                                    {{::blueprint.name}}
                                </a>
                            </umb-dropdown-item>
@@ -45,11 +45,11 @@
                        <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                            <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
                                <a ng-click="createBlank(entityType,contentType.alias)" prevent-default ng-href="">
-                                   <i class="{{::contentType.icon}}"></i>
+                                   <umb-icon icon-name="{{::contentType.icon}}" class="{{::contentType.icon}}"></umb-icon>
                                    {{::contentType.name}} <span ng-show="contentType.blueprints" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
                                </a>
                                <a href="" ng-repeat="blueprint in contentType.blueprints | orderBy:'name':false" ng-click="createFromBlueprint(entityType, contentType.alias, blueprint.id)" prevent-default>
-                                   &nbsp;&nbsp;<i class="{{::contentType.icon}}"></i>
+                                   &nbsp;&nbsp;<umb-icon icon-name="{{::contentType.icon}}" class="{{::contentType.icon}}"></umb-icon>
                                    {{::blueprint.name}}
                                </a>
                            </umb-dropdown-item>
@@ -60,7 +60,7 @@
 
                        <li ng-repeat="blueprint in docType.blueprints | orderBy:'name':false">
                            <a ng-click="createFromBlueprint(blueprint.id)">
-                               <i class="large {{docType.icon}}"></i>
+                               <umb-icon icon-name="{{docType.icon}}" class="large {{docType.icon}}"></umb-icon>
                                <span class="menu-label">
                                    {{blueprint.name}}
                                </span>
@@ -69,7 +69,7 @@
 
                        <li class="sep" ng-show="allowBlank">
                            <a ng-click="createBlank(docType)">
-                               <i class="large {{docType.icon}}"></i>
+                               <umb-icon icon-name="{{docType.icon}}" class="large {{docType.icon}}"></umb-icon>
                                <span class="menu-label">
                                    <localize key="blueprints_blankBlueprint">Blank</localize>
                                </span>
@@ -119,7 +119,7 @@
                <umb-editor-sub-header-section ng-show="(selection.length == 0)">
                    <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
                        <div class="inner-addon left-addon">
-                           <i class="icon icon-search" ng-click="enterSearch($event)"></i>
+                           <umb-icon icon-name="icon-search" class="icon icon-search" ng-click="enterSearch($event)"></umb-icon>
                            <input
                                class="form-control search-input"
                                type="text"

@@ -5,11 +5,11 @@
         <div class="fileinput-button umb-upload-button-big"
              style="margin-bottom: 5px;"
              ng-hide="vm.files.length > 0">
-            <i class="icon icon-page-up"></i>
+            <umb-icon icon-name="icon-page-up" class="icon icon-page-up"></umb-icon>
             <p><localize key="media_clickToUpload">Click to upload</localize></p>
             <umb-single-file-upload></umb-single-file-upload>
         </div>
-        
+
         <div ng-if="vm.files.length > 0">
             <div ng-if="!vm.hideSelection">
 
@@ -29,7 +29,7 @@
                     <div class="span4 thumbnail" ng-if="!file.isImage && file.extension != 'svg'">
                         <span class="file-icon-wrap">
                             <span class="file-icon">
-                                <i class="icon icon-document"></i>
+                                <umb-icon icon-name="icon-document" class="icon icon-document"></umb-icon>
                                 <span ng-if="file.isClientSide">.{{file.extension}}</span>
                                 <a ng-if="!file.isClientSide" href="{{file.fileSrc}}" target="_blank">
                                     <span>.{{file.extension}}</span>
@@ -42,7 +42,7 @@
                 </div>
 
                 <div>
-                    <a href class="btn btn-link btn-crop-delete" ng-click="vm.clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
+                    <a href class="btn btn-link btn-crop-delete" ng-click="vm.clear()"><umb-icon icon-name="icon-delete" class="icon-delete red"></umb-icon> <localize key="content_uploadClear">Remove file</localize></a>
                 </div>
 
             </div>

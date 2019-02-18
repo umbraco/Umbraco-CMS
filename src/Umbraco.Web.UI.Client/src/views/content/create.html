@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.Editors.Content.CreateController">
-    
+
     <div class="umb-dialog-body with-footer" ng-cloak>
 
         <div class="umb-pane">
@@ -14,7 +14,7 @@
 
                 <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
                     <a class="umb-action-link" ng-click="createOrSelectBlueprintIfAny(docType)">
-                        <i class="large icon {{docType.icon}}"></i>
+                        <umb-icon icon-name="{{docType.icon}}" class="large icon {{docType.icon}}"></umb-icon>
                         <span class="menu-label">
                             {{docType.name}}
                             <small>
@@ -29,16 +29,16 @@
 
                 <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false">
                     <a class="umb-action-link" ng-click="createFromBlueprint(blueprint.id)">
-                        <i class="large icon {{docType.icon}}"></i>
+                        <umb-icon icon-name="{{docType.icon}}" class="large icon {{docType.icon}}"></umb-icon>
                         <span class="menu-label">
                             {{blueprint.name}}
                         </span>
                     </a>
                 </li>
-                
+
                 <li class="umb-action sep" ng-show="allowBlank">
                     <a class="umb-action-link" ng-click="createBlank(docType)">
-                        <i class="large icon {{docType.icon}}"></i>
+                        <umb-icon icon-name="{{docType.icon}}" class="large icon {{docType.icon}}"></umb-icon>
                         <span class="menu-label">
                             <localize key="blueprints_blankBlueprint">Blank</localize>
                         </span>

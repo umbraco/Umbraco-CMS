@@ -92,11 +92,11 @@
                                <div class="umb-tools row-tools" ng-show="row.active && !sortMode">
 
                                    <div class="cell-tools-edit row-tool" ng-if="hasSettings">
-                                       <i class="icon icon-settings" title="@grid_settings" localize="title" ng-click="editGridItemSettings(row, 'row')"></i>
+                                       <umb-icon icon-name="icon-settings" class="icon icon-settings" title="@grid_settings" localize="title" ng-click="editGridItemSettings(row, 'row')"></umb-icon>
                                    </div>
 
                                     <div class="cell-tools-remove row-tool">
-                                        <i class="icon-trash" ng-click="togglePrompt(row)"></i>
+                                        <umb-icon icon-name="icon-trash" class="icon-trash" ng-click="togglePrompt(row)"></umb-icon>
                                         <umb-confirm-action
                                             ng-if="row.deletePrompt"
                                             direction="left"
@@ -139,13 +139,13 @@
 
                                                       <!-- disable drop overlay -->
                                                       <div class="drop-overlay -disable" ng-if="area.dropNotAllowed">
-                                                          <i class="icon-delete drop-icon"></i>
+                                                          <umb-icon icon-name="icon-delete" class="icon icon-delete drop-icon"></umb-icon>
                                                           <localize key="grid_contentNotAllowed" />
                                                       </div>
 
                                                       <!-- allow drop overlay -->
                                                       <div class="drop-overlay -allow" ng-if="area.dropOnEmpty">
-                                                          <i class="icon-download drop-icon"></i>
+                                                          <umb-icon icon-name="icon-download" class="icon icon-download drop-icon"></umb-icon>
                                                           <localize key="grid_contentAllowed" />
                                                       </div>
 
@@ -155,7 +155,7 @@
 
                                                       <div class="cell-tools" ng-if="area.active && !sortMode">
                                                          <div class="cell-tool" ng-click="editGridItemSettings(area, 'cell')">
-                                                            <i class="icon-settings"></i>
+                                                            <umb-icon icon-name="icon-settings" class="icon-settings"></umb-icon>
                                                          </div>
                                                       </div>
 
@@ -196,11 +196,11 @@
                                                                       <div class="umb-tools" ng-if="control.active">
 
                                                                           <div class="umb-control-tool" ng-if="control.editor.config.settings">
-                                                                              <i class="umb-control-tool-icon icon-settings" ng-click="editGridItemSettings(control, 'control')"></i>
+                                                                              <umb-icon icon-name="icon-settings" class="umb-control-tool-icon icon-settings" ng-click="editGridItemSettings(control, 'control')"></umb-icon>
                                                                           </div>
 
                                                                         <div class="umb-control-tool">
-                                                                            <i class="umb-control-tool-icon icon-trash"  ng-click="togglePrompt(control)"></i>
+                                                                            <umb-icon icon-name="icon-trash" class="umb-control-tool-icon icon-trash"  ng-click="togglePrompt(control)"></umb-icon>
                                                                             <umb-confirm-action
                                                                                 ng-if="control.deletePrompt"
                                                                                 direction="left"
@@ -255,7 +255,7 @@
                           ng-click="toggleAddRow()"
                           ng-if="!showRowConfigurations">
 
-                          <i class=" icon icon-add" title="@general_add" localize="title"></i>
+                          <umb-icon icon-name="icon-add" class=" icon icon-add" title="@general_add" localize="title"></umb-icon>
 
                        </a>
 

@@ -23,7 +23,7 @@
                     <div class="content">
 
                         <!-- Drag and drop illustration -->
-                        <i class="icon-box" draggable="false"></i>
+                        <umb-icon icon-name="icon-box" class="icon-box" draggable="false"></umb-icon>
                         <small class="faded" draggable="false"><strong><localize key="packager_dropHere">Drop to upload</localize></strong></small>
 
                         <!-- Select files -->
@@ -36,9 +36,9 @@
                              ngf-max-size="{{ maxFileSize }}">
                             - <localize key="packager_orClickHereToUpload">or click here to choose files</localize>
                         </div>
-                        
+
                     </div>
-                    
+
                 </div>
 
                 <h3><strong><localize key="packager_uploadPackage">Upload package</localize></strong></h3>
@@ -63,7 +63,7 @@
             <div class="flex items-center justify-center">
                 <div class="umb-info-local-items">
                     <div class="umb-package-icon">
-                        <i ng-if="!vm.localPackage.iconUrl" class="icon-box"></i>
+                        <umb-icon icon-name="icon-box" ng-if="!vm.localPackage.iconUrl" class="icon-box"></umb-icon>
                     </div>
                     <div class="umb-package-info">
 
@@ -76,7 +76,7 @@
                         <div class="umb-info-local-item text-error mt3" ng-if="vm.zipFile.uploadStatus === 'error'">
                             {{ vm.zipFile.serverErrorMessage }}
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -101,7 +101,7 @@
 
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.iconUrl" class="icon-box"></i>
+                            <umb-icon icon-name="icon-box" ng-if="!vm.localPackage.iconUrl" class="icon-box"></umb-icon>
                             <img ng-if="vm.localPackage.iconUrl" ng-src="{{vm.localPackage.iconUrl}}" alt="" />
                         </div>
 

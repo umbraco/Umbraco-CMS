@@ -12,7 +12,7 @@
 
 				<li data-element="action-{{docType.alias}}" class="umb-action" ng-repeat="docType in allowedTypes">
 					<a ng-href="" ng-click="createMediaItem(docType)" class="umb-action-link" prevent-default>
-						<i class="large icon {{docType.icon}}"></i>
+						<umb-icon icon-name="{{docType.icon}}" class="large icon {{docType.icon}}"></umb-icon>
 						<span class="menu-label">
 							{{docType.name}}
 							<small>{{docType.description}}</small>
@@ -22,7 +22,7 @@
 				<!--
 					<li class="add">
 						<a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
-							<i class="icon-large icon-plus"></i>
+							<umb-icon icon-name="icon-large" class="icon-large icon-plus"></umb-icon>
 							<span class="menu-label">
 								Create a new media type
 								<small>

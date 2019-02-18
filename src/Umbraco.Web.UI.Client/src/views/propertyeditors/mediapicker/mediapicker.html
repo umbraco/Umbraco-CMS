@@ -9,7 +9,7 @@
 
                 <p class="label label__trashed" ng-if="media.trashed">
                     <localize key="mediaPicker_trashed"></localize>
-                    <i class="icon-trash" aria-hidden="true"></i>
+                    <umb-icon icon-name="icon-trash" class="icon-trash" aria-hidden="true"></umb-icon>
                 </p>
 
                 <div ng-if="image.loading" class="umb-sortable-thumbnails__loading">
@@ -33,7 +33,7 @@
                 <!-- FILE -->
                 <div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail || media.metaData.umbracoExtension.Value === 'svg' || media.extension === 'svg'">
                     <span class="file-icon">
-                        <i class="icon {{media.icon}} large"></i>
+                        <umb-icon icon-name="{{media.icon}}" class="icon {{media.icon}} large"></umb-icon>
                         <span>.{{media.metaData.umbracoExtension.Value}}</span>
                     </span>
                     <small>{{media.name}}</small>
@@ -41,16 +41,16 @@
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
                     <a ng-if="allowEditMedia" class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="editItem(media)">
-                        <i class="icon icon-edit"></i>
+                        <umb-icon icon-name="icon-edit" class="icon icon-edit"></umb-icon>
                     </a>
                     <a class="umb-sortable-thumbnails__action -red" data-element="action-remove" href="" ng-click="remove($index)">
-                        <i class="icon icon-delete"></i>
+                        <umb-icon icon-name="icon-delete" class="icon icon-delete"></umb-icon>
                     </a>
                 </div>
             </li>
             <li style="border: none;" class="add-wrapper unsortable" ng-if="showAdd() && allowAddMedia">
                 <a data-element="sortable-thumbnails-add" href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (mediaItems.length === 0 || isMultiPicker)}" prevent-default>
-                    <i class="icon icon-add large"></i>
+                    <umb-icon icon-name="icon-add " class="large icon icon-add "></umb-icon>
                 </a>
             </li>
         </ul>

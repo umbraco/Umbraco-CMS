@@ -6,17 +6,17 @@
 
             <div class="umb-sortable-thumbnails__actions">
                 <!--<a class="umb-sortable-thumbnails__action" href="" ng-click="goToItem(image)">
-                    <i class="icon icon-edit"></i>
+                    <umb-icon icon-name="icon-edit" class="icon icon-edit"></umb-icon>
                 </a>-->
                 <a class="umb-sortable-thumbnails__action -red" href="" ng-click="remove()">
-                    <i class="icon icon-delete"></i>
+                    <umb-icon icon-name="icon-delete" class="icon icon-delete"></umb-icon>
                 </a>
             </div>
         </li>
     </ul>
 
     <a href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': !model.value }" ng-hide="model.value" prevent-default>
-        <i class="icon icon-add large"></i>
+        <umb-icon icon-name="icon-add " class="large icon icon-add "></umb-icon>
     </a>
 
     <umb-overlay

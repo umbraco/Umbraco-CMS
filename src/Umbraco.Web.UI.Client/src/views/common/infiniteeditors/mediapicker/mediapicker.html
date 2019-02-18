@@ -22,7 +22,7 @@
                     </umb-load-indicator>
 
                     <div class="form-search">
-                        <i class="icon-search"></i>
+                        <umb-icon icon-name="icon-search" class="icon-search"></umb-icon>
                         <input class="umb-search-field search-query -full-width-input"
                                ng-model="searchOptions.filter"
                                localize="placeholder"
@@ -65,7 +65,7 @@
 
                         <li class="umb-breadcrumbs__ancestor" ng-show="!lockedFolder">
                             <a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
-                                <i class="icon icon-add small"></i>
+                                <umb-icon icon-name="icon-add" class="icon icon-add small"></umb-icon>
                             </a>
 
                             <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="showFolderInput" ng-model="model.newFolderName" ng-keydown="enterSubmitFolder($event)"

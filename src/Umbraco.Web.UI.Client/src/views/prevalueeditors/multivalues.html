@@ -9,7 +9,7 @@
     </div>
     <div ui-sortable="sortableOptions">
         <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="item in model.value">
-            <i class="icon icon-navigation handle"></i>
+            <umb-icon icon-name="icon-navigation" class="icon icon-navigation handle"></umb-icon>
             <div class="umb-prevalues-multivalues__left">
                 <input type="text" ng-model="item.value" val-server="item_{{$index}}" required />
             </div>

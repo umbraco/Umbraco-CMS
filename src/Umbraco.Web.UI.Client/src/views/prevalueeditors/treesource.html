@@ -9,40 +9,40 @@
 	<ul class="unstyled list-icons" ng-if="node" style="margin-top: 30px">
 		<li>
 			<a href="" class="hover-show pull-right" ng-click="clear()">
-				<i class="icon icon-delete red"></i>
+				<umb-icon icon-name="icon-delete" class="icon icon-delete red"></umb-icon>
 			</a>
-			<i class="icon {{node.icon}} hover-hide"></i>
-			
+			<umb-icon icon-name="{{node.icon}}" class="icon {{node.icon}} hover-hide"></umb-icon>
+
 			<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
 		</li>
 	</ul>
 
-	<div ng-if="!node && model.value.type !== 'member'" style="margin-top: 30px">	
+	<div ng-if="!node && model.value.type !== 'member'" style="margin-top: 30px">
 		<span ng-hide="showSearch || model.value.query">
-			<ul class="unstyled list-icons">	
-				<li>	
-					<i class="icon icon-add turquoise"></i>
+			<ul class="unstyled list-icons">
+				<li>
+					<umb-icon icon-name="icon-add" class="icon icon-add turquoise"></umb-icon>
 					<a href ng-click="openContentPicker()" prevent-default>
 						<localize key="general_choose">Choose a root node</localize>...
 					</a>
 				</li>
 				<li ng-show="model.value.type == 'content'">
-					<i class="icon icon-search"></i>
+					<umb-icon icon-name="icon-search" class="icon icon-search"></umb-icon>
 					<a href ng-click="showSearch = true">Query for root node with xpath</a>
 				</li>
 			</ul>
 		</span>
 
 		<span ng-show="showSearch || model.value.query">
-			
-			<input type="text" 
-				ng-model="model.value.query" 
-				class="umb-property-editor umb-textstring" 
+
+			<input type="text"
+				ng-model="model.value.query"
+				class="umb-property-editor umb-textstring"
 				placeholder="Enter xpath query">
 
-				<ul class="unstyled list-icons" style="margin-top: 15px">	
-					<li style="max-width: 600px">	
-						<i class="icon icon-help-alt"></i>
+				<ul class="unstyled list-icons" style="margin-top: 15px">
+					<li style="max-width: 600px">
+						<umb-icon icon-name="icon-help-alt" class="icon icon-help-alt"></umb-icon>
 						<a href ng-click="showHelp = 1" prevent-default>
 							Show xpath query help
 						</a>
@@ -53,7 +53,7 @@
 							</p>
 
 							<p>
-								Placeholders finds the nearest published ID and runs its query from there. so for instance: 
+								Placeholders finds the nearest published ID and runs its query from there. so for instance:
 
 								<pre>$parent/newsArticle</pre>
 
@@ -70,7 +70,7 @@
 						</small>
 					</li>
 					<li>
-						<i class="icon icon-delete red"></i>
+						<umb-icon icon-name="icon-delete" class="icon icon-delete red"></umb-icon>
 						<a href ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</a>
 					</li>
 				</ul>

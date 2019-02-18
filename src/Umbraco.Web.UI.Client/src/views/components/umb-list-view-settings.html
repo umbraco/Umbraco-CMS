@@ -13,11 +13,11 @@
     <div class="umb-list-view-settings__box" ng-class="{'-open': editDataTypeSettings}">
 
         <div class="umb-list-view-settings__content">
-            <i class="umb-list-view-settings__list-view-icon icon-list"></i>
+            <umb-icon icon-name="icon-list" class="umb-list-view-settings__list-view-icon icon-list"></umb-icon>
             <div>
                 <div>
                     <div class="umb-list-view-settings__name">{{ dataType.name }} <em ng-if="!customListViewCreated">(<localize key="general_default">default</localize>)</em></div>
-                    <a href="" ng-click="toggleEditListViewDataTypeSettings()"><i class="umb-list-view-settings__settings-icon icon-settings"></i></a>
+                    <a href="" ng-click="toggleEditListViewDataTypeSettings()"><umb-icon icon-name="icon-settings" class="umb-list-view-settings__settings-icon icon-settings"></umb-icon></a>
                 </div>
                 <a href="" class="umb-list-view-settings__create-new" ng-if="!customListViewCreated" ng-click="createCustomListViewDataType()"><localize key="editcontenttype_createListView">Create custom list view</localize></a>
                 <a href="" class="umb-list-view-settings__remove-new" ng-if="customListViewCreated" ng-click="removeCustomListDataType()"><localize key="editcontenttype_removeListView">Remove custom list view</localize></a>

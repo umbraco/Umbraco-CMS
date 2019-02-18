@@ -4,10 +4,10 @@
         <div class="umb-pane" ng-if="!model.creatingFolder">
             <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
-            <ul class="umb-actions umb-actions-child">           
+            <ul class="umb-actions umb-actions-child">
                 <li data-element="action-data-type" class="umb-action">
                     <a href="" class="umb-action-link" ng-click="createDataType()" umb-auto-focus>
-                        <i class="large icon icon-autofill"></i>
+                        <umb-icon icon-name="icon-autofill" class="large icon icon-autofill"></umb-icon>
                         <span class="menu-label">
                             <localize key="create_newDataType">New data type</localize>
                         </span>
@@ -15,7 +15,7 @@
                 </li>
                 <li data-element="action-folder" class="umb-action">
                     <a href="" class="umb-action-link" ng-click="showCreateFolder()">
-                        <i class="large icon icon-folder"></i>
+                        <umb-icon icon-name="icon-folder" class="large icon icon-folder"></umb-icon>
                         <span class="menu-label">
                             <localize key="create_newFolder">New folder</localize>...
                         </span>

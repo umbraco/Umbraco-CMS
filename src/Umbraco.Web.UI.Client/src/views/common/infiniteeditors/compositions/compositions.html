@@ -53,7 +53,6 @@
                             <li class="umb-checkbox-list__item"
                                 ng-repeat="contentTypeEntity in model.whereCompositionUsed">
                                 <a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)">
-                                    <i class="{{contentTypeEntity.contentType.icon}}"></i>
                                     <umb-icon icon-name="{{contentTypeEntity.contentType.icon}}" class="{{contentTypeEntity.contentType.icon}}"></umb-icon>
                                     &nbsp;{{contentTypeEntity.contentType.name}}
                                 </a>
@@ -64,7 +63,7 @@
                     <div ng-if="vm.availableGroups.length > 0">
                         <ul class="umb-checkbox-list" ng-repeat="group in vm.availableGroups | filter:searchTerm">
                             <li style="font-weight: bold" ng-show="vm.availableGroups.length > 1">
-                                <i class="icon-folder umb-checkbox-list__item-icon"></i>
+                                <umb-icon icon-name="icon-folder" class="icon-folder umb-checkbox-list__item-icon"></umb-icon>
                                 {{group.containerPath}}
                             </li>
                             <li class="umb-checkbox-list__item"
@@ -82,7 +81,7 @@
                                 </div>
 
                                 <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed===false}">
-                                    <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon"></i>
+                                    <umb-icon icon-name="{{ compositeContentType.contentType.icon }}" class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon"></umb-icon>
                                     {{ compositeContentType.contentType.name }}
                                     <span class="umb-checkbox-list__item-caption" ng-if="compositeContentType.inherited">(inherited)</span>
                                 </label>
@@ -95,7 +94,7 @@
             </umb-box>
 
             <div ng-if="vm.compositionRemoved" class="umb-editor-confirm">
-                <h5 class="red"><i class="icon-alert"></i>Warning</h5>
+                <h5 class="red"><umb-icon icon-name="icon-alert" class="icon-alert"></umb-icon>Warning</h5>
                 <p>Removing a composition will delete all the associated property data. Once you save the document type there's no way back, are you sure?</p>
                 <label class="checkbox no-indent">
                     <input type="checkbox" ng-model="vm.allowSubmit" />

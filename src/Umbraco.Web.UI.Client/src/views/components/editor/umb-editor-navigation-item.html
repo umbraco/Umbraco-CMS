@@ -5,7 +5,7 @@
     hotkey="{{vm.index+1}}"
     hotkey-when-hidden="true"
     ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}">
-    <i class="icon {{ vm.item.icon }}"></i>
+    <umb-icon icon-name="{{ vm.item.icon }}" class="icon {{ vm.item.icon }}"></umb-icon>
     <span class="umb-sub-views-nav-item-text">{{ vm.item.name }}</span>
     <div ng-show="item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
 </a>

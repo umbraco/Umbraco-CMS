@@ -26,7 +26,7 @@
 
                     <div>
                         {{template.name}} <br />
-                        <i class="icon-delete red"></i>
+                        <umb-icon icon-name="icon-delete" class="icon-delete red"></umb-icon>
                         <a class="btn btn-small btn-link"
                            href
                            ng-click="deleteTemplate($index)"><localize key="general_delete" /></a>
@@ -38,7 +38,7 @@
             <button class="btn btn-small"
                     prevent-default
                     ng-click="configureTemplate()">
-                <i class="icon-add"></i> <localize key="grid_addGridLayout" />
+                <umb-icon icon-name="icon-add" class="icon-add"></umb-icon> <localize key="grid_addGridLayout" />
             </button>
         </div>
     </div>
@@ -74,7 +74,7 @@
 
                         <div>
                             {{layout.label || layout.name}}<br />
-                            <i class="icon-delete red"></i>
+                            <umb-icon icon-name="icon-delete" class="icon-delete red"></umb-icon>
                             <a class="btn btn-small btn-link" href ng-click="deleteLayout($index)">
                                 <localize key="general_delete" />
                             </a>
@@ -84,7 +84,7 @@
                 </ul>
 
                 <button class="btn btn-small" prevent-default ng-click="configureLayout()">
-                    <i class="icon-add"></i> <localize key="grid_addRowConfiguration" />
+                    <umb-icon icon-name="icon-add" class="icon-add"></umb-icon> <localize key="grid_addRowConfiguration" />
                 </button>
 
             </div>
@@ -108,10 +108,10 @@
                 ng-model="model.value.config">
 
                 <li ng-repeat="configValue in model.value.config">
-                    <i class="icon icon-navigation handle"></i>
+                    <umb-icon icon-name="icon-navigation" class="icon icon-navigation handle"></umb-icon>
 
                     <a href="#" prevent-default ng-click="removeConfigValue(model.value.config, $index)">
-                        <i class="icon icon-delete red"></i>
+                        <umb-icon icon-name="icon-delete" class="icon icon-delete red"></umb-icon>
                         {{configValue.label}}
                     </a>
                 </li>
@@ -119,7 +119,7 @@
 
             <ul class="unstyled list-icons">
                 <li>
-                    <i class="icon icon-settings-alt-2 turquoise"></i>
+                    <umb-icon icon-name="icon-settings-alt-2" class="icon icon-settings-alt-2 turquoise"></umb-icon>
 
                     <a href="#" ng-click="editConfig()" prevent-default>
                         <localize key="general_edit" />
@@ -137,10 +137,10 @@
                 ng-model="model.value.styles">
 
                 <li ng-repeat="style in model.value.styles">
-                    <i class="icon icon-navigation handle"></i>
+                    <umb-icon icon-name="icon-navigation" class="icon icon-navigation handle"></umb-icon>
 
                     <a href="#" prevent-default ng-click="removeConfigValue(model.value.styles, $index)">
-                        <i class="icon icon-delete red"></i>
+                        <umb-icon icon-name="icon-delete" class="icon icon-delete red"></umb-icon>
                         {{style.label}}
                     </a>
 
@@ -149,7 +149,7 @@
 
             <ul class="unstyled list-icons">
                 <li>
-                    <i class="icon icon-settings-alt-2 turquoise"></i>
+                    <umb-icon icon-name="icon-settings-alt-2" class="icon icon-settings-alt-2 turquoise"></umb-icon>
                     <a href="#" ng-click="editStyles()" prevent-default>
                         <localize key="general_edit" />
                     </a>

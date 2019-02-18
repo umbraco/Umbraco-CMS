@@ -54,12 +54,12 @@
                             <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%;" placeholder="Search logs&hellip;" />
 
                             <!-- Save Search & Clear Search icon buttons -->
-                            <ins class="icon-rate" ng-if="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 160px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
-                            <ins class="icon-wrong" ng-if="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 140px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
+                            <umb-icon icon-name="icon-rate" class="icon-rate" ng-if="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 160px; color: #fdb45c; cursor: pointer;">&nbsp;</umb-icon>
+                            <umb-icon icon-name="icon-wrong" class="icon-wrong" ng-if="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 140px; color: #bbbabf; cursor: pointer;">&nbsp;</umb-icon>
 
                             <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top:0;">
                                 <span class="ng-binding">Example Searches</span>
-                                <ins class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
+                                <umb-icon icon-name="icon-navigation-down" class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</umb-icon>
                             </a>
 
                             <!-- Common Searches Dropdown -->
@@ -69,7 +69,7 @@
                                         <span class="umb-variant-switcher__name">{{search.name}}</span>
                                         <span>{{ search.query }}</span>
                                     </a>
-                                    <a href=""><span><i class="icon icon-trash text-error" title="Delete this search" ng-click="vm.deleteSavedSearch(search)"></i></span></a>
+                                    <a href=""><span><umb-icon icon-name="icon-trash" class="icon icon-trash text-error" title="Delete this search" ng-click="vm.deleteSavedSearch(search)"></umb-icon></span></a>
                                 </umb-dropdown-item>
                             </umb-dropdown>
                         </div>
@@ -111,7 +111,7 @@
                                     <tr>
                                         <th style="min-width:100px;" ng-click="vm.toggleOrderBy()">
                                             Timestamp
-                                            <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
+                                            <umb-icon icon-name="{{vm.logOptions.orderDirection === 'Descending ? 'icon-navigation-down' : 'icon-navigation-up'}}" class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</umb-icon>
                                         </th>
                                         <th>Level</th>
                                         <th>Machine</th>
@@ -148,10 +148,10 @@
                                                     <tr ng-repeat="(key, val) in log.Properties">
                                                         <th>{{key}}</th>
                                                         <td ng-switch on="key">
-                                                            <a ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Request ID">{{val.Value}} <i class="icon-search"></i></a>
-                                                            <a ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Namespace">{{val.Value}} <i class="icon-search"></i></a>
-                                                            <a ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Machine Name">{{val.Value}} <i class="icon-search"></i></a>
-                                                            <a ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" title="Open">{{val.Value}} <i class="icon-link"></i></a>
+                                                            <a ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Request ID">{{val.Value}} <umb-icon icon-name="icon-search" class="icon-search"></umb-icon></a>
+                                                            <a ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Namespace">{{val.Value}} <umb-icon icon-name="icon-search" class="icon-search"></umb-icon></a>
+                                                            <a ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Machine Name">{{val.Value}} <umb-icon icon-name="icon-search" class="icon-search"></umb-icon></a>
+                                                            <a ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" title="Open">{{val.Value}} <umb-icon icon-name="icon-link" class="icon-link"></umb-icon></a>
                                                             <span ng-switch-default>{{val.Value}}</span>
                                                         </td>
                                                     </tr>
@@ -160,7 +160,7 @@
 
                                             <div class="btn-group">
                                                 <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
-                                                    <i class="icon-search"></i> <localize key="general_search">Search</localize>
+                                                    <umb-icon icon-name="icon-search" class="icon-search"></umb-icon> <localize key="general_search">Search</localize>
                                                     <span class="caret"></span>
                                                 </a>
 

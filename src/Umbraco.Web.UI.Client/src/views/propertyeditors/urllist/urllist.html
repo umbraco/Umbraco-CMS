@@ -2,7 +2,7 @@
     <ul class="nav nav-stacked">
         <li ng-repeat="value in renderModel">
             <a href="{{getUrl(value.url)}}" prevent-default="{{value.url.indexOf('/') == -1}}" target="{{value.urlTarget}}">
-                <i ng-class="value.icon"></i>
+                <umb-icon icon-name="{{value.icon}}" ng-class="value.icon"></umb-icon>
                 <span ng-if="value.linkText">{{value.linkText}}</span>
                 <span ng-if="!value.linkText">{{value.url}}</span>
             </a>

@@ -4,7 +4,7 @@
     </umb-load-indicator>
 
     <umb-editor-view ng-if="!vm.loading">
-        <umb-editor-header 
+        <umb-editor-header
             name="vm.title"
             hide-alias="true"
             hide-description="true"
@@ -36,8 +36,8 @@
                             <span class="bold" ng-style="item.style">{{item.name}}</span>
                         </td>
                         <td ng-repeat="column in item.translations">
-                            <i ng-if="column.hasTranslation" class="icon-check color-green"></i>
-                            <i ng-if="!column.hasTranslation" class="icon-alert color-red"></i>
+                            <umb-icon icon-name="icon-check" ng-if="column.hasTranslation" class="icon-check color-green"></umb-icon>
+                            <umb-icon icon-name="icon-alert" ng-if="!column.hasTranslation" class="icon-alert color-red"></umb-icon>
                         </td>
                     </tr>
                 </tbody>

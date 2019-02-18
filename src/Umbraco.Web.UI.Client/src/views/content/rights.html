@@ -4,10 +4,10 @@
     <div ng-show="vm.viewState === 'manageGroups'">
         <div class="umb-dialog-body" ng-cloak>
 
-            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>    
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
             <div class="umb-pane" ng-show="!vm.loading">
-                
+
                 <form name="permissionsForm">
 
                     <div ng-show="vm.saveError">
@@ -31,15 +31,15 @@
                         <umb-button
                             type="button"
                             button-style="info"
-                            label-key="defaultdialogs_permissionsSet" 
+                            label-key="defaultdialogs_permissionsSet"
                             action="vm.groupsDropdownOpen = !vm.groupsDropdownOpen"
                             add-ellipsis="true">
                         </umb-button>
-                        
+
                         <umb-dropdown ng-if="vm.groupsDropdownOpen" on-close="vm.groupsDropdownOpen = false">
                             <umb-dropdown-item ng-repeat="group in vm.availableUserGroups | filter:{selected: '!true'}">
                                 <a href="" ng-click="vm.editPermissions(group)" prevent-default>
-                                    <i class="{{group.icon}}"></i>
+                                    <umb-icon icon-name="{{group.icon}}" class="{{group.icon}}"></umb-icon>
                                     {{group.name}}
                                 </a>
                             </umb-dropdown-item>
@@ -61,7 +61,7 @@
                             on-edit="vm.editPermissions(group)">
                         </umb-user-group-preview>
                     </div>
-        
+
                     <div class="umb-notifications" style="bottom: 0;" ng-if="vm.showNotification">
                         <div class="umb-notification alert alert-block alert-form umb-notifications__notification animated -half-second fadeIn -no-border -extra-padding">
                             <h4 style="font-size: 16px;"><localize key="prompt_unsavedChanges"></localize></h4>

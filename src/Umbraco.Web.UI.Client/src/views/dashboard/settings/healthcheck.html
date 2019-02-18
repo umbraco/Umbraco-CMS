@@ -1,19 +1,19 @@
 <div ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
 
     <div ng-if="vm.viewState === 'list'">
-        
+
         <umb-box>
             <umb-box-content>
                 <div class="flex justify-between items-center">
                     <h3 class="bold">Health Check</h3>
                     <umb-button
                         type="button"
-                        button-style="success" 
+                        button-style="success"
                         label="Check All Groups"
                         action="vm.checkAllGroups(vm.groups)">
                     </umb-button>
                 </div>
-        
+
                 <div class="umb-healthcheck-help-text">
                     <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
                     You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
@@ -35,22 +35,22 @@
                     <div class="umb-healthcheck-messages" ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
 
                         <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
-                            <i class="icon-check color-green"></i>
+                            <umb-icon icon-name="icon-check class="icon-check color-green"></umb-icon>
                             {{ group.totalSuccess }}
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
-                            <i class="icon-alert color-orange"></i>
+                            <umb-icon icon-name="icon-alert" class="icon-alert color-orange"></umb-icon>
                             {{ group.totalWarning }}
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
-                            <i class="icon-delete color-red"></i>
+                            <umb-icon icon-name="icon-delete" class="icon-delete color-red"></umb-icon>
                             {{ group.totalError }}
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
-                            <i class="umb-healthcheck-status-icon icon-info"></i>
+                            <umb-icon icon-name="icon-info" class="umb-healthcheck-status-icon icon-info"></umb-icon>
                             {{ group.totalInfo }}
                         </div>
 
@@ -79,7 +79,7 @@
                 <div class="umb-panel-group__details-group-title">
                     <div class="umb-panel-group__details-group-name">{{ vm.selectedGroup.name }}</div>
                     <umb-button
-                        type="button" 
+                        type="button"
                         action="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks)"
                         label="Check group">
                     </umb-button>
@@ -97,10 +97,10 @@
                         <div class="umb-panel-group__details-status" ng-repeat="status in check.status">
 
                             <div class="umb-panel-group__details-status-icon-container">
-                                <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0"></i>
-                                <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1"></i>
-                                <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2"></i>
-                                <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType === 3"></i>
+                                <umb-icon icon-name="icon-check" class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0"></umb-icon>
+                                <umb-icon icon-name="icon-alert" class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1"></umb-icon>
+                                <umb-icon icon-name="icon-delete" class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2"></umb-icon>
+                                <umb-icon icon-name="icon-info" class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType === 3"></umb-icon>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">

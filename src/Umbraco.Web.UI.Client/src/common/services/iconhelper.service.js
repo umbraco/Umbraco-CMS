@@ -244,7 +244,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
 
                     // If the current icon is being requested, wait a bit so that we don't have to make another http request and can instead get the icon from the cache.
                     // This is a bit rough and ready and could probably be improved used an event based system
-                    if(liveRequests.includes(iconRequestPath)) {
+                    if(liveRequests.indexOf(iconRequestPath) >= 0) {
                         setTimeout(() => {
                             resolve(this.getIcon(iconName));
                         }, 10);
