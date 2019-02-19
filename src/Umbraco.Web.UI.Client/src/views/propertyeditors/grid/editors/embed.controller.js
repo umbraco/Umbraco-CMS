@@ -1,14 +1,26 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.EmbedController",
     function ($scope, $timeout, $sce, editorService) {
-
-    	$scope.hasEmbed = function(){
-            return $scope.control.value !== null;
-        }
-    	$scope.getEmbed = function(){
+        
+        
+        
+    	function getEmbed() {
             return $sce.trustAsHtml($scope.control.value);
         }
-    	$scope.setEmbed = function(){
+        
+        
+        $scope.embedHtml = getEmbed();
+        $scope.$watch('control.value', function(newValue, oldValue) {
+            if(angular.equals(newValue, oldValue)){
+                return; // simply skip that
+            }
+            
+            $scope.embedHtml = getEmbed();
+        }, false);
+    	$scope.hasEmbed = function() {
+            return $scope.control.value !== null;
+        }
+    	$scope.setEmbed = function() {
             var embed = {
                 submit: function(model) {
                     $scope.control.value = model.embed.preview;
