@@ -316,7 +316,7 @@ angular.module("umbraco")
         // *********************************************
 
         $scope.clickRow = function(index, rows, $event) {
-            //rows[index].active = true;
+            
             $scope.currentRowWithActiveChild = null;
             $scope.active = rows[index];
             
