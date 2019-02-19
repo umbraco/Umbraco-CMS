@@ -66,7 +66,7 @@ namespace Umbraco.Web.Editors
             if (e.Model is UserDisplay)
                 OnSendingUserModel(sender, new EditorModelEventArgs<UserDisplay>(e));
 
-            if (e.Model is IEnumerable<IDashboard>)
+            if (e.Model is IEnumerable<Tab<IDashboardSlim>>)
                 OnSendingDashboardModel(sender, new EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>>(e));
         }
     }
