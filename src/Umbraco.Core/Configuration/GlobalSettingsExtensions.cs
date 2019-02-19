@@ -128,6 +128,7 @@ namespace Umbraco.Core.Configuration
             if (routes == null) throw new ArgumentNullException(nameof(routes));
 
             //check if the current request matches a route, if so then it is reserved.
+            //TODO: This value should be cached! Else this is doing double routing in MVC every request!
             var route = routes.GetRouteData(httpContext);
             if (route != null)
                 return true;
