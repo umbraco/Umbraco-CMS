@@ -269,7 +269,7 @@
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Композиции</key>
-    <key alias="noTabs">Вы не добавили ни одной вкладки</key>
+    <key alias="noGroups">Вы не добавили ни одной вкладки</key>
     <key alias="inheritedFrom">Унаследовано от</key>
     <key alias="addProperty">Добавить свойство</key>
     <key alias="requiredLabel">Обязательная метка</key>
@@ -1355,7 +1355,7 @@
     <key alias="tabs">Вкладки</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Добавить вкладку</key>
+    <key alias="addGroup">Добавить вкладку</key>
     <key alias="addProperty">Добавить свойство</key>
     <key alias="addEditor">Добавить редактор</key>
     <key alias="addTemplate">Добавить шаблон</key>

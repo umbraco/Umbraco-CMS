@@ -38,6 +38,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Web.Composing.CompositionExtensions;
+using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
@@ -218,14 +219,14 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
 
             // register back office sections in the order we want them rendered
-            Composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>().Append<ContentBackOfficeSection>()
-                .Append<MediaBackOfficeSection>()
-                .Append<SettingsBackOfficeSection>()
-                .Append<PackagesBackOfficeSection>()
-                .Append<UsersBackOfficeSection>()
-                .Append<MembersBackOfficeSection>()
-                .Append<FormsBackOfficeSection>()
-                .Append<TranslationBackOfficeSection>();
+            Composition.WithCollectionBuilder<SectionCollectionBuilder>().Append<ContentSection>()
+                .Append<MediaSection>()
+                .Append<SettingsSection>()
+                .Append<PackagesSection>()
+                .Append<UsersSection>()
+                .Append<MembersSection>()
+                .Append<FormsSection>()
+                .Append<TranslationSection>();
             Composition.RegisterUnique<ISectionService, SectionService>();
 
         }

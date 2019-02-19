@@ -5,8 +5,7 @@
 @if (Model.editor.config.markup != null)
 {
     string markup = Model.editor.config.markup.ToString();
-    var umbracoHelper = Current.UmbracoHelper;
-    markup = markup.Replace("#value#", umbracoHelper.ReplaceLineBreaksForHtml(HttpUtility.HtmlEncode(Model.value.ToString())).ToString());
+    markup = markup.Replace("#value#", Html.ReplaceLineBreaksForHtml(HttpUtility.HtmlEncode((string)Model.value.ToString())).ToString());
 
     if (Model.editor.config.style != null)
     {

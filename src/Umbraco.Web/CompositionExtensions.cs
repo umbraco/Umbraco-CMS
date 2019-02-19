@@ -11,6 +11,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
+using Umbraco.Web.Sections;
 using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
@@ -93,8 +94,8 @@ namespace Umbraco.Web
         /// Gets the backoffice sections/applications collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        public static BackOfficeSectionCollectionBuilder Sections(this Composition composition)
-            => composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>();
+        public static SectionCollectionBuilder Sections(this Composition composition)
+            => composition.WithCollectionBuilder<SectionCollectionBuilder>();
 
         /// <summary>
         /// Gets the backoffice dashboards collection builder.

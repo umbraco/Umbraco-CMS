@@ -302,7 +302,7 @@
 
         function setSectionIcon(sections) {
             angular.forEach(sections, function (section) {
-                section.icon = "icon-section " + section.cssclass;
+                section.icon = "icon-section";
             });
         }
 
