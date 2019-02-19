@@ -67,7 +67,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
-        public static FilteredControllerFactoryCollectionBuilder FilderedControllerFactory(this Composition composition)
+        public static FilteredControllerFactoryCollectionBuilder FilteredControllerFactory(this Composition composition)
             => composition.WithCollectionBuilder<FilteredControllerFactoryCollectionBuilder>();
 
         /// <summary>
