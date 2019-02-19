@@ -810,47 +810,42 @@
         };
 
         $scope.preview = function (content) {
+            // Chromes popup blocker will kick in if a window is opened
+            // without the initial scoped request. This trick will fix that.
+            //
+            var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
+            // Build the correct path so both /#/ and #/ work.
+            var query = 'id=' + content.id;
+            if ($scope.culture) {
+                query += "#?culture=" + $scope.culture;
+            }
+            var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
-            if (!$scope.busy) {
-
-                // Chromes popup blocker will kick in if a window is opened
-                // without the initial scoped request. This trick will fix that.
-                //
-                var previewWindow = $window.open('preview/?init=true', 'umbpreview');
-
-                // Build the correct path so both /#/ and #/ work.
-                var query = 'id=' + content.id;
+            //The user cannot save if they don't have access to do that, in which case we just want to preview
+            //and that's it otherwise they'll get an unauthorized access message
+            if (!_.contains(content.allowedActions, "A")) {
+                previewWindow.location.href = redirect;
+            }
+            else {
+                var selectedVariant = $scope.content.variants[0];
                 if ($scope.culture) {
-                    query += "#?culture=" + $scope.culture;
-                }
-                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
-
-                //The user cannot save if they don't have access to do that, in which case we just want to preview
-                //and that's it otherwise they'll get an unauthorized access message
-                if (!_.contains(content.allowedActions, "A")) {
-                    previewWindow.location.href = redirect;
-                }
-                else {
-                    var selectedVariant = $scope.content.variants[0];
-                    if ($scope.culture) {
-                        var found = _.find($scope.content.variants, function (v) {
-                            return (v.language && v.language.culture === $scope.culture);
-                        });
-
-                        if(found){
-                            selectedVariant = found;
-                        }
-                    }
-
-                    //ensure the save flag is set
-                    selectedVariant.save = true;
-                    performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
-                        previewWindow.location.href = redirect;
-                    }, function (err) {
-                        //validation issues ....
+                    var found = _.find($scope.content.variants, function (v) {
+                        return (v.language && v.language.culture === $scope.culture);
                     });
+
+                    if (found) {
+                        selectedVariant = found;
+                    }
                 }
+
+                //ensure the save flag is set
+                selectedVariant.save = true;
+                performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
+                    previewWindow.location.href = redirect;
+                }, function (err) {
+                    //validation issues ....
+                });
             }
         };
 
