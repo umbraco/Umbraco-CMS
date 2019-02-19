@@ -145,7 +145,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					data["data-id"] = img.id;
 				}
 
-				editor.insertContent(editor.dom.createHTML('img', data));
+				editor.selection.setContent(editor.dom.createHTML('img', data));
 
 				$timeout(function () {
 					var imgElm = editor.dom.get('__mcenew');
