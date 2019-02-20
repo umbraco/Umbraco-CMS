@@ -29,7 +29,7 @@ namespace Umbraco.Core.IO
         // shadow support
         private readonly List<ShadowWrapper> _shadowWrappers = new List<ShadowWrapper>();
         private readonly object _shadowLocker = new object();
-        private static Guid _shadowCurrentId = Guid.Empty; // static - unique!!
+        private static string _shadowCurrentId; // static - unique!!
         #region Constructor
 
         // DI wants a public ctor
@@ -45,13 +45,13 @@ namespace Umbraco.Core.IO
             _shadowWrappers.Clear();
             _filesystems.Clear();
             Volatile.Write(ref _wkfsInitialized, false);
-            _shadowCurrentId = Guid.Empty;
+            _shadowCurrentId = null;
         }
 
         // for tests only, totally unsafe
         internal static void ResetShadowId()
         {
-            _shadowCurrentId = Guid.Empty;
+            _shadowCurrentId = null;
         }
 
         // set by the scope provider when taking control of filesystems
@@ -179,35 +179,37 @@ namespace Umbraco.Core.IO
         // global shadow for the entire application, so great care should be taken to ensure that the
         // application is *not* doing anything else when using a shadow.
 
-        internal ICompletable Shadow(Guid id)
+        internal ICompletable Shadow()
         {
             if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
 
+            var id = ShadowWrapper.CreateShadowId();
             return new ShadowFileSystems(this, id); // will invoke BeginShadow and EndShadow
         }
 
-        internal void BeginShadow(Guid id)
+        internal void BeginShadow(string id)
         {
             lock (_shadowLocker)
             {
                 // if we throw here, it means that something very wrong happened.
-                if (_shadowCurrentId != Guid.Empty)
+                if (_shadowCurrentId != null)
                     throw new InvalidOperationException("Already shadowing.");
+
                 _shadowCurrentId = id;
 
-                _logger.Debug<ShadowFileSystems>("Shadow '{ShadowId}'", id);
+                _logger.Debug<ShadowFileSystems>("Shadow '{ShadowId}'", _shadowCurrentId);
 
                 foreach (var wrapper in _shadowWrappers)
-                    wrapper.Shadow(id);
+                    wrapper.Shadow(_shadowCurrentId);
             }
         }
 
-        internal void EndShadow(Guid id, bool completed)
+        internal void EndShadow(string id, bool completed)
         {
             lock (_shadowLocker)
             {
                 // if we throw here, it means that something very wrong happened.
-                if (_shadowCurrentId == Guid.Empty)
+                if (_shadowCurrentId == null)
                     throw new InvalidOperationException("Not shadowing.");
                 if (id != _shadowCurrentId)
                     throw new InvalidOperationException("Not the current shadow.");
@@ -228,7 +230,7 @@ namespace Umbraco.Core.IO
                     }
                 }
 
-                _shadowCurrentId = Guid.Empty;
+                _shadowCurrentId = null;
 
                 if (exceptions.Count > 0)
                     throw new AggregateException(completed ? "Failed to apply all changes (see exceptions)." : "Failed to abort (see exceptions).", exceptions);
@@ -240,7 +242,7 @@ namespace Umbraco.Core.IO
             lock (_shadowLocker)
             {
                 var wrapper = new ShadowWrapper(filesystem, shadowPath, IsScoped);
-                if (_shadowCurrentId != Guid.Empty)
+                if (_shadowCurrentId != null)
                     wrapper.Shadow(_shadowCurrentId);
                 _shadowWrappers.Add(wrapper);
                 return wrapper;
