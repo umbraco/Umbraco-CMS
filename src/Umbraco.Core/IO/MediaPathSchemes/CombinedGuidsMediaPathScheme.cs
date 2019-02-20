@@ -7,7 +7,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
     /// Implements a combined-guids media path scheme.
     /// </summary>
     /// <remarks>
-    /// <para>Path is "{combinedGuid}/{filename>}" where combinedGuid is a combination of itemGuid and propertyGuid.</para>
+    /// <para>Path is "{combinedGuid}/{filename}" where combinedGuid is a combination of itemGuid and propertyGuid.</para>
     /// </remarks>
     public class CombinedGuidsMediaPathScheme : IMediaPathScheme
     {
@@ -17,7 +17,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
             // assumes that cuid and puid keys can be trusted - and that a single property type
             // for a single content cannot store two different files with the same name
             var directory = HexEncoder.Encode(GuidUtils.Combine(itemGuid, propertyGuid).ToByteArray()/*'/', 2, 4*/); // could use ext to fragment path eg 12/e4/f2/...
-            return Path.Combine(directory, filename).Replace('\\', '/');
+            return Path.Combine(directory, filename).Replace('\\', '/').Substring(0, 9);
         }
 
         /// <inheritdoc />

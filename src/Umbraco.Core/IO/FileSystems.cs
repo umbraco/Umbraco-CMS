@@ -126,11 +126,11 @@ namespace Umbraco.Core.IO
             var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", IsScoped);
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", IsScoped);
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "macro-partials", IsScoped);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "partials", IsScoped);
             _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", IsScoped);
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", IsScoped);
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", IsScoped);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "views", IsScoped);
 
             // TODO: do we need a lock here?
             _shadowWrappers.Add(_macroPartialFileSystem);
@@ -145,6 +145,11 @@ namespace Umbraco.Core.IO
         #endregion
 
         #region Providers
+
+        private readonly Dictionary<Type, string> _paths = new Dictionary<Type, string>();
+
+        // internal for tests
+        internal IReadOnlyDictionary<Type, string> Paths => _paths;
 
         /// <summary>
         /// Gets a strongly-typed filesystem.
@@ -162,10 +167,33 @@ namespace Umbraco.Core.IO
 
             return (TFileSystem) _filesystems.GetOrAdd(typeof(TFileSystem), _ => new Lazy<IFileSystem>(() =>
             {
-                var name = typeof(TFileSystem).FullName;
-                if (name == null) throw new Exception("panic!");
+                var typeofTFileSystem = typeof(TFileSystem);
 
-                var shadowWrapper = CreateShadowWrapper(supporting, "typed/" + name);
+                // path must be unique and not collide with paths used in CreateWellKnownFileSystems
+                // for our well-known 'media' filesystem we can use the short 'media' path
+                // for others, put them under 'x/' and use ... something
+                string path;
+                if (typeofTFileSystem == typeof(MediaFileSystem))
+                {
+                    path = "media";
+                }
+                else
+                {
+                    lock (_paths)
+                    {
+                        if (!_paths.TryGetValue(typeofTFileSystem, out path))
+                        {
+                            path = Guid.NewGuid().ToString("N").Substring(0, 6);
+                            while (_paths.ContainsValue(path)) // this can't loop forever, right?
+                                path = Guid.NewGuid().ToString("N").Substring(0, 6);
+                            _paths[typeofTFileSystem] = path;
+                        }
+                    }
+
+                    path = "x/" + path;
+                }
+
+                var shadowWrapper = CreateShadowWrapper(supporting, path);
                 return _container.CreateInstance<TFileSystem>(shadowWrapper);
             })).Value;
         }

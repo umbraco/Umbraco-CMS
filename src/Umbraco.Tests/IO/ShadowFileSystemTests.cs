@@ -428,10 +428,11 @@ namespace Umbraco.Tests.IO
             Assert.AreEqual(1, dirs.Length);
             Assert.AreEqual((shadowfs + "/" + id).Replace('\\', '/'), dirs[0].Replace('\\', '/'));
             dirs = Directory.GetDirectories(dirs[0]);
-            var typedDir = dirs.FirstOrDefault(x => x.Replace('\\', '/').EndsWith("/typed"));
+            var typedDir = dirs.FirstOrDefault(x => x.Replace('\\', '/').EndsWith("/x"));
             Assert.IsNotNull(typedDir);
             dirs = Directory.GetDirectories(typedDir);
-            var scopedDir = dirs.FirstOrDefault(x => x.Replace('\\', '/').EndsWith("/Umbraco.Tests.IO.ShadowFileSystemTests+FS")); // this is where files go
+            var suid = fileSystems.Paths[typeof(FS)];
+            var scopedDir = dirs.FirstOrDefault(x => x.Replace('\\', '/').EndsWith("/" + suid)); // this is where files go
             Assert.IsNotNull(scopedDir);
             scope.Dispose();
             scopedFileSystems = false;
