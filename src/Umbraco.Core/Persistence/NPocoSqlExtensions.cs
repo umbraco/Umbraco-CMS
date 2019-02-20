@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Core.Persistence.Querying;
 
@@ -1115,6 +1116,25 @@ namespace Umbraco.Core.Persistence
             public Sql GetSqlRhs(Sql sql) => _getSqlRhs(sql);
 
             public void Reset(Sql sql) => _setSqlFinal(sql, null);
+        }
+
+        #endregion
+
+        #region Aliasing
+
+        internal static string GetAliasedField(this Sql<ISqlContext> sql, string field)
+        {
+            // get alias, if aliased
+            //
+            // regex looks for pattern "([\w+].[\w+]) AS ([\w+])" ie "(field) AS (alias)"
+            // and, if found & a group's field matches the field name, returns the alias
+            //
+            // so... if query contains "[umbracoNode].[nodeId] AS [umbracoNode__nodeId]"
+            // then GetAliased for "[umbracoNode].[nodeId]" returns "[umbracoNode__nodeId]"
+
+            var matches = sql.SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
+            var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(field));
+            return match == null ? field : match.Groups[2].Value;
         }
 
         #endregion
