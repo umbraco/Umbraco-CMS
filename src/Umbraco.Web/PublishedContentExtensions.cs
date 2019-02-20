@@ -979,11 +979,11 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
-        /// <param name="alias">One or more content type alias.</param>
+        /// <param name="contentTypeAlias">The content type alias.</param>
         /// <returns>The children of the content, of any of the specified types.</returns>
-        public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, string alias, string culture = null)
+        public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.Children(x => alias.InvariantContains(x.ContentType.Alias), culture);
+            return content.Children(x => contentTypeAlias.InvariantContains(x.ContentType.Alias), culture);
         }
 
         /// <summary>
@@ -1010,9 +1010,9 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the first child of the content, of a given content type.
         /// </summary>
-        public static IPublishedContent FirstChildOfType(this IPublishedContent content, string alias, string culture = null)
+        public static IPublishedContent FirstChildOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.ChildrenOfType(alias, culture).FirstOrDefault();
+            return content.ChildrenOfType(contentTypeAlias, culture).FirstOrDefault();
         }
 
         public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate, string culture = null)
