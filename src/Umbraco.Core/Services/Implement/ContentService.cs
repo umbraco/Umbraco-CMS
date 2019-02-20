@@ -869,19 +869,28 @@ namespace Umbraco.Core.Services.Implement
             // if culture is specific, first publish the invariant values, then publish the culture itself.
             // if culture is '*', then publish them all (including variants)
 
+            Property[] invalidProperties;
+
             // explicitly SaveAndPublish a specific culture also publishes invariant values
             if (!culture.IsNullOrWhiteSpace() && culture != "*")
             {
                 // publish the invariant values
-                var publishInvariant = content.PublishCulture(null);
+                var publishInvariant = content.PublishCulture(out invalidProperties, null);
                 if (!publishInvariant)
-                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
+                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
+                    {
+                        InvalidProperties = invalidProperties ?? Enumerable.Empty<Property>()
+                    };
+
             }
 
             // publish the culture(s)
-            var publishCulture = content.PublishCulture(culture);
+            var publishCulture = content.PublishCulture(out invalidProperties, culture);
             if (!publishCulture)
-                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
+                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
+                {
+                    InvalidProperties = invalidProperties ?? Enumerable.Empty<Property>()
+                };
 
             // finally, "save publishing"
             // what happens next depends on whether the content can be published or not
@@ -1242,6 +1251,7 @@ namespace Umbraco.Core.Services.Implement
                             .Distinct()
                             .ToList();
 
+                        Property[] invalidProperties = null;
                         var publishing = true;
                         foreach (var culture in pendingCultures)
                         {
@@ -1250,14 +1260,17 @@ namespace Umbraco.Core.Services.Implement
 
                             if (d.Trashed) continue; // won't publish
 
-                            publishing &= d.PublishCulture(culture); //set the culture to be published
+                            publishing &= d.PublishCulture(out invalidProperties, culture); //set the culture to be published
                             if (!publishing) break; // no point continuing
                         }
 
                         if (d.Trashed)
                             result = new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d);
                         else if (!publishing)
-                            result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
+                            result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d)
+                            {
+                                InvalidProperties = invalidProperties ?? Enumerable.Empty<Property>()
+                            };
                         else
                             result = CommitDocumentChanges(d, d.WriterId);
 
@@ -1536,7 +1549,11 @@ namespace Umbraco.Core.Services.Implement
 
             // publish & check if values are valid
             if (!publishCultures(document, culturesToPublish))
+            {
+                //TODO: Based on this callback behavior there is no way to know which properties may have been invalid if this failed, see other results of FailedPublishContentInvalid
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
+            }
+                
 
             var result = CommitDocumentChangesInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
             if (result.Success)
