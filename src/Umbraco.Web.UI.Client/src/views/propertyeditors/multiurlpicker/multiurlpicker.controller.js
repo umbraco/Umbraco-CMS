@@ -73,7 +73,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             currentTarget: target,
             show: true,
             submit: function (model) {
-                if (model.target.url) {
+                if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed
                     if (model.target.anchor && model.target.anchor[0] !== '?' && model.target.anchor[0] !== '#') {
                         model.target.anchor = (model.target.anchor.indexOf('=') === -1 ? '#' : '?') + model.target.anchor;
@@ -87,14 +87,14 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                             link.isMedia = model.target.isMedia;
                         }
 
-                        link.name = model.target.name || model.target.url;
+                        link.name = model.target.name || model.target.url || model.target.anchor;
                         link.queryString = model.target.anchor;
                         link.target = model.target.target;
                         link.url = model.target.url;
                     } else {
                         link = {
                             isMedia: model.target.isMedia,
-                            name: model.target.name || model.target.url,
+                            name: model.target.name || model.target.url || model.target.anchor,
                             queryString: model.target.anchor,
                             target: model.target.target,
                             udi: model.target.udi,
