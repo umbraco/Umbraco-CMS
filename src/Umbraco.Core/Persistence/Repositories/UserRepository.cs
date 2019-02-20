@@ -267,8 +267,8 @@ ORDER BY colName";
 
             var fromDate = DateTime.UtcNow - timespan;
 
-            var count = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUserLogin WHERE lastValidatedUtc=@fromDate", new { fromDate = fromDate });
-            Database.Execute("DELETE FROM umbracoUserLogin WHERE lastValidatedUtc=@fromDate", new { fromDate = fromDate });
+            var count = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUserLogin WHERE lastValidatedUtc=<@fromDate", new { fromDate = fromDate });
+            Database.Execute("DELETE FROM umbracoUserLogin WHERE lastValidatedUtc=<@fromDate", new { fromDate = fromDate });
             return count;
         }
 
