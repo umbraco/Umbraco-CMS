@@ -193,6 +193,13 @@ namespace Umbraco.Core.Models
 
         public static bool PublishCulture(this IContent content, string culture = "*")
         {
+            return PublishCulture(content, out _, culture);
+        }
+
+        public static bool PublishCulture(this IContent content, out Property[] invalidProperties, string culture = "*")
+        {
+            invalidProperties = null;
+
             culture = culture.NullOrWhiteSpaceAsNull();
 
             // the variation should be supported by the content type properties
@@ -202,7 +209,8 @@ namespace Umbraco.Core.Models
                 throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
 
             // the values we want to publish should be valid
-            if (content.ValidateProperties(culture).Any())
+            invalidProperties = content.ValidateProperties(culture);
+            if (invalidProperties.Length > 0)
                 return false;
 
             var alsoInvariant = false;
