@@ -1449,7 +1449,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force,
+        internal IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force,
             Func<IContent, HashSet<string>> shouldPublish,
             Func<IContent, HashSet<string>, bool> publishCultures,
             int userId = Constants.Security.SuperUserId)
