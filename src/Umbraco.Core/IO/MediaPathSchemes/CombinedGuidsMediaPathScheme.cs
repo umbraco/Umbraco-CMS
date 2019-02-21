@@ -11,13 +11,17 @@ namespace Umbraco.Core.IO.MediaPathSchemes
     /// </remarks>
     public class CombinedGuidsMediaPathScheme : IMediaPathScheme
     {
+        private const int DirectoryLength = 8;
+
         /// <inheritdoc />
         public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
         {
             // assumes that cuid and puid keys can be trusted - and that a single property type
             // for a single content cannot store two different files with the same name
-            var directory = HexEncoder.Encode(GuidUtils.Combine(itemGuid, propertyGuid).ToByteArray()/*'/', 2, 4*/); // could use ext to fragment path eg 12/e4/f2/...
-            return Path.Combine(directory, filename).Replace('\\', '/').Substring(0, 9);
+
+            var combinedGuid = GuidUtils.Combine(itemGuid, propertyGuid);
+            var directory = GuidUtils.ToBase32String(combinedGuid, DirectoryLength); // see also HexEncoder, we may want to fragment path eg 12/e4/f3...
+            return Path.Combine(directory, filename).Replace('\\', '/');
         }
 
         /// <inheritdoc />
