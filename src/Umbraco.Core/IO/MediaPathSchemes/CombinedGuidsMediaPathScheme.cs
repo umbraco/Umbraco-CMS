@@ -8,6 +8,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
     /// </summary>
     /// <remarks>
     /// <para>Path is "{combinedGuid}/{filename}" where combinedGuid is a combination of itemGuid and propertyGuid.</para>
+    /// <para>This scheme is dangerous, as it does not prevent potential collisions.</para>
     /// </remarks>
     public class CombinedGuidsMediaPathScheme : IMediaPathScheme
     {
