@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Collections;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -101,35 +105,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Validates the content item's properties pass variant rules
-        /// </summary>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
-        public static Property[] ValidateProperties(this IContentBase content, string culture = "*")
-        {
-            // select invalid properties
-            return content.Properties.Where(x =>
-                {
-                    // if culture is null, we validate invariant properties only
-                    // if culture is '*' we validate both variant and invariant properties, automatically
-                    // if culture is specific eg 'en-US' we both too, but explicitly
-
-                    var varies = x.PropertyType.VariesByCulture();
-
-                    if (culture == null)
-                        return !(varies || x.IsValid(null)); // validate invariant property, invariant culture
-
-                    if (culture == "*")
-                        return !x.IsValid(culture); // validate property, all cultures
-
-                    return varies
-                        ? !x.IsValid(culture) // validate variant property, explicit culture
-                        : !x.IsValid(null); // validate invariant property, explicit culture
-                })
-                .ToArray();
-        }
-
         public static void SetPublishInfo(this IContent content, string culture, string name, DateTime date)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -191,15 +166,19 @@ namespace Umbraco.Core.Models
             content.CultureInfos.AddOrUpdate(culture, name, date);
         }
 
-        public static bool PublishCulture(this IContent content, string culture = "*")
+        /// <summary>
+        /// This will set the publishing values for names and properties for the content/culture
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="culture"></param>
+        /// <returns>
+        /// A boolean if it's possible to publish the values for the provided culture. This may fail required names are not set.
+        /// </returns>
+        /// <remarks>
+        /// This does not validation property data
+        /// </remarks>
+        public static bool PublishCulture(this IContent content,string culture = "*")
         {
-            return PublishCulture(content, out _, culture);
-        }
-
-        public static bool PublishCulture(this IContent content, out Property[] invalidProperties, string culture = "*")
-        {
-            invalidProperties = null;
-
             culture = culture.NullOrWhiteSpaceAsNull();
 
             // the variation should be supported by the content type properties
@@ -207,11 +186,6 @@ namespace Umbraco.Core.Models
             //  if the content type varies, everything is ok because some properties may be invariant
             if (!content.ContentType.SupportsPropertyVariation(culture, "*", true))
                 throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
-
-            // the values we want to publish should be valid
-            invalidProperties = content.ValidateProperties(culture);
-            if (invalidProperties.Length > 0)
-                return false;
 
             var alsoInvariant = false;
             if (culture == "*") // all cultures

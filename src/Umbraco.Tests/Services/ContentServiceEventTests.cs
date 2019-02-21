@@ -81,9 +81,15 @@ namespace Umbraco.Tests.Services
 
             ContentService.Saving += OnSaving;
             ContentService.Saved += OnSaved;
-            contentService.Save(document);
-            ContentService.Saving -= OnSaving;
-            ContentService.Saved -= OnSaved;
+            try
+            {
+                contentService.Save(document);
+            }
+            finally
+            {
+                ContentService.Saving -= OnSaving;
+                ContentService.Saved -= OnSaved;
+            }
         }
 
         [Test]
@@ -123,9 +129,16 @@ namespace Umbraco.Tests.Services
 
             ContentService.Saving += OnSaving;
             ContentService.Saved += OnSaved;
-            contentService.Save(document);
-            ContentService.Saving -= OnSaving;
-            ContentService.Saved -= OnSaved;
+            try
+            {
+                contentService.Save(document);
+            }
+            finally
+            {
+                ContentService.Saving -= OnSaving;
+                ContentService.Saved -= OnSaved;
+            }
+            
         }
 
         [Test]
@@ -179,9 +192,15 @@ namespace Umbraco.Tests.Services
 
             ContentService.Publishing += OnPublishing;
             ContentService.Published += OnPublished;
-            contentService.SaveAndPublish(document, "fr-FR");
-            ContentService.Publishing -= OnPublishing;
-            ContentService.Published -= OnPublished;
+            try
+            {
+                contentService.SaveAndPublish(document, "fr-FR");
+            }
+            finally
+            {
+                ContentService.Publishing -= OnPublishing;
+                ContentService.Published -= OnPublished;
+            }
 
             document = contentService.GetById(document.Id);
 
@@ -225,13 +244,69 @@ namespace Umbraco.Tests.Services
                 Assert.AreEqual("title", propValue.PublishedValue);
             }
 
-            //We are binding to Saving (not Publishing), because it shouldn't make a difference, when setting a property value
-            //during Saving, this should become published during a SaveAndPublish operation
+            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be 
+            //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
+            //are published, but Saving is raised BEFORE.
             ContentService.Saving += OnSaving;
             ContentService.Saved += OnSaved;
-            contentService.SaveAndPublish(document);
-            ContentService.Saving -= OnSaving;
-            ContentService.Saved -= OnSaved;
+            try
+            {
+                contentService.SaveAndPublish(document);
+            }
+            finally
+            {
+                ContentService.Saving -= OnSaving;
+                ContentService.Saved -= OnSaved;
+            }
+        }
+
+        [Test]
+        public void Publishing_Set_Mandatory_Value()
+        {
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextPageContentType();
+            var titleProperty = contentType.PropertyTypes.First(x => x.Alias == "title");
+            titleProperty.Mandatory = true; // make this required!
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+            contentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+
+            IContent document = new Content("content", -1, contentType);
+
+            var result = contentService.SaveAndPublish(document);
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual("title", result.InvalidProperties.First().Alias);
+
+            //TODO: The ContentService doesn't reset the document's PublishedState so since the above fails, if we then try to do
+            // a SaveAndPublish again, we will get an exception: "Cannot save-and-publish (un)publishing content, use the dedicated CommitDocumentChanges method."
+            // but this exception is misleading and is caused because the document's PublishedState wasn't reset.
+            // So instead, we'll just re-create it.
+            document = new Content("content", -1, contentType);
+
+            void OnSaving(IContentService sender, ContentSavingEventArgs e)
+            {
+                var saved = e.SavedEntities.First();
+
+                Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
+
+                saved.SetValue("title", "title");
+            }
+
+            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be 
+            //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
+            //are published, but Saving is raised BEFORE.
+            ContentService.Saving += OnSaving;
+            try
+            {
+                result = contentService.SaveAndPublish(document);
+                Assert.IsTrue(result.Success); //will succeed now because we were able to specify the required value in the Saving event
+            }
+            finally
+            {
+                ContentService.Saving -= OnSaving;
+            }
         }
 
         [Test]
@@ -293,9 +368,15 @@ namespace Umbraco.Tests.Services
 
             ContentService.Publishing += OnPublishing;
             ContentService.Published += OnPublished;
-            contentService.CommitDocumentChanges(document);
-            ContentService.Publishing -= OnPublishing;
-            ContentService.Published -= OnPublished;
+            try
+            {
+                contentService.CommitDocumentChanges(document);
+            }
+            finally
+            {
+                ContentService.Publishing -= OnPublishing;
+                ContentService.Published -= OnPublished;
+            }
 
             document = contentService.GetById(document.Id);
 

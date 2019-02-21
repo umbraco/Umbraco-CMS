@@ -486,14 +486,15 @@ namespace Umbraco.Tests.Models
             prop.SetValue("a");
             Assert.AreEqual("a", prop.GetValue());
             Assert.IsNull(prop.GetValue(published: true));
+            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
 
-            Assert.IsTrue(prop.IsValid());
+            Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
 
             propertyType.Mandatory = true;
-            Assert.IsTrue(prop.IsValid());
+            Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
 
             prop.SetValue(null);
-            Assert.IsFalse(prop.IsValid());
+            Assert.IsFalse(propertyValidationService.IsPropertyValid(prop));
 
             // can publish, even though invalid
             prop.PublishValues();

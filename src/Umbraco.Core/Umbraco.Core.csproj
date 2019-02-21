@@ -210,6 +210,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
+    <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Composing\WeightAttribute.cs" />
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
