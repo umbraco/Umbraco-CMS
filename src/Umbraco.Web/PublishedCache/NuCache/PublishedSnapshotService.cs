@@ -946,8 +946,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.ContentTypes);
+
                 var typesA = CreateContentTypes(PublishedItemType.Content, refreshedIdsA).ToArray();
                 var kits = _dataSource.GetTypeContentSources(scope, refreshedIdsA);
+
                 _contentStore.UpdateContentTypes(removedIds, typesA, kits);
                 _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()).ToArray());
                 _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()).ToArray());
@@ -967,8 +969,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.MediaTypes);
+
                 var typesA = CreateContentTypes(PublishedItemType.Media, refreshedIdsA).ToArray();
                 var kits = _dataSource.GetTypeMediaSources(scope, refreshedIdsA);
+
                 _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
                 _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
                 _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
