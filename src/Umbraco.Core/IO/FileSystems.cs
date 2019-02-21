@@ -29,7 +29,7 @@ namespace Umbraco.Core.IO
         // shadow support
         private readonly List<ShadowWrapper> _shadowWrappers = new List<ShadowWrapper>();
         private readonly object _shadowLocker = new object();
-        private static Guid _shadowCurrentId = Guid.Empty; // static - unique!!
+        private static string _shadowCurrentId; // static - unique!!
         #region Constructor
 
         // DI wants a public ctor
@@ -45,13 +45,13 @@ namespace Umbraco.Core.IO
             _shadowWrappers.Clear();
             _filesystems.Clear();
             Volatile.Write(ref _wkfsInitialized, false);
-            _shadowCurrentId = Guid.Empty;
+            _shadowCurrentId = null;
         }
 
         // for tests only, totally unsafe
         internal static void ResetShadowId()
         {
-            _shadowCurrentId = Guid.Empty;
+            _shadowCurrentId = null;
         }
 
         // set by the scope provider when taking control of filesystems
@@ -126,11 +126,11 @@ namespace Umbraco.Core.IO
             var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", IsScoped);
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", IsScoped);
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "macro-partials", IsScoped);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "partials", IsScoped);
             _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", IsScoped);
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", IsScoped);
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", IsScoped);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "views", IsScoped);
 
             // TODO: do we need a lock here?
             _shadowWrappers.Add(_macroPartialFileSystem);
@@ -145,6 +145,11 @@ namespace Umbraco.Core.IO
         #endregion
 
         #region Providers
+
+        private readonly Dictionary<Type, string> _paths = new Dictionary<Type, string>();
+
+        // internal for tests
+        internal IReadOnlyDictionary<Type, string> Paths => _paths;
 
         /// <summary>
         /// Gets a strongly-typed filesystem.
@@ -162,10 +167,33 @@ namespace Umbraco.Core.IO
 
             return (TFileSystem) _filesystems.GetOrAdd(typeof(TFileSystem), _ => new Lazy<IFileSystem>(() =>
             {
-                var name = typeof(TFileSystem).FullName;
-                if (name == null) throw new Exception("panic!");
+                var typeofTFileSystem = typeof(TFileSystem);
 
-                var shadowWrapper = CreateShadowWrapper(supporting, "typed/" + name);
+                // path must be unique and not collide with paths used in CreateWellKnownFileSystems
+                // for our well-known 'media' filesystem we can use the short 'media' path
+                // for others, put them under 'x/' and use ... something
+                string path;
+                if (typeofTFileSystem == typeof(MediaFileSystem))
+                {
+                    path = "media";
+                }
+                else
+                {
+                    lock (_paths)
+                    {
+                        if (!_paths.TryGetValue(typeofTFileSystem, out path))
+                        {
+                            path = Guid.NewGuid().ToString("N").Substring(0, 6);
+                            while (_paths.ContainsValue(path)) // this can't loop forever, right?
+                                path = Guid.NewGuid().ToString("N").Substring(0, 6);
+                            _paths[typeofTFileSystem] = path;
+                        }
+                    }
+
+                    path = "x/" + path;
+                }
+
+                var shadowWrapper = CreateShadowWrapper(supporting, path);
                 return _container.CreateInstance<TFileSystem>(shadowWrapper);
             })).Value;
         }
@@ -179,35 +207,37 @@ namespace Umbraco.Core.IO
         // global shadow for the entire application, so great care should be taken to ensure that the
         // application is *not* doing anything else when using a shadow.
 
-        internal ICompletable Shadow(Guid id)
+        internal ICompletable Shadow()
         {
             if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
 
+            var id = ShadowWrapper.CreateShadowId();
             return new ShadowFileSystems(this, id); // will invoke BeginShadow and EndShadow
         }
 
-        internal void BeginShadow(Guid id)
+        internal void BeginShadow(string id)
         {
             lock (_shadowLocker)
             {
                 // if we throw here, it means that something very wrong happened.
-                if (_shadowCurrentId != Guid.Empty)
+                if (_shadowCurrentId != null)
                     throw new InvalidOperationException("Already shadowing.");
+
                 _shadowCurrentId = id;
 
-                _logger.Debug<ShadowFileSystems>("Shadow '{ShadowId}'", id);
+                _logger.Debug<ShadowFileSystems>("Shadow '{ShadowId}'", _shadowCurrentId);
 
                 foreach (var wrapper in _shadowWrappers)
-                    wrapper.Shadow(id);
+                    wrapper.Shadow(_shadowCurrentId);
             }
         }
 
-        internal void EndShadow(Guid id, bool completed)
+        internal void EndShadow(string id, bool completed)
         {
             lock (_shadowLocker)
             {
                 // if we throw here, it means that something very wrong happened.
-                if (_shadowCurrentId == Guid.Empty)
+                if (_shadowCurrentId == null)
                     throw new InvalidOperationException("Not shadowing.");
                 if (id != _shadowCurrentId)
                     throw new InvalidOperationException("Not the current shadow.");
@@ -228,7 +258,7 @@ namespace Umbraco.Core.IO
                     }
                 }
 
-                _shadowCurrentId = Guid.Empty;
+                _shadowCurrentId = null;
 
                 if (exceptions.Count > 0)
                     throw new AggregateException(completed ? "Failed to apply all changes (see exceptions)." : "Failed to abort (see exceptions).", exceptions);
@@ -240,7 +270,7 @@ namespace Umbraco.Core.IO
             lock (_shadowLocker)
             {
                 var wrapper = new ShadowWrapper(filesystem, shadowPath, IsScoped);
-                if (_shadowCurrentId != Guid.Empty)
+                if (_shadowCurrentId != null)
                     wrapper.Shadow(_shadowCurrentId);
                 _shadowWrappers.Add(wrapper);
                 return wrapper;

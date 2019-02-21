@@ -161,7 +161,7 @@
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
-    <Compile Include="CompositionExtensions_Accessors.cs" />
+    <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\DisableAttribute.cs" />
     <Compile Include="Composing\DisableComposerAttribute.cs" />
     <Compile Include="Composing\EnableAttribute.cs" />
@@ -187,6 +187,8 @@
     <Compile Include="Composing\CompositionExtensions\Repositories.cs" />
     <Compile Include="Composing\CompositionExtensions\Services.cs" />
     <Compile Include="CompositionExtensions_Essentials.cs" />
+    <Compile Include="CompositionExtensions_FileSystems.cs" />
+    <Compile Include="CompositionExtensions_Uniques.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
