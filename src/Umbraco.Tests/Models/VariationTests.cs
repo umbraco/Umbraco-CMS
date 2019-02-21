@@ -364,6 +364,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ContentPublishValuesWithMixedPropertyTypeVariations()
         {
+            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
             const string langFr = "fr-FR";
 
             // content type varies by Culture
@@ -383,9 +384,12 @@ namespace Umbraco.Tests.Models
 
             content.SetCultureName("hello", langFr);
 
-            Assert.IsFalse(content.PublishCulture(langFr)); // fails because prop1 is mandatory
+            Assert.IsTrue(content.PublishCulture(langFr));
+            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop1 is mandatory
+
             content.SetValue("prop1", "a", langFr);
-            Assert.IsFalse(content.PublishCulture(langFr)); // fails because prop2 is mandatory and invariant
+            Assert.IsTrue(content.PublishCulture(langFr));
+            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop2 is mandatory and invariant
             content.SetValue("prop2", "x");
             Assert.IsTrue(content.PublishCulture(langFr)); // now it's ok
 
