@@ -48,7 +48,7 @@ namespace Umbraco.Core.IO
             throw new Exception($"Could not get a shadow identifier (tried {retries} times)");
         }
 
-        internal void Shadow(Guid id)
+        internal void Shadow(string id)
         {
             // note: no thread-safety here, because ShadowFs is thread-safe due to the check
             // on ShadowFileSystemsScope.None - and if None is false then we should be running
