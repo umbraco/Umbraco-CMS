@@ -243,7 +243,7 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
             Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
-            Composition.RegisterUnique<IMediaPathScheme, CombinedGuidsMediaPathScheme>();
+            Composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
             // register empty content apps collection
             Composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
