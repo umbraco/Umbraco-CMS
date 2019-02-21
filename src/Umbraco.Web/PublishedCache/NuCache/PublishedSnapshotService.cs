@@ -947,7 +947,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 scope.ReadLock(Constants.Locks.ContentTypes);
                 var typesA = CreateContentTypes(PublishedItemType.Content, refreshedIdsA).ToArray();
-                var kits = _dataSource.GetTypeContentSources(scope, refreshedIdsA);
+                var kits = _dataSource.GetTypeContentSources(scope, refreshedIdsA).ToArray();
                 _contentStore.UpdateContentTypes(removedIds, typesA, kits);
                 _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()).ToArray());
                 _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()).ToArray());
