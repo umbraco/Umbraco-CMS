@@ -593,13 +593,14 @@ namespace Umbraco.Core
         ///<returns></returns>
         public static string ToUrlBase64(this string input)
         {
-            if (input == null) throw new ArgumentNullException("input");
+            if (input == null) throw new ArgumentNullException(nameof(input));
 
-            if (String.IsNullOrEmpty(input)) return String.Empty;
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
 
+            //return Convert.ToBase64String(bytes).Replace(".", "-").Replace("/", "_").Replace("=", ",");
             var bytes = Encoding.UTF8.GetBytes(input);
             return UrlTokenEncode(bytes);
-            //return Convert.ToBase64String(bytes).Replace(".", "-").Replace("/", "_").Replace("=", ",");
         }
 
         /// <summary>
@@ -609,14 +610,14 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static string FromUrlBase64(this string input)
         {
-            if (input == null) throw new ArgumentNullException("input");
+            if (input == null) throw new ArgumentNullException(nameof(input));
 
             //if (input.IsInvalidBase64()) return null;
 
             try
             {
                 //var decodedBytes = Convert.FromBase64String(input.Replace("-", ".").Replace("_", "/").Replace(",", "="));
-                byte[] decodedBytes = UrlTokenDecode(input);
+                var decodedBytes = UrlTokenDecode(input);
                 return decodedBytes != null ? Encoding.UTF8.GetString(decodedBytes) : null;
             }
             catch (FormatException)
@@ -795,42 +796,40 @@ namespace Umbraco.Core
         internal static byte[] UrlTokenDecode(string input)
         {
             if (input == null)
+                throw new ArgumentNullException(nameof(input));
+
+            if (input.Length == 0)
+                return Array.Empty<byte>();
+
+            // calc array size - must be groups of 4
+            var arrayLength = input.Length;
+            var remain = arrayLength % 4;
+            if (remain != 0) arrayLength += 4 - remain;
+
+            var inArray = new char[arrayLength];
+            for (var i = 0; i < input.Length; i++)
             {
-                throw new ArgumentNullException("input");
-            }
-            int length = input.Length;
-            if (length < 1)
-            {
-                return new byte[0];
-            }
-            int num2 = input[length - 1] - '0';
-            if ((num2 < 0) || (num2 > 10))
-            {
-                return null;
-            }
-            char[] inArray = new char[(length - 1) + num2];
-            for (int i = 0; i < (length - 1); i++)
-            {
-                char ch = input[i];
+                var ch = input[i];
                 switch (ch)
                 {
-                    case '-':
+                    case '-': // restore '-' as '+'
                         inArray[i] = '+';
                         break;
 
-                    case '_':
+                    case '_': // restore '_' as '/'
                         inArray[i] = '/';
                         break;
 
-                    default:
+                    default: // keep char unchanged
                         inArray[i] = ch;
                         break;
                 }
             }
-            for (int j = length - 1; j < inArray.Length; j++)
-            {
+
+            // pad with '='
+            for (var j = input.Length; j < inArray.Length; j++)
                 inArray[j] = '=';
-            }
+
             return Convert.FromBase64CharArray(inArray, 0, inArray.Length);
         }
 
@@ -842,54 +841,40 @@ namespace Umbraco.Core
         internal static string UrlTokenEncode(byte[] input)
         {
             if (input == null)
+                throw new ArgumentNullException(nameof(input));
+
+            if (input.Length == 0)
+                return string.Empty;
+
+            // base-64 digits are A-Z, a-z, 0-9, + and /
+            // the = char is used for trailing padding
+
+            var str = Convert.ToBase64String(input);
+
+            var pos = str.IndexOf('=');
+            if (pos < 0) pos = str.Length;
+
+            // replace chars that would cause problems in urls
+            var chArray = new char[pos];
+            for (var i = 0; i < pos; i++)
             {
-                throw new ArgumentNullException("input");
-            }
-            if (input.Length < 1)
-            {
-                return String.Empty;
-            }
-            string str = null;
-            int index = 0;
-            char[] chArray = null;
-            str = Convert.ToBase64String(input);
-            if (str == null)
-            {
-                return null;
-            }
-            index = str.Length;
-            while (index > 0)
-            {
-                if (str[index - 1] != '=')
-                {
-                    break;
-                }
-                index--;
-            }
-            chArray = new char[index + 1];
-            chArray[index] = (char)((0x30 + str.Length) - index);
-            for (int i = 0; i < index; i++)
-            {
-                char ch = str[i];
+                var ch = str[i];
                 switch (ch)
                 {
-                    case '+':
+                    case '+': // replace '+' with '-'
                         chArray[i] = '-';
                         break;
 
-                    case '/':
+                    case '/': // replace '/' with '_'
                         chArray[i] = '_';
                         break;
 
-                    case '=':
-                        chArray[i] = ch;
-                        break;
-
-                    default:
+                    default: // keep char unchanged
                         chArray[i] = ch;
                         break;
                 }
             }
+
             return new string(chArray);
         }
 

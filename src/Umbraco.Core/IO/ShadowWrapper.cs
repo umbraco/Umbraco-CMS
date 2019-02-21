@@ -25,7 +25,7 @@ namespace Umbraco.Core.IO
         public static string CreateShadowId()
         {
             const int retries = 50; // avoid infinite loop
-            const int idLength = 6; // 6 chars
+            const int idLength = 8; // 6 chars
 
             // shorten a Guid to idLength chars, and see whether it collides
             // with an existing directory or not - if it does, try again, and
@@ -34,7 +34,7 @@ namespace Umbraco.Core.IO
 
             for (var i = 0; i < retries; i++)
             {
-                var id = Guid.NewGuid().ToString("N").Substring(0, idLength);
+                var id = GuidUtils.ToBase32String(Guid.NewGuid(), idLength);
 
                 var virt = ShadowFsPath + "/" + id;
                 var shadowDir = IOHelper.MapPath(virt);
