@@ -22,6 +22,32 @@ namespace Umbraco.Core.IO
             _isScoped = isScoped;
         }
 
+        public static string CreateShadowId()
+        {
+            const int retries = 50; // avoid infinite loop
+            const int idLength = 8; // 6 chars
+
+            // shorten a Guid to idLength chars, and see whether it collides
+            // with an existing directory or not - if it does, try again, and
+            // we should end up with a unique identifier eventually - but just
+            // detect infinite loops (just in case)
+
+            for (var i = 0; i < retries; i++)
+            {
+                var id = GuidUtils.ToBase32String(Guid.NewGuid(), idLength);
+
+                var virt = ShadowFsPath + "/" + id;
+                var shadowDir = IOHelper.MapPath(virt);
+                if (Directory.Exists(shadowDir))
+                    continue;
+
+                Directory.CreateDirectory(shadowDir);
+                return id;
+            }
+
+            throw new Exception($"Could not get a shadow identifier (tried {retries} times)");
+        }
+
         internal void Shadow(Guid id)
         {
             // note: no thread-safety here, because ShadowFs is thread-safe due to the check

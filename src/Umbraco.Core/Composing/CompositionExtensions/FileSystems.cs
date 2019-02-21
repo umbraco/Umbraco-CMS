@@ -79,7 +79,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IFileSystems>(factory => factory.GetInstance<IO.FileSystems>());
 
             // register the scheme for media paths
-            composition.RegisterUnique<IMediaPathScheme, TwoGuidsMediaPathScheme>();
+            composition.RegisterUnique<IMediaPathScheme, CombinedGuidsMediaPathScheme>();
 
             // register the IMediaFileSystem implementation
             composition.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>();
