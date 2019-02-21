@@ -14,7 +14,8 @@ angular.module("umbraco.directives")
 				scope: {
 					src: '=',
 					center: "=",
-                    onImageLoaded: "&"
+                    onImageLoaded: "&",
+                    onGravityChanged: "&"
 				},
 				link: function(scope, element, attrs) {
 
@@ -34,7 +35,7 @@ angular.module("umbraco.directives")
                     var $overlay = element.find(".overlay");
 
 				    scope.style = function () {
-                        if (scope.dimensions.width <= 0) {
+                        if (scope.dimensions.width <= 0 || scope.dimensions.height <= 0) {
 							setDimensions();
 						}
 
@@ -52,7 +53,7 @@ angular.module("umbraco.directives")
 
 					    calculateGravity(offsetX, offsetY);
 
-					    lazyEndEvent();
+					    gravityChanged();
 					};
 
                     var setDimensions = function () {
@@ -77,12 +78,11 @@ angular.module("umbraco.directives")
 						scope.center.top =  (scope.dimensions.top+10) / scope.dimensions.height;
 					};
 
-					var lazyEndEvent = _.debounce(function(){
-						scope.$apply(function(){
-							scope.$emit("imageFocalPointStop");
-						});
-					}, 2000);
-
+                    var gravityChanged = function () {
+                        if (angular.isFunction(scope.onGravityChanged)) {
+                            scope.onGravityChanged();
+                        }
+                    };
 
 					//Drag and drop positioning, using jquery ui draggable
 					//TODO ensure that the point doesnt go outside the box
@@ -100,7 +100,7 @@ angular.module("umbraco.directives")
 								calculateGravity(offsetX, offsetY);
 							});
 
-							lazyEndEvent();
+							gravityChanged();
 						}
 					});
 

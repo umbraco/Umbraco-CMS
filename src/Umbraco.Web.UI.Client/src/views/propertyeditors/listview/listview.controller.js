@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService, mediaHelper) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -269,10 +269,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          $scope.listViewResultSet = data;
 
          //update all values for display
+         var section = appState.getSectionState("currentSection");
          if ($scope.listViewResultSet.items) {
             _.each($scope.listViewResultSet.items, function (e, index) {
                setPropertyValues(e);
-               if (e.contentTypeAlias === 'Folder') {
+               // create the folders collection (only for media list views)
+               if (section === "media" && !mediaHelper.hasFilePropertyType(e)) {
                    $scope.folders.push(e);
                }
             });
@@ -396,6 +398,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                         if (activeNode) {
                             navigationService.reloadNode(activeNode);
                         }
+                        $scope.getContent();
                     });
                 }
             });
@@ -605,13 +608,17 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
        //$scope.listViewAllowedTypes = getContentTypesCallback(id);
       getContentTypesCallback(id).then(function (listViewAllowedTypes) {
-          var blueprints = false;
           $scope.listViewAllowedTypes = listViewAllowedTypes;
 
-          angular.forEach(listViewAllowedTypes, function (allowedType) {
-              angular.forEach(allowedType.blueprints, function (value, key) {
+          var blueprints = false;
+          _.each(listViewAllowedTypes, function (allowedType) {
+              if (_.isEmpty(allowedType.blueprints)) {
+                  // this helps the view understand that there are no blueprints available
+                  allowedType.blueprints = null;
+              }
+              else {
                   blueprints = true;
-              });
+              }
           });
 
           if (listViewAllowedTypes.length === 1 && blueprints === false) {

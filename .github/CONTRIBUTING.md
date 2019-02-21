@@ -16,7 +16,7 @@ This document gives you a quick overview on how to get started, we will link to 
 
 ## Guidelines for contributions we welcome
 
-Not all changes are wanted, so on occassion we might close a PR without merging it. We will give you feedback why we can't accept your changes and we'll be nice about it, thanking you for spending your valueable time.
+Not all changes are wanted, so on occassion we might close a PR without merging it. We will give you feedback why we can't accept your changes and we'll be nice about it, thanking you for spending your valuable time.
 
 We have [documented what we consider small and large changes](CONTRIBUTION_GUIDELINES.md). Make sure to talk to us before making large changes.
 
@@ -82,7 +82,6 @@ You can get in touch with [the PR team](#the-pr-team) in multiple ways, we love 
 
 - If there's an existing issue on the issue tracker then that's a good place to leave questions and discuss how to start or move forward
 - Unsure where to start? Did something not work as expected? Try leaving a note in the ["Contributing to Umbraco"](https://our.umbraco.com/forum/contributing-to-umbraco-cms/) forum, the team monitors that one closely
-- We're also [active in the Gitter chatroom](https://gitter.im/umbraco/Umbraco-CMS)
 
 ## Code of Conduct
 
