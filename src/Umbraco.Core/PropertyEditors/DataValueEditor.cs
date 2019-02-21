@@ -290,7 +290,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         public IEnumerable<XElement> ConvertDbToXml(Property property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published)
         {
-            published &= property.PropertyType.IsPublishing;
+            published &= property.PropertyType.SupportsPublishing;
 
             var nodeName = property.PropertyType.Alias.ToSafeAlias();
 

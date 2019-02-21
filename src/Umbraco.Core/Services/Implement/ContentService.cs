@@ -1029,7 +1029,7 @@ namespace Umbraco.Core.Services.Implement
         /// This MUST NOT be called from within this service, this used to be a public API and must only be used outside of this service.
         /// Internally in this service, calls must be made to CommitDocumentChangesInternal
         /// </para>
-        /// 
+        ///
         /// <para>This is the underlying logic for both publishing and unpublishing any document</para>
         /// <para>Pending publishing/unpublishing changes on a document are made with calls to <see cref="ContentRepositoryExtensions.PublishCulture"/> and
         /// <see cref="ContentRepositoryExtensions.UnpublishCulture"/>.</para>
@@ -1068,7 +1068,7 @@ namespace Umbraco.Core.Services.Implement
             if (saveEventArgs == null) throw new ArgumentNullException(nameof(saveEventArgs));
 
             var evtMsgs = saveEventArgs.Messages;
-            
+
             PublishResult publishResult = null;
             PublishResult unpublishResult = null;
 
@@ -1093,7 +1093,6 @@ namespace Umbraco.Core.Services.Implement
             var isNew = !content.HasIdentity;
             var changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
             var previouslyPublished = content.HasIdentity && content.Published;
-
 
             if (publishing)
             {
@@ -1130,7 +1129,7 @@ namespace Umbraco.Core.Services.Implement
                     // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
                     // PublishState to anything other than Publishing or Unpublishing - which is precisely
                     // what we want to do here - throws
-                    content.Published = content.Published; 
+                    content.Published = content.Published;
                 }
             }
 
@@ -1420,6 +1419,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        // utility 'PublishCultures' func used by SaveAndPublishBranch
         private bool SaveAndPublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish)
         {
             //TODO: This does not support being able to return invalid property details to bubble up to the UI
@@ -1431,7 +1431,8 @@ namespace Umbraco.Core.Services.Implement
                 : content.PublishCulture() && _propertyValidationService.Value.IsPropertyDataValid(content, out _);
         }
 
-        private HashSet<string> SaveAndPublishBranch_ShouldPublish3(ref HashSet<string> cultures, string c, bool published, bool edited, bool isRoot, bool force)
+        // utility 'ShouldPublish' func used by SaveAndPublishBranch
+        private HashSet<string> SaveAndPublishBranch_ShouldPublish(ref HashSet<string> cultures, string c, bool published, bool edited, bool isRoot, bool force)
         {
             // if published, republish
             if (published)
@@ -1448,7 +1449,6 @@ namespace Umbraco.Core.Services.Implement
             cultures.Add(c); // <culture> means 'publish this culture'
             return cultures;
         }
-
 
         /// <inheritdoc />
         public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId)
@@ -1468,10 +1468,10 @@ namespace Umbraco.Core.Services.Implement
                 HashSet<string> culturesToPublish = null;
 
                 if (!c.ContentType.VariesByCulture()) // invariant content type
-                    return SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
+                    return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
 
                 if (culture != "*") // variant content type, specific culture
-                    return SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, force);
+                    return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, force);
 
                 // variant content type, all cultures
                 if (c.Published)
@@ -1479,7 +1479,7 @@ namespace Umbraco.Core.Services.Implement
                     // then some (and maybe all) cultures will be 'already published' (unless forcing),
                     // others will have to 'republish this culture'
                     foreach (var x in c.AvailableCultures)
-                        SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
+                        SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
                     return culturesToPublish;
                 }
 
@@ -1508,7 +1508,7 @@ namespace Umbraco.Core.Services.Implement
                 HashSet<string> culturesToPublish = null;
 
                 if (!c.ContentType.VariesByCulture()) // invariant content type
-                    return SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
+                    return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
 
                 // variant content type, specific cultures
                 if (c.Published)
@@ -1516,7 +1516,7 @@ namespace Umbraco.Core.Services.Implement
                     // then some (and maybe all) cultures will be 'already published' (unless forcing),
                     // others will have to 'republish this culture'
                     foreach (var x in cultures)
-                        SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
+                        SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
                     return culturesToPublish;
                 }
 
@@ -1529,7 +1529,6 @@ namespace Umbraco.Core.Services.Implement
             return SaveAndPublishBranch(content, force, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
         }
 
-        /// <inheritdoc />
         internal IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force,
             Func<IContent, HashSet<string>> shouldPublish,
             Func<IContent, HashSet<string>, bool> publishCultures,
@@ -1554,7 +1553,7 @@ namespace Umbraco.Core.Services.Implement
                     throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
 
                 // deal with the branch root - if it fails, abort
-                var result = SaveAndPublishBranchOne(scope, document, shouldPublish, publishCultures, true, publishedDocuments, evtMsgs, userId);
+                var result = SaveAndPublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, evtMsgs, userId);
                 if (result != null)
                 {
                     results.Add(result);
@@ -1585,7 +1584,7 @@ namespace Umbraco.Core.Services.Implement
                         }
 
                         // no need to check path here, parent has to be published here
-                        result = SaveAndPublishBranchOne(scope, d, shouldPublish, publishCultures, false, publishedDocuments, evtMsgs, userId);
+                        result = SaveAndPublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, evtMsgs, userId);
                         if (result != null)
                         {
                             results.Add(result);
@@ -1615,7 +1614,7 @@ namespace Umbraco.Core.Services.Implement
         // shouldPublish: a function determining whether the document has changes that need to be published
         //  note - 'force' is handled by 'editing'
         // publishValues: a function publishing values (using the appropriate PublishCulture calls)
-        private PublishResult SaveAndPublishBranchOne(IScope scope, IContent document,
+        private PublishResult SaveAndPublishBranchItem(IScope scope, IContent document,
             Func<IContent, HashSet<string>> shouldPublish,
             Func<IContent, HashSet<string>, bool> publishCultures,
             bool isRoot,
@@ -1637,7 +1636,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 //TODO: Based on this callback behavior there is no way to know which properties may have been invalid if this failed, see other results of FailedPublishContentInvalid
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
-            }   
+            }
 
             var result = CommitDocumentChangesInternal(scope, document, saveEventArgs, userId, branchOne: true, branchRoot: isRoot);
             if (result.Success)
@@ -2613,7 +2612,6 @@ namespace Umbraco.Core.Services.Implement
 
                 return new PublishResult(PublishResultType.SuccessPublishCulture, evtMsgs, content);
             }
-
 
             Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
             return new PublishResult(evtMsgs, content);

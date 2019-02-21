@@ -279,10 +279,8 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(result.Success);
             Assert.AreEqual("title", result.InvalidProperties.First().Alias);
 
-            //TODO: The ContentService doesn't reset the document's PublishedState so since the above fails, if we then try to do
-            // a SaveAndPublish again, we will get an exception: "Cannot save-and-publish (un)publishing content, use the dedicated CommitDocumentChanges method."
-            // but this exception is misleading and is caused because the document's PublishedState wasn't reset.
-            // So instead, we'll just re-create it.
+            // when a service operation fails, the object is dirty and should not be re-used,
+            // re-create it
             document = new Content("content", -1, contentType);
 
             void OnSaving(IContentService sender, ContentSavingEventArgs e)

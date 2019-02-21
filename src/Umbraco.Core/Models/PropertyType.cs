@@ -85,14 +85,19 @@ namespace Umbraco.Core.Models
         /// Gets a value indicating whether the content type owning this property type is publishing.
         /// </summary>
         /// <remarks>
-        /// When set to true the Property of this Property Type will return it's published value if it has one.
-        /// This also affects the validation behavior of the Property when assigning values since Members and Media don't support publishing.
-        /// For those entity types, this will be false which means if a value is attempted to be published on a property when it's not supported
-        /// by the PropertyType, an exception will be thrown.
-        ///
-        /// TODO: Should we rename this and other instances of "IsPublishing" (including parameters) to be more clear? Like SupportsPublishing ?
+        /// <para>A publishing content type supports draft and published values for properties.
+        /// It is possible to retrieve either the draft (default) or published value of a property.
+        /// Setting the value always sets the draft value, which then needs to be published.</para>
+        /// <para>A non-publishing content type only supports one value for properties. Getting
+        /// the draft or published value of a property returns the same thing, and publishing
+        /// a value property has no effect.</para>
+        /// <para>When true, getting the property value returns the edited value by default, but
+        /// it is possible to get the published value using the appropriate 'published' method
+        /// parameter.</para>
+        /// <para>When false, getting the property value always return the edited value,
+        /// regardless of the 'published' method parameter.</para>
         /// </remarks>
-        public bool IsPublishing { get; internal set; }
+        public bool SupportsPublishing { get; internal set; }
 
         /// <summary>
         /// Gets of sets the name of the property type.

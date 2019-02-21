@@ -167,17 +167,13 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// This will set the publishing values for names and properties for the content/culture
+        /// Sets the publishing values for names and properties.
         /// </summary>
         /// <param name="content"></param>
         /// <param name="culture"></param>
-        /// <returns>
-        /// A boolean if it's possible to publish the values for the provided culture. This may fail required names are not set.
-        /// </returns>
-        /// <remarks>
-        /// This does not validation property data
-        /// </remarks>
-        public static bool PublishCulture(this IContent content,string culture = "*")
+        /// <returns>A value indicating whether it was possible to publish the names and values for the specified
+        /// culture(s). The method may fail if required names are not set, but it does NOT validate property data</returns>
+        public static bool PublishCulture(this IContent content, string culture = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
 

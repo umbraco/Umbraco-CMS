@@ -184,7 +184,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return null;
 
-            return PropertyType.IsPublishing
+            return PropertyType.SupportsPublishing
                 ? (published ? pvalue.PublishedValue : pvalue.EditedValue)
                 : pvalue.EditedValue;
         }
@@ -244,7 +244,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return;
 
-            if (!PropertyType.IsPublishing)
+            if (!PropertyType.SupportsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = PropertyType.ConvertAssignedValue(pvalue.EditedValue);
@@ -255,7 +255,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return;
 
-            if (!PropertyType.IsPublishing)
+            if (!PropertyType.SupportsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = PropertyType.ConvertAssignedValue(null);
@@ -288,7 +288,7 @@ namespace Umbraco.Core.Models
         {
             var (pvalue, _) = GetPValue(culture, segment, true);
 
-            if (published && PropertyType.IsPublishing)
+            if (published && PropertyType.SupportsPublishing)
                 pvalue.PublishedValue = value;
             else
                 pvalue.EditedValue = value;

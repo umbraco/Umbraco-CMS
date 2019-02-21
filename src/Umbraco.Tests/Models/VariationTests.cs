@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Models
             Assert.Throws<NotSupportedException>(() => prop.PublishValues());
 
             // change
-            propertyType.IsPublishing = true;
+            propertyType.SupportsPublishing = true;
 
             // can get value
             // and now published value is null
@@ -384,14 +384,15 @@ namespace Umbraco.Tests.Models
 
             content.SetCultureName("hello", langFr);
 
-            Assert.IsTrue(content.PublishCulture(langFr));
+            Assert.IsTrue(content.PublishCulture(langFr)); // succeeds because names are ok (not validating properties here)
             Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop1 is mandatory
 
             content.SetValue("prop1", "a", langFr);
-            Assert.IsTrue(content.PublishCulture(langFr));
+            Assert.IsTrue(content.PublishCulture(langFr)); // succeeds because names are ok (not validating properties here)
             Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop2 is mandatory and invariant
             content.SetValue("prop2", "x");
-            Assert.IsTrue(content.PublishCulture(langFr)); // now it's ok
+            Assert.IsTrue(content.PublishCulture(langFr)); // still ok...
+            Assert.IsTrue(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// now it's ok
 
             Assert.AreEqual("a", content.GetValue("prop1", langFr, published: true));
             Assert.AreEqual("x", content.GetValue("prop2", published: true));
@@ -484,7 +485,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ValidationTests()
         {
-            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop", IsPublishing = true };
+            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop", SupportsPublishing = true };
             var prop = new Property(propertyType);
 
             prop.SetValue("a");

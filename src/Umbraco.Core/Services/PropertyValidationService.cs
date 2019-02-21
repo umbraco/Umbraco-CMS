@@ -76,6 +76,7 @@ namespace Umbraco.Core.Services
             // (including ensuring that the value exists, if mandatory)
             if ((culture == null || culture == "*") && (segment == null || segment == "*") && property.PropertyType.SupportsVariation(null, null))
             {
+                // validate pvalue (which is the invariant value)
                 pvalue = property.Values.FirstOrDefault(x => x.Culture == null && x.Segment == null);
                 if (!IsValidPropertyValue(property, pvalue?.EditedValue))
                     return false;
@@ -92,17 +93,18 @@ namespace Umbraco.Core.Services
             // for anything else, validate the existing values (including mandatory),
             // but we cannot validate mandatory globally (we don't know the possible cultures and segments)
 
-            var vvalues = property.Values.Count > (pvalue == null ? 0 : 1)
-                ? property.Values.Where(x => x != pvalue).ToDictionary(x => new CompositeNStringNStringKey(x.Culture, x.Segment), x => x)
-                : null;
+            // validate vvalues (which are the variant values)
 
-            if (vvalues == null) return culture == "*" || IsValidPropertyValue(property,null);
+            // if we don't have vvalues (property.Values is empty or only contains pvalue), validate null
+            if (property.Values.Count == (pvalue == null ? 0 : 1))
+                return culture == "*" || IsValidPropertyValue(property, null);
 
-            var pvalues = vvalues.Where(x =>
-                    property.PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment, true) && // the value variation is ok
-                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
-                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
-                .Select(x => x.Value)
+            // else validate vvalues (but don't revalidate pvalue)
+            var pvalues = property.Values.Where(x =>
+                    x != pvalue && // don't revalidate pvalue
+                    property.PropertyType.SupportsVariation(x.Culture, x.Segment, true) && // the value variation is ok
+                    (culture == "*" || x.Culture.InvariantEquals(culture)) && // the culture matches
+                    (segment == "*" || x.Segment.InvariantEquals(segment))) // the segment matches
                 .ToList();
 
             return pvalues.Count == 0 || pvalues.All(x => IsValidPropertyValue(property, x.EditedValue));
