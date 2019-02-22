@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core.Scoping;
+using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // This class is optimized for many readers, few writers
         // Readers are lock-free
 
-        private readonly ConcurrentDictionary<TKey, LinkedNode> _items;
+        private readonly ConcurrentDictionary<TKey, LinkedNode<TValue>> _items;
         private readonly ConcurrentQueue<GenObj> _genObjs;
         private GenObj _genObj;
         private readonly object _wlocko = new object();
@@ -40,7 +41,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public SnapDictionary()
         {
-            _items = new ConcurrentDictionary<TKey, LinkedNode>();
+            _items = new ConcurrentDictionary<TKey, LinkedNode<TValue>>();
             _genObjs = new ConcurrentQueue<GenObj>();
             _genObj = null; // no initial gen exists
             _liveGen = _floorGen = 0;
@@ -198,9 +199,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public int Count => _items.Count;
 
-        private LinkedNode GetHead(TKey key)
+        private LinkedNode<TValue> GetHead(TKey key)
         {
-            _items.TryGetValue(key, out LinkedNode link); // else null
+            _items.TryGetValue(key, out var link); // else null
             return link;
         }
 
@@ -221,7 +222,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         // for an older gen - if value is different then insert a new
                         // link for the new gen, with the new value
                         if (link.Value != value)
-                            _items.TryUpdate(key, new LinkedNode(value, _liveGen, link), link);
+                            _items.TryUpdate(key, new LinkedNode<TValue>(value, _liveGen, link), link);
                     }
                     else
                     {
@@ -235,7 +236,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
                 else
                 {
-                    _items.TryAdd(key, new LinkedNode(value, _liveGen));
+                    _items.TryAdd(key, new LinkedNode<TValue>(value, _liveGen));
                 }
             }
             finally
@@ -261,7 +262,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     if (kvp.Value.Gen < _liveGen)
                     {
-                        var link = new LinkedNode(null, _liveGen, kvp.Value);
+                        var link = new LinkedNode<TValue>(null, _liveGen, kvp.Value);
                         _items.TryUpdate(kvp.Key, link, kvp.Value);
                     }
                     else
@@ -425,7 +426,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Collect(_items);
         }
 
-        private void Collect(ConcurrentDictionary<TKey, LinkedNode> dict)
+        private void Collect(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict)
         {
             // it is OK to enumerate a concurrent dictionary and it does not lock
             // it - and here it's not an issue if we skip some items, they will be
@@ -460,7 +461,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // not live, null value, no next link = remove that one -- but only if
                     // the dict has not been updated, have to do it via ICollection<> (thanks
                     // Mr Toub) -- and if the dict has been updated there is nothing to collect
-                    var idict = dict as ICollection<KeyValuePair<TKey, LinkedNode>>;
+                    var idict = dict as ICollection<KeyValuePair<TKey, LinkedNode<TValue>>>;
                     /*var removed =*/ idict.Remove(kvp);
                     //Console.WriteLine("remove (" + (removed ? "true" : "false") + ")");
                     continue;
@@ -526,7 +527,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             public GenVal[] GetValues(TKey key)
             {
-                _dict._items.TryGetValue(key, out LinkedNode link); // else null
+                _dict._items.TryGetValue(key, out var link); // else null
 
                 if (link == null)
                     return new GenVal[0];
@@ -558,23 +559,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #endregion
 
         #region Classes
-
-        private class LinkedNode
-        {
-            public LinkedNode(TValue value, long gen, LinkedNode next = null)
-            {
-                Value = value;
-                Gen = gen;
-                Next = next;
-            }
-
-            internal readonly long Gen;
-
-            // reading & writing references is thread-safe on all .NET platforms
-            // mark as volatile to ensure we always read the correct value
-            internal volatile TValue Value;
-            internal volatile LinkedNode Next;
-        }
 
         public class Snapshot : IDisposable
         {
@@ -637,48 +621,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _generationReference?.GenObj.Release();
                 GC.SuppressFinalize(this);
             }
-        }
-
-        internal class GenObj
-        {
-            public GenObj(long gen)
-            {
-                Gen = gen;
-                WeakGenRef = new WeakReference(null);
-            }
-
-            public GenerationReference GetGenRef()
-            {
-                // not thread-safe but always invoked from within a lock
-                var generationReference = (GenerationReference) WeakGenRef.Target;
-                if (generationReference == null)
-                    WeakGenRef.Target = generationReference = new GenerationReference(this);
-                return generationReference;
-            }
-
-            public readonly long Gen;
-            public readonly WeakReference WeakGenRef;
-            public int Count;
-
-            public void Reference()
-            {
-                Interlocked.Increment(ref Count);
-            }
-
-            public void Release()
-            {
-                Interlocked.Decrement(ref Count);
-            }
-        }
-
-        internal class GenerationReference
-        {
-            public GenerationReference(GenObj genObj)
-            {
-                GenObj = genObj;
-            }
-
-            public readonly GenObj GenObj;
         }
 
         #endregion

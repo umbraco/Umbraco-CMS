@@ -8,6 +8,7 @@ using CSharpTest.Net.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
+using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -1061,24 +1062,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Classes
 
-        private class LinkedNode<TValue>
-            where TValue: class
-        {
-            public LinkedNode(TValue value, long gen, LinkedNode<TValue> next = null)
-            {
-                Value = value;
-                Gen = gen;
-                Next = next;
-            }
-
-            internal readonly long Gen;
-
-            // reading & writing references is thread-safe on all .NET platforms
-            // mark as volatile to ensure we always read the correct value
-            internal volatile TValue Value;
-            internal volatile LinkedNode<TValue> Next;
-        }
-
         public class Snapshot : IDisposable
         {
             private readonly ContentStore _store;
@@ -1208,40 +1191,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     Interlocked.Decrement(ref _genRef.GenObj.Count);
                 GC.SuppressFinalize(this);
             }
-        }
-
-        internal class GenObj
-        {
-            public GenObj(long gen)
-            {
-                Gen = gen;
-                WeakGenRef = new WeakReference(null);
-            }
-
-            public GenRef GetGenRef()
-            {
-                // not thread-safe but always invoked from within a lock
-                var genRef = (GenRef) WeakGenRef.Target;
-                if (genRef == null)
-                    WeakGenRef.Target = genRef = new GenRef(this, Gen);
-                return genRef;
-            }
-
-            public readonly long Gen;
-            public readonly WeakReference WeakGenRef;
-            public int Count;
-        }
-
-        internal class GenRef
-        {
-            public GenRef(GenObj genObj, long gen)
-            {
-                GenObj = genObj;
-                Gen = gen;
-            }
-
-            public readonly GenObj GenObj;
-            public readonly long Gen;
         }
 
         #endregion
