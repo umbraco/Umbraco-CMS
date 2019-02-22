@@ -29,8 +29,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private readonly ILogger _logger;
         private BPlusTree<int, ContentNodeKit> _localDb;
-        private readonly ConcurrentQueue<GenRefRef> _genRefRefs;
-        private GenRefRef _genRefRef;
+        private readonly ConcurrentQueue<GenObj> _genObjs;
+        private GenObj _genObj;
         private readonly object _wlocko = new object();
         private readonly object _rlocko = new object();
         private long _liveGen, _floorGen;
@@ -64,8 +64,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _contentTypesByAlias = new ConcurrentDictionary<string, LinkedNode<PublishedContentType>>(StringComparer.InvariantCultureIgnoreCase);
             _xmap = new ConcurrentDictionary<Guid, int>();
 
-            _genRefRefs = new ConcurrentQueue<GenRefRef>();
-            _genRefRef = null; // no initial gen exists
+            _genObjs = new ConcurrentQueue<GenObj>();
+            _genObj = null; // no initial gen exists
             _liveGen = _floorGen = 0;
             _nextGen = false; // first time, must create a snapshot
             _collectAuto = true; // collect automatically by default
@@ -836,8 +836,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 // if no next generation is required, and we already have one,
                 // use it and create a new snapshot
-                if (_nextGen == false && _genRefRef != null)
-                    return new Snapshot(this, _genRefRef.GetGenRef()
+                if (_nextGen == false && _genObj != null)
+                    return new Snapshot(this, _genObj.GetGenRef()
 #if DEBUG
                         , _logger
 #endif
@@ -852,15 +852,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     var snapGen = _nextGen ? _liveGen - 1 : _liveGen;
 
                     // create a new gen ref unless we already have it
-                    if (_genRefRef == null)
-                        _genRefRefs.Enqueue(_genRefRef = new GenRefRef(snapGen));
-                    else if (_genRefRef.Gen != snapGen)
+                    if (_genObj == null)
+                        _genObjs.Enqueue(_genObj = new GenObj(snapGen));
+                    else if (_genObj.Gen != snapGen)
                         throw new Exception("panic");
                 }
                 else
                 {
                     // not write-locked, can use latest gen, create a new gen ref
-                    _genRefRefs.Enqueue(_genRefRef = new GenRefRef(_liveGen));
+                    _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
                     _nextGen = false; // this is the ONLY thing that triggers a _liveGen++
                 }
 
@@ -873,7 +873,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // - the genRefRef weak ref is dead because all snapshots have been collected
                 // in both cases, we will dequeue and collect
 
-                var snapshot = new Snapshot(this, _genRefRef.GetGenRef()
+                var snapshot = new Snapshot(this, _genObj.GetGenRef()
 #if DEBUG
                     , _logger
 #endif
@@ -930,10 +930,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 #if DEBUG
             _logger.Debug<ContentStore>("Collect.");
 #endif
-            while (_genRefRefs.TryPeek(out GenRefRef genRefRef) && (genRefRef.Count == 0 || genRefRef.WGenRef.IsAlive == false))
+            while (_genObjs.TryPeek(out var genObj) && (genObj.Count == 0 || genObj.WeakGenRef.IsAlive == false))
             {
-                _genRefRefs.TryDequeue(out genRefRef); // cannot fail since TryPeek has succeeded
-                _floorGen = genRefRef.Gen;
+                _genObjs.TryDequeue(out genObj); // cannot fail since TryPeek has succeeded
+                _floorGen = genObj.Gen;
 #if DEBUG
                 //_logger.Debug<ContentStore>("_floorGen=" + _floorGen + ", _liveGen=" + _liveGen);
 #endif
@@ -1009,9 +1009,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 await task;
         }
 
-        public long GenCount => _genRefRefs.Count;
+        public long GenCount => _genObjs.Count;
 
-        public long SnapCount => _genRefRefs.Sum(x => x.Count);
+        public long SnapCount => _genObjs.Sum(x => x.Count);
 
         #endregion
 
@@ -1100,7 +1100,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _store = store;
                 _genRef = genRef;
                 _gen = genRef.Gen;
-                Interlocked.Increment(ref genRef.GenRefRef.Count);
+                Interlocked.Increment(ref genRef.GenObj.Count);
                 //_thisCount = _count++;
 
 #if DEBUG
@@ -1201,46 +1201,46 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0) return;
 #if DEBUG
-                _logger.Debug<Snapshot>("Dispose snapshot ({Snapshot})", _genRef?.GenRefRef.Count.ToString() ?? "live");
+                _logger.Debug<Snapshot>("Dispose snapshot ({Snapshot})", _genRef?.GenObj.Count.ToString() ?? "live");
 #endif
                 _gen = -1;
                 if (_genRef != null)
-                    Interlocked.Decrement(ref _genRef.GenRefRef.Count);
+                    Interlocked.Decrement(ref _genRef.GenObj.Count);
                 GC.SuppressFinalize(this);
             }
         }
 
-        internal class GenRefRef
+        internal class GenObj
         {
-            public GenRefRef(long gen)
+            public GenObj(long gen)
             {
                 Gen = gen;
-                WGenRef = new WeakReference(null);
+                WeakGenRef = new WeakReference(null);
             }
 
             public GenRef GetGenRef()
             {
                 // not thread-safe but always invoked from within a lock
-                var genRef = (GenRef) WGenRef.Target;
+                var genRef = (GenRef) WeakGenRef.Target;
                 if (genRef == null)
-                    WGenRef.Target = genRef = new GenRef(this, Gen);
+                    WeakGenRef.Target = genRef = new GenRef(this, Gen);
                 return genRef;
             }
 
             public readonly long Gen;
-            public readonly WeakReference WGenRef;
+            public readonly WeakReference WeakGenRef;
             public int Count;
         }
 
         internal class GenRef
         {
-            public GenRef(GenRefRef genRefRef, long gen)
+            public GenRef(GenObj genObj, long gen)
             {
-                GenRefRef = genRefRef;
+                GenObj = genObj;
                 Gen = gen;
             }
 
-            public readonly GenRefRef GenRefRef;
+            public readonly GenObj GenObj;
             public readonly long Gen;
         }
 
