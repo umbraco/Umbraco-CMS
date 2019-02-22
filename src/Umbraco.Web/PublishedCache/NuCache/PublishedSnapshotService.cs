@@ -330,14 +330,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadContent(Action<IScope> action)
         {
+            // first get a writer, then a scope
+            // if there already is a scope, the writer will attach to it
+            // otherwise, it will only exist here - cheap
             using (_contentStore.GetWriter(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.ContentTree);
-                    action(scope);
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.ContentTree);
+                action(scope);
+                scope.Complete();
             }
         }
 
@@ -399,14 +400,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadMedia(Action<IScope> action)
         {
+            // see note in LockAndLoadContent
             using (_mediaStore.GetWriter(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.MediaTree);
-                    action(scope);
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.MediaTree);
+                action(scope);
+                scope.Complete();
             }
         }
 
@@ -528,14 +528,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadDomains()
         {
+            // see note in LockAndLoadContent
             using (_domainStore.GetWriter(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.Domains);
-                    LoadDomainsLocked();
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.Domains);
+                LoadDomainsLocked();
+                scope.Complete();
             }
         }
 
@@ -858,6 +857,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_isReady == false)
                 return;
 
+            // see note in LockAndLoadContent
             using (_domainStore.GetWriter(_scopeProvider))
             {
                 foreach (var payload in payloads)
