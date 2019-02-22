@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -65,20 +66,8 @@ namespace Umbraco.Web.Cache
             // service of changes, else factories may try to rebuild models while
             // we are using the database to load content into caches
 
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (_publishedModelFactory is ILivePublishedModelFactory live)
-            {
-                lock (live.SyncRoot)
-                {
-                    live.Refresh();
-                    _publishedSnapshotService.Notify(payloads);
-                }
-            }
-            else
-            {
-                // ReSharper disable once InconsistentlySynchronizedField
-                _publishedSnapshotService.Notify(payloads);
-            }
+            _publishedModelFactory.WithSafeLiveFactory(() =>
+                _publishedSnapshotService.Notify(payloads));
 
             base.Refresh(payloads);
         }
