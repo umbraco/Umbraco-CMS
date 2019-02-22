@@ -101,7 +101,7 @@ namespace Umbraco.Web.Install
             if (syntax is SqlCeSyntaxProvider)
                 dbProvider = "SqlServerCE";
             else if (syntax is SqlServerSyntaxProvider)
-                dbProvider = (syntax as SqlServerSyntaxProvider).ServerVersion?.IsAzure == true ? "SqlAzure" : "SqlServer";
+                dbProvider = (syntax as SqlServerSyntaxProvider).ServerVersion.IsAzure ? "SqlAzure" : "SqlServer";
 
             return dbProvider;
         }
