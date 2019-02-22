@@ -388,8 +388,8 @@ namespace Umbraco.Tests.Cache
             // collect liveGen
             GC.Collect();
 
-            SnapDictionary<int, string>.GenerationObject genObj;
-            Assert.IsTrue(d.Test.GenerationObjects.TryPeek(out genObj));
+            SnapDictionary<int, string>.GenObj genObj;
+            Assert.IsTrue(d.Test.GenObjs.TryPeek(out genObj));
             genObj = null;
 
             // in Release mode, it works, but in Debug mode, the weak reference is still alive
@@ -399,14 +399,14 @@ namespace Umbraco.Tests.Cache
             GC.Collect();
 #endif
 
-            Assert.IsTrue(d.Test.GenerationObjects.TryPeek(out genObj));
-            Assert.IsFalse(genObj.WeakReference.IsAlive); // snapshot is gone, along with its reference
+            Assert.IsTrue(d.Test.GenObjs.TryPeek(out genObj));
+            Assert.IsFalse(genObj.WeakGenRef.IsAlive); // snapshot is gone, along with its reference
 
             await d.CollectAsync();
 
             Assert.AreEqual(0, d.Test.GetValues(1).Length); // null value is gone
             Assert.AreEqual(0, d.Count); // item is gone
-            Assert.AreEqual(0, d.Test.GenerationObjects.Count);
+            Assert.AreEqual(0, d.Test.GenObjs.Count);
             Assert.AreEqual(0, d.SnapCount); // snapshot is gone
             Assert.AreEqual(0, d.GenCount); // and generation has been dequeued
         }
