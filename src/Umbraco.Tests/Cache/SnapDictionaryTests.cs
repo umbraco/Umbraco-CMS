@@ -712,16 +712,102 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public void NestedWriteLocking()
+        public void NestedWriteLocking1()
+        {
+            var d = new SnapDictionary<int, string>();
+            var t = d.Test;
+            t.CollectAuto = false;
+
+            Assert.AreEqual(0, d.CreateSnapshot().Gen);
+
+            // no scope context: writers nest, last one to be disposed commits
+
+            var scopeProvider = GetScopeProvider();
+
+            using (var w1 = d.GetWriter(scopeProvider))
+            {
+                Assert.AreEqual(1, t.LiveGen);
+                Assert.AreEqual(1, t.WLocked);
+                Assert.IsTrue(t.NextGen);
+
+                using (var w2 = d.GetWriter(scopeProvider))
+                {
+                    Assert.AreEqual(1, t.LiveGen);
+                    Assert.AreEqual(2, t.WLocked);
+                    Assert.IsTrue(t.NextGen);
+
+                    Assert.AreNotSame(w1, w2); // get a new writer each time
+
+                    d.Set(1, "one");
+
+                    Assert.AreEqual(0, d.CreateSnapshot().Gen);
+                }
+
+                Assert.AreEqual(1, t.LiveGen);
+                Assert.AreEqual(1, t.WLocked);
+                Assert.IsTrue(t.NextGen);
+
+                Assert.AreEqual(0, d.CreateSnapshot().Gen);
+            }
+
+            Assert.AreEqual(1, t.LiveGen);
+            Assert.AreEqual(0, t.WLocked);
+            Assert.IsTrue(t.NextGen);
+
+            Assert.AreEqual(1, d.CreateSnapshot().Gen);
+        }
+
+        [Test]
+        public void NestedWriteLocking2()
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
 
-            var scopeProvider = GetScopeProvider();
-            using (d.GetWriter(scopeProvider))
+            Assert.AreEqual(0, d.CreateSnapshot().Gen);
+
+            // scope context: writers enlist
+
+            var scopeContext = new ScopeContext();
+            var scopeProvider = GetScopeProvider(scopeContext);
+
+            using (var w1 = d.GetWriter(scopeProvider))
             {
-                using (d.GetWriter(scopeProvider))
+                using (var w2 = d.GetWriter(scopeProvider))
                 {
+                    Assert.AreSame(w1, w2);
+
+                    d.Set(1, "one");
+                }
+            }
+        }
+
+        [Test]
+        public void NestedWriteLocking3()
+        {
+            var d = new SnapDictionary<int, string>();
+            var t = d.Test;
+            t.CollectAuto = false;
+
+            Assert.AreEqual(0, d.CreateSnapshot().Gen);
+
+            var scopeContext = new ScopeContext();
+            var scopeProvider1 = GetScopeProvider();
+            var scopeProvider2 = GetScopeProvider(scopeContext);
+
+            using (var w1 = d.GetWriter(scopeProvider1))
+            {
+                Assert.AreEqual(1, t.LiveGen);
+                Assert.AreEqual(1, t.WLocked);
+                Assert.IsTrue(t.NextGen);
+
+                using (var w2 = d.GetWriter(scopeProvider2))
+                {
+                    Assert.AreEqual(1, t.LiveGen);
+                    Assert.AreEqual(2, t.WLocked);
+                    Assert.IsTrue(t.NextGen);
+
+                    Assert.AreNotSame(w1, w2);
+
                     d.Set(1, "one");
                 }
             }
@@ -846,7 +932,8 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            var scopeProvider = GetScopeProvider(true);
+            var scopeContext = new ScopeContext();
+            var scopeProvider = GetScopeProvider(scopeContext);
 
             using (d.GetWriter(scopeProvider))
             {
@@ -867,7 +954,7 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(2, s4.Gen);
             Assert.AreEqual("uno", s4.Get(1));
 
-            ((ScopeContext) scopeProvider.Context).ScopeExit(true);
+            scopeContext.ScopeExit(true);
 
             var s5 = d.CreateSnapshot();
             Assert.AreEqual(3, s5.Gen);
@@ -878,7 +965,8 @@ namespace Umbraco.Tests.Cache
         public void ScopeLocking2()
         {
             var d = new SnapDictionary<int, string>();
-            d.Test.CollectAuto = false;
+            var t = d.Test;
+            t.CollectAuto = false;
 
             // gen 1
             d.Set(1, "one");
@@ -891,10 +979,11 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            var scopeProviderMock = new Mock<IScopeProvider>();
+            Assert.AreEqual(2, t.LiveGen);
+            Assert.IsFalse(t.NextGen);
+
             var scopeContext = new ScopeContext();
-            scopeProviderMock.Setup(x => x.Context).Returns(scopeContext);
-            var scopeProvider = scopeProviderMock.Object;
+            var scopeProvider = GetScopeProvider(scopeContext);
 
             using (d.GetWriter(scopeProvider))
             {
@@ -905,18 +994,72 @@ namespace Umbraco.Tests.Cache
                 Assert.AreEqual(2, s3.Gen);
                 Assert.AreEqual("uno", s3.Get(1));
 
+                // we made some changes, so a next gen is required
+                Assert.AreEqual(3, t.LiveGen);
+                Assert.IsTrue(t.NextGen);
+                Assert.AreEqual(1, t.WLocked);
+
                 // but live snapshot contains changes
-                var ls = d.Test.LiveSnapshot;
+                var ls = t.LiveSnapshot;
                 Assert.AreEqual("ein", ls.Get(1));
                 Assert.AreEqual(3, ls.Gen);
             }
 
+            // nothing is committed until scope exits
+            Assert.AreEqual(3, t.LiveGen);
+            Assert.IsTrue(t.NextGen);
+            Assert.AreEqual(1, t.WLocked);
+
+            // no changes until exit
             var s4 = d.CreateSnapshot();
             Assert.AreEqual(2, s4.Gen);
             Assert.AreEqual("uno", s4.Get(1));
 
+            // fixme - remove debugging code
+            /*
+            Exception caught = null;
+            var genFlip = 0;
+            var lckFlip = 0;
+            var thread = new System.Threading.Thread(() =>
+            {
+                try
+                {
+                    for (var i = 0; i < 20; i++)
+                    {
+                        if (t.LiveGen == 2 && genFlip == 0) genFlip = i; // flips at 1
+                        if (t.WLocked == 0 && lckFlip == 0) lckFlip = i; // flips at 10 ie 5s, as expected
+                        d.CreateSnapshot();
+                        System.Threading.Thread.Sleep(500);
+                    }
+                }
+                catch (Exception e)
+                {
+                    caught = e;
+                }
+            });
+            thread.Start();
+            */
+
             scopeContext.ScopeExit(false);
 
+            // fixme - remove debugging code
+            /*
+            thread.Join();
+
+            Assert.IsNull(caught); // but then how can it be not null?
+
+            Console.WriteLine(genFlip);
+            Console.WriteLine(lckFlip);
+            Assert.AreEqual(1, genFlip);
+            Assert.AreEqual(10, lckFlip);
+            */
+
+            // now things have changed
+            Assert.AreEqual(2, t.LiveGen);
+            Assert.IsFalse(t.NextGen);
+            Assert.AreEqual(0, t.WLocked);
+
+            // no changes since not completed
             var s5 = d.CreateSnapshot();
             Assert.AreEqual(2, s5.Gen);
             Assert.AreEqual("uno", s5.Get(1));
@@ -955,12 +1098,11 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual("four", all[3]);
         }
 
-        private IScopeProvider GetScopeProvider(bool withContext = false)
+        private IScopeProvider GetScopeProvider(ScopeContext scopeContext = null)
         {
-            var scopeProviderMock = new Mock<IScopeProvider>();
-            var scopeContext = withContext ? new ScopeContext() : null;
-            scopeProviderMock.Setup(x => x.Context).Returns(scopeContext);
-            var scopeProvider = scopeProviderMock.Object;
+            var scopeProvider = Mock.Of<IScopeProvider>();
+            Mock.Get(scopeProvider)
+                .Setup(x => x.Context).Returns(scopeContext);
             return scopeProvider;
         }
     }

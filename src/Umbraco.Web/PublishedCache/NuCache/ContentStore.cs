@@ -95,7 +95,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private class ContentStoreWriter : ScopeContextualBase
         {
             private readonly WriteLockInfo _lockinfo = new WriteLockInfo();
-            private ContentStore _store;
+            private readonly ContentStore _store;
+            private int _released;
 
             public ContentStoreWriter(ContentStore store, bool scoped)
             {
@@ -105,9 +106,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             public override void Release(bool completed)
             {
-                if (_store== null) return;
+                if (Interlocked.CompareExchange(ref _released, 1, 0) != 0)
+                    return;
                 _store.Release(_lockinfo, completed);
-                _store = null;
             }
         }
 
