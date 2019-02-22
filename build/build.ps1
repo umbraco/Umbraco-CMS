@@ -15,7 +15,12 @@
     [Parameter(Mandatory=$false)]
     [Alias("c")]
     [Alias("cont")]
-    [switch] $continue = $false
+    [switch] $continue = $false,
+
+    # execute a command
+    [Parameter(Mandatory=$false, ValueFromRemainingArguments=$true)]
+    [String[]]
+    $command
   )
 
   # ################################################################
@@ -475,7 +480,11 @@
   # run
   if (-not $get)
   {
-    $ubuild.Build()
+    if ($command.Length -eq 0)
+    {
+      $command = @( "Build" )
+    }
+    $ubuild.RunMethod($command);
     if ($ubuild.OnError()) { return }
   }
   if ($get) { return $ubuild }
