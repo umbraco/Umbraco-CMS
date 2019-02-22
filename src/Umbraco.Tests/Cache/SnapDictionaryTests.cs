@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.PublishedCache.NuCache;
+using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Tests.Cache
 {
@@ -388,8 +389,7 @@ namespace Umbraco.Tests.Cache
             // collect liveGen
             GC.Collect();
 
-            SnapDictionary<int, string>.GenObj genObj;
-            Assert.IsTrue(d.Test.GenObjs.TryPeek(out genObj));
+            Assert.IsTrue(d.Test.GenObjs.TryPeek(out var genObj));
             genObj = null;
 
             // in Release mode, it works, but in Debug mode, the weak reference is still alive
