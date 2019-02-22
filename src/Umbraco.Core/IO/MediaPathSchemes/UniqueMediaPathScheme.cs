@@ -7,7 +7,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
     /// Implements a unique directory media path scheme.
     /// </summary>
     /// <remarks>
-    /// <para>This scheme provides short paths, yet handle potential collisions.</para>
+    /// <para>This scheme provides deterministic short paths, with potential collisions.</para>
     /// </remarks>
     public class UniqueMediaPathScheme : IMediaPathScheme
     {
@@ -16,23 +16,22 @@ namespace Umbraco.Core.IO.MediaPathSchemes
         /// <inheritdoc />
         public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
         {
-            string directory;
-
-            // no point "combining" guids if all we want is some random guid - just get a new one
-            // and then, because we don't want collisions, ensure that the directory does not already exist
-            // (should be quite rare, but eh...)
-
-            do
-            {
-                var combinedGuid = Guid.NewGuid();
-                directory = GuidUtils.ToBase32String(combinedGuid, DirectoryLength); // see also HexEncoder, we may want to fragment path eg 12/e4/f3...
-
-            } while (fileSystem.DirectoryExists(directory));
+            var combinedGuid = GuidUtils.Combine(itemGuid, propertyGuid);
+            var directory = GuidUtils.ToBase32String(combinedGuid, DirectoryLength);
 
             return Path.Combine(directory, filename).Replace('\\', '/');
         }
 
         /// <inheritdoc />
-        public string GetDeleteDirectory(IMediaFileSystem fileSystem, string filepath) => Path.GetDirectoryName(filepath);
+        /// <remarks>
+        /// <para>Returning null so that <see cref="MediaFileSystem.DeleteMediaFiles"/> does *not*
+        /// delete any directory. This is because the above shortening of the Guid to 8 chars
+        /// means we're increasing the risk of collision, and we don't want to delete files
+        /// belonging to other media items.</para>
+        /// <para>And, at the moment, we cannot delete directory "only if it is empty" because of
+        /// race conditions. We'd need to implement locks in <see cref="MediaFileSystem"/> for
+        /// this.</para>
+        /// </remarks>
+        public string GetDeleteDirectory(IMediaFileSystem fileSystem, string filepath) => null;
     }
 }
