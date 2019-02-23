@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
@@ -127,7 +128,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// <param name="e">EventArgs (expect empty)</param>
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			int id;
+            int id;
 			if (int.TryParse(Request.QueryString["id"], out id))
 			{
                 var relationService = Services.RelationService;
@@ -281,5 +282,25 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 				}
 			}
 		}
+
+
+        public string GetEditUrl(string objectTypeName, int id)
+        {
+            var path = new StringBuilder();
+            path.Append(UmbracoPath.Replace("~", string.Empty));
+
+            if (objectTypeName == UmbracoObjectTypes.Document.GetFriendlyName())
+                path.Append("#/content/content/");
+            else if (objectTypeName == UmbracoObjectTypes.Media.GetFriendlyName())
+                path.Append("#/media/media/");
+            else if (objectTypeName == UmbracoObjectTypes.Member.GetFriendlyName())
+                path.Append("#/member/member/");
+            else
+                return string.Empty;
+
+            path.Append("edit/");
+            path.Append(id);
+            return path.ToString();
+        }
 	}
 }
