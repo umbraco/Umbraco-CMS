@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -202,6 +203,20 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual(expected, result);
         }
 
+        [TestCase("hello", "aGVsbG8")]
+        [TestCase("tad", "dGFk")]
+        [TestCase("AmqGr+Fd!~ééé", "QW1xR3IrRmQhfsOpw6nDqQ")]
+        public void UrlTokenEncoding(string value, string expected)
+        {
+            var bytes = Encoding.UTF8.GetBytes(value);
+            Console.WriteLine("base64: " + Convert.ToBase64String(bytes));
+            var encoded = StringExtensions.UrlTokenEncode(bytes);
+            Assert.AreEqual(expected, encoded);
+
+            var backBytes = StringExtensions.UrlTokenDecode(encoded);
+            var backString = Encoding.UTF8.GetString(backBytes);
+            Assert.AreEqual(value, backString);
+        }
 
         // FORMAT STRINGS
 

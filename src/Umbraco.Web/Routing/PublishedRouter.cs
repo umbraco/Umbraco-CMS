@@ -728,7 +728,7 @@ namespace Umbraco.Web.Routing
 
         private ITemplate GetTemplateModel(int? templateId)
         {
-            if (templateId.HasValue == false)
+            if (templateId.HasValue == false || templateId.Value == default)
             {
                 _logger.Debug<PublishedRouter>("GetTemplateModel: No template.");
                 return null;

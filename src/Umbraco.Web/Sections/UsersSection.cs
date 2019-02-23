@@ -1,12 +1,12 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Models.Trees;
+using Umbraco.Core.Models.Sections;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.Sections
 {
     /// <summary>
     /// Defines the back office users section
     /// </summary>
-    public class UsersBackOfficeSection : IBackOfficeSection
+    public class UsersSection : ISection
     {
         /// <inheritdoc />
         public string Alias => Constants.Applications.Users;

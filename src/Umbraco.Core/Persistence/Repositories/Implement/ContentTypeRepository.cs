@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _templateRepository = templateRepository;
         }
 
-        protected override bool IsPublishing => ContentType.IsPublishingConst;
+        protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;
 
         protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy()
         {
@@ -60,11 +60,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (ids.Any())
             {
                 //NOTE: This logic should never be executed according to our cache policy
-                return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, IsPublishing, this, _templateRepository)
+                return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, SupportsPublishing, this, _templateRepository)
                     .Where(x => ids.Contains(x.Id));
             }
 
-            return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, IsPublishing, this, _templateRepository);
+            return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, SupportsPublishing, this, _templateRepository);
         }
 
         protected override IEnumerable<IContentType> PerformGetAll(params Guid[] ids)

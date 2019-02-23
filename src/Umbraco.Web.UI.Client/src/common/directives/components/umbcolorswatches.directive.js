@@ -34,8 +34,17 @@ Use this directive to generate color swatches to pick from.
             }
             
             scope.setColor = function (color, $index, $event) {
-                scope.selectedColor = color;
                 if (scope.onSelect) {
+                    // did the value change?
+                    if (scope.selectedColor != null && scope.selectedColor.value === color.value) {
+                        // User clicked the currently selected color
+                        // to remove the selection, they don't want
+                        // to select any color after all.
+                        // Unselect the color
+                        color = null;
+                    }
+
+                    scope.selectedColor = color;
                     scope.onSelect({color: color, $index: $index, $event: $event});
                     $event.stopPropagation();
                 }

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void SavingTest()
+        public void Saving_Culture()
         {
             var languageService = ServiceContext.LocalizationService;
 
@@ -80,13 +81,68 @@ namespace Umbraco.Tests.Services
 
             ContentService.Saving += OnSaving;
             ContentService.Saved += OnSaved;
-            contentService.Save(document);
-            ContentService.Saving -= OnSaving;
-            ContentService.Saved -= OnSaved;
+            try
+            {
+                contentService.Save(document);
+            }
+            finally
+            {
+                ContentService.Saving -= OnSaving;
+                ContentService.Saved -= OnSaved;
+            }
         }
 
         [Test]
-        public void PublishingTest()
+        public void Saving_Set_Value()
+        {
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextPageContentType();
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+            contentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+
+            IContent document = new Content("content", -1, contentType);
+            
+            void OnSaving(IContentService sender, ContentSavingEventArgs e)
+            {
+                var saved = e.SavedEntities.First();
+
+                Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
+
+                saved.SetValue("title", "title");
+            }
+
+            void OnSaved(IContentService sender, ContentSavedEventArgs e)
+            {
+                var saved = e.SavedEntities.First();
+
+                Assert.AreSame("title", document.GetValue<string>("title"));
+
+                //we're only dealing with invariant here
+                var propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
+                
+                Assert.AreEqual("title", propValue.EditedValue);
+                Assert.IsNull(propValue.PublishedValue);
+            }
+
+            ContentService.Saving += OnSaving;
+            ContentService.Saved += OnSaved;
+            try
+            {
+                contentService.Save(document);
+            }
+            finally
+            {
+                ContentService.Saving -= OnSaving;
+                ContentService.Saved -= OnSaved;
+            }
+            
+        }
+
+        [Test]
+        public void Publishing_Culture()
         {
             var languageService = ServiceContext.LocalizationService;
 
@@ -136,9 +192,15 @@ namespace Umbraco.Tests.Services
 
             ContentService.Publishing += OnPublishing;
             ContentService.Published += OnPublished;
-            contentService.SaveAndPublish(document, "fr-FR");
-            ContentService.Publishing -= OnPublishing;
-            ContentService.Published -= OnPublished;
+            try
+            {
+                contentService.SaveAndPublish(document, "fr-FR");
+            }
+            finally
+            {
+                ContentService.Publishing -= OnPublishing;
+                ContentService.Published -= OnPublished;
+            }
 
             document = contentService.GetById(document.Id);
 
@@ -148,7 +210,105 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void UnpublishingTest()
+        public void Publishing_Set_Value()
+        {
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextPageContentType();
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+            contentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+
+            IContent document = new Content("content", -1, contentType);
+
+            void OnSaving(IContentService sender, ContentSavingEventArgs e)
+            {
+                var saved = e.SavedEntities.First();
+
+                Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
+
+                saved.SetValue("title", "title");
+            }
+
+            void OnSaved(IContentService sender, ContentSavedEventArgs e)
+            {
+                var saved = e.SavedEntities.First();
+
+                Assert.AreSame("title", document.GetValue<string>("title"));
+
+                //we're only dealing with invariant here
+                var propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
+
+                Assert.AreEqual("title", propValue.EditedValue);
+                Assert.AreEqual("title", propValue.PublishedValue);
+            }
+
+            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be 
+            //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
+            //are published, but Saving is raised BEFORE.
+            ContentService.Saving += OnSaving;
+            ContentService.Saved += OnSaved;
+            try
+            {
+                contentService.SaveAndPublish(document);
+            }
+            finally
+            {
+                ContentService.Saving -= OnSaving;
+                ContentService.Saved -= OnSaved;
+            }
+        }
+
+        [Test]
+        public void Publishing_Set_Mandatory_Value()
+        {
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextPageContentType();
+            var titleProperty = contentType.PropertyTypes.First(x => x.Alias == "title");
+            titleProperty.Mandatory = true; // make this required!
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+            contentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+
+            IContent document = new Content("content", -1, contentType);
+
+            var result = contentService.SaveAndPublish(document);
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual("title", result.InvalidProperties.First().Alias);
+
+            // when a service operation fails, the object is dirty and should not be re-used,
+            // re-create it
+            document = new Content("content", -1, contentType);
+
+            void OnSaving(IContentService sender, ContentSavingEventArgs e)
+            {
+                var saved = e.SavedEntities.First();
+
+                Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
+
+                saved.SetValue("title", "title");
+            }
+
+            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be 
+            //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
+            //are published, but Saving is raised BEFORE.
+            ContentService.Saving += OnSaving;
+            try
+            {
+                result = contentService.SaveAndPublish(document);
+                Assert.IsTrue(result.Success); //will succeed now because we were able to specify the required value in the Saving event
+            }
+            finally
+            {
+                ContentService.Saving -= OnSaving;
+            }
+        }
+
+        [Test]
+        public void Unpublishing_Culture()
         {
             var languageService = ServiceContext.LocalizationService;
 
@@ -206,9 +366,15 @@ namespace Umbraco.Tests.Services
 
             ContentService.Publishing += OnPublishing;
             ContentService.Published += OnPublished;
-            contentService.CommitDocumentChanges(document);
-            ContentService.Publishing -= OnPublishing;
-            ContentService.Published -= OnPublished;
+            try
+            {
+                contentService.CommitDocumentChanges(document);
+            }
+            finally
+            {
+                ContentService.Publishing -= OnPublishing;
+                ContentService.Published -= OnPublished;
+            }
 
             document = contentService.GetById(document.Id);
 

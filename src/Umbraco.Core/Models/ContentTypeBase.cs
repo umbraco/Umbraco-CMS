@@ -40,7 +40,7 @@ namespace Umbraco.Core.Models
 
             // actually OK as IsPublishing is constant
             // ReSharper disable once VirtualMemberCallInConstructor
-            _noGroupPropertyTypes = new PropertyTypeCollection(IsPublishing);
+            _noGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing);
             _noGroupPropertyTypes.CollectionChanged += PropertyTypesChanged;
 
             _variations = ContentVariation.Nothing;
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Models
 
             // actually OK as IsPublishing is constant
             // ReSharper disable once VirtualMemberCallInConstructor
-            _noGroupPropertyTypes = new PropertyTypeCollection(IsPublishing);
+            _noGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing);
             _noGroupPropertyTypes.CollectionChanged += PropertyTypesChanged;
 
             _variations = ContentVariation.Nothing;
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models
         public abstract ISimpleContentType ToSimple();
 
         /// <summary>
-        /// Gets a value indicating whether the content type is publishing.
+        /// Gets a value indicating whether the content type supports publishing.
         /// </summary>
         /// <remarks>
         /// <para>A publishing content type supports draft and published values for properties.
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Models
         /// the draft or published value of a property returns the same thing, and publishing
         /// a value property has no effect.</para>
         /// </remarks>
-        public abstract bool IsPublishing { get; }
+        public abstract bool SupportsPublishing { get; }
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<ContentTypeSort>> ContentTypeSortComparer =
@@ -257,7 +257,7 @@ namespace Umbraco.Core.Models
             {
                 if (_noGroupPropertyTypes != null)
                     _noGroupPropertyTypes.CollectionChanged -= PropertyTypesChanged;
-                _noGroupPropertyTypes = new PropertyTypeCollection(IsPublishing, value);
+                _noGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, value);
                 _noGroupPropertyTypes.CollectionChanged += PropertyTypesChanged;
                 PropertyTypesChanged(_noGroupPropertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }

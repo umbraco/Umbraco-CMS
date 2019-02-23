@@ -4,7 +4,16 @@ using Umbraco.Core;
 
 namespace Umbraco.Web
 {
-    internal abstract class HybridAccessorBase<T>
+    /// <summary>
+    /// Provides a base class for hybrid accessors.
+    /// </summary>
+    /// <typeparam name="T">The type of the accessed object.</typeparam>
+    /// <remarks>
+    /// <para>Hybrid accessors store the accessed object in HttpContext if they can,
+    /// otherwise they rely on the logical call context, to maintain an ambient
+    /// object that flows with async.</para>
+    /// </remarks>
+    public abstract class HybridAccessorBase<T>
         where T : class
     {
         // ReSharper disable StaticMemberInGenericType
@@ -33,7 +42,7 @@ namespace Umbraco.Web
         // yes! flows with async!
         private T NonContextValue
         {
-            get { return (T) CallContext.LogicalGetData(ItemKey); }
+            get => (T) CallContext.LogicalGetData(ItemKey);
             set
             {
                 if (value == null) CallContext.FreeNamedDataSlot(ItemKey);
@@ -43,8 +52,7 @@ namespace Umbraco.Web
 
         protected HybridAccessorBase(IHttpContextAccessor httpContextAccessor)
         {
-            if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
-            _httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
 
             lock (Locker)
             {

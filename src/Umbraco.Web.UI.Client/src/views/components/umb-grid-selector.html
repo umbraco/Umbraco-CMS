@@ -22,7 +22,7 @@
             <umb-icon class="umb-grid-selector__item-remove icon-trash" icon-name="icon-trash" ng-click="removeItem(selectedItem)"></umb-icon>
         </div>
 
-        <a href="" class="umb-grid-selector__item -placeholder" ng-if="(availableItems | compareArrays:selectedItems:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+t">
+        <a href="" class="umb-grid-selector__item -placeholder" ng-if="(availableItems | compareArrays:selectedItems:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+g">
             <div class="umb-grid-selector__item-content">
                 <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem !== null"><localize key="grid_chooseExtra">Choose extra</localize> {{ itemLabel }}</div>
                 <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem === null"><localize key="grid_chooseDefault">Choose default</localize> {{ itemLabel }}</div>

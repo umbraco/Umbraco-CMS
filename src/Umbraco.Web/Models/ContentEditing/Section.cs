@@ -11,9 +11,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "name")]
         public string Name { get; set; }
 
-        [DataMember(Name = "cssclass")]
-        public string Icon { get; set; }
-
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
 

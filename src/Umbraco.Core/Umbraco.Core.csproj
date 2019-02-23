@@ -161,7 +161,7 @@
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
-    <Compile Include="CompositionExtensions_Accessors.cs" />
+    <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\DisableAttribute.cs" />
     <Compile Include="Composing\DisableComposerAttribute.cs" />
     <Compile Include="Composing\EnableAttribute.cs" />
@@ -187,6 +187,8 @@
     <Compile Include="Composing\CompositionExtensions\Repositories.cs" />
     <Compile Include="Composing\CompositionExtensions\Services.cs" />
     <Compile Include="CompositionExtensions_Essentials.cs" />
+    <Compile Include="CompositionExtensions_FileSystems.cs" />
+    <Compile Include="CompositionExtensions_Uniques.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -205,7 +207,13 @@
     <Compile Include="Composing\TypeFinder.cs" />
     <Compile Include="Composing\TypeHelper.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
+    <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
+    <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
+    <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
+    <Compile Include="PublishedModelFactoryExtensions.cs" />
+    <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Composing\WeightAttribute.cs" />
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
@@ -345,7 +353,7 @@
     <Compile Include="Logging\Viewer\MessageTemplateFilter.cs" />
     <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
-    <Compile Include="Manifest\ManifestBackOfficeSection.cs" />
+    <Compile Include="Manifest\ManifestSection.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
     <Compile Include="Manifest\ManifestDashboard.cs" />
@@ -452,7 +460,7 @@
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\SimpleContentType.cs" />
-    <Compile Include="Models\Trees\IBackOfficeSection.cs" />
+    <Compile Include="Models\Sections\ISection.cs" />
     <Compile Include="PackageActions\AllowDoctype.cs" />
     <Compile Include="PackageActions\PublishRootDocument.cs" />
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />

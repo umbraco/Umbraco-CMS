@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class MemberType : ContentTypeCompositionBase, IMemberType
     {
-        public const bool IsPublishingConst = false;
+        public const bool SupportsPublishingConst = false;
 
         //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
         private string _alias;
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Models
         public override ISimpleContentType ToSimple() => new SimpleContentType(this);
 
         /// <inheritdoc />
-        public override bool IsPublishing => IsPublishingConst;
+        public override bool SupportsPublishing => SupportsPublishingConst;
 
         public override ContentVariation Variations
         {

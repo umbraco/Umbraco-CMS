@@ -209,7 +209,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 // if we don't have a name for a culture, it means the culture is not available, and
                 // hey we should probably not be mapping it, but it's too late, return a fallback name
-                return doc.CultureNames.TryGetValue(culture, out var name) && !name.IsNullOrWhiteSpace() ? name : $"(({source.Name}))";
+                return doc.CultureNames.TryGetValue(culture, out var name) && !name.IsNullOrWhiteSpace() ? name : $"({source.Name})";
             }
         }
     }
