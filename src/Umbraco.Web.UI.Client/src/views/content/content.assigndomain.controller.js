@@ -131,6 +131,7 @@
                     }
 
                 }, function (e) {
+                    vm.error = e;
                     vm.submitButtonState = "error";
                 });
             }

@@ -16,6 +16,13 @@
 
             <umb-pane>
 
+                <div ng-show="vm.error">
+                    <div class="alert alert-error">
+                        <div><strong>{{vm.error.errorMsg}}</strong></div>
+                        <div>{{vm.error.data.Message}}</div>
+                    </div>
+                </div>
+
                 <h5 class="umb-pane-title"><localize key="assignDomain_setDomains">Domains</localize></h5>
                 <small class="db" style="margin-bottom: 10px;">
                     <localize key="assignDomain_domainHelp"></localize>

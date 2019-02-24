@@ -251,6 +251,16 @@ namespace Umbraco.Web.Routing
                 .OrderByDescending(d => d.Uri.ToString());
         }
 
+        internal static Uri ParseUriFromDomainName(string Name, Uri currentUri)
+        {
+            // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
+            var name = Name.StartsWith("/") && currentUri != null
+                ? currentUri.GetLeftPart(UriPartial.Authority) + Name
+                : Name;
+            var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
+            return new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(name, scheme)));
+        }
+
         #endregion
 
         #region Utilities

@@ -22,16 +22,11 @@ namespace Umbraco.Web.Routing
         {
             try
             {
-                // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
-                var name = Name.StartsWith("/") && currentUri != null
-                    ? currentUri.GetLeftPart(UriPartial.Authority) + Name
-                    : Name;
-                var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
-                Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(name, scheme)));
+                Uri = DomainHelper.ParseUriFromDomainName(Name, currentUri);
             }
             catch (UriFormatException)
             {
-                throw new ArgumentException($"Failed to parse invalid domain: node id={domain.ContentId}, hostname=\"{Name.ToCSharpString()}\"."
+                throw new ArgumentException($"Failed to parse invalid domain: node id={domain.ContentId}, hostname=\"{domain.Name.ToCSharpString()}\"."
                     + " Hostname should be a valid uri.", nameof(domain));
             }
         }
