@@ -117,7 +117,7 @@ angular.module("umbraco")
 
             $scope.submitFolder = function() {
                 if ($scope.model.newFolderName) {
-                    $scope.creatingFolder = true;
+                    $scope.model.creatingFolder = true;
                     mediaResource
                         .addFolder($scope.model.newFolderName, $scope.currentFolder.id)
                         .then(function(data) {
@@ -126,13 +126,13 @@ angular.module("umbraco")
                                 cacheKey: "__media", //this is the main media tree cache key
                                 childrenOf: data.parentId //clear the children of the parent
                             });
-                            $scope.creatingFolder = false;
+                            $scope.model.creatingFolder = false;
                             $scope.gotoFolder(data);
-                            $scope.showFolderInput = false;
+                            $scope.model.showFolderInput = false;
                             $scope.model.newFolderName = "";
                         });
                 } else {
-                    $scope.showFolderInput = false;
+                    $scope.model.showFolderInput = false;
                 }
             };
 
