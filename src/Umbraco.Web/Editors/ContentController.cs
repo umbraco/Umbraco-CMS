@@ -57,7 +57,8 @@ namespace Umbraco.Web.Editors
 
         public object Domains { get; private set; }
 
-        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -1200,6 +1201,10 @@ namespace Umbraco.Web.Editors
                     variant.Publish = false;
             }
 
+            //At this stage all variants might have failed validation which means there are no cultures flagged for publishing!
+            var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+            canPublish = canPublish && culturesToPublish.Length > 0;
+
             if (canPublish)
             {
                 //try to publish all the values on the model - this will generally only fail if someone is tampering with the request
@@ -1209,8 +1214,6 @@ namespace Umbraco.Web.Editors
 
             if (canPublish)
             {
-                var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
-
                 //proceed to publish if all validation still succeeds
                 var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;

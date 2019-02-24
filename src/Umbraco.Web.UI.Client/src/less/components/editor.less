@@ -82,6 +82,10 @@
 .umb-editor-header__name-wrapper {
 	position: relative;
 	display: flex;
+	border: 1px solid @inputBorder;
+    &:focus-within {
+        border-color: @inputBorderFocus;
+    }
 }
 
 .umb-editor-header__name-and-description {
@@ -109,7 +113,9 @@ input.umb-editor-header__name-input {
 	width: 100%;
 	padding: 0 10px;
 	background: @white;
-	border: 1px solid @gray-8;
+    &:focus {
+        border-color: transparent;
+    }
 }
 
 input.umb-editor-header__name-input:disabled {
@@ -156,7 +162,6 @@ a.umb-editor-header__close-split-view:hover {
 	align-items: center;
 	padding: 0 10px; 
     margin: 1px 1px;
-    position: absolute;
     right: 0;
     height: 30px;
 	text-decoration: none !important;

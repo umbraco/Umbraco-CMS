@@ -184,7 +184,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return null;
 
-            return PropertyType.IsPublishing
+            return PropertyType.SupportsPublishing
                 ? (published ? pvalue.PublishedValue : pvalue.EditedValue)
                 : pvalue.EditedValue;
         }
@@ -244,7 +244,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return;
 
-            if (!PropertyType.IsPublishing)
+            if (!PropertyType.SupportsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = PropertyType.ConvertAssignedValue(pvalue.EditedValue);
@@ -255,7 +255,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return;
 
-            if (!PropertyType.IsPublishing)
+            if (!PropertyType.SupportsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = PropertyType.ConvertAssignedValue(null);
@@ -288,7 +288,7 @@ namespace Umbraco.Core.Models
         {
             var (pvalue, _) = GetPValue(culture, segment, true);
 
-            if (published && PropertyType.IsPublishing)
+            if (published && PropertyType.SupportsPublishing)
                 pvalue.PublishedValue = value;
             else
                 pvalue.EditedValue = value;
@@ -330,56 +330,6 @@ namespace Umbraco.Core.Models
                 change = true;
             }
             return (pvalue, change);
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the property has valid values.
-        /// </summary>
-        internal bool IsValid(string culture = "*", string segment = "*")
-        {
-            // TODO: validating values shouldn't be done here, this calls in to IsValidValue
-
-            culture = culture.NullOrWhiteSpaceAsNull();
-            segment = segment.NullOrWhiteSpaceAsNull();
-
-            // if validating invariant/neutral, and it is supported, validate
-            // (including ensuring that the value exists, if mandatory)
-            if ((culture == null || culture == "*") && (segment == null || segment == "*") && PropertyType.SupportsVariation(null, null))
-                if (!IsValidValue(_pvalue?.EditedValue))
-                    return false;
-
-            // if validating only invariant/neutral, we are good
-            if (culture == null && segment == null)
-                return true;
-
-            // if nothing else to validate, we are good
-            if ((culture == null || culture == "*") && (segment == null || segment == "*") && !PropertyType.VariesByCulture())
-                return true;
-
-            // for anything else, validate the existing values (including mandatory),
-            // but we cannot validate mandatory globally (we don't know the possible cultures and segments)
-
-            if (_vvalues == null) return culture == "*" || IsValidValue(null);
-
-            var pvalues = _vvalues.Where(x =>
-                    PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment, true) && // the value variation is ok
-                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
-                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
-                .Select(x => x.Value)
-                .ToList();
-
-            return pvalues.Count == 0 || pvalues.All(x => IsValidValue(x.EditedValue));
-        }
-
-        /// <summary>
-        /// Boolean indicating whether the passed in value is valid
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns>True is property value is valid, otherwise false</returns>
-        private bool IsValidValue(object value)
-        {
-            // TODO: this shouldn't exist here, the model itself shouldn't be responsible for it's own validation and this requires singleton access
-            return PropertyType.IsPropertyValueValid(value);
         }
 
         protected override void PerformDeepClone(object clone)

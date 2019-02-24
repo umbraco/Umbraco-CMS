@@ -21,7 +21,7 @@ using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
-{   
+{
 
     /// <summary>
     /// The API controller used for editing dictionary items
@@ -32,7 +32,8 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMacroService _macroService;
 
-        public MacrosController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public MacrosController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _macroService = Services.MacroService;
         }

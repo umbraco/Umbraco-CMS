@@ -22,20 +22,14 @@ namespace Umbraco.Web.Install.Controllers
         private readonly InstallStepCollection _installSteps;
         private readonly ILogger _logger;
 
-        public InstallApiController(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, IProfilingLogger proflog, InstallHelper installHelper, InstallStepCollection installSteps)
+        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog, InstallHelper installHelper, InstallStepCollection installSteps)
         {
-            UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _installSteps = installSteps;
             InstallHelper = installHelper;
             _logger = _proflog;
         }
-
-        /// <summary>
-        /// Gets the Umbraco context.
-        /// </summary>
-        public UmbracoContext UmbracoContext { get; }
 
         internal InstallHelper InstallHelper { get; }
 

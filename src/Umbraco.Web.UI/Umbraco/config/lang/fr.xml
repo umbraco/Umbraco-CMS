@@ -612,7 +612,7 @@
     <key alias="blue">Bleu</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Ajouter un onglet</key>
+    <key alias="addGroup">Ajouter un onglet</key>
     <key alias="addProperty">Ajouter une propriété</key>
     <key alias="addEditor">Ajouter un éditeur</key>
     <key alias="addTemplate">Ajouter un modèle</key>
@@ -1374,7 +1374,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
-    <key alias="noTabs">Vous n'avez pas ajouté d'onglet</key>
+    <key alias="noGroups">Vous n'avez pas ajouté d'onglet</key>
     <key alias="inheritedFrom">Hérité de</key>
     <key alias="addProperty">Ajouter une propriété</key>
     <key alias="requiredLabel">Label requis</key>

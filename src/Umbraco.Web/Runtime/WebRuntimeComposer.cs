@@ -31,6 +31,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
+using Umbraco.Web.Sections;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Services;
@@ -69,7 +70,7 @@ namespace Umbraco.Web.Runtime
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
-            composition.RegisterUnique<IVariationContextAccessor, HttpContextVariationContextAccessor>();
+            composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
@@ -225,15 +226,15 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentInfoContentAppFactory>();
 
             // register back office sections in the order we want them rendered
-            composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>()
-                .Append<ContentBackOfficeSection>()
-                .Append<MediaBackOfficeSection>()
-                .Append<SettingsBackOfficeSection>()
-                .Append<PackagesBackOfficeSection>()
-                .Append<UsersBackOfficeSection>()
-                .Append<MembersBackOfficeSection>()
-                .Append<FormsBackOfficeSection>()
-                .Append<TranslationBackOfficeSection>();
+            composition.WithCollectionBuilder<SectionCollectionBuilder>()
+                .Append<ContentSection>()
+                .Append<MediaSection>()
+                .Append<SettingsSection>()
+                .Append<PackagesSection>()
+                .Append<UsersSection>()
+                .Append<MembersSection>()
+                .Append<FormsSection>()
+                .Append<TranslationSection>();
 
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
             composition.WithCollectionBuilder<DashboardCollectionBuilder>()

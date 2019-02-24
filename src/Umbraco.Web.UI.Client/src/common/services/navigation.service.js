@@ -28,7 +28,7 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
 
     //A list of query strings defined that when changed will not cause a reload of the route
     var nonRoutingQueryStrings = ["mculture", "cculture", "lq"];
-    var retainedQueryStrings = ["mculture", "cculture"];
+    var retainedQueryStrings = ["mculture"];
 
         
     function setMode(mode) {

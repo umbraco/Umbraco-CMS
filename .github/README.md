@@ -1,5 +1,7 @@
+[![Build status](https://umbraco.visualstudio.com/Umbraco%20Cms/_apis/build/status/Cms%208%20Continuous?branchName=dev-v8)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=75) [![pullreminders](https://pullreminders.com/badge.svg)](https://pullreminders.com?ref=badge)
+
+
 _You are browsing the Umbraco v8 branch. Umbraco 8 is currently under development._
-[![pullreminders](https://pullreminders.com/badge.svg)](https://pullreminders.com?ref=badge)
 
 _Looking for Umbraco version 7? [Click here](https://github.com/umbraco/Umbraco-CMS) to go to the v7 branch._
 

@@ -1,12 +1,12 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Models.Trees;
+using Umbraco.Core.Models.Sections;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.Sections
 {
     /// <summary>
     /// Defines the back office settings section
     /// </summary>
-    public class SettingsBackOfficeSection : IBackOfficeSection
+    public class SettingsSection : ISection
     {
         /// <inheritdoc />
         public string Alias => Constants.Applications.Settings;
