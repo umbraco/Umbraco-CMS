@@ -3,16 +3,6 @@ angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
         function($scope, mediaResource, entityResource, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
 
-            if (!$scope.model.title) {
-                localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
-                    .then(function (data) {
-                        $scope.labels = {
-                            title: data[0],
-                            includeSubFolders: data[1]
-                        }
-                    });
-            }
-
             var dialogOptions = $scope.model;
 
             $scope.disableFolderSelect = dialogOptions.disableFolderSelect;
