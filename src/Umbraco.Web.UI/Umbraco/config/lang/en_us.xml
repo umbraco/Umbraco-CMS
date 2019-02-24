@@ -87,7 +87,7 @@
     <key alias="addNew">Add new Domain</key>
     <key alias="remove">remove</key>
     <key alias="invalidNode">Invalid node.</key>
-    <key alias="invalidDomain">Invalid domain format.</key>
+    <key alias="invalidDomain">One or more domains have an invalid format.</key>
     <key alias="duplicateDomain">Domain has already been assigned.</key>
     <key alias="language">Language</key>
     <key alias="domain">Domain</key>

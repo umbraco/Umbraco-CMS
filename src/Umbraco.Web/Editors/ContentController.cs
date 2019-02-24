@@ -1596,8 +1596,8 @@ namespace Umbraco.Web.Editors
                     var uri = DomainHelper.ParseUriFromDomainName(domain.Name, Request.RequestUri);
                 }
                 catch (UriFormatException)
-                {
-                    var response = Request.CreateValidationErrorResponse("One or more domains are not valid");
+                {                    
+                    var response = Request.CreateValidationErrorResponse(Services.TextService.Localize("assignDomain/invalidDomain"));
                     throw new HttpResponseException(response);
                 }
             }
