@@ -278,7 +278,7 @@ angular.module("umbraco")
                         $scope.linkPickerOverlay = {
                             view: "linkpicker",
                             currentTarget: currentTarget,
-							anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
+							              anchors: editorState.current ? tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
                             bypassUserPermissions: $scope.model.config.bypassUserPermissions === '1',
                             show: true,
                             submit: function(model) {

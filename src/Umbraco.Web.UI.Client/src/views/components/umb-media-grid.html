@@ -23,7 +23,7 @@
             <!-- Icon for files -->
             <span class="umb-media-grid__item-file-icon" ng-if="!item.thumbnail && item.extension != 'svg'">
                 <i class="umb-media-grid__item-icon {{item.icon}}"></i>
-                <span>.{{item.extension}}</span>
+                <span ng-if="item.extension">.{{item.extension}}</span>
             </span>
         </div>
     </div>

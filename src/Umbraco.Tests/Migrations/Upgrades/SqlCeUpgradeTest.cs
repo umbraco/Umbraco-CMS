@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 catch (Exception)
                 {
                     //if this doesn't work we have to make sure everything is reset! otherwise
-                    // well run into issues because we've already set some things up
+                    // we'll run into issues because we've already set some things up
                     TearDown();
                     throw;
                 }

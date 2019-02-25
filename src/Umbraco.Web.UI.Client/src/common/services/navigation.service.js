@@ -25,6 +25,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     var mainTreeEventHandler = null;
     //tracks the user profile dialog
     var userDialog = null;
+    var syncTreePromise;
 
     function setMode(mode) {
         switch (mode) {
@@ -176,6 +177,11 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             //when a tree is loaded into a section, we need to put it into appState
             mainTreeEventHandler.bind("treeLoaded", function(ev, args) {
                 appState.setTreeState("currentRootNode", args.tree);
+                if (syncTreePromise) {
+                    mainTreeEventHandler.syncTree(syncTreePromise.args).then(function(syncArgs) {
+                        syncTreePromise.resolve(syncArgs);
+                    });
+                }
             });
 
             //when a tree node is synced this event will fire, this allows us to set the currentNode
@@ -297,8 +303,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 }
             }
 
-            //couldn't sync
-            return angularHelper.rejectedPromise();
+            //create a promise and resolve it later
+            syncTreePromise = $q.defer();
+            syncTreePromise.args = args;
+            return syncTreePromise.promise;
         },
 
         /**
@@ -463,7 +471,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                     //if it is not two parts long then this most likely means that it's a legacy action
                     var js = action.metaData["jsAction"].replace("javascript:", "");
-                    //there's not really a different way to acheive this except for eval
+                    //there's not really a different way to achieve this except for eval
                     eval(js);
                 }
                 else {

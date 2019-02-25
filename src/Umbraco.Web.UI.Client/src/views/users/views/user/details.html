@@ -19,7 +19,7 @@
                            name="email"
                            id="email"
                            val-email
-                           required
+                           ng-required="true"
                            val-server-field="Email" />
                     <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
                     <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
@@ -385,7 +385,19 @@
                 </div>
             </div>
 
-        </div>
+            <div class="umb-user-details-details__information-item">
+                <div class="umb-user-details-details__information-item-label">
+                    <localize key="general_id">Id</localize>:
+                </div>
+                <div class="umb-user-details-details__information-item-content">
+                    {{ model.user.id }}
+                </div>
+                <div class="umb-user-details-details__information-item-content">
+                    <small>{{ model.user.key }}</small>
+                </div>
+                </div>
+
+            </div>
 
     </div>
 
