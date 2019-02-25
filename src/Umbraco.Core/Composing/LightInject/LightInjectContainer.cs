@@ -179,11 +179,13 @@ namespace Umbraco.Core.Composing.LightInject
         /// <inheritdoc />
         public void RegisterFor<TService, TTarget>(Lifetime lifetime = Lifetime.Transient)
             where TService : class
+            where TTarget : TService
             => RegisterFor<TService, TTarget>(typeof(TService), lifetime);
 
         /// <inheritdoc />
         public void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
             where TService : class
+            where TTarget : TService
         {
             // note that there can only be one implementation or instance registered "for" a service
             Container.Register(typeof(TService), implementingType, GetTargetedServiceName<TTarget>(), GetLifetime(lifetime));
@@ -192,6 +194,7 @@ namespace Umbraco.Core.Composing.LightInject
         /// <inheritdoc />
         public void RegisterFor<TService, TTarget>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class
+            where TTarget : TService
         {
             // note that there can only be one implementation or instance registered "for" a service
             Container.Register(f => factory(this), GetTargetedServiceName<TTarget>(), GetLifetime(lifetime));
@@ -200,6 +203,7 @@ namespace Umbraco.Core.Composing.LightInject
         /// <inheritdoc />
         public void RegisterFor<TService, TTarget>(TService instance)
             where TService : class
+            where TTarget : TService
             => Container.RegisterInstance(typeof(TService), instance, GetTargetedServiceName<TTarget>());
 
         private ILifetime GetLifetime(Lifetime lifetime)

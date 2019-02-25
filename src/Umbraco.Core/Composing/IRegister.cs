@@ -36,42 +36,54 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Registers a service for a target, as its own implementation.
         /// </summary>
+        /// <typeparam name="TService">The type you want to resolve as</typeparam>
+        /// <typeparam name="TTarget">The type for the registration base (eg: What would be constructed)</typeparam>
         /// <remarks>
         /// There can only be one implementation or instanced registered for a service and target;
         /// what happens if many are registered is not specified.
         /// </remarks>
         void RegisterFor<TService, TTarget>(Lifetime lifetime = Lifetime.Transient)
-            where TService : class;
+            where TService : class
+            where TTarget : TService;
 
         /// <summary>
         /// Registers a service for a target, with an implementation type.
         /// </summary>
+        /// <typeparam name="TService">The type you want to resolve as</typeparam>
+        /// <typeparam name="TTarget">The type for the registration base (eg: What would be constructed)</typeparam>
         /// <remarks>
         /// There can only be one implementation or instanced registered for a service and target;
         /// what happens if many are registered is not specified.
         /// </remarks>
         void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
-            where TService : class;
+            where TService : class
+            where TTarget : TService;
 
         /// <summary>
         /// Registers a service for a target, with an implementation factory.
         /// </summary>
+        /// <typeparam name="TService">The type you want to resolve as</typeparam>
+        /// <typeparam name="TTarget">The type for the registration base (eg: What would be constructed)</typeparam>
         /// <remarks>
         /// There can only be one implementation or instanced registered for a service and target;
         /// what happens if many are registered is not specified.
         /// </remarks>
         void RegisterFor<TService, TTarget>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
-            where TService : class;
+            where TService : class
+            where TTarget : TService;
 
         /// <summary>
         /// Registers a service for a target, with an implementing instance.
         /// </summary>
+        /// <typeparam name="TService">The type you want to resolve as</typeparam>
+        /// <typeparam name="TTarget">The type for the registration base (eg: What would be constructed)</typeparam>
         /// <remarks>
         /// There can only be one implementation or instanced registered for a service and target;
         /// what happens if many are registered is not specified.
         /// </remarks>
         void RegisterFor<TService, TTarget>(TService instance)
-            where TService : class;
+            where TService : class
+            where TTarget : TService;
 
         /// <summary>
         /// Registers a base type for auto-registration.

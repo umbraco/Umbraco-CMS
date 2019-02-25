@@ -92,21 +92,25 @@ namespace Umbraco.Core.Composing
         /// <inheritdoc />
         public void RegisterFor<TService, TTarget>(Lifetime lifetime = Lifetime.Transient)
             where TService : class
+            where TTarget : TService
             => _register.RegisterFor<TService, TTarget>(lifetime);
 
         /// <inheritdoc />
         public void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
             where TService : class
+            where TTarget : TService
             => _register.RegisterFor<TService, TTarget>(implementingType, lifetime);
 
         /// <inheritdoc />
         public void RegisterFor<TService, TTarget>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class
+            where TTarget : TService
             => _register.RegisterFor<TService, TTarget>(factory, lifetime);
 
         /// <inheritdoc />
         public void RegisterFor<TService, TTarget>(TService instance)
             where TService : class
+            where TTarget : TService
             => _register.RegisterFor<TService, TTarget>(instance);
 
         /// <inheritdoc />
@@ -190,32 +194,44 @@ namespace Umbraco.Core.Composing
         /// Registers a unique service for a target, as its own implementation.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        /// <typeparam name="TService">The type you want to resolve as</typeparam>
+        /// <typeparam name="TTarget">The type for the registration base (eg: What would be constructed)</typeparam>
         public void RegisterUniqueFor<TService, TTarget>()
             where TService : class
+            where TTarget : TService
             => _uniques[GetUniqueName<TService, TTarget>()] = register => register.RegisterFor<TService, TTarget>(Lifetime.Singleton);
 
         /// <summary>
         /// Registers a unique service for a target, with an implementing type.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        /// <typeparam name="TService">The type you want to resolve as</typeparam>
+        /// <typeparam name="TTarget">The type for the registration base (eg: What would be constructed)</typeparam>
         public void RegisterUniqueFor<TService, TTarget>(Type implementingType)
             where TService : class
+            where TTarget : TService
             => _uniques[GetUniqueName<TService, TTarget>()] = register => register.RegisterFor<TService, TTarget>(implementingType, Lifetime.Singleton);
 
         /// <summary>
         /// Registers a unique service for a target, with an implementation factory.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        /// <typeparam name="TService">The type you want to resolve as</typeparam>
+        /// <typeparam name="TTarget">The type for the registration base (eg: What would be constructed)</typeparam>
         public void RegisterUniqueFor<TService, TTarget>(Func<IFactory, TService> factory)
             where TService : class
+            where TTarget : TService
             => _uniques[GetUniqueName<TService, TTarget>()] = register => register.RegisterFor<TService, TTarget>(factory, Lifetime.Singleton);
 
         /// <summary>
         /// Registers a unique service for a target, with an implementing instance.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        /// <typeparam name="TService">The type you want to resolve as</typeparam>
+        /// <typeparam name="TTarget">The type for the registration base (eg: What would be constructed)</typeparam>
         public void RegisterUniqueFor<TService, TTarget>(TService instance)
             where TService : class
+            where TTarget : TService
             => _uniques[GetUniqueName<TService, TTarget>()] = register => register.RegisterFor<TService, TTarget>(instance);
 
         #endregion
