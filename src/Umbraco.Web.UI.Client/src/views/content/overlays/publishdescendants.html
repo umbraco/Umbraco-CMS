@@ -50,21 +50,20 @@
                         <div>
                             <label for="{{variant.htmlId}}" style="margin-bottom: 0;">
                                 <span>{{ variant.language.name }}</span>
+
+                                <span class="db umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                    <umb-variant-state variant="variant"></umb-variant-state>
+                                    <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                                </span>
+
+                                <span class="db" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                                    <span class="db umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
+                                </span>
+
+                                <span class="db" ng-repeat="notification in variant.notifications">
+                                    <span class="db umb-permission__description" style="color: #1FB572;">{{notification.message}}</span>
+                                </span>
                             </label>
-
-                            <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                                <umb-variant-state variant="variant"></umb-variant-state>
-                                <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                            </div>
-
-                            <div ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
-                                <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</div>
-                            </div>
-
-                            <div ng-repeat="notification in variant.notifications">
-                                <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
-                            </div>
-
                         </div>
                     </div>
 
