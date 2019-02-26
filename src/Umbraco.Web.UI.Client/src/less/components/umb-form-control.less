@@ -1,0 +1,120 @@
+@checkboxWidth: 15px;
+@checkboxHeight: 15px;
+
+.umb-form-control{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    position: relative;
+    padding: 0;
+    margin: 0;
+
+    &__text{
+        margin: 0 0 0 26px;
+        position: relative;
+        top: 2px;
+    }
+
+    &__input{
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+
+        &:focus:checked ~ .umb-form-control .umb-form-control__check,
+        &:focus ~ .umb-form-control__state .umb-form-control__check{
+            border-color: @gray-5;
+        }
+
+        &:checked ~ .umb-form-control__state .umb-form-control__check{
+            border-color: @green;
+        }
+
+        // This only happens if the state has a radiobutton modifier
+        &:checked ~ .umb-form-control__state--radiobutton .umb-form-control__check{
+            &:before{
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        // This only happens if state has the checkbox modifier
+        &:checked ~ .umb-form-control__state--checkbox{
+            .umb-form-control__check{
+                &:before{
+                    width: @checkboxWidth;
+                    height: @checkboxHeight;
+                }
+            }
+
+            .umb-form-control__icon{
+                opacity: 1;
+            }
+        }
+    }
+
+    &__state{
+        height: 17px;
+        position: absolute;
+        top: 2px;
+        left: 0;
+    }
+
+    &__check{
+        position: relative;
+        border: 1px solid @gray-7;
+        width: @checkboxWidth;
+        height: @checkboxHeight;
+
+        &:before{
+            content: "";
+            background: @green;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+        }
+
+        // This only happens if state has the radiobutton modifier
+        .umb-form-control__state--radiobutton &{
+            border-radius: 100%;
+
+            &:before{
+                width: 9px;
+                height: 9px;
+                border-radius: 100%;
+                opacity: 0;
+                transform: scale(0);
+                transition: .15s ease-out;
+            }
+        }
+
+        // This only happens if state has the checkbox modifier
+        .umb-form-control__state--checkbox &{
+            &:before{
+                width: 0;
+                height: 0;
+                transition: .05s ease-out;
+            }
+        }
+    }
+
+    &__icon{
+        color: @white;
+        text-align: center;
+        font-size: 10px;
+        opacity: 0;
+        transition: .2s ease-out;
+
+        &:before{
+            position: absolute;
+            top: -2px;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            margin: auto;
+        }
+    }
+}

@@ -1,20 +1,20 @@
-﻿<div class="umb-editor umb-checkboxlist" ng-controller="Umbraco.PropertyEditors.CheckboxListController">
+﻿<div class="umb-editor umb-editor--list" ng-controller="Umbraco.PropertyEditors.CheckboxListController">
 
     <ul class="unstyled">
-        <li ng-repeat="item in selectedItems" class="umb-checkboxlist__item">
-            <label class="checkbox umb-checkboxlist__label">
+        <li ng-repeat="item in selectedItems" class="umb-editor__item">
+            <label class="checkbox umb-form-control">
                 <input type="checkbox" name="checkboxlist"
                        value="{{item.key}}"
                        ng-model="item.checked"
-                       class="umb-checkboxlist__input"
+                       class="umb-form-control__input"
                        ng-required="model.validation.mandatory && !model.value.length" />
 
-                <div class="umb-checkboxlist__state" aria-hidden="true">
-                    <div class="umb-checkboxlist__check">
-                        <i class="umb-checkboxlist__icon icon-check"></i>
+                <div class="umb-form-control__state umb-form-control__state--checkbox" aria-hidden="true">
+                    <div class="umb-form-control__check">
+                        <i class="umb-form-control__icon icon-check"></i>
                     </div>
                 </div>
-                <span class="umb-checkboxlist__label-text">{{item.val}}</span>
+                <span class="umb-form-control__text">{{item.val}}</span>
             </label>
         </li>
     </ul>
