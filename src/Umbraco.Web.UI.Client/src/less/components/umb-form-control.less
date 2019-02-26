@@ -21,13 +21,13 @@
         left: 0;
         opacity: 0;
 
+        &:checked ~ .umb-form-control__state .umb-form-control__check{
+            border-color: @green;
+        }
+
         &:focus:checked ~ .umb-form-control .umb-form-control__check,
         &:focus ~ .umb-form-control__state .umb-form-control__check{
             border-color: @gray-5;
-        }
-
-        &:checked ~ .umb-form-control__state .umb-form-control__check{
-            border-color: @green;
         }
 
         // This only happens if the state has a radiobutton modifier
