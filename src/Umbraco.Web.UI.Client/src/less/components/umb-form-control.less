@@ -30,25 +30,30 @@
             border-color: @gray-5;
         }
 
-        // This only happens if the state has a radiobutton modifier
-        &:checked ~ .umb-form-control__state--radiobutton .umb-form-control__check{
-            &:before{
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        // This only happens if state has the checkbox modifier
-        &:checked ~ .umb-form-control__state--checkbox{
+        &:checked ~ .umb-form-control__state{
             .umb-form-control__check{
-                &:before{
-                    width: @checkboxWidth;
-                    height: @checkboxHeight;
+                // This only happens if the state has a radiobutton modifier
+                .umb-form-control--radiobutton &{
+                    &:before{
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+
+                // This only happens if state has the checkbox modifier
+                .umb-form-control--checkbox &{
+                    &:before{
+                        width: @checkboxWidth;
+                        height: @checkboxHeight;
+                    }
                 }
             }
 
-            .umb-form-control__icon{
-                opacity: 1;
+            // This only happens if state has the checkbox modifier
+            .umb-form-control--checkbox &{
+                .umb-form-control__icon{
+                    opacity: 1;
+                }
             }
         }
     }
@@ -78,7 +83,7 @@
         }
 
         // This only happens if state has the radiobutton modifier
-        .umb-form-control__state--radiobutton &{
+        .umb-form-control--radiobutton &{
             border-radius: 100%;
 
             &:before{
@@ -92,7 +97,7 @@
         }
 
         // This only happens if state has the checkbox modifier
-        .umb-form-control__state--checkbox &{
+        .umb-form-control--checkbox &{
             &:before{
                 width: 0;
                 height: 0;
