@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper, editorService) {
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper, editorService, listViewHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -64,8 +64,8 @@
             }
         ];
 
-        // Set card layout to active by default
-        vm.activeLayout = vm.layouts[0];
+        // Get last selected layout for "users" (defaults to first layout = card layout)
+        vm.activeLayout = listViewHelper.getLayout("users", vm.layouts); 
 
         // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
@@ -194,11 +194,8 @@
         }
 
         function selectLayout(selectedLayout) {
-            angular.forEach(vm.layouts, function (layout) {
-                layout.active = false;
-            });
-            selectedLayout.active = true;
-            vm.activeLayout = selectedLayout;
+            // save the selected layout for "users" so it's applied next time the user visits this section
+            vm.activeLayout = listViewHelper.setLayout("users", selectedLayout, vm.layouts); 
         }
 
         function selectUser(user) {
