@@ -2889,14 +2889,11 @@ namespace Umbraco.Core.Services.Implement
                     content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
                 }
 
-                content.Name = blueprint.Name;
                 if (!string.IsNullOrEmpty(culture))
                 {
                     content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
                 }
             }
-
-
 
             return content;
         }
