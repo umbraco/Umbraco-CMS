@@ -265,7 +265,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(int id)
+        public ContentItemDisplay GetById(int id, [FromUri]bool bypassUserPermissions = false)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
             if (foundContent == null)
@@ -1125,7 +1125,8 @@ namespace Umbraco.Web.Editors
                 IEntityService entityService,
                 int nodeId,
                 char[] permissionsToCheck = null,
-                IContent contentItem = null)
+                IContent contentItem = null,
+                bool bypassUserPermissions = false)
         {
             if (storage == null) throw new ArgumentNullException("storage");
             if (user == null) throw new ArgumentNullException("user");
@@ -1144,6 +1145,11 @@ namespace Umbraco.Web.Editors
             if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if(bypassUserPermissions == true)
+            {
+                return true;
             }
 
             var hasPathAccess = (nodeId == Constants.System.Root)

@@ -46,7 +46,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                     });
 
                     // if a link exists, get the properties to build the anchor name list
-                    contentResource.getById(id).then(function (resp) {
+                    contentResource.getById(id, { bypassUserPermissions: dialogOptions.bypassUserPermissions }).then(function (resp) {
                         $scope.model.target.url = resp.urls[0];
                         $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
                     });
@@ -88,7 +88,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             if (args.node.id < 0) {
                 $scope.model.target.url = "/";
             } else {
-                contentResource.getById(args.node.id).then(function (resp) {
+                contentResource.getById(args.node.id, { bypassUserPermissions: dialogOptions.bypassUserPermissions }).then(function (resp) {
                     $scope.model.target.url = resp.urls[0];
                     $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
                 });
