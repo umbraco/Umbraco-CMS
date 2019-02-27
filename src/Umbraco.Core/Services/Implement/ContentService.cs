@@ -2875,7 +2875,8 @@ namespace Umbraco.Core.Services.Implement
             {
                 foreach (var property in blueprint.Properties)
                 {
-                    content.SetValue(property.Alias, property.GetValue(culture), culture);
+					var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
+                    content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
                 }
 
                 content.Name = blueprint.Name;
