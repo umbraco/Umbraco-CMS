@@ -32,6 +32,13 @@ namespace Umbraco.Web.PropertyEditors
         {
             public MultiUrlPickerPreValueEditor()
             {
+                Fields.Add(new PreValueField()
+                {
+                    Key = "bypassUserPermissions",
+                    View = "boolean",
+                    Name = "Bypass User Permissions",
+                    Description = "If set, user and group start node permissions will be bypassed."
+                });
                 Fields.Add(new PreValueField
                 {
                     Key = "minNumber",

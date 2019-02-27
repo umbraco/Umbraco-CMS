@@ -67,10 +67,11 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             url: link.url,
             target: link.target
         } : null;
-
+        
         $scope.linkPickerOverlay = {
             view: "linkpicker",
             currentTarget: target,
+            bypassUserPermissions: $scope.model.config.bypassUserPermissions === '1',
             show: true,
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {
