@@ -85,7 +85,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         protected override void PersistNewItem(ITag entity)
         {
-            ((EntityBase)entity).AddingEntity();
+            entity.AddingEntity();
 
             var dto = TagFactory.BuildDto(entity);
             var id = Convert.ToInt32(Database.Insert(dto));
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         protected override void PersistUpdatedItem(ITag entity)
         {
-            ((EntityBase)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             var dto = TagFactory.BuildDto(entity);
             Database.Update(dto);
