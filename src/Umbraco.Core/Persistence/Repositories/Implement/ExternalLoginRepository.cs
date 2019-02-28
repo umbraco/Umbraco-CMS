@@ -139,7 +139,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IIdentityUserLogin entity)
         {
-            ((EntityBase)entity).AddingEntity();
+            entity.AddingEntity();
 
             var dto = ExternalLoginFactory.BuildDto(entity);
 
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IIdentityUserLogin entity)
         {
-            ((EntityBase)entity).UpdatingEntity();
+            entity.UpdatingEntity();
             
             var dto = ExternalLoginFactory.BuildDto(entity);
 
