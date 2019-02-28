@@ -261,10 +261,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IContent entity)
         {
-            if (entity is EntityBase entityBase)
-            {
-                entityBase.AddingEntity();
-            }
+            entity.AddingEntity();
 
             var publishing = entity.PublishedState == PublishedState.Publishing;
 
