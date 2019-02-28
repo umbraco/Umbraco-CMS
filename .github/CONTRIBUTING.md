@@ -1,4 +1,3 @@
-_Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-CMS/blob/dev-v8/.github/V8_GETTING_STARTED.md) to go to the v8 branch_
 # Contributing to Umbraco CMS
 
 👍🎉 First off, thanks for taking the time to contribute! 🎉👍
@@ -31,7 +30,7 @@ Great question! The short version goes like this:
   ![Fork the repository](img/forkrepository.png)
 
   * **Clone** - when GitHub has created your fork, you can clone it in your favorite Git tool
-  
+
   ![Clone the fork](img/clonefork.png)
 
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
@@ -44,7 +43,7 @@ Great question! The short version goes like this:
 
 ### Further reading
 
-At this point you might want to [read on about contributing in depth](CONTRIBUTING_DETAILED.md). 
+At this point you might want to [read on about contributing in depth](CONTRIBUTING_DETAILED.md).
 
 ### Reviews
 
@@ -74,7 +73,7 @@ The pull request team consists of a member of Umbraco HQ, [Sebastiaan](https://g
 - [Emma Burstow](https://github.com/emmaburstow)
 - [Poornima Nayar](https://github.com/poornimanayar)
 
-These wonderful volunteers will provide you with a first reply to your PR, review and test out your changes and might ask more questions. After that they'll let Umbraco HQ know if everything seems okay. 
+These wonderful volunteers will provide you with a first reply to your PR, review and test out your changes and might ask more questions. After that they'll let Umbraco HQ know if everything seems okay.
 
 ## Questions?
 

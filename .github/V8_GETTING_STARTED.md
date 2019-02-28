@@ -17,7 +17,7 @@
 
 ### Want to run from a zip instead?
 
-If you just want to try out a few things, you can run the site from a zip file which you can download from here https://github.com/umbraco/Umbraco-CMS/releases/tag/temp8-cg18. 
+If you just want to try out a few things, you can run the site from a zip file which you can download from here https://github.com/umbraco/Umbraco-CMS/releases/tag/release-8.0.0.
 
 We recommend running the site with the Visual Studio since you'll be able to remain up to date with the latest source code changes.
 
@@ -25,7 +25,7 @@ We recommend running the site with the Visual Studio since you'll be able to rem
 
 * _[The process for making code changes in v8 is the same as v7](https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/.github/CONTRIBUTING.md)_
 * Any .NET changes you make you just need to compile
-* Any Angular/JS changes you make you will need to make sure you are running the Gulp build. Easiest way to do this is from within Visual Studio in the `Task Runner Explorer`. You can find this window by pressing `ctrl + q` and typing in `Task Runner Explorer`. In this window you'll see all Gulp tasks, double click on the `dev` task, this will compile the angular solution and start a file watcher, then any html/js changes you make are automatically built.  
+* Any Angular/JS changes you make you will need to make sure you are running the Gulp build. Easiest way to do this is from within Visual Studio in the `Task Runner Explorer`. You can find this window by pressing `ctrl + q` and typing in `Task Runner Explorer`. In this window you'll see all Gulp tasks, double click on the `dev` task, this will compile the angular solution and start a file watcher, then any html/js changes you make are automatically built.
 * When making js changes, you should have the chrome developer tools open to ensure that cache is disabled
 * If you are only making C# changes and are not touching the UI code at all, you can significantly speed up the VS build by adding an empty file specifically called `~/src/preserve.belle`. The UI (Belle) build will then be skipped during a Rebuild.
 
@@ -33,5 +33,5 @@ We recommend running the site with the Visual Studio since you'll be able to rem
 
 We are keeping track of [known issues and limitations here](http://issues.umbraco.org/issue/U4-11279). These line items will eventually be turned into actual tasks to be worked on. Feel free to help us keep this list updated if you find issues and even help fix some of these items. If there is a particular item you'd like to help fix please mention this on the task and we'll create a sub task for the item to continue discussion there.
 
-There's [a list of tasks for v8 that haven't been completed](https://github.com/umbraco/Umbraco-CMS/labels/release%2F8.0.0). If you are interested in helping out with any of these please mention this on the task. This list will be constantly updated as we begin to document and design some of the other tasks that still need to get done.
+There's [a list of tasks for v8 that haven't been completed](https://github.com/umbraco/Umbraco-CMS/labels/release%2F8.1.0). If you are interested in helping out with any of these please mention this on the task. This list will be constantly updated as we begin to document and design some of the other tasks that still need to get done.
 

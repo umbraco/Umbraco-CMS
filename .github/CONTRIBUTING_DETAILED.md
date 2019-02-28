@@ -118,7 +118,7 @@ To find the general areas of something you're looking to fix or improve, have a 
 
 ### What branch should I target for my contributions?
 
-We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `dev-v7`. Whatever the default is, that's where we'd like you to target your contributions.
+We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `dev-v8`. Whatever the default is, that's where we'd like you to target your contributions.
 
 ![What branch do you want me to target?](img/defaultbranch.png)
 
@@ -154,9 +154,9 @@ Then when you want to get the changes from the main repository:
 
 ```
 git fetch upstream
-git rebase upstream/dev-v7
+git rebase upstream/dev-87
 ```
 
-In this command we're syncing with the `dev-v7` branch, but you can of course choose another one if needed.
+In this command we're syncing with the `dev-v8` branch, but you can of course choose another one if needed.
 
 (More info on how this works: [http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated](http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated))
