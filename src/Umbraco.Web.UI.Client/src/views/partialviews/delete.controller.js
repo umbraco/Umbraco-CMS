@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting partial views
  */
-function PartialViewsDeleteController($scope, codefileResource, treeService, navigationService) {
+function PartialViewsDeleteController($scope, $location, codefileResource, treeService, navigationService, appState) {
 
     $scope.performDelete = function() {
 
@@ -24,6 +24,13 @@ function PartialViewsDeleteController($scope, codefileResource, treeService, nav
                 // TODO: Need to sync tree, etc...
                 treeService.removeNode($scope.currentNode);
                 navigationService.hideMenu();
+
+                if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
+                    //The deleted PartialView is open, so redirect
+                    var section = appState.getSectionState("currentSection");
+                    $location.path("/" + section);
+                }
+
             }, function (err) {
                 $scope.currentNode.loading = false;
                 $scope.error = err;

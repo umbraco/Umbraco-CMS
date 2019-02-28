@@ -6,7 +6,7 @@
  * @description
  * The controller for the media type delete dialog
  */
-function MediaTypesDeleteController($scope, dataTypeResource, mediaTypeResource, treeService, navigationService) {
+function MediaTypesDeleteController($scope, $location, dataTypeResource, mediaTypeResource, treeService, navigationService, appState) {
 
     $scope.performDelete = function() {
 
@@ -21,6 +21,12 @@ function MediaTypesDeleteController($scope, dataTypeResource, mediaTypeResource,
             // TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
+
+            if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) { 
+             //The deleted MediaType is open, so redirect
+                var section = appState.getSectionState("currentSection");
+                $location.path("/" + section);
+            }
         });
 
     };

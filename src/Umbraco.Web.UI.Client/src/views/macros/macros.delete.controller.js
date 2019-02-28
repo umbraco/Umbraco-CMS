@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting macro items
  */
-function MacrosDeleteController($scope, $location, macroResource, navigationService, treeService) {
+function MacrosDeleteController($scope, $location, macroResource, navigationService, treeService, appState) {
     var vm = this;
     
     vm.name = $scope.currentNode.name;
@@ -18,6 +18,14 @@ function MacrosDeleteController($scope, $location, macroResource, navigationServ
             treeService.removeNode($scope.currentNode);
             
             navigationService.hideMenu();
+
+            if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
+                //The deleted Macro is open, so redirect
+                var section = appState.getSectionState("currentSection");
+                $location.path("/" + section);
+            }
+
+
         });
     }
 

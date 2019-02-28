@@ -6,8 +6,8 @@
  * @description
  * The controller for deleting content
  */
-function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeResource, treeService, navigationService) {
-
+function DocumentTypesDeleteController($scope, $location, dataTypeResource, contentTypeResource, treeService, navigationService, appState) {
+    
     $scope.performDelete = function() {
 
         //mark it for deletion (used in the UI)
@@ -20,7 +20,13 @@ function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeReso
 
             // TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
-            navigationService.hideMenu();
+            navigationService.hideMenu(); 
+
+            if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
+                //The deleted doctype is open, so redirect 
+                var section = appState.getSectionState("currentSection");
+                $location.path("/" + section );
+            }
         });
 
     };
@@ -38,6 +44,7 @@ function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeReso
             // TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
+
         });
 
     };

@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function DataTypeDeleteController($scope, dataTypeResource, treeService, navigationService) {
+function DataTypeDeleteController($scope, $location, dataTypeResource, treeService, navigationService, appState) {
 
     $scope.performDelete = function() {
 
@@ -22,6 +22,12 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
         });
+
+        if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
+            //The deleted DataType is open, so redirect
+            var section = appState.getSectionState("currentSection");
+            $location.path("/" + section);
+        }
 
     };
 

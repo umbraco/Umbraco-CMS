@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting member types
  */
-function MemberTypesDeleteController($scope, memberTypeResource, treeService, navigationService) {
+function MemberTypesDeleteController($scope, $location, memberTypeResource, treeService, navigationService, appState) {
 
     $scope.performDelete = function() {
 
@@ -21,6 +21,12 @@ function MemberTypesDeleteController($scope, memberTypeResource, treeService, na
             // TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
+
+            if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
+               //The deleted MemberType is open, so redirect
+                var section = appState.getSectionState("currentSection");
+                $location.path("/" + section);
+            }
         });
 
     };

@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting stylesheets
  */
-function StyleSheetsDeleteController($scope, codefileResource, treeService, navigationService) {
+function StyleSheetsDeleteController($scope, $location, codefileResource, treeService, navigationService, appState) {
 
     $scope.performDelete = function() {
 
@@ -18,6 +18,12 @@ function StyleSheetsDeleteController($scope, codefileResource, treeService, navi
                 $scope.currentNode.loading = false;
                 treeService.removeNode($scope.currentNode);
                 navigationService.hideMenu();
+
+                if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
+                    //The deleted StyleSheet is open, so redirect
+                    var section = appState.getSectionState("currentSection");
+                    $location.path("/" + section);
+                }
             });
     };
 

@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting partial view macros
  */
-function PartialViewMacrosDeleteController($scope, codefileResource, treeService, navigationService) {
+function PartialViewMacrosDeleteController($scope, $location, codefileResource, treeService, navigationService, appState) {
 
     $scope.performDelete = function() {
 
@@ -21,6 +21,12 @@ function PartialViewMacrosDeleteController($scope, codefileResource, treeService
                 // TODO: Need to sync tree, etc...
                 treeService.removeNode($scope.currentNode);
                 navigationService.hideMenu();
+
+                if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
+                    //The deleted PartialViewMacro is open, so redirect
+                    var section = appState.getSectionState("currentSection");
+                    $location.path("/" + section);
+                }
             });
     };
 
