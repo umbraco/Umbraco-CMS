@@ -154,7 +154,7 @@ Then when you want to get the changes from the main repository:
 
 ```
 git fetch upstream
-git rebase upstream/dev-87
+git rebase upstream/dev-v8
 ```
 
 In this command we're syncing with the `dev-v8` branch, but you can of course choose another one if needed.
