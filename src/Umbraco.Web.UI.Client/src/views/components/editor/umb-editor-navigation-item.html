@@ -1,10 +1,10 @@
 <a data-element="sub-view-{{vm.item.alias}}"
-    tabindex="-1"
-    ng-href=""
-    ng-click="vm.clicked()"
-    hotkey="{{vm.index+1}}"
-    hotkey-when-hidden="true"
-    ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}">
+   tabindex="-1"
+   ng-href=""
+   ng-click="vm.clicked()"
+   hotkey="{{::vm.hotkey}}"
+   hotkey-when-hidden="true"
+   ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}">
     <i class="icon {{ vm.item.icon }}"></i>
     <span class="umb-sub-views-nav-item-text">{{ vm.item.name }}</span>
     <div ng-show="vm.item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
