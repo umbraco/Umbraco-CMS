@@ -7,7 +7,7 @@
     ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}">
     <i class="icon {{ vm.item.icon }}"></i>
     <span class="umb-sub-views-nav-item-text">{{ vm.item.name }}</span>
-    <div ng-show="item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
+    <div ng-show="vm.item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
 </a>
 
 <ul class="dropdown-menu umb-sub-views-nav-item__anchor_dropdown" ng-if="vm.item.anchors && vm.item.anchors.length > 1">
