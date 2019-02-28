@@ -675,12 +675,12 @@ namespace Umbraco.Web
         public IEnumerable<IPublishedContent> TypedContent(params object[] ids)
         {
             return TypedContentForObjects(ids);
-        }
+        }   
 
 
 
         /// <summary>
-        /// Gets the medias corresponding to the identifiers.
+        /// Gets the content corresponding to the identifiers.
         /// </summary>
         /// <param name="ids">The unique identifiers, or the keys, of the content items.</param>
         /// <returns>The content items that were found in the cache</returns>
@@ -768,7 +768,7 @@ namespace Umbraco.Web
 
 
         /// <summary>
-        /// Gets the medias corresponding to the identifiers.
+        /// Gets the content corresponding to the identifiers.
         /// </summary>
         /// <param name="ids">The unique identifiers, or the keys, of the content items.</param>
         /// <returns>The content items that were found in the cache</returns>
