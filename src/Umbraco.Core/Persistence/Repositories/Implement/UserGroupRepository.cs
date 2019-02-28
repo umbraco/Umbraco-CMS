@@ -290,7 +290,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IUserGroup entity)
         {
-            ((UserGroup) entity).AddingEntity();
+            entity.AddingEntity();
 
             var userGroupDto = UserGroupFactory.BuildDto(entity);
 
@@ -304,7 +304,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IUserGroup entity)
         {
-            ((UserGroup) entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             var userGroupDto = UserGroupFactory.BuildDto(entity);
 
