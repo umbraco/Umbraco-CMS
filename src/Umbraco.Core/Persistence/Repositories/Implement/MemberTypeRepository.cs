@@ -5,6 +5,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -197,7 +198,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             ValidateAlias(entity);
 
-            ((MemberType)entity).AddingEntity();
+            entity.AddingEntity();
 
             //set a default icon if one is not specified
             if (entity.Icon.IsNullOrWhiteSpace())
@@ -231,7 +232,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             ValidateAlias(entity);
 
             //Updates Modified date
-            ((MemberType)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))

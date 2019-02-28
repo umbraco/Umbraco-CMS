@@ -6,6 +6,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -91,8 +92,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistNewItem(IMemberGroup entity)
         {
             //Save to db
+            entity.AddingEntity();
             var group = (MemberGroup)entity;
-            group.AddingEntity();
             var dto = MemberGroupFactory.BuildDto(group);
             var o = Database.IsNew(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
             group.Id = dto.NodeId; //Set Id on entity to ensure an Id is set

@@ -5,6 +5,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -230,7 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 throw ex;
             }
 
-            ((ContentType)entity).AddingEntity();
+            entity.AddingEntity();
 
             PersistNewBaseContentType(entity);
             PersistTemplates(entity, false);
@@ -270,7 +271,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             ValidateAlias(entity);
 
             //Updates Modified date
-            ((ContentType)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))

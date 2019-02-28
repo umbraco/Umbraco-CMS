@@ -478,19 +478,6 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _providerUserKey, nameof(ProviderUserKey));
         }
 
-
-        /// <summary>
-        /// Method to call when Entity is being saved
-        /// </summary>
-        /// <remarks>Created date is set and a Unique key is assigned</remarks>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            if (ProviderUserKey == null)
-                ProviderUserKey = Key;
-        }
-
         /* Internal experiment - only used for mapping queries.
          * Adding these to have first level properties instead of the Properties collection.
          */

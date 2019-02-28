@@ -6,6 +6,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -232,8 +233,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IMember entity)
         {
+            if (entity.ProviderUserKey == null)
+            {
+                entity.ProviderUserKey = entity.Key;
+            }
+            entity.AddingEntity();
+
             var member = (Member) entity;
-            member.AddingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
