@@ -20,7 +20,8 @@ function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeReso
 
             // TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
-            navigationService.hideMenu();
+            navigationService.hideMenu(); 
+
         });
 
     };
@@ -38,6 +39,7 @@ function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeReso
             // TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
+
         });
 
     };

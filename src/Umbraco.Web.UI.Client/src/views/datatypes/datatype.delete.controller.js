@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function DataTypeDeleteController($scope, dataTypeResource, treeService, navigationService) {
+function DataTypeDeleteController($scope, $location, dataTypeResource, treeService, navigationService, appState) {
 
     $scope.performDelete = function() {
 
@@ -22,7 +22,6 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
         });
-
     };
 
     $scope.performContainerDelete = function () {
