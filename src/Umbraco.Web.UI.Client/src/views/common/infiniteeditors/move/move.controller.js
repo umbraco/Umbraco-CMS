@@ -96,7 +96,7 @@
       // Mini list view
       $scope.selectListViewNode = function (node) {
 	      node.selected = node.selected === true ? false : true;
-		  nodeSelectHandler({}, { node: node });
+		  nodeSelectHandler({ node: node });
       };
 
       $scope.closeMiniListView = function () {
