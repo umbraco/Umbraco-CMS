@@ -32,7 +32,7 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
 
         var currentEditorState = editorState.getCurrent()
         console.log("currentEditorState", currentEditorState);
-        if (currentEditorState != null && currentEditorState.id === args.node.id) {
+        if (currentEditorState && currentEditorState.id === args.node.id) {
             //current page is loaded, so navigate to root
             var section = appState.getSectionState("currentSection");
             $location.path("/" + section);
