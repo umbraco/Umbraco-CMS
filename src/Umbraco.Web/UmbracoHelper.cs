@@ -373,9 +373,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(params Udi[] ids)
         {
-            if (!(ids is IEnumerable<GuidUdi> udis)) return null;
-
-            return ids.Select(id => ContentQuery.Content(id));
+            return ids.Select(id => ContentQuery.Content(id)).WhereNotNull();
         }
 
         /// <summary>
@@ -447,10 +445,8 @@ namespace Umbraco.Web
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(IEnumerable<Udi> ids)
-        {
-            if (!(ids is IEnumerable<GuidUdi> udis)) return null;
-
-            return ids.Select(id => ContentQuery.Content(id));
+        {          
+            return ids.Select(id => ContentQuery.Content(id)).WhereNotNull();
         }
 
         /// <summary>
@@ -688,9 +684,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(params Udi[] ids)
         {
-            if (!(ids is IEnumerable<GuidUdi> udis)) return null;
-
-            return ids.Select(id => ContentQuery.Media(id));
+            return ids.Select(id => ContentQuery.Media(id)).WhereNotNull();
         }
 
         /// <summary>
@@ -734,9 +728,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(IEnumerable<Udi> ids)
         {
-            if (!(ids is IEnumerable<GuidUdi> udis)) return null;
-
-            return ids.Select(id => ContentQuery.Media(id));
+            return ids.Select(id => ContentQuery.Media(id)).WhereNotNull();
         }
 
         /// <summary>
