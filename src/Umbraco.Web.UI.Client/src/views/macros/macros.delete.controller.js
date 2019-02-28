@@ -18,14 +18,6 @@ function MacrosDeleteController($scope, $location, macroResource, navigationServ
             treeService.removeNode($scope.currentNode);
             
             navigationService.hideMenu();
-
-            if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
-                //The deleted Macro is open, so redirect
-                var section = appState.getSectionState("currentSection");
-                $location.path("/" + section);
-            }
-
-
         });
     }
 

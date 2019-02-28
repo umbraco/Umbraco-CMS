@@ -13,7 +13,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($routeParams, $location, $q, $timeout, $injector, eventsService, umbModelMapper, treeService, appState) {
+function navigationService($routeParams, $location, $q, $timeout, $injector, eventsService, umbModelMapper, treeService, appState, editorState) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();
@@ -24,6 +24,19 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
     eventsService.on("app.navigationReady", function (e, args) {
         mainTreeApi = args.treeApi;
         navReadyPromise.resolve(mainTreeApi);
+    });
+
+    eventsService.on("treeService.removeNode", function (e, args) {
+        //check to see if the current page has been removed
+     
+
+        var currentEditorState = editorState.getCurrent()
+        console.log("currentEditorState", currentEditorState);
+        if (currentEditorState != null && currentEditorState.id === args.node.id) {
+            //current page is loaded, so navigate to root
+            var section = appState.getSectionState("currentSection");
+            $location.path("/" + section);
+        }
     });
 
     //A list of query strings defined that when changed will not cause a reload of the route

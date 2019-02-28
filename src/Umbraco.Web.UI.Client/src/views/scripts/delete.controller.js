@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting scripts
  */
-function ScriptsDeleteController($scope, $location, codefileResource, treeService, navigationService, appState) {
+function ScriptsDeleteController($scope, codefileResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 
@@ -21,12 +21,6 @@ function ScriptsDeleteController($scope, $location, codefileResource, treeServic
                 // TODO: Need to sync tree, etc...
                 treeService.removeNode($scope.currentNode);
                 navigationService.hideMenu();
-
-                if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
-                    //The deleted Script is open, so redirect
-                    var section = appState.getSectionState("currentSection");
-                    $location.path("/" + section);
-                }
 
             });
     };

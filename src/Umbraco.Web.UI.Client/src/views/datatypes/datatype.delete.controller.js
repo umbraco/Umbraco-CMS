@@ -22,13 +22,6 @@ function DataTypeDeleteController($scope, $location, dataTypeResource, treeServi
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
         });
-
-        if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
-            //The deleted DataType is open, so redirect
-            var section = appState.getSectionState("currentSection");
-            $location.path("/" + section);
-        }
-
     };
 
     $scope.performContainerDelete = function () {

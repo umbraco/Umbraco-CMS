@@ -21,12 +21,6 @@ function MediaTypesDeleteController($scope, $location, dataTypeResource, mediaTy
             // TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
-
-            if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) { 
-             //The deleted MediaType is open, so redirect
-                var section = appState.getSectionState("currentSection");
-                $location.path("/" + section);
-            }
         });
 
     };

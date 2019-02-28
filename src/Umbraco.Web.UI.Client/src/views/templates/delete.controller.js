@@ -6,7 +6,7 @@
  * @description
  * The controller for the template delete dialog
  */
-function TemplatesDeleteController($scope, $location, templateResource, treeService, navigationService, appState) {
+function TemplatesDeleteController($scope, templateResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 
@@ -25,13 +25,6 @@ function TemplatesDeleteController($scope, $location, templateResource, treeServ
             // TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
-
-            if ("/" + $scope.currentNode.routePath.toLowerCase() === $location.path().toLowerCase()) {
-                //The deleted Template is open, so redirect
-                var section = appState.getSectionState("currentSection");
-                $location.path("/" + section);
-            }
-
 
         }, function (err) {
             $scope.currentNode.loading = false;
