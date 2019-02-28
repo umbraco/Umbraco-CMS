@@ -22,21 +22,19 @@ namespace Umbraco.Web.Mvc
 
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
-
-        // note
-        // properties marked as [Inject] below will be property-injected (vs constructor-injected) in
-        // order to keep the constructor as light as possible, so that ppl implementing eg a SurfaceController
-        // don't need to implement complex constructors + need to refactor them each time we change ours.
-        // this means that these properties have a setter.
-        // what can go wrong?
-
+        
         /// <summary>
-        /// Gets or sets the Umbraco context.
+        /// Gets the Umbraco context.
         /// </summary>
-        public virtual UmbracoContext UmbracoContext { get; }
+        public virtual UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
 
         /// <summary>
-        /// Gets or sets the database context.
+        /// Gets the database context accessor.
+        /// </summary>
+        public virtual IUmbracoContextAccessor UmbracoContextAccessor { get; }
+
+        /// <summary>
+        /// Gets the database context.
         /// </summary>
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
@@ -77,7 +75,7 @@ namespace Umbraco.Web.Mvc
 
         protected PluginController()
             : this(
-                  Current.Factory.GetInstance<UmbracoContext>(),
+                  Current.Factory.GetInstance<IUmbracoContextAccessor>(),
                   Current.Factory.GetInstance<IUmbracoDatabaseFactory>(),
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
@@ -88,9 +86,9 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+        protected PluginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
         {
-            UmbracoContext = umbracoContext;
+            UmbracoContextAccessor = umbracoContextAccessor;
             DatabaseFactory = databaseFactory;
             Services = services;
             AppCaches = appCaches;

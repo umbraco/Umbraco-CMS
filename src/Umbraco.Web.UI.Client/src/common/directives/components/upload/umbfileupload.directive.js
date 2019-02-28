@@ -15,7 +15,9 @@ function umbFileUpload() {
             el.on('change', function (event) {
                 var files = event.target.files;
                 //emit event upward
-                scope.$emit("filesSelected", { files: files });                           
+                scope.$emit("filesSelected", { files: files });
+                //clear the element value - this allows us to pick the same file again and again
+                el.val('');
             });
         }
     };

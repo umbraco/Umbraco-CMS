@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.Factories
             var propertyGroups = new PropertyGroupCollection();
             foreach (var groupDto in dto.PropertyTypeGroups.Where(x => x.Id.HasValue))
             {
-                var group = new PropertyGroup(MemberType.IsPublishingConst);
+                var group = new PropertyGroup(MemberType.SupportsPublishingConst);
 
                 // if the group is defined on the current member type,
                 // assign its identifier, else it will be zero
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Persistence.Factories
                 group.Key = groupDto.UniqueId;
                 group.Name = groupDto.Text;
                 group.SortOrder = groupDto.SortOrder;
-                group.PropertyTypes = new PropertyTypeCollection(MemberType.IsPublishingConst);
+                group.PropertyTypes = new PropertyTypeCollection(MemberType.SupportsPublishingConst);
 
                 //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
                 var localGroupDto = groupDto;

@@ -24,6 +24,7 @@ function PartialViewsDeleteController($scope, codefileResource, treeService, nav
                 // TODO: Need to sync tree, etc...
                 treeService.removeNode($scope.currentNode);
                 navigationService.hideMenu();
+
             }, function (err) {
                 $scope.currentNode.loading = false;
                 $scope.error = err;

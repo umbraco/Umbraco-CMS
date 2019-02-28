@@ -362,11 +362,6 @@
       <orgName>blogpost.cshtml</orgName>
     </file>
     <file>
-      <guid>Bootstrap2.cshtml</guid>
-      <orgPath>/Views/Partials/Grid</orgPath>
-      <orgName>Bootstrap2.cshtml</orgName>
-    </file>
-    <file>
       <guid>Bootstrap3.cshtml</guid>
       <orgPath>/Views/Partials/Grid</orgPath>
       <orgName>Bootstrap3.cshtml</orgName>
@@ -2483,11 +2478,11 @@
     <meta name="description" content="@CurrentPage.siteDescription">
 
     <title>@CurrentPage.siteTitle</title>
-	
+
 	<!-- Fonts -->
 	<link href="http://fonts.googleapis.com/css?family=Merriweather:400,700,300,900" rel="stylesheet" type="text/css">
 	<link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet" type="text/css">
-	
+
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/fanoe.css">
@@ -2522,13 +2517,13 @@
         <a href="#" class="cross"><span></span></a>
       </div>
     </header>
-	
+
     @RenderBody()
 
     <footer class="field dark">
       <div class="container">
         <div class="row">
-          
+
           <div class="col-xs-6 col-sm-3">
             <strong>Products</strong>
             <ul>
@@ -2598,7 +2593,7 @@
         </div>
       </div>
     </footer>
-    
+
     <!-- Javascripts -->
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>

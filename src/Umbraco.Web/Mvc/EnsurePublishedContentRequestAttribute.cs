@@ -22,18 +22,18 @@ namespace Umbraco.Web.Mvc
     public class EnsurePublishedContentRequestAttribute : ActionFilterAttribute
     {
         private readonly string _dataTokenName;
-        private UmbracoContext _umbracoContext;
+        private IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly int? _contentId;
         private UmbracoHelper _helper;
 
         /// <summary>
         /// Constructor - can be used for testing
         /// </summary>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         /// <param name="contentId"></param>
-        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, int contentId)
+        public EnsurePublishedContentRequestAttribute(IUmbracoContextAccessor umbracoContextAccessor, int contentId)
         {
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _contentId = contentId;
         }
 
@@ -58,18 +58,18 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Constructor - can be used for testing
         /// </summary>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         /// <param name="dataTokenName"></param>
-        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, string dataTokenName)
+        public EnsurePublishedContentRequestAttribute(IUmbracoContextAccessor umbracoContextAccessor, string dataTokenName)
         {
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _dataTokenName = dataTokenName;
         }
 
         /// <summary>
         /// Exposes the UmbracoContext
         /// </summary>
-        protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = Current.UmbracoContext);
+        protected UmbracoContext UmbracoContext => _umbracoContextAccessor?.UmbracoContext ?? Current.UmbracoContext;
 
         // TODO: try lazy property injection?
         private IPublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<IPublishedRouter>();

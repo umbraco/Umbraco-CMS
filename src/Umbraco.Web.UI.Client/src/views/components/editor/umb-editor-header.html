@@ -21,7 +21,7 @@
             </ng-form>
 
             <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1 1 auto;">
-                <div class="umb-editor-header__name-wrapper">
+                <div class="umb-editor-header__name-wrapper" ng-show="!nameLocked || !hideAlias">
                     <ng-form name="headerNameForm">
                         <input data-element="editor-name-field"
                                no-password-manager
@@ -77,7 +77,7 @@
             </umb-editor-navigation>
         </div>
 
-        <div ng-if="menu.currentNode && splitViewOpen !== true && hideMenu !== true">
+        <div ng-if="menu.currentNode && splitViewOpen !== true && hideActionsMenu !== true">
             <umb-editor-menu
                 data-element="editor-actions"
                 current-node="menu.currentNode"

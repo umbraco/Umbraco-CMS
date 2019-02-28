@@ -359,12 +359,12 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar) { Alias = "singleLineText", Name = "Text String", Mandatory = false, SortOrder = 4, DataTypeId = -88 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextArea, ValueStorageType.Ntext) { Alias = "multilineText", Name = "Multiple Text Strings", Mandatory = false, SortOrder = 5, DataTypeId = -89 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.UploadField, ValueStorageType.Nvarchar) { Alias = "upload", Name = "Upload Field", Mandatory = false, SortOrder = 6, DataTypeId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Nvarchar) { Alias = "label", Name = "Label", Mandatory = false, SortOrder = 7, DataTypeId = -92 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar) { Alias = "label", Name = "Label", Mandatory = false, SortOrder = 7, DataTypeId = -92 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.DateTime, ValueStorageType.Date) { Alias = "dateTime", Name = "Date Time", Mandatory = false, SortOrder = 8, DataTypeId = -36 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.ColorPicker, ValueStorageType.Nvarchar) { Alias = "colorPicker", Name = "Color Picker", Mandatory = false, SortOrder = 9, DataTypeId = -37 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.DropDownListFlexible, ValueStorageType.Nvarchar) { Alias = "ddlMultiple", Name = "Dropdown List Multiple", Mandatory = false, SortOrder = 11, DataTypeId = -39 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.RadioButtonList, ValueStorageType.Nvarchar) { Alias = "rbList", Name = "Radio Button List", Mandatory = false, SortOrder = 12, DataTypeId = -40 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Date, ValueStorageType.Date) { Alias = "date", Name = "Date", Mandatory = false, SortOrder = 13, DataTypeId = -41 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.DateTime, ValueStorageType.Date) { Alias = "date", Name = "Date", Mandatory = false, SortOrder = 13, DataTypeId = -36 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.DropDownListFlexible, ValueStorageType.Integer) { Alias = "ddl", Name = "Dropdown List", Mandatory = false, SortOrder = 14, DataTypeId = -42 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.CheckBoxList, ValueStorageType.Nvarchar) { Alias = "chklist", Name = "Checkbox List", Mandatory = false, SortOrder = 15, DataTypeId = -43 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.ContentPicker, ValueStorageType.Integer) { Alias = "contentPicker", Name = "Content Picker", Mandatory = false, SortOrder = 16, DataTypeId = 1046 });
@@ -420,10 +420,10 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             var contentCollection = new PropertyTypeCollection(false);
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.UploadField, ValueStorageType.Nvarchar) { Alias = Constants.Conventions.Media.File, Name = "File", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Width, Name = "Width", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Height, Name = "Height", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Bytes, Name = "Bytes", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Nvarchar) { Alias = Constants.Conventions.Media.Extension, Name = "File Extension", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Width, Name = "Width", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Height, Name = "Height", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Bytes, Name = "Bytes", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar) { Alias = Constants.Conventions.Media.Extension, Name = "File Extension", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
 
             mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
 

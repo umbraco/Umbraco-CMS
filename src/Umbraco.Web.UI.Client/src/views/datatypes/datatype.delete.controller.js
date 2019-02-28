@@ -22,7 +22,6 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
         });
-
     };
 
     $scope.performContainerDelete = function () {

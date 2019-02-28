@@ -63,7 +63,7 @@
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.0.0-beta079" />
+    <PackageReference Include="Examine" Version="1.0.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
@@ -202,6 +202,7 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
+    <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Services\DashboardService.cs" />
@@ -218,16 +219,16 @@
     <Compile Include="PropertyEditors\MultiUrlPickerValueEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiUrlPickerValueConverter.cs" />
     <Compile Include="Templates\ITemplateRenderer.cs" />
-    <Compile Include="Trees\BackOfficeSectionCollectionBuilder.cs" />
-    <Compile Include="Trees\FormsBackOfficeSection.cs" />
-    <Compile Include="Trees\MediaBackOfficeSection.cs" />
-    <Compile Include="Trees\MembersBackOfficeSection.cs" />
-    <Compile Include="Trees\PackagesBackOfficeSection.cs" />
-    <Compile Include="Trees\SettingsBackOfficeSection.cs" />
-    <Compile Include="Trees\TranslationBackOfficeSection.cs" />
+    <Compile Include="Sections\SectionCollectionBuilder.cs" />
+    <Compile Include="Sections\FormsSection.cs" />
+    <Compile Include="Sections\MediaSection.cs" />
+    <Compile Include="Sections\MembersSection.cs" />
+    <Compile Include="Sections\PackagesSection.cs" />
+    <Compile Include="Sections\SettingsSection.cs" />
+    <Compile Include="Sections\TranslationSection.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="Trees\TreeUse.cs" />
-    <Compile Include="Trees\UsersBackOfficeSection.cs" />
+    <Compile Include="Sections\UsersSection.cs" />
     <Compile Include="Trees\Tree.cs" />
     <Compile Include="Trees\ITree.cs" />
     <Compile Include="Models\ContentEditing\PublicAccess.cs" />
@@ -247,7 +248,7 @@
     <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
     <Compile Include="Services\ITreeService.cs" />
     <Compile Include="Services\ISectionService.cs" />
-    <Compile Include="Trees\BackOfficeSectionCollection.cs" />
+    <Compile Include="Sections\SectionCollection.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComposer.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComposer.cs" />
@@ -455,9 +456,7 @@
     <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ContentPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ContentPickerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DateConfiguration.cs" />
     <Compile Include="PropertyEditors\DateValueEditor.cs" />
-    <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="PropertyEditors\DecimalConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DropDownFlexiblePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DropDownFlexibleConfigurationEditor.cs" />
@@ -630,7 +629,7 @@
     <Compile Include="Actions\ActionUpdate.cs" />
     <Compile Include="Actions\IAction.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
-    <Compile Include="Trees\ContentBackOfficeSection.cs" />
+    <Compile Include="Sections\ContentSection.cs" />
     <Compile Include="Services\SectionService.cs" />
     <Compile Include="Trees\TreeAttribute.cs" />
     <Compile Include="Models\Trees\TreeNode.cs" />
@@ -666,7 +665,6 @@
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="PropertyEditors\DateConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
     <Compile Include="Routing\RedirectTrackingComponent.cs" />
@@ -861,7 +859,6 @@
     <Compile Include="Models\Mapping\DataTypeConfigurationFieldDisplayResolver.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />

@@ -34,10 +34,10 @@ namespace Umbraco.Web.Trees
         private readonly ITreeService _treeService;
         private readonly ISectionService _sectionService;
 
-        public ApplicationTreeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
+        public ApplicationTreeController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
             IRuntimeState runtimeState, ITreeService treeService, ISectionService sectionService, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
             _sectionService = sectionService;
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Trees
                 //full screen section without trees
                 var name = Services.TextService.Localize("sections/" + application);
                 return TreeRootNode.CreateSingleTreeRoot(Constants.System.Root.ToInvariantString(), null, null, name, TreeNodeCollection.Empty, true);
-            }   
+            }
 
             // handle request for a specific tree / or when there is only one tree
             if (!tree.IsNullOrWhiteSpace() || allTrees.Count == 1)

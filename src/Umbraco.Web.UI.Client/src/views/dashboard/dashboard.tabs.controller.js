@@ -167,7 +167,7 @@ function FormsController($scope, $cookies, packageResource, localizationService)
                     return packageResource.installData(pack);
                 }, vm.error)
             .then(function(pack) {
-                vm.state = installStateComplete;
+                vm.state = labels.installStateComplete;
                     return packageResource.cleanUp(pack);
                 }, vm.error)
             .then(vm.complete, vm.error);

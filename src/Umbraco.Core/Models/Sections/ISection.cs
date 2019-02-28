@@ -1,9 +1,9 @@
-﻿namespace Umbraco.Core.Models.Trees
+﻿namespace Umbraco.Core.Models.Sections
 {
     /// <summary>
     /// Defines a back office section.
     /// </summary>
-    public interface IBackOfficeSection
+    public interface ISection
     {
         /// <summary>
         /// Gets the alias of the section.
