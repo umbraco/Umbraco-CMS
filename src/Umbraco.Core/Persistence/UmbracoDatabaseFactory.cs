@@ -119,9 +119,23 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <inheritdoc />
-        public bool CanConnect => Configured && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
+        public bool CanConnect
+        {
+            get
+            {
+                if (!Configured || !DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName)) return false;
 
-        private DatabaseType DetectSqlServerVersion()
+                if (_serverVersionDetected) return true;
+
+                if (_databaseType.IsSqlServer())
+                    DetectSqlServerVersion();
+                _serverVersionDetected = true;
+
+                return true;
+            }
+        }
+
+        private void DetectSqlServerVersion()
         {
             // replace NPoco database type by a more efficient one
 
@@ -138,28 +152,22 @@ namespace Umbraco.Core.Persistence
                 fromSettings = true;
             }
 
-            DatabaseType databaseType;
             switch (versionName)
             {
                 case SqlServerSyntaxProvider.VersionName.V2008:
-                    databaseType = DatabaseType.SqlServer2008;
+                    _databaseType = DatabaseType.SqlServer2008;
                     break;
                 case SqlServerSyntaxProvider.VersionName.V2012:
                 case SqlServerSyntaxProvider.VersionName.V2014:
                 case SqlServerSyntaxProvider.VersionName.V2016:
                 case SqlServerSyntaxProvider.VersionName.V2017:
-                    databaseType = DatabaseType.SqlServer2012;
+                    _databaseType = DatabaseType.SqlServer2012;
                     break;
                 // else leave unchanged
-                default:
-                    databaseType = _databaseType;
-                    break;
             }
 
             _logger.Debug<UmbracoDatabaseFactory>("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
-                versionName, databaseType, fromSettings ? "settings" : "detected");
-
-            return databaseType;
+                versionName, _databaseType, fromSettings ? "settings" : "detected");
         }
 
         /// <inheritdoc />
@@ -215,9 +223,6 @@ namespace Umbraco.Core.Persistence
                     .WithFluentConfig(config)); // with proper configuration
 
                 if (_npocoDatabaseFactory == null) throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
-
-                if (_databaseType.IsSqlServer() && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName))
-                    _databaseType = DetectSqlServerVersion();
 
                 SqlContext = new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
 
