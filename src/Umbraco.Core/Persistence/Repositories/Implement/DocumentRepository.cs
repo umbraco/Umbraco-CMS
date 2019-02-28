@@ -450,7 +450,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 throw new InvalidOperationException("Cannot save a non-current version.");
 
             // update
-            entityBase?.UpdatingEntity();
+            entity.UpdatingEntity();
 
             var publishing = entity.PublishedState == PublishedState.Publishing;
 
