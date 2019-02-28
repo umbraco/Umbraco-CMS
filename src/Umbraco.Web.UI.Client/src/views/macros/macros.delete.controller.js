@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting macro items
  */
-function MacrosDeleteController($scope, $location, macroResource, navigationService, treeService, appState) {
+function MacrosDeleteController($scope, macroResource, navigationService, treeService) {
     var vm = this;
     
     vm.name = $scope.currentNode.name;
