@@ -8,6 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
@@ -238,7 +239,17 @@ namespace Umbraco.Web.Runtime
 
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
             composition.WithCollectionBuilder<DashboardCollectionBuilder>()
-                .Add(composition.TypeLoader.GetTypes<IDashboard>());
+                .Add<ContentDashboard>()
+                .Add<ExamineDashboard>()
+                .Add<FormsDashboard>()
+                .Add<HealthCheckDashboard>()
+                .Add<ManifestDashboard>()
+                .Add<MediaDashboard>()
+                .Add<MembersDashboard>()
+                .Add<PublishedStatusDashboard>()
+                .Add<RedirectUrlDashboard>()
+                .Add<RedirectUrlDashboard>()
+                .Add<SettingsDashboard>();
 
             // register back office trees
             // the collection builder only accepts types inheriting from TreeControllerBase
