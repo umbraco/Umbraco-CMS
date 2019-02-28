@@ -675,6 +675,9 @@ namespace Umbraco.Web.Routing
                 // TODO: When we remove the need for a database for templates, then this id should be irrelevant,
                 // not sure how were going to do this nicely.
 
+                // TODO: We need to limit altTemplate to only allow templates that are assigned to the current document type!
+                // if the template isn't assigned to the document type we should log a warning and return 404
+
                 var templateId = request.PublishedContent.TemplateId;
                 request.TemplateModel = GetTemplateModel(templateId);
             }
