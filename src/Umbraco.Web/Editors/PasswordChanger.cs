@@ -177,11 +177,11 @@ namespace Umbraco.Web.Editors
             //Are we resetting the password?
             //This flag indicates that either an admin user is changing another user's password without knowing the original password
             // or that the password needs to be reset to an auto-generated one.
-            if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
+            if (passwordModel.Reset.HasValue)
             {
                 //if a new password is supplied then it's an admin user trying to change another user's password without knowing the original password
                 //this is only possible when using a membership provider if the membership provider supports AllowManuallyChangingPassword
-                if (passwordModel.NewPassword.IsNullOrWhiteSpace() == false)
+                if (!passwordModel.Reset.Value && passwordModel.NewPassword.IsNullOrWhiteSpace() == false)
                 {
                     if (membershipProvider is MembershipProviderBase umbracoBaseProvider && umbracoBaseProvider.AllowManuallyChangingPassword)
                     {

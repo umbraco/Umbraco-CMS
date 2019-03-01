@@ -94,6 +94,8 @@
       //if there was a previously generated password displaying, clear it
       $scope.passwordValues.generatedPassword = null;
       $scope.passwordValues.confirm = null;
+      $scope.passwordValues.reset = false;
+
     };
 
     $scope.cancelChange = function () {
