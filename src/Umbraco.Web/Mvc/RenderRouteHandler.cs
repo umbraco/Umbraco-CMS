@@ -86,7 +86,7 @@ namespace Umbraco.Web.Mvc
         internal void SetupRouteDataForRequest(ContentModel contentModel, RequestContext requestContext, PublishedRequest frequest)
         {
             //put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
-            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, contentModel); //required for the RenderModelBinder and view engine
+            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, contentModel); //required for the ContentModelBinder and view engine
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.PublishedDocumentRequestDataToken, frequest); //required for RenderMvcController
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, UmbracoContext); //required for UmbracoViewPage
         }
@@ -260,7 +260,7 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
-        /// Returns a RouteDefinition object based on the current renderModel
+        /// Returns a RouteDefinition object based on the current content request
         /// </summary>
         /// <param name="requestContext"></param>
         /// <param name="request"></param>

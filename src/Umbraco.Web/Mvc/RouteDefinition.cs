@@ -19,7 +19,7 @@ namespace Umbraco.Web.Mvc
 
 
         /// <summary>
-        /// The current RenderModel found for the request
+        /// Everything related to the current content request including the requested content
         /// </summary>
         public PublishedRequest PublishedRequest { get; set; }
 
