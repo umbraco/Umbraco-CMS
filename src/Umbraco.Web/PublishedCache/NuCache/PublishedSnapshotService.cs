@@ -44,9 +44,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
-        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
+        private readonly IPublishedModelFactory _publishedModelFactory;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -88,8 +88,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IEntityXmlSerializer entitySerializer)
+            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper,
+            IEntityXmlSerializer entitySerializer, IPublishedModelFactory publishedModelFactory)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -107,7 +107,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _publishedModelFactory = publishedModelFactory;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -167,7 +167,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _domainStore = new SnapDictionary<int, Domain>();
 
-            LoadCaches();
+            _publishedModelFactory.WithSafeLiveFactory(LoadCaches);
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
@@ -570,6 +570,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // But for NuCache... we cannot rebuild the cache now. So it will NOT work and we are not fixing it,
         // because now we should ALWAYS run with the database server messenger, and then the RefreshAll will
         // be processed as soon as we are configured and the messenger processes instructions.
+
+        // note: notifications for content type and data type changes should be invoked with the
+        // pure live model factory, if any, locked and refreshed - see ContentTypeCacheRefresher and
+        // DataTypeCacheRefresher
 
         public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {

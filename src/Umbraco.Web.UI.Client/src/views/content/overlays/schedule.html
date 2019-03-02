@@ -97,13 +97,13 @@
 
                             <label for="{{'saveVariantSelector_' + variant.language.culture}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
-                            </label>
 
-                            <div class="umb-permission__description"
-                                 ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                                <umb-variant-state variant="variant"></umb-variant-state>
-                                <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                            </div>
+                                <span class="db umb-permission__description"
+                                      ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                    <umb-variant-state variant="variant"></umb-variant-state>
+                                    <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                                </span>
+                            </label>
 
                             <div class="flex items-center" style="margin-top: 10px; margin-bottom: 10px;">
 

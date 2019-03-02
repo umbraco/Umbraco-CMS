@@ -212,6 +212,7 @@
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
+    <Compile Include="PublishedModelFactoryExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Composing\WeightAttribute.cs" />

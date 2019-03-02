@@ -5,7 +5,7 @@
 * [Visual Studio 2017 Community (Free)](https://www.visualstudio.com/vs/community/), or Professional, Enterprise, etc... _(**Minimum of Version 15.7** or higher, this is important, you WILL get issues with lesser versions)_
 * .NET Framework 4.7.2 installed, get it here: https://www.microsoft.com/net/download/thank-you/net472?survey=false
 * .NET Framework 4.7.2 developer pack, get it here: https://www.microsoft.com/net/download/thank-you/net472-developer-pack _(be sure this is the ENU file which will be named `NDP472-DevPack-ENU.exe`)_
-* Clone the Umbraco repository using the `temp8` branch. If your git client doesn't support specifying the branch as you clone then use the command `git clone --single-branch -b temp8 <your fork url>`. _(If you clone the repo using the default v7 branch and then checkout the `temp8` branch you **might** get problems)_
+* Clone the Umbraco repository using the `dev-v8` branch. If your git client doesn't support specifying the branch as you clone then use the command `git clone --single-branch -b dev-v8 <your fork url>`. _(If you clone the repo using the default v7 branch and then checkout the `dev-v8` branch you **might** get problems)_
 
 ### Start the solution
 
