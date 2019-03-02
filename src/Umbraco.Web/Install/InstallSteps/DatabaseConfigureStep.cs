@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -53,7 +54,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
             else
             {
-                var password = database.Password;
+                var password = database.Password.Replace("'", "''");
                 password = string.Format("'{0}'", password);
 
                 _databaseBuilder.ConfigureDatabaseConnection(
