@@ -5,11 +5,11 @@
     /** configure some defaults on init */
     function configureDefaults() {
         $scope.model.config.enableRange = $scope.model.config.enableRange ? Object.toBoolean($scope.model.config.enableRange) : false;
-        $scope.model.config.initVal1 = $scope.model.config.initVal1 ? parseFloat($scope.model.config.initVal1) : 0;
-        $scope.model.config.initVal2 = $scope.model.config.initVal2 ? parseFloat($scope.model.config.initVal2) : 0;
-        $scope.model.config.minVal = $scope.model.config.minVal ? parseFloat($scope.model.config.minVal) : 0;
-        $scope.model.config.maxVal = $scope.model.config.maxVal ? parseFloat($scope.model.config.maxVal) : 100;
-        $scope.model.config.step = $scope.model.config.step ? parseFloat($scope.model.config.step) : 1;
+        $scope.model.config.initVal1 = $scope.model.config.initVal1 ? parseInt($scope.model.config.initVal1) : 0;
+        $scope.model.config.initVal2 = $scope.model.config.initVal2 ? parseInt($scope.model.config.initVal2) : 0;
+        $scope.model.config.minVal = $scope.model.config.minVal ? parseInt($scope.model.config.minVal) : 0;
+        $scope.model.config.maxVal = $scope.model.config.maxVal ? parseInt($scope.model.config.maxVal) : 100;
+        $scope.model.config.step = $scope.model.config.step ? parseInt($scope.model.config.step) : 1;
     }
 
     function setModelValue(values) {
