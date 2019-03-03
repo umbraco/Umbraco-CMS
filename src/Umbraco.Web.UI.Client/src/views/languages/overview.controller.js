@@ -84,7 +84,7 @@
                 overlayService.open(dialog);
             });
 
-            event.preventDefault()
+            event.preventDefault();
             event.stopPropagation();
         }
 
