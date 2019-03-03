@@ -213,7 +213,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             updateModel();
         }
 
-        $scope.getName = function (idx) {
+        $scope.getName = function (node, idx) {
 
             var name = "Item " + (idx + 1);
 
@@ -240,10 +240,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             }
 
             // Update the nodes actual name value
-            if ($scope.nodes[idx].name !== name) {
-                $scope.nodes[idx].name = name;
+            if (node.name !== name) {
+                node.name = name;
             }
-
 
             return name;
         };

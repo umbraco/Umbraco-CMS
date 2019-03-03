@@ -9,7 +9,7 @@
 
                 <div class="umb-nested-content__header-bar" ng-click="$parent.editNode(node, $event)" ng-hide="$parent.singleMode">
 
-                    <div class="umb-nested-content__heading" ng-class="{'-with-icon': showIcons}"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-bind="$parent.getName($index)"></span></div>
+                    <div class="umb-nested-content__heading" ng-class="{'-with-icon': showIcons}"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-bind="$parent.getName(node, $index)"></span></div>
 
                     <div class="umb-nested-content__icons">
                         <a class="umb-nested-content__icon umb-nested-content__icon--edit" localize="title" title="general_edit" ng-class="{ 'umb-nested-content__icon--active' : $parent.realCurrentNode.id == node.id }" ng-click="$parent.editNode(node, $event)" ng-show="$parent.maxItems > 1" prevent-default>
