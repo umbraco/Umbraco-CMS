@@ -23,7 +23,35 @@
         $scope.sortableOptions = {
             axis: 'y',
             cursor: "move",
-            handle: ".icon-navigation"
+            handle: ".handle",
+            placeholder: 'sortable-placeholder',
+            forcePlaceholderSize: true,
+            helper: function (e, ui) {
+                // When sorting table rows, the cells collapse. This helper fixes that: https://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
+                ui.children().each(function () {
+                    $(this).width($(this).width());
+                });
+                return ui;
+            },
+            start: function (e, ui) {
+
+                var cellHeight = ui.item.height();
+
+                // Build a placeholder cell that spans all the cells in the row: https://stackoverflow.com/questions/25845310/jquery-ui-sortable-and-table-cell-size
+                var cellCount = 0;
+                $('td, th', ui.helper).each(function () {
+                    // For each td or th try and get it's colspan attribute, and add that or 1 to the total
+                    var colspan = 1;
+                    var colspanAttr = $(this).attr('colspan');
+                    if (colspanAttr > 1) {
+                        colspan = colspanAttr;
+                    }
+                    cellCount += colspan;
+                });
+
+                // Add the placeholder UI - note that this is the item's content, so td rather than tr - and set height of tr
+                ui.placeholder.html('<td colspan="' + cellCount + '"></td>').height(cellHeight);
+            }
         };
 
         $scope.docTypeTabs = {};
