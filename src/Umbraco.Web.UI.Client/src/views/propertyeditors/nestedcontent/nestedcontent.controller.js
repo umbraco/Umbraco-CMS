@@ -12,8 +12,7 @@
                 ncAlias: "",
                 ncTabAlias: "",
                 nameTemplate: ""
-            }
-            );
+            });
         }
 
         $scope.remove = function (index) {
@@ -61,16 +60,12 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "$scope",
     "$interpolate",
     "$filter",
-    "$timeout",
     "contentResource",
     "localizationService",
+    "overlayService",
     "iconHelper",
 
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
-
-        //$scope.model.config.contentTypes;
-        //$scope.model.config.minItems;
-        //$scope.model.config.maxItems;
+    function ($scope, $interpolate, $filter, contentResource, localizationService, overlayService, iconHelper) {
 
         var inited = false;
 
@@ -166,6 +161,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         };
 
         $scope.editNode = function (idx) {
+            
             if ($scope.currentNode && $scope.currentNode.key == $scope.nodes[idx].key) {
                 $scope.currentNode = undefined;
             } else {
@@ -173,23 +169,47 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             }
         };
 
-        $scope.deleteNode = function (idx) {
+        $scope.deleteNode = function (node, event) {
+
+            const dialog = {
+                view: "views/propertyeditors/nestedcontent/overlays/delete.html",
+                submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                node: node,
+                submit: function (model) {
+                    performDelete(model.node);
+                    overlayService.close();
+                },
+                close: function () {
+                    overlayService.close();
+                }
+            };
+
             if ($scope.nodes.length > $scope.model.config.minItems) {
                 if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes == 1) {
-                    localizationService.localize('content_nestedContentDeleteItem').then(function (value) {
-                        if (confirm(value)) {
-                            $scope.nodes.splice(idx, 1);
-                            $scope.setDirty();
-                            updateModel();
-                        }
+
+                    localizationService.localize("general_delete").then(value => {
+                        dialog.title = value;
+                        overlayService.open(dialog);
                     });
+
                 } else {
-                    $scope.nodes.splice(idx, 1);
-                    $scope.setDirty();
-                    updateModel();
+                    performDelete(node);
                 }
             }
-        };
+
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        function performDelete(node) {
+
+            // remove from list
+            var index = $scope.nodes.indexOf(node);
+            $scope.nodes.splice(index, 1);
+
+            $scope.setDirty();
+            updateModel();
+        }
 
         $scope.getName = function (idx) {
 
