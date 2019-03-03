@@ -160,13 +160,15 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.overlayMenu.show = true;
         };
 
-        $scope.editNode = function (idx) {
+        $scope.editNode = function (node, event) {
             
-            if ($scope.currentNode && $scope.currentNode.key == $scope.nodes[idx].key) {
+            if ($scope.currentNode && $scope.currentNode.key == node.key) {
                 $scope.currentNode = undefined;
             } else {
-                $scope.currentNode = $scope.nodes[idx];
+                $scope.currentNode = node;
             }
+
+            event.stopPropagation();
         };
 
         $scope.deleteNode = function (node, event) {
