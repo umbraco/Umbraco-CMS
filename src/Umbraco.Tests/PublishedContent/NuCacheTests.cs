@@ -180,8 +180,8 @@ namespace Umbraco.Tests.PublishedContent
                 dataSource,
                 globalSettings,
                 new SiteDomainHelper(),
-                contentTypeServiceBaseFactory,
-                Mock.Of<IEntityXmlSerializer>());
+                Mock.Of<IEntityXmlSerializer>(),
+                Mock.Of<IPublishedModelFactory>());
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
