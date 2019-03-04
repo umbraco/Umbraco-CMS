@@ -17,7 +17,7 @@ namespace Umbraco.Core.Strings
         /// Converts an Utf8 string into an Ascii string.
         /// </summary>
         /// <param name="text">The text to convert.</param>
-        /// <param name="fail">The character to used to replace characters that cannot properly be converted.</param>
+        /// <param name="fail">The character to use to replace characters that cannot properly be converted.</param>
         /// <returns>The converted text.</returns>
         public static string ToAsciiString(string text, char fail = '?')
         {
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Strings
         /// Converts an Utf8 string into an array of Ascii characters.
         /// </summary>
         /// <param name="text">The text to convert.</param>
-        /// <param name="fail">The character to used to replace characters that cannot properly be converted.</param>
+        /// <param name="fail">The character to use to replace characters that cannot properly be converted.</param>
         /// <returns>The converted text.</returns>
         public static char[] ToAsciiCharArray(string text, char fail = '?')
         {
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Strings
         /// </summary>
         /// <param name="input">The input array.</param>
         /// <param name="output">The output array.</param>
-        /// <param name="fail">The character to used to replace characters that cannot properly be converted.</param>
+        /// <param name="fail">The character to use to replace characters that cannot properly be converted.</param>
         /// <returns>The number of characters in the output array.</returns>
         /// <remarks>The caller must ensure that the output array is big enough.</remarks>
         /// <exception cref="OverflowException">The output array is not big enough.</exception>
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Strings
         /// <param name="ipos">The input position.</param>
         /// <param name="output">The output array.</param>
         /// <param name="opos">The output position.</param>
-        /// <param name="fail">The character to used to replace characters that cannot properly be converted.</param>
+        /// <param name="fail">The character to use to replace characters that cannot properly be converted.</param>
         /// <remarks>
         /// <para>Adapted from various sources on the 'net including <c>Lucene.Net.Analysis.ASCIIFoldingFilter</c>.</para>
         /// <para>Input should contain Utf8 characters exclusively and NOT Unicode.</para>
