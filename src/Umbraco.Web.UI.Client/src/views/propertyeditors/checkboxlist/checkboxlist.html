@@ -2,14 +2,7 @@
 
     <ul class="unstyled">
         <li ng-repeat="item in selectedItems track by item.key">
-            <label class="checkbox">
-                <input type="checkbox" name="checkboxlist"
-                       value="{{item.value}}"
-                       ng-model="item.checked"
-                       ng-change="changed(item)"
-                       ng-required="model.validation.mandatory && !model.value.length" />
-                {{item.val}}
-            </label>
+            <umb-checkbox name="checkboxlist" value="{{item.key}}" model="item" text="{{item.val}}" onChange="changed(item)"></umb-checkbox>
         </li>
     </ul>
 
