@@ -1,7 +1,7 @@
 @checkboxWidth: 15px;
 @checkboxHeight: 15px;
 
-.umb-form-control{
+.umb-form-check {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -21,19 +21,19 @@
         left: 0;
         opacity: 0;
 
-        &:checked ~ .umb-form-control__state .umb-form-control__check{
+        &:checked ~ .umb-form-check__state .umb-form-check__check{
             border-color: @green;
         }
 
-        &:focus:checked ~ .umb-form-control .umb-form-control__check,
-        &:focus ~ .umb-form-control__state .umb-form-control__check{
+        &:focus:checked ~ .umb-form-check .umb-form-check__check,
+        &:focus ~ .umb-form-check__state .umb-form-check__check{
             border-color: @gray-5;
         }
 
-        &:checked ~ .umb-form-control__state{
-            .umb-form-control__check{
+        &:checked ~ .umb-form-check__state{
+            .umb-form-check__check{
                 // This only happens if the state has a radiobutton modifier
-                .umb-form-control--radiobutton &{
+                .umb-form-check--radiobutton &{
                     &:before{
                         opacity: 1;
                         transform: scale(1);
@@ -41,7 +41,7 @@
                 }
 
                 // This only happens if state has the checkbox modifier
-                .umb-form-control--checkbox &{
+                .umb-form-check--checkbox &{
                     &:before{
                         width: @checkboxWidth;
                         height: @checkboxHeight;
@@ -50,8 +50,8 @@
             }
 
             // This only happens if state has the checkbox modifier
-            .umb-form-control--checkbox &{
-                .umb-form-control__icon{
+            .umb-form-check--checkbox &{
+                .umb-form-check__icon{
                     opacity: 1;
                 }
             }
@@ -83,7 +83,7 @@
         }
 
         // This only happens if state has the radiobutton modifier
-        .umb-form-control--radiobutton &{
+        .umb-form-check--radiobutton &{
             border-radius: 100%;
 
             &:before{
@@ -97,7 +97,7 @@
         }
 
         // This only happens if state has the checkbox modifier
-        .umb-form-control--checkbox &{
+        .umb-form-check--checkbox &{
             &:before{
                 width: 0;
                 height: 0;
