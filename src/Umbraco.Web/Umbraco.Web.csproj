@@ -1186,6 +1186,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="WebViewPageExtensions.cs" />
+    <Compile Include="Runtime\WebFinalComponent.cs" />
+    <Compile Include="Runtime\WebFinalComposer.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="JavaScript\Resources.resx">

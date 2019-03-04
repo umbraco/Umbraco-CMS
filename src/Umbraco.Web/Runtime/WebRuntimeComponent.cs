@@ -90,9 +90,6 @@ namespace Umbraco.Web.Runtime
 
             // set routes
             CreateRoutes(_umbracoContextAccessor, _globalSettings, _surfaceControllerTypes, _apiControllerTypes);
-
-            // ensure WebAPI is initialized, after everything
-            GlobalConfiguration.Configuration.EnsureInitialized();
         }
 
         public void Terminate()
