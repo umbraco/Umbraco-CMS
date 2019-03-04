@@ -2862,7 +2862,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (blueprint == null) throw new ArgumentNullException(nameof(blueprint));
 
-            var contentType = _contentTypeRepository.Get(blueprint.ContentType.Id);
+            var contentType = GetContentType(blueprint.ContentType.Alias);
             var content = new Content(name, -1, contentType);
             content.Path = string.Concat(content.ParentId.ToString(), ",", content.Id);
 
