@@ -248,7 +248,6 @@ namespace Umbraco.Web.Runtime
                 .Add<MembersDashboard>()
                 .Add<PublishedStatusDashboard>()
                 .Add<RedirectUrlDashboard>()
-                .Add<RedirectUrlDashboard>()
                 .Add<SettingsDashboard>();
 
             // register back office trees
