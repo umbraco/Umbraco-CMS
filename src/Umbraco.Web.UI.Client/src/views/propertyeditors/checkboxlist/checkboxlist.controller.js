@@ -64,7 +64,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
         }
 
         function changed(item) {
-            debugger;
+            
             var index = _.findIndex($scope.model.value,
                 function (v) {
                     return v === item.val;

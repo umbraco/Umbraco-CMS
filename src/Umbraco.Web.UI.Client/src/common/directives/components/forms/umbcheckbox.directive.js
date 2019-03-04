@@ -54,6 +54,3 @@
     angular.module('umbraco.directives').directive('umbCheckbox', CheckboxDirective);
 
 })();
-
-
-
