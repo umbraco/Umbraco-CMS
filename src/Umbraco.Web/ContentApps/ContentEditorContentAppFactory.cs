@@ -18,7 +18,7 @@ namespace Umbraco.Web.ContentApps
         {
             switch (o)
             {
-                case IContent _:
+                case IContent content when content.Properties.Count > 0:
                     return _contentApp ?? (_contentApp = new ContentApp
                     {
                         Alias = "umbContent",
@@ -27,6 +27,9 @@ namespace Umbraco.Web.ContentApps
                         View = "views/content/apps/content/content.html",
                         Weight = Weight
                     });
+
+                case IContent _:
+                    return null;
 
                 case IMedia media when !media.ContentType.IsContainer && media.ContentType.Alias != Core.Constants.Conventions.MediaTypes.Folder:
                     return _mediaApp ?? (_mediaApp = new ContentApp

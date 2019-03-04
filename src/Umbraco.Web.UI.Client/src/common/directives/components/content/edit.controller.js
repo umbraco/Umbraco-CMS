@@ -55,9 +55,9 @@
                 }
                 
             }
-            
+
             // if we still dont have a app, lets show the first one:
-            if (isAppPresent === false) {
+            if (isAppPresent === false && content.apps.length) {
                 content.apps[0].active = true;
                 $scope.appChanged(content.apps[0]);
             }
