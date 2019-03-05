@@ -1,7 +1,7 @@
 ﻿<div class="umb-property-editor umb-radiobuttons" ng-controller="Umbraco.PropertyEditors.RadioButtonsController">
     <ul class="unstyled">
         <li ng-repeat="item in configItems track by item.id">
-            <umb-radiobutton name="{{model.alias}}" value="{{item.id}}" model="model.value" text="{{item.value}}"></umb-radiobutton>
+            <umb-radiobutton name="{{model.alias}}" value="{{item.id}}" model="model.value" text="{{item.value}}" required="model.validation.mandatory && model.value == ''"></umb-radiobutton>
         </li>
     </ul>
 </div>

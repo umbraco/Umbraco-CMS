@@ -71,15 +71,15 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             var index = _.findIndex($scope.model.value,
                 function (v) {
                     return v === item.val;
-                });
+                }
+            );
             
             if (item.checked) {
                 //if it doesn't exist in the model, then add it
                 if (index < 0) {
                     $scope.model.value.push(item.val);
                 }
-            }
-            else {
+            } else {
                 //if it exists in the model, then remove it
                 if (index >= 0) {
                     $scope.model.value.splice(index, 1);

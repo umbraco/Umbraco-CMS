@@ -41,7 +41,8 @@
                 model: "=",
                 value: "@",
                 name: "@",
-                text: "@"
+                text: "@",
+                required: "="
             }
         };
 

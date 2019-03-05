@@ -43,7 +43,8 @@
                 value: "@",
                 name: "@",
                 text: "@",
-                onChange: "="
+                required: "=",
+                onChange: "&"
             }
         };
 
