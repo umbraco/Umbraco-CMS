@@ -8,11 +8,13 @@
     position: relative;
     padding: 0;
     margin: 0;
+    min-height: 22px;
+    cursor: pointer !important;
 
     &__text{
         margin: 0 0 0 26px;
         position: relative;
-        top: 2px;
+        top: -1px;
     }
 
     &__input{
@@ -22,12 +24,12 @@
         opacity: 0;
 
         &:checked ~ .umb-form-check__state .umb-form-check__check{
-            border-color: @green;
+            border-color: @ui-option-type;
         }
 
         &:focus:checked ~ .umb-form-check .umb-form-check__check,
         &:focus ~ .umb-form-check__state .umb-form-check__check{
-            border-color: @gray-5;
+            border-color: @inputBorderFocus;
         }
 
         &:checked ~ .umb-form-check__state{
@@ -67,13 +69,13 @@
 
     &__check{
         position: relative;
-        border: 1px solid @gray-7;
+        border: 1px solid @inputBorder;
         width: @checkboxWidth;
         height: @checkboxHeight;
 
         &:before{
             content: "";
-            background: @green;
+            background: @ui-option-type;
             position: absolute;
             left: 0;
             right: 0;
