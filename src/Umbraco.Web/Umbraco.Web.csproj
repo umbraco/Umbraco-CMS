@@ -253,7 +253,7 @@
     <Compile Include="PropertyEditors\PropertyEditorsComposer.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComposer.cs" />
     <Compile Include="Routing\RedirectTrackingComposer.cs" />
-    <Compile Include="Runtime\WebRuntimeComposer.cs" />
+    <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Scheduling\SchedulerComposer.cs" />
     <Compile Include="Search\ExamineComposer.cs" />
     <Compile Include="Search\GenericIndexDiagnostics.cs" />
@@ -605,7 +605,7 @@
     <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
     <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
     <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
-    <Compile Include="Runtime\WebRuntimeComponent.cs" />
+    <Compile Include="Runtime\WebInitialComponent.cs" />
     <Compile Include="Editors\PublishedStatusController.cs" />
     <Compile Include="Editors\NuCacheStatusController.cs" />
     <Compile Include="Actions\ActionAssignDomain.cs" />

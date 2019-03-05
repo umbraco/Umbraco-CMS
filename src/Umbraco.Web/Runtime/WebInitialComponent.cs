@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
@@ -15,56 +14,33 @@ using ClientDependency.Core.Config;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
 using Umbraco.Web.Install;
 using Umbraco.Web.JavaScript;
-using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
-using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
 {
-    public sealed class WebRuntimeComponent : IComponent
+    public sealed class WebInitialComponent : IComponent
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly SurfaceControllerTypeCollection _surfaceControllerTypes;
         private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
-        private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IUserService _userService;
-        private readonly IUmbracoSettingsSection _umbracoSettings;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IVariationContextAccessor _variationContextAccessor;
-        private readonly UrlProviderCollection _urlProviders;
 
-        public WebRuntimeComponent(
+        public WebInitialComponent(
             IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
-            IPublishedSnapshotService publishedSnapshotService,
-            IUserService userService,
-            IUmbracoSettingsSection umbracoSettings,
-            IGlobalSettings globalSettings,
-            IVariationContextAccessor variationContextAccessor,
-            UrlProviderCollection urlProviders)
+            IGlobalSettings globalSettings)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;
             _apiControllerTypes = apiControllerTypes;
-            _publishedSnapshotService = publishedSnapshotService;
-            _userService = userService;
-            _umbracoSettings = umbracoSettings;
             _globalSettings = globalSettings;
-            _variationContextAccessor = variationContextAccessor;
-            _urlProviders = urlProviders;
         }
 
         public void Initialize()
