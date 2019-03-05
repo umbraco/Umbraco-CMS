@@ -20,6 +20,6 @@
 
     }
     
-    angular.module("umbraco.directives").directive("umbGridHackScope", umbGridHackScope);
+    angular.module("umbraco").directive("umbGridHackScope", umbGridHackScope);
 
 })();
