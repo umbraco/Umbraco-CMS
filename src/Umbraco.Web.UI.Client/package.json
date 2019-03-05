@@ -50,6 +50,7 @@
     "cssnano": "4.1.7",
     "fs": "0.0.2",
     "gulp": "^3.9.1",
+    "gulp-angular-embed-templates": "^2.3.0",
     "gulp-babel": "8.0.0",
     "gulp-clean-css": "4.0.0",
     "gulp-cli": "^2.0.1",
