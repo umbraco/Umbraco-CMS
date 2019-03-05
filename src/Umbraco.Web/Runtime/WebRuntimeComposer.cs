@@ -156,12 +156,11 @@ namespace Umbraco.Web.Runtime
                 .Add(() => composition.TypeLoader.GetTypes<IAction>());
 
             //we need to eagerly scan controller types since they will need to be routed
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(composition.TypeLoader.GetSurfaceControllers());
-            composition.RegisterUnique(surfaceControllerTypes);
-
-            //we need to eagerly scan controller types since they will need to be routed
-            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(composition.TypeLoader.GetUmbracoApiControllers());
-            composition.RegisterUnique(umbracoApiControllerTypes);
+            composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
+                .Add(composition.TypeLoader.GetSurfaceControllers());
+            var umbracoApiControllerTypes = composition.TypeLoader.GetUmbracoApiControllers().ToList();
+            composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+                .Add(umbracoApiControllerTypes);
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We HAVE to remove one of them

@@ -204,6 +204,7 @@
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
+    <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
@@ -603,6 +604,7 @@
     <Compile Include="Editors\Filters\MemberSaveValidationAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
+    <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
     <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
     <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
     <Compile Include="Runtime\WebRuntimeComponent.cs" />
