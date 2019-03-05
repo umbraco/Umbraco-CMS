@@ -1,6 +1,6 @@
-> Looking for the source code of the **next Umbraco major version**? Click [here](https://github.com/umbraco/Umbraco-CMS/tree/temp8) to go to the v8 development branch and contribute!
+> Looking for the source code of the **previous Umbraco major version**? Click [here](https://github.com/umbraco/Umbraco-CMS/tree/dev-v7) to go to the v7 development branch and contribute!
 
-# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://ci.appveyor.com/api/projects/status/6by6harxtxt0ocdx/branch/dev-v7?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-b2cri/branch/dev-v7) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/umbraco/Umbraco-CMS) [![pullreminders](https://pullreminders.com/badge.svg)](https://pullreminders.com?ref=badge)
+# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://ci.appveyor.com/api/projects/status/6by6harxtxt0ocdx/branch/dev-v8?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-b2cri/branch/dev-v8) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/umbraco/Umbraco-CMS) [![pullreminders](https://pullreminders.com/badge.svg)](https://pullreminders.com?ref=badge)
 
 Umbraco is a fully-featured, open source Content Management System loved by thousands for its flexibility and great editing experience.
 
@@ -23,7 +23,7 @@ Please also see our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 There are a couple of ways you can start playing with Umbraco CMS. The recommended way to install and run Umbraco always depends on your project and purpose. Here you can find short guides for the most common scenarios:
 
-- [Building Umbraco from source code](https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/.github/BUILD.md)
+- [Building Umbraco from source code](https://github.com/umbraco/Umbraco-CMS/blob/dev-v8/.github/BUILD.md)
 - [Dowloading Umbraco from Our or NuGet](https://our.umbraco.com/download)
 - [Using Umbraco Cloud Trial](https://umbraco.com/pricing/) (always the latest, cloud-based & hosted instance free for 14 days ready to preview in less than 2 minutes)
 
