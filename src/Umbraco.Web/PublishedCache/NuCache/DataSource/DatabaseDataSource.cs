@@ -223,6 +223,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     p = new ContentData
                     {
                         Name = dto.PubName,
+                        UrlSegment = nested.UrlSegment,
                         Published = true,
                         TemplateId = dto.PubTemplateId,
                         VersionId = dto.VersionId,

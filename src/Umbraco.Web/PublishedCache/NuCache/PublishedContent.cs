@@ -31,7 +31,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             VariationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
 
-            _urlSegment = ContentData.Name.ToUrlSegment();
+            _urlSegment = ContentData.UrlSegment;
             IsPreviewing = ContentData.Published == false;
 
             var properties = new List<IPublishedProperty>();
@@ -276,8 +276,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (ContentData.CultureInfos == null)
                     throw new Exception("oops: _contentDate.CultureInfos is null.");
+
                 return _cultureInfos = ContentData.CultureInfos
-                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date), StringComparer.OrdinalIgnoreCase);
+                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date), StringComparer.OrdinalIgnoreCase);
             }
         }
 
