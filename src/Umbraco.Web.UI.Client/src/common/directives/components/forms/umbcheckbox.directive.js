@@ -41,7 +41,8 @@
                 model: "=",
                 value: "@",
                 name: "@",
-                text: "@"
+                text: "@",
+                required: "="
             }
         };
 
@@ -52,6 +53,3 @@
     angular.module('umbraco.directives').directive('umbCheckbox', CheckboxDirective);
 
 })();
-
-
-
