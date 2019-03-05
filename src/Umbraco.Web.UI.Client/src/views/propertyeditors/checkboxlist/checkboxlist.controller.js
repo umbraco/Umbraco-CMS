@@ -37,13 +37,16 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             //check if it's already in sync
 
             //get the checked vals from the view model
-            var selectedVals = _.map(_.filter($scope.selectedItems,
+            var selectedVals = _.map(
+                _.filter($scope.selectedItems,
                     function(f) {
                         return f.checked;
-                    }),
+                    }
+                ),
                 function(m) {
                     return m.value;
-                });
+                }
+            );
             //get all of the same values between the arrays
             var same = _.intersection($scope.model.value, selectedVals);
             //if the lengths are the same as the value, then we are in sync, just exit

@@ -2,7 +2,7 @@
 
     <ul class="unstyled">
         <li ng-repeat="item in selectedItems track by item.key">
-            <umb-checkbox name="checkboxlist" value="{{item.key}}" model="item" text="{{item.val}}" on-change="changed(item)"></umb-checkbox>
+            <umb-checkbox name="{{model.alias}}" value="{{item.key}}" model="item" text="{{item.val}}" on-change="changed(item)"></umb-checkbox>
         </li>
     </ul>
 
