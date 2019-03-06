@@ -5,7 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Upgrade.V_7_12_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_14_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -170,7 +170,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             From("{init-7.12.4}").To("{init-7.10.0}"); // same as 7.12.0
             From("{init-7.13.0}").To("{init-7.10.0}"); // same as 7.12.0
             From("{init-7.13.1}").To("{init-7.10.0}"); // same as 7.12.0
-
+                
             // 7.14.0 has migrations, handle it...
             //  clone going from 7.10 to 1350617A (the last one before we started to merge 7.12 migrations), then
             //  clone going from CF51B39B (after 7.12 migrations) to 0009109C (the last one before we started to merge 7.12 migrations),
