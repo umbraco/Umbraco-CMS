@@ -20,6 +20,12 @@
             supportsDimensions: ""
         };
 
+        if ($scope.model.original) {
+            angular.extend($scope.model.embed, $scope.model.original);
+
+            showPreview();
+        }
+
         vm.showPreview = showPreview;
         vm.changeSize = changeSize;
         vm.submit = submit;
@@ -41,7 +47,6 @@
                 $scope.model.embed.info = "";
                 $scope.model.embed.success = false;
 
-
                 $http({
                     method: 'GET',
                     url: umbRequestHelper.getApiUrl("embedApiBaseUrl", "GetEmbed"),
@@ -53,7 +58,6 @@
                 }).then(function(response) {
 
                     $scope.model.embed.preview = "";
-
 
                     switch (response.data.OEmbedStatus) {
                         case 0:
