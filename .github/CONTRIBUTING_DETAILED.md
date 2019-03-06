@@ -103,7 +103,7 @@ There's two big areas that you should know about:
   1. The Umbraco backoffice is a extensible AngularJS app and requires you to run a `gulp dev` command while you're working with it, so changes are copied over to the appropriate directories and you can refresh your browser to view the results of your changes.
   You may need to run the following commands to set up gulp properly:
   ```
-  npm cache clean
+  npm cache clean --force
   npm install
   npm run build
   ```
