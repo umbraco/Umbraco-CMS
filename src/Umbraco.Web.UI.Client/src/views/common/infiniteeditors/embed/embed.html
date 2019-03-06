@@ -16,7 +16,7 @@
                     <umb-box-content>
 
                         <umb-control-group label="@general_url">
-                            <input id="url" class="umb-property-editor input-block-level" type="text" style="margin-bottom: 10px;" ng-model="model.embed.url" ng-keyup="$event.keyCode == 13 ? vm.showPreview() : null" required />
+                            <input type="text" id="url" class="umb-property-editor input-block-level" ng-model="model.embed.url" ng-keyup="$event.keyCode == 13 ? vm.showPreview() : null" required />
                             <umb-button
                                 type="button"
                                 action="vm.showPreview()"
