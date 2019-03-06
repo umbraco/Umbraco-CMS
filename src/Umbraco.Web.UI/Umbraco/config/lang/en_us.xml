@@ -1240,6 +1240,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% can not be published, because a parent page is not published.
     ]]></key>
+    <key alias="contentPublishedFailedByMissingName"><![CDATA[
+      %0% can not be published, because its missing a name.
+    ]]></key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
     <key alias="nodePublish">%0% has been published</key>
