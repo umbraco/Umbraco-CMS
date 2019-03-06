@@ -195,7 +195,9 @@ namespace Umbraco.Web.Editors
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Alias, display.Content, master);
+                // we need to pass the template name as alias to keep the template file casing consistent with templates created with content
+                // - see comment in FileService.CreateTemplateForContentType for additional details
+                var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Name, display.Content, master);
                 Mapper.Map(template, display);
             }
 
