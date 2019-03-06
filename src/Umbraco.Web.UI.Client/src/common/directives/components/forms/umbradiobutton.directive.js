@@ -12,7 +12,7 @@
     <div ng-controller="My.Controller as vm">
 
         <umb-radiobutton
-            name="checkboxlist"
+            name="radiobuttonlist"
             value="{{key}}"
             model="true"
             text="{{text}}">
