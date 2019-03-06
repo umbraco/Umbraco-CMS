@@ -44,7 +44,6 @@
 
             if ($scope.model.embed.url) {
                 $scope.model.embed.show = true;
-                $scope.model.embed.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
                 $scope.model.embed.info = "";
                 $scope.model.embed.success = false;
 
