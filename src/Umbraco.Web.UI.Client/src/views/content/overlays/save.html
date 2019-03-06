@@ -34,11 +34,11 @@
                                 </span>
 
                                 <span class="db" ng-messages="saveVariantSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
-                                    <span class="db umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
+                                    <span class="db umb-permission__description text-error" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
                                 </span>
 
                                 <span class="db" ng-repeat="notification in variant.notifications">
-                                    <span class="db umb-permission__description" style="color: #1FB572;">{{notification.message}}</span>
+                                    <span class="db umb-permission__description text-success">{{notification.message}}</span>
                                 </span>
                             </label>
                         </div>
@@ -77,11 +77,11 @@
                                 </span>
 
                                 <span class="db" ng-messages="saveVariantSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
-                                    <span class="db umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
+                                    <span class="db umb-permission__description text-error" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
                                 </span>
 
                                 <span class="db" ng-repeat="notification in variant.notifications">
-                                    <span class="db umb-permission__description" style="color: #1FB572;">{{notification.message}}</span>
+                                    <span class="db umb-permission__description text-success">{{notification.message}}</span>
                                 </span>
                             </label>
                         </div>
@@ -109,7 +109,7 @@
                     </div>
 
                     <div ng-repeat="notification in variant.notifications">
-                        <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                        <div class="umb-permission__description text-success">{{notification.message}}</div>
                     </div>
                 </div>
             </div>
