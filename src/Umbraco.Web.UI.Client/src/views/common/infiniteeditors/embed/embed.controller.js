@@ -7,6 +7,7 @@
         var origWidth = 500;
         var origHeight = 300;
 
+        vm.loading = false;
         vm.trustedPreview = null;
 
         $scope.model.embed = {
@@ -47,6 +48,8 @@
                 $scope.model.embed.info = "";
                 $scope.model.embed.success = false;
 
+                vm.loading = true;
+
                 $http({
                     method: 'GET',
                     url: umbRequestHelper.getApiUrl("embedApiBaseUrl", "GetEmbed"),
@@ -75,12 +78,16 @@
                             $scope.model.embed.success = true;
                             break;
                     }
+
+                    vm.loading = false;
+
                 }, function() {
                     $scope.model.embed.supportsDimensions = false;
                     $scope.model.embed.preview = "";
                     $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
-                });
 
+                    vm.loading = false;
+                });
             } else {
                 $scope.model.embed.supportsDimensions = false;
                 $scope.model.embed.preview = "";
