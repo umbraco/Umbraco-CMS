@@ -242,7 +242,7 @@ namespace Umbraco.Core.Runtime
                 }
                 catch
                 {
-                    timer.Fail();
+                    timer?.Fail();
                     throw;
                 }
             }
