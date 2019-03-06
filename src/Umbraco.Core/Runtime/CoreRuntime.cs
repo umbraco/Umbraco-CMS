@@ -168,7 +168,7 @@ namespace Umbraco.Core.Runtime
                     _state.BootFailedException = bfe;
                 }
 
-                timer.Fail(exception: bfe); // be sure to log the exception - even if we repeat ourselves
+                timer?.Fail(exception: bfe); // be sure to log the exception - even if we repeat ourselves
 
                 // if something goes wrong above, we may end up with no factory
                 // meaning nothing can get the runtime state, etc - so let's try
