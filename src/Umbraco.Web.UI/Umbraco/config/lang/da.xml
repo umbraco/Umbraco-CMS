@@ -582,6 +582,7 @@
     <key alias="closewindow">Luk vindue</key>
     <key alias="comment">Kommentar</key>
     <key alias="confirm">Bekræft</key>
+    <key alias="constrain">Proportioner</key>
     <key alias="constrainProportions">Behold proportioner</key>
     <key alias="content">Indhold</key>
     <key alias="continue">Fortsæt</key>
