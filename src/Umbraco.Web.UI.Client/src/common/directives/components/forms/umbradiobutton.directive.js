@@ -25,7 +25,8 @@
 @param {string} value Set the value of the radiobutton.
 @param {string} name Set the name of the radiobutton.
 @param {string} text Set the text for the radiobutton label.
-
+@param {boolean} disabled Set the radiobutton to be disabled.
+@param {boolean} required Set the radiobutton to be required.
 
 **/
 
@@ -42,6 +43,7 @@
                 value: "@",
                 name: "@",
                 text: "@",
+                disabled: "=",
                 required: "="
             }
         };

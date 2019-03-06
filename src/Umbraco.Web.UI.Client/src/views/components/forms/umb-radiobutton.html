@@ -1,8 +1,9 @@
-<label class="radio umb-form-check umb-form-check--radiobutton">
+<label class="radio umb-form-check umb-form-check--radiobutton" ng-class="{ 'umb-form-check--disabled': disabled }">
     <input type="radio" name="{{name}}"
         value="{{value}}"
-        ng-model="model"
         class="umb-form-check__input"
+        ng-model="model"
+        ng-disabled="disabled"
         ng-required="required" />
 
     <div class="umb-form-check__state umb-form-check__state" aria-hidden="true">

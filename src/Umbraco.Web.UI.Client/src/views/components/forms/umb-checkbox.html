@@ -1,8 +1,9 @@
-<label class="checkbox umb-form-check umb-form-check--checkbox">
+<label class="checkbox umb-form-check umb-form-check--checkbox" ng-class="{ 'umb-form-check--disabled': disabled }">
     <input type="checkbox" name="{{name}}"
            value="{{value}}"
-           ng-model="model.checked"
            class="umb-form-check__input"
+           ng-model="model.checked"
+           ng-disabled="disabled"
            ng-required="required"
            ng-change="onChange(model)"/>
 
