@@ -44,10 +44,11 @@
                                 </umb-control-group>
                 
                                 <umb-control-group label="@general_constrain">
-                                    <label>
+                                    <umb-toggle checked="model.embed.constrain" on-click="vm.toggleConstrain()" label-on="Constrain proportions"></umb-toggle>
+                                    <!--<label>
                                         <input type="checkbox" ng-model="model.embed.constrain" />
                                         <localize key="general_constrainProportions">Constrain proportions</localize>
-                                    </label>
+                                    </label>-->
                                 </umb-control-group>
                             </div>
 
@@ -71,6 +72,7 @@
                         button-style="success"
                         label-key="general_submit"
                         state="vm.saveButtonState"
+                        disabled="model.embed.url.length === 0"
                         action="vm.submit(model)">
                     </umb-button>
                 </umb-editor-footer-content-right>

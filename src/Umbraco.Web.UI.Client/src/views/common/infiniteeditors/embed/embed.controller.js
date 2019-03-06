@@ -27,6 +27,7 @@
             showPreview();
         }
 
+        vm.toggleConstrain = toggleConstrain;
         vm.showPreview = showPreview;
         vm.changeSize = changeSize;
         vm.submit = submit;
@@ -113,6 +114,10 @@
                showPreview();
            }
 
+       }
+
+       function toggleConstrain() {
+           $scope.model.embed.constrain = !$scope.model.embed.constrain;
        }
 
        function submit() {
