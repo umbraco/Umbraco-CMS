@@ -79,6 +79,10 @@
         };
 
         function checkIfTemplateExists() {
+            if ($scope.model.id === 0) {
+                return;
+            }
+
             var existingTemplate = vm.availableTemplates.find(function (availableTemplate) {
                 return (availableTemplate.name === $scope.model.name || availableTemplate.placeholder);
             });
