@@ -49,9 +49,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Snapshot;
-        }
+            => PropertyCacheLevel.Snapshot;
 
         private bool IsMultipleDataType(PublishedDataType dataType)
         {
@@ -71,7 +69,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (source == null) return null;
 
             var nodeIds = source.ToString()
-                .Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(Udi.Parse)
                 .ToArray();
             return nodeIds;
