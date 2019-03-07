@@ -166,11 +166,11 @@
                                    val-server-field="{{variant.htmlId}}" />
 
                             <div ng-messages="scheduleSelectorForm.saveVariantReleaseDate.$error" show-validation-on-submit>
-                                <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
+                                <div class="umb-permission__description text-error" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
                             </div>
 
                             <div ng-repeat="notification in variant.notifications">
-                                <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                                <div class="umb-permission__description text-success">{{notification.message}}</div>
                             </div>
 
                         </div>
