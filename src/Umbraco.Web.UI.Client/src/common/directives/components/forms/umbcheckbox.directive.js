@@ -42,9 +42,9 @@
         var vm = this;
         
         vm.callOnChange = function() {
-            $timeout(function(){
+            $timeout(function() {
                 vm.onChange({model:vm.model, value:vm.value});
-            }, 0, false);
+            }, 0);
         }
         
     }
