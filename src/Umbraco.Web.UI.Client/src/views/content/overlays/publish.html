@@ -13,14 +13,15 @@
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid || (variant.warnings && variant.warnings.length > 0)}">
             <ng-form name="publishVariantSelectorForm">
                 <div class="flex">
-                    <input id="{{variant.htmlId}}"
-                           name="publishVariantSelector"
-                           type="checkbox"
-                           ng-model="variant.publish"
-                           ng-change="vm.changeSelection(variant)"
-                           ng-disabled="(variant.canPublish === false)"
-                           style="margin-right: 8px;"
-                           val-server-field="{{variant.htmlId}}" />
+
+                    <umb-checkbox
+                        id="{{variant.htmlId}}"
+                        name="publishVariantSelector"
+                        type="checkbox"
+                        model="variant.publish"
+                        on-change="vm.changeSelection(variant)"
+                        disabled="(variant.canPublish === false)"
+                        server-validation-field="{{variant.htmlId}}"/>
                     <div>
                         <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                             <span>{{ variant.language.name }}</span>

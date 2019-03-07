@@ -41,9 +41,11 @@
             templateUrl: 'views/components/forms/umb-checkbox.html',
             scope: {
                 model: "=",
+                id: "@",
                 value: "@",
                 name: "@",
                 text: "@",
+                serverValidationField: "@",
                 disabled: "=",
                 required: "=",
                 onChange: "&"

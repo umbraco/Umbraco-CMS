@@ -1,7 +1,10 @@
 <label class="checkbox umb-form-check umb-form-check--checkbox" ng-class="{ 'umb-form-check--disabled': disabled }">
-    <input type="checkbox" name="{{name}}"
+    <input type="checkbox"
+           id="{{id}}"
+           name="{{name}}"
            value="{{value}}"
            class="umb-form-check__input"
+           val-server-field="{{serverValidationField}}"
            ng-model="model.checked"
            ng-disabled="disabled"
            ng-required="required"
