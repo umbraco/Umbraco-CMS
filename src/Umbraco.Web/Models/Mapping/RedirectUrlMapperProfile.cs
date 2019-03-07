@@ -17,6 +17,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.RedirectId, expression => expression.MapFrom(item => item.Key));
         }
 
-        private static string GetUrl(IUmbracoContextAccessor umbracoContextAccessor, IRedirectUrl item) => umbracoContextAccessor?.UmbracoContext?.UrlProvider?.GetUrl(item.Id, item.Culture);
+        private static string GetUrl(IUmbracoContextAccessor umbracoContextAccessor, IRedirectUrl item) => umbracoContextAccessor?.UmbracoContext?.UrlProvider?.GetUrl(item.ContentId, item.Culture);
     }
 }

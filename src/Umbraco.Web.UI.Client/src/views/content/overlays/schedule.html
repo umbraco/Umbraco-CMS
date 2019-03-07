@@ -97,13 +97,13 @@
 
                             <label for="{{'saveVariantSelector_' + variant.language.culture}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
-                            </label>
 
-                            <div class="umb-permission__description"
-                                 ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                                <umb-variant-state variant="variant"></umb-variant-state>
-                                <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                            </div>
+                                <span class="db umb-permission__description"
+                                      ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                    <umb-variant-state variant="variant"></umb-variant-state>
+                                    <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                                </span>
+                            </label>
 
                             <div class="flex items-center" style="margin-top: 10px; margin-bottom: 10px;">
 
@@ -166,11 +166,11 @@
                                    val-server-field="{{variant.htmlId}}" />
 
                             <div ng-messages="scheduleSelectorForm.saveVariantReleaseDate.$error" show-validation-on-submit>
-                                <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
+                                <div class="umb-permission__description text-error" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
                             </div>
 
                             <div ng-repeat="notification in variant.notifications">
-                                <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                                <div class="umb-permission__description text-success">{{notification.message}}</div>
                             </div>
 
                         </div>

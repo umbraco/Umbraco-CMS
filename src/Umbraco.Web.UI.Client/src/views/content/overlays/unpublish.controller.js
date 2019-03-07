@@ -21,6 +21,12 @@
                 });
             }
 
+            _.each(vm.variants,
+                function (variant) {
+                    variant.compositeId = variant.language.culture + "_" + (variant.segment ? variant.segment : "");
+                    variant.htmlId = "_content_variant_" + variant.compositeId;
+                });
+
             // node has variants
             if (vm.variants.length !== 1) {
                 //now sort it so that the current one is at the top

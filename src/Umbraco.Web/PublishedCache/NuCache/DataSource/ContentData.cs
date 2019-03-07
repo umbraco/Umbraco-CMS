@@ -7,6 +7,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     internal class ContentData
     {
         public string Name { get; set; }
+        public string UrlSegment { get; set; }
         public int VersionId { get; set; }
         public DateTime VersionDate { get; set; }
         public int WriterId { get; set; }

@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
@@ -198,10 +199,10 @@ namespace Umbraco.Web.Macros
                 Id = _inner.Id;
                 Key = _inner.Key;
 
-                // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
                 CreatorName = _inner.GetCreatorProfile()?.Name;
                 WriterName = _inner.GetWriterProfile()?.Name;
 
+                // TODO: inject
                 var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(_inner);
                 ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentType);
 
@@ -252,8 +253,9 @@ namespace Umbraco.Web.Macros
                     if (_cultureInfos != null)
                         return _cultureInfos;
 
+                    var urlSegmentProviders = Current.UrlSegmentProviders; // TODO inject
                     return _cultureInfos = _inner.PublishCultureInfos.Values
-                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, x.Date));
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(urlSegmentProviders, x.Culture), x.Date));
                 }
             }
 
