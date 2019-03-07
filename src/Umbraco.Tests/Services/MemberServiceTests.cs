@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Security.Providers;
@@ -521,22 +522,6 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Get_Member_Name_In_Created_Event()
-        {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
-
-            TypedEventHandler<IMemberService, NewEventArgs<IMember>> callback = (sender, args) =>
-            {
-                Assert.AreEqual("Test Real Name", args.Entity.Name);
-            };
-
-            MemberService.Created += callback;
-            var member = ServiceContext.MemberService.CreateMember("testUsername", "test@test.com", "Test Real Name", memberType);
-            MemberService.Created -= callback;
-        }
-
-        [Test]
         public void Get_By_Username()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
@@ -894,7 +879,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Less_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Date, ValueStorageType.Date, "number")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.DateTime, ValueStorageType.Date, "number")
             {
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything

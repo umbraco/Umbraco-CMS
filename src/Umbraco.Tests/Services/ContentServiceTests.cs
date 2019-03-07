@@ -18,6 +18,8 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Cache;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 
 namespace Umbraco.Tests.Services
 {
@@ -985,7 +987,10 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(parent.Published);
 
             // content cannot publish values because they are invalid
-            Assert.IsNotEmpty(content.ValidateProperties());
+            var propertyValidationService = new PropertyValidationService(Factory.GetInstance<PropertyEditorCollection>(), ServiceContext.DataTypeService);
+            var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties);
+            Assert.IsFalse(isValid);
+            Assert.IsNotEmpty(invalidProperties);
 
             // and therefore cannot be published,
             // because it did not have a published version at all

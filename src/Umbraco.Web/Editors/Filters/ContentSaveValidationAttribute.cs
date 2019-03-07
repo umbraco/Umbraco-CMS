@@ -15,7 +15,6 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -24,23 +23,21 @@ namespace Umbraco.Web.Editors.Filters
     /// </summary>
     internal sealed class ContentSaveValidationAttribute : ActionFilterAttribute
     {
-        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService, UmbracoContext.Current.Security)
+        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService)
         { }
 
-        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IContentService contentService, IUserService userService, IEntityService entityService, WebSecurity security)
+        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IContentService contentService, IUserService userService, IEntityService entityService)
         {
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor;
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-            _security = security ?? throw new ArgumentNullException(nameof(security));
         }
 
         private readonly ILogger _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IContentService _contentService;
-        private readonly WebSecurity _security;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
 
@@ -51,7 +48,7 @@ namespace Umbraco.Web.Editors.Filters
 
             if (!ValidateAtLeastOneVariantIsBeingSaved(model, actionContext)) return;
             if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
-            if (!ValidateUserAccess(model, actionContext)) return;
+            if (!ValidateUserAccess(model, actionContext, _umbracoContextAccessor.UmbracoContext.Security)) return;
             
             //validate for each variant that is being updated
             foreach (var variant in model.Variants.Where(x => x.Save))
@@ -83,7 +80,8 @@ namespace Umbraco.Web.Editors.Filters
         /// </summary>
         /// <param name="actionContext"></param>
         /// <param name="contentItem"></param>
-        private bool ValidateUserAccess(ContentItemSave contentItem, HttpActionContext actionContext)
+        /// <param name="webSecurity"></param>
+        private bool ValidateUserAccess(ContentItemSave contentItem, HttpActionContext actionContext, WebSecurity webSecurity)
         {  
 
             //We now need to validate that the user is allowed to be doing what they are doing.
@@ -194,13 +192,13 @@ namespace Umbraco.Web.Editors.Filters
                 actionContext.Request.Properties[typeof(IContent).ToString()] = contentItem;
 
                 accessResult = ContentPermissionsHelper.CheckPermissions(
-                    contentToCheck, _security.CurrentUser,
+                    contentToCheck, webSecurity.CurrentUser,
                     _userService, _entityService, permissionToCheck.ToArray());
             }
             else
             {
                 accessResult = ContentPermissionsHelper.CheckPermissions(
-                       contentIdToCheck, _security.CurrentUser,
+                       contentIdToCheck, webSecurity.CurrentUser,
                        _userService, _contentService, _entityService,
                        out contentToCheck,
                        permissionToCheck.ToArray());

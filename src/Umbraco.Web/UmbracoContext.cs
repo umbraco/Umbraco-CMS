@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Web;
-using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
@@ -18,109 +16,13 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
+    public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private DomainHelper _domainHelper;
         private string _previewToken;
         private bool? _previewing;
-
-        #region Ensure Context
-
-        ///  <summary>
-        ///  Ensures that there is a "current" UmbracoContext.
-        ///  </summary>
-        /// <param name="umbracoContextAccessor"></param>
-        /// <param name="httpContext">An http context.</param>
-        /// <param name="publishedSnapshotService">A published snapshot service.</param>
-        /// <param name="webSecurity">A security helper.</param>
-        /// <param name="umbracoSettings">The umbraco settings.</param>
-        /// <param name="urlProviders">Some url providers.</param>
-        /// <param name="globalSettings"></param>
-        /// <param name="replace">A value indicating whether to replace the existing context.</param>
-        ///  <returns>The "current" UmbracoContext.</returns>
-        ///  <remarks>
-        ///  TODO: this needs to be clarified
-        ///
-        ///  If <paramref name="replace"/> is true then the "current" UmbracoContext is replaced
-        ///  with a new one even if there is one already. See <see cref="WebRuntimeComponent"/>. Has to do with
-        ///  creating a context at startup and not being able to access httpContext.Request at that time, so
-        ///  the OriginalRequestUrl remains unspecified until <see cref="UmbracoModule"/> replaces the context.
-        ///
-        ///  This *has* to be done differently!
-        ///
-        ///  See http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
-        ///
-        ///  </remarks>
-        // used by
-        // UmbracoModule BeginRequest (since it's a request it has an UmbracoContext)
-        //   in BeginRequest so *late* ie *after* the HttpApplication has started (+ init? check!)
-        // WebRuntimeComponent (and I'm not quite sure why)
-        // -> because an UmbracoContext seems to be required by UrlProvider to get the "current" published snapshot?
-        //    note: at startup not sure we have an HttpContext.Current
-        //          at startup not sure we have an httpContext.Request => hard to tell "current" url
-        //          should we have a post-boot event of some sort for ppl that *need* ?!
-        //          can we have issues w/ routing context?
-        // and tests
-        // can .ContentRequest be null? of course!
-        public static UmbracoContext EnsureContext(
-            IUmbracoContextAccessor umbracoContextAccessor,
-            HttpContextBase httpContext,
-            IPublishedSnapshotService publishedSnapshotService,
-            WebSecurity webSecurity,
-            IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders,
-            IGlobalSettings globalSettings,
-            IVariationContextAccessor variationContextAccessor,
-            bool replace = false)
-        {
-            if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
-            if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
-            if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
-            if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
-            if (globalSettings == null) throw new ArgumentNullException(nameof(globalSettings));
-
-            // if there is already a current context, return if not replacing
-            var current = umbracoContextAccessor.UmbracoContext;
-            if (current != null && replace == false)
-                return current;
-
-            // create & assign to accessor, dispose existing if any
-            umbracoContextAccessor.UmbracoContext?.Dispose();
-            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, variationContextAccessor);
-        }
-
-        /// <summary>
-        /// Gets a disposable object representing the presence of a current UmbracoContext.
-        /// </summary>
-        /// <remarks>
-        /// <para>The disposable object should be used in a using block: using (UmbracoContext.EnsureContext()) { ... }.</para>
-        /// <para>If an actual current UmbracoContext is already present, the disposable object is null and this method does nothing.</para>
-        /// <para>Otherwise, a temporary, dummy UmbracoContext is created and registered in the accessor. And disposed and removed from the accessor.</para>
-        /// </remarks>
-        internal static IDisposable EnsureContext(HttpContextBase httpContext = null) // keep this internal for now!
-        {
-            if (Composing.Current.UmbracoContext != null) return null;
-
-            httpContext = httpContext ?? new HttpContextWrapper(System.Web.HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("temp.aspx", "", new StringWriter())));
-
-            return EnsureContext(
-                Composing.Current.UmbracoContextAccessor,
-                httpContext,
-                Composing.Current.PublishedSnapshotService,
-                new WebSecurity(httpContext, Composing.Current.Services.UserService, Composing.Current.Configs.Global()),
-                Composing.Current.Configs.Settings(),
-                Composing.Current.UrlProviders,
-                Composing.Current.Configs.Global(),
-                Composing.Current.Factory.GetInstance<IVariationContextAccessor>(),
-                true);
-
-            // when the context will be disposed, it will be removed from the accessor
-            // (see DisposeResources)
-        }
 
         // initializes a new instance of the UmbracoContext class
         // internal for unit tests
@@ -171,14 +73,6 @@ namespace Umbraco.Web
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
             UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, variationContextAccessor);
         }
-
-        #endregion
-
-        /// <summary>
-        /// Gets the current Umbraco Context.
-        /// </summary>
-        // note: obsolete, use Current.UmbracoContext... then obsolete Current too, and inject!
-        public static UmbracoContext Current => Composing.Current.UmbracoContext;
 
         /// <summary>
         /// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
@@ -281,7 +175,7 @@ namespace Umbraco.Web
                         || string.IsNullOrEmpty(request["umbdebug"]) == false);
             }
         }
-        
+
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
@@ -294,6 +188,78 @@ namespace Umbraco.Web
             }
             private set => _previewing = value;
         }
+
+        #region Urls
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(int contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, culture);
+        }
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(Guid contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, culture);
+        }
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="mode">The mode.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(int contentId, UrlProviderMode mode, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, mode, culture);
+        }
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="mode">The mode.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(Guid contentId, UrlProviderMode mode, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, mode, culture);
+        }
+
+        /// <summary>
+        /// Gets the absolute url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The absolute url for the content.</returns>
+        public string UrlAbsolute(int contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, true, culture);
+        }
+
+        /// <summary>
+        /// Gets the absolute url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The absolute url for the content.</returns>
+        public string UrlAbsolute(Guid contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, true, culture);
+        }
+
+        #endregion
 
         private string PreviewToken
         {
@@ -345,15 +311,11 @@ namespace Umbraco.Web
 
             Security.DisposeIfDisposable();
 
-            // reset - important when running outside of http context
-            // also takes care of the accessor
-            Composing.Current.ClearUmbracoContext();
-
             // help caches release resources
             // (but don't create caches just to dispose them)
             // context is not multi-threaded
             if (_publishedSnapshot.IsValueCreated)
-                _publishedSnapshot.Value.DisposeIfDisposable();
+                _publishedSnapshot.Value.Dispose();
         }
     }
 }

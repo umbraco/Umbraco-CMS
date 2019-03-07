@@ -62,7 +62,6 @@
 
 .btn-group>.btn+.dropdown-toggle {
     box-shadow: none;
-    -webkit-box-shadow:none;
     border-left-width: 1px;
     border-left-style: solid;
     border-color: rgba(0,0,0,0.09);
@@ -139,7 +138,6 @@ input[type="button"] {
 
   line-height: 32px;
   text-align: center;
-  -moz-border-radius: 15px;
   border-radius: 15px;
   height: 32px;
   width: 32px;
@@ -272,23 +270,6 @@ input[type="submit"].btn {
   &::-moz-focus-inner {
     padding: 0;
     border: 0;
-  }
-
-  // IE7 has some default padding on button controls
-  *padding-top: 3px;
-  *padding-bottom: 3px;
-
-  &.btn-large {
-    *padding-top: 7px;
-    *padding-bottom: 7px;
-  }
-  &.btn-small {
-    *padding-top: 3px;
-    *padding-bottom: 3px;
-  }
-  &.btn-mini {
-    *padding-top: 1px;
-    *padding-bottom: 1px;
   }
 
   // Safari defaults to 1px for input. Ref U4-7721.

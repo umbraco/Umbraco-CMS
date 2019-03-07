@@ -34,11 +34,7 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string ContentPicker = "Umbraco.ContentPicker";
 
-                /// <summary>
-                /// Date.
-                /// </summary>
-                public const string Date = "Umbraco.Date";
-
+   
                 /// <summary>
                 /// DateTime.
                 /// </summary>
@@ -48,7 +44,7 @@ namespace Umbraco.Core
                 /// DropDown List.
                 /// </summary>
                 public const string DropDownListFlexible = "Umbraco.DropDown.Flexible";
-                
+
                 /// <summary>
                 /// Grid.
                 /// </summary>
@@ -105,9 +101,9 @@ namespace Umbraco.Core
                 public const string MultipleTextstring = "Umbraco.MultipleTextstring";
 
                 /// <summary>
-                /// NoEdit.
+                /// Label.
                 /// </summary>
-                public const string NoEdit = "Umbraco.NoEdit";
+                public const string Label = "Umbraco.Label";
 
                 /// <summary>
                 /// Picker Relations.
@@ -118,7 +114,7 @@ namespace Umbraco.Core
                 /// RadioButton list.
                 /// </summary>
                 public const string RadioButtonList = "Umbraco.RadioButtonList";
-                
+
                 /// <summary>
                 /// Slider.
                 /// </summary>
@@ -142,7 +138,7 @@ namespace Umbraco.Core
                 /// <summary>
                 /// TinyMCE
                 /// </summary>
-                public const string TinyMce = "Umbraco.TinyMCEv3";
+                public const string TinyMce = "Umbraco.TinyMCE";
 
                 /// <summary>
                 /// Boolean.
@@ -163,7 +159,7 @@ namespace Umbraco.Core
                 /// Upload Field.
                 /// </summary>
                 public const string UploadField = "Umbraco.UploadField";
-                
+
                 /// <summary>
                 /// Email Address.
                 /// </summary>

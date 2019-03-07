@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader($location, $routeParams) {
+    function EditorContentHeader() {
 
         function link(scope, el, attr, ctrl) {
 
@@ -22,7 +22,6 @@
                 
                 angular.forEach(scope.content.apps, (app) => {
                     if (app.alias === "umbContent") {
-                        console.log("app: ", app)
                         app.anchors = scope.content.tabs;
                     }
                 });
@@ -38,7 +37,9 @@
             }
 
             scope.goBack = function () {
-                $location.path('/' + $routeParams.section + '/' + $routeParams.tree + '/' + $routeParams.method + '/' + scope.menu.currentNode.parentId);
+                if (scope.onBack) {
+                    scope.onBack();
+                }
             };
 
             scope.selectVariant = function (event, variant) {
@@ -114,13 +115,14 @@
                 name: "=",
                 nameDisabled: "<?",
                 menu: "=",
-                hideMenu: "<?",
+                hideActionsMenu: "<?",
                 content: "=",
                 openVariants: "<",
                 hideChangeVariant: "<?",
                 onSelectNavigationItem: "&?",
                 onSelectAnchorItem: "&?",
                 showBackButton: "<?",
+                onBack: "&?",
                 splitViewOpen: "=?",
                 onOpenInSplitView: "&?",
                 onCloseSplitView: "&?",

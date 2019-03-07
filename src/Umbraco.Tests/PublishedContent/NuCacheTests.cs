@@ -15,6 +15,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -180,8 +181,9 @@ namespace Umbraco.Tests.PublishedContent
                 dataSource,
                 globalSettings,
                 new SiteDomainHelper(),
-                contentTypeServiceBaseFactory,
-                Mock.Of<IEntityXmlSerializer>());
+                Mock.Of<IEntityXmlSerializer>(),
+                Mock.Of<IPublishedModelFactory>(),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

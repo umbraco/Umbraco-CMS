@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Components;
+﻿using Umbraco.Core.Compose;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging.Viewer
 {
@@ -8,7 +9,7 @@ namespace Umbraco.Core.Logging.Viewer
     {
         public void Compose(Composition composition)
         {
-            composition.SetLogViewer(_ => new JsonLogViewer());
+            composition.SetLogViewer(_ => new JsonLogViewer(composition.Logger));
         }
     }
 }

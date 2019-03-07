@@ -24,7 +24,8 @@ namespace Umbraco.Web.Models.Mapping
             IContentService contentService,
             IContentTypeService contentTypeService,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService)
         {
             // create, capture, cache
             var contentOwnerResolver = new OwnerResolver<IContent>(userService);
@@ -32,7 +33,7 @@ namespace Umbraco.Web.Models.Mapping
             var actionButtonsResolver = new ActionButtonsResolver(userService, contentService);
             var childOfListViewResolver = new ContentChildOfListViewResolver(contentService, contentTypeService);
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>(contentTypeBaseServiceProvider);
-            var allowedTemplatesResolver = new AllowedTemplatesResolver(contentTypeService);
+            var allowedTemplatesResolver = new AllowedTemplatesResolver(contentTypeService, localizedTextService);
             var defaultTemplateResolver = new DefaultTemplateResolver();
             var variantResolver = new ContentVariantResolver(localizationService);
             var schedPublishReleaseDateResolver = new ScheduledPublishDateResolver(ContentScheduleAction.Release);
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentApps, opt => opt.MapFrom(contentAppResolver))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
-                .ForMember(dest => dest.ContentTypeName, opt => opt.MapFrom(src => src.ContentType.Name))
+                .ForMember(dest => dest.ContentTypeName, opt => opt.MapFrom(src => localizedTextService.UmbracoDictionaryTranslate(src.ContentType.Name)))
                 .ForMember(dest => dest.IsContainer, opt => opt.MapFrom(src => src.ContentType.IsContainer))
                 .ForMember(dest => dest.IsElement, opt => opt.MapFrom(src => src.ContentType.IsElement))
                 .ForMember(dest => dest.IsBlueprint, opt => opt.MapFrom(src => src.Blueprint))
@@ -138,7 +139,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 // if we don't have a name for a culture, it means the culture is not available, and
                 // hey we should probably not be mapping it, but it's too late, return a fallback name
-                return source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"(({source.Name}))";
+                return source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"({source.Name})";
             }
         }
 
@@ -146,10 +147,12 @@ namespace Umbraco.Web.Models.Mapping
         private class AllowedTemplatesResolver : IValueResolver<IContent, ContentItemDisplay, IDictionary<string, string>>
         {
             private readonly IContentTypeService _contentTypeService;
+            private readonly ILocalizedTextService _localizedTextService;
 
-            public AllowedTemplatesResolver(IContentTypeService contentTypeService)
+            public AllowedTemplatesResolver(IContentTypeService contentTypeService, ILocalizedTextService localizedTextService)
             {
                 _contentTypeService = contentTypeService;
+                _localizedTextService = localizedTextService;
             }
 
             public IDictionary<string, string> Resolve(IContent source, ContentItemDisplay destination, IDictionary<string, string> destMember, ResolutionContext context)
@@ -158,7 +161,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 return contentType.AllowedTemplates
                     .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
-                    .ToDictionary(t => t.Alias, t => t.Name);
+                    .ToDictionary(t => t.Alias, t => _localizedTextService.UmbracoDictionaryTranslate(t.Name));
             }
         }
     }

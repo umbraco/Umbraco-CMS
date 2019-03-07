@@ -3,7 +3,6 @@
   function CreateBlueprintController(
     $scope,
     contentResource,
-    notificationsService,
     navigationService,
     localizationService,
     formHelper,
@@ -13,12 +12,9 @@
       name: $scope.currentNode.name
     };
 
-    var successText = {};
     localizationService.localize("blueprints_createBlueprintFrom", ["<em>" + $scope.message.name + "</em>"]).then(function (localizedVal) {
       $scope.title = localizedVal;
     });
-
-   
 
     $scope.cancel = function () {
       navigationService.hideMenu();

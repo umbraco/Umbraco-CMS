@@ -649,7 +649,6 @@
     <key alias="contentTypeEnabled">Huvudinnehållstyp påslagen</key>
     <key alias="contentTypeUses">Denna huvudinnehållstyp använder</key>
     <key alias="defaulttemplate">Defaultmall</key>
-    <key alias="dictionary editor egenskab">Ordboksnyckel</key>
     <key alias="importDocumentTypeHelp">För att importera en dokumenttyp, leta upp ".udt"-filen på din hårddisk genom att klicka på "Browse"-knappen och sedan på "Importera" (du får bekräfta ditt val i nästa steg).</key>
     <key alias="newtabname">Namn på ny flik</key>
     <key alias="nodetype">Nodtyp</key>
@@ -657,7 +656,6 @@
     <key alias="objecttype">Typ</key>
     <key alias="script">Skript</key>
     <key alias="stylesheet">Stilmall</key>
-    <key alias="stylesheet editor egenskab">Egenskap för stilmall</key>
     <key alias="tab">Flik</key>
     <key alias="tabname">Fliknamn</key>
     <key alias="tabs">Flikar</key>

@@ -4,16 +4,16 @@ using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Composing.CompositionExtensions;
+using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
 {
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.IO
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
             composition.Register(_ => Mock.Of<IContentSection>());
-            composition.RegisterUnique<IMediaPathScheme, OriginalMediaPathScheme>();
+            composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
             composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
             composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
@@ -112,9 +112,19 @@ namespace Umbraco.Tests.IO
             fs.DeleteMediaFiles(new[] { virtPath });
             Assert.IsFalse(File.Exists(physPath));
 
-            // ~/media/1234 is gone
-            physPath = Path.GetDirectoryName(physPath);
-            Assert.IsFalse(Directory.Exists(physPath));
+            var scheme = Current.Factory.GetInstance<IMediaPathScheme>();
+            if (scheme is UniqueMediaPathScheme)
+            {
+                // ~/media/1234 is *not* gone
+                physPath = Path.GetDirectoryName(physPath);
+                Assert.IsTrue(Directory.Exists(physPath));
+            }
+            else
+            {
+                // ~/media/1234 is gone
+                physPath = Path.GetDirectoryName(physPath);
+                Assert.IsFalse(Directory.Exists(physPath));
+            }
 
             // ~/media exists
             physPath = Path.GetDirectoryName(physPath);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -119,14 +120,14 @@ namespace Umbraco.Web.Models.Mapping
 
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination, TPropertyTypeDisplay>(
             this IMappingExpression<TSource, TDestination> mapping, PropertyEditorCollection propertyEditors,
-            IDataTypeService dataTypeService, IContentTypeService contentTypeService)
+            IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILogger logger)
             where TSource : IContentTypeComposition
             where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDisplay>
             where TPropertyTypeDisplay : PropertyTypeDisplay, new()
         {
             var contentTypeUdiResolver = new ContentTypeUdiResolver();
             var lockedCompositionsResolver = new LockedCompositionsResolver(contentTypeService);
-            var propertyTypeGroupResolver = new PropertyTypeGroupResolver<TPropertyTypeDisplay>(propertyEditors, dataTypeService);
+            var propertyTypeGroupResolver = new PropertyTypeGroupResolver<TPropertyTypeDisplay>(propertyEditors, dataTypeService, logger);
 
             return mapping
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => contentTypeUdiResolver.Resolve(src)))

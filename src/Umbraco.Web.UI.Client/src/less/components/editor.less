@@ -63,24 +63,37 @@
 // header
 
 .umb-editor-header {
-	background: @white;
-	position: absolute;
-	padding-left: 20px;
-	z-index: @zIndexEditor;
-	border-bottom: 1px solid @gray-9;
-	width: 100%;
-	box-sizing: border-box;
-	height: @editorHeaderHeight;
+    background: @white;
+    position: absolute;
+    padding-left: 20px;
+    z-index: @zIndexEditor;
+    border-bottom: 1px solid @gray-9;
+    width: 100%;
+    box-sizing: border-box;
+    height: @editorHeaderHeight;
 }
 
 .umb-editor-header__back {
 	color: @gray-6;
+    margin-bottom: 1px;
 	transition: color 0.1s ease-in-out;
 }
 
 .umb-editor-header__name-wrapper {
 	position: relative;
 	display: flex;
+	border: 1px solid @inputBorder;
+    &:focus-within {
+        border-color: @inputBorderFocus;
+    }
+}
+
+.umb-editor-header__name-and-description {
+    margin-right: 20px;
+}
+
+.-split-view-active .umb-editor-header__name-and-description {
+    margin-right: 0;
 }
 
 .umb-editor-header__name-wrapper ng-form {
@@ -95,12 +108,14 @@ input.umb-editor-header__name-input {
 	margin-bottom: 0;
 	font-weight: bold;
 	box-sizing: border-box;
-	height: 32px;
+	height: 30px;
 	line-height: 32px;
 	width: 100%;
 	padding: 0 10px;
 	background: @white;
-	border: 1px solid @gray-8;
+    &:focus {
+        border-color: transparent;
+    }
 }
 
 input.umb-editor-header__name-input:disabled {
@@ -147,7 +162,6 @@ a.umb-editor-header__close-split-view:hover {
 	align-items: center;
 	padding: 0 10px; 
     margin: 1px 1px;
-    position: absolute;
     right: 0;
     height: 30px;
 	text-decoration: none !important;

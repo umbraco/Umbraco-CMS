@@ -148,9 +148,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         },
         treeAlias: $scope.model.config.startNode.type,
         section: $scope.model.config.startNode.type,
-        idType: "udi",
-        //only show the lang selector for content
-        showLanguageSelector: $scope.model.config.startNode.type === "content"
+        idType: "udi"
     };
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
@@ -191,7 +189,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         //if we have a query for the startnode, we will use that.
         var rootId = $routeParams.id;
         entityResource.getByQuery($scope.model.config.startNode.query, rootId, "Document").then(function (ent) {
-            dialogOptions.startNodeId = $scope.model.config.idType === "udi" ? ent.udi : ent.id;
+            dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
         });
     }
     else {
@@ -261,7 +259,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.add = function (item) {
         var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
-        var itemId = $scope.model.config.idType === "udi" ? item.udi : item.id;
+        var itemId = ($scope.model.config.idType === "udi" ? item.udi : item.id).toString();
 
         if (currIds.indexOf(itemId) < 0) {
             currIds.push(itemId);

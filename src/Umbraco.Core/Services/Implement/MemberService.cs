@@ -331,9 +331,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
             }
-
-            scope.Events.Dispatch(Created, this, new NewEventArgs<IMember>(member, false, member.ContentType.Alias, -1));
-
+            
             if (withIdentity == false)
                 return;
 
@@ -1111,15 +1109,6 @@ namespace Umbraco.Core.Services.Implement
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
 
         /// <summary>
-        /// Occurs after Create
-        /// </summary>
-        /// <remarks>
-        /// Please note that the Member object has been created, but might not have been saved
-        /// so it does not have an identity yet (meaning no Id has been set).
-        /// </remarks>
-        public static event TypedEventHandler<IMemberService, NewEventArgs<IMember>> Created;
-
-        /// <summary>
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
@@ -1186,7 +1175,7 @@ namespace Umbraco.Core.Services.Implement
             var identity = int.MaxValue;
 
             var memType = new MemberType(-1);
-            var propGroup = new PropertyGroup(MemberType.IsPublishingConst)
+            var propGroup = new PropertyGroup(MemberType.SupportsPublishingConst)
             {
                 Name = "Membership",
                 Id = --identity
@@ -1212,21 +1201,21 @@ namespace Umbraco.Core.Services.Implement
                 Id = --identity,
                 Key = identity.ToGuid()
             });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, Constants.Conventions.Member.LastLockoutDate)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Date, Constants.Conventions.Member.LastLockoutDate)
             {
                 Name = Constants.Conventions.Member.LastLockoutDateLabel,
                 SortOrder = 5,
                 Id = --identity,
                 Key = identity.ToGuid()
             });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, Constants.Conventions.Member.LastLoginDate)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Date, Constants.Conventions.Member.LastLoginDate)
             {
                 Name = Constants.Conventions.Member.LastLoginDateLabel,
                 SortOrder = 6,
                 Id = --identity,
                 Key = identity.ToGuid()
             });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, Constants.Conventions.Member.LastPasswordChangeDate)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Date, Constants.Conventions.Member.LastPasswordChangeDate)
             {
                 Name = Constants.Conventions.Member.LastPasswordChangeDateLabel,
                 SortOrder = 7,

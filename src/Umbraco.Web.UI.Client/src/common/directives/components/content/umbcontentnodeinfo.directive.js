@@ -44,7 +44,8 @@
                     "prompt_doctypeChangeWarning",
                     "general_history",
                     "auditTrails_historyIncludingVariants",
-                    "content_itemNotPublished"
+                    "content_itemNotPublished",
+                    "general_choose"
                 ];
 
                 localizationService.localizeMany(keys)
@@ -59,10 +60,11 @@
                         labels.notPublished = data[9];
 
                         scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
+                        scope.chooseLabel = data[10];
 
                         setNodePublishStatus();
 
-                        if (scope.currentUrls.length === 0) {
+                        if (scope.currentUrls && scope.currentUrls.length === 0) {
                             if (scope.node.id > 0) {
                                 //it's created but not published
                                 scope.currentUrls.push({ text: labels.notPublished, isUrl: false });
@@ -102,6 +104,8 @@
                     loadAuditTrail();
                 }
 
+                // never show templates for element types (if they happen to have been created in the content tree)
+                scope.disableTemplates = scope.disableTemplates || scope.node.isElement;
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -301,6 +305,12 @@
             }
 
             function updateCurrentUrls() {
+                // never show urls for element types (if they happen to have been created in the content tree)
+                if (scope.node.isElement) {
+                    scope.currentUrls = null;
+                    return;
+                }
+
                 // find the urls for the currently selected language
                 if (scope.node.variants.length > 1) {
                     // nodes with variants
@@ -334,8 +344,8 @@
                     loadAuditTrail(true);
                     loadRedirectUrls();
                     setNodePublishStatus();
-                    updateCurrentUrls();
                 }
+                updateCurrentUrls();
             });
 
             //ensure to unregister from all events!

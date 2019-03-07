@@ -312,7 +312,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 		 */
         defaultPrevalues: function () {
             var cfg = {};
-            cfg.toolbar = ["code", "bold", "italic", "styleselect", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link", "image", "umbmediapicker", "umbembeddialog", "umbmacro"];
+            cfg.toolbar = ["ace", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link", "umbmediapicker", "umbmacro", "umbembeddialog"];
             cfg.stylesheets = [];
             cfg.maxImageSize = 500;
             return cfg;
@@ -427,8 +427,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     data["rel"] = img.id;
                     data["data-id"] = img.id;
                 }
-
-                editor.insertContent(editor.dom.createHTML('img', data));
+                
+                editor.selection.setContent(editor.dom.createHTML('img', data));
 
                 $timeout(function () {
                     var imgElm = editor.dom.get('__mcenew');
@@ -1222,7 +1222,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var aceEditor = {
                     content: args.editor.getContent(),
                     view: 'views/propertyeditors/rte/codeeditor.html',
-                    size: 'small',
                     submit: function (model) {
                         args.editor.setContent(model.content);
                         editorService.close();

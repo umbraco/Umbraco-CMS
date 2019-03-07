@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -27,7 +28,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             if (refreshCache)
             {
-                //FIXME: trigger cache rebuild. Currently the data in the database tables is wrong.
+                Context.AddPostMigration<RebuildPublishedSnapshot>();
             }
         }
 
@@ -53,7 +54,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 {
                     Logger.Error<DropDownPropertyEditorsMigration>(
                         ex,
-                        "Invalid radio button configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
+                        "Invalid property editor configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
                         dataType.Configuration);
 
                     continue;

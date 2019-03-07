@@ -34,10 +34,10 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
-        public PackageInstallController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
+        public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
         }
 
@@ -85,8 +85,8 @@ namespace Umbraco.Web.Editors
             return Ok();
         }
 
-        
-        
+
+
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
             var zipFile = new FileInfo(Path.Combine(IOHelper.MapPath(SystemDirectories.Packages), model.ZipFileName));
@@ -96,6 +96,7 @@ namespace Umbraco.Web.Editors
             model.Name = ins.Name;
             model.Author = ins.Author;
             model.AuthorUrl = ins.AuthorUrl;
+            model.Contributors = ins.Contributors;
             model.IconUrl = ins.IconUrl;
             model.License = ins.License;
             model.LicenseUrl = ins.LicenseUrl;
@@ -156,7 +157,7 @@ namespace Umbraco.Web.Editors
                 if (ext.InvariantEquals("zip") || ext.InvariantEquals("umb"))
                 {
                     //we always save package files to /App_Data/packages/package-guid.umb for processing as a standard so lets copy.
-                    
+
                     var packagesFolder = IOHelper.MapPath(SystemDirectories.Packages);
                     Directory.CreateDirectory(packagesFolder);
                     var packageFile = Path.Combine(packagesFolder, model.PackageGuid + ".umb");
@@ -284,7 +285,7 @@ namespace Umbraco.Web.Editors
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
+
 
             return model;
         }

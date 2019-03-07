@@ -166,11 +166,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return _snapshot.GetContentType(alias);
         }
 
-        public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
 
         #region IDisposable

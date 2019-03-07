@@ -597,7 +597,7 @@
     <key alias="blue">Azul</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Añadir pestaña</key>
+    <key alias="addGroup">Añadir pestaña</key>
     <key alias="addProperty">Añadir propiedad</key>
     <key alias="addEditor">Añadir editor</key>
     <key alias="addTemplate">Añadir platilla</key>
@@ -988,21 +988,19 @@
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Plantilla por defecto</key>
-    <key alias="dictionary editor egenskab">Clave de diccionario</key>
-        <key alias="importDocumentTypeHelp">Para importar un tipo de documento encuentra el fichero ".udt" en tu ordenador haciendo clic sobre el botón "Navegar" y pulsando "Importar" (se te solicitará confirmación en la siguiente pantalla)</key>
+    <key alias="importDocumentTypeHelp">Para importar un tipo de documento encuentra el fichero ".udt" en tu ordenador haciendo clic sobre el botón "Navegar" y pulsando "Importar" (se te solicitará confirmación en la siguiente pantalla)</key>
     <key alias="newtabname">Nuevo nombre de la pestaña</key>
     <key alias="nodetype">Tipo de nodo</key>
     <key alias="objecttype">Tipo</key>
     <key alias="stylesheet">Hoja de estilos</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Propiedades de la hoja de estilos</key>
     <key alias="tab">Pestaña</key>
     <key alias="tabname">Nombre de la pestaña</key>
     <key alias="tabs">Pestañas</key>
     <key alias="contentTypeEnabled">Tipo de Contenido Maestro activado</key>
     <key alias="contentTypeUses">Este Tipo de Contenido usa</key>
     <key alias="asAContentMasterType">como Tipo de Contenido Maestro. Las pestañas para los Tipos de Contenido Maestros no se muestran y solo se pueden modificar desde el Tipo de Contenido Maestro</key>
-        <key alias="noPropertiesDefinedOnTab">No existen propiedades para esta pestaña. Haz clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.</key>
+    <key alias="noPropertiesDefinedOnTab">No existen propiedades para esta pestaña. Haz clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.</key>
     <key alias="addIcon">Añadir icono</key>
   </area>
   <area alias="sort">
@@ -1202,7 +1200,7 @@
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Composiciones</key>
-        <key alias="noTabs">No has añadido ninguna pestaña</key>
+        <key alias="noGroups">No has añadido ninguna pestaña</key>
     <key alias="inheritedFrom">Heredado de</key>
     <key alias="addProperty">Añadir propiedad</key>
     <key alias="requiredLabel">Etiqueta requerida</key>
@@ -1294,9 +1292,9 @@
     <key alias="mailBody"><![CDATA[
         Hola %0%.
 
-        Este mail se ha generado automáticamente para informale que %2% has solicitado que el documento '%1%' sea traducido en '%5%'. 
+        Este mail se ha generado automáticamente para informale que %2% has solicitado que el documento '%1%' sea traducido en '%5%'.
 
-        Para editarlo, vaya a la dirección http://%3%/translation/details.aspx?id=%4% o inicia sesión en umbraco y ve a http://%3% para ver las tareas pendientes de traducir. 
+        Para editarlo, vaya a la dirección http://%3%/translation/details.aspx?id=%4% o inicia sesión en umbraco y ve a http://%3% para ver las tareas pendientes de traducir.
 
         Espero que tenga un buen dia.
 
@@ -1589,13 +1587,13 @@
         <key alias="httpsCheckExpiringCertificate">El certificado SSL de tu sitio caducará en %0% días.</key>
         <key alias="healthCheckInvalidUrl">Error haciendo ping a la URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Actualmente estás %0% viendo el sitio usando el esquema HTTPS.</key>
-        <key alias="httpsCheckConfigurationRectifyNotPossible">El appSetting 'umbracoUseSSL' está configurado como 'false' en tu archivo web.config. Una vez que accedes al sitio usando HTTPS, debería ser configurado como 'true'.</key>
-        <key alias="httpsCheckConfigurationCheckResult">Ele appSetting 'umbracoUseSSL' está configurado como '%0%' en tu archivo web.config, tus cookies son %1% marcadas como seguras.</key>
-    <key alias="httpsCheckEnableHttpsError">No se pudo actualizar 'umbracoUseSSL' en tu archivo web.config. Error: %0%</key>
+        <key alias="httpsCheckConfigurationRectifyNotPossible">El appSetting 'Umbraco.Core.UseHttps' está configurado como 'false' en tu archivo web.config. Una vez que accedes al sitio usando HTTPS, debería ser configurado como 'true'.</key>
+        <key alias="httpsCheckConfigurationCheckResult">Ele appSetting 'Umbraco.Core.UseHttps' está configurado como '%0%' en tu archivo web.config, tus cookies son %1% marcadas como seguras.</key>
+    <key alias="httpsCheckEnableHttpsError">No se pudo actualizar 'Umbraco.Core.UseHttps' en tu archivo web.config. Error: %0%</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">Activar HTTPS</key>
     <key alias="httpsCheckEnableHttpsDescription">Configura umbracoSSL como true en los appSettings del archivo web.config.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">El appSetting 'umbracoUseSSL' está ahora configurado como 'true' en tu archivo web.config, tus cookies se marcarán como seguras.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">El appSetting 'Umbraco.Core.UseHttps' está ahora configurado como 'true' en tu archivo web.config, tus cookies se marcarán como seguras.</key>
     <key alias="rectifyButton">Arreglar</key>
     <key alias="cannotRectifyShouldNotEqual">No se pudo arreglar chequeo con un valor de comparación 'ShouldNotEqual'.</key>
     <key alias="cannotRectifyShouldEqualWithValue">No se pudo arreglar chequeo con un valor de comparación 'ShouldEqual' con el valor introducido.</key>
@@ -1645,10 +1643,9 @@
     <key alias="redirectedTo">Redirigido a To</key>
     <key alias="noRedirects">No se ha creado ninguna redirección</key>
     <key alias="noRedirectsDescription">Cuando una página es renombrada o movida, una redirección a la nueva página es automáticamente creada.</key>
-    <key alias="removeButton">Eliminar</key>
     <key alias="confirmRemove">¿Estás seguro que quieres eliminar la redirección de '%0%' a '%1%'?</key>
     <key alias="redirectRemoved">Redirección URL eliminada.</key>
-        <key alias="redirectRemoveError">Error borrando la redirección URL.</key>
+    <key alias="redirectRemoveError">Error borrando la redirección URL.</key>
     <key alias="confirmDisable">¿Seguro que quieres desactivar URL tracker?</key>
     <key alias="disabledConfirm">URL tracker ha sido desactivado.</key>
     <key alias="disableError">Error desactivando URL tracker, más información se puede encontrar en los logs.</key>

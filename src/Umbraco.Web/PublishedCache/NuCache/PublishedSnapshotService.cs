@@ -23,10 +23,12 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
+using File = System.IO.File;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -43,9 +45,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
-        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
+        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -87,8 +89,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IEntityXmlSerializer entitySerializer)
+            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper,
+            IEntityXmlSerializer entitySerializer, IPublishedModelFactory publishedModelFactory,
+            UrlSegmentProviderCollection urlSegmentProviders)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -106,7 +109,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _urlSegmentProviders = urlSegmentProviders;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -142,31 +145,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (registered)
                 {
-                    string path;
-                    var tempLocation = globalSettings.LocalTempStorageLocation;
-                    switch (tempLocation)
-                    {
-                        case LocalTempStorage.AspNetTemp:
-                            path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "NuCache");
-                            break;
-                        case LocalTempStorage.EnvironmentTemp:
-                            // TODO: why has this to be repeated everywhere?!
-                            // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-                            // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-                            // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
-                            var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
-                            path = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash, "NuCache");
-                            break;
-                        //case LocalTempStorage.Default:
-                        //case LocalTempStorage.Unknown:
-                        default:
-                            path = IOHelper.MapPath("~/App_Data/TEMP/NuCache");
-                            break;
-                    }
-
-                    if (!Directory.Exists(path))
-                        Directory.CreateDirectory(path);
-
+                    var path = GetLocalFilesPath();
                     var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
                     var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
                     _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
@@ -190,7 +169,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _domainStore = new SnapDictionary<int, Domain>();
 
-            LoadCaches();
+            publishedModelFactory.WithSafeLiveFactory(LoadCaches);
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
@@ -295,13 +274,49 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #endregion
 
+        #region Local files
+
+        private string GetLocalFilesPath()
+        {
+            var path = Path.Combine(_globalSettings.LocalTempPath, "NuCache");
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            return path;
+        }
+
+        private void DeleteLocalFilesForContent()
+        {
+            if (_isReady && _localContentDb != null)
+                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
+
+            var path = GetLocalFilesPath();
+            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+            if (File.Exists(localContentDbPath))
+                File.Delete(localContentDbPath);
+        }
+
+        private void DeleteLocalFilesForMedia()
+        {
+            if (_isReady && _localMediaDb != null)
+                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
+
+            var path = GetLocalFilesPath();
+            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
+            if (File.Exists(localMediaDbPath))
+                File.Delete(localMediaDbPath);
+        }
+
+        #endregion
+
         #region Environment
 
         public override bool EnsureEnvironment(out IEnumerable<string> errors)
         {
             // must have app_data and be able to write files into it
-            var ok = FilePermissionHelper.TryCreateDirectory(SystemDirectories.Data);
-            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local DB files." };
+            var ok = FilePermissionHelper.TryCreateDirectory(GetLocalFilesPath());
+            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local files." };
             return ok;
         }
 
@@ -558,12 +573,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // because now we should ALWAYS run with the database server messenger, and then the RefreshAll will
         // be processed as soon as we are configured and the messenger processes instructions.
 
+        // note: notifications for content type and data type changes should be invoked with the
+        // pure live model factory, if any, locked and refreshed - see ContentTypeCacheRefresher and
+        // DataTypeCacheRefresher
+
         public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
-            // no cache, nothing we can do
+            // no cache, trash everything
             if (_isReady == false)
             {
-                draftChanged = publishedChanged = false;
+                DeleteLocalFilesForContent();
+                draftChanged = publishedChanged = true;
                 return;
             }
 
@@ -655,10 +675,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
-            // no cache, nothing we can do
+            // no cache, trash everything
             if (_isReady == false)
             {
-                anythingChanged = false;
+                DeleteLocalFilesForMedia();
+                anythingChanged = true;
                 return;
             }
 
@@ -931,8 +952,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.ContentTypes);
+
                 var typesA = CreateContentTypes(PublishedItemType.Content, refreshedIdsA).ToArray();
                 var kits = _dataSource.GetTypeContentSources(scope, refreshedIdsA);
+
                 _contentStore.UpdateContentTypes(removedIds, typesA, kits);
                 _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()).ToArray());
                 _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()).ToArray());
@@ -952,8 +975,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.MediaTypes);
+
                 var typesA = CreateContentTypes(PublishedItemType.Media, refreshedIdsA).ToArray();
                 var kits = _dataSource.GetTypeMediaSources(scope, refreshedIdsA);
+
                 _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
                 _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
                 _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
@@ -1246,7 +1271,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 foreach (var cultureInfo in infos)
                 {
                     var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
-                    cultureData[cultureInfo.Culture] = new CultureVariation { Name = cultureInfo.Name, Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
+                    cultureData[cultureInfo.Culture] = new CultureVariation
+                    {
+                        Name = cultureInfo.Name,
+                        UrlSegment = content.GetUrlSegment(_urlSegmentProviders, cultureInfo.Culture),
+                        Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
+                        IsDraft = cultureIsDraft
+                    };
                 }
             }
 
@@ -1254,7 +1285,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var nestedData = new ContentNestedData
             {
                 PropertyData = propertyData,
-                CultureData = cultureData
+                CultureData = cultureData,
+                UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
             };
 
             var dto = new ContentNuDto
@@ -1276,6 +1308,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #endregion
 
         #region Rebuild Database PreCache
+
+        public override void Rebuild()
+        {
+            _logger.Debug<PublishedSnapshotService>("Rebuilding...");
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                scope.ReadLock(Constants.Locks.MediaTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
+                RebuildContentDbCacheLocked(scope, 5000, null);
+                RebuildMediaDbCacheLocked(scope, 5000, null);
+                RebuildMemberDbCacheLocked(scope, 5000, null);
+                scope.Complete();
+            }
+        }
 
         public void RebuildContentDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {

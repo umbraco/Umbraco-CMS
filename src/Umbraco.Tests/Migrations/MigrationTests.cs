@@ -16,32 +16,6 @@ namespace Umbraco.Tests.Migrations
     [TestFixture]
     public class MigrationTests
     {
-        public class TestUpgraderWithPostMigrations : Upgrader
-        {
-            private PostMigrationCollection _postMigrations;
-
-            public TestUpgraderWithPostMigrations(MigrationPlan plan)
-                : base(plan)
-            { }
-
-            public void Execute(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger, PostMigrationCollection postMigrations)
-            {
-                _postMigrations = postMigrations;
-                Execute(scopeProvider, migrationBuilder, keyValueService, logger);
-            }
-
-            public override void AfterMigrations(IScope scope, ILogger logger)
-            {
-                // run post-migrations
-                var originVersion = new SemVersion(0);
-                var targetVersion = new SemVersion(0);
-
-                // run post-migrations
-                foreach (var postMigration in _postMigrations)
-                    postMigration.Execute(Name, scope, originVersion, targetVersion, logger);
-            }
-        }
-
         public class TestScopeProvider : IScopeProvider
         {
             private readonly IScope _scope;

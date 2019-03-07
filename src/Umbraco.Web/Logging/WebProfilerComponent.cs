@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web;
-using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Logging
