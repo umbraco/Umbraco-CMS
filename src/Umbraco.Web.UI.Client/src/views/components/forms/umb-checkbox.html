@@ -2,10 +2,10 @@
     <input type="checkbox" name="{{name}}"
            value="{{value}}"
            class="umb-form-check__input"
-           ng-model="model.checked"
+           ng-model="model"
            ng-disabled="disabled"
            ng-required="required"
-           ng-change="onChange(model)"/>
+           ng-change="callOnChange()"/>
 
     <span class="umb-form-check__state" aria-hidden="true">
         <span class="umb-form-check__check">
