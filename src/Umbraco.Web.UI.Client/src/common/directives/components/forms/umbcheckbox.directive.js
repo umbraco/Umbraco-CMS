@@ -35,6 +35,16 @@
     'use strict';
 
     function CheckboxDirective() {
+        
+        function link(scope, el, attr, ctrl) {
+            
+            scope.callOnChange = function() {
+                scope.onChange({model:scope.model, value:scope.value});
+            }
+            
+        }
+
+        
         var directive = {
             restrict: 'E',
             replace: true,
@@ -49,7 +59,8 @@
                 disabled: "=",
                 required: "=",
                 onChange: "&"
-            }
+            },
+            link: link
         };
 
         return directive;
