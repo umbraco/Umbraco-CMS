@@ -3,16 +3,8 @@ angular.module("umbraco")
     function ($scope, $timeout, $sce, editorService) {
 
         function onInit() {
-
-            console.log("$scope.control", $scope.control);
-
-            console.log("value", $scope.control.value);
-            console.log("is object", angular.isObject($scope.control.value));
-
-            console.log("new syntax", $scope.control.value && $scope.control.value.embed && $scope.control.value.embed.preview);
-
+            
             var embedPreview = angular.isObject($scope.control.value) && $scope.control.value.preview ? $scope.control.value.preview : $scope.control.value;
-            console.log("embedPreview", embedPreview);
 
             $scope.trustedValue = embedPreview ? $sce.trustAsHtml(embedPreview) : null;
 
@@ -27,17 +19,11 @@ angular.module("umbraco")
 
         $scope.setEmbed = function () {
 
-            console.log("setEmbed", $scope.control.value);
-
             var original = angular.isObject($scope.control.value) ? $scope.control.value : null;
 
             var embed = {
                 original: original,
                 submit: function (model) {
-                    console.log("model", model);
-
-                    //$scope.control.value = model.embed.preview;
-                    //$scope.trustedValue = $sce.trustAsHtml(model.embed.preview);
 
                     var embed = {
                         constrain: model.embed.constrain,
