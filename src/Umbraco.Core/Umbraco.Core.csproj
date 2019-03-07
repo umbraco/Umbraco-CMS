@@ -168,7 +168,6 @@
     <Compile Include="Composing\EnableComposerAttribute.cs" />
     <Compile Include="Composing\IComposer.cs" />
     <Compile Include="Composing\ICoreComposer.cs" />
-    <Compile Include="Composing\IRuntimeComposer.cs" />
     <Compile Include="Composing\IComponent.cs" />
     <Compile Include="Composing\IUserComposer.cs" />
     <Compile Include="Compose\ManifestWatcherComposer.cs" />
@@ -531,7 +530,7 @@
     <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
-    <Compile Include="Runtime\CoreRuntimeComponent.cs" />
+    <Compile Include="Runtime\CoreInitialComponent.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
     <Compile Include="Migrations\Expressions\Common\ExecutableBuilder.cs" />
     <Compile Include="Migrations\Expressions\Common\IExecutableBuilder.cs" />
@@ -1312,7 +1311,7 @@
     <Compile Include="ReflectionUtilities.cs" />
     <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
-    <Compile Include="Runtime\CoreRuntimeComposer.cs" />
+    <Compile Include="Runtime\CoreInitialComposer.cs" />
     <Compile Include="SafeCallContext.cs" />
     <Compile Include="Scoping\IInstanceIdentifiable.cs" />
     <Compile Include="Scoping\IScope.cs" />
