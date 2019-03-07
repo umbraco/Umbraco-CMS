@@ -72,7 +72,7 @@
                         button-style="success"
                         label-key="general_submit"
                         state="vm.saveButtonState"
-                        disabled="model.embed.url.length === 0"
+                        disabled="model.embed.url.length === 0 || model.embed.preview.length === 0"
                         action="vm.submit(model)">
                     </umb-button>
                 </umb-editor-footer-content-right>
