@@ -25,8 +25,9 @@
 @param {string} value Set the value of the checkbox.
 @param {string} name Set the name of the checkbox.
 @param {string} text Set the text for the checkbox label.
+@param {boolean} disabled Set the checkbox to be disabled.
+@param {boolean} required Set the checkbox to be required.
 @param {string} onChange Callback when the value of the input element changes.
-
 
 **/
 
@@ -43,6 +44,7 @@
                 value: "@",
                 name: "@",
                 text: "@",
+                disabled: "=",
                 required: "=",
                 onChange: "&"
             }
