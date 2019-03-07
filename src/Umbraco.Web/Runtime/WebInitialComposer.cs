@@ -44,8 +44,10 @@ using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
 {
-    [ComposeAfter(typeof(CoreRuntimeComposer))]
-    public sealed class WebRuntimeComposer : ComponentComposer<WebRuntimeComponent>, IRuntimeComposer
+    // web's initial composer composes after core's, and before all core composers
+    [ComposeAfter(typeof(CoreInitialComposer))]
+    [ComposeBefore(typeof(ICoreComposer))]
+    public sealed class WebInitialComposer : ComponentComposer<WebInitialComponent>
     {
         public override void Compose(Composition composition)
         {
