@@ -271,13 +271,14 @@
     <key alias="languagesToPublishForFirstTime">Hvilke sprog vil du gerne udgive? Alle sprog med indhold gemmes!</key>
     <key alias="languagesToPublish">Hvilke sprog vil du gerne udgive?</key>
     <key alias="languagesToSave">Hvilke sprog vil du gerne gemme?</key>
-    <key alias="languagesToSaveForFirstTime">Alle sprog med indhold gemmes ved oprettelsen!</key>
+    <key alias="languagesToSaveForFirstTime">Hvilke sprog vil du gerne gemme?</key>
     <key alias="languagesToSendForApproval">Hvilke sprog vil du gerne sende til godkendelse?</key>
     <key alias="languagesToSchedule">Hvilke sprog vil du gerne planlægge?</key>
     <key alias="languagesToUnpublish">Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil afpublicere alle sprog.</key>
     <key alias="publishedLanguages">Udgivne sprog</key>
     <key alias="unpublishedLanguages">Ikke-udgivne sprog</key>
     <key alias="unmodifiedLanguages">Uændrede sprog</key>
+    <key alias="untouchedLanguagesForFirstTime">Disse sprog er ikke blevet oprettet</key>
     <key alias="readyToPublish">Klar til at udgive?</key>
     <key alias="readyToSave">Klar til at gemme?</key>
     <key alias="sendForApproval">Send til godkendelse</key>
