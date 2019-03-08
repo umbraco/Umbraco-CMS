@@ -22,11 +22,13 @@
             <p><localize key="content_publishDescendantsWithVariantsHelp"></localize></p>
         </div>
 
-        <div style="margin-bottom: 15px;">
-            <label>
-                <input type="checkbox"
-                       ng-model="model.includeUnpublished"
-                       style="margin-right: 8px;" />
+        <div style="margin-bottom: 15px;" class="flex">
+
+            <umb-checkbox
+                input-id="includeUnpublishedSelector"
+                model="model.includeUnpublished" />
+
+            <label for="includeUnpublishedSelector">
                 <localize key="content_includeUnpublished"></localize>
             </label>
         </div>
@@ -40,13 +42,14 @@
             <div class="umb-list-item umb-list--condensed" ng-repeat="variant in vm.variants">
                 <ng-form name="publishVariantSelectorForm">
                     <div class="flex">
-                        <input id="{{variant.htmlId}}"
-                               name="publishVariantSelector"
-                               type="checkbox"
-                               ng-model="variant.publish"
-                               ng-change="vm.changeSelection(variant)"
-                               style="margin-right: 8px;"
-                               val-server-field="{{variant.htmlId}}" />
+
+                        <umb-checkbox
+                            input-id="{{variant.htmlId}}"
+                            name="publishVariantSelector"
+                            model="variant.publish"
+                            on-change="vm.changeSelection(variant)"
+                            server-validation-field="{{variant.htmlId}}"/>
+
                         <div>
                             <label for="{{variant.htmlId}}" style="margin-bottom: 0;">
                                 <span>{{ variant.language.name }}</span>
