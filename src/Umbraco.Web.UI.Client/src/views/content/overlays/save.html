@@ -17,13 +17,15 @@
             <div class="umb-list-item" ng-repeat="variant in vm.variants">
                 <ng-form name="saveVariantSelectorForm">
                     <div class="flex">
-                        <input id="{{variant.htmlId}}"
-                               name="saveVariantSelector"
-                               type="checkbox"
-                               ng-model="variant.save"
-                               ng-disabled="vm.isNew"
-                               style="margin-right: 8px;"
-                               val-server-field="{{variant.htmlId}}" />
+
+                       <umb-checkbox
+                            input-id="{{variant.htmlId}}"
+                            name="saveVariantSelector"
+                            type="checkbox"
+                            model="variant.save"
+                            disabled="vm.isNew"
+                            server-validation-field="{{variant.htmlId}}"/>
+
                         <div>
                             <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
