@@ -15,13 +15,14 @@
                 <div class="flex">
 
                     <umb-checkbox
-                        id="{{variant.htmlId}}"
+                        input-id="{{variant.htmlId}}"
                         name="publishVariantSelector"
                         type="checkbox"
                         model="variant.publish"
                         on-change="vm.changeSelection(variant)"
                         disabled="(variant.canPublish === false)"
                         server-validation-field="{{variant.htmlId}}"/>
+
                     <div>
                         <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                             <span>{{ variant.language.name }}</span>
