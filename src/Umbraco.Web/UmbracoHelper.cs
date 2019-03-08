@@ -264,7 +264,7 @@ namespace Umbraco.Web
 
         public IPublishedContent Member(Guid id)
         {
-            return MembershipHelper.GetByProviderKey(id);
+            return MembershipHelper.GetById(id);
         }
 
         public IPublishedContent Member(object id)
@@ -288,55 +288,55 @@ namespace Umbraco.Web
             var asInt = id.TryConvertTo<int>();
             return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
         }
-        
+
         public IEnumerable<IPublishedContent> Member(IEnumerable<int> ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return MembershipHelper.GetById(ids);
         }
 
         public IEnumerable<IPublishedContent> Member(IEnumerable<string> ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return ids.Select(Member).WhereNotNull();
         }
 
         public IEnumerable<IPublishedContent> Member(IEnumerable<Guid> ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return MembershipHelper.GetById(ids);
         }
 
         public IEnumerable<IPublishedContent> Member(IEnumerable<Udi> ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return ids.Select(Member).WhereNotNull();
         }
 
         public IEnumerable<IPublishedContent> Member(IEnumerable<object> ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return ids.Select(Member).WhereNotNull();
         }
 
         public IEnumerable<IPublishedContent> Member(params int[] ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return ids.Select(Member).WhereNotNull();
         }
 
         public IEnumerable<IPublishedContent> Member(params string[] ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return ids.Select(Member).WhereNotNull();
         }
 
         public IEnumerable<IPublishedContent> Member(params Guid[] ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return MembershipHelper.GetById(ids);
         }
 
         public IEnumerable<IPublishedContent> Member(params Udi[] ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return ids.Select(Member).WhereNotNull();
         }
 
         public IEnumerable<IPublishedContent> Member(params object[] ids)
         {
-            return ids.Select(id => Member(id)).WhereNotNull();
+            return ids.Select(Member).WhereNotNull();
         }
 
         #endregion
