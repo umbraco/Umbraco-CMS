@@ -20,17 +20,21 @@ angular.module('umbraco')
         }
 
 		if($scope.model.value.id && $scope.model.value.type !== "member"){
-			var ent = "Document";
-			if($scope.model.value.type === "media"){
-				ent = "Media";
-			}
-			
-			entityResource.getById($scope.model.value.id, ent).then(function(item){
-				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-				$scope.node = item;
+			entityResource.getById($scope.model.value.id, entityType()).then(function(item){
+                populate(item);
 			});
 		}
 
+        function entityType() {
+			var ent = "Document";
+            if($scope.model.value.type === "media"){
+                ent = "Media";
+            }
+            else if ($scope.model.value.type === "member") {
+                ent = "Member";
+            }
+            return ent;
+        }
 
 		$scope.openContentPicker =function(){
 			var treePicker = {
@@ -71,9 +75,13 @@ angular.module('umbraco')
 	    });
 
 		function populate(item){
-				$scope.clear();
-				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-				$scope.node = item;
-                $scope.model.value.id = $scope.model.config.idType === "udi" ? item.udi : item.id;
+			$scope.clear();
+			item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+			$scope.node = item;
+            $scope.node.path = "";
+            $scope.model.value.id = $scope.model.config.idType === "udi" ? item.udi : item.id;
+            entityResource.getUrl(item.id, entityType()).then(function (data) {
+                $scope.node.path = data;
+            });
 		}
 });
