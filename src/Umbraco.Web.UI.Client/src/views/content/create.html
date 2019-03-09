@@ -12,7 +12,7 @@
 
             <ul class="umb-actions umb-actions-child" ng-if="selectContentType && allowedTypes.length > 0">
 
-                <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
+                <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes">
                     <a class="umb-action-link" ng-click="createOrSelectBlueprintIfAny(docType)">
                         <i class="large icon {{docType.icon}}"></i>
                         <span class="menu-label">
