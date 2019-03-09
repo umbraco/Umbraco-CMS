@@ -202,7 +202,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @param {Object} editor rendering options
          * @param {String} editor.view Path to view
-         * @param {String} editor.size Sets the size of the editor ("Small"). If nothing is set it will use full width.
+         * @param {String} editor.size Sets the size of the editor ("small"). If nothing is set it will use full width.
          */
         function open(editor) {
 
