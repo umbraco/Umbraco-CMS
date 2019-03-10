@@ -239,11 +239,11 @@ namespace Umbraco.Web.Editors
                     return Enumerable.Empty<ContentTypeBasic>();
                 }
 
-                var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var ids = contentItem.ContentType.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
-                types = Services.ContentTypeService.GetAllMediaTypes(ids).ToList();
+                types = Services.ContentTypeService.GetAllMediaTypes(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
             }
 
             var basics = types.Select(Mapper.Map<IMediaType, ContentTypeBasic>).ToList();
@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
                 basic.Description = TranslateItem(basic.Description);
             }
 
-            return basics.OrderBy(x => x.Name);
+            return basics.OrderBy(c => contentId == Constants.System.Root ? c.Name : string.Empty);
         }
 
         /// <summary>

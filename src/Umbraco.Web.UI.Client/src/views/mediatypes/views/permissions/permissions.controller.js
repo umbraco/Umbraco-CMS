@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, mediaTypeResource, iconHelper, contentTypeHelper, localizationService) {
+    function PermissionsController($scope, $timeout, mediaTypeResource, iconHelper, contentTypeHelper, localizationService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -13,6 +13,7 @@
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
+        vm.sortChildren = sortChildren;
         vm.toggle = toggle;
 
         /* ---------- INIT ---------- */
@@ -64,6 +65,13 @@
            // remove from content type model
            var selectedChildIndex = $scope.model.allowedContentTypes.indexOf(selectedChild.id);
            $scope.model.allowedContentTypes.splice(selectedChildIndex, 1);
+        }
+
+        function sortChildren() {
+            // we need to wait until the next digest cycle for vm.selectedChildren to be updated
+            $timeout(function () {
+                $scope.model.allowedContentTypes = _.pluck(vm.selectedChildren, "id");
+            });
         }
 
         /**

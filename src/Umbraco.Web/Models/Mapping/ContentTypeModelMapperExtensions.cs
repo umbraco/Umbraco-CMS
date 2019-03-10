@@ -137,7 +137,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 .ForMember(
                     dto => dto.AllowedContentTypes,
-                    expression => expression.MapFrom(dto => dto.AllowedContentTypes.Select(x => x.Id.Value)))
+                    expression => expression.MapFrom(dto => dto.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value)))
 
                 .ForMember(
                     dto => dto.CompositeContentTypes,
