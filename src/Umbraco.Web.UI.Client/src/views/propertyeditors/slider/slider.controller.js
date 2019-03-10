@@ -26,10 +26,6 @@
     };
 
     function init() {
-
-        // convert to array
-        $scope.sliderValue = $scope.model.value ? $scope.model.value.split(',') : null;
-
         configureDefaults();
 
         // format config to fit slider plugin
@@ -38,6 +34,13 @@
         const tooltips = $scope.model.config.enableRange ? [true, true] : [true];
         const min = $scope.model.config.minVal ? [$scope.model.config.minVal] : [$scope.model.config.minVal];
         const max = $scope.model.config.maxVal ? [$scope.model.config.maxVal] : [$scope.model.config.maxVal];
+
+        // set model.value to the default value if it's not set (but don't trigger setDirty, just silently update with the default value)
+        if (!$scope.model.value) {
+            $scope.model.value = start.toString();
+        }
+        // convert to array
+        $scope.sliderValue = $scope.model.value ? $scope.model.value.split(',') : null;
 
         // setup default
         $scope.sliderOptions = {
