@@ -49,21 +49,21 @@
                 <umb-editor-sub-header>
                     <umb-editor-sub-header-content-left style="width:100%">
 
-                        <div style="position:relative; width:100%;">
+                        <div class="umb-editor-header__name-wrapper" style="background:#FFF; white-space:nowrap; flex-grow:1; height:32px; box-sizing:border-box;">
                             <!-- Search/expression filter -->
-                            <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%;" placeholder="Search logs&hellip;" />
+                            <input class="umb-editor-header__name-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%;" placeholder="Search logs&hellip;" />
 
                             <!-- Save Search & Clear Search icon buttons -->
-                            <ins class="icon-rate" ng-if="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 160px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
-                            <ins class="icon-wrong" ng-if="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 140px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
+                            <ins class="icon-rate" ng-if="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="line-height: 32px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
+                            <ins class="icon-wrong" ng-if="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="line-height: 32px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
 
-                            <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top:0;">
+                            <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
                                 <span class="ng-binding">Example Searches</span>
-                                <ins class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
+                                <ins class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}" style="margin-top:1px;">&nbsp;</ins>
                             </a>
 
                             <!-- Common Searches Dropdown -->
-                            <umb-dropdown ng-if="vm.dropdownOpen"  style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: -10px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                            <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top:10px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                                 <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active}" ng-repeat="search in vm.searches">
                                     <a href="" class="umb-variant-switcher__name-wrapper" ng-click="vm.selectSearch(search)" prevent-default>
                                         <span class="umb-variant-switcher__name">{{search.name}}</span>
@@ -75,12 +75,12 @@
                         </div>
 
                         <!-- Search Button -->
-                        <umb-button
-                            button-style="button"
-                            type="submit"
-                            action="vm.search()"
-                            label-key="general_search">
+                        <umb-button button-style="success"
+                                    type="submit"
+                                    action="vm.search()"
+                                    label-key="general_search">
                         </umb-button>
+
 
                     </umb-editor-sub-header-content-left>
                 </umb-editor-sub-header>
