@@ -198,7 +198,6 @@ Use this directive to render a ui component for selecting child items to a paren
                 scroll: true,
                 zIndex: 6000,
                 update: function (e, ui) {
-                    console.log("update", scope.selectedChildren)
                     if(scope.onSort) {
                         scope.onSort();
                     }
