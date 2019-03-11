@@ -5,11 +5,11 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Runtime
 {
-    public class CoreRuntimeComponent : IComponent
+    public class CoreInitialComponent : IComponent
     {
         private readonly IEnumerable<Profile> _mapperProfiles;
 
-        public CoreRuntimeComponent(IEnumerable<Profile> mapperProfiles)
+        public CoreInitialComponent(IEnumerable<Profile> mapperProfiles)
         {
             _mapperProfiles = mapperProfiles;
         }
