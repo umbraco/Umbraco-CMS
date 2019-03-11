@@ -41,7 +41,7 @@
                 </div>
                 <div class="umb-table-cell umb-table__name">
                     <a title="{{ item.name }}" class="umb-table-body__link"
-                       ng-href="vm.getItemUrl(item)"
+                       ng-href="{{'#' + item.editPath}}"
                        ng-click="vm.clickItem(item, $event)"
                        ng-bind="item.name">
                     </a>

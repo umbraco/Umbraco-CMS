@@ -116,15 +116,6 @@
             listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
         }
         
-        function getItemUrl(item) {
-            // if item.id is 2147483647 (int.MaxValue) use item.key
-            
-            console.log("request URL for", item)
-            console.log($scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id))
-            
-            return $scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id);
-        }
-        
         function goToItem(node, $event, $index) {
             
             var contentEditor = {

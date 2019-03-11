@@ -117,16 +117,11 @@
         var vm = this;
 
         vm.clickItem = function (item, $event) {
-            if (vm.onClick) {
+            if (vm.onClick && !($event.metaKey || $event.ctrlKey)) {
                 vm.onClick({ item: item});
-                $event.stopPropagation();
+                $event.preventDefault();
             }
-        };
-
-        vm.getItemUrl = function (item) {
-            if (vm.getItemUrl) {
-                vm.getItemUrl({ item: item});
-            }
+            $event.stopPropagation();
         };
 
         vm.selectItem = function (item, $index, $event) {
@@ -177,7 +172,6 @@
                 allowSelectAll: '<',
                 onSelect: '&',
                 onClick: '&',
-                getItemUrl: '&',
                 onSelectAll: '&',
                 onSelectedAll: '&',
                 onSortingDirection: '&',
