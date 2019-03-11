@@ -130,9 +130,6 @@
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Logging\LogviewerTests.cs" />
     <Compile Include="Manifest\ManifestContentAppTests.cs" />
-    <Compile Include="Mbuilder.cs">
-      <Generator>UmbracoModelsBuilder</Generator>
-    </Compile>
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\ContentScheduleTests.cs" />
