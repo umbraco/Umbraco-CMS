@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
@@ -7,8 +7,8 @@ namespace Umbraco.Web.Routing
 {
     /// <summary>
     /// This url provider is used purely to deal with umbraco custom routes that utilize <see cref="UmbracoVirtualNodeRouteHandler"/> and will return
-    /// the URL returned from the current PublishedContentRequest.PublishedContent (virtual node) if the request is in fact a virtual route and
-    /// the id that is being requested matches the id of the current PublishedContentRequest.PublishedContent.
+    /// the URL returned from the current PublishedRequest.PublishedContent (virtual node) if the request is in fact a virtual route and
+    /// the id that is being requested matches the id of the current PublishedRequest.PublishedContent.
     /// </summary>
     internal class CustomRouteUrlProvider : IUrlProvider
     {
