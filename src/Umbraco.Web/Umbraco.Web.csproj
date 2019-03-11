@@ -877,7 +877,6 @@
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
-    <Compile Include="Routing\CustomRouteUrlProvider.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerOptions.cs" />
     <Compile Include="Scheduling\IBackgroundTaskRunner.cs" />
