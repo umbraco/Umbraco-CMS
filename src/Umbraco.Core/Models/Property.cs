@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Models.Entities;
@@ -24,8 +23,6 @@ namespace Umbraco.Core.Models
 
         // _vvalues contains the (indexed) variant property values
         private Dictionary<CompositeNStringNStringKey, PropertyValue> _vvalues;
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Property"/> class.
@@ -100,32 +97,25 @@ namespace Umbraco.Core.Models
                 => new PropertyValue { _culture = _culture, _segment = _segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            // TODO: This allows us to track changes for an entire Property, but doesn't allow us to track changes at the variant level
-            public readonly PropertyInfo ValuesSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Values);
+        private static readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(
+            (o, o1) =>
+            {
+                if (o == null && o1 == null) return true;
 
-            public readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(
-                (o, o1) =>
-                {
-                    if (o == null && o1 == null) return true;
+                // custom comparer for strings.
+                // if one is null and another is empty then they are the same
+                if (o is string || o1 is string)
+                    return ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace()) || (o != null && o1 != null && o.Equals(o1));
 
-                    // custom comparer for strings.
-                    // if one is null and another is empty then they are the same
-                    if (o is string || o1 is string)
-                        return ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace()) || (o != null && o1 != null && o.Equals(o1));
+                if (o == null || o1 == null) return false;
 
-                    if (o == null || o1 == null) return false;
+                // custom comparer for enumerable
+                // ReSharper disable once MergeCastWithTypeCheck
+                if (o is IEnumerable && o1 is IEnumerable enumerable)
+                    return ((IEnumerable)o).Cast<object>().UnsortedSequenceEqual(enumerable.Cast<object>());
 
-                    // custom comparer for enumerable
-                    // ReSharper disable once MergeCastWithTypeCheck
-                    if (o is IEnumerable && o1 is IEnumerable enumerable)
-                        return ((IEnumerable) o).Cast<object>().UnsortedSequenceEqual(enumerable.Cast<object>());
-
-                    return o.Equals(o1);
-                }, o => o.GetHashCode());
-        }
+                return o.Equals(o1);
+            }, o => o.GetHashCode());
 
         /// <summary>
         /// Returns the PropertyType, which this Property is based on
@@ -194,7 +184,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return null;
 
-            return PropertyType.IsPublishing
+            return PropertyType.SupportsPublishing
                 ? (published ? pvalue.PublishedValue : pvalue.EditedValue)
                 : pvalue.EditedValue;
         }
@@ -254,22 +244,22 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return;
 
-            if (!PropertyType.IsPublishing)
+            if (!PropertyType.SupportsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = PropertyType.ConvertAssignedValue(pvalue.EditedValue);
-            DetectChanges(pvalue.EditedValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
+            DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
         }
 
         private void UnpublishValue(PropertyValue pvalue)
         {
             if (pvalue == null) return;
 
-            if (!PropertyType.IsPublishing)
+            if (!PropertyType.SupportsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = PropertyType.ConvertAssignedValue(null);
-            DetectChanges(pvalue.EditedValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
+            DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
         }
 
         /// <summary>
@@ -290,7 +280,7 @@ namespace Umbraco.Core.Models
 
             pvalue.EditedValue = setValue;
 
-            DetectChanges(setValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
+            DetectChanges(setValue, origValue, nameof(Values), PropertyValueComparer, change);
         }
 
         // bypasses all changes detection and is the *only* way to set the published value
@@ -298,7 +288,7 @@ namespace Umbraco.Core.Models
         {
             var (pvalue, _) = GetPValue(culture, segment, true);
 
-            if (published && PropertyType.IsPublishing)
+            if (published && PropertyType.SupportsPublishing)
                 pvalue.PublishedValue = value;
             else
                 pvalue.EditedValue = value;
@@ -340,56 +330,6 @@ namespace Umbraco.Core.Models
                 change = true;
             }
             return (pvalue, change);
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the property has valid values.
-        /// </summary>
-        internal bool IsValid(string culture = "*", string segment = "*")
-        {
-            // TODO: validating values shouldn't be done here, this calls in to IsValidValue
-
-            culture = culture.NullOrWhiteSpaceAsNull();
-            segment = segment.NullOrWhiteSpaceAsNull();
-
-            // if validating invariant/neutral, and it is supported, validate
-            // (including ensuring that the value exists, if mandatory)
-            if ((culture == null || culture == "*") && (segment == null || segment == "*") && PropertyType.SupportsVariation(null, null))
-                if (!IsValidValue(_pvalue?.EditedValue))
-                    return false;
-
-            // if validating only invariant/neutral, we are good
-            if (culture == null && segment == null)
-                return true;
-
-            // if nothing else to validate, we are good
-            if ((culture == null || culture == "*") && (segment == null || segment == "*") && !PropertyType.VariesByCulture())
-                return true;
-
-            // for anything else, validate the existing values (including mandatory),
-            // but we cannot validate mandatory globally (we don't know the possible cultures and segments)
-
-            if (_vvalues == null) return culture == "*" || IsValidValue(null);
-
-            var pvalues = _vvalues.Where(x =>
-                    PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment, true) && // the value variation is ok
-                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
-                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
-                .Select(x => x.Value)
-                .ToList();
-
-            return pvalues.Count == 0 || pvalues.All(x => IsValidValue(x.EditedValue));
-        }
-
-        /// <summary>
-        /// Boolean indicating whether the passed in value is valid
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns>True is property value is valid, otherwise false</returns>
-        private bool IsValidValue(object value)
-        {
-            // TODO: this shouldn't exist here, the model itself shouldn't be responsible for it's own validation and this requires singleton access
-            return PropertyType.IsPropertyValueValid(value);
         }
 
         protected override void PerformDeepClone(object clone)

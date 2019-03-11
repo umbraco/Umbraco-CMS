@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using NPoco;
@@ -122,6 +123,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     SERVERPROPERTY('ResourceLastUpdateDateTime') ResourceLastUpdateDateTime,
     SERVERPROPERTY('ProductLevel') ProductLevel;";
 
+            string GetString(IDataReader reader, int ordinal, string defaultValue)
+                => reader.IsDBNull(ordinal) ? defaultValue : reader.GetString(ordinal);
+
+            int GetInt32(IDataReader reader, int ordinal, int defaultValue)
+                => reader.IsDBNull(ordinal) ? defaultValue : reader.GetInt32(ordinal);
+
             connection.ConnectionString = connectionString;
             ServerVersionInfo version;
             using (connection)
@@ -135,7 +142,13 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                     {
                         reader.Read();
                         // InstanceName can be NULL for the default instance
-                        version = new ServerVersionInfo(reader.GetString(0), reader.GetString(2), reader.IsDBNull(3) ? "(default)" : reader.GetString(3), (EngineEdition) reader.GetInt32(5), reader.GetString(7), reader.GetString(9));
+                        version = new ServerVersionInfo(
+                            GetString(reader, 0, "Unknown"),
+                            GetString(reader, 2, "(default)"),
+                            GetString(reader, 3, string.Empty),
+                            (EngineEdition) GetInt32(reader, 5, 0),
+                            GetString(reader, 7, "DEFAULT"),
+                            GetString(reader, 9, "Unknown"));
                     }
                     connection.Close();
                 }

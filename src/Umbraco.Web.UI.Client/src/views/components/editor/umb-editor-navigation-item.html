@@ -1,0 +1,19 @@
+<a data-element="sub-view-{{vm.item.alias}}"
+   tabindex="-1"
+   ng-href=""
+   ng-click="vm.clicked()"
+   hotkey="{{::vm.hotkey}}"
+   hotkey-when-hidden="true"
+   ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}">
+    <i class="icon {{ vm.item.icon }}"></i>
+    <span class="umb-sub-views-nav-item-text">{{ vm.item.name }}</span>
+    <div ng-show="vm.item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
+</a>
+
+<ul class="dropdown-menu umb-sub-views-nav-item__anchor_dropdown" ng-if="vm.item.anchors && vm.item.anchors.length > 1">
+    <li ng-repeat="anchor in vm.item.anchors" ng-class="{'is-active': vm.item.active && anchor.active}">
+        <a href="" ng-click="vm.anchorClicked(anchor, $event)">
+            {{anchor.label}}
+        </a>
+    </li>
+</ul>

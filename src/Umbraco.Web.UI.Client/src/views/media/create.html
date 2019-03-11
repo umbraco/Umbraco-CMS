@@ -4,7 +4,7 @@
 
 			<h5><localize key="create_createUnder">Create under</localize> {{currentNode.name}}</h5>
 
-			<p class="abstract" ng-hide="allowedTypes">
+			<p class="abstract" ng-show="allowedTypes && allowedTypes.length === 0">
 				<localize key="create_noMediaTypes" />
 			</p>
 

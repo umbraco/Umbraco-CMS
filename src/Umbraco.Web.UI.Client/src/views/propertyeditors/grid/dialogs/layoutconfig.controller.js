@@ -1,10 +1,25 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditor.LayoutConfigController",
-    function ($scope) {
+    function ($scope, localizationService) {
+
+        
+            function init() {
+                setTitle();
+            }
+
+            function setTitle() {
+                if (!$scope.model.title) {
+                    localizationService.localize("grid_addGridLayout")
+                        .then(function(data){
+                            $scope.model.title = data;
+                        });
+                }
+            }
 
     		$scope.currentLayout = $scope.model.currentLayout;
     		$scope.columns = $scope.model.columns;
     		$scope.rows = $scope.model.rows;
+            $scope.currentSection = undefined;
 
     		$scope.scaleUp = function(section, max, overflow){
     		   var add = 1;
@@ -57,9 +72,12 @@ angular.module("umbraco")
     			template.sections.splice(index, 1);
     		};
     		
-    		$scope.closeSection = function(){
-    		    $scope.currentSection = undefined;
-    		};
+    		
+            $scope.close = function() {
+                if($scope.model.close) {
+                    $scope.model.close();
+                }
+            }
 
     		$scope.$watch("currentLayout", function(layout){
     		    if(layout){
@@ -71,4 +89,6 @@ angular.module("umbraco")
     		        $scope.availableLayoutSpace = $scope.columns - total;
     		    }
     		}, true);
+            
+            init();
     });

@@ -79,7 +79,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             Target = dto.Target,
                             Type = type,
                             Udi = dto.Udi,
-                            Url = url,
+                            Url = url + dto.QueryString,
                         }
                     );
                 }

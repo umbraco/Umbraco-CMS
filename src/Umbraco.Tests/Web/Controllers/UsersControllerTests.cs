@@ -7,9 +7,13 @@ using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
@@ -49,7 +53,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task Save_User()
         {
-            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
                 //setup some mocks
                 Umbraco.Core.Configuration.GlobalSettings.HasSmtpServer = true;
@@ -68,7 +72,15 @@ namespace Umbraco.Tests.Web.Controllers
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
                     .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
 
-                var usersController = new UsersController();
+                var usersController = new UsersController(
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContextAccessor,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
                 return usersController;
             }
 
@@ -82,7 +94,7 @@ namespace Umbraco.Tests.Web.Controllers
                 UserGroups = new[] { "writers" }
             };
 
-            var runner = new TestRunner(Factory);
+            var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Users", "PostSaveUser", HttpMethod.Post,
                 new ObjectContent<UserSave>(userSave, new JsonMediaTypeFormatter()));
             var obj = JsonConvert.DeserializeObject<UserDisplay>(response.Item2);
@@ -122,15 +134,23 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetPagedUsers_Empty()
         {
-            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
-                var usersController = new UsersController();
+                var usersController = new UsersController(
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContextAccessor,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
                 return usersController;
             }
 
             MockForGetPagedUsers();
 
-            var runner = new TestRunner(Factory);
+            var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Users", "GetPagedUsers", HttpMethod.Get);
 
             var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);
@@ -140,7 +160,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetPagedUsers_10()
         {
-            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
                 //setup some mocks
                 var userServiceMock = Mock.Get(Current.Services.UserService);
@@ -151,13 +171,21 @@ namespace Umbraco.Tests.Web.Controllers
                         It.IsAny<UserState[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<IQuery<IUser>>()))
                     .Returns(() => users);
 
-                var usersController = new UsersController();
+                var usersController = new UsersController(
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContextAccessor,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
                 return usersController;
             }
 
             MockForGetPagedUsers();
 
-            var runner = new TestRunner(Factory);
+            var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Users", "GetPagedUsers", HttpMethod.Get);
 
             var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);

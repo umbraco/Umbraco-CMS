@@ -11,14 +11,14 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedCultureInfo"/> class.
         /// </summary>
-        public PublishedCultureInfo(string culture, string name, DateTime date)
+        public PublishedCultureInfo(string culture, string name, string urlSegment, DateTime date)
         {
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentNullOrEmptyException(nameof(culture));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
             Culture = culture;
             Name = name;
-            UrlSegment = name.ToUrlSegment(culture);
+            UrlSegment = urlSegment;
             Date = date;
         }
 

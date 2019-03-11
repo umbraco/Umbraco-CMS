@@ -13,10 +13,10 @@ using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services.Implement
 {
-    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeServiceBase<TItem>
+    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeBaseService<TItem>
         where TRepository : IContentTypeRepositoryBase<TItem>
         where TItem : class, IContentTypeComposition
-        where TService : class, IContentTypeServiceBase<TItem>
+        where TService : class, IContentTypeBaseService<TItem>
     {
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityContainerRepository _containerRepository;
@@ -211,6 +211,11 @@ namespace Umbraco.Core.Services.Implement
 
         #region Get, Has, Is, Count
 
+        IContentTypeComposition IContentTypeBaseService.Get(int id)
+        {
+            return Get(id);
+        }
+
         public TItem Get(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -371,7 +376,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save
 
-        public void Save(TItem item, int userId = 0)
+        public void Save(TItem item, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -409,7 +414,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void Save(IEnumerable<TItem> items, int userId = 0)
+        public void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
         {
             var itemsA = items.ToArray();
 
@@ -455,7 +460,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Delete
 
-        public void Delete(TItem item, int userId = 0)
+        public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -509,7 +514,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void Delete(IEnumerable<TItem> items, int userId = 0)
+        public void Delete(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
         {
             var itemsA = items.ToArray();
 
@@ -730,7 +735,7 @@ namespace Umbraco.Core.Services.Implement
 
         protected Guid ContainerObjectType => EntityContainer.GetContainerObjectType(ContainedObjectType);
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -770,7 +775,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0)
+        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -864,7 +869,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0)
+        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -901,7 +906,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -951,5 +956,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
+
+
     }
 }

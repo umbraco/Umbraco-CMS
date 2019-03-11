@@ -5,6 +5,6 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Manages <see cref="IMediaType"/> objects.
     /// </summary>
-    public interface IMediaTypeService : IContentTypeServiceBase<IMediaType>
+    public interface IMediaTypeService : IContentTypeBaseService<IMediaType>
     { }
 }

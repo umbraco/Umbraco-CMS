@@ -24,7 +24,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
             bool canBePublished,
             IUmbracoContextAccessor umbracoContextAccessor)
         {
-            Node.SetContentTypeAndData(contentType, DraftData, canBePublished ? PublishedData : null, publishedSnapshotAccessor, variationContextAccessor,umbracoContextAccessor);
+            var draftData = DraftData;
+
+            // no published data if it cannot be published (eg is masked)
+            var publishedData = canBePublished ? PublishedData : null;
+
+            // we *must* have either published or draft data
+            // if it cannot be published, published data is going to be null
+            // therefore, ensure that draft data is not
+            if (draftData == null && !canBePublished)
+                draftData = PublishedData;
+
+            Node.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor,umbracoContextAccessor);
         }
     }
 }

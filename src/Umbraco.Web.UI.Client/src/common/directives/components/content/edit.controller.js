@@ -3,8 +3,8 @@
 
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
-        serverValidationManager, contentEditingHelper, treeService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, relationResource, overlayService) {
+        serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
+        editorState, $http, eventsService, overlayService, $location) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -22,7 +22,7 @@
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
-        $scope.page.hideChangeVariant = infiniteMode ? true : false;
+        $scope.page.hideChangeVariant = false;
         $scope.allowOpen = true;
         $scope.app = null;
 
@@ -174,8 +174,8 @@
          */
         function createButtons(content) {
 
-            // for trashed items, the save button is the primary action - otherwise it's a secondary action
-            $scope.page.saveButtonStyle = content.trashed ? "primary" : "info";
+            // for trashed and element type items, the save button is the primary action - otherwise it's a secondary action
+            $scope.page.saveButtonStyle = content.trashed || content.isElement ? "primary" : "info";
 
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
@@ -213,24 +213,7 @@
             $scope.page.showPreviewButton = true;
 
         }
-
-        // create infinite editing buttons
-        function createInfiniteModeButtons(content) {
-
-            $scope.page.allowInfinitePublishAndClose = false;
-            $scope.page.allowInfiniteSaveAndClose = false;
-
-            // check for publish rights
-            if (_.contains(content.allowedActions, "U")) {
-                $scope.page.allowInfinitePublishAndClose = true;
-
-                // check for save rights
-            } else if (_.contains(content.allowedActions, "A")) {
-                $scope.page.allowInfiniteSaveAndClose = true;
-            }
-
-        }
-
+        
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(content, path, initialLoad) {
 
@@ -427,6 +410,20 @@
             }
         }
 
+        /** Just shows a simple notification that there are client side validation issues to be fixed */
+        function showValidationNotification() {
+            //TODO: We need to make the validation UI much better, there's a lot of inconsistencies in v8 including colors, issues with the property groups and validation errors between variants
+
+            //need to show a notification else it's not clear there was an error.
+            localizationService.localizeMany([
+                    "speechBubbles_validationFailedHeader",
+                    "speechBubbles_validationFailedMessage"
+                ]
+            ).then(function (data) {
+                notificationsService.error(data[0], data[1]);
+            });
+        }
+
         if ($scope.page.isNew) {
 
             $scope.page.loading = true;
@@ -508,7 +505,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_saveToPublish",
-                        submit: function (model) {
+                        submit: function(model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -516,27 +513,31 @@
                                 saveMethod: contentResource.sendToPublish,
                                 action: "sendToPublish",
                                 showNotifications: false
-                            }).then(function (data) {
-                                //show all notifications manually here since we disabled showing them automatically in the save method
-                                formHelper.showNotifications(data);
-                                clearNotifications($scope.content);
-                                overlayService.close();
-                                return $q.when(data);
-                            }, function (err) {
-                                clearDirtyState($scope.content.variants);
-                                model.submitButtonState = "error";
-                                //re-map the dialog model since we've re-bound the properties
-                                dialog.variants = $scope.content.variants;
-                                //don't reject, we've handled the error
-                                return $q.when(err);
-                            });
+                            }).then(function(data) {
+                                    //show all notifications manually here since we disabled showing them automatically in the save method
+                                    formHelper.showNotifications(data);
+                                    clearNotifications($scope.content);
+                                    overlayService.close();
+                                    return $q.when(data);
+                                },
+                                function(err) {
+                                    clearDirtyState($scope.content.variants);
+                                    model.submitButtonState = "error";
+                                    //re-map the dialog model since we've re-bound the properties
+                                    dialog.variants = $scope.content.variants;
+                                    //don't reject, we've handled the error
+                                    return $q.when(err);
+                                });
                         },
-                        close: function () {
+                        close: function() {
                             overlayService.close();
                         }
                     };
 
                     overlayService.open(dialog);
+                }
+                else {
+                    showValidationNotification();
                 }
             }
             else {
@@ -564,7 +565,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_saveAndPublish",
-                        submit: function (model) {
+                        submit: function(model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -572,14 +573,14 @@
                                 saveMethod: contentResource.publish,
                                 action: "publish",
                                 showNotifications: false
-                            }).then(function (data) {
-                                //show all notifications manually here since we disabled showing them automatically in the save method
-                                formHelper.showNotifications(data);
-                                clearNotifications($scope.content);
-                                overlayService.close();
-                                return $q.when(data);
-                            },
-                                function (err) {
+                            }).then(function(data) {
+                                    //show all notifications manually here since we disabled showing them automatically in the save method
+                                    formHelper.showNotifications(data);
+                                    clearNotifications($scope.content);
+                                    overlayService.close();
+                                    return $q.when(data);
+                                },
+                                function(err) {
                                     clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
@@ -588,12 +589,15 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function () {
+                        close: function() {
                             overlayService.close();
                         }
                     };
 
                     overlayService.open(dialog);
+                }
+                else {
+                    showValidationNotification();
                 }
             }
             else {
@@ -617,7 +621,7 @@
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
-                if (formHelper.submitForm({ scope: $scope, action: "save" })) {
+                if (formHelper.submitForm({ scope: $scope, action: "openSaveDialog" })) {
 
                     var dialog = {
                         parentScope: $scope,
@@ -625,7 +629,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_save",
-                        submit: function (model) {
+                        submit: function(model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -633,27 +637,31 @@
                                 saveMethod: $scope.saveMethod(),
                                 action: "save",
                                 showNotifications: false
-                            }).then(function (data) {
-                                //show all notifications manually here since we disabled showing them automatically in the save method
-                                formHelper.showNotifications(data);
-                                clearNotifications($scope.content);
-                                overlayService.close();
-                                return $q.when(data);
-                            }, function (err) {
-                                clearDirtyState($scope.content.variants);
-                                model.submitButtonState = "error";
-                                //re-map the dialog model since we've re-bound the properties
-                                dialog.variants = $scope.content.variants;
-                                //don't reject, we've handled the error
-                                return $q.when(err);
-                            });
+                            }).then(function(data) {
+                                    //show all notifications manually here since we disabled showing them automatically in the save method
+                                    formHelper.showNotifications(data);
+                                    clearNotifications($scope.content);
+                                    overlayService.close();
+                                    return $q.when(data);
+                                },
+                                function(err) {
+                                    clearDirtyState($scope.content.variants);
+                                    model.submitButtonState = "error";
+                                    //re-map the dialog model since we've re-bound the properties
+                                    dialog.variants = $scope.content.variants;
+                                    //don't reject, we've handled the error
+                                    return $q.when(err);
+                                });
                         },
-                        close: function (oldModel) {
+                        close: function(oldModel) {
                             overlayService.close();
                         }
                     };
 
                     overlayService.open(dialog);
+                }
+                else {
+                    showValidationNotification();
                 }
             }
             else {
@@ -737,6 +745,9 @@
                 };
                 overlayService.open(dialog);
             }
+            else {
+                showValidationNotification();
+            }
         };
 
         $scope.publishDescendants = function() {
@@ -793,49 +804,48 @@
                 };
                 overlayService.open(dialog);
             }
+            else {
+                showValidationNotification();
+            }
         };
 
         $scope.preview = function (content) {
+            // Chromes popup blocker will kick in if a window is opened
+            // without the initial scoped request. This trick will fix that.
+            //
+            var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
+            // Build the correct path so both /#/ and #/ work.
+            var query = 'id=' + content.id;
+            if ($scope.culture) {
+                query += "#?culture=" + $scope.culture;
+            }
+            var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
-            if (!$scope.busy) {
-
-                // Chromes popup blocker will kick in if a window is opened
-                // without the initial scoped request. This trick will fix that.
-                //
-                var previewWindow = $window.open('preview/?init=true', 'umbpreview');
-
-                // Build the correct path so both /#/ and #/ work.
-                var query = 'id=' + content.id;
+            //The user cannot save if they don't have access to do that, in which case we just want to preview
+            //and that's it otherwise they'll get an unauthorized access message
+            if (!_.contains(content.allowedActions, "A")) {
+                previewWindow.location.href = redirect;
+            }
+            else {
+                var selectedVariant = $scope.content.variants[0];
                 if ($scope.culture) {
-                    query += "#?culture=" + $scope.culture;
-                }
-                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
-
-                //The user cannot save if they don't have access to do that, in which case we just want to preview
-                //and that's it otherwise they'll get an unauthorized access message
-                if (!_.contains(content.allowedActions, "A")) {
-                    previewWindow.location.href = redirect;
-                }
-                else {
-                    var selectedVariant;
-                    if (!$scope.culture) {
-                        selectedVariant = $scope.content.variants[0];
-                    }
-                    else {
-                        selectedVariant = _.find($scope.content.variants, function (v) {
-                            return v.language.culture === $scope.culture;
-                        });
-                    }
-
-                    //ensure the save flag is set
-                    selectedVariant.save = true;
-                    performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
-                        previewWindow.location.href = redirect;
-                    }, function (err) {
-                        //validation issues ....
+                    var found = _.find($scope.content.variants, function (v) {
+                        return (v.language && v.language.culture === $scope.culture);
                     });
+
+                    if (found) {
+                        selectedVariant = found;
+                    }
                 }
+
+                //ensure the save flag is set
+                selectedVariant.save = true;
+                performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
+                    previewWindow.location.href = redirect;
+                }, function (err) {
+                    //validation issues ....
+                });
             }
         };
 
@@ -871,17 +881,37 @@
             
             $scope.app = app;
             
-            if (infiniteMode) {
-                createInfiniteModeButtons($scope.content);
-            } else {
-                createButtons($scope.content);
-            }
+            $scope.$broadcast("editors.apps.appChanged", { app: app });
+            
+            createButtons($scope.content);
+            
+        };
+
+        /**
+         * Call back when a content app changes
+         * @param {any} app
+         */
+        $scope.appAnchorChanged = function (app, anchor) {
+            //send an event downwards
+            $scope.$broadcast("editors.apps.appAnchorChanged", { app: app, anchor: anchor });
         };
 
         // methods for infinite editing
         $scope.close = function () {
             if ($scope.infiniteModel.close) {
                 $scope.infiniteModel.close($scope.infiniteModel);
+            }
+        };
+        
+        /**
+         * Call back when user click the back-icon
+         */
+        $scope.onBack = function() {
+            if ($scope.infiniteModel && $scope.infiniteModel.close) {
+                $scope.infiniteModel.close($scope.infiniteModel);
+            } else {
+                // navigate backwards if content has a parent.
+                $location.path('/' + $routeParams.section + '/' + $routeParams.tree + '/' + $routeParams.method + '/' + $scope.content.parentId);
             }
         };
 

@@ -9,43 +9,23 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Editors.Filters
 {
-
-    //internal class ContentValidationHelper : ContentItemValidationHelper<IContent, ContentItemSave>
-    //{
-    //    public ContentValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
-    //    {
-    //    }
-
-    //    /// <summary>
-    //    /// Validates that the correct information is in the request for saving a culture variant
-    //    /// </summary>
-    //    /// <param name="postedItem"></param>
-    //    /// <param name="actionContext"></param>
-    //    /// <returns></returns>
-    //    protected override bool ValidateCultureVariant(ContentItemSave postedItem, HttpActionContext actionContext)
-    //    {
-    //        var contentType = postedItem.PersistedContent.GetContentType();
-    //        if (contentType.VariesByCulture() && postedItem.Culture.IsNullOrWhiteSpace())
-    //        {
-    //            //we cannot save a content item that is culture variant if no culture was specified in the request!
-    //            actionContext.Response = actionContext.Request.CreateValidationErrorResponse($"No culture found in request. Cannot save a content item that varies by culture, without a specified culture.");
-    //            return false;
-    //        }
-    //        return true;
-    //    }
-    //}
 
     /// <summary>
     /// Custom validation helper so that we can exclude the Member.StandardPropertyTypeStubs from being validating for existence
     /// </summary>
     internal class MemberValidationHelper : ContentItemValidationHelper<IMember, MemberSave>
     {
-        public MemberValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
+        private readonly IMemberTypeService _memberTypeService;
+
+        public MemberValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService)
+            : base(logger, umbracoContextAccessor)
         {
+            _memberTypeService = memberTypeService;
         }
 
         /// <summary>
@@ -117,8 +97,9 @@ namespace Umbraco.Web.Editors.Filters
             //if a sensitive value is being submitted.
             if (UmbracoContextAccessor.UmbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
             {
-                var sensitiveProperties = model.PersistedContent.ContentType
-                    .PropertyTypes.Where(x => model.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
+                var contentType = _memberTypeService.Get(model.PersistedContent.ContentTypeId);
+                var sensitiveProperties = contentType
+                    .PropertyTypes.Where(x => contentType.IsSensitiveProperty(x.Alias))
                     .ToList();
 
                 foreach (var sensitiveProperty in sensitiveProperties)

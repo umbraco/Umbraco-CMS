@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     // TODO: these comments are not true anymore
     // TODO: this class needs not be disposable!
-    internal class UmbracoDatabaseFactory : DisposableObject, IUmbracoDatabaseFactory
+    internal class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFactory
     {
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly ILogger _logger;
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Persistence
         {
             // replace NPoco database type by a more efficient one
 
-            var setting = ConfigurationManager.AppSettings["Umbraco.DatabaseFactory.ServerVersion"];
+            var setting = ConfigurationManager.AppSettings[Constants.AppSettings.Debug.DatabaseFactoryServerVersion];
             var fromSettings = false;
 
             if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")

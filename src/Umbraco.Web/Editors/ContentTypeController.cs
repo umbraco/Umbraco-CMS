@@ -51,11 +51,11 @@ namespace Umbraco.Web.Editors
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionaryFactory cultureDictionaryFactory,
             IGlobalSettings globalSettings,
-            UmbracoContext umbracoContext,
+            IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
             ServiceContext services, AppCaches appCaches,
-            IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _serializer = serializer;
             _propertyEditors = propertyEditors;
@@ -214,7 +214,7 @@ namespace Umbraco.Web.Editors
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
-        
+
         public CreatedContentTypeCollectionResult PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
         {
             // create item doctype
@@ -222,7 +222,7 @@ namespace Umbraco.Web.Editors
             itemDocType.Name = collectionItemName;
             itemDocType.Alias = collectionItemName.ToSafeAlias(true);
             itemDocType.Icon = collectionItemIcon;
-            
+
             // create item doctype template
             if (collectionItemCreateTemplate)
             {
@@ -243,7 +243,7 @@ namespace Umbraco.Web.Editors
             {
                 new ContentTypeSort(itemDocType.Id, 0)
             };
-            
+
             // create collection doctype template
             if (collectionCreateTemplate)
             {
@@ -393,7 +393,11 @@ namespace Umbraco.Web.Editors
             IEnumerable<IContentType> types;
             if (contentId == Constants.System.Root)
             {
-                types = Services.ContentTypeService.GetAll().Where(x => x.AllowedAsRoot).ToList();
+                var allContentTypes = Services.ContentTypeService.GetAll().ToList();
+                bool AllowedAsRoot(IContentType x) => x.AllowedAsRoot;
+                types = allContentTypes.Any(AllowedAsRoot)
+                    ? allContentTypes.Where(AllowedAsRoot).ToList()
+                    : allContentTypes;
             }
             else
             {
@@ -403,7 +407,8 @@ namespace Umbraco.Web.Editors
                     return Enumerable.Empty<ContentTypeBasic>();
                 }
 
-                var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var contentType = Services.ContentTypeBaseServices.GetContentTypeOf(contentItem);
+                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
@@ -497,7 +502,7 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
-            
+
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
                 Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors);
 
@@ -543,7 +548,7 @@ namespace Umbraco.Web.Editors
             }
 
             var model = new ContentTypeImportModel();
-            
+
             var file = result.FileData[0];
             var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
@@ -577,6 +582,6 @@ namespace Umbraco.Web.Editors
 
         }
 
-        
+
     }
 }

@@ -76,9 +76,10 @@
 @gray-10:               #F3F3F5;
 @gray-11:               #F6F6F7;
 
-@sand-1:                hsl(22, 33%, 93%);// added 2019
+@sand-1:                hsl(22, 18%, 84%);// added 2019
 @sand-2:                hsl(22, 34%, 88%);// added 2019
 @sand-5:                hsl(22, 31%, 93%);// added 2019
+@sand-6:                hsl(22, 29%, 95%);// added 2019
 @sand-7:                hsl(22, 26%, 97%);// added 2019
 
 
@@ -138,8 +139,8 @@
 @ui-active-type:        @blueExtraDark;
 @ui-active-type-hover:  @blueMid;
 
-@ui-selected:           @sand-1;
-@ui-selected-hover:     ligthen(@sand-1, 10);
+@ui-selected:           @sand-5;
+@ui-selected-hover:     ligthen(@sand-5, 10);
 @ui-selected-type:           @blueExtraDark;
 @ui-selected-type-hover:     @blueMid;
 @ui-selected-border:           @pinkLight;
@@ -176,7 +177,7 @@
 @ui-btn-type:                   @white;
 
 @ui-btn-positive:               @green;
-@ui-btn-positive-hover:         @green-l1;
+@ui-btn-positive-hover:         lighten(@green, 6%);
 @ui-btn-positive-type:          @white;
 
 @ui-btn-negative:               @red;
@@ -507,7 +508,7 @@
 @warningBorder:           transparent;
 
 @errorText:               @white;
-@errorBackground:         @red-d1;
+@errorBackground:         @red;
 @errorBorder:             transparent;
 
 @successText:             @white;

@@ -612,7 +612,7 @@
     <key alias="blue">Bleu</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Ajouter un onglet</key>
+    <key alias="addGroup">Ajouter un onglet</key>
     <key alias="addProperty">Ajouter une propriété</key>
     <key alias="addEditor">Ajouter un éditeur</key>
     <key alias="addTemplate">Ajouter un modèle</key>
@@ -1156,14 +1156,12 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Modèle par défaut</key>
-    <key alias="dictionary editor egenskab">Clé de dictionnaire</key>
     <key alias="importDocumentTypeHelp">Pour importer un type de document, trouvez le fichier ".udt" sur votre ordinateur en cliquant sur le bouton "Parcourir" et cliquez sur "Importer" (une confirmation vous sera demandée à l'écran suivant)</key>
     <key alias="newtabname">Titre du nouvel onglet</key>
     <key alias="nodetype">Type de noeud</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Feuille de style</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Propriété de feuille de style</key>
     <key alias="tab">Onglet</key>
     <key alias="tabname">Titre de l'onglet</key>
     <key alias="tabs">Onglets</key>
@@ -1376,7 +1374,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
-    <key alias="noTabs">Vous n'avez pas ajouté d'onglet</key>
+    <key alias="noGroups">Vous n'avez pas ajouté d'onglet</key>
     <key alias="inheritedFrom">Hérité de</key>
     <key alias="addProperty">Ajouter une propriété</key>
     <key alias="requiredLabel">Label requis</key>
@@ -1784,13 +1782,13 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="httpsCheckExpiringCertificate">Le certificat SSL de votre site web va expirer dans %0% jours.</key>
     <key alias="healthCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Vous êtes actuellement %0% à voir le site via le schéma HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">La valeur appSetting 'umbracoUseSSL' est fixée à 'false' dans votre fichier web.config. Une fois que vous donnerez accès à ce site en utilisant le schéma HTTPS, cette valeur devra être mise à 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">La valeur appSetting 'umbracoUseSSL' est fixée à '%0%' dans votre fichier web.config, vos cookies sont %1% marqués comme étant sécurisés.</key>
-    <key alias="httpsCheckEnableHttpsError">Impossible de mettre à jour la configuration 'umbracoUseSSL' dans votre fichier web.config. Erreur : %0%</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">La valeur appSetting 'Umbraco.Core.UseHttps' est fixée à 'false' dans votre fichier web.config. Une fois que vous donnerez accès à ce site en utilisant le schéma HTTPS, cette valeur devra être mise à 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">La valeur appSetting 'Umbraco.Core.UseHttps' est fixée à '%0%' dans votre fichier web.config, vos cookies sont %1% marqués comme étant sécurisés.</key>
+    <key alias="httpsCheckEnableHttpsError">Impossible de mettre à jour la configuration 'Umbraco.Core.UseHttps' dans votre fichier web.config. Erreur : %0%</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">Activer HTTPS</key>
     <key alias="httpsCheckEnableHttpsDescription">Fixe la configuration 'umbracoSSL' à 'true' dans la section appSettings du fichier web.config.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">La configuration appSetting 'umbracoUseSSL' est maintenant fixée à 'true' dans votre fichier web.config, vos cookies seront marqués comme étant sécurisés.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">La configuration appSetting 'Umbraco.Core.UseHttps' est maintenant fixée à 'true' dans votre fichier web.config, vos cookies seront marqués comme étant sécurisés.</key>
     <key alias="rectifyButton">Corriger</key>
     <key alias="cannotRectifyShouldNotEqual">Impossible de corriger une vérification avec un type de comparaison 'ShouldNotEqual'.</key>
     <key alias="cannotRectifyShouldEqualWithValue">Impossible de corriger une vérification avec un type de comparaison 'ShouldEqual' avec une valeur spécifiée.</key>
@@ -1852,7 +1850,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="redirectedTo">Redirigé Vers</key>
     <key alias="noRedirects">Aucune redirection n'a été créée</key>
     <key alias="noRedirectsDescription">Lorsqu'une page publiée est renommée ou déplacée, une redirection sera automatiquement créée vers la nouvelle page.</key>
-    <key alias="removeButton">Supprimer</key>
     <key alias="confirmRemove">Etes-vous certain(e) de vouloir supprimer la redirection de '%0%' vers '%1%'?</key>
     <key alias="redirectRemoved">Redirection d'URL supprimée.</key>
     <key alias="redirectRemoveError">Erreur lors de la suppression de la redirection d'URL.</key>

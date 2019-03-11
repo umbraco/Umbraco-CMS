@@ -33,7 +33,7 @@
     </umb-editor-sub-header>
 
     <div ng-if="sortingMode && model.groups.length <= 1" class="umb-group-builder__no-data-text">
-        <localize key="contentTypeEditor_noTabs"></localize>
+        <localize key="contentTypeEditor_noGroups"></localize>
     </div>
 
     <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
@@ -41,7 +41,7 @@
         <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{tab.name}}">
 
             <!-- TAB INIT STATE -->
-            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
+            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+g" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
                 <localize key="contentTypeEditor_addGroup"></localize>
             </a>
 
@@ -210,6 +210,11 @@
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.isSensitiveData">
                                         <i class="icon-lock umb-group-builder__property-tag-icon"></i>
                                         <localize key="contentTypeEditor_isSensitiveData"></localize>
+                                    </div>
+
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.allowCultureVariant">
+                                        <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
+                                        <localize key="contentTypeEditor_variantsHeading"></localize>
                                     </div>
 
                                 </div>

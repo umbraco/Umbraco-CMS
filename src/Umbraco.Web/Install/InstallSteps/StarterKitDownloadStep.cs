@@ -18,14 +18,14 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {
         private readonly InstallHelper _installHelper;
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IContentService _contentService;
         private readonly IPackagingService _packageService;
 
-        public StarterKitDownloadStep(IContentService contentService, IPackagingService packageService, InstallHelper installHelper, UmbracoContext umbracoContext)
+        public StarterKitDownloadStep(IContentService contentService, IPackagingService packageService, InstallHelper installHelper, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _installHelper = installHelper;
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _contentService = contentService;
             _packageService = packageService;
         }
@@ -64,26 +64,24 @@ namespace Umbraco.Web.Install.InstallSteps
         private async Task<(string packageFile, int packageId)> DownloadPackageFilesAsync(Guid kitGuid)
         {
             //Go get the package file from the package repo
-            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, UmbracoVersion.Current, _umbracoContext.Security.GetUserId().ResultOr(0));
+            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, UmbracoVersion.Current, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(0));
             if (packageFile == null) throw new InvalidOperationException("Could not fetch package file " + kitGuid);
 
             //add an entry to the installedPackages.config
             var compiledPackage = _packageService.GetCompiledPackageInfo(packageFile);
             var packageDefinition = PackageDefinition.FromCompiledPackage(compiledPackage);
+            packageDefinition.PackagePath = packageFile.FullName;
+
             _packageService.SaveInstalledPackage(packageDefinition);
 
-            InstallPackageFiles(packageDefinition, compiledPackage.PackageFile);
+            _packageService.InstallCompiledPackageFiles(packageDefinition, packageFile, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(-1));
 
             return (compiledPackage.PackageFile.Name, packageDefinition.Id);
         }
 
-        private void InstallPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile)
-        {
-            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
-
-            _packageService.InstallCompiledPackageData(packageDefinition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(0));
-        }
-
+        /// <summary>
+        /// Don't show the view if there's already packages installed
+        /// </summary>
         public override string View => _packageService.GetAllInstalledPackages().Any() ? string.Empty : base.View;
 
         public override bool RequiresExecution(Guid? model)
@@ -94,6 +92,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
+            //Don't continue if there's already packages installed
             if (_packageService.GetAllInstalledPackages().Any())
                 return false;
 

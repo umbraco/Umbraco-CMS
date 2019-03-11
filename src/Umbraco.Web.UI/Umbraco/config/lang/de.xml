@@ -707,14 +707,12 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardvorlage</key>
-    <key alias="dictionary editor egenskab">Wörterbuch-Schlüsselwort</key>
     <key alias="importDocumentTypeHelp">Wählen Sie die lokale .udt-Datei aus, die den zu importierenden Dokumenttyp enthält und fahren Sie mit dem Import fort. Die endgültige Übernahme erfolgt im Anschluss erst nach einer weiteren Bestätigung.</key>
     <key alias="newtabname">Beschriftung der neuen Registerkarte</key>
     <key alias="nodetype">Elementtyp</key>
     <key alias="objecttype">Typ</key>
     <key alias="stylesheet">Stylesheet</key>
     <key alias="script">Skript</key>
-    <key alias="stylesheet editor egenskab">Stylesheet-Eigenschaft</key>
     <key alias="tab">Registerkarte</key>
     <key alias="tabname">Registerkartenbeschriftung</key>
     <key alias="tabs">Registerkarten</key>

@@ -11,6 +11,7 @@
           changePassword: null
         };
         vm.breadcrumbs = [];
+        vm.showBackButton = true;
         vm.avatarFile = {};
         vm.labels = {};
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";

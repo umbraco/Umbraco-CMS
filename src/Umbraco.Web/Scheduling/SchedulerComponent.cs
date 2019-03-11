@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
@@ -24,6 +23,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IScopeProvider _scopeProvider;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
+        private readonly IUmbracoContextFactory _umbracoContextFactory;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -38,13 +38,14 @@ namespace Umbraco.Web.Scheduling
         public SchedulerComponent(IRuntimeState runtime,
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IScopeProvider scopeProvider, IProfilingLogger logger)
+            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger)
         {
             _runtime = runtime;
             _contentService = contentService;
             _auditService = auditService;
             _scopeProvider = scopeProvider;
             _logger = logger;
+            _umbracoContextFactory = umbracoContextFactory;
 
             _healthChecks = healthChecks;
             _notifications = notifications;
@@ -114,11 +115,11 @@ namespace Umbraco.Web.Scheduling
         {
             // scheduled publishing/unpublishing
             // install on all, will only run on non-replica servers
-            var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _logger);
+            var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _umbracoContextFactory, _logger);
             _publishingRunner.TryAdd(task);
             return task;
         }
-        
+
         private IBackgroundTask RegisterHealthCheckNotifier(IHealthChecks healthCheckConfig,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IProfilingLogger logger)

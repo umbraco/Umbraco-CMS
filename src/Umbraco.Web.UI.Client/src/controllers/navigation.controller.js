@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, $cookies, treeService, appState, navigationService, keyboardService, historyService, eventsService, angularHelper, languageResource, contentResource) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, $cookies, treeService, appState, navigationService, keyboardService, historyService, eventsService, angularHelper, languageResource, contentResource, editorState) {
 
     //this is used to trigger the tree to start loading once everything is ready
     var treeInitPromise = $q.defer();
@@ -248,6 +248,20 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     evts.push(eventsService.on("appState.editors.close", function (name, args) {
         $scope.infiniteMode = args && args.editors.length > 0 ? true : false;
     }));
+
+    evts.push(eventsService.on("treeService.removeNode", function (e, args) {
+        //check to see if the current page has been removed
+
+        var currentEditorState = editorState.getCurrent()
+        if (currentEditorState && currentEditorState.id.toString() === args.node.id.toString()) {
+            //current page is loaded, so navigate to root
+            var section = appState.getSectionState("currentSection");
+            $location.path("/" + section);
+        }
+    }));
+
+
+    
 
     /**
      * Based on the current state of the application, this configures the scope variables that control the main tree and language drop down

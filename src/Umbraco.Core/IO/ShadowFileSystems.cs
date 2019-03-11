@@ -10,7 +10,7 @@ namespace Umbraco.Core.IO
         private bool _completed;
 
         // invoked by the filesystems when shadowing
-        public ShadowFileSystems(FileSystems fileSystems, Guid id)
+        public ShadowFileSystems(FileSystems fileSystems, string id)
         {
             _fileSystems = fileSystems;
             Id = id;
@@ -19,7 +19,7 @@ namespace Umbraco.Core.IO
         }
 
         // for tests
-        public Guid Id { get; }
+        public string Id { get; }
 
         // invoked by the scope when exiting, if completed
         public void Complete()

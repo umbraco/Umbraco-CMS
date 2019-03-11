@@ -25,51 +25,46 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a value indicating whether the content is published.
         /// </summary>
-        bool Published { get; }
+        bool Published { get; set; }
 
-        PublishedState PublishedState { get; }
+        PublishedState PublishedState { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the content has been edited.
         /// </summary>
-        bool Edited { get; }
+        bool Edited { get; set; }
 
         /// <summary>
         /// Gets the published version identifier.
         /// </summary>
-        int PublishedVersionId { get; }
+        int PublishedVersionId { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the content item is a blueprint.
         /// </summary>
-        bool Blueprint { get; }
+        bool Blueprint { get; set; }
 
         /// <summary>
         /// Gets the template id used to render the published version of the content.
         /// </summary>
         /// <remarks>When editing the content, the template can change, but this will not until the content is published.</remarks>
-        int? PublishTemplateId { get; }
+        int? PublishTemplateId { get; set; }
 
         /// <summary>
         /// Gets the name of the published version of the content.
         /// </summary>
         /// <remarks>When editing the content, the name can change, but this will not until the content is published.</remarks>
-        string PublishName { get; }
+        string PublishName { get; set; }
 
         /// <summary>
         /// Gets the identifier of the user who published the content.
         /// </summary>
-        int? PublisherId { get; }
+        int? PublisherId { get; set; }
 
         /// <summary>
         /// Gets the date and time the content was published.
         /// </summary>
-        DateTime? PublishDate { get; }
-
-        /// <summary>
-        /// Gets the content type of this content.
-        /// </summary>
-        IContentType ContentType { get; }
+        DateTime? PublishDate { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether a culture is published.
@@ -79,18 +74,10 @@ namespace Umbraco.Core.Models
         /// and the content published name for this culture is non-null. It becomes non-published
         /// whenever values for this culture are unpublished.</para>
         /// <para>A culture becomes published as soon as PublishCulture has been invoked,
-        /// even though the document might now have been saved yet (and can have no identity).</para>
+        /// even though the document might not have been saved yet (and can have no identity).</para>
         /// <para>Does not support the '*' wildcard (returns false).</para>
         /// </remarks>
         bool IsCulturePublished(string culture);
-
-        /// <summary>
-        /// Gets a value indicating whether a culture was published.
-        /// </summary>
-        /// <remarks>
-        /// <para>Mirrors <see cref="IsCulturePublished"/> whenever the content item is saved.</para>
-        /// </remarks>
-        bool WasCulturePublished(string culture);
 
         /// <summary>
         /// Gets the date a culture was published.
@@ -125,7 +112,7 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, ContentCultureInfos> PublishCultureInfos { get; }
+        ContentCultureInfosCollection PublishCultureInfos { get; set; }
 
         /// <summary>
         /// Gets the published cultures.
@@ -135,47 +122,13 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the edited cultures.
         /// </summary>
-        IEnumerable<string> EditedCultures { get; }
-
-        // TODO: these two should move to some kind of service
-
-        /// <summary>
-        /// Changes the <see cref="IContentType"/> for the current content object
-        /// </summary>
-        /// <param name="contentType">New ContentType for this content</param>
-        /// <remarks>Leaves PropertyTypes intact after change</remarks>
-        void ChangeContentType(IContentType contentType);
-
-        /// <summary>
-        /// Changes the <see cref="IContentType"/> for the current content object and removes PropertyTypes,
-        /// which are not part of the new ContentType.
-        /// </summary>
-        /// <param name="contentType">New ContentType for this content</param>
-        /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
-        void ChangeContentType(IContentType contentType, bool clearProperties);
+        IEnumerable<string> EditedCultures { get; set; }
 
         /// <summary>
         /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
-
-        /// <summary>
-        /// Registers a culture to be published.
-        /// </summary>
-        /// <returns>A value indicating whether the culture can be published.</returns>
-        /// <remarks>
-        /// <para>Fails if properties don't pass variant validation rules.</para>
-        /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
-        /// </remarks>
-        bool PublishCulture(string culture = "*");
-
-        /// <summary>
-        /// Registers a culture to be unpublished.
-        /// </summary>
-        /// <remarks>
-        /// <para>Unpublishing must be finalized via the content service SavePublishing method.</para>
-        /// </remarks>
-        void UnpublishCulture(string culture = "*");
+        
     }
 }

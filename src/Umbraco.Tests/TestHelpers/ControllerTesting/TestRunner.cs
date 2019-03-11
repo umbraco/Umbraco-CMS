@@ -15,9 +15,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
     public class TestRunner
     {
-        private readonly Func<HttpRequestMessage, UmbracoHelper, ApiController> _controllerFactory;
+        private readonly Func<HttpRequestMessage, IUmbracoContextAccessor, UmbracoHelper, ApiController> _controllerFactory;
 
-        public TestRunner(Func<HttpRequestMessage, UmbracoHelper, ApiController> controllerFactory)
+        public TestRunner(Func<HttpRequestMessage, IUmbracoContextAccessor, UmbracoHelper, ApiController> controllerFactory)
         {
             _controllerFactory = controllerFactory;
         }
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 {
                     Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 }
-                
+
                 return Tuple.Create(response, json);
             }
         }

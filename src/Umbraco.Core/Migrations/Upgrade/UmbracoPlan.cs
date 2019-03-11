@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Upgrade.V_7_12_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_14_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -36,8 +37,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             get
             {
                 // no state in database yet - assume we have something in web.config that makes some sense
-                if (!SemVersion.TryParse(ConfigurationManager.AppSettings["umbracoConfigurationStatus"], out var currentVersion))
-                    throw new InvalidOperationException("Could not get current version from web.config umbracoConfigurationStatus appSetting.");
+                if (!SemVersion.TryParse(ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus], out var currentVersion))
+                    throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");
 
                 // we currently support upgrading from 7.10.0 and later
                 if (currentVersion < new SemVersion(7, 10))
@@ -56,7 +57,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             }
         }
 
-         // define the plan
+        // define the plan
         protected void DefinePlan()
         {
             // MODIFYING THE PLAN
@@ -126,7 +127,18 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<UpdateMemberGroupPickerData>("{8A027815-D5CD-4872-8B88-9A51AB5986A6}"); // from 7.14.0
             To<ConvertRelatedLinksToMultiUrlPicker>("{ED28B66A-E248-4D94-8CDB-9BDF574023F0}");
             To<UpdatePickerIntegerValuesToUdi>("{38C809D5-6C34-426B-9BEA-EFD39162595C}");
+            To<RenameUmbracoDomainsTable>("{6017F044-8E70-4E10-B2A3-336949692ADD}");
+            To<AddUserLoginDtoDateIndex>("{98339BEF-E4B2-48A8-B9D1-D173DC842BBE}");
 
+            Merge()
+                .To<DropXmlTables>("{CDBEDEE4-9496-4903-9CF2-4104E00FF960}")
+            .With()
+                .To<RadioAndCheckboxAndDropdownPropertyEditorsMigration>("{940FD19A-00A8-4D5C-B8FF-939143585726}")
+            .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
+
+            To<RenameLabelAndRichTextPropertyEditorAliases>("{E0CBE54D-A84F-4A8F-9B13-900945FD7ED9}");
+            To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}");
+            To<ChangeNuCacheJsonFormat>("{80C0A0CB-0DD5-4573-B000-C4B7C313C70D}");
 
             //FINAL
 
@@ -158,7 +170,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             From("{init-7.12.4}").To("{init-7.10.0}"); // same as 7.12.0
             From("{init-7.13.0}").To("{init-7.10.0}"); // same as 7.12.0
             From("{init-7.13.1}").To("{init-7.10.0}"); // same as 7.12.0
-
+                
             // 7.14.0 has migrations, handle it...
             //  clone going from 7.10 to 1350617A (the last one before we started to merge 7.12 migrations), then
             //  clone going from CF51B39B (after 7.12 migrations) to 0009109C (the last one before we started to merge 7.12 migrations),

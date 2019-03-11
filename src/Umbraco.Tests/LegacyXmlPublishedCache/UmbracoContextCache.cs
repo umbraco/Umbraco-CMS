@@ -13,7 +13,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             get
             {
-                var umbracoContext = UmbracoContext.Current;
+                var umbracoContext = Umbraco.Web.Composing.Current.UmbracoContext;
 
                 // will get or create a value
                 // a ConditionalWeakTable is thread-safe

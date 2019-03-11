@@ -197,9 +197,6 @@ namespace Umbraco.Web.Routing
             // handlers like default.aspx will want it and most macros currently need it
             frequest.LegacyContentHashTable = new PublishedContentHashtableConverter(frequest);
 
-            // used by many legacy objects
-            frequest.UmbracoContext.HttpContext.Items["pageElements"] = frequest.LegacyContentHashTable.Elements;
-
             return true;
         }
 
@@ -239,9 +236,7 @@ namespace Umbraco.Web.Routing
             // assign the legacy page back to the docrequest
             // handlers like default.aspx will want it and most macros currently need it
             request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
-
-            // this is used by many legacy objects
-            request.UmbracoContext.HttpContext.Items["pageElements"] = request.LegacyContentHashTable.Elements;
+            
         }
 
         #endregion
@@ -599,29 +594,38 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    // grab the current member
-                    var member = membershipHelper.GetCurrentMember();
-                    // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
-                    var memberIsActive = true;
-                    if (member != null)
+                    if (membershipHelper.IsUmbracoMembershipProviderActive())
                     {
-                        if (member.HasProperty(Constants.Conventions.Member.IsApproved) == false)
-                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsApproved);
+                        // grab the current member
+                        var member = membershipHelper.GetCurrentMember();
+                        // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
+                        var memberIsActive = true;
+                        if (member != null)
+                        {
+                            if (member.HasProperty(Constants.Conventions.Member.IsApproved) == false)
+                                memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsApproved);
 
-                        if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false)
-                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsLockedOut) == false;
-                    }
+                            if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false)
+                                memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsLockedOut) == false;
+                        }
 
-                    if (memberIsActive == false)
-                    {
-                        _logger.Debug<PublishedRouter>("Current member is either unapproved or locked out, redirect to error page");
-                        var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
-                        if (errorPageId != request.PublishedContent.Id)
-                            request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
+                        if (memberIsActive == false)
+                        {
+                            _logger.Debug<PublishedRouter>(
+                                "Current member is either unapproved or locked out, redirect to error page");
+                            var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
+                            if (errorPageId != request.PublishedContent.Id)
+                                request.PublishedContent =
+                                    request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
+                        }
+                        else
+                        {
+                            _logger.Debug<PublishedRouter>("Current member has access");
+                        }
                     }
                     else
                     {
-                        _logger.Debug<PublishedRouter>("Current member has access");
+                        _logger.Debug<PublishedRouter>("Current custom MembershipProvider member has access");
                     }
                 }
             }
@@ -670,6 +674,9 @@ namespace Umbraco.Web.Routing
 
                 // TODO: When we remove the need for a database for templates, then this id should be irrelevant,
                 // not sure how were going to do this nicely.
+
+                // TODO: We need to limit altTemplate to only allow templates that are assigned to the current document type!
+                // if the template isn't assigned to the document type we should log a warning and return 404
 
                 var templateId = request.PublishedContent.TemplateId;
                 request.TemplateModel = GetTemplateModel(templateId);
@@ -733,7 +740,7 @@ namespace Umbraco.Web.Routing
 
         private ITemplate GetTemplateModel(int? templateId)
         {
-            if (templateId.HasValue == false)
+            if (templateId.HasValue == false || templateId.Value == default)
             {
                 _logger.Debug<PublishedRouter>("GetTemplateModel: No template.");
                 return null;

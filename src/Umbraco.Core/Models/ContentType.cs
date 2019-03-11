@@ -13,8 +13,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class ContentType : ContentTypeCompositionBase, IContentType
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-        public const bool IsPublishingConst = true;
+        public const bool SupportsPublishingConst = true;
 
         private int _defaultTemplate;
         private IEnumerable<ITemplate> _allowedTemplates;
@@ -43,19 +42,15 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public override bool IsPublishing => IsPublishingConst;
+        public override ISimpleContentType ToSimple() => new SimpleContentType(this);
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
-            public readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
+        /// <inheritdoc />
+        public override bool SupportsPublishing => SupportsPublishingConst;
 
-            //Custom comparer for enumerable
-            public readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
-                (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
-                templates => templates.GetHashCode());
-        }
+        //Custom comparer for enumerable
+        private static readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
+            (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
+            templates => templates.GetHashCode());
 
         /// <summary>
         /// Gets or sets the alias of the default Template.
@@ -75,8 +70,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         internal int DefaultTemplateId
         {
-            get { return _defaultTemplate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, Ps.Value.DefaultTemplateSelector); }
+            get => _defaultTemplate;
+            set => SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, nameof(DefaultTemplateId));
         }
 
         /// <summary>
@@ -91,7 +86,7 @@ namespace Umbraco.Core.Models
             get => _allowedTemplates;
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector, Ps.Value.TemplateComparer);
+                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, nameof(AllowedTemplates), TemplateComparer);
 
                 if (_allowedTemplates.Any(x => x.Id == _defaultTemplate) == false)
                     DefaultTemplateId = 0;
@@ -105,8 +100,8 @@ namespace Umbraco.Core.Models
         /// <returns>True if AllowedTemplates contains the templateId else False</returns>
         public bool IsAllowedTemplate(int templateId)
         {
-            return AllowedTemplates == null 
-                ? false 
+            return AllowedTemplates == null
+                ? false
                 : AllowedTemplates.Any(t => t.Id == templateId);
         }
 

@@ -14,6 +14,7 @@ namespace Umbraco.Core.Migrations
     public class MigrationPlan
     {
         private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>();
+        private readonly List<Type> _postMigrationTypes = new List<Type>();
 
         private string _prevState;
         private string _finalState;
@@ -167,6 +168,25 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
+        /// Prepares post-migrations.
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be overriden to filter, complement, and/or re-order post-migrations.</para>
+        /// </remarks>
+        protected virtual IEnumerable<Type> PreparePostMigrations(IEnumerable<Type> types)
+            => types;
+
+        /// <summary>
+        /// Adds a post-migration to the plan.
+        /// </summary>
+        public virtual MigrationPlan AddPostMigration<TMigration>()
+            where TMigration : IMigration
+        {
+            _postMigrationTypes.Add(typeof(TMigration));
+            return this;
+        }
+
+        /// <summary>
         /// Creates a random, unique state.
         /// </summary>
         public virtual string CreateRandomState()
@@ -270,6 +290,7 @@ namespace Umbraco.Core.Migrations
                 throw new Exception($"Unknown state \"{origState}\".");
 
             var context = new MigrationContext(scope.Database, logger);
+            context.PostMigrations.AddRange(_postMigrationTypes);
 
             while (transition != null)
             {
@@ -283,6 +304,20 @@ namespace Umbraco.Core.Migrations
 
                 if (!_transitions.TryGetValue(origState, out transition))
                     throw new Exception($"Unknown state \"{origState}\".");
+            }
+
+            // prepare and de-duplicate post-migrations, only keeping the 1st occurence
+            var temp = new HashSet<Type>();
+            var postMigrationTypes = PreparePostMigrations(context.PostMigrations)
+                .Where(x => !temp.Contains(x))
+                .Select(x => { temp.Add(x); return x; });
+
+            // run post-migrations
+            foreach (var postMigrationType in postMigrationTypes)
+            {
+                logger.Info<MigrationPlan>($"PostMigration: {postMigrationType.FullName}.");
+                var postMigration = migrationBuilder.Build(postMigrationType, context);
+                postMigration.Migrate();
             }
 
             logger.Info<MigrationPlan>("Done (pending scope completion).");

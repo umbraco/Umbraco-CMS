@@ -20,12 +20,10 @@ body {
     position: absolute;
     padding: 0;
     margin: 0;
-    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 20px;
     color: #343434;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
     padding-left:80px;
 }
@@ -106,35 +104,11 @@ a, a:hover{
     cursor: pointer;
     background: #f2f2f2;
     border: 1px solid #cccccc;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
     border-radius: 2px;
-    -webkit-box-shadow: none;
     box-shadow: none;
 }
-/*
-.btn-success {
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-    background-color: #53a93f;
-    background-image: -moz-linear-gradient(top, #53a93f, #53a93f);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#53a93f), to(#53a93f));
-    background-image: -webkit-linear-gradient(top, #53a93f, #53a93f);
-    background-image: -o-linear-gradient(top, #53a93f, #53a93f);
-    background-image: linear-gradient(to bottom, #53a93f, #53a93f);
-    background-repeat: repeat-x;
-    border-color: #53a93f #53a93f #38712a;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff53a93f', endColorstr='#ff53a93f', GradientType=0);
-    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
-}
 
-.btn-success:hover {
-    color: #ffffff;
-}
-*/
 .btn-group > .btn + .dropdown-toggle {
-    -webkit-box-shadow: none;
     box-shadow: none;
 }
 
@@ -145,18 +119,12 @@ a, a:hover{
 .btn-group > .btn + .dropdown-toggle {
     padding-right: 8px;
     padding-left: 8px;
-    -webkit-box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
-    -moz-box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
     box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .btn-group > .btn:last-child, .btn-group > .dropdown-toggle {
-    -webkit-border-top-right-radius: 2px;
     border-top-right-radius: 2px;
-    -webkit-border-bottom-right-radius: 2px;
     border-bottom-right-radius: 2px;
-    -moz-border-radius-topright: 2px;
-    -moz-border-radius-bottomright: 2px;
 }
 
 .caret {
@@ -176,6 +144,7 @@ a, a:hover{
 
 .dropdown-menu {
     position: absolute;
+    display: block;
     top: auto;
     right: 0;
     z-index: 1000;
@@ -189,14 +158,8 @@ a, a:hover{
     background-color: #ffffff;
     border: 1px solid #ccc;
     border: 1px solid rgba(0, 0, 0, 0.2);
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
-    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding;
     background-clip: padding-box;
 }
 
@@ -276,8 +239,6 @@ a, a:hover{
     font-size: 13px;
     line-height: 16px;
     background: #1b264f;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
     z-index: 9999;
 }
@@ -299,8 +260,6 @@ a, a:hover{
     text-align: center;
     color: #D8D7D9;
     opacity: 0.4;
-    -webkit-transition: all .3s linear;
-    -moz-transition: all .3s linear;
     transition: all .3s linear;
 }
 
@@ -311,8 +270,6 @@ ul.sections {
     position:absolute;
     top: 90px;
     width: 80px;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
     list-style:none;
     margin:0;
@@ -323,8 +280,6 @@ ul.sections {
 ul.sections li {
     display: block;
     border-left: 4px #1b264f solid;
-    -webkit-transition: all .3s linear;
-    -moz-transition: all .3s linear;
     transition: all .3s linear;
 }
 
@@ -332,8 +287,6 @@ ul.sections li {
 .fix-left-menu ul.sections li a i {
     color: #fff;
     opacity: .7;
-    -webkit-transition: all .3s linear;
-    -moz-transition: all .3s linear;
     transition: all .3s linear;
 }
 
@@ -400,15 +353,11 @@ ul.sections li.current, ul.sections li:hover {
     font-size: 13px;
     line-height: 16px;
     background: #ffffff;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
     width: 250px;
     height: 100%;
     padding: 0;
     z-index: 999;
-    -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-    -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
     box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
 }
 
@@ -429,8 +378,6 @@ ul.sections li.current, ul.sections li:hover {
     position: absolute;
     right: 20px;
     cursor:pointer;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
 }
 
@@ -468,11 +415,7 @@ ul.sections li.current, ul.sections li:hover {
     font-size: 13px;
     line-height: 16px;
     background: #ffffff;
-    -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-    -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
     box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
 }
 
@@ -628,7 +571,7 @@ h4.panel-title {
 
 .canvasdesigner .ui-widget-content {
     background: rgba(0, 0, 0, 0.27) !important;
-    border: 0px solid #fff !important;
+    border: 0 solid #fff !important;
     border-radius: 1px !important;
 }
 
@@ -720,10 +663,6 @@ h4.panel-title {
     border-radius: 1px;
     background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==);
     cursor: pointer;
-}
-
-.canvasdesigner .spectrumcolorpicker {
-
 }
 
 .canvasdesigner .float-panel .sp-container.sp-flat {
@@ -826,9 +765,7 @@ iframe {
 }
 
 .flip:before {
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
 }
 
 /*************************************************/
@@ -895,9 +832,6 @@ iframe {
     height: 78px;
     cursor: pointer;
     background-position: center center;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
     background-size: cover;
     border: 2px solid #F3F2F2;
 }
@@ -969,7 +903,6 @@ iframe {
   font-size: 23px;
   cursor: pointer;
   opacity: 0;
-  filter: alpha(opacity=0);
   transform: translate(-300px, 0) scale(4);
   direction: ltr;
 }

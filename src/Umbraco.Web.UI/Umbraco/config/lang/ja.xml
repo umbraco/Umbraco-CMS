@@ -466,7 +466,7 @@
     <key alias="blue">ブルー</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">タブの追加</key>
+    <key alias="addGroup">タブの追加</key>
     <key alias="addProperty">プロパティの追加</key>
     <key alias="addEditor">エディターの追加</key>
     <key alias="addTemplate">テンプレートの追加</key>
@@ -802,14 +802,12 @@ Runwayをインストールして作られた新しいウェブサイトがど�
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">既定のテンプレート</key>
-    <key alias="dictionary editor egenskab">ディクショナリのキー</key>
     <key alias="importDocumentTypeHelp">ドキュメントタイプを読み込むには、「参照」ボタンをクリックして自分のPC内にある".udt"ファイルを選択して、「インポート」ボタンをクリックします。 (次画面で確認画面が表示されます)</key>
     <key alias="newtabname">新規タブの名前</key>
     <key alias="nodetype">ノードのタイプ</key>
     <key alias="objecttype">タイプ</key>
     <key alias="stylesheet">スタイルシート</key>
     <key alias="script">スクリプト</key>
-    <key alias="stylesheet editor egenskab">スタイルシートのプロパティ</key>
     <key alias="tab">タブ</key>
     <key alias="tabname">タブの名前</key>
     <key alias="tabs">タブ</key>
@@ -934,7 +932,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">構成</key>
-    <key alias="noTabs">タブが追加されていません</key>
+    <key alias="noGroups">タブが追加されていません</key>
     <key alias="inheritedFrom">次から継承:</key>
     <key alias="addProperty">プロパティの追加</key>
     <key alias="requiredLabel">必要なラベル</key>

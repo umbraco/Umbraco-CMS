@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -53,6 +54,7 @@ namespace Umbraco.Tests.Services
             var documentRepository = Factory.GetInstance<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
+            var contentTypeServiceBaseFactory = Current.Services.ContentTypeBaseServices;
 
             return new PublishedSnapshotService(
                 options,
@@ -70,7 +72,9 @@ namespace Umbraco.Tests.Services
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
                 Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
-                Factory.GetInstance<IEntityXmlSerializer>());
+                Factory.GetInstance<IEntityXmlSerializer>(),
+                Mock.Of<IPublishedModelFactory>(),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
         }
 
         public class LocalServerMessenger : ServerMessengerBase
@@ -175,8 +179,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("v1en", document.GetValue("value1"));
             Assert.AreEqual("v2", document.GetValue("value2"));
 
-            Assert.IsFalse(document.ContentType.PropertyTypes.First(x => x.Alias == "value1").VariesByCulture());
-
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(document.Id,
                 "{'properties':{'value1':[{'culture':'','seg':'','val':'v1en'}],'value2':[{'culture':'','seg':'','val':'v2'}]},'cultureData':");
@@ -194,8 +196,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("v1en", document.GetValue("value1"));
             Assert.AreEqual("v2", document.GetValue("value2"));
 
-            Assert.IsFalse(document.ContentType.PropertyTypes.First(x => x.Alias == "value1").VariesByCulture());
-
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(document.Id,
                 "{'properties':{'value1':[{'culture':'','seg':'','val':'v1en'}],'value2':[{'culture':'','seg':'','val':'v2'}]},'cultureData':");
@@ -211,8 +211,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("v1en", document.GetValue("value1", "en"));
             Assert.AreEqual("v1fr", document.GetValue("value1", "fr"));
             Assert.AreEqual("v2", document.GetValue("value2"));
-
-            Assert.IsTrue(document.ContentType.PropertyTypes.First(x => x.Alias == "value1").VariesByCulture());
 
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(document.Id,
@@ -288,8 +286,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("v1", document.GetValue("value1"));
             Assert.AreEqual("v2", document.GetValue("value2"));
 
-            Assert.IsFalse(document.ContentType.PropertyTypes.First(x => x.Alias == "value1").VariesByCulture());
-
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(document.Id,
                 "{'properties':{'value1':[{'culture':'','seg':'','val':'v1'}],'value2':[{'culture':'','seg':'','val':'v2'}]},'cultureData':");
@@ -304,8 +300,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("v1", document.GetValue("value1", "en"));
             Assert.IsNull(document.GetValue("value1", "fr"));
             Assert.AreEqual("v2", document.GetValue("value2"));
-
-            Assert.IsTrue(document.ContentType.PropertyTypes.First(x => x.Alias == "value1").VariesByCulture());
 
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(document.Id,
@@ -323,8 +317,6 @@ namespace Umbraco.Tests.Services
             Assert.IsNull(document.GetValue("value1", "fr"));
             Assert.AreEqual("v1", document.GetValue("value1"));
             Assert.AreEqual("v2", document.GetValue("value2"));
-
-            Assert.IsFalse(document.ContentType.PropertyTypes.First(x => x.Alias == "value1").VariesByCulture());
 
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(document.Id,
@@ -401,8 +393,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("v1en", document.GetValue("value1"));
             Assert.AreEqual("v2", document.GetValue("value2"));
 
-            Assert.IsFalse(document.ContentType.PropertyTypes.First(x => x.Alias == "value1").VariesByCulture());
-
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(document.Id,
                 "{'properties':{'value1':[{'culture':'','seg':'','val':'v1en'}],'value2':[{'culture':'','seg':'','val':'v2'}]},'cultureData':");
@@ -418,8 +408,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("v1en", document.GetValue("value1", "en"));
             Assert.AreEqual("v1fr", document.GetValue("value1", "fr"));
             Assert.AreEqual("v2", document.GetValue("value2"));
-
-            Assert.IsTrue(document.ContentType.PropertyTypes.First(x => x.Alias == "value1").VariesByCulture());
 
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(document.Id,
@@ -438,8 +426,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("v2", document.GetValue("value2", "en"));
             Assert.IsNull(document.GetValue("value2", "fr"));
             Assert.IsNull(document.GetValue("value2"));
-
-            Assert.IsTrue(document.ContentType.PropertyTypes.First(x => x.Alias == "value2").VariesByCulture());
 
             Console.WriteLine(GetJson(document.Id));
             AssertJsonStartsWith(document.Id,

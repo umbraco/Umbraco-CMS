@@ -13,24 +13,27 @@
         let packageUri = $routeParams.method;
 
         if (packageInstallData) {            
-            localStorageService.remove("packageInstallData");                       
+            localStorageService.remove("packageInstallData");
+
+            if (packageInstallData.postInstallationPath) {
+                //navigate to the custom installer screen if set
+                $location.path(packageInstallData.postInstallationPath).search("packageId", packageInstallData.id);
+                return;
+            }
+
+            //if it is "installed" then set the uri/path to that
+            if (packageInstallData === "installed") {
+                packageUri = "installed";
+            }
         }
 
-        if (packageInstallData && packageInstallData !== "installed" && packageInstallData.postInstallationPath) {
-            //navigate to the custom installer screen, if it is just "installed" it means there is no custom installer screen
-            $location.path(packageInstallData.postInstallationPath).search("packageId", packageInstallData.id);
-        }
-        else {
-            var vm = this;
-            vm.page = {};
-            vm.page.labels = {};
-            vm.page.name = "";
-            vm.page.navigation = [];
+        var vm = this;
+        vm.page = {};
+        vm.page.labels = {};
+        vm.page.name = "";
+        vm.page.navigation = [];
 
-            packageUri = packageInstallData ? packageInstallData : packageUri; //use the path stored in storage over the one in the current path
-
-            onInit();
-        }
+        onInit();
 
         function onInit() {
 
@@ -72,7 +75,7 @@
                     },
                     {
                         "name": vm.page.labels.install,
-                        "icon": "icon-add",
+                        "icon": "icon-cloud-upload",
                         "view": "views/packages/views/install-local.html",
                         "active": packageUri === "local",
                         "alias": "umbInstallLocal",
@@ -82,7 +85,7 @@
                     },
                     {
                         "name": vm.page.labels.created,
-                        "icon": "icon-add",
+                        "icon": "icon-files",
                         "view": "views/packages/views/created.html",
                         "active": packageUri === "created",
                         "alias": "umbCreatedPackages",

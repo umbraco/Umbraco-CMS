@@ -505,7 +505,7 @@
     <key alias="blue">Blauw</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Tab toevoegen</key>
+    <key alias="addGroup">Groep toevoegen</key>
     <key alias="addProperty">Property toevoegen</key>
     <key alias="addEditor">Editor toevoegen</key>
     <key alias="addTemplate">Template toevoegen</key>
@@ -819,14 +819,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standaard template</key>
-    <key alias="dictionary editor egenskab">Woordenboek sleutel</key>
     <key alias="importDocumentTypeHelp">Om een bestaand documenttype te importeren, zoek het betreffende “.udt” bestand door op browse en import te klikken. (Je ziet een bevestigingspagina voordat de import start. Als het documenttype al bestaat dan wordt het bijgewerkt.)</key>
     <key alias="newtabname">Nieuwe tabtitel</key>
     <key alias="nodetype">Node type</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Stylesheet</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Stylesheet eigenschap</key>
     <key alias="tab">Tab</key>
     <key alias="tabname">Tab titel</key>
     <key alias="tabs">Tabs</key>
@@ -970,7 +968,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Composities</key>
-    <key alias="noTabs">Er zijn nog geen tabs toegevoegd</key>
+    <key alias="noGroups">Er zijn nog geen groepen toegevoegd</key>
+    <key alias="addGroup">Voeg groep toe</key>
     <key alias="inheritedFrom">Inherited van</key>
     <key alias="addProperty">Voeg property toe</key>
     <key alias="requiredLabel">Verplicht label</key>
@@ -1345,13 +1344,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="httpsCheckInvalidCertificate">Cerficaat validatie foutmelding: '%0%'</key>
     <key alias="healthCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">De site wordt momenteel %0% bekeken via HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">De appSetting 'umbracoUseSSL' in web.config staat op 'false'. Indien HTTPS gebruikt wordt moet deze op 'true' staan.</key>
-    <key alias="httpsCheckConfigurationCheckResult">De appSetting 'umbracoUseSSL' in web.config is ingesteld op '%0%'. Cookies zijn %1% ingesteld als secure.</key>
-    <key alias="httpsCheckEnableHttpsError">De 'umbracoUseSSL' waarde in web.config kon niet aangepast worden. Foutmelding: %0%</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">De appSetting 'Umbraco.Core.UseHttps' in web.config staat op 'false'. Indien HTTPS gebruikt wordt moet deze op 'true' staan.</key>
+    <key alias="httpsCheckConfigurationCheckResult">De appSetting 'Umbraco.Core.UseHttps' in web.config is ingesteld op '%0%'. Cookies zijn %1% ingesteld als secure.</key>
+    <key alias="httpsCheckEnableHttpsError">De 'Umbraco.Core.UseHttps' waarde in web.config kon niet aangepast worden. Foutmelding: %0%</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">HTTPS inschakelen</key>
     <key alias="httpsCheckEnableHttpsDescription">Zet in de appSettings van de web.config de umbracoSSL instelling op 'true'.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">De appSetting 'umbracoUseSSL' is nu ingesteld op 'true', cookies zullen als 'secure' worden aangemerkt.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">De appSetting 'Umbraco.Core.UseHttps' is nu ingesteld op 'true', cookies zullen als 'secure' worden aangemerkt.</key>
     <key alias="rectifyButton">Herstellen</key>
     <key alias="cannotRectifyShouldNotEqual">Kan een controle met vergelijkingstype 'ShouldNotEqual' niet herstellen.</key>
     <key alias="cannotRectifyShouldEqualWithValue">Kan een controle met vergelijkingstype 'ShouldNotEqual' en gedefinieerde waarde niet herstellen.</key>
@@ -1399,7 +1398,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="redirectedTo">Doorgestuurd naar</key>
     <key alias="noRedirects">Er zijn geen redirects</key>
     <key alias="noRedirectsDescription">Er wordt automatisch een redirect aangemaakt als een gepubliceerde pagina hernoemd of verplaatst wordt.</key>
-    <key alias="removeButton">Verwijder</key>
     <key alias="confirmRemove">Weet je zeker dat je de redirect van '%0%' naar '%1%' wilt verwijderen?</key>
     <key alias="redirectRemoved">Redirect URL verwijderd.</key>
     <key alias="redirectRemoveError">Fout bij verwijderen redirect URL.</key>

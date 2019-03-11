@@ -42,30 +42,30 @@ namespace Umbraco.Core.Composing
         private string _currentAssembliesHash;
         private IEnumerable<Assembly> _assemblies;
         private bool _reportedChange;
-        private static LocalTempStorage _localTempStorage;
+        private static string _localTempPath;
         private static string _fileBasePath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
         /// <param name="runtimeCache">The application runtime cache.</param>
-        /// <param name="localTempStorage">Files storage mode.</param>
+        /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
-        public TypeLoader(IAppPolicyCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger)
-            : this(runtimeCache, localTempStorage, logger, true)
+        public TypeLoader(IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger)
+            : this(runtimeCache, localTempPath, logger, true)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
         /// <param name="runtimeCache">The application runtime cache.</param>
-        /// <param name="localTempStorage">Files storage mode.</param>
+        /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        internal TypeLoader(IAppPolicyCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger, bool detectChanges)
+        internal TypeLoader(IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger, bool detectChanges)
         {
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
-            _localTempStorage = localTempStorage == LocalTempStorage.Unknown ? LocalTempStorage.Default : localTempStorage;
+            _localTempPath = localTempPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             if (detectChanges)
@@ -211,7 +211,7 @@ namespace Umbraco.Core.Composing
         /// file properties (false) or the file contents (true).</remarks>
         private static string GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, IProfilingLogger logger)
         {
-            using (logger.TraceDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
+            using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {
                 // get the distinct file infos to hash
                 var uniqInfos = new HashSet<string>();
@@ -269,7 +269,7 @@ namespace Umbraco.Core.Composing
         // internal for tests
         internal static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, IProfilingLogger logger)
         {
-            using (logger.TraceDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
+            using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {
                 using (var generator = new HashGenerator())
                 {
@@ -388,25 +388,7 @@ namespace Umbraco.Core.Composing
                 if (_fileBasePath != null)
                     return _fileBasePath;
 
-                switch (_localTempStorage)
-                {
-                    case LocalTempStorage.AspNetTemp:
-                        _fileBasePath = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "umbraco-types");
-                        break;
-                    case LocalTempStorage.EnvironmentTemp:
-                        // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-                        // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
-                        var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
-                        var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash);
-                        _fileBasePath = Path.Combine(cachePath, "umbraco-types");
-                        break;
-                    case LocalTempStorage.Default:
-                    default:
-                        var tempFolder = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "TypesCache");
-                        _fileBasePath = Path.Combine(tempFolder, "umbraco-types." + NetworkHelper.FileSafeMachineName);
-                        break;
-                }
+                _fileBasePath = Path.Combine(_localTempPath, "TypesCache", "umbraco-types." + NetworkHelper.FileSafeMachineName);
 
                 // ensure that the folder exists
                 var directory = Path.GetDirectoryName(_fileBasePath);
@@ -666,7 +648,7 @@ namespace Umbraco.Core.Composing
             var name = GetName(baseType, attributeType);
 
             lock (_locko)
-            using (_logger.TraceDuration<TypeLoader>(
+            using (_logger.DebugDuration<TypeLoader>(
                 "Getting " + name,
                 "Got " + name)) // cannot contain typesFound.Count as it's evaluated before the find
             {

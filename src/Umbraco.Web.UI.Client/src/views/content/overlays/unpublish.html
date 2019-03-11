@@ -27,13 +27,12 @@
                         <div>
                             <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
-                            </label>
-    
-                            <div class="umb-permission__description">
-                                <umb-variant-state variant="variant"></umb-variant-state>
-                                <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                            </div>
-    
+
+                                <span class="db umb-permission__description">
+                                    <umb-variant-state variant="variant"></umb-variant-state>
+                                    <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                                </span>
+                            </label>    
                         </div>
                     </div>
     

@@ -6,7 +6,6 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -14,14 +13,13 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
-using System.Reflection;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 
 namespace Umbraco.Tests.Services
 {
@@ -60,32 +58,6 @@ namespace Umbraco.Tests.Services
             Composition.RegisterUnique(factory => Mock.Of<ILocalizedTextService>());
         }
 
-        /// <summary>
-        /// Used to list out all ambiguous events that will require dispatching with a name
-        /// </summary>
-        [Test, Explicit]
-        public void List_Ambiguous_Events()
-        {
-            var events = ServiceContext.ContentService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
-            var typedEventHandler = typeof(TypedEventHandler<,>);
-            foreach(var e in events)
-            {
-                //only continue if this is a TypedEventHandler
-                if (!e.EventHandlerType.IsGenericType) continue;
-                var typeDef = e.EventHandlerType.GetGenericTypeDefinition();
-                if (typedEventHandler != typeDef) continue;
-
-                //get the event arg type
-                var eventArgType = e.EventHandlerType.GenericTypeArguments[1];
-
-                var found = EventNameExtractor.FindEvent(typeof(ContentService), eventArgType, EventNameExtractor.MatchIngNames);
-                if (!found.Success && found.Result.Error == EventNameExtractorError.Ambiguous)
-                {
-                    Console.WriteLine($"Ambiguous event, source: {typeof(ContentService)}, args: {eventArgType}");
-                }
-            }
-        }
-
         [Test]
         public void Create_Blueprint()
         {
@@ -96,7 +68,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
             contentTypeService.Save(contentType);
 
-            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", Constants.System.Root);
             blueprint.SetValue("title", "blueprint 1");
             blueprint.SetValue("bodyText", "blueprint 2");
             blueprint.SetValue("keywords", "blueprint 3");
@@ -122,7 +94,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
             contentTypeService.Save(contentType);
 
-            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", Constants.System.Root);
             blueprint.SetValue("title", "blueprint 1");
             blueprint.SetValue("bodyText", "blueprint 2");
             blueprint.SetValue("keywords", "blueprint 3");
@@ -139,29 +111,33 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Create_Content_From_Blueprint()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var contentService = ServiceContext.ContentService;
+                var contentTypeService = ServiceContext.ContentTypeService;
 
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
-            contentTypeService.Save(contentType);
+                var contentType = MockedContentTypes.CreateTextPageContentType();
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+                contentTypeService.Save(contentType);
 
-            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
-            blueprint.SetValue("title", "blueprint 1");
-            blueprint.SetValue("bodyText", "blueprint 2");
-            blueprint.SetValue("keywords", "blueprint 3");
-            blueprint.SetValue("description", "blueprint 4");
+                var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", Constants.System.Root);
+                blueprint.SetValue("title", "blueprint 1");
+                blueprint.SetValue("bodyText", "blueprint 2");
+                blueprint.SetValue("keywords", "blueprint 3");
+                blueprint.SetValue("description", "blueprint 4");
 
-            contentService.SaveBlueprint(blueprint);
+                contentService.SaveBlueprint(blueprint);
 
-            var fromBlueprint = contentService.CreateContentFromBlueprint(blueprint, "hello world");
-            contentService.Save(fromBlueprint);
+                var fromBlueprint = contentService.CreateContentFromBlueprint(blueprint, "hello world");
+                contentService.Save(fromBlueprint);
 
-            Assert.IsTrue(fromBlueprint.HasIdentity);
-            Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].GetValue());
-            Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].GetValue());
-            Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].GetValue());
-            Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].GetValue());
+                Assert.IsTrue(fromBlueprint.HasIdentity);
+                Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].GetValue());
+                Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].GetValue());
+                Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].GetValue());
+                Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].GetValue());
+            }
+
         }
 
         [Test]
@@ -179,7 +155,7 @@ namespace Umbraco.Tests.Services
 
             for (int i = 0; i < 10; i++)
             {
-                var blueprint = MockedContent.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, -1);
+                var blueprint = MockedContent.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, Constants.System.Root);
                 contentService.SaveBlueprint(blueprint);
             }
 
@@ -290,7 +266,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.CreateAndSave("Test", -1, "umbTextpage", Constants.Security.SuperUserId);
+            var content = contentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage", Constants.Security.SuperUserId);
 
             content.ContentSchedule.Add(null, DateTime.Now.AddHours(2));
             contentService.Save(content, Constants.Security.SuperUserId);
@@ -318,7 +294,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.CreateAndSave("Test", -1, "umbTextpage", Constants.Security.SuperUserId);
+            var content = contentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage", Constants.Security.SuperUserId);
             for (var i = 0; i < 20; i++)
             {
                 content.SetValue("bodyText", "hello world " + Guid.NewGuid());
@@ -343,7 +319,7 @@ namespace Umbraco.Tests.Services
             var results = new List<IContent>();
             for (var i = 0; i < 20; i++)
             {
-                results.Add(contentService.CreateAndSave("Test", -1, "umbTextpage", 0));
+                results.Add(contentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage", 0));
             }
 
             var sortedGet = contentService.GetByIds(new[] {results[10].Id, results[5].Id, results[12].Id}).ToArray();
@@ -363,7 +339,7 @@ namespace Umbraco.Tests.Services
             // Act
             for (int i = 0; i < 20; i++)
             {
-                contentService.CreateAndSave("Test", -1, "umbTextpage", Constants.Security.SuperUserId);
+                contentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage", Constants.Security.SuperUserId);
             }
 
             // Assert
@@ -382,7 +358,7 @@ namespace Umbraco.Tests.Services
             // Act
             for (int i = 0; i < 20; i++)
             {
-                contentService.CreateAndSave("Test", -1, "umbBlah", Constants.Security.SuperUserId);
+                contentService.CreateAndSave("Test", Constants.System.Root, "umbBlah", Constants.Security.SuperUserId);
             }
 
             // Assert
@@ -397,7 +373,7 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
             contentTypeService.Save(contentType);
-            var parent = contentService.CreateAndSave("Test", -1, "umbBlah", Constants.Security.SuperUserId);
+            var parent = contentService.CreateAndSave("Test", Constants.System.Root, "umbBlah", Constants.Security.SuperUserId);
 
             // Act
             for (int i = 0; i < 20; i++)
@@ -417,7 +393,7 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
             contentTypeService.Save(contentType);
-            var parent = contentService.CreateAndSave("Test", -1, "umbBlah", Constants.Security.SuperUserId);
+            var parent = contentService.CreateAndSave("Test", Constants.System.Root, "umbBlah", Constants.Security.SuperUserId);
 
             // Act
             IContent current = parent;
@@ -451,7 +427,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.Create("Test", -1, "umbTextpage", Constants.Security.SuperUserId);
+            var content = contentService.Create("Test", Constants.System.Root, "umbTextpage", Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -465,7 +441,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.Create("Test", -1, "umbTextpage", Constants.Security.SuperUserId);
+            var content = contentService.Create("Test", Constants.System.Root, "umbTextpage", Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -479,12 +455,12 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.Create("Test", -1, "umbTextpage");
+            var content = contentService.Create("Test", Constants.System.Root, "umbTextpage");
 
             // Assert
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
-            Assert.That(content.CreatorId, Is.EqualTo(0)); //Default to 0 (unknown) since we didn't explicitly set this in the Create call
+            Assert.That(content.CreatorId, Is.EqualTo(Constants.Security.SuperUserId)); //Default to -1 aka SuperUser (unknown) since we didn't explicitly set this in the Create call
         }
 
         [Test]
@@ -498,7 +474,7 @@ namespace Umbraco.Tests.Services
                 RawPasswordValue = "test"
                 };
             ServiceContext.UserService.Save(user);
-            var content = new Content("Test", -1, ServiceContext.ContentTypeService.Get("umbTextpage"));
+            var content = new Content("Test", Constants.System.Root, ServiceContext.ContentTypeService.Get("umbTextpage"));
 
             // Act
             ServiceContext.ContentService.Save(content, (int)user.Id);
@@ -515,7 +491,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act & Assert
-            Assert.Throws<Exception>(() => contentService.Create("Test", -1, "umbAliasDoesntExist"));
+            Assert.Throws<Exception>(() => contentService.Create("Test", Constants.System.Root, "umbAliasDoesntExist"));
         }
 
         [Test]
@@ -523,7 +499,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = new Content(string.Empty, -1, ServiceContext.ContentTypeService.Get("umbTextpage"));
+            var content = new Content(string.Empty, Constants.System.Root, ServiceContext.ContentTypeService.Get("umbTextpage"));
 
             // Act & Assert
             Assert.Throws<InvalidOperationException>(() => contentService.Save(content));
@@ -753,42 +729,35 @@ namespace Umbraco.Tests.Services
             contentType.Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            IContent content = new Content("content", -1, contentType);
+            IContent content = new Content("content", Constants.System.Root, contentType);
             content.SetCultureName("content-fr", langFr.IsoCode);
             content.SetCultureName("content-en", langUk.IsoCode);
             content.PublishCulture(langFr.IsoCode);
             content.PublishCulture(langUk.IsoCode);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));    //not persisted yet, will be false
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            Assert.IsFalse(content.WasCulturePublished(langUk.IsoCode));    //not persisted yet, will be false
 
-            var published = ServiceContext.ContentService.SavePublishing(content);
+            var published = ServiceContext.ContentService.SaveAndPublish(content, new[]{ langFr.IsoCode , langUk.IsoCode });
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsTrue(published.Success);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-            Assert.IsTrue(content.WasCulturePublished(langFr.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            Assert.IsTrue(content.WasCulturePublished(langUk.IsoCode));
 
             var unpublished = ServiceContext.ContentService.Unpublish(content, langFr.IsoCode);
             Assert.IsTrue(unpublished.Success);
             Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
-
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-            //this is slightly confusing but this will be false because this method is used for checking the state of the current model,
-            //but the state on the model has changed with the above Unpublish call
-            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-            //this is slightly confusing but this will be false because this method is used for checking the state of a current model,
-            //but we've re-fetched from the database
-            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            Assert.IsTrue(content.WasCulturePublished(langUk.IsoCode));
+            
 
         }
 
@@ -812,13 +781,12 @@ namespace Umbraco.Tests.Services
 
             ServiceContext.ContentTypeService.Save(contentType);
 
-            IContent content = new Content("content", -1, contentType);
+            IContent content = new Content("content", Constants.System.Root, contentType);
             content.SetCultureName("content-en", langGB.IsoCode);
             content.SetCultureName("content-fr", langFr.IsoCode);
-            content.PublishCulture(langGB.IsoCode);
-            content.PublishCulture(langFr.IsoCode);
-            Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content).Success);
-           
+            
+            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content, new []{ langGB.IsoCode , langFr.IsoCode }).Success);
+
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.AreEqual(PublishedState.Published, content.PublishedState);
@@ -855,10 +823,9 @@ namespace Umbraco.Tests.Services
             contentType.Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            IContent content = new Content("content", -1, contentType);
+            IContent content = new Content("content", Constants.System.Root, contentType);
             content.SetCultureName("content-fr", langFr.IsoCode);
-            content.PublishCulture(langFr.IsoCode);
-            var published = ServiceContext.ContentService.SavePublishing(content);
+            var published = ServiceContext.ContentService.SaveAndPublish(content, langFr.IsoCode);
             //audit log will only show that french was published
             var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Published languages: French (France)", lastLog.Comment);
@@ -866,8 +833,7 @@ namespace Umbraco.Tests.Services
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             content.SetCultureName("content-en", langGB.IsoCode);
-            content.PublishCulture(langGB.IsoCode);
-            published = ServiceContext.ContentService.SavePublishing(content);
+            published = ServiceContext.ContentService.SaveAndPublish(content, langGB.IsoCode);
             //audit log will only show that english was published
             lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Published languages: English (United Kingdom)", lastLog.Comment);
@@ -888,18 +854,15 @@ namespace Umbraco.Tests.Services
             contentType.Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            IContent content = new Content("content", -1, contentType);
+            IContent content = new Content("content", Constants.System.Root, contentType);
             content.SetCultureName("content-fr", langFr.IsoCode);
             content.SetCultureName("content-gb", langGB.IsoCode);
-            content.PublishCulture(langGB.IsoCode);
-            content.PublishCulture(langFr.IsoCode);
-            var published = ServiceContext.ContentService.SavePublishing(content);
+            var published = ServiceContext.ContentService.SaveAndPublish(content, new[] {langGB.IsoCode, langFr.IsoCode});
             Assert.IsTrue(published.Success);
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
-            content.UnpublishCulture(langFr.IsoCode); //unpublish non-mandatory lang
-            var unpublished = ServiceContext.ContentService.SavePublishing(content);
+            var unpublished = ServiceContext.ContentService.Unpublish(content, langFr.IsoCode);
             //audit log will only show that french was unpublished
             var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Unpublished languages: French (France)", lastLog.Comment);
@@ -907,8 +870,7 @@ namespace Umbraco.Tests.Services
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             content.SetCultureName("content-en", langGB.IsoCode);
-            content.UnpublishCulture(langGB.IsoCode); //unpublish mandatory lang
-            unpublished = ServiceContext.ContentService.SavePublishing(content);
+            unpublished = ServiceContext.ContentService.Unpublish(content, langGB.IsoCode);
             //audit log will only show that english was published
             var logs = ServiceContext.AuditService.GetLogs(content.Id).ToList();
             Assert.AreEqual($"Unpublished languages: English (United Kingdom)", logs[logs.Count - 2].Comment);
@@ -923,8 +885,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(published.Success, Is.True);
@@ -951,7 +912,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var parent = contentService.Create("parent", -1, "umbTextpage");
+            var parent = contentService.Create("parent", Constants.System.Root, "umbTextpage");
 
             contentService.SaveAndPublish(parent);
             var content = contentService.Create("child", parent, "umbTextpage");
@@ -978,8 +939,7 @@ namespace Umbraco.Tests.Services
                 Assert.AreEqual("Home", content.Name);
 
                 content.Name = "foo";
-                content.PublishCulture();
-                var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+                var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
                 Assert.That(published.Success, Is.True);
                 Assert.That(content.Published, Is.True);
@@ -1026,11 +986,11 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(parentPublished.Success);
             Assert.IsTrue(parent.Published);
 
-            var contentCanPublishValues = content.PublishCulture();
-
             // content cannot publish values because they are invalid
-            Assert.IsFalse(contentCanPublishValues);
-            Assert.IsNotEmpty(content.ValidateProperties());
+            var propertyValidationService = new PropertyValidationService(Factory.GetInstance<PropertyEditorCollection>(), ServiceContext.DataTypeService);
+            var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties);
+            Assert.IsFalse(isValid);
+            Assert.IsNotEmpty(invalidProperties);
 
             // and therefore cannot be published,
             // because it did not have a published version at all
@@ -1043,6 +1003,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Publish_And_Unpublish_Cultures_In_Single_Operation()
         {
+            //TODO: This is using an internal API - we aren't exposing this publicly (at least for now) but we'll keep the test around
+
             var langFr = new Language("fr");
             var langDa = new Language("da");
             ServiceContext.LocalizationService.Save(langFr);
@@ -1057,7 +1019,7 @@ namespace Umbraco.Tests.Services
             content.SetCultureName("name-da", langDa.IsoCode);
 
             content.PublishCulture(langFr.IsoCode);
-            var result = ServiceContext.ContentService.SavePublishing(content);
+            var result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
@@ -1066,7 +1028,7 @@ namespace Umbraco.Tests.Services
             content.UnpublishCulture(langFr.IsoCode);
             content.PublishCulture(langDa.IsoCode);
 
-            result = ServiceContext.ContentService.SavePublishing(content);
+            result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(PublishResultType.SuccessMixedCulture, result.Result);
 
@@ -1145,12 +1107,10 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            parent.PublishCulture();
-            var parentPublished = contentService.SavePublishing(parent, Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
+            var parentPublished = contentService.SaveAndPublish(parent, userId: Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(parentPublished.Success, Is.True);
@@ -1188,12 +1148,10 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, Constants.Security.SuperUserId);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            parent.PublishCulture();
-            var parentPublished = contentService.SavePublishing(parent, Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
+            var parentPublished = contentService.SaveAndPublish(parent, userId: Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(parentPublished.Success, Is.True);
@@ -1245,8 +1203,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 5);
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(published.Success, Is.False);
@@ -1263,8 +1220,7 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Barack Obama");
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(content.HasIdentity, Is.True);
@@ -1284,19 +1240,17 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.Create("Home US", -1, "umbTextpage", Constants.Security.SuperUserId);
+            var content = contentService.Create("Home US", Constants.System.Root, "umbTextpage", Constants.Security.SuperUserId);
             content.SetValue("author", "Barack Obama");
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
             var childContent = contentService.Create("Child", content.Id, "umbTextpage", Constants.Security.SuperUserId);
             // Reset all identity properties
             childContent.Id = 0;
             childContent.Path = null;
             ((Content)childContent).ResetIdentity();
-            childContent.PublishCulture();
-            var childPublished = contentService.SavePublishing(childContent, Constants.Security.SuperUserId);
+            var childPublished = contentService.SaveAndPublish(childContent, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(content.HasIdentity, Is.True);
@@ -1625,7 +1579,7 @@ namespace Umbraco.Tests.Services
 
             var contentType = MockedContentTypes.CreateAllTypesContentType("test", "test");
             ServiceContext.ContentTypeService.Save(contentType, Constants.Security.SuperUserId);
-
+            
             object obj =
                 new
                 {
@@ -1635,14 +1589,12 @@ namespace Umbraco.Tests.Services
             content1.PropertyValues(obj);
             content1.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content1, Constants.Security.SuperUserId);
-            content1.PublishCulture();
-            Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content1, 0).Success);
+            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content1, userId: 0).Success);
             var content2 = MockedContent.CreateBasicContent(contentType);
             content2.PropertyValues(obj);
             content2.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content2, Constants.Security.SuperUserId);
-            content2.PublishCulture();
-            Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content2, 0).Success);
+            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content2, userId: 0).Success);
 
             var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
             editorGroup.StartContentId = content1.Id;
@@ -1783,7 +1735,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
 
-            var content = MockedContent.CreateSimpleContent(contentType, "Simple Tags Page", -1);
+            var content = MockedContent.CreateSimpleContent(contentType, "Simple Tags Page", Constants.System.Root);
             content.AssignTags(propAlias, new[] {"hello", "world"});
             contentService.Save(content);
 
@@ -1959,7 +1911,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
 
-            var page = new Content("Page", -1, contentType)
+            var page = new Content("Page", Constants.System.Root, contentType)
             {
                 Level = 1,
                 SortOrder = 1,
@@ -2186,7 +2138,7 @@ namespace Umbraco.Tests.Services
             var contentType = MockedContentTypes.CreateAllTypesContentType("allDataTypes", "All DataTypes");
             contentTypeService.Save(contentType);
             var contentService = ServiceContext.ContentService;
-            var content = MockedContent.CreateAllTypesContent(contentType, "Random Content", -1);
+            var content = MockedContent.CreateAllTypesContent(contentType, "Random Content", Constants.System.Root);
             contentService.Save(content);
             var id = content.Id;
 
@@ -2239,7 +2191,7 @@ namespace Umbraco.Tests.Services
         public void Ensure_Content_Xml_Created()
         {
             var contentService = ServiceContext.ContentService;
-            var content = contentService.Create("Home US", -1, "umbTextpage", Constants.Security.SuperUserId);
+            var content = contentService.Create("Home US", Constants.System.Root, "umbTextpage", Constants.Security.SuperUserId);
             content.SetValue("author", "Barack Obama");
 
             contentService.Save(content);
@@ -2261,7 +2213,7 @@ namespace Umbraco.Tests.Services
         public void Ensure_Preview_Xml_Created()
         {
             var contentService = ServiceContext.ContentService;
-            var content = contentService.Create("Home US", -1, "umbTextpage", Constants.Security.SuperUserId);
+            var content = contentService.Create("Home US", Constants.System.Root, "umbTextpage", Constants.Security.SuperUserId);
             content.SetValue("author", "Barack Obama");
 
             contentService.Save(content);
@@ -2289,10 +2241,10 @@ namespace Umbraco.Tests.Services
             }
 
             long total;
-            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            var entities = service.GetPagedChildren(Constants.System.Root, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
-            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            entities = service.GetPagedChildren(Constants.System.Root, 1, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));
         }
@@ -2324,10 +2276,10 @@ namespace Umbraco.Tests.Services
 
             long total;
             // children in root including the folder - not the descendants in the folder
-            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            var entities = service.GetPagedChildren(Constants.System.Root, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
-            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            entities = service.GetPagedChildren(Constants.System.Root, 1, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));
 
@@ -2343,7 +2295,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void PublishingTest()
         {
-            var contentType = new ContentType(-1)
+            var contentType = new ContentType(Constants.System.Root)
             {
                 Alias = "foo",
                 Name = "Foo"
@@ -2361,7 +2313,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
-            var content = contentService.Create("foo", -1, "foo");
+            var content = contentService.Create("foo", Constants.System.Root, "foo");
             contentService.Save(content);
 
             Assert.IsFalse(content.Published);
@@ -2489,7 +2441,7 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
-            var content = new Content(null, -1, contentType);
+            var content = new Content(null, Constants.System.Root, contentType);
 
             content.SetCultureName("name-us", langUk.IsoCode);
             content.SetCultureName("name-fr", langFr.IsoCode);
@@ -2524,7 +2476,7 @@ namespace Umbraco.Tests.Services
 
             var contentService = ServiceContext.ContentService;
 
-            var content = new Content(null, -1, contentType);
+            var content = new Content(null, Constants.System.Root, contentType);
             content.SetCultureName("root", langUk.IsoCode);
             contentService.Save(content);
 
@@ -2566,13 +2518,13 @@ namespace Umbraco.Tests.Services
             var o = new[] { 2, 1, 3, 0, 4 }; // randomly different
             for (var i = 0; i < 5; i++)
             {
-                var contentA = new Content(null, -1, contentType);
+                var contentA = new Content(null, Constants.System.Root, contentType);
                 contentA.SetCultureName("contentA" + i + "uk", langUk.IsoCode);
                 contentA.SetCultureName("contentA" + o[i] + "fr", langFr.IsoCode);
                 contentA.SetCultureName("contentX" + i + "da", langDa.IsoCode);
                 contentService.Save(contentA);
 
-                var contentB = new Content(null, -1, contentType);
+                var contentB = new Content(null, Constants.System.Root, contentType);
                 contentB.SetCultureName("contentB" + i + "uk", langUk.IsoCode);
                 contentB.SetCultureName("contentB" + o[i] + "fr", langFr.IsoCode);
                 contentB.SetCultureName("contentX" + i + "da", langDa.IsoCode);
@@ -2580,7 +2532,7 @@ namespace Umbraco.Tests.Services
             }
 
             // get all
-            var list = contentService.GetPagedChildren(-1, 0, 100, out var total).ToList();
+            var list = contentService.GetPagedChildren(Constants.System.Root, 0, 100, out var total).ToList();
 
             Console.WriteLine("ALL");
             WriteList(list);
@@ -2590,7 +2542,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(11, list.Count);
 
             // filter
-            list = contentService.GetPagedChildren(-1, 0, 100, out total,
+            list = contentService.GetPagedChildren(Constants.System.Root, 0, 100, out total,
                 SqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
                 Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
@@ -2598,7 +2550,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(0, list.Count);
 
             // filter
-            list = contentService.GetPagedChildren(-1, 0, 100, out total,
+            list = contentService.GetPagedChildren(Constants.System.Root, 0, 100, out total,
                 SqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
                 Ordering.By("name", culture: langDa.IsoCode)).ToList();
 
@@ -2609,7 +2561,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(10, list.Count);
 
             // filter
-            list = contentService.GetPagedChildren(-1, 0, 100, out total,
+            list = contentService.GetPagedChildren(Constants.System.Root, 0, 100, out total,
                 SqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
                 Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
@@ -2622,7 +2574,7 @@ namespace Umbraco.Tests.Services
             for (var i = 0; i < 5; i++)
                 Assert.AreEqual("contentA" + i + "fr", list[i].GetCultureName(langFr.IsoCode));
 
-            list = contentService.GetPagedChildren(-1, 0, 100, out total,
+            list = contentService.GetPagedChildren(Constants.System.Root, 0, 100, out total,
                 SqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
                 Ordering.By("name", direction: Direction.Descending, culture: langFr.IsoCode)).ToList();
 
@@ -2667,7 +2619,7 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
-            var content = contentService.Create("Home US", -1, "umbTextpage");
+            var content = contentService.Create("Home US", Constants.System.Root, "umbTextpage");
 
             // creating content with a name but no culture - will set the invariant name
             // but, because that content is variant, as soon as we save, we'll need to
@@ -2717,9 +2669,7 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.PublishCulture(langFr.IsoCode);
-            content.PublishCulture(langUk.IsoCode);
-            contentService.SavePublishing(content);
+            contentService.SaveAndPublish(content, new[]{ langFr.IsoCode, langUk.IsoCode });
 
             // both FR and UK have been published,
             // and content has been published,
@@ -2823,8 +2773,7 @@ namespace Umbraco.Tests.Services
             // act
             // cannot just 'save' since we are changing what's published!
 
-            content.UnpublishCulture(langFr.IsoCode);
-            contentService.SavePublishing(content);
+            contentService.Unpublish(content, langFr.IsoCode);
 
             // content has been published,
             // the french culture is gone
@@ -2914,8 +2863,10 @@ namespace Umbraco.Tests.Services
             // act
 
             // that HAS to be SavePublishing, because SaveAndPublish would just republish everything!
-
-            contentService.SavePublishing(content);
+            //TODO: This is using an internal API - the test can't pass without this but we want to keep the test here
+            // will need stephane to have a look at this test at some stage since there is a lot of logic here that we
+            // want to keep on testing but don't need the public API to do these more complicated things.
+            ((ContentService)contentService).CommitDocumentChanges(content);
 
             // content has been re-published,
             // everything is back to what it was before being unpublished
@@ -2955,8 +2906,7 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.PublishCulture(langUk.IsoCode);
-            contentService.SavePublishing(content);
+            contentService.SaveAndPublish(content, langUk.IsoCode);
 
             content2 = contentService.GetById(content.Id);
 

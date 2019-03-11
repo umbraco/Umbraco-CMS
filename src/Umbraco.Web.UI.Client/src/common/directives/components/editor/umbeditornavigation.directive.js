@@ -17,14 +17,24 @@
                 name: "More"
             };
 
-            scope.clickNavigationItem = function (selectedItem) {
+            scope.openNavigationItem = function(item) {
+                
                 scope.showDropdown = false;
-                runItemAction(selectedItem);
-                setItemToActive(selectedItem);
+                runItemAction(item);
+                setItemToActive(item);
                 if(scope.onSelect) {
-                    scope.onSelect({"item": selectedItem});
+                    scope.onSelect({"item": item});
                 }
-                eventsService.emit("app.tabChange", selectedItem);
+                eventsService.emit("app.tabChange", item);
+            };
+
+            scope.openAnchorItem = function(item, anchor) {
+                if(scope.onAnchorSelect) {
+                    scope.onAnchorSelect({"item": item, "anchor": anchor});
+                }
+                if (item.active !== true) {
+                    scope.openNavigationItem(item);
+                }
             };
 
             scope.toggleDropdown = function () {
@@ -36,18 +46,15 @@
             };
 
             function onInit() {
-
-                // hide navigation if there is only 1 item
-                if (scope.navigation.length <= 1) {
-                    scope.showNavigation = false;
-                }
-                
-                $timeout(function(){
-                    if($window && $window.innerWidth) {
-                        calculateVisibleItems($window.innerWidth);
-                    }
-                });
-
+                var firstRun = true;
+                scope.$watch("navigation.length",
+                    (newVal, oldVal) => {
+                        if (firstRun || newVal !== undefined && newVal !== oldVal) {
+                            firstRun = false;
+                            scope.showNavigation = newVal > 1;
+                            calculateVisibleItems($window.innerWidth);
+                        }
+                    });
             }
 
             function calculateVisibleItems(windowWidth) {
@@ -128,7 +135,8 @@
             templateUrl: 'views/components/editor/umb-editor-navigation.html',
             scope: {
                 navigation: "=",
-                onSelect: "&"
+                onSelect: "&",
+                onAnchorSelect: "&"
             },
             link: link
         };

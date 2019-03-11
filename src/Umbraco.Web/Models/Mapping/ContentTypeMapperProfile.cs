@@ -2,6 +2,7 @@
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentTypeMapperProfile : Profile
     {
-        public ContentTypeMapperProfile(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService, IContentTypeService contentTypeService, IMediaTypeService mediaTypeService)
+        public ContentTypeMapperProfile(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService, IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, ILogger logger)
         {
             CreateMap<DocumentTypeSave, IContentType>()
                 //do the base mapping
@@ -74,7 +75,7 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<IMemberType, MemberTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(propertyEditors, dataTypeService, contentTypeService)
+                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(propertyEditors, dataTypeService, contentTypeService, logger)
                 .AfterMap((memberType, display) =>
                 {
                     //map the MemberCanEditProperty,MemberCanViewProperty,IsSensitiveData
@@ -93,7 +94,7 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<IMediaType, MediaTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IMediaType, MediaTypeDisplay, PropertyTypeDisplay>(propertyEditors, dataTypeService, contentTypeService)
+                .MapBaseContentTypeEntityToDisplay<IMediaType, MediaTypeDisplay, PropertyTypeDisplay>(propertyEditors, dataTypeService, contentTypeService, logger)
                 .AfterMap((source, dest) =>
                  {
                      //default listview
@@ -109,7 +110,7 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<IContentType, DocumentTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(propertyEditors, dataTypeService, contentTypeService)
+                .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(propertyEditors, dataTypeService, contentTypeService, logger)
                 .ForMember(dto => dto.AllowedTemplates, opt => opt.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, opt => opt.Ignore())
                 .ForMember(display => display.Notifications, opt => opt.Ignore())
@@ -134,6 +135,10 @@ namespace Umbraco.Web.Models.Mapping
 
                 });
 
+            CreateMap<IContentTypeComposition, ContentTypeBasic>()
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(source => Udi.Create(Constants.UdiEntityType.MemberType, source.Key)))
+                .ForMember(dest => dest.Blueprints, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
             CreateMap<IMemberType, ContentTypeBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(source => Udi.Create(Constants.UdiEntityType.MemberType, source.Key)))
                 .ForMember(dest => dest.Blueprints, opt => opt.Ignore())
@@ -149,7 +154,7 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<PropertyTypeBasic, PropertyType>()
 
-                .ConstructUsing(propertyTypeBasic =>
+                .ConstructUsing((propertyTypeBasic, context) =>
                 {
                     var dataType = dataTypeService.GetDataType(propertyTypeBasic.DataTypeId);
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeBasic.DataTypeId);
@@ -158,13 +163,13 @@ namespace Umbraco.Web.Models.Mapping
 
                 .IgnoreEntityCommonProperties()
 
-                .ForMember(dest => dest.IsPublishing, opt => opt.Ignore())
+                .ForMember(dest => dest.SupportsPublishing, opt => opt.Ignore())
 
                 // see note above - have to do this here?
                 .ForMember(dest => dest.PropertyEditorAlias, opt => opt.Ignore())
                 .ForMember(dest => dest.DeleteDate, opt => opt.Ignore())
 
-                .ForMember(dto => dto.Variations, opt => opt.ResolveUsing<PropertyTypeVariationsResolver>())
+                .ForMember(dto => dto.Variations, opt => opt.MapFrom<PropertyTypeVariationsResolver>())
 
                 //only map if it is actually set
                 .ForMember(dest => dest.Id, opt => opt.Condition(source => source.Id > 0))

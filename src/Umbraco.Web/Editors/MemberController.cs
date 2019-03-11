@@ -26,7 +26,10 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using System.Collections.Generic;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
@@ -43,7 +46,8 @@ namespace Umbraco.Web.Editors
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
-        public MemberController(PropertyEditorCollection propertyEditors)
+        public MemberController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
         }
@@ -432,8 +436,9 @@ namespace Umbraco.Web.Editors
             //There's only 3 special ones we need to deal with that are part of the MemberSave instance
             if (Security.CurrentUser.HasAccessToSensitiveData() == false)
             {
-                var sensitiveProperties = contentItem.PersistedContent.ContentType
-                    .PropertyTypes.Where(x => contentItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
+                var memberType = Services.MemberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
+                var sensitiveProperties = memberType
+                    .PropertyTypes.Where(x => memberType.IsSensitiveProperty(x.Alias))
                     .ToList();
 
                 foreach (var sensitiveProperty in sensitiveProperties)

@@ -121,7 +121,7 @@ namespace Umbraco.Core.Persistence.Factories
 
             foreach (var property in properties)
             {
-                if (property.PropertyType.IsPublishing)
+                if (property.PropertyType.SupportsPublishing)
                 {
                     //create the resulting hashset if it's not created and the entity varies by culture
                     if (entityVariesByCulture && editedCultures == null)

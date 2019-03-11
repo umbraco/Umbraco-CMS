@@ -22,20 +22,20 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoFeatures _features;
         private readonly IGlobalSettings _globalSettings;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
 
         public PreviewController(
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
-            UmbracoContext umbracoContext,
+            IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService)
         {
             _features = features;
             _globalSettings = globalSettings;
             _publishedSnapshotService = publishedSnapshotService;
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
         }
 
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Editors
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
-            var user = _umbracoContext.Security.CurrentUser;
+            var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
 
             var previewToken = _publishedSnapshotService.EnterPreview(user, id);
 

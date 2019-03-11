@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -19,8 +15,6 @@ namespace Umbraco.Core.Models
     public class Member : ContentBase, IMember
     {
         private IDictionary<string, object> _additionalData;
-        private IMemberType _contentType;
-        private readonly string _contentTypeAlias;
         private string _username;
         private string _email;
         private string _rawPasswordValue;
@@ -33,8 +27,6 @@ namespace Umbraco.Core.Models
         public Member(IMemberType contentType)
             : base("", -1, contentType, new PropertyCollection())
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
             IsApproved = true;
 
             //this cannot be null but can be empty
@@ -53,8 +45,6 @@ namespace Umbraco.Core.Models
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
             IsApproved = true;
 
             //this cannot be null but can be empty
@@ -77,8 +67,6 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullOrEmptyException(nameof(username));
 
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
             _email = email;
             _username = username;
             IsApproved = isApproved;
@@ -100,9 +88,6 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
-
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
@@ -123,22 +108,10 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
             IsApproved = isApproved;
-        }
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
-            public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
-            public readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
-            public readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
         }
 
         /// <summary>
@@ -147,8 +120,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Username
         {
-            get { return _username; }
-            set { SetPropertyValueAndDetectChanges(value, ref _username, Ps.Value.UsernameSelector); }
+            get => _username;
+            set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
         }
 
         /// <summary>
@@ -157,8 +130,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Email
         {
-            get { return _email; }
-            set { SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
+            get => _email;
+            set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
         }
 
         /// <summary>
@@ -167,7 +140,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public string RawPasswordValue
         {
-            get { return _rawPasswordValue; }
+            get => _rawPasswordValue;
             set
             {
                 if (value == null)
@@ -178,7 +151,7 @@ namespace Umbraco.Core.Models
                 }
                 else
                 {
-                    SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector);
+                    SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
                 }
             }
         }
@@ -487,10 +460,7 @@ namespace Umbraco.Core.Models
         /// String alias of the default ContentType
         /// </summary>
         [DataMember]
-        public virtual string ContentTypeAlias
-        {
-            get { return _contentTypeAlias; }
-        }
+        public virtual string ContentTypeAlias => ContentType.Alias;
 
         /// <summary>
         /// User key from the Provider.
@@ -504,11 +474,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual object ProviderUserKey
         {
-            get
-            {
-                return _providerUserKey;
-            }
-            set { SetPropertyValueAndDetectChanges(value, ref _providerUserKey, Ps.Value.ProviderUserKeySelector); }
+            get => _providerUserKey;
+            set => SetPropertyValueAndDetectChanges(value, ref _providerUserKey, nameof(ProviderUserKey));
         }
 
 
@@ -522,15 +489,6 @@ namespace Umbraco.Core.Models
 
             if (ProviderUserKey == null)
                 ProviderUserKey = Key;
-        }
-
-        /// <summary>
-        /// Gets the ContentType used by this content object
-        /// </summary>
-        [IgnoreDataMember]
-        public IMemberType ContentType
-        {
-            get { return _contentType; }
         }
 
         /* Internal experiment - only used for mapping queries.
@@ -596,17 +554,6 @@ namespace Umbraco.Core.Models
             }
 
             return true;
-        }
-
-        protected override void PerformDeepClone(object clone)
-        {
-            base.PerformDeepClone(clone);
-
-            var clonedEntity = (Member)clone;
-
-            //need to manually clone this since it's not settable
-            clonedEntity._contentType = (IMemberType)ContentType.DeepClone();
-            
         }
 
         /// <inheritdoc />

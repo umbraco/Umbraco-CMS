@@ -20,12 +20,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class MacroContainerValueConverter : PropertyValueConverterBase
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly ServiceContext _services;
+        private readonly IMacroRenderer _macroRenderer;
 
-        public MacroContainerValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services)
+        public MacroContainerValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _macroRenderer = macroRenderer ?? throw new ArgumentNullException(nameof(macroRenderer));
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -48,14 +48,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 var sb = new StringBuilder();
 
-                var umbracoHelper = new UmbracoHelper(umbracoContext, _services);
                 MacroTagParser.ParseMacros(
                     source,
                     //callback for when text block is found
                     textBlock => sb.Append(textBlock),
                     //callback for when macro syntax is found
-                    (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
+                    (macroAlias, macroAttributes) => sb.Append(_macroRenderer.Render(
                         macroAlias,
+                        umbracoContext.PublishedRequest?.PublishedContent,
                         //needs to be explicitly casted to Dictionary<string, object>
                         macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
 

@@ -66,7 +66,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 	    // method to select a search result 
 	    $scope.selectResult = function (evt, result) {
 	        result.selected = result.selected === true ? false : true;
-	        nodeSelectHandler(evt, { event: evt, node: result });
+	        nodeSelectHandler({ event: evt, node: result });
 	    };
 
 	    //callback when there are search results 
@@ -124,7 +124,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 		// Mini list view
 		$scope.selectListViewNode = function (node) {
 			node.selected = node.selected === true ? false : true;
-			nodeSelectHandler({}, { node: node });
+			nodeSelectHandler({ node: node });
 		};
 
 		$scope.closeMiniListView = function () {

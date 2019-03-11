@@ -3,7 +3,7 @@
 
     function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
 
-        function link(scope, umbVariantContentCtrl) {
+        function link(scope) {
 
             var evts = [];
             var isInfoTab = false;
@@ -44,7 +44,8 @@
                     "prompt_doctypeChangeWarning",
                     "general_history",
                     "auditTrails_historyIncludingVariants",
-                    "content_itemNotPublished"
+                    "content_itemNotPublished",
+                    "general_choose"
                 ];
 
                 localizationService.localizeMany(keys)
@@ -59,10 +60,11 @@
                         labels.notPublished = data[9];
 
                         scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
+                        scope.chooseLabel = data[10];
 
                         setNodePublishStatus();
 
-                        if (scope.currentUrls.length === 0) {
+                        if (scope.currentUrls && scope.currentUrls.length === 0) {
                             if (scope.node.id > 0) {
                                 //it's created but not published
                                 scope.currentUrls.push({ text: labels.notPublished, isUrl: false });
@@ -96,22 +98,19 @@
                     scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
                 }
 
-                //load in the audit trail if we are currently looking at the INFO tab
-                if (umbVariantContentCtrl && umbVariantContentCtrl.editor) {
-                    var activeApp = _.find(umbVariantContentCtrl.editor.content.apps, a => a.active);
-                    if (activeApp && activeApp.alias === "umbInfo") {
-                        isInfoTab = true;
-                        loadAuditTrail();
-                        loadRedirectUrls();
-                    }
+                var activeApp = _.find(scope.node.apps, (a) => a.active);
+                if (activeApp.alias === "umbInfo") {
+                    loadRedirectUrls();
+                    loadAuditTrail();
                 }
 
+                // never show templates for element types (if they happen to have been created in the content tree)
+                scope.disableTemplates = scope.disableTemplates || scope.node.isElement;
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
                 scope.auditTrailOptions.pageNumber = pageNumber;
-                auditTrailLoaded = false;
-                loadAuditTrail();
+                loadAuditTrail(true);
             };
 
             scope.openDocumentType = function (documentType) {
@@ -192,10 +191,12 @@
                 editorService.rollback(rollback);
             };
 
-            function loadAuditTrail() {
+            function loadAuditTrail(forceReload) {
 
                 //don't load this if it's already done
-                if (auditTrailLoaded) { return; };
+                if (auditTrailLoaded && !forceReload) {
+                    return; 
+                }
 
                 scope.loadingAuditTrail = true;
 
@@ -304,6 +305,12 @@
             }
 
             function updateCurrentUrls() {
+                // never show urls for element types (if they happen to have been created in the content tree)
+                if (scope.node.isElement) {
+                    scope.currentUrls = null;
+                    return;
+                }
+
                 // find the urls for the currently selected language
                 if (scope.node.variants.length > 1) {
                     // nodes with variants
@@ -334,12 +341,11 @@
                 if (newValue === oldValue) { return; }
 
                 if (isInfoTab) {
-                    auditTrailLoaded = false;
-                    loadAuditTrail();
+                    loadAuditTrail(true);
                     loadRedirectUrls();
                     setNodePublishStatus();
-                    updateCurrentUrls();
                 }
+                updateCurrentUrls();
             });
 
             //ensure to unregister from all events!

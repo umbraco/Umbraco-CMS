@@ -33,13 +33,13 @@ namespace Umbraco.Web.Editors
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
         private ICultureDictionary _cultureDictionary;
 
-        protected ContentTypeControllerBase(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        protected ContentTypeControllerBase(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _cultureDictionaryFactory = cultureDictionaryFactory;
         }
 
-        
+
 
         /// <summary>
         /// Returns the available composite content types for a given content type
@@ -102,7 +102,7 @@ namespace Umbraco.Web.Editors
 
             var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
 
-            
+
 
             var currCompositions = source == null ? new IContentTypeComposition[] { } : source.ContentTypeComposition.ToArray();
             var compAliases = currCompositions.Select(x => x.Alias).ToArray();
@@ -156,7 +156,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns a list of content types where a particular composition content type is used
         /// </summary>
-        /// <param name="type">Type of content Type, eg documentType or mediaType</param>      
+        /// <param name="type">Type of content Type, eg documentType or mediaType</param>
         /// <param name="contentTypeId">Id of composition content type</param>
         /// <returns></returns>
         protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId, UmbracoObjectTypes type)

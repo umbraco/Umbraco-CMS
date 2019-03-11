@@ -5,7 +5,7 @@ using Umbraco.Web.Composing;
 namespace Umbraco.Web.Trees
 {
     [CoreTree]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, TreeTitle = "Stylesheets", IconOpen = "icon-folder", IconClosed = "icon-folder", SortOrder = 9, TreeGroup = Constants.Trees.Groups.Templating)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, TreeTitle = "Stylesheets", SortOrder = 9, TreeGroup = Constants.Trees.Groups.Templating)]
     public class StylesheetsTreeController : FileSystemTreeController
     {
         protected override IFileSystem FileSystem => Current.FileSystems.StylesheetsFileSystem; // TODO: inject

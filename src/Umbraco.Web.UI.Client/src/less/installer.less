@@ -21,9 +21,6 @@
 
 html {
   background: url('../img/installer.jpg') no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
   background-size: cover;
 }
 
@@ -153,9 +150,6 @@ input.ng-dirty.ng-invalid{border-color: #b94a48; color: #b94a48;}
 }
 
 .fade-hide, .fade-show {
-    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-    -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-    -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
     transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 }
 .fade-hide {
@@ -173,84 +167,23 @@ input.ng-dirty.ng-invalid{border-color: #b94a48; color: #b94a48;}
 
 
 .umb-loader{
-background-color: @white;
-margin-top:0;
-margin-left:-100%;
--moz-animation-name:bounce_loadingProgressG;
--moz-animation-duration:1s;
--moz-animation-iteration-count:infinite;
--moz-animation-timing-function:linear;
--webkit-animation-name:bounce_loadingProgressG;
--webkit-animation-duration:1s;
--webkit-animation-iteration-count:infinite;
--webkit-animation-timing-function:linear;
--ms-animation-name:bounce_loadingProgressG;
--ms-animation-duration:1s;
--ms-animation-iteration-count:infinite;
--ms-animation-timing-function:linear;
--o-animation-name:bounce_loadingProgressG;
--o-animation-duration:1s;
--o-animation-iteration-count:infinite;
--o-animationtiming-function:linear;
-animation-name:bounce_loadingProgressG;
-animation-duration:1s;
-animation-iteration-count:infinite;
-animation-timing-function:linear;
-width:100%;
-height: 5px;
+    background-color: @white;
+    margin-top:0;
+    margin-left:-100%;
+    animation-name:bounce_loadingProgressG;
+    animation-duration:1s;
+    animation-iteration-count:infinite;
+    animation-timing-function:linear;
+    width:100%;
+    height: 5px;
 }
 
-
-    @-moz-keyframes bounce_loadingProgressG{
+@keyframes bounce_loadingProgressG{
     0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @-webkit-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @-ms-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @-o-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
+        margin-left:-100%;
     }
     100%{
-    margin-left:100%;
+        margin-left:100%;
     }
 }
 

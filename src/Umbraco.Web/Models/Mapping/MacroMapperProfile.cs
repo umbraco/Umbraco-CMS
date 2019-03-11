@@ -19,9 +19,9 @@ namespace Umbraco.Web.Models.Mapping
             //FROM IMacro TO EntityBasic
             CreateMap<IMacro, EntityBasic>()
                 .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Macro, content.Key)))
-                  .ForMember(entityBasic => entityBasic.Icon, expression => expression.UseValue("icon-settings-alt"))
-                  .ForMember(dto => dto.ParentId, expression => expression.UseValue(-1))
-                  .ForMember(dto => dto.Path, expression => expression.ResolveUsing(macro => "-1," + macro.Id))
+                  .ForMember(entityBasic => entityBasic.Icon, expression => expression.MapFrom(_ => "icon-settings-alt"))
+                  .ForMember(dto => dto.ParentId, expression => expression.MapFrom(_ => -1))
+                  .ForMember(dto => dto.Path, expression => expression.MapFrom(macro => "-1," + macro.Id))
                   .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                   .ForMember(dto => dto.AdditionalData, expression => expression.Ignore());
 
@@ -45,8 +45,15 @@ namespace Umbraco.Web.Models.Mapping
                     }
 
                     parameter.View = paramEditor.GetValueEditor().View;
-                    //set the config
-                    parameter.Configuration = paramEditor.DefaultConfiguration;
+
+                    // sets the parameter configuration to be the default configuration editor's configuration,
+                    // ie configurationEditor.DefaultConfigurationObject, prepared for the value editor, ie
+                    // after ToValueEditor - important to use DefaultConfigurationObject here, because depending
+                    // on editors, ToValueEditor expects the actual strongly typed configuration - not the
+                    // dictionary thing returned by DefaultConfiguration
+
+                    var configurationEditor = paramEditor.GetConfigurationEditor();
+                    parameter.Configuration = configurationEditor.ToValueEditor(configurationEditor.DefaultConfigurationObject);
                 });
         }
     }

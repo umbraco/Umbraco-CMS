@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <metadata minClientVersion="3.4.4">
+    <metadata minClientVersion="4.6.0">
         <id>UmbracoCms</id>
         <version>8.0.0</version>
         <title>Umbraco Cms</title>
@@ -15,18 +15,25 @@
         <language>en-US</language>
         <tags>umbraco</tags>
         <dependencies>
-            <dependency id="UmbracoCms.Web" version="[$version$]" />
-            <!--
-              note: dependencies are specified as [x.y.z,x.999999) eg [2.1.0,2.999999) and NOT [2.1.0,3.0.0) because
-              the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
-              not want this to happen as the alpha of the next major is, really, the next major already.
-            -->
-            <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.3, 2.999999)" />
-            <dependency id="Umbraco.ModelsBuilder.Ui" version="[8.0.0-alpha.34]" />
-            <dependency id="ImageProcessor.Web" version="[4.9.3.25,4.999999)" />
-            <dependency id="ImageProcessor.Web.Config" version="[2.4.1.19,2.999999)" />
-            <dependency id="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="[2.0.1,2.999999)" />
-            <dependency id="Microsoft.Net.Compilers" version="[2.10.0,2.999999)" />
+
+            <group targetFramework="net472">
+
+                <dependency id="UmbracoCms.Web" version="[$version$]" />
+                <!--
+                  note: dependencies are specified as [x.y.z,x.999999) eg [2.1.0,2.999999) and NOT [2.1.0,3.0.0) because
+                  the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
+                  not want this to happen as the alpha of the next major is, really, the next major already.
+                -->
+                <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.4.0, 2.999999)" />
+                <dependency id="Umbraco.ModelsBuilder.Ui" version="[8.0.1]" />
+                <dependency id="ImageProcessor.Web" version="[4.10.0.100,4.999999)" />
+                <dependency id="ImageProcessor.Web.Config" version="[2.5.0.100,2.999999)" />
+                <dependency id="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="[2.0.1,2.999999)" />
+                <dependency id="Microsoft.Net.Compilers" version="[2.10.0,2.999999)" />
+
+            </group>
+
+
         </dependencies>
     </metadata>
     <files>

@@ -10,7 +10,10 @@
             page: "<",
             content: "<", // TODO: Not sure if this should be = since we are changing the 'active' property of a variant
             culture: "<",
-            onSelectApp: "&?"
+            onSelectApp: "&?",
+            onSelectAppAnchor: "&?",
+            onBack: "&?",
+            showBack: "<?"
         },
         controllerAs: 'vm',
         controller: umbVariantContentEditorsController
@@ -32,6 +35,7 @@
         vm.closeSplitView = closeSplitView;
         vm.selectVariant = selectVariant;
         vm.selectApp = selectApp;
+        vm.selectAppAnchor = selectAppAnchor;
 
         //Used to track how many content views there are (for split view there will be 2, it could support more in theory)
         vm.editors = [];
@@ -316,13 +320,24 @@
          * @param {any} app This is the model of the selected app
          */
         function selectApp(app) {
-            if(app && app.alias) {
-                activeAppAlias = app.alias;
-            }
             if(vm.onSelectApp) {
                 vm.onSelectApp({"app": app});
             }
         }
+        
+        function selectAppAnchor(app, anchor) {
+            if(vm.onSelectAppAnchor) {
+                vm.onSelectAppAnchor({"app": app, "anchor": anchor});
+            }
+        }
+        
+        
+        $scope.$on("editors.apps.appChanged", function($event, $args) {
+            var app = $args.app;
+            if(app && app.alias) {
+                activeAppAlias = app.alias;
+            }
+        });
 
     }
 

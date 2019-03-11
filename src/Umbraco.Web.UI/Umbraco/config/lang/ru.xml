@@ -269,7 +269,7 @@
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Композиции</key>
-    <key alias="noTabs">Вы не добавили ни одной вкладки</key>
+    <key alias="noGroups">Вы не добавили ни одной вкладки</key>
     <key alias="inheritedFrom">Унаследовано от</key>
     <key alias="addProperty">Добавить свойство</key>
     <key alias="requiredLabel">Обязательная метка</key>
@@ -712,13 +712,13 @@
     <key alias="httpsCheckValidCertificate">Сертификат Вашего веб-сайта отмечен как проверенный.</key>
     <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Сейчас Вы %0% просматриваете сайт, используя протокол HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">Параметр 'umbracoUseSSL' в секции 'appSetting' установлен в 'false' в файле web.config. Если Вам необходим доступ к сайту по протоколу HTTPS, нужно установить данный параметр в 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">Параметр 'umbracoUseSSL' в секции 'appSetting' в файле установлен в '%0%', значения cookies %1% маркированы как безопасные.</key>
-    <key alias="httpsCheckEnableHttpsError">Невозможно обновить значение параметра 'umbracoUseSSL' в файле web.config. Ошибка: %0%</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">Параметр 'Umbraco.Core.UseHttps' в секции 'appSetting' установлен в 'false' в файле web.config. Если Вам необходим доступ к сайту по протоколу HTTPS, нужно установить данный параметр в 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">Параметр 'Umbraco.Core.UseHttps' в секции 'appSetting' в файле установлен в '%0%', значения cookies %1% маркированы как безопасные.</key>
+    <key alias="httpsCheckEnableHttpsError">Невозможно обновить значение параметра 'Umbraco.Core.UseHttps' в файле web.config. Ошибка: %0%</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">Разрешить HTTPS</key>
     <key alias="httpsCheckEnableHttpsDescription">Устанавливает значение параметра 'umbracoSSL' в 'true' в секции 'appSettings' файла web.config.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">Параметр 'umbracoUseSSL' в секции 'appSetting' файла web.config теперь установлен в 'true', значения cookies будут промаркированы как безопасные.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">Параметр 'Umbraco.Core.UseHttps' в секции 'appSetting' файла web.config теперь установлен в 'true', значения cookies будут промаркированы как безопасные.</key>
     <key alias="rectifyButton">Исправить</key>
     <key alias="cannotRectifyShouldNotEqual">Невозможно исправление по результату проверки значения на 'ShouldNotEqual'.</key>
     <key alias="cannotRectifyShouldEqualWithValue">Невозможно исправление по результату проверки значения на 'ShouldEqual' с предоставленным значением.</key>
@@ -1286,7 +1286,6 @@
     <key alias="redirectedTo">Перенаправлен в</key>
     <key alias="noRedirects">На данный момент нет ни одного перенаправления</key>
     <key alias="noRedirectsDescription">Если опубликованный документ переименовывается или меняет свое расположение в дереве, а следовательно, меняется адрес (URL), автоматически создается перенаправление на новое местоположение этого документа.</key>
-    <key alias="removeButton">Удалить</key>
     <key alias="confirmRemove">Вы уверены, что хотите удалить перенаправление с '%0%' на '%1%'?</key>
     <key alias="redirectRemoved">Перенаправление удалено.</key>
     <key alias="redirectRemoveError">Ошибка удаления перенаправления.</key>
@@ -1344,7 +1343,6 @@
     <key alias="contentTypeEnabled">Родительский тип контента разрешен</key>
     <key alias="contentTypeUses">Данный тип контента использует</key>
     <key alias="defaulttemplate">Шаблон по-умолчанию</key>
-    <key alias="dictionary editor egenskab">Словарная статья</key>
     <key alias="importDocumentTypeHelp">Чтобы импортировать тип документа, найдите файл ".udt" на своем компьютере, нажав на кнопку "Обзор", затем нажмите "Импортировать" (на следующем экране будет запрошено подтверждение для этой операции).</key>
     <key alias="newtabname">Заголовок новой вкладки</key>
     <key alias="nodetype">Тип узла (документа)</key>
@@ -1352,13 +1350,12 @@
     <key alias="objecttype">Тип</key>
     <key alias="script">Скрипт</key>
     <key alias="stylesheet">Стили CSS</key>
-    <key alias="stylesheet editor egenskab">Правило стиля CSS</key>
     <key alias="tab">Вкладка</key>
     <key alias="tabname">Заголовок вкладки</key>
     <key alias="tabs">Вкладки</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Добавить вкладку</key>
+    <key alias="addGroup">Добавить вкладку</key>
     <key alias="addProperty">Добавить свойство</key>
     <key alias="addEditor">Добавить редактор</key>
     <key alias="addTemplate">Добавить шаблон</key>

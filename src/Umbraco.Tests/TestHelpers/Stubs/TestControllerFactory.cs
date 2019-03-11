@@ -17,17 +17,27 @@ namespace Umbraco.Tests.TestHelpers.Stubs
     /// </summary>
     internal class TestControllerFactory : IControllerFactory
     {
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILogger _logger;
+        private readonly Func<RequestContext, IController> _factory;
 
-        public TestControllerFactory(UmbracoContext umbracoContext, ILogger logger)
+        public TestControllerFactory(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
         {
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
+        }
+
+        public TestControllerFactory(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, Func<RequestContext, IController> factory)
+        {
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _logger = logger;
+            _factory = factory;
         }
 
         public IController CreateController(RequestContext requestContext, string controllerName)
         {
+            if (_factory != null) return _factory(requestContext);
+
             var types = TypeFinder.FindClassesOfType<ControllerBase>(new[] { Assembly.GetExecutingAssembly() });
 
             var controllerTypes = types.Where(x => x.Name.Equals(controllerName + "Controller", StringComparison.InvariantCultureIgnoreCase));
@@ -38,7 +48,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 
             var possibleParams = new object[]
             {
-                _umbracoContext, _logger
+                _umbracoContextAccessor, _logger
             };
             var ctors = t.GetConstructors();
             foreach (var ctor in ctors.OrderByDescending(x => x.GetParameters().Length))

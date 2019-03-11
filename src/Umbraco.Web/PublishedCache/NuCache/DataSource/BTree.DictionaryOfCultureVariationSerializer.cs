@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             for (var i = 0; i < pcount; i++)
             {
                 var languageId = PrimitiveSerializer.String.ReadFrom(stream);
-                var cultureVariation = new CultureVariation { Name = ReadStringObject(stream), Date = ReadDateTime(stream) };
+                var cultureVariation = new CultureVariation { Name = ReadStringObject(stream), UrlSegment = ReadStringObject(stream), Date = ReadDateTime(stream) };
                 dict[languageId] = cultureVariation;
             }
             return dict;
@@ -40,6 +40,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                 PrimitiveSerializer.String.WriteTo(culture, stream); // should never be null
                 WriteObject(variation.Name, stream); // write an object in case it's null (though... should not happen)
+                WriteObject(variation.UrlSegment, stream); // write an object in case it's null (though... should not happen)
                 PrimitiveSerializer.DateTime.WriteTo(variation.Date, stream);
             }
         }

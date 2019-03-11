@@ -4,15 +4,8 @@ using System.Linq;
 using System.Net.Configuration;
 using System.Web;
 using System.Web.Configuration;
-using System.Web.Hosting;
-using System.Web.Security;
-using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Configuration
 {
@@ -31,7 +24,7 @@ namespace Umbraco.Core.Configuration
         private static string _reservedPaths;
         private static string _reservedUrls;
         //ensure the built on (non-changeable) reserved paths are there at all times
-        internal const string StaticReservedPaths = "~/app_plugins/,~/install/,"; //must end with a comma!
+        internal const string StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
         internal const string StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known,"; //must end with a comma!
         #endregion
 
@@ -85,8 +78,8 @@ namespace Umbraco.Core.Configuration
             {
                 if (_reservedUrls != null) return _reservedUrls;
 
-                var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
-                    ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
+                var urls = ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ReservedUrls)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ReservedUrls]
                     : string.Empty;
 
                 //ensure the built on (non-changeable) reserved paths are there at all times
@@ -107,14 +100,14 @@ namespace Umbraco.Core.Configuration
                 if (_reservedPaths != null) return _reservedPaths;
 
                 var reservedPaths = StaticReservedPaths;
-                var umbPath = ConfigurationManager.AppSettings.ContainsKey("umbracoPath") && !ConfigurationManager.AppSettings["umbracoPath"].IsNullOrWhiteSpace()
-                    ? ConfigurationManager.AppSettings["umbracoPath"]
+                var umbPath = ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path) && !ConfigurationManager.AppSettings[Constants.AppSettings.Path].IsNullOrWhiteSpace()
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.Path]
                     : "~/umbraco";
                 //always add the umbraco path to the list
                 reservedPaths += umbPath.EnsureEndsWith(',');
 
-                var allPaths = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
-                    ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
+                var allPaths = ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ReservedPaths)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ReservedPaths]
                     : string.Empty;
 
                 _reservedPaths = reservedPaths + allPaths;
@@ -133,8 +126,8 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoContentXML")
-                    ? ConfigurationManager.AppSettings["umbracoContentXML"]
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ContentXML)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ContentXML]
                     : "~/App_Data/umbraco.config";
             }
         }
@@ -147,8 +140,8 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoPath")
-                    ? IOHelper.ResolveUrl(ConfigurationManager.AppSettings["umbracoPath"])
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path)
+                    ? IOHelper.ResolveUrl(ConfigurationManager.AppSettings[Constants.AppSettings.Path])
                     : string.Empty;
             }
         }
@@ -161,13 +154,13 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoConfigurationStatus")
-                    ? ConfigurationManager.AppSettings["umbracoConfigurationStatus"]
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ConfigurationStatus)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus]
                     : string.Empty;
             }
             set
             {
-                SaveSetting("umbracoConfigurationStatus", value);
+                SaveSetting(Constants.AppSettings.ConfigurationStatus, value);
             }
         }
         
@@ -249,7 +242,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return int.Parse(ConfigurationManager.AppSettings["umbracoTimeOutInMinutes"]);
+                    return int.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.TimeOutInMinutes]);
                 }
                 catch
                 {
@@ -268,7 +261,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return int.Parse(ConfigurationManager.AppSettings["umbracoVersionCheckPeriod"]);
+                    return int.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.VersionCheckPeriod]);
                 }
                 catch
                 {
@@ -277,23 +270,42 @@ namespace Umbraco.Core.Configuration
             }
         }
         
-        /// <summary>
-        /// This is the location type to store temporary files such as cache files or other localized files for a given machine
-        /// </summary>
-        /// <remarks>
-        /// Currently used for the xml cache file and the plugin cache files
-        /// </remarks>
+        /// <inheritdoc />
         public LocalTempStorage LocalTempStorageLocation
         {
             get
             {
-                var setting = ConfigurationManager.AppSettings["umbracoLocalTempStorage"];
+                var setting = ConfigurationManager.AppSettings[Constants.AppSettings.LocalTempStorage];
                 if (!string.IsNullOrWhiteSpace(setting))
                     return Enum<LocalTempStorage>.Parse(setting);
 
                 return LocalTempStorage.Default;
             }
         }
+
+        /// <inheritdoc />
+        public string LocalTempPath
+        {
+            get
+            {
+                switch (LocalTempStorageLocation)
+                {
+                    case LocalTempStorage.AspNetTemp:
+                        return System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
+                    case LocalTempStorage.EnvironmentTemp:
+                        // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
+                        var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
+                        return System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash);
+                    //case LocalTempStorage.Default:
+                    //case LocalTempStorage.Unknown:
+                    default:
+                        return IOHelper.MapPath("~/App_Data/TEMP");
+                }
+            }
+        }
+
 
         /// <summary>
         /// Gets the default UI language.
@@ -304,8 +316,8 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoDefaultUILanguage")
-                    ? ConfigurationManager.AppSettings["umbracoDefaultUILanguage"]
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.DefaultUILanguage)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.DefaultUILanguage]
                     : string.Empty;
             }
         }
@@ -322,7 +334,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoHideTopLevelNodeFromPath"]);
+                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.HideTopLevelNodeFromPath]);
                 }
                 catch
                 {
@@ -340,7 +352,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoUseHttps"]);
+                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.UseHttps]);
                 }
                 catch
                 {
@@ -348,10 +360,5 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
-
     }
-
-
-
-
 }

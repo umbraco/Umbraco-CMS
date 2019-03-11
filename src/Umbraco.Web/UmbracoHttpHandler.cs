@@ -14,19 +14,16 @@ namespace Umbraco.Web
         private UrlHelper _url;
 
         protected UmbracoHttpHandler()
-            : this(Current.UmbracoContext, Current.Services)
+            : this(Current.UmbracoContextAccessor, Current.UmbracoHelper, Current.Services, Current.ProfilingLogger)
         { }
 
-        protected UmbracoHttpHandler(UmbracoContext umbracoContext, ServiceContext services)
+        protected UmbracoHttpHandler(IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper umbracoHelper, ServiceContext service, IProfilingLogger plogger)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            UmbracoContext = umbracoContext;
-            Umbraco = new UmbracoHelper(umbracoContext, services);
-
-            // TODO: inject somehow
-            Logger = Current.Logger;
-            ProfilingLogger = Current.ProfilingLogger;
-            Services = Current.Services;
+            UmbracoContextAccessor = umbracoContextAccessor;
+            Logger = plogger;
+            ProfilingLogger = plogger;
+            Services = service;
+            Umbraco = umbracoHelper;
         }
 
         public abstract void ProcessRequest(HttpContext context);
@@ -44,9 +41,9 @@ namespace Umbraco.Web
         public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
-        /// Gets the Umbraco context.
+        /// Gets the Umbraco context accessor.
         /// </summary>
-        public UmbracoContext UmbracoContext { get; }
+        public IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
         /// <summary>
         /// Gets the Umbraco helper.
@@ -61,7 +58,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public WebSecurity Security => UmbracoContext.Security;
+        public WebSecurity Security => UmbracoContextAccessor.UmbracoContext.Security;
 
         /// <summary>
         /// Gets the Url helper.

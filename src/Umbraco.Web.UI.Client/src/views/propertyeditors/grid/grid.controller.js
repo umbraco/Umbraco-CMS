@@ -60,8 +60,8 @@ angular.module("umbraco")
             start: function (e, ui) {
 
                 // Fade out row when sorting
-                ui.item.context.style.display = "block";
-                ui.item.context.style.opacity = "0.5";
+                ui.item[0].style.display = "block";
+                ui.item[0].style.opacity = "0.5";
 
                 draggedRteSettings = {};
                 ui.item.find(".mceNoEditor").each(function () {
@@ -75,7 +75,7 @@ angular.module("umbraco")
             stop: function (e, ui) {
 
                 // Fade in row when sorting stops
-                ui.item.context.style.opacity = "1";
+                ui.item[0].style.opacity = "1";
 
                 // reset all RTEs affected by the dragging
                 ui.item.parents(".umb-column").find(".mceNoEditor").each(function () {
@@ -122,24 +122,25 @@ angular.module("umbraco")
             },
 
             over: function (event, ui) {
-                var area = $(event.target).scope().area;
+                
+                var area = event.target.getScope_HackForSortable().area;
                 var allowedEditors = area.allowed;
-
-                if (($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
+                
+                if (($.inArray(ui.item[0].getScope_HackForSortable().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
                         (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                     $scope.$apply(function () {
-                        $(event.target).scope().area.dropNotAllowed = true;
+                        event.target.getScope_HackForSortable().area.dropNotAllowed = true;
                     });
 
                     ui.placeholder.hide();
                     cancelMove = true;
                 }
                 else {
-                    if ($(event.target).scope().area.controls.length == 0){
+                    if (event.target.getScope_HackForSortable().area.controls.length == 0){
 
                         $scope.$apply(function () {
-                            $(event.target).scope().area.dropOnEmpty = true;
+                            event.target.getScope_HackForSortable().area.dropOnEmpty = true;
                         });
                         ui.placeholder.hide();
                     } else {
@@ -151,8 +152,9 @@ angular.module("umbraco")
 
             out: function(event, ui) {
                 $scope.$apply(function () {
-                    $(event.target).scope().area.dropNotAllowed = false;
-                    $(event.target).scope().area.dropOnEmpty = false;
+                    var dropArea = event.target.getScope_HackForSortable().area;
+                    dropArea.dropNotAllowed = false;
+                    dropArea.dropOnEmpty = false;
                 });
             },
 
@@ -178,19 +180,18 @@ angular.module("umbraco")
                 currentForm.$setDirty();
             },
 
-            start: function (e, ui) {
-
+            start: function (event, ui) {
                 //Get the starting area for reference
-                var area = $(e.target).scope().area;
+                var area = event.target.getScope_HackForSortable().area;
                 startingArea = area;
 
                 // fade out control when sorting
-                ui.item.context.style.display = "block";
-                ui.item.context.style.opacity = "0.5";
+                ui.item[0].style.display = "block";
+                ui.item[0].style.opacity = "0.5";
 
                 // reset dragged RTE settings in case a RTE isn't dragged
                 draggedRteSettings = undefined;
-                ui.item.context.style.display = "block";
+                ui.item[0].style.display = "block";
                 ui.item.find(".mceNoEditor").each(function () {
                     notIncludedRte = [];
                     var editors = _.findWhere(tinyMCE.editors, { id: $(this).attr("id") });
@@ -207,10 +208,10 @@ angular.module("umbraco")
                 });
             },
 
-            stop: function (e, ui) {
+            stop: function (event, ui) {
 
                 // Fade in control when sorting stops
-                ui.item.context.style.opacity = "1";
+                ui.item[0].style.opacity = "1";
 
                 ui.item.offsetParent().find(".mceNoEditor").each(function () {
                     if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
@@ -236,7 +237,7 @@ angular.module("umbraco")
 
                 $scope.$apply(function () {
 
-                    var cell = $(e.target).scope().area;
+                    var cell = event.target.getScope_HackForSortable().area;
                     cell.hasActiveChild = hasActiveChild(cell, cell.controls);
                     cell.active = false;
                 });
@@ -400,7 +401,7 @@ angular.module("umbraco")
         }
 
         $scope.editGridItemSettings = function (gridItem, itemType) {
-
+            
             placeHolder = "{0}";
 
             var styles, config;
@@ -658,7 +659,7 @@ angular.module("umbraco")
         // *********************************************
         $scope.initContent = function () {
             var clear = true;
-
+            
             //settings indicator shortcut
             if (($scope.model.config.items.config && $scope.model.config.items.config.length > 0) || ($scope.model.config.items.styles && $scope.model.config.items.styles.length > 0)) {
                 $scope.hasSettings = true;
@@ -755,7 +756,7 @@ angular.module("umbraco")
         // Init layout / row
         // *********************************************
         $scope.initRow = function (row) {
-
+            
             //merge the layout data with the original config data
             //if there are no config info on this, splice it out
             var original = _.find($scope.model.config.items.layouts, function (o) { return o.name === row.name; });
@@ -909,9 +910,9 @@ angular.module("umbraco")
         // needs to be merged in at runtime to ensure that the real config values are used
         // if they are ever updated.
 
-        var unsubscribe = $scope.$on("formSubmitting", function () {
-
-            if ($scope.model.value && $scope.model.value.sections) {
+        var unsubscribe = $scope.$on("formSubmitting", function (e, args) {
+            
+            if (args.action === "save" && $scope.model.value && $scope.model.value.sections) {
                 _.each($scope.model.value.sections, function(section) {
                     if (section.rows) {
                         _.each(section.rows, function (row) {
