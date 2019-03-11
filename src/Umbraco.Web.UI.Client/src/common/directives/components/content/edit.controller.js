@@ -348,7 +348,7 @@
                                 var tokens = [iVariant.language.name];
                                 
                                 localizationService.localize("publish_contentPublishedFailedByMissingName", tokens).then(function (value) {
-                                    iVariant.warnings = {"message": value};
+                                    iVariant.warnings = [{"message": value}];
                                 });
                                 
                                 return $q(function(resolve, reject) {
