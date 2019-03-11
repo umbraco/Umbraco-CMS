@@ -343,7 +343,7 @@
                         iVariant.notifications = [];// maybe not needed, need to investigate.
                         
                         if(iVariant.publish === true) {
-                            if (iVariant.name == null) {
+                            if (iVariant.name == null || iVariant.name == "") {
                                 
                                 var tokens = [iVariant.language.name];
                                 

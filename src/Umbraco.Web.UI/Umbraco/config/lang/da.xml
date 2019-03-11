@@ -987,6 +987,7 @@ Mange hilsner fra Umbraco robotten
     %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
     ]]></key>
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
+    <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% kan ikke udgives, fordi det mangler et navn.]]></key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
     <key alias="inProgress">Publicerer - vent venligst...</key>
     <key alias="inProgressCounter">%0% ud af %1% sider er blevet udgivet...</key>
