@@ -121,7 +121,7 @@ namespace Umbraco.Web.Mvc
                 {
                     throw new InvalidOperationException("The data token resolved with name " + _dataTokenName + " was not an instance of " + typeof(IPublishedContent));
                 }
-                request.PublishedContent = (IPublishedContent) result;
+                request.PublishedContent = (IPublishedContent)result;
             }
 
             PublishedRouter.PrepareRequest(request);
