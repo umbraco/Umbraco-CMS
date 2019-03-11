@@ -1,7 +1,7 @@
 (function () {
     "use strict";
     
-    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService) {
+    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService, contentEditingHelper) {
 
         var vm = this;
 
@@ -45,7 +45,7 @@
 
                 _.each(vm.variants,
                     function (variant) {
-                        variant.compositeId = (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "");
+                        variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
                         variant.htmlId = "_content_variant_" + variant.compositeId;
     
                         //check for pristine variants

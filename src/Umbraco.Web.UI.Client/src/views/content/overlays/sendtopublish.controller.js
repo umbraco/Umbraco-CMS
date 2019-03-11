@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function SendToPublishController($scope, localizationService) {
+    function SendToPublishController($scope, localizationService, contentEditingHelper) {
 
         var vm = this;
         vm.loading = true;
@@ -25,7 +25,7 @@
             if (vm.variants.length !== 0) {
                 _.each(vm.variants,
                     function (variant) {
-                        variant.compositeId = (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "");
+                        variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
                         variant.htmlId = "_content_variant_" + variant.compositeId;
                     });
 
