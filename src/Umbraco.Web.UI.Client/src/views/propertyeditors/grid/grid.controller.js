@@ -8,7 +8,8 @@ angular.module("umbraco")
         umbRequestHelper,
         angularHelper,
         $element,
-        eventsService
+        eventsService,
+        editorService
     ) {
 
         // Grid status variables
@@ -431,44 +432,83 @@ angular.module("umbraco")
                 });
             }
 
-            $scope.gridItemSettingsDialog = {};
-            $scope.gridItemSettingsDialog.view = "views/propertyeditors/grid/dialogs/config.html";
-            $scope.gridItemSettingsDialog.title = "Settings";
-            $scope.gridItemSettingsDialog.styles = styles;
-            $scope.gridItemSettingsDialog.config = config;
+            var dialogOptions = {
+                view: "views/propertyeditors/grid/dialogs/config.html",
+                title: "Settings",
+                size: "small",
+                styles: styles,
+                config: config,
+                submit: function (model) {
+                    var styleObject = {};
+                    var configObject = {};
 
-            $scope.gridItemSettingsDialog.show = true;
+                    _.each(model.styles, function (style) {
+                        if (style.value) {
+                            styleObject[style.key] = addModifier(style.value, style.modifier);
+                        }
+                    });
+                    _.each(model.config, function (cfg) {
+                        cfg.alias = cfg.key;
+                        cfg.label = cfg.value;
 
-            $scope.gridItemSettingsDialog.submit = function(model) {
+                        if (cfg.value) {
+                            configObject[cfg.key] = addModifier(cfg.value, cfg.modifier);
+                        }
+                    });
 
-                var styleObject = {};
-                var configObject = {};
+                    gridItem.styles = styleObject;
+                    gridItem.config = configObject;
+                    gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
 
-                _.each(model.styles, function(style){
-                    if(style.value){
-                        styleObject[style.key] = addModifier(style.value, style.modifier);
-                    }
-                });
-                _.each(model.config, function (cfg) {
-                    if (cfg.value) {
-                        configObject[cfg.key] = addModifier(cfg.value, cfg.modifier);
-                    }
-                });
+                    currentForm.$setDirty();
 
-                gridItem.styles = styleObject;
-                gridItem.config = configObject;
-                gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
-
-                currentForm.$setDirty();
-
-                $scope.gridItemSettingsDialog.show = false;
-                $scope.gridItemSettingsDialog = null;
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
             };
 
-            $scope.gridItemSettingsDialog.close = function(oldModel) {
-                $scope.gridItemSettingsDialog.show = false;
-                $scope.gridItemSettingsDialog = null;
-            };
+            editorService.open(dialogOptions);
+
+            //$scope.gridItemSettingsDialog = {};
+            //$scope.gridItemSettingsDialog.view = "views/propertyeditors/grid/dialogs/config.html";
+            //$scope.gridItemSettingsDialog.title = "Settings";
+            //$scope.gridItemSettingsDialog.styles = styles;
+            //$scope.gridItemSettingsDialog.config = config;
+
+            //$scope.gridItemSettingsDialog.show = true;
+
+            //$scope.gridItemSettingsDialog.submit = function(model) {
+
+            //    var styleObject = {};
+            //    var configObject = {};
+
+            //    _.each(model.styles, function(style){
+            //        if(style.value){
+            //            styleObject[style.key] = addModifier(style.value, style.modifier);
+            //        }
+            //    });
+            //    _.each(model.config, function (cfg) {
+            //        if (cfg.value) {
+            //            configObject[cfg.key] = addModifier(cfg.value, cfg.modifier);
+            //        }
+            //    });
+
+            //    gridItem.styles = styleObject;
+            //    gridItem.config = configObject;
+            //    gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
+
+            //    currentForm.$setDirty();
+
+            //    $scope.gridItemSettingsDialog.show = false;
+            //    $scope.gridItemSettingsDialog = null;
+            //};
+
+            //$scope.gridItemSettingsDialog.close = function(oldModel) {
+            //    $scope.gridItemSettingsDialog.show = false;
+            //    $scope.gridItemSettingsDialog = null;
+            //};
 
         };
 

@@ -1,4 +1,4 @@
-function EditConfigController($scope) {
+function ConfigController($scope) {
 
     $scope.close = function() {
         if($scope.model.close) {
@@ -13,4 +13,4 @@ function EditConfigController($scope) {
     }
 }
 
-angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.EditConfigController", EditConfigController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.ConfigController", ConfigController);

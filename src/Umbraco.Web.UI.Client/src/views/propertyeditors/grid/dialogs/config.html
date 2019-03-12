@@ -1,16 +1,57 @@
-<div ng-if="model.config">
-    <umb-property
-        property="configValue"
-        ng-repeat="configValue in model.config">
-        <umb-property-editor model="configValue" is-pre-value="true"></umb-property-editor>
-    </umb-property>
-</div>
+<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.EditConfigController">
 
-<div ng-if="model.styles">
-    <h4>Style</h4>
-    <umb-property
-        property="styleValue"
-        ng-repeat="styleValue in model.styles">
-        <umb-property-editor model="styleValue" is-pre-value="true"></umb-property-editor>
-    </umb-property>
+    <umb-editor-view>
+
+        <umb-editor-header name="model.title"
+                           name-locked="true"
+                           hide-alias="true"
+                           hide-icon="true"
+                           hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content>
+
+                    <ng-form name="gridItemConfigEditor" val-form-manager>
+
+                        <div ng-if="model.config">
+                            <umb-property property="configValue"
+                                          ng-repeat="configValue in model.config">
+                                <umb-property-editor model="configValue" is-pre-value="true"></umb-property-editor>
+                            </umb-property>
+                        </div>
+
+                        <div ng-if="model.styles">
+                            <h4>Style</h4>
+                            <umb-property property="styleValue"
+                                          ng-repeat="styleValue in model.styles">
+                                <umb-property-editor model="styleValue" is-pre-value="true"></umb-property-editor>
+                            </umb-property>
+                        </div>
+
+                    </ng-form>
+
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button type="button"
+                            button-style="link"
+                            label-key="general_close"
+                            shortcut="esc"
+                            action="close()">
+                </umb-button>
+                <umb-button type="button"
+                            button-style="success"
+                            label-key="general_submit"
+                            action="submit()">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
 </div>
