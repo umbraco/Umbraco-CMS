@@ -155,6 +155,13 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
 
+    // add the current filter (if any) as title for the filtered out nodes
+    if ($scope.model.config.filter) {
+        localizationService.localize("contentPicker_allowedItemTypes", [$scope.model.config.filter]).then(function (data) {
+            dialogOptions.filterTitle = data;
+        });
+    }
+
     //We need to manually handle the filter for members here since the tree displayed is different and only contains
     // searchable list views
     if (entityType === "Member") {

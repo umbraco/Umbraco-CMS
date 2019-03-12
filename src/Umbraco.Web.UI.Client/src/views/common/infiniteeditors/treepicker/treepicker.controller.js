@@ -415,6 +415,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                                 value.cssClasses = [];
                             }
                             value.cssClasses.push($scope.model.filterCssClass);
+                            value.title = $scope.model.filterTitle;
                         }
                     });
             }
@@ -433,6 +434,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                                     value.cssClasses = [];
                                 }
                                 value.cssClasses.push($scope.model.filterCssClass);
+                                value.title = $scope.model.filterTitle;
                             }
                         }
                     });
