@@ -304,7 +304,13 @@ namespace Umbraco.Core.IO
             // permissions to reach that path, but it may nevertheless be outside of
             // our root path, due to relative segments, so better check
             if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
+            {
+                // this says that 4.7.2 supports long paths - but Windows does not
+                // https://docs.microsoft.com/en-us/dotnet/api/system.io.pathtoolongexception?view=netframework-4.7.2
+                if (path.Length > 260)
+                    throw new PathTooLongException($"Path {path} is too long.");
                 return path;
+            }
 
             // nothing prevents us to reach the file, security-wise, yet it is outside
             // this filesystem's root - throw

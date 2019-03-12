@@ -3,26 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
-using System.Xml.Linq;
 using Semver;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
-using Content = Umbraco.Core.Models.Content;
 
 namespace Umbraco.Core.Services.Implement
 {

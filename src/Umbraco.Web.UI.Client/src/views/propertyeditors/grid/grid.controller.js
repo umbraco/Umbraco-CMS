@@ -127,24 +127,25 @@ angular.module("umbraco")
             },
 
             over: function (event, ui) {
-                var area = $(event.target).scope().area;
+                
+                var area = event.target.getScope_HackForSortable().area;
                 var allowedEditors = area.allowed;
-
-                if (($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
+                
+                if (($.inArray(ui.item[0].getScope_HackForSortable().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
                         (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                     $scope.$apply(function () {
-                        $(event.target).scope().area.dropNotAllowed = true;
+                        event.target.getScope_HackForSortable().area.dropNotAllowed = true;
                     });
 
                     ui.placeholder.hide();
                     cancelMove = true;
                 }
                 else {
-                    if ($(event.target).scope().area.controls.length == 0){
+                    if (event.target.getScope_HackForSortable().area.controls.length == 0){
 
                         $scope.$apply(function () {
-                            $(event.target).scope().area.dropOnEmpty = true;
+                            event.target.getScope_HackForSortable().area.dropOnEmpty = true;
                         });
                         ui.placeholder.hide();
                     } else {
@@ -156,8 +157,9 @@ angular.module("umbraco")
 
             out: function(event, ui) {
                 $scope.$apply(function () {
-                    $(event.target).scope().area.dropNotAllowed = false;
-                    $(event.target).scope().area.dropOnEmpty = false;
+                    var dropArea = event.target.getScope_HackForSortable().area;
+                    dropArea.dropNotAllowed = false;
+                    dropArea.dropOnEmpty = false;
                 });
             },
 
@@ -183,10 +185,9 @@ angular.module("umbraco")
                 currentForm.$setDirty();
             },
 
-            start: function (e, ui) {
-
+            start: function (event, ui) {
                 //Get the starting area for reference
-                var area = $(e.target).scope().area;
+                var area = event.target.getScope_HackForSortable().area;
                 startingArea = area;
 
                 // fade out control when sorting
@@ -212,7 +213,7 @@ angular.module("umbraco")
                 });
             },
 
-            stop: function (e, ui) {
+            stop: function (event, ui) {
 
                 // Fade in control when sorting stops
                 ui.item[0].style.opacity = "1";
@@ -240,7 +241,7 @@ angular.module("umbraco")
                 }, 500, false);
 
                 $scope.$apply(function () {
-                    var cell = $(e.target).scope().area;
+                    var cell = event.target.getScope_HackForSortable().area;
                     
                     if(hasActiveChild(cell, cell.controls)) {
                         $scope.currentCellWithActiveChild = cell;

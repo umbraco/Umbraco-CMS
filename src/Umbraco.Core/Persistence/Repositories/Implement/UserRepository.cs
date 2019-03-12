@@ -702,23 +702,6 @@ ORDER BY colName";
         {
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
-            // get the referenced column name and find the corresp mapped column name
-            var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
-            var mapper = _mapperCollection[typeof(IUser)];
-            var mappedField = mapper.Map(SqlContext.SqlSyntax, expressionMember.Name);
-
-            if (mappedField.IsNullOrWhiteSpace())
-                throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
-
-            return GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, mappedField, orderDirection, includeUserGroups, excludeUserGroups, userState, filter);
-        }
-
-        private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection = Direction.Ascending,
-            string[] includeUserGroups = null, string[] excludeUserGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
-        {
-            if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(orderBy));
-
             Sql<ISqlContext> filterSql = null;
             var customFilterWheres = filter?.GetWhereClauses().ToArray();
             var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
@@ -733,7 +716,6 @@ ORDER BY colName";
                 foreach (var clause in customFilterWheres)
                     filterSql.Append($"AND ({clause.Item1})", clause.Item2);
             }
-
 
             if (includeUserGroups != null && includeUserGroups.Length > 0)
             {
@@ -808,7 +790,7 @@ ORDER BY colName";
                 sql = new SqlTranslator<IUser>(sql, query).Translate();
 
             // get sorted and filtered sql
-            var sqlNodeIdsWithSort = ApplySort(ApplyFilter(sql, filterSql, query != null), orderDirection, orderBy);
+            var sqlNodeIdsWithSort = ApplySort(ApplyFilter(sql, filterSql, query != null), orderBy, orderDirection);
 
             // get a page of results and total count
             var pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
@@ -834,14 +816,36 @@ ORDER BY colName";
             return sql;
         }
 
-        private static Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Direction orderDirection, string orderBy)
+        private Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Expression<Func<IUser, object>> orderBy, Direction orderDirection)
         {
-            if (string.IsNullOrEmpty(orderBy)) return sql;
+            if (orderBy == null) return sql;
+
+            var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
+            var mapper = _mapperCollection[typeof(IUser)];
+            var mappedField = mapper.Map(SqlContext.SqlSyntax, expressionMember.Name);
+
+            if (mappedField.IsNullOrWhiteSpace())
+                throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
+
+            // beware! NPoco paging code parses the query to isolate the ORDER BY fragment,
+            // using a regex that wants "([\w\.\[\]\(\)\s""`,]+)" - meaning that anything
+            // else in orderBy is going to break NPoco / not be detected
+
+            // beware! NPoco paging code (in PagingHelper) collapses everything [foo].[bar]
+            // to [bar] only, so we MUST use aliases, cannot use [table].[field]
+
+            // beware! pre-2012 SqlServer is using a convoluted syntax for paging, which
+            // includes "SELECT ROW_NUMBER() OVER (ORDER BY ...) poco_rn FROM SELECT (...",
+            // so anything added here MUST also be part of the inner SELECT statement, ie
+            // the original statement, AND must be using the proper alias, as the inner SELECT
+            // will hide the original table.field names entirely
+
+            var orderByField = sql.GetAliasedField(mappedField);
 
             if (orderDirection == Direction.Ascending)
-                sql.OrderBy(orderBy);
+                sql.OrderBy(orderByField);
             else
-                sql.OrderByDescending(orderBy);
+                sql.OrderByDescending(orderByField);
 
             return sql;
         }

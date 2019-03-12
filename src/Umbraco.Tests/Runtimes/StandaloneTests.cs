@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Runtimes
 
             var composerTypes = typeLoader.GetTypes<IComposer>() // all of them
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests.")) // exclude test components
-                .Where(x => x != typeof(WebRuntimeComposer)); // exclude web runtime
+                .Where(x => x != typeof(WebInitialComposer)); // exclude web runtime
             var composers = new Composers(composition, composerTypes, profilingLogger);
             composers.Compose();
 

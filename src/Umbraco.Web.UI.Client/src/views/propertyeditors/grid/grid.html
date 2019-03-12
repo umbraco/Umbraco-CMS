@@ -159,7 +159,7 @@
                                                          </div>
                                                       </div>
 
-                                                      <div class="umb-cell-inner" ui-sortable="sortableOptionsCell" ng-model="area.controls">
+                                                      <div class="umb-cell-inner" ui-sortable="sortableOptionsCell" umb-grid-hack-scope ng-model="area.controls">
 
                                                           <!-- Control placeholder -->
                                                           <div class="umb-cell-placeholder" ng-if="area.controls.length === 0" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">
@@ -171,6 +171,7 @@
 
                                                           <!-- for each control in areas -->
                                                           <div class="umb-control"
+                                                              umb-grid-hack-scope
                                                               ng-repeat="control in area.controls"
                                                               ng-click="clickControl($index, area.controls, area, $event)"
                                                               ng-class="{'-active': control === active}"
