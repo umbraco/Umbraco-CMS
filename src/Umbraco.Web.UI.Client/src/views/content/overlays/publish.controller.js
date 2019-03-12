@@ -55,10 +55,13 @@
         }
 
         function hasAnyData(variant) {
-            
-            if(variant.name == null || variant.name.length === 0) {
-                return false;
-            }
+
+            //** DO NOT MERGE THIS!!!!!! THIS IS FOR TESTING *****
+            //if(variant.name == null || variant.name.length === 0) {
+            //    return false;
+            //}
+
+
             var result = variant.isDirty != null;
 
             if(result) return true;

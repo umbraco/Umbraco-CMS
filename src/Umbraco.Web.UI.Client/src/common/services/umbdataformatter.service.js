@@ -365,7 +365,7 @@
                     action: action,
                     variants: _.map(displayModel.variants, function(v) {
                         return {
-                            name: v.name,
+                            name: v.name ? v.name : "", //if its null/empty,we must pass up an empty string else we get json converter errors
                             properties: getContentProperties(v.tabs),
                             culture: v.language ? v.language.culture : null,
                             publish: v.publish,

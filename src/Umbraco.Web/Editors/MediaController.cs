@@ -498,6 +498,7 @@ namespace Umbraco.Web.Editors
             if (ModelState.IsValid == false)
             {
                 if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem)
+                    //TODO: Why are we only doing this on SaveNew? If the Name is null, how can we ever save it even if it already exists?
                     && (contentItem.Action == ContentSaveAction.SaveNew))
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
