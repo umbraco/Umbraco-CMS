@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Web;
 using System.Web.Http;
 using Semver;
 using Umbraco.Core.IO;
@@ -113,7 +115,7 @@ namespace Umbraco.Web.Editors
             };
 
             // Set custom header so umbRequestHelper.downloadFile can save the correct filename
-            response.Headers.Add("x-filename", fileName);
+            response.Headers.Add("x-filename", HttpUtility.UrlEncode(fileName));
 
             return response;
         }
