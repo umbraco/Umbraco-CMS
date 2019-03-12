@@ -105,11 +105,6 @@
 
 
             vm.variants = $scope.model.variants;
-            
-            // create warnings array for each variant. This is needed for angular to watch the array.
-            _.forEach(vm.variants, function(varaint) {
-                varaint.warnings = [];
-            });
 
             if (!$scope.model.title) {
                 localizationService.localize("content_readyToPublish").then(function (value) {
@@ -129,9 +124,7 @@
 
             _.each(vm.variants,
                 function (variant) {
-
                     variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-              
                     variant.htmlId = "_content_variant_" + variant.compositeId;
                     
                     // reset to not be published

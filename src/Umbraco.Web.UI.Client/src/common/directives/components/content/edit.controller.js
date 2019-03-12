@@ -343,17 +343,15 @@
                         iVariant.notifications = [];// maybe not needed, need to investigate.
                         
                         if(iVariant.publish === true) {
-                            if (iVariant.name == null || iVariant.name == "") {
+                            if (iVariant.name == null) {
                                 
                                 var tokens = [iVariant.language.name];
                                 
                                 localizationService.localize("publish_contentPublishedFailedByMissingName", tokens).then(function (value) {
-                                    iVariant.warnings = [{"message": value}];
+                                    iVariant.notifications.push({"message": value, "type": 1});
                                 });
                                 
-                                return $q(function(resolve, reject) {
-                                    reject();
-                                });
+                                return $q.reject();
                             }
                         }
                     }
