@@ -33,8 +33,8 @@
                                 <p ng-bind="model.embed.info"></p>
                                 <div ng-bind-html="vm.trustedPreview"></div>
                             </umb-control-group>
-                
-                            <div ng-show="model.embed.supportsDimensions">
+                            
+                            <div ng-show="model.embed.supportsDimensions && model.embed.success">
                                 <umb-control-group label="@general_width">
                                     <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.width" ng-blur="vm.changeSize('width')" />
                                 </umb-control-group>
@@ -45,11 +45,6 @@
                 
                                 <umb-control-group label="@general_constrain">
                                     <umb-toggle checked="model.embed.constrain" on-click="vm.toggleConstrain()"></umb-toggle>
-
-                                    <!--<label>
-                                        <input type="checkbox" ng-model="model.embed.constrain" />
-                                        <localize key="general_constrainProportions">Constrain proportions</localize>
-                                    </label>-->
                                 </umb-control-group>
                             </div>
 

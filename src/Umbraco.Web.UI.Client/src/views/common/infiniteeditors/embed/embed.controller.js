@@ -18,7 +18,7 @@
             preview: "",
             success: false,
             info: "",
-            supportsDimensions: ""
+            supportsDimensions: false
         };
 
         if ($scope.model.original) {
@@ -65,23 +65,32 @@
                     switch (response.data.OEmbedStatus) {
                         case 0:
                             //not supported
+                            $scope.model.embed.preview = "";
                             $scope.model.embed.info = "Not supported";
+                            $scope.model.embed.success = false;
+                            $scope.model.embed.supportsDimensions = false;
+                            vm.trustedPreview = null;
                             break;
                         case 1:
                             //error
+                            $scope.model.embed.preview = "";
                             $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
+                            $scope.model.embed.success = false;
+                            $scope.model.embed.supportsDimensions = false;
+                            vm.trustedPreview = null;
                             break;
                         case 2:
+                            $scope.model.embed.success = true;
+                            $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
                             $scope.model.embed.preview = response.data.Markup;
                             vm.trustedPreview = $sce.trustAsHtml(response.data.Markup);
-                            $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
-                            $scope.model.embed.success = true;
                             break;
                     }
 
                     vm.loading = false;
 
                 }, function() {
+                    $scope.model.embed.success = false;
                     $scope.model.embed.supportsDimensions = false;
                     $scope.model.embed.preview = "";
                     $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
