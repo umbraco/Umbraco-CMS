@@ -50,7 +50,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             //get all of the same values between the arrays
             var same = _.intersection($scope.model.value, selectedVals);
             //if the lengths are the same as the value, then we are in sync, just exit
-            if (same.length === $scope.model.value.length && same.length === selectedVals.length) {
+            if (same.length === $scope.model.value.length === selectedVals.length) {
                 return;
             }
 
