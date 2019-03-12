@@ -104,7 +104,10 @@ namespace Umbraco.Web.Editors
                         {
                             FileName = fileName
                         },
-                        ContentType = new MediaTypeHeaderValue( "application/octet-stream")
+                        ContentType = new MediaTypeHeaderValue("application/octet-stream")
+                        {
+                            CharSet = Encoding.UTF8.WebName
+                        }
                     }
                 }
             };
