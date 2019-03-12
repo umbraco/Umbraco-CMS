@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PublishController($scope, localizationService) {
+    function PublishController($scope, localizationService, contentEditingHelper) {
 
         var vm = this;
         vm.loading = true;
@@ -129,8 +129,9 @@
 
             _.each(vm.variants,
                 function (variant) {
-                    
-                    variant.compositeId = variant.language.culture + "_" + (variant.segment ? variant.segment : "");
+
+                    variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
+              
                     variant.htmlId = "_content_variant_" + variant.compositeId;
                     
                     // reset to not be published

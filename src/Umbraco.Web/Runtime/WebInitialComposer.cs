@@ -181,8 +181,7 @@ namespace Umbraco.Web.Runtime
 
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>()
                 .Append<AliasUrlProvider>()
-                .Append<DefaultUrlProvider>()
-                .Append<CustomRouteUrlProvider>();
+                .Append<DefaultUrlProvider>();
 
             composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 

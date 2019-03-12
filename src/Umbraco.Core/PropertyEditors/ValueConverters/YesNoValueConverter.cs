@@ -36,6 +36,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (source is int)
                 return (int)source == 1;
 
+            // this is required for correct true/false handling in nested content elements
+            if (source is long)
+                return (long)source == 1;
+
             if (source is bool)
                 return (bool)source;
 
