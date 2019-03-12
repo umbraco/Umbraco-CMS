@@ -96,6 +96,8 @@ namespace Umbraco.Web.Editors
 
             var fileName = Path.GetFileName(package.PackagePath);
 
+            var encoding = Encoding.UTF8;
+
             var response = new HttpResponseMessage
             {
                 Content = new StreamContent(File.OpenRead(fullPath))
@@ -104,18 +106,18 @@ namespace Umbraco.Web.Editors
                     {
                         ContentDisposition = new ContentDispositionHeaderValue("attachment")
                         {
-                            FileName = fileName
+                            FileName = HttpUtility.UrlEncode(fileName, encoding)
                         },
                         ContentType = new MediaTypeHeaderValue("application/octet-stream")
                         {
-                            CharSet = Encoding.UTF8.WebName
+                            CharSet = encoding.WebName
                         }
                     }
                 }
             };
 
             // Set custom header so umbRequestHelper.downloadFile can save the correct filename
-            response.Headers.Add("x-filename", HttpUtility.UrlEncode(fileName));
+            response.Headers.Add("x-filename", HttpUtility.UrlEncode(fileName, encoding));
 
             return response;
         }
