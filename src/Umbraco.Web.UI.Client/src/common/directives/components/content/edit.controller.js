@@ -345,13 +345,13 @@
                         if(iVariant.publish === true) {
                             if (iVariant.name == null) {
                                 
-                                localizationService.localize("publish_contentPublishedFailedByMissingName").then(function (value) {
-                                    iVariant.warnings = [{"message": value.replace("%0%", iVariant.language.name)}]
+                                var tokens = [iVariant.language.name];
+                                
+                                localizationService.localize("publish_contentPublishedFailedByMissingName", tokens).then(function (value) {
+                                    iVariant.notifications.push({"message": value, "type": 1});
                                 });
                                 
-                                return $q(function(resolve, reject) {
-                                    reject();
-                                });
+                                return $q.reject();
                             }
                         }
                     }
