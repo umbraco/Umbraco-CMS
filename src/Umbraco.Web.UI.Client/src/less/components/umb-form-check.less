@@ -1,5 +1,5 @@
-@checkboxWidth: 15px;
-@checkboxHeight: 15px;
+@checkboxWidth: 16px;
+@checkboxHeight: 16px;
 
 .umb-form-check {
     display: flex;
@@ -9,71 +9,74 @@
     padding: 0;
     margin: 0;
     min-height: 22px;
+    line-height: 22px;
     cursor: pointer !important;
 
-    &__text{
+    &__text {
         margin: 0 0 0 26px;
         position: relative;
-        top: -1px;
+        top: 0;
     }
 
-    &__input{
+    &__input {
         position: absolute;
         top: 0;
         left: 0;
         opacity: 0;
 
-        &:checked ~ .umb-form-check__state .umb-form-check__check{
+        &:checked ~ .umb-form-check__state .umb-form-check__check {
             border-color: @ui-option-type;
         }
 
         &:focus:checked ~ .umb-form-check .umb-form-check__check,
-        &:focus ~ .umb-form-check__state .umb-form-check__check{
+        &:focus ~ .umb-form-check__state .umb-form-check__check {
             border-color: @inputBorderFocus;
         }
 
-        &:checked ~ .umb-form-check__state{
-            .umb-form-check__check{
+        &:checked ~ .umb-form-check__state {
+            .umb-form-check__check {
                 // This only happens if the state has a radiobutton modifier
-                .umb-form-check--radiobutton &{
-                    &:before{
+                .umb-form-check--radiobutton & {
+                    &:before {
                         opacity: 1;
                         transform: scale(1);
                     }
                 }
-
                 // This only happens if state has the checkbox modifier
-                .umb-form-check--checkbox &{
-                    &:before{
+                .umb-form-check--checkbox & {
+                    &:before {
                         width: @checkboxWidth;
                         height: @checkboxHeight;
                     }
                 }
             }
-
             // This only happens if state has the checkbox modifier
-            .umb-form-check--checkbox &{
-                .umb-form-check__icon{
+            .umb-form-check--checkbox & {
+                .umb-form-check__icon {
                     opacity: 1;
                 }
             }
         }
     }
 
-    &__state{
-        height: 17px;
+    &__state {
+        display: flex;
+        height: 18px;
+        margin-top: 2px;
         position: absolute;
-        top: 2px;
+        top: 0;
         left: 0;
     }
 
-    &__check{
+    &__check {
+        display: flex;
         position: relative;
+        background: @white;
         border: 1px solid @inputBorder;
         width: @checkboxWidth;
         height: @checkboxHeight;
 
-        &:before{
+        &:before {
             content: "";
             background: @ui-option-type;
             position: absolute;
@@ -83,24 +86,22 @@
             bottom: 0;
             margin: auto;
         }
-
         // This only happens if state has the radiobutton modifier
-        .umb-form-check--radiobutton &{
+        .umb-form-check--radiobutton & {
             border-radius: 100%;
 
-            &:before{
-                width: 9px;
-                height: 9px;
+            &:before {
+                width: 10px;
+                height: 10px;
                 border-radius: 100%;
                 opacity: 0;
                 transform: scale(0);
                 transition: .15s ease-out;
             }
         }
-
         // This only happens if state has the checkbox modifier
-        .umb-form-check--checkbox &{
-            &:before{
+        .umb-form-check--checkbox & {
+            &:before {
                 width: 0;
                 height: 0;
                 transition: .05s ease-out;
@@ -108,20 +109,28 @@
         }
     }
 
-    &__icon{
+    &__icon {
         color: @white;
         text-align: center;
-        font-size: 10px;
+        font-size: 12px;
         opacity: 0;
         transition: .2s ease-out;
 
-        &:before{
+        &:before {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             position: absolute;
-            top: -2px;
+            top: 0;
             right: 0;
             left: 0;
             bottom: 0;
             margin: auto;
         }
+    }
+
+    &.umb-form-check--disabled {
+        cursor: not-allowed !important;
+        opacity: 0.5;
     }
 }
