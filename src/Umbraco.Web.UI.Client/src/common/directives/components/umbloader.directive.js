@@ -43,6 +43,9 @@ Use this directive to generate a loading indicator.
         angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
+
+@param {string=} position The loader position ("top", "bottom").
+
 **/
 
 (function() {
