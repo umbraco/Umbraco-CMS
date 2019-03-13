@@ -12,8 +12,8 @@ function ConfigController($scope) {
     }
 
     function close() {
-        if($scope.model.close) {
-           $scope.model.close();
+        if ($scope.model.close) {
+            $scope.model.close();
         }
     }
     
