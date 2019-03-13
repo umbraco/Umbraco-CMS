@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
@@ -35,7 +36,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             appCaches = appCaches ?? AppCaches;
             var scopeAccessor = (IScopeAccessor) provider;
 
-            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger);
+            var templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock());
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository);
+            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger, commonRepository);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
             var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
             return repository;

@@ -210,6 +210,9 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
+    <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
+    <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
+    <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedModelFactoryExtensions.cs" />
@@ -852,8 +855,7 @@
     <Compile Include="Persistence\Dtos\MacroPropertyDto.cs" />
     <Compile Include="Persistence\Dtos\Member2MemberGroupDto.cs" />
     <Compile Include="Persistence\Dtos\MemberDto.cs" />
-    <Compile Include="Persistence\Dtos\MemberTypeDto.cs" />
-    <Compile Include="Persistence\Dtos\MemberTypeReadOnlyDto.cs" />
+    <Compile Include="Persistence\Dtos\MemberPropertyTypeDto.cs" />
     <Compile Include="Persistence\Dtos\NodeDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyDataDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeDto.cs" />
@@ -948,7 +950,6 @@
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Factories\ContentBaseFactory.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
-    <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />

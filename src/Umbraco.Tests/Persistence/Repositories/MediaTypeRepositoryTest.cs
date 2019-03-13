@@ -6,7 +6,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
@@ -21,7 +20,10 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private MediaTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
+            var cacheHelper = AppCaches.Disabled;
+            var templateRepository = new TemplateRepository((IScopeAccessor)provider, cacheHelper, Logger, TestObjects.GetFileSystemsMock());
+            var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository);
+            return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository);
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeProvider provider)
