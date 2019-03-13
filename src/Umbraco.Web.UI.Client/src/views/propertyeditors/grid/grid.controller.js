@@ -434,7 +434,6 @@ angular.module("umbraco")
 
             var dialogOptions = {
                 view: "views/propertyeditors/grid/dialogs/config.html",
-                title: "Settings",
                 size: "small",
                 styles: styles,
                 config: config,
@@ -469,7 +468,10 @@ angular.module("umbraco")
                 }
             };
 
-            editorService.open(dialogOptions);
+            localizationService.localize("general_settings").then(value => {
+                dialogOptions.title = value;
+                editorService.open(dialogOptions);
+            });
 
         };
 
