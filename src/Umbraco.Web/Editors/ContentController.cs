@@ -595,70 +595,6 @@ namespace Umbraco.Web.Editors
             return contentItemDisplay;
         }
 
-        /// <summary>
-        /// Validates critical data for persistence and updates the ModelState and result accordingly
-        /// </summary>
-        /// <param name="contentItem"></param>
-        /// <param name="variantCount">Returns the total number of variants (will be one if it's an invariant content item)</param>
-        /// <returns></returns>
-        /// <remarks>
-        /// For invariant, the variants collection count will be 1 and this will check if that invariant item has the critical values for persistence (i.e. Name)
-        /// 
-        /// For variant, each variant will be checked for critical data for persistence and if it's not there then it's flags will be reset and it will not
-        /// be persisted. However, we also need to deal with the case where all variants don't pass this check and then there is nothing to save. This also deals
-        /// with removing the Name validation keys based on data annotations validation for items that haven't been marked to be saved.
-        /// </remarks>
-        /// <returns>
-        /// returns false if persistence cannot take place, returns true if persistence can take place even if there are validation errors
-        /// </returns>
-        private bool ValidateCriticalData(ContentItemSave contentItem, out int variantCount)
-        {
-            var variants = contentItem.Variants.ToList();
-            variantCount = variants.Count;
-            var savedCount = 0;
-            var variantCriticalValidationErrors = new List<string>();
-            for (var i = 0; i < variants.Count; i++)
-            {
-                var variant = variants[i];
-                if (variant.Save)
-                {
-                    //ensure the variant has all critical required data to be persisted
-                    if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(variant))
-                    {
-                        variantCriticalValidationErrors.Add(variant.Culture);
-                        //if there's no Name, it cannot be persisted at all reset the flags, this cannot be saved or published
-                        variant.Save = variant.Publish = false;
-
-                        //if there's more than 1 variant, then we need to add the culture specific error
-                        //messages based on the variants in error so that the messages show in the publish/save dialog
-                        if (variants.Count > 1)
-                            AddCultureValidationError(variant.Culture, "speechBubbles/contentCultureCriticalValidationError");
-                        else
-                            return false; //It's invariant and is missing critical data, it cannot be saved
-                    }
-
-                    savedCount++;
-                }
-                else
-                {
-                    var msKey = $"Variants[{i}].Name";
-                    if (ModelState.ContainsKey(msKey))
-                    {
-                        //if it's not being saved, remove the validation key
-                        if (!variant.Save) ModelState.Remove(msKey);
-                    }
-                }
-            }
-
-            if (savedCount == variantCriticalValidationErrors.Count)
-            {
-                //in this case there can be nothing saved since all variants marked to be saved haven't passed critical validation rules
-                return false;
-            }
-
-            return true;
-        }
-
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
             //Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
@@ -681,14 +617,9 @@ namespace Umbraco.Web.Editors
             MapValuesForPersistence(contentItem);
 
             var passesCriticalValidationRules = ValidateCriticalData(contentItem, out var variantCount);
-            
-            //We need to manually check the validation results here because:
-            // * We still need to save the entity even if there are validation value errors
-            // * Depending on if the entity is new, and if there are non property validation errors (i.e. the name is null)
-            //      then we cannot continue saving, we can only display errors
-            // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display
-            //      a message indicating this
-            if (ModelState.IsValid == false)
+
+            //we will continue to save if model state is invalid, however we cannot save if critical data is missing.
+            if (!ModelState.IsValid)
             {
                 //check for critical data validation issues, we can't continue saving if this data is invalid
                 if (!passesCriticalValidationRules)
@@ -860,6 +791,70 @@ namespace Umbraco.Web.Editors
             display.PersistedContent = contentItem.PersistedContent;
 
             return display;
+        }
+
+        /// <summary>
+        /// Validates critical data for persistence and updates the ModelState and result accordingly
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <param name="variantCount">Returns the total number of variants (will be one if it's an invariant content item)</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// For invariant, the variants collection count will be 1 and this will check if that invariant item has the critical values for persistence (i.e. Name)
+        /// 
+        /// For variant, each variant will be checked for critical data for persistence and if it's not there then it's flags will be reset and it will not
+        /// be persisted. However, we also need to deal with the case where all variants don't pass this check and then there is nothing to save. This also deals
+        /// with removing the Name validation keys based on data annotations validation for items that haven't been marked to be saved.
+        /// </remarks>
+        /// <returns>
+        /// returns false if persistence cannot take place, returns true if persistence can take place even if there are validation errors
+        /// </returns>
+        private bool ValidateCriticalData(ContentItemSave contentItem, out int variantCount)
+        {
+            var variants = contentItem.Variants.ToList();
+            variantCount = variants.Count;
+            var savedCount = 0;
+            var variantCriticalValidationErrors = new List<string>();
+            for (var i = 0; i < variants.Count; i++)
+            {
+                var variant = variants[i];
+                if (variant.Save)
+                {
+                    //ensure the variant has all critical required data to be persisted
+                    if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(variant))
+                    {
+                        variantCriticalValidationErrors.Add(variant.Culture);
+                        //if there's no Name, it cannot be persisted at all reset the flags, this cannot be saved or published
+                        variant.Save = variant.Publish = false;
+
+                        //if there's more than 1 variant, then we need to add the culture specific error
+                        //messages based on the variants in error so that the messages show in the publish/save dialog
+                        if (variants.Count > 1)
+                            AddCultureValidationError(variant.Culture, "speechBubbles/contentCultureCriticalValidationError");
+                        else
+                            return false; //It's invariant and is missing critical data, it cannot be saved
+                    }
+
+                    savedCount++;
+                }
+                else
+                {
+                    var msKey = $"Variants[{i}].Name";
+                    if (ModelState.ContainsKey(msKey))
+                    {
+                        //if it's not being saved, remove the validation key
+                        if (!variant.Save) ModelState.Remove(msKey);
+                    }
+                }
+            }
+
+            if (savedCount == variantCriticalValidationErrors.Count)
+            {
+                //in this case there can be nothing saved since all variants marked to be saved haven't passed critical validation rules
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
