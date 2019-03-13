@@ -1,16 +1,22 @@
 function ConfigController($scope) {
 
-    $scope.close = function() {
+    var vm = this;
+
+    vm.submit = submit;
+    vm.close = close;
+
+    function submit() {
+        if ($scope.model && $scope.model.submit) {
+            $scope.model.submit($scope.model);
+        }
+    }
+
+    function close() {
         if($scope.model.close) {
            $scope.model.close();
         }
     }
     
-    $scope.submit = function() {
-        if($scope.model && $scope.model.submit) {
-           $scope.model.submit($scope.model);
-        }
-    }
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.ConfigController", ConfigController);

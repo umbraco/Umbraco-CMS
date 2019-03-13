@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.EditConfigController">
+<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.EditConfigController as vm">
 
     <umb-editor-view>
 
@@ -42,12 +42,12 @@
                             button-style="link"
                             label-key="general_close"
                             shortcut="esc"
-                            action="close()">
+                            action="vm.close()">
                 </umb-button>
                 <umb-button type="button"
                             button-style="success"
                             label-key="general_submit"
-                            action="submit()">
+                            action="vm.submit()">
                 </umb-button>
             </umb-editor-footer-content-right>
         </umb-editor-footer>
