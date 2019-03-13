@@ -471,45 +471,6 @@ angular.module("umbraco")
 
             editorService.open(dialogOptions);
 
-            //$scope.gridItemSettingsDialog = {};
-            //$scope.gridItemSettingsDialog.view = "views/propertyeditors/grid/dialogs/config.html";
-            //$scope.gridItemSettingsDialog.title = "Settings";
-            //$scope.gridItemSettingsDialog.styles = styles;
-            //$scope.gridItemSettingsDialog.config = config;
-
-            //$scope.gridItemSettingsDialog.show = true;
-
-            //$scope.gridItemSettingsDialog.submit = function(model) {
-
-            //    var styleObject = {};
-            //    var configObject = {};
-
-            //    _.each(model.styles, function(style){
-            //        if(style.value){
-            //            styleObject[style.key] = addModifier(style.value, style.modifier);
-            //        }
-            //    });
-            //    _.each(model.config, function (cfg) {
-            //        if (cfg.value) {
-            //            configObject[cfg.key] = addModifier(cfg.value, cfg.modifier);
-            //        }
-            //    });
-
-            //    gridItem.styles = styleObject;
-            //    gridItem.config = configObject;
-            //    gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
-
-            //    currentForm.$setDirty();
-
-            //    $scope.gridItemSettingsDialog.show = false;
-            //    $scope.gridItemSettingsDialog = null;
-            //};
-
-            //$scope.gridItemSettingsDialog.close = function(oldModel) {
-            //    $scope.gridItemSettingsDialog.show = false;
-            //    $scope.gridItemSettingsDialog = null;
-            //};
-
         };
 
         function stripModifier(val, modifier) {
