@@ -50,8 +50,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             //get all of the same values between the arrays
             var same = _.intersection($scope.model.value, selectedVals);
             //if the lengths are the same as the value, then we are in sync, just exit
-            if (same.length == $scope.model.value.length === selectedVals.length) {
-                return; 
+
+            if (same.length === $scope.model.value.length === selectedVals.length) {
+                return;
             }
 
             $scope.selectedItems = [];
@@ -66,18 +67,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             }
         }
 
-        function changed(item) {
+        function changed(model, value) {
             
-            var index = _.findIndex($scope.model.value,
-                function (v) {
-                    return v === item.val;
-                }
-            );
+            var index = $scope.model.value.indexOf(value);
             
-            if (item.checked) {
+            if (model) {
                 //if it doesn't exist in the model, then add it
                 if (index < 0) {
-                    $scope.model.value.push(item.val);
+                    $scope.model.value.push(value);
                 }
             } else {
                 //if it exists in the model, then remove it

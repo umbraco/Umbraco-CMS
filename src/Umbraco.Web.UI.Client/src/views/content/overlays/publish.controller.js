@@ -14,34 +14,51 @@
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
         function canPublish() {
-            var selected = [];
+            
+            var possible = false;
             for (var i = 0; i < vm.variants.length; i++) {
                 var variant = vm.variants[i];
-
-                //if this variant will show up in the publish-able list
-                var publishable = dirtyVariantFilter(variant);
-                var published = !(variant.state === "NotCreated" || variant.state === "Draft");
-
-                if ((variant.language.isMandatory && !published) && (!publishable || !variant.publish)) {
-                    //if a mandatory variant isn't published
-                    //and it's not publishable or not selected to be published
-                    //then we cannot continue
-
-                    // TODO: Show a message when this occurs
+                var state = canVariantPublish(variant);
+                if (state === true) {
+                    possible = true;
+                }
+                if (state === false) {
                     return false;
                 }
-
-                if (variant.publish) {
-                    selected.push(variant.publish);
-                }
             }
-            return selected.length > 0;
+            return possible;
+        }
+        
+        /** Returns true if publishing is possible based on if the variant is a un-published mandatory language */
+        function canVariantPublish(variant) {
+            
+            //if this variant will show up in the publish-able list
+            var publishable = dirtyVariantFilter(variant);
+            var published = !(variant.state === "NotCreated" || variant.state === "Draft");
+            
+            // is this variant mandatory:
+            if (variant.language.isMandatory && !published && !variant.publish) {
+                //if a mandatory variant isn't published or set to be published
+                //then we cannot continue
+                
+                return false;
+            }
+            
+            // is this variant selected for publish:
+            if (variant.publish === true) {
+                return publishable;
+            }
+            
+            return null;
         }
 
         function changeSelection(variant) {
+            
             $scope.model.disableSubmitButton = !canPublish();
             //need to set the Save state to true if publish is true
             variant.save = variant.publish;
+            
+            variant.willPublish = canVariantPublish(variant);
         }
 
         function dirtyVariantFilter(variant) {
@@ -102,32 +119,49 @@
 
             _.each(vm.variants,
                 function (variant) {
-                    if(variant.state !== "NotCreated"){
-                        vm.isNew = false;
+                    if(variant.state === "NotCreated") {
+                        vm.isNew = true;
                     }
-                });
+                }
+            );
 
             _.each(vm.variants,
                 function (variant) {
                     variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
                     variant.htmlId = "_content_variant_" + variant.compositeId;
+                    
+                    // reset to not be published
+                    variant.publish = false;
+                    variant.save = false;
 
                     //check for pristine variants
                     if (!vm.hasPristineVariants) {
                         vm.hasPristineVariants = pristineVariantFilter(variant);
                     }
-
-                    if(hasAnyData(variant)){
+                    
+                    // If the variant havent been created jet.
+                    if(variant.state === "NotCreated") {
+                        // If the variant is mandatory, then set the variant to be published.
+                        if (variant.language.isMandatory === true) {
+                            variant.publish = true;
+                            variant.save = true;
+                        }
+                    }
+                    
+                    variant.canPublish = dirtyVariantFilter(variant);
+                    
+                    // if we have data on this variant.
+                    if(variant.canPublish && hasAnyData(variant)) {
+                        // and if some varaints havent been saved before, or they dont have a publishing date set, then we set it for publishing.
                         if(vm.isNew || variant.publishDate == null){
                             variant.publish = true;
                             variant.save = true;
                         }
-                    }else{
-                        variant.publish = false;
-                        variant.save = false;
-                        variant.canSave = false;
                     }
-                });
+                    
+                    variant.willPublish = canVariantPublish(variant);
+                }
+            );
 
             if (vm.variants.length !== 0) {
                 //now sort it so that the current one is at the top
@@ -156,7 +190,6 @@
 
             localizationService.localize(labelKey).then(function (value) {
                 vm.headline = value;
-
                 vm.loading = false;
             });
 

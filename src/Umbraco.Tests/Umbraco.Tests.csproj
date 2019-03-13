@@ -118,6 +118,7 @@
     <Compile Include="Cache\SnapDictionaryTests.cs" />
     <Compile Include="Clr\ReflectionUtilitiesTests.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
+    <Compile Include="Composing\CompositionTests.cs" />
     <Compile Include="Composing\LightInjectValidation.cs" />
     <Compile Include="Composing\ContainerConformingTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
