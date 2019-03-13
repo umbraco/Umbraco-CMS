@@ -347,11 +347,14 @@
                                 
                                 var tokens = [iVariant.language.name];
                                 
-                                localizationService.localize("publish_contentPublishedFailedByMissingName", tokens).then(function (value) {
-                                    iVariant.notifications.push({"message": value, "type": 1});
+                                return localizationService.localize("publish_contentPublishedFailedByMissingName", tokens).then(value => {
+
+                                    //note - type 1 is a "Info" based on the c# enum Umbraco.Web.Models.ContentEditing.NotificationStyle
+                                    iVariant.notifications.push({ "message": value, "type": 1 });
+
+                                    return $q.reject();
                                 });
                                 
-                                return $q.reject();
                             }
                         }
                     }

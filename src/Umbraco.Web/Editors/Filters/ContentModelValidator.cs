@@ -8,6 +8,7 @@ using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Editors.Filters
@@ -15,12 +16,12 @@ namespace Umbraco.Web.Editors.Filters
     /// <summary>
     /// A base class purely used for logging without generics
     /// </summary>
-    internal class ContentItemValidationHelper
+    internal class ContentModelValidator
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
         protected ILogger Logger { get; }
 
-        public ContentItemValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor)
+        public ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             UmbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -32,15 +33,17 @@ namespace Umbraco.Web.Editors.Filters
     /// </summary>
     /// <typeparam name="TPersisted"></typeparam>
     /// <typeparam name="TModelSave"></typeparam>
+    /// <typeparam name="TModelWithProperties"></typeparam>
     /// <remarks>
     /// If any severe errors occur then the response gets set to an error and execution will not continue. Property validation
     /// errors will just be added to the ModelState.
     /// </remarks>
-    internal class ContentItemValidationHelper<TPersisted, TModelSave>: ContentItemValidationHelper
+    internal class ContentModelValidator<TPersisted, TModelSave, TModelWithProperties>: ContentModelValidator
         where TPersisted : class, IContentBase
         where TModelSave: IContentSave<TPersisted>
+        where TModelWithProperties : IContentProperties<ContentPropertyBasic>
     {
-        public ContentItemValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
+        public ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
         {
         }
 
@@ -119,13 +122,13 @@ namespace Umbraco.Web.Editors.Filters
         /// <remarks>
         /// All property data validation goes into the model state with a prefix of "Properties"
         /// </remarks>
-        public virtual bool ValidatePropertyData(
+        public virtual bool ValidatePropertiesData(
             TModelSave model,
-            IContentProperties<ContentPropertyBasic> modelWithProperties,
+            TModelWithProperties modelWithProperties,
             ContentPropertyCollectionDto dto,
             ModelStateDictionary modelState)
         {
-            var properties = modelWithProperties.Properties.ToList();
+            var properties = modelWithProperties.Properties.ToDictionary(x => x.Alias, x => x);
 
             foreach (var p in dto.Properties)
             {
@@ -135,33 +138,47 @@ namespace Umbraco.Web.Editors.Filters
                 {
                     var message = $"Could not find property editor \"{p.DataType.EditorAlias}\" for property with id {p.Id}.";
 
-                    Logger.Warn<ContentItemValidationHelper>(message);
+                    Logger.Warn<ContentModelValidator>(message);
                     continue;
                 }
 
                 //get the posted value for this property, this may be null in cases where the property was marked as readonly which means
                 //the angular app will not post that value.
-                var postedProp = properties.FirstOrDefault(x => x.Alias == p.Alias);
-                if (postedProp == null) continue;
+                if (!properties.TryGetValue(p.Alias, out var postedProp))
+                    continue;
 
                 var postedValue = postedProp.Value;
 
-                // validate
-                var valueEditor = editor.GetValueEditor(p.DataType.Configuration);
-                foreach (var r in valueEditor.Validate(postedValue, p.IsRequired, p.ValidationRegExp))
-                {
-                    //this could be a thing, but it does make the errors seem very verbose
-                    ////update the error message to include the property name and culture if available
-                    //r.ErrorMessage = p.Culture.IsNullOrWhiteSpace()
-                    //    ? $"'{p.Label}' - {r.ErrorMessage}"
-                    //    : $"'{p.Label}' ({p.Culture}) - {r.ErrorMessage}";
-
-                    modelState.AddPropertyError(r, p.Alias, p.Culture);
-                }
-                    
+                ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState);
+    
             }
 
             return modelState.IsValid;
+        }
+
+        /// <summary>
+        /// Validates a property's value and adds the error to model state if found
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="modelWithProperties"></param>
+        /// <param name="editor"></param>
+        /// <param name="property"></param>
+        /// <param name="postedValue"></param>
+        /// <param name="modelState"></param>
+        protected virtual void ValidatePropertyValue(
+            TModelSave model,
+            TModelWithProperties modelWithProperties,
+            IDataEditor editor,
+            ContentPropertyDto property,
+            object postedValue,
+            ModelStateDictionary modelState)
+        {
+            // validate
+            var valueEditor = editor.GetValueEditor(property.DataType.Configuration);
+            foreach (var r in valueEditor.Validate(postedValue, property.IsRequired, property.ValidationRegExp))
+            {
+                modelState.AddPropertyError(r, property.Alias, property.Culture);
+            }
         }
 
 

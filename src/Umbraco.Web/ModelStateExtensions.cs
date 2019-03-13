@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web
 {
@@ -51,15 +52,19 @@ namespace Umbraco.Web
         {
             if (culture == null)
                 culture = "";
-            modelState.AddValidationError(result, "_Properties", propertyAlias, culture);
+            modelState.AddValidationError(result, "_Properties", propertyAlias,
+                //if the culture is null, we'll add the term 'invariant' as part of the key
+                culture.IsNullOrWhiteSpace() ? "invariant" : culture);
         }
 
         /// <summary>
         /// Returns a list of cultures that have property errors
         /// </summary>
         /// <param name="modelState"></param>
+        /// <param name="localizationService"></param>
         /// <returns></returns>
-        internal static IReadOnlyList<string> GetCulturesWithPropertyErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)
+        internal static IReadOnlyList<string> GetCulturesWithPropertyErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            ILocalizationService localizationService)
         {
             //Add any culture specific errors here
             var cultureErrors = modelState.Keys
@@ -67,6 +72,9 @@ namespace Umbraco.Web
                 .Where(x => x.Length >= 3 && x[0] == "_Properties") //only choose _Properties errors
                 .Select(x => x[2]) //select the culture part
                 .Where(x => !x.IsNullOrWhiteSpace()) //if it has a value
+                //if it's marked "invariant" than return the default language, this is because we can only edit invariant properties on the default language
+                //so errors for those must show up under the default lang.
+                .Select(x => x == "invariant" ? localizationService.GetDefaultLanguageIsoCode() : x) 
                 .Distinct()
                 .ToList();
 

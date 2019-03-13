@@ -689,7 +689,7 @@ namespace Umbraco.Web.Editors
                     {
                         if (variantCount > 1)
                         {
-                            var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+                            var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
                             foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
                             {
                                 AddSuccessNotification(notifications, c,
@@ -773,7 +773,7 @@ namespace Umbraco.Web.Editors
                     v.Notifications.AddRange(n.Notifications);
             }
 
-            //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
             HandleInvalidModelState(display);
 
             if (wasCancelled)
@@ -882,7 +882,7 @@ namespace Umbraco.Web.Editors
             {
                 if (variantCount > 1)
                 {
-                    var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+                    var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
                     foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
                     {
                         AddSuccessNotification(notifications, c,
@@ -1151,7 +1151,7 @@ namespace Umbraco.Web.Editors
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
             //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
-            var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+            var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
             foreach (var variant in contentItem.Variants)
             {
                 if (cultureErrors.Contains(variant.Culture))
@@ -1220,7 +1220,7 @@ namespace Umbraco.Web.Editors
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
             //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
-            var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+            var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
             foreach (var variant in contentItem.Variants)
             {
                 if (cultureErrors.Contains(variant.Culture))
@@ -1751,18 +1751,19 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Override to ensure there is culture specific errors in the result if any errors are for culture properties
+        /// Ensure there is culture specific errors in the result if any errors are for culture properties
+        /// and we're dealing with variant content, then call the base class HandleInvalidModelState
         /// </summary>
         /// <param name="display"></param>
         /// <remarks>
         /// This is required to wire up the validation in the save/publish dialog
         /// </remarks>
-        protected override void HandleInvalidModelState(IErrorModel display)
+        private void HandleInvalidModelState(ContentItemDisplay display)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && display.Variants.Count() > 1)
             {
                 //Add any culture specific errors here
-                var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+                var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
 
                 foreach (var cultureError in cultureErrors)
                 {
@@ -1771,8 +1772,9 @@ namespace Umbraco.Web.Editors
             }
 
             base.HandleInvalidModelState(display);
-        }
 
+        }
+        
         /// <summary>
         /// Maps the dto property values and names to the persisted model
         /// </summary>
