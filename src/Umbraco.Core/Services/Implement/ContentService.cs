@@ -945,12 +945,15 @@ namespace Umbraco.Core.Services.Implement
                 if (cultures.Select(content.PublishCulture).Any(isValid => !isValid))
                     return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
-                //validate the property values
-                if (!_propertyValidationService.Value.IsPropertyDataValid(content, out var invalidProperties))
-                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
-                    {
-                        InvalidProperties = invalidProperties
-                    };
+                //validate the property values on the cultures trying to be published
+                foreach (var culture in cultures)
+                {
+                    if (!_propertyValidationService.Value.IsPropertyDataValid(content, out var invalidProperties, culture))
+                        return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
+                        {
+                            InvalidProperties = invalidProperties
+                        };
+                }
 
                 var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, userId, raiseEvents);
                 scope.Complete();

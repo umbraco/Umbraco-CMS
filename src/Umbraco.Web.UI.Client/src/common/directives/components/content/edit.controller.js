@@ -332,37 +332,6 @@
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
             
-            // Check that all variants for publishing have a name.
-            if (args.action === "publish" || args.action === "sendToPublish") {
-                
-                if ($scope.content.variants) {
-                    var iVariant;
-                    for (var i = 0; i < $scope.content.variants.length; i++) {
-                        iVariant = $scope.content.variants[i];
-                        
-                        iVariant.notifications = [];// maybe not needed, need to investigate.
-                        
-                        if(iVariant.publish === true) {
-                            if (iVariant.name == null) {
-                                
-                                var tokens = [iVariant.language.name];
-                                
-                                return localizationService.localize("publish_contentPublishedFailedByMissingName", tokens).then(value => {
-
-                                    //note - type 1 is a "Info" based on the c# enum Umbraco.Web.Models.ContentEditing.NotificationStyle
-                                    iVariant.notifications.push({ "message": value, "type": 1 });
-
-                                    return $q.reject();
-                                });
-                                
-                            }
-                        }
-                    }
-                }
-                
-            }
-            
-            
             //Used to check validility of nested form - coming from Content Apps mostly
             //Set them all to be invalid
             var fieldsToRollback = checkValidility();

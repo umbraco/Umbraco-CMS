@@ -46,15 +46,7 @@ namespace Umbraco.Web.Editors.Filters
         public ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
         {
         }
-
-        //public void ValidateItem(HttpActionContext actionContext, TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentPropertyCollectionDto dto)
-        //{
-        //    //now do each validation step
-        //    if (ValidateExistingContent(model, actionContext) == false) return;
-        //    if (ValidateProperties(model, modelWithProperties, actionContext) == false) return;
-        //    if (ValidatePropertyData(model, modelWithProperties, dto, actionContext.ModelState) == false) return;
-        //}
-
+        
         /// <summary>
         /// Ensure the content exists
         /// </summary>

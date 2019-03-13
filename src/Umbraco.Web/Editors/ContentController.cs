@@ -830,7 +830,7 @@ namespace Umbraco.Web.Editors
                         //if there's more than 1 variant, then we need to add the culture specific error
                         //messages based on the variants in error so that the messages show in the publish/save dialog
                         if (variants.Count > 1)
-                            AddCultureValidationError(variant.Culture, "speechBubbles/contentCultureCriticalValidationError");
+                            AddCultureValidationError(variant.Culture, "publish/contentPublishedFailedByMissingName");
                         else
                             return false; //It's invariant and is missing critical data, it cannot be saved
                     }
