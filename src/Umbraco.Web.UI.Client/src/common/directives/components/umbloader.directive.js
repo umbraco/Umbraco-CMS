@@ -50,10 +50,18 @@ Use this directive to generate a loading indicator.
 
   function UmbLoaderDirective() {
 
+    function link(scope, el, attr, ctrl) {
+        
+    }
+
     var directive = {
-      restrict: 'E',
-      replace: true,
-      templateUrl: 'views/components/umb-loader.html'
+        restrict: 'E',
+        replace: true,
+        templateUrl: 'views/components/umb-loader.html',
+        scope: {
+            position: "@?"
+        },
+        link: link
     };
 
     return directive;

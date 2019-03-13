@@ -95,9 +95,7 @@
                    <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} <localize key="general_of">of</localize> {{ listViewResultSet.items.length }} <localize key="general_selected">selected</localize></strong>
                    <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
 
-                   <div class="umb-loader-wrapper -bottom" ng-show="actionInProgress">
-                       <div class="umb-loader"></div>
-                   </div>
+                   <umb-loader position="bottom" ng-show="actionInProgress"></umb-loader>
 
                </umb-editor-sub-header-section>
 
