@@ -2,38 +2,42 @@
 
     <umb-editor-view>
 
-        <umb-editor-header name="model.title"
-                           name-locked="true"
-                           hide-alias="true"
-                           hide-icon="true"
-                           hide-description="true">
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
         </umb-editor-header>
 
         <umb-editor-container>
-            <umb-box>
-                <umb-box-content>
+            <ng-form name="gridItemConfigEditor" val-form-manager>
 
-                    <ng-form name="gridItemConfigEditor" val-form-manager>
-
-                        <div ng-if="model.config">
+                <umb-box ng-if="model.config">
+                    <umb-box-header title-key="grid_settings" />
+                    <umb-box-content>
+                        <div>
                             <umb-property property="configValue"
                                           ng-repeat="configValue in model.config">
                                 <umb-property-editor model="configValue" is-pre-value="true"></umb-property-editor>
                             </umb-property>
                         </div>
+                    </umb-box-content>
+                </umb-box>
 
-                        <div ng-if="model.styles">
-                            <h4>Style</h4>
+                <umb-box ng-if="model.styles">
+                    <umb-box-header title-key="grid_styles" />
+                    <umb-box-content>
+                        <div>
                             <umb-property property="styleValue"
                                           ng-repeat="styleValue in model.styles">
                                 <umb-property-editor model="styleValue" is-pre-value="true"></umb-property-editor>
                             </umb-property>
                         </div>
+                    </umb-box-content>
+                </umb-box>
 
-                    </ng-form>
-
-                </umb-box-content>
-            </umb-box>
+            </ng-form>
         </umb-editor-container>
 
         <umb-editor-footer>
