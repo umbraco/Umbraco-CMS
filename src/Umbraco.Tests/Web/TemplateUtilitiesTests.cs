@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Web
                 new TestDefaultCultureAccessor(),
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 globalSettings,
-                new[] { testUrlProvider.Object },
+                new UrlProviderCollection(new[] { testUrlProvider.Object }),
                 Mock.Of<IUserService>());
 
             using (var reference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>()))

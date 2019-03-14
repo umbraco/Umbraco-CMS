@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 TestObjects.GetUmbracoSettings(),
                 globalSettings,
-                Enumerable.Empty<IUrlProvider>(),
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 TestObjects.GetUmbracoSettings(),
                 globalSettings,
-                Enumerable.Empty<IUrlProvider>(),
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 TestObjects.GetUmbracoSettings(),
                 globalSettings,
-                Enumerable.Empty<IUrlProvider>(),
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 TestObjects.GetUmbracoSettings(),
                 globalSettings,
-                Enumerable.Empty<IUrlProvider>(),
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());

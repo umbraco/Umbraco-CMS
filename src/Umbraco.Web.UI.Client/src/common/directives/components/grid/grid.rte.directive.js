@@ -19,9 +19,15 @@ angular.module("umbraco.directives")
                     promises.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
                 }
 
-                var toolbar = ["code", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "link", "umbmediapicker", "umbembeddialog"];
-                if (scope.configuration && scope.configuration.toolbar) {
-                    toolbar = scope.configuration.toolbar;
+                var editorConfig = scope.configuration ? scope.configuration : null;
+                if (!editorConfig || angular.isString(editorConfig)) {
+                    editorConfig = tinyMceService.defaultPrevalues();
+                    //for the grid by default, we don't want to include the macro toolbar
+                    editorConfig.toolbar = _.without(editorConfig, "umbmacro");
+                }
+                //make sure there's a max image size
+                if (!scope.configuration.maxImageSize && scope.configuration.maxImageSize !== 0) {
+                    editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
                 }
 
                 //stores a reference to the editor
@@ -29,9 +35,9 @@ angular.module("umbraco.directives")
 
                 promises.push(tinyMceService.getTinyMceEditorConfig({
                     htmlId: scope.uniqueId,
-                    stylesheets: scope.configuration ? scope.configuration.stylesheets : null,
-                    toolbar: toolbar,
-                    mode: scope.configuration.mode
+                    stylesheets: editorConfig.stylesheets,
+                    toolbar: editorConfig.toolbar,
+                    mode: editorConfig.mode
                 }));
 
                 // pin toolbar to top of screen if we have focus and it scrolls off the screen
@@ -46,9 +52,16 @@ angular.module("umbraco.directives")
 
                 $q.all(promises).then(function (result) {
 
-                    var tinyMceEditorConfig = result[promises.length - 1];
+                    var standardConfig = result[promises.length - 1];
 
-                    tinyMceEditorConfig.setup = function (editor) {
+                    //create a baseline Config to extend upon
+                    var baseLineConfigObj = {
+                        maxImageSize: editorConfig.maxImageSize
+                    };
+
+                    angular.extend(baseLineConfigObj, standardConfig);
+
+                    baseLineConfigObj.setup = function (editor) {
 
                         //set the reference
                         tinyMceEditor = editor;
@@ -111,7 +124,7 @@ angular.module("umbraco.directives")
                         //the elements needed
                         $timeout(function () {
                             tinymce.DOM.events.domLoaded = true;
-                            tinymce.init(tinyMceEditorConfig);
+                            tinymce.init(baseLineConfigObj);
                         }, 150, false);
                     }
 

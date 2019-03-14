@@ -344,8 +344,8 @@
                     loadAuditTrail(true);
                     loadRedirectUrls();
                     setNodePublishStatus();
-                    updateCurrentUrls();
                 }
+                updateCurrentUrls();
             });
 
             //ensure to unregister from all events!
