@@ -1098,6 +1098,87 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual("four", all[3]);
         }
 
+        [Test]
+        public void DontPanic()
+        {
+            var d = new SnapDictionary<int, string>();
+            d.Test.CollectAuto = false;
+
+            Assert.IsNull(d.Test.GenObj); // set with first snapshot or first lock, then never null
+
+            // gen 1
+            d.Set(1, "one");
+            Assert.IsTrue(d.Test.NextGen);
+            Assert.AreEqual(1, d.Test.LiveGen);
+            Assert.IsNotNull(d.Test.GenObj); // set with lock
+
+            var s1 = d.CreateSnapshot();
+            Assert.IsFalse(d.Test.NextGen);
+            Assert.AreEqual(1, d.Test.LiveGen);
+            Assert.IsNotNull(d.Test.GenObj);
+            Assert.AreEqual(1, d.Test.GenObj.Gen);
+
+            Assert.AreEqual(1, s1.Gen);
+            Assert.AreEqual("one", s1.Get(1));
+
+            d.Set(1, "uno");
+            Assert.IsTrue(d.Test.NextGen);
+            Assert.AreEqual(2, d.Test.LiveGen);
+            Assert.IsNotNull(d.Test.GenObj);
+            Assert.AreEqual(1, d.Test.GenObj.Gen);
+
+            var scopeContext = new ScopeContext();
+            var scopeProvider = GetScopeProvider(scopeContext);
+
+            // scopeProvider.Context == scopeContext -> writer is scoped
+            // writer is scope contextual and scoped
+            //  when disposed, nothing happens
+            //  when the context exists, the writer is released
+            using (d.GetWriter(scopeProvider))
+            {
+                d.Set(1, "ein");
+                Assert.IsTrue(d.Test.NextGen);
+                Assert.AreEqual(3, d.Test.LiveGen);
+                Assert.IsNotNull(d.Test.GenObj);
+                Assert.AreEqual(2, d.Test.GenObj.Gen);
+            }
+
+            // writer has not released
+            Assert.AreEqual(1, d.Test.WLocked);
+            Assert.IsNotNull(d.Test.GenObj);
+            Assert.AreEqual(2, d.Test.GenObj.Gen);
+
+            // nothing changed
+            Assert.IsTrue(d.Test.NextGen);
+            Assert.AreEqual(3, d.Test.LiveGen);
+
+            // panic!
+            var s2 = d.CreateSnapshot();
+
+            Assert.AreEqual(1, d.Test.WLocked);
+            Assert.IsNotNull(d.Test.GenObj);
+            Assert.AreEqual(2, d.Test.GenObj.Gen);
+            Assert.AreEqual(3, d.Test.LiveGen);
+            Assert.IsTrue(d.Test.NextGen);
+
+            // release writer
+            scopeContext.ScopeExit(true);
+
+            Assert.AreEqual(0, d.Test.WLocked);
+            Assert.IsNotNull(d.Test.GenObj);
+            Assert.AreEqual(2, d.Test.GenObj.Gen);
+            Assert.AreEqual(3, d.Test.LiveGen);
+            Assert.IsTrue(d.Test.NextGen);
+
+            var s3 = d.CreateSnapshot();
+
+            Assert.AreEqual(0, d.Test.WLocked);
+            Assert.IsNotNull(d.Test.GenObj);
+            Assert.AreEqual(3, d.Test.GenObj.Gen);
+            Assert.AreEqual(3, d.Test.LiveGen);
+            Assert.IsFalse(d.Test.NextGen);
+        }
+
         private IScopeProvider GetScopeProvider(ScopeContext scopeContext = null)
         {
             var scopeProvider = Mock.Of<IScopeProvider>();

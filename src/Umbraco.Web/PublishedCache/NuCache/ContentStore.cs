@@ -133,11 +133,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     _wlocked++;
                     lockInfo.Count = true;
-                    if (_nextGen == false || (forceGen && _wlocked == 1)) // if true already... ok to have "holes" in generation objects
+                    if (_nextGen == false || (forceGen && _wlocked == 1))
                     {
                         // because we are changing things, a new generation
                         // is created, which will trigger a new snapshot
                         _nextGen = true;
+                        _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
                         _liveGen += 1;
                     }
                 }
@@ -214,7 +215,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 else
                     dictionary.TryUpdate(key, link.Next, link);
             }
-
         }
 
         #endregion
