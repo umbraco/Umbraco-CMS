@@ -10,7 +10,9 @@
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
 
-        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid || (variant.notifications | filter:{type:1}).length > 0}">
+        <!--Why are we doing the filter on notification type?-->
+
+        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
             <ng-form name="publishVariantSelectorForm">
                 <div class="flex">
                     <input id="{{variant.htmlId}}"
@@ -37,7 +39,8 @@
                             </span>
 
                             <span class="db" ng-repeat="notification in variant.notifications">
-                                <span class="db umb-permission__description" ng-class="{'text-success': notification.type === 3, 'text-error': notification.type !== 3}">{{notification.message}}</span>
+                                <!-- These are server side notifications for successful messages, non successful messages are returned via validation errors -->
+                                <span class="db umb-permission__description text-success">{{notification.message}}</span>
                             </span>
                         </label>
                     </div>
