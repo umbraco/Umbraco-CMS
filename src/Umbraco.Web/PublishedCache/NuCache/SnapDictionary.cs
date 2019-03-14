@@ -87,13 +87,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // a scope contextual that represents a locked writer to the dictionary
-        private class SnapDictionaryWriter : ScopeContextualBase
+        private class ScopedWriteLock : ScopeContextualBase
         {
             private readonly WriteLockInfo _lockinfo = new WriteLockInfo();
             private readonly SnapDictionary<TKey, TValue> _dictionary;
             private int _released;
 
-            public SnapDictionaryWriter(SnapDictionary<TKey, TValue> dictionary, bool scoped)
+            public ScopedWriteLock(SnapDictionary<TKey, TValue> dictionary, bool scoped)
             {
                 _dictionary = dictionary;
                 dictionary.Lock(_lockinfo, scoped);
@@ -108,14 +108,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // gets a scope contextual representing a locked writer to the dictionary
-        // fixme GetScopedWriter? should the dict have a ref onto the scope provider?
-        // fixme this is not a "writer" but a "write lock" => rename GetWriteLock
         // the dict is write-locked until the write-lock is released
         //  which happens when it is disposed (non-scoped)
         //  or when the scope context exits (scoped)
-        public IDisposable GetWriter(IScopeProvider scopeProvider)
+        public IDisposable GetScopedWriteLock(IScopeProvider scopeProvider)
         {
-            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new SnapDictionaryWriter(this, scoped));
+            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }
 
         private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
@@ -143,9 +141,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     {
                         // because we are changing things, a new generation
                         // is created, which will trigger a new snapshot
-                        _nextGen = true; // this is the ONLY place where _nextGen becomes true
-                        _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
+                        if (_nextGen)
+                            _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
                         _liveGen += 1;
+                        _nextGen = true; // this is the ONLY place where _nextGen becomes true
                     }
                 }
             }
@@ -196,9 +195,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         _items.TryUpdate(key, link.Next, link);
                 }
             }
-
-            // fixme - pretend we need to do something that takes time
-            //System.Threading.Thread.Sleep(TimeSpan.FromSeconds(5));
 
             // decrement the lock count, if counting, then exit the lock
             if (lockInfo.Count) _wlocked--;
