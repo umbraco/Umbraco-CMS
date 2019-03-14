@@ -139,18 +139,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _wlocked++;
                     lockInfo.Count = true;
 
-                    // fixme - this comment: "ok to have holes in generation objects" is annoying
-                    // 'cos if you have a hole, then doing _liveGen-1 in some places would be wrong
-                    // besides, forceGen is used only when getting a scoped write lock, which is not reentrant?
-                    //
-                    // but... if _wlocked ==1 and we just incremented it, it means it was 0, so it wasnt locked, so wtf?
-                    // this is the only place where _nextGen would turn true so ... this makes no sense at all!
-
-                    if (_nextGen == false || (forceGen && _wlocked == 1)) // if true already... ok to have "holes" in generation objects
+                    if (_nextGen == false || (forceGen && _wlocked == 1))
                     {
                         // because we are changing things, a new generation
                         // is created, which will trigger a new snapshot
                         _nextGen = true; // this is the ONLY place where _nextGen becomes true
+                        _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
                         _liveGen += 1;
                     }
                 }
@@ -379,9 +373,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (_genObj == null)
                         _genObjs.Enqueue(_genObj = new GenObj(snapGen));
 
-                    // fixme - getting a panic exception here
-                    // means _genObj != null, means _nextGen == true
-
                     // if we have one already, ensure it's consistent
                     else if (_genObj.Gen != snapGen)
                         throw new Exception("panic");
@@ -550,6 +541,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 get => _dict._collectAuto;
                 set => _dict._collectAuto = value;
             }
+
+            public GenObj GenObj => _dict._genObj;
 
             public ConcurrentQueue<GenObj> GenObjs => _dict._genObjs;
 
