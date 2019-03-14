@@ -689,7 +689,7 @@ namespace Umbraco.Web.Editors
                     {
                         if (variantCount > 1)
                         {
-                            var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
+                            var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService);
                             foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
                             {
                                 AddSuccessNotification(notifications, c,
@@ -882,7 +882,7 @@ namespace Umbraco.Web.Editors
             {
                 if (variantCount > 1)
                 {
-                    var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
+                    var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService);
                     foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
                     {
                         AddSuccessNotification(notifications, c,
@@ -1142,16 +1142,19 @@ namespace Umbraco.Web.Editors
 
             var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
+            var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService);
+
             //validate if we can publish based on the mandatory language requirements
             var canPublish = ValidatePublishingMandatoryLanguages(
-                contentItem, cultureVariants, mandatoryCultures, "speechBubbles/contentReqCulturePublishError",
-                mandatoryVariant => mandatoryVariant.Publish, out var _);
+                cultureErrors,
+                contentItem, cultureVariants, mandatoryCultures, 
+                mandatoryVariant => mandatoryVariant.Publish);
 
             //Now check if there are validation errors on each variant.
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
             //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
-            var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
+            
             foreach (var variant in contentItem.Variants)
             {
                 if (cultureErrors.Contains(variant.Culture))
@@ -1211,16 +1214,21 @@ namespace Umbraco.Web.Editors
 
             var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
-            //validate if we can publish based on the mandatory language requirements
+            var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService);
+
+            //validate if we can publish based on the mandatory languages selected
             var canPublish = ValidatePublishingMandatoryLanguages(
-                contentItem, cultureVariants, mandatoryCultures, "speechBubbles/contentReqCulturePublishError",
-                mandatoryVariant => mandatoryVariant.Publish, out var _);
+                cultureErrors,
+                contentItem, cultureVariants, mandatoryCultures,
+                mandatoryVariant => mandatoryVariant.Publish);
+
+            //if none are published and there are validation errors for mandatory cultures, then we can't publish anything
+
 
             //Now check if there are validation errors on each variant.
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
-            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
-            var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
+            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.            
             foreach (var variant in contentItem.Variants)
             {
                 if (cultureErrors.Contains(variant.Culture))
@@ -1260,23 +1268,21 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Validate if publishing is possible based on the mandatory language requirements
         /// </summary>
+        /// <param name="culturesWithValidationErrors"></param>
         /// <param name="contentItem"></param>
         /// <param name="cultureVariants"></param>
         /// <param name="mandatoryCultures"></param>
-        /// <param name="localizationKey"></param>
         /// <param name="publishingCheck"></param>
-        /// <param name="mandatoryVariants"></param>
         /// <returns></returns>
         private bool ValidatePublishingMandatoryLanguages(
+            IReadOnlyCollection<string> culturesWithValidationErrors,
             ContentItemSave contentItem,
             IReadOnlyCollection<ContentVariantSave> cultureVariants,
             IReadOnlyList<string> mandatoryCultures,
-            string localizationKey,
-            Func<ContentVariantSave, bool> publishingCheck,
-            out IReadOnlyList<(ContentVariantSave mandatoryVariant, bool isPublished)> mandatoryVariants)
+            Func<ContentVariantSave, bool> publishingCheck)
         {
             var canPublish = true;
-            var result = new List<(ContentVariantSave, bool)>();
+            var result = new List<(ContentVariantSave model, bool publishing, bool isValid)>();
 
             foreach (var culture in mandatoryCultures)
             {
@@ -1285,18 +1291,39 @@ namespace Umbraco.Web.Editors
                 var mandatoryVariant = cultureVariants.First(x => x.Culture.InvariantEquals(culture));
 
                 var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(culture);
-                result.Add((mandatoryVariant, isPublished));
-
                 var isPublishing = isPublished || publishingCheck(mandatoryVariant);
+                var isValid = !culturesWithValidationErrors.InvariantContains(culture);
 
-                if (isPublished || isPublishing) continue;
-
-                //cannot continue publishing since a required language that is not currently being published isn't published
-                AddCultureValidationError(culture, localizationKey);
-                canPublish = false;
+                result.Add((mandatoryVariant, isPublished || isPublishing, isValid));
             }
 
-            mandatoryVariants = result;
+            //iterate over the results by invalid first
+            string firstInvalidMandatoryCulture = null;
+            foreach (var r in result.OrderBy(x => x.isValid))
+            {
+                if (!r.isValid)
+                    firstInvalidMandatoryCulture = r.model.Culture;
+
+                if (r.publishing && !r.isValid)
+                {
+                    //flagged for publishing but the mandatory culture is invalid
+                    AddCultureValidationError(r.model.Culture, "publish/contentPublishedFailedReqCultureValidationError");
+                    canPublish = false;
+                }
+                else if (r.publishing && r.isValid && firstInvalidMandatoryCulture != null)
+                {
+                    //in this case this culture also cannot be published because another mandatory culture is invalid
+                    AddCultureValidationError(r.model.Culture, "publish/contentPublishedFailedReqCultureValidationError", firstInvalidMandatoryCulture);
+                    canPublish = false;
+                }
+                else if (!r.publishing)
+                {
+                    //cannot continue publishing since a required culture that is not currently being published isn't published
+                    AddCultureValidationError(r.model.Culture, "speechBubbles/contentReqCulturePublishError");
+                    canPublish = false;
+                }
+            }
+
             return canPublish;
         }
 
@@ -1328,14 +1355,15 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
         /// </summary>
-        /// <param name="culture"></param>
+        /// <param name="culture">Culture to assign the error to</param>
         /// <param name="localizationKey"></param>
-        private void AddCultureValidationError(string culture, string localizationKey)
+        /// <param name="cultureToken">
+        /// The culture used in the localization message, null by default which means <see cref="culture"/> will be used. 
+        /// </param>
+        private void AddCultureValidationError(string culture, string localizationKey, string cultureToken = null)
         {
-            var key = "_content_variant_" + culture + "_";
-            if (ModelState.ContainsKey(key)) return;
-            var errMsg = Services.TextService.Localize(localizationKey, new[] { _allLangs.Value[culture].CultureName });
-            ModelState.AddModelError(key, errMsg);
+            var errMsg = Services.TextService.Localize(localizationKey, new[] { cultureToken == null ? _allLangs.Value[culture].CultureName : _allLangs.Value[cultureToken].CultureName });
+            ModelState.AddCultureValidationError(culture, errMsg);
         }
 
         /// <summary>
@@ -1763,7 +1791,7 @@ namespace Umbraco.Web.Editors
             if (!ModelState.IsValid && display.Variants.Count() > 1)
             {
                 //Add any culture specific errors here
-                var cultureErrors = ModelState.GetCulturesWithPropertyErrors(Services.LocalizationService);
+                var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService);
 
                 foreach (var cultureError in cultureErrors)
                 {

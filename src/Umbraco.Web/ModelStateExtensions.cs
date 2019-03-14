@@ -58,7 +58,21 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Returns a list of cultures that have property errors
+        /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <param name="culture"></param>
+        /// <param name="errMsg"></param>
+        internal static void AddCultureValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            string culture, string errMsg)
+        {
+            var key = "_content_variant_" + culture + "_";
+            if (modelState.ContainsKey(key)) return;
+            modelState.AddModelError(key, errMsg);
+        }
+
+        /// <summary>
+        /// Returns a list of cultures that have property validation errors errors
         /// </summary>
         /// <param name="modelState"></param>
         /// <param name="localizationService"></param>
@@ -79,6 +93,30 @@ namespace Umbraco.Web
                 .ToList();
 
             return cultureErrors;
+        }
+
+        /// <summary>
+        /// Returns a list of cultures that have any validation errors
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <param name="localizationService"></param>
+        /// <returns></returns>
+        internal static IReadOnlyList<string> GetCulturesWithErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            ILocalizationService localizationService)
+        {
+            var propertyCultureErrors = modelState.GetCulturesWithPropertyErrors(localizationService);
+
+            //now check the other special culture errors that are
+            var genericCultureErrors = modelState.Keys
+                .Where(x => x.StartsWith("_content_variant_") && x.EndsWith("_"))
+                .Select(x => x.TrimStart("_content_variant_").TrimEnd("_"))
+                .Where(x => !x.IsNullOrWhiteSpace())
+                //if it's marked "invariant" than return the default language, this is because we can only edit invariant properties on the default language
+                //so errors for those must show up under the default lang.
+                .Select(x => x == "invariant" ? localizationService.GetDefaultLanguageIsoCode() : x)
+                .Distinct();
+
+            return propertyCultureErrors.Union(genericCultureErrors).ToList();
         }
 
         /// <summary>
