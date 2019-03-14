@@ -92,13 +92,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // a scope contextual that represents a locked writer to the dictionary
-        private class ContentStoreWriter : ScopeContextualBase
+        private class ScopedWriteLock : ScopeContextualBase
         {
             private readonly WriteLockInfo _lockinfo = new WriteLockInfo();
             private readonly ContentStore _store;
             private int _released;
 
-            public ContentStoreWriter(ContentStore store, bool scoped)
+            public ScopedWriteLock(ContentStore store, bool scoped)
             {
                 _store = store;
                 store.Lock(_lockinfo, scoped);
@@ -114,9 +114,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         // gets a scope contextual representing a locked writer to the dictionary
         // TODO: GetScopedWriter? should the dict have a ref onto the scope provider?
-        public IDisposable GetWriter(IScopeProvider scopeProvider)
+        public IDisposable GetScopedWriteLock(IScopeProvider scopeProvider)
         {
-            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ContentStoreWriter(this, scoped));
+            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }
 
         private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
@@ -137,9 +137,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     {
                         // because we are changing things, a new generation
                         // is created, which will trigger a new snapshot
-                        _nextGen = true;
-                        _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
+                        if (_nextGen)
+                            _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
                         _liveGen += 1;
+                        _nextGen = true;
                     }
                 }
             }

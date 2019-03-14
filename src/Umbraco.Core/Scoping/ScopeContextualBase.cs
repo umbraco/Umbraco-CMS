@@ -12,7 +12,7 @@ namespace Umbraco.Core.Scoping
     /// </remarks>
     public abstract class ScopeContextualBase : IDisposable
     {
-        private bool _using, _scoped;
+        private bool _scoped;
 
         /// <summary>
         /// Gets a contextual object.
@@ -38,9 +38,6 @@ namespace Umbraco.Core.Scoping
                 () => ctor(true),
                 (completed, item) => { item.Release(completed); });
 
-            // the object can be 'used' only once at a time
-            if (w._using) throw new InvalidOperationException("panic: used.");
-            w._using = true;
             w._scoped = true;
 
             return w;
@@ -52,8 +49,6 @@ namespace Umbraco.Core.Scoping
         /// </remarks>
         public void Dispose()
         {
-            _using = false;
-
             if (_scoped == false)
                 Release(true);
         }
