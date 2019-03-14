@@ -16,12 +16,12 @@ namespace Umbraco.Web.Editors.Filters
     /// <summary>
     /// A base class purely used for logging without generics
     /// </summary>
-    internal class ContentModelValidator
+    internal abstract class ContentModelValidator
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
         protected ILogger Logger { get; }
 
-        public ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor)
+        protected ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             UmbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -38,12 +38,12 @@ namespace Umbraco.Web.Editors.Filters
     /// If any severe errors occur then the response gets set to an error and execution will not continue. Property validation
     /// errors will just be added to the ModelState.
     /// </remarks>
-    internal class ContentModelValidator<TPersisted, TModelSave, TModelWithProperties>: ContentModelValidator
+    internal abstract class ContentModelValidator<TPersisted, TModelSave, TModelWithProperties>: ContentModelValidator
         where TPersisted : class, IContentBase
         where TModelSave: IContentSave<TPersisted>
         where TModelWithProperties : IContentProperties<ContentPropertyBasic>
     {
-        public ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
+        protected ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
         {
         }
         

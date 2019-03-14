@@ -10,8 +10,6 @@
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
 
-        <!--Why are we doing the filter on notification type?-->
-
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
             <ng-form name="publishVariantSelectorForm">
                 <div class="flex">

@@ -39,7 +39,7 @@ namespace Umbraco.Web.Editors.Filters
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var model = (MediaItemSave)actionContext.ActionArguments["contentItem"];
-            var contentItemValidator = new ContentModelValidator<IMedia, MediaItemSave, IContentProperties<ContentPropertyBasic>>(_logger, _umbracoContextAccessor);
+            var contentItemValidator = new MediaSaveModelValidator(_logger, _umbracoContextAccessor);
 
             if (ValidateUserAccess(model, actionContext))
             {

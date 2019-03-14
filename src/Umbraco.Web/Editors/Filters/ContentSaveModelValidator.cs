@@ -8,7 +8,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.Editors.Filters
 {
     /// <summary>
-    /// Validation helper for <see cref="ContentItemSave"/>
+    /// Validator for <see cref="ContentItemSave"/>
     /// </summary>
     internal class ContentSaveModelValidator : ContentModelValidator<IContent, ContentItemSave, ContentVariantSave>
     {
