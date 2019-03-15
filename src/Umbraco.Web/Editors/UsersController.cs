@@ -82,6 +82,7 @@ namespace Umbraco.Web.Editors
 
         [AppendUserModifiedHeader("id")]
         [FileUploadCleanupFilter(false)]
+        [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
             return await PostSetAvatarInternal(Request, Services.UserService, ApplicationContext.ApplicationCache.StaticCache, id);
@@ -145,6 +146,7 @@ namespace Umbraco.Web.Editors
         }
 
         [AppendUserModifiedHeader("id")]
+        [AdminUsersAuthorize]
         public HttpResponseMessage PostClearAvatar(int id)
         {
             var found = Services.UserService.GetUserById(id);
@@ -183,6 +185,7 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
+        [AdminUsersAuthorize]
         public UserDisplay GetById(int id)
         {
             var user = Services.UserService.GetUserById(id);
