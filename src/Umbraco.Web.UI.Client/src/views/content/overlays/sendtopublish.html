@@ -12,7 +12,7 @@
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.modifiedVariantFilter">
             <ng-form name="publishVariantSelectorForm">
-                <div class="flex">
+                <div class="flex" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
 
                     <umb-checkbox
                         input-id="{{variant.htmlId}}"

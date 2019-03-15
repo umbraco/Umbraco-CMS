@@ -86,7 +86,7 @@
 
             <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter">
                 <ng-form name="scheduleSelectorForm">
-                    <div class="flex">
+                    <div class="flex" ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid}">
 
                         <umb-checkbox
                             input-id="{{'saveVariantSelector_' + variant.language.culture}}"
