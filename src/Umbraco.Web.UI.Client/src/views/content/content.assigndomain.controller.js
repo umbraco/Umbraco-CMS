@@ -46,8 +46,7 @@
 
                     if (data.language !== "undefined") {
                         var lang = vm.languages.filter(function (l) {
-                            return matchLanguageById(l, data.language.Id);
-
+                            return matchLanguageById(l, data.language);
                         });
                         if (lang.length > 0) {
                             vm.language = lang[0];
