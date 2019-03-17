@@ -465,6 +465,8 @@ When building a custom infinite editor view you can use the same components as a
          * @description
          * Opens an icon picker in infinite editing, the submit callback returns the selected icon
          * @param {Object} editor rendering options
+         * @param {String} editor.icon The CSS class representing the icon - eg. "icon-autofill".
+         * @param {String} editor.color The CSS class representing the color - eg. "color-red".
          * @param {Callback} editor.submit Submits the editor
          * @param {Callback} editor.close Closes the editor
          * @returns {Object} editor object
