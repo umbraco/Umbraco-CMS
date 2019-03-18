@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper, editorService) {
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, usersHelper, formHelper, dateHelper, editorService) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
