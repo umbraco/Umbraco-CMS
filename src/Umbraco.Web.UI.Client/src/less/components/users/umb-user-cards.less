@@ -17,6 +17,10 @@
     outline: none;
     text-decoration: none !important;
 }
+
+.umb-user-card.-selectable {
+    cursor: pointer;
+}
 .umb-user-card.-selected {
     &::before {
         content: "";
@@ -31,7 +35,6 @@
         box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
         pointer-events: none;
     }
-    
 }
 
 .umb-user-card__content {
@@ -44,7 +47,6 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    cursor: pointer;
     max-width: 100%;
 }
 

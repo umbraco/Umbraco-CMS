@@ -96,6 +96,7 @@
         vm.toggleFilter = toggleFilter;
         vm.setUsersViewState = setUsersViewState;
         vm.selectLayout = selectLayout;
+        vm.isSelectable = isSelectable;
         vm.selectUser = selectUser;
         vm.clearSelection = clearSelection;
         vm.clickUser = clickUser;
@@ -200,10 +201,14 @@
             selectedLayout.active = true;
             vm.activeLayout = selectedLayout;
         }
-
+        
+        function isSelectable(user) {
+            return !user.isCurrentUser;
+        }
+        
         function selectUser(user) {
             
-            if (user.isCurrentUser) {
+            if (!isSelectable(user)) {
                 return;
             }
             
@@ -227,10 +232,14 @@
             vm.selection = [];
         }
 
-        function clickUser(user) {
-            goToUser(user.id);
+        function clickUser(user, $event) {
+            if (!($event.metaKey || $event.ctrlKey)) {
+                goToUser(user);
+                $event.preventDefault();
+            }
+            $event.stopPropagation();
         }
-
+        
         function disableUsers() {
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers(vm.selection).then(function (data) {
@@ -551,8 +560,12 @@
             vm.page.copyPasswordButtonState = "init";
         }
 
-        function goToUser(userId) {
-            $location.path('users/users/user/' + userId).search("create", null).search("invite", null);
+        function goToUser(user) {
+            $location.path('users/users/user/' + user.id).search("create", null).search("invite", null);
+        }
+        
+        function getEditPath(user) {
+            return '/users/users/user/' + user.id;
         }
 
         // helpers
@@ -569,8 +582,9 @@
                 vm.usersOptions.pageSize = data.pageSize;
                 vm.usersOptions.totalItems = data.totalItems;
                 vm.usersOptions.totalPages = data.totalPages;
-
+                
                 formatDates(vm.users);
+                addEditPaths(vm.users);
                 setUserDisplayState(vm.users);
                 vm.userStatesFilter = usersHelper.getUserStatesFilter(data.userStates);
 
@@ -607,6 +621,14 @@
                     userService.getCurrentUser().then(function (currentUser) {
                         user.formattedLastLogin = dateVal.locale(currentUser.locale).format("LLL");
                     });
+                }
+            });
+        }
+        
+        function addEditPaths(users) {
+            angular.forEach(users, function (user) {
+                if (!user.editPath) {
+                    user.editPath = getEditPath(user);
                 }
             });
         }

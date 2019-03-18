@@ -191,18 +191,18 @@
 
         <!-- Layout: Cards -->
         <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
-            <div class="umb-user-card" ng-class="{'-selected': user.selected}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user)">
+            <div class="umb-user-card" ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user)">
                 <div class="umb-user-card__content">
-                    <div class="umb-user-card__goToUser" ng-click="vm.clickUser(user)">
-                        <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
-                            {{ user.userDisplayState.name }}
-                        </umb-badge>
+                    <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
+                        {{ user.userDisplayState.name }}
+                    </umb-badge>
+                    <a class="umb-user-card__goToUser" ng-click="vm.clickUser(user)" ng-href="{{'#' + user.editPath}}">
                         <div class="umb-user-card__avatar">
                             <umb-avatar size="l" color="secondary" name="{{user.name}}" img-src="{{user.avatars[2]}}" img-srcset="{{user.avatars[3]}} 2x, {{user.avatars[4]}} 3x">
                             </umb-avatar>
                         </div>
                         <div class="umb-user-card__name">{{user.name}}</div>
-                    </div>
+                    </a>
                     <div class="umb-user-card__group">
                         <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
                     </div>
@@ -257,16 +257,22 @@
                                 </umb-checkmark>
                             </div>
                         </td>
-                        <td scope="row" ng-click="vm.clickUser(user)">
-                            <umb-avatar
-                                size="xs"
-                                color="secondary"
-                                name="{{user.name}}"
-                                img-src="{{user.avatars[0]}}"
-                                img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
-                            </umb-avatar>
+                        <td scope="row">
+                            <a ng-click="vm.clickUser(user)" ng-href="{{'#' + user.editPath}}">
+                                <umb-avatar
+                                    size="xs"
+                                    color="secondary"
+                                    name="{{user.name}}"
+                                    img-src="{{user.avatars[0]}}"
+                                    img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
+                                </umb-avatar>
+                            </a>
                         </td>
-                        <td class="bold" ng-click="vm.clickUser(user)">{{user.name}}</td>
+                        <td class="bold">
+                            <a ng-click="vm.clickUser(user)" ng-href="{{'#' + user.editPath}}">
+                                {{user.name}}
+                            </a>
+                        </td>
                         <td><span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span></td>
                         <td>{{ user.formattedLastLogin }}</td>
                         <td style="text-transform: capitalize;">
@@ -490,7 +496,7 @@
                             type="button"
                             button-style="action"
                             label-key="user_goToProfile"
-                            action="vm.goToUser(vm.newUser.id);"
+                            action="vm.goToUser(vm.newUser);"
                             size="m">
                         </umb-button>
                     </div>
@@ -540,7 +546,7 @@
                         type="button"
                         button-style="action"
                         label-key="user_goToProfile"
-                        action="vm.goToUser(vm.newUser.id);"
+                        action="vm.goToUser(vm.newUser);"
                         size="m">
                     </umb-button>
                 </div>
