@@ -50,8 +50,13 @@
 
 .umb-user-card__goToUser {
     &:hover {
+        text-decoration: none;
         .umb-user-card__name {
-        text-decoration: underline;
+            text-decoration: underline;
+            color: @ui-option-type-hover;
+        }
+        .umb-avatar {
+            border: 1px solid @ui-option-type-hover;
         }
     }
 }
