@@ -116,6 +116,7 @@
                     if(response.valid) {
 
                         vm.submitButtonState = "success";
+                        closeDialog();
 
                     // show validation messages for each domain
                     } else {
