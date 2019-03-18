@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -16,46 +15,41 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class ContentTypeCommonRepository : IContentTypeCommonRepository
     {
+        private const string CacheKey = "Umbraco.Core.Persistence.Repositories.Implement.ContentTypeCommonRepository::AllTypes";
+
+        private readonly AppCaches _appCaches;
         private readonly IScopeAccessor _scopeAccessor;
         private readonly ITemplateRepository _templateRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IContentTypeCommonRepository"/> class.
         /// </summary>
-        public ContentTypeCommonRepository(IScopeAccessor scopeAccessor, ITemplateRepository templateRepository)
+        public ContentTypeCommonRepository(IScopeAccessor scopeAccessor, ITemplateRepository templateRepository, AppCaches appCaches)
         {
             _scopeAccessor = scopeAccessor;
             _templateRepository = templateRepository;
+            _appCaches = appCaches;
         }
 
         private IScope AmbientScope => _scopeAccessor.AmbientScope;
         private IUmbracoDatabase Database => AmbientScope.Database;
         private ISqlContext SqlContext => AmbientScope.SqlContext;
         private Sql<ISqlContext> Sql() => SqlContext.Sql();
-        private Sql<ISqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);
-        private ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
-        private IQuery<T> Query<T>() => SqlContext.Query<T>();
-
-        // a full dataset repository cache policy is equivalent to statically caching everything
-        private IEnumerable<IContentTypeComposition> _allTypes;
-        private readonly object _allTypesLock = new object();
+        //private Sql<ISqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);
+        //private ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
+        //private IQuery<T> Query<T>() => SqlContext.Query<T>();
 
         /// <inheritdoc />
         public IEnumerable<IContentTypeComposition> GetAllTypes()
         {
-            lock (_allTypesLock)
-            {
-                return _allTypes ?? (_allTypes = GetAllTypesInternal());
-            }
+            // use a 5 minutes sliding cache - same as FullDataSet cache policy
+            return _appCaches.RuntimeCache.GetCacheItem(CacheKey, GetAllTypesInternal, TimeSpan.FromMinutes(5), true);
         }
 
         /// <inheritdoc />
         public void ClearCache()
         {
-            lock (_allTypesLock)
-            {
-                _allTypes = null;
-            }
+            _appCaches.RuntimeCache.Clear(CacheKey);
         }
 
         private IEnumerable<IContentTypeComposition> GetAllTypesInternal()
@@ -70,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .OrderBy<ContentTypeDto>(x => x.NodeId);
 
             var contentTypeDtos = Database.Fetch<ContentTypeDto>(sql1);
-            
+
             // get allowed content types
             var sql2 = Sql()
                 .Select<ContentTypeAllowedContentTypeDto>()
@@ -168,7 +162,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var compositionDtos = Database.Fetch<ContentType2ContentTypeDto>(sql1);
 
-            // map 
+            // map
             var compositionIx = 0;
             foreach (var contentType in contentTypes.Values)
             {

@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var cacheHelper = AppCaches.Disabled;
             var templateRepository = new TemplateRepository((IScopeAccessor)provider, cacheHelper, Logger, TestObjects.GetFileSystemsMock());
-            var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository);
+            var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches);
             return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository);
         }
 

@@ -32,20 +32,19 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository)
         {
-            var cacheHelper = AppCaches.Disabled;
-            var templateRepository = new TemplateRepository(scopeAccessor, cacheHelper, Logger, TestObjects.GetFileSystemsMock());
-            var tagRepository = new TagRepository(scopeAccessor, cacheHelper, Logger);
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository);
-            contentTypeRepository = new ContentTypeRepository(scopeAccessor, cacheHelper, Logger, commonRepository);
-            var languageRepository = new LanguageRepository(scopeAccessor, cacheHelper, Logger);
-            var repository = new DocumentRepository(scopeAccessor, cacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
+            var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, Logger);
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled);
+            contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository);
+            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger);
+            var repository = new DocumentRepository(scopeAccessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 
         private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor)
         {
             var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository);
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled);
             var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository);
             return contentTypeRepository;
         }
@@ -53,7 +52,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MediaTypeRepository CreateMediaTypeRepository(IScopeAccessor scopeAccessor)
         {
             var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository);
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled);
             var contentTypeRepository = new MediaTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository);
             return contentTypeRepository;
         }

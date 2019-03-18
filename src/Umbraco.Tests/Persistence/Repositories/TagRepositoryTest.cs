@@ -955,7 +955,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var accessor = (IScopeAccessor) provider;
             var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
             var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
-            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository);
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled);
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository);
             var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
             var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
@@ -967,7 +967,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var accessor = (IScopeAccessor) provider;
             var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
             var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
-            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository);
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled);
             mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository);
             var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
             return repository;

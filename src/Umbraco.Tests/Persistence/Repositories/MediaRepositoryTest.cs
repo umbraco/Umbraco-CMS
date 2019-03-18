@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var scopeAccessor = (IScopeAccessor) provider;
 
             var templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock());
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository);
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches);
             mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger, commonRepository);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
             var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());

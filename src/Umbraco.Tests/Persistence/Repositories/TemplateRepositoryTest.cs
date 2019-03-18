@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var templateRepository = CreateRepository(ScopeProvider);
 
                 var tagRepository = new TagRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger);
-                var commonRepository = new ContentTypeCommonRepository(ScopeProvider, templateRepository);
+                var commonRepository = new ContentTypeCommonRepository(ScopeProvider, templateRepository, AppCaches);
                 var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, commonRepository);
                 var languageRepository = new LanguageRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger);
                 var contentRepo = new DocumentRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
