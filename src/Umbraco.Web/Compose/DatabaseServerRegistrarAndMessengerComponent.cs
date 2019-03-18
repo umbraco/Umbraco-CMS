@@ -38,54 +38,44 @@ namespace Umbraco.Web.Compose
 
     public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
     {
+        public static DatabaseServerMessengerOptions GetDefaultOptions(IFactory factory)
+        {
+            var logger = factory.GetInstance<ILogger>();
+            var indexRebuilder = factory.GetInstance<IndexRebuilder>();
+
+            return new DatabaseServerMessengerOptions
+            {
+                //These callbacks will be executed if the server has not been synced
+                // (i.e. it is a new server or the lastsynced.txt file has been removed)
+                InitializingCallbacks = new Action[]
+                {
+                    //rebuild the xml cache file if the server is not synced
+                    () =>
+                    {
+                        // rebuild the published snapshot caches entirely, if the server is not synced
+                        // this is equivalent to DistributedCache RefreshAll... but local only
+                        // (we really should have a way to reuse RefreshAll... locally)
+                        // note: refresh all content & media caches does refresh content types too
+                        var svc = Current.PublishedSnapshotService;
+                        svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
+                        svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _, out _);
+                        svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _);
+                    },
+
+                    //rebuild indexes if the server is not synced
+                    // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
+                    // indexes then they can adjust this logic themselves.
+                    () => { ExamineComponent.RebuildIndexes(indexRebuilder, logger, false, 5000); }
+                }
+            };
+        }
+
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
 
-            composition.SetServerMessenger(factory =>
-            {
-                var runtime = factory.GetInstance<IRuntimeState>();
-                var databaseFactory = factory.GetInstance<IUmbracoDatabaseFactory>();
-                var globalSettings = factory.GetInstance<IGlobalSettings>();
-                var proflog = factory.GetInstance<IProfilingLogger>();
-                var scopeProvider = factory.GetInstance<IScopeProvider>();
-                var sqlContext = factory.GetInstance<ISqlContext>();
-                var logger = factory.GetInstance<ILogger>();
-                var indexRebuilder = factory.GetInstance<IndexRebuilder>();
-
-                return new BatchedDatabaseServerMessenger(
-                    runtime, databaseFactory, scopeProvider, sqlContext, proflog, globalSettings,
-                    true,
-                    //Default options for web including the required callbacks to build caches
-                    new DatabaseServerMessengerOptions
-                    {
-                        //These callbacks will be executed if the server has not been synced
-                        // (i.e. it is a new server or the lastsynced.txt file has been removed)
-                        InitializingCallbacks = new Action[]
-                        {
-                            //rebuild the xml cache file if the server is not synced
-                            () =>
-                            {
-                                // rebuild the published snapshot caches entirely, if the server is not synced
-                                // this is equivalent to DistributedCache RefreshAll... but local only
-                                // (we really should have a way to reuse RefreshAll... locally)
-                                // note: refresh all content & media caches does refresh content types too
-                                var svc = Current.PublishedSnapshotService;
-                                svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
-                                svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _, out _);
-                                svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _);
-                            },
-
-                            //rebuild indexes if the server is not synced
-                            // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
-                            // indexes then they can adjust this logic themselves.
-                            () =>
-                            {
-                                ExamineComponent.RebuildIndexes(indexRebuilder, logger, false, 5000);
-                            }
-                        }
-                    });
-            });
+            composition.SetDatabaseServerMessengerOptions(GetDefaultOptions);
+            composition.SetServerMessenger<BatchedDatabaseServerMessenger>();
         }
     }
 
@@ -128,7 +118,7 @@ namespace Umbraco.Web.Compose
         }
 
         public void Initialize()
-        { 
+        {
             //We will start the whole process when a successful request is made
             if (_registrar != null || _messenger != null)
                 UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
