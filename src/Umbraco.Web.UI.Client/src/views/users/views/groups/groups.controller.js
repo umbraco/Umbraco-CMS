@@ -63,12 +63,10 @@
                 return;
 
             if (userGroup.selected) {
+                vm.selection.push(userGroup.group.id);
+            } else {
                 var index = selection.indexOf(userGroup.group.id);
                 selection.splice(index, 1);
-                userGroup.selected = false;
-            } else {
-                userGroup.selected = true;
-                vm.selection.push(userGroup.group.id);
             }
 
             if(event){

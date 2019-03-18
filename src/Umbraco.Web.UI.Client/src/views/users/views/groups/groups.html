@@ -79,18 +79,16 @@
         </thead>
         <tbody>
             <tr ng-repeat="group in vm.userGroups | filter:vm.filter"
-                ng-click="vm.goToUserGroup(group)"
-                ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess, '--selected': group.selected}">
+                ng-class="{'--selected': group.selected}">
 
                 <td style="padding-right: 5px">
-                    <input
-                        ng-show="group.hasAccess && group.group.alias !== 'admin' && group.group.alias !== 'translator'"
-                        type="checkbox"
-                        ng-model="group.selected"
-                        ng-click="vm.selectUserGroup(group, vm.selection, $event)"
-                        style="width: 20px; height: 100px;"/>
+                    <umb-checkbox model="group.selected"
+                                  on-change="vm.selectUserGroup(group, vm.selection, $event)"
+                                  ng-show="group.hasAccess && group.group.alias !== 'admin' && group.group.alias !== 'translator'">
+                    </umb-checkbox>
                 </td>
-                <td>
+                <td ng-click="vm.goToUserGroup(group)"
+                    ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess}">
                     <umb-user-group-preview
                         style="border-bottom: none; margin-bottom: 0; padding: 0;"
                         icon="group.group.icon"
