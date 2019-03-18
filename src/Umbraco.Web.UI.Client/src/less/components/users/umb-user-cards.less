@@ -36,7 +36,6 @@
 
 .umb-user-card__content {
     position: relative;
-    padding: 15px;
     flex: 1 1 auto;
     background-color: @white;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
@@ -49,9 +48,15 @@
 }
 
 .umb-user-card__goToUser {
-    &:hover {
+    padding: 15px 15px 0 15px;
+    cursor: pointer;
+    display: block;
+
+    &:hover, &:focus {
+        text-decoration: none;
+
         .umb-user-card__name {
-        text-decoration: underline;
+            text-decoration: underline;
         }
     }
 }
@@ -80,11 +85,12 @@
 .umb-user-card__group {
     font-size: 14px;
     text-align: center;
-    margin-bottom: 15px;
+    margin: 0 15px 15px 15px;
 }
 
 .umb-user-card__last-login {
     font-size: 13px;
     text-align: center;
     margin-top: auto;
+    padding-bottom: 15px;
 }

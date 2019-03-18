@@ -98,7 +98,6 @@
         vm.selectLayout = selectLayout;
         vm.selectUser = selectUser;
         vm.clearSelection = clearSelection;
-        vm.clickUser = clickUser;
         vm.disableUsers = disableUsers;
         vm.enableUsers = enableUsers;
         vm.unlockUsers = unlockUsers;
@@ -120,6 +119,7 @@
         vm.copySuccess = copySuccess;
         vm.copyError = copyError;
         vm.goToUser = goToUser;
+        vm.linkToUser = linkToUser;
 
         function init() {
 
@@ -201,8 +201,19 @@
             vm.activeLayout = selectedLayout;
         }
 
-        function selectUser(user) {
-            
+        function selectUser(user, event) {
+            if (event) {
+                // targeting a new tab/window?
+                if (event.ctrlKey || 
+                    event.shiftKey ||
+                    event.metaKey || // apple
+                    (event.button && event.button === 1) // middle click, >IE9 + everyone else
+                ) {
+                    // yes, let the link open itself
+                    return;
+                }
+            }
+
             if (user.isCurrentUser) {
                 return;
             }
@@ -225,10 +236,6 @@
                 user.selected = false;
             });
             vm.selection = [];
-        }
-
-        function clickUser(user) {
-            goToUser(user.id);
         }
 
         function disableUsers() {
@@ -552,7 +559,15 @@
         }
 
         function goToUser(userId) {
-            $location.path('users/users/user/' + userId).search("create", null).search("invite", null);
+            $location.path(pathToUser(userId)).search("create", null).search("invite", null);
+        }
+
+        function linkToUser(userId) {
+            return pathToUser(userId) + "?mculture=" + $location.search().mculture;
+        }
+
+        function pathToUser(userId) {
+            return "/users/users/user/" + userId;
         }
 
         // helpers

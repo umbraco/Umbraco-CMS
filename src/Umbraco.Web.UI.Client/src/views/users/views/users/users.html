@@ -191,9 +191,9 @@
 
         <!-- Layout: Cards -->
         <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
-            <div class="umb-user-card" ng-class="{'-selected': user.selected}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user)">
-                <div class="umb-user-card__content">
-                    <div class="umb-user-card__goToUser" ng-click="vm.clickUser(user)">
+            <div class="umb-user-card" ng-class="{'-selected': user.selected}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user, $event)">
+                <div class="umb-user-card__content" ng-class="{'cursor-not-allowed': user.isCurrentUser}">
+                    <a ng-href="#{{::vm.linkToUser(user.id)}}" class="umb-user-card__goToUser">
                         <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
                             {{ user.userDisplayState.name }}
                         </umb-badge>
@@ -202,7 +202,7 @@
                             </umb-avatar>
                         </div>
                         <div class="umb-user-card__name">{{user.name}}</div>
-                    </div>
+                    </a>
                     <div class="umb-user-card__group">
                         <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
                     </div>
@@ -243,12 +243,12 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="user in vm.users track by user.key"
-                        ng-click="vm.selectUser(user, vm.selection, $event)"
+                        ng-click="vm.selectUser(user, $event)"
                         ng-class="{'--selected': user.selected}"
                         style="cursor: pointer;"
                         ng-mouseenter="user.hover = true"
                         ng-mouseleave="user.hover = false">
-                        <td style="padding-left: 10px;">
+                        <td style="padding-left: 10px;" ng-class="{'cursor-not-allowed': user.isCurrentUser}">
                             <div ng-if="!user.isCurrentUser">
                                 <umb-checkmark
                                     ng-if="vm.selection.length > 0 || user.hover"
@@ -257,16 +257,18 @@
                                 </umb-checkmark>
                             </div>
                         </td>
-                        <td scope="row" ng-click="vm.clickUser(user)">
-                            <umb-avatar
-                                size="xs"
-                                color="secondary"
-                                name="{{user.name}}"
-                                img-src="{{user.avatars[0]}}"
-                                img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
-                            </umb-avatar>
+                        <td scope="row">
+                            <a ng-href="#{{::vm.linkToUser(user.id)}}" class="umb-user-table-item__avatar">
+                                <umb-avatar
+                                    size="xs"
+                                    color="secondary"
+                                    name="{{user.name}}"
+                                    img-src="{{user.avatars[0]}}"
+                                    img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
+                                </umb-avatar>
+                            </a>
                         </td>
-                        <td class="bold" ng-click="vm.clickUser(user)">{{user.name}}</td>
+                        <td class="bold"><a ng-href="#{{::vm.linkToUser(user.id)}}">{{user.name}}</a></td>
                         <td><span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span></td>
                         <td>{{ user.formattedLastLogin }}</td>
                         <td style="text-transform: capitalize;">
