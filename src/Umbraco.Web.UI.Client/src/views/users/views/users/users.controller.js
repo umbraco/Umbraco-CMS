@@ -574,7 +574,7 @@
         }
 
         function goToUser(user) {
-            $location.path(pathToUser(user.id).search("create", null).search("invite", null);
+            $location.path(pathToUser(user.id).search("create", null).search("invite", null));
         }
         
         function getEditPath(user) {
