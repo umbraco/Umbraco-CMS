@@ -4,16 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Security;
-using Mapper = Umbraco.Core.Mapping.Mapper;
+using Umbraco.Core.Mapping;
 using UserExtensions = Umbraco.Core.Models.UserExtensions;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -28,6 +25,9 @@ namespace Umbraco.Web.WebApi.Filters
     /// </remarks>
     public sealed class CheckIfUserTicketDataIsStaleAttribute : ActionFilterAttribute
     {
+        // this is an attribute - no choice
+        private Mapper Mapper => Current.Mapper;
+
         public override async Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
         {
             await CheckStaleData(actionContext);
@@ -114,9 +114,7 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 var signInManager = owinCtx.Result.GetBackOfficeSignInManager();
 
-                var m = Composing.Current.Factory.GetInstance<Mapper>();
-                //var backOfficeIdentityUser = Mapper.Map<BackOfficeIdentityUser>(user);
-                var backOfficeIdentityUser = m.Map<BackOfficeIdentityUser>(user);
+                var backOfficeIdentityUser = Mapper.Map<BackOfficeIdentityUser>(user);
                 await signInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true, rememberBrowser: false);
 
                 //ensure the remainder of the request has the correct principal set

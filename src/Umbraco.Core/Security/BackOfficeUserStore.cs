@@ -21,7 +21,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeUserStore : DisposableObjectSlim, 
+    public class BackOfficeUserStore : DisposableObjectSlim,
         IUserStore<BackOfficeIdentityUser, int>,
         IUserPasswordStore<BackOfficeIdentityUser, int>,
         IUserEmailStore<BackOfficeIdentityUser, int>,
@@ -42,9 +42,10 @@ namespace Umbraco.Core.Security
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
         private readonly IGlobalSettings _globalSettings;
+        private readonly Mapper _mapper;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider)
+        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider, Mapper mapper)
         {
             _userService = userService;
             _memberTypeService = memberTypeService;
@@ -54,6 +55,7 @@ namespace Umbraco.Core.Security
             if (userService == null) throw new ArgumentNullException("userService");
             if (usersMembershipProvider == null) throw new ArgumentNullException("usersMembershipProvider");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
+            _mapper = mapper;
 
             _userService = userService;
             _externalLoginService = externalLoginService;
@@ -188,9 +190,7 @@ namespace Umbraco.Core.Security
                 return null;
             }
 
-            var m = Composing.Current.Factory.GetInstance<Mapper>();
-            //return await Task.FromResult(AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user)));
-            return await Task.FromResult(AssignLoginsCallback(m.Map<BackOfficeIdentityUser>(user)));
+            return await Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)));
         }
 
         /// <summary>
@@ -207,9 +207,7 @@ namespace Umbraco.Core.Security
                 return null;
             }
 
-            var m = Composing.Current.Factory.GetInstance<Mapper>();
-            //var result = AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user));
-            var result = AssignLoginsCallback(m.Map<BackOfficeIdentityUser>(user));
+            var result = AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user));
 
             return await Task.FromResult(result);
         }
@@ -318,12 +316,10 @@ namespace Umbraco.Core.Security
         public Task<BackOfficeIdentityUser> FindByEmailAsync(string email)
         {
             ThrowIfDisposed();
-            var m = Composing.Current.Factory.GetInstance<Mapper>();
             var user = _userService.GetByEmail(email);
             var result = user == null
                 ? null
-                //: Mapper.Map<BackOfficeIdentityUser>(user);
-                : m.Map<BackOfficeIdentityUser>(user);
+                : _mapper.Map<BackOfficeIdentityUser>(user);
 
             return Task.FromResult(AssignLoginsCallback(result));
         }
@@ -400,9 +396,7 @@ namespace Umbraco.Core.Security
                     var user = _userService.GetUserById(l.UserId);
                     if (user != null)
                     {
-                        var m = Composing.Current.Factory.GetInstance<Mapper>();
-                        //output = Mapper.Map<BackOfficeIdentityUser>(user);
-                        output = m.Map<BackOfficeIdentityUser>(user);
+                        output = _mapper.Map<BackOfficeIdentityUser>(user);
                         break;
                     }
                 }

@@ -507,7 +507,7 @@ namespace Umbraco.Web.Editors
                 var culture = ClientCulture();
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
-                    Items = entities.Select(entity => Mapper.Map<IEntitySlim, EntityBasic>(entity, options =>
+                    Items = entities.Select(entity => AutoMapper.Mapper.Map<IEntitySlim, EntityBasic>(entity, options =>
                             {
                                 options.SetCulture(culture);
                                 options.AfterMap((src, dest) => { dest.AdditionalData["hasChildren"] = src.HasChildren; });
@@ -1052,7 +1052,7 @@ namespace Umbraco.Web.Editors
         private EntityBasic MapEntity(object entity, string culture = null)
         {
             culture = culture ?? ClientCulture();
-            return Mapper.Map<EntityBasic>(entity, opts => { opts.SetCulture(culture); });
+            return AutoMapper.Mapper.Map<EntityBasic>(entity, opts => { opts.SetCulture(culture); });
         }
 
         private string ClientCulture() => Request.ClientCulture();

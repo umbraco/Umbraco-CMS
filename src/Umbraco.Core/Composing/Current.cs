@@ -4,6 +4,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;
@@ -102,6 +103,9 @@ namespace Umbraco.Core.Composing
         internal static event EventHandler Resetted;
 
         #region Getters
+
+        public static Mapper Mapper
+            => _factory.GetInstance<Mapper>();
 
         public static IShortStringHelper ShortStringHelper
             => _shortStringHelper ?? (_shortStringHelper = _factory?.TryGetInstance<IShortStringHelper>()

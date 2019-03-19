@@ -9,7 +9,7 @@ namespace Umbraco.Core.Runtime
     {
         private readonly IEnumerable<Profile> _mapperProfiles;
 
-        public CoreInitialComponent(IEnumerable<Profile> mapperProfiles)
+        public CoreInitialComponent(IEnumerable<Profile> mapperProfiles) // fixme - this is what we want to kill: mapper
         {
             _mapperProfiles = mapperProfiles;
         }

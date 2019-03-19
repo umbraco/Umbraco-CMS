@@ -4,6 +4,11 @@ using System.Linq;
 
 namespace Umbraco.Core.Mapping
 {
+    // FIXME we should inject the mapper
+    // FIXME in order to transition, this should also handle AutoMapper?
+    // FIXME we might have to manage a 'context' for some contextual mappings?
+    // FIXME we have an infinite loop problem w/ logging in due to mapping issues
+
     public class Mapper
     {
         private readonly Dictionary<Type, Dictionary<Type, Func<object, object>>> _maps = new Dictionary<Type, Dictionary<Type, Func<object, object>>>();
@@ -30,21 +35,64 @@ namespace Umbraco.Core.Mapping
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            var sourceType = source.GetType();
-            var targetType = typeof(TTarget);
+            var map = GetMap(source.GetType(), typeof(TTarget));
+            if (map == null)
+            {
+                // fixme this is temp
+                //throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
+                return AutoMapper.Mapper.Map<TTarget>(source);
+            }
 
+            return (TTarget) map(source);
+        }
+
+        private Func<object, object> GetMap(Type sourceType, Type targetType)
+        {
             if (!_maps.TryGetValue(sourceType, out var sourceMap))
             {
                 var type = _maps.Keys.FirstOrDefault(x => x.IsAssignableFrom(sourceType));
                 if (type == null)
-                    throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
+                    return null;
                 sourceMap = _maps[sourceType] = _maps[type];
             }
 
-            if (!sourceMap.TryGetValue(targetType, out var map))
-                throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
+            return sourceMap.TryGetValue(targetType, out var map) ? map : null;
+        }
 
-            return (TTarget) map(source);
+        public TTarget Map<TSource, TTarget>(TSource source)
+        {
+            return AutoMapper.Mapper.Map<TSource, TTarget>(source);
+
+            var sourceType = typeof(TSource);
+            var targetType = typeof(TTarget);
+
+            var map = GetMap(sourceType, targetType);
+            if (map != null)
+                return (TTarget) map(source);
+
+            if (sourceType.IsGenericType && targetType.IsGenericType)
+            {
+                var sourceGeneric = sourceType.GetGenericTypeDefinition();
+                var targetGeneric = targetType.GetGenericTypeDefinition();
+                var ienumerable = typeof(IEnumerable<>);
+
+                if (sourceGeneric == ienumerable && targetGeneric == ienumerable)
+                {
+                    var sourceGenericType = sourceGeneric.GetGenericArguments()[0];
+                    var targetGenericType = targetGeneric.GetGenericArguments()[0];
+                    map = GetMap(sourceGenericType, targetGenericType);
+                    // fixme - how can we enumerate, generically?
+                }
+            }
+
+            // fixme this is temp
+            //throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
+            return AutoMapper.Mapper.Map<TSource, TTarget>(source);
+        }
+
+        public TTarget Map<TSource, TTarget>(TSource source, TTarget target)
+        {
+            return AutoMapper.Mapper.Map(source, target); // fixme what does this do exactly?
         }
     }
 }
