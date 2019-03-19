@@ -1120,15 +1120,15 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Axes: siblings
+        #region Axes: Parent Children (siblings including self)
 
         /// <summary>
-        /// Gets the siblings of the content.
+        /// Gets the children of the parent of the content.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
-        /// <returns>The siblings of the content.</returns>
-        public static IEnumerable<IPublishedContent> Siblings(this IPublishedContent content, string culture = null)
+        /// <returns>The children of the parent of the content.</returns>
+        public static IEnumerable<IPublishedContent> ParentChildren(this IPublishedContent content, string culture = null)
         {
             return content.Parent != null
                 ? content.Parent.Children(culture)
@@ -1136,13 +1136,13 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the siblings of the content, of a given content type.
+        /// Gets the children of the parent of the content, of a given content type.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <param name="contentTypeAlias">The content type alias.</param>
-        /// <returns>The siblings of the content, of the given content type.</returns>
-        public static IEnumerable<IPublishedContent> SiblingsOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        /// <returns>The children of the parent of the content, of the given content type.</returns>
+        public static IEnumerable<IPublishedContent> ParentChildrenOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
             return content.Parent != null
                 ? content.Parent.ChildrenOfType(contentTypeAlias, culture)
@@ -1150,13 +1150,13 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the siblings of the content, of a given content type.
+        /// Gets the children of the parent of the content, of a given content type.
         /// </summary>
         /// <typeparam name="T">The content type.</typeparam>
         /// <param name="content">The content.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
-        /// <returns>The siblings of the content, of the given content type.</returns>
-        public static IEnumerable<T> Siblings<T>(this IPublishedContent content, string culture = null)
+        /// <returns>The children of the parent of the content, of the given content type.</returns>
+        public static IEnumerable<T> ParentChildren<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
             return content.Parent != null
