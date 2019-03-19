@@ -231,15 +231,28 @@
             });
             vm.selection = [];
         }
-
-        function clickUser(user, $event) {
-            if (!($event.metaKey || $event.ctrlKey)) {
-                goToUser(user);
-                $event.preventDefault();
-            }
-            $event.stopPropagation();
-        }
         
+        function clickUser(user, $event) {
+            
+            $event.stopPropagation();
+            
+            if ($event) {
+                // targeting a new tab/window?
+                if ($event.ctrlKey || 
+                    $event.shiftKey ||
+                    $event.metaKey || // apple
+                    ($event.button && $event.button === 1) // middle click, >IE9 + everyone else
+                ) {
+                    // yes, let the link open itself
+                    return;
+                }
+            }
+            
+            goToUser(user);
+            $event.preventDefault();
+
+        }
+
         function disableUsers() {
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers(vm.selection).then(function (data) {
@@ -561,11 +574,15 @@
         }
 
         function goToUser(user) {
-            $location.path('users/users/user/' + user.id).search("create", null).search("invite", null);
+            $location.path(pathToUser(user.id).search("create", null).search("invite", null);
         }
         
         function getEditPath(user) {
-            return '/users/users/user/' + user.id;
+            return pathToUser(userId) + "?mculture=" + $location.search().mculture;
+        }
+        
+        function pathToUser(userId) {
+            return "/users/users/user/" + userId;
         }
 
         // helpers
@@ -584,7 +601,6 @@
                 vm.usersOptions.totalPages = data.totalPages;
                 
                 formatDates(vm.users);
-                addEditPaths(vm.users);
                 setUserDisplayState(vm.users);
                 vm.userStatesFilter = usersHelper.getUserStatesFilter(data.userStates);
 
@@ -621,14 +637,6 @@
                     userService.getCurrentUser().then(function (currentUser) {
                         user.formattedLastLogin = dateVal.locale(currentUser.locale).format("LLL");
                     });
-                }
-            });
-        }
-        
-        function addEditPaths(users) {
-            angular.forEach(users, function (user) {
-                if (!user.editPath) {
-                    user.editPath = getEditPath(user);
                 }
             });
         }

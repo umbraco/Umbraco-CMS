@@ -191,12 +191,12 @@
 
         <!-- Layout: Cards -->
         <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
-            <div class="umb-user-card" ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user)">
+            <div class="umb-user-card" ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user, $event)">
                 <div class="umb-user-card__content">
                     <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
                         {{ user.userDisplayState.name }}
                     </umb-badge>
-                    <a class="umb-user-card__goToUser" ng-click="vm.clickUser(user, $event)" ng-href="{{'#' + user.editPath}}">
+                    <a class="umb-user-card__goToUser" ng-click="vm.clickUser(user, $event)" ng-href="#{{::vm.getEditPath(user)}}">
                         <div class="umb-user-card__avatar">
                             <umb-avatar size="l" color="secondary" name="{{user.name}}" img-src="{{user.avatars[2]}}" img-srcset="{{user.avatars[3]}} 2x, {{user.avatars[4]}} 3x">
                             </umb-avatar>
@@ -244,7 +244,7 @@
                 <tbody>
                     <tr ng-repeat="user in vm.users track by user.key"
                         ng-click="vm.selectUser(user, vm.selection, $event)"
-                        ng-class="{'--selected': user.selected}"
+                         ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}"
                         style="cursor: pointer;"
                         ng-mouseenter="user.hover = true"
                         ng-mouseleave="user.hover = false">
@@ -258,7 +258,7 @@
                             </div>
                         </td>
                         <td scope="row">
-                            <a ng-click="vm.clickUser(user, $event)" ng-href="{{'#' + user.editPath}}">
+                            <a ng-click="vm.clickUser(user, $event)" ng-href="#{{::vm.getEditPath(user)}}">
                                 <umb-avatar
                                     size="xs"
                                     color="secondary"
@@ -269,7 +269,7 @@
                             </a>
                         </td>
                         <td class="bold">
-                            <a ng-click="vm.clickUser(user, $event)" ng-href="{{'#' + user.editPath}}">
+                            <a ng-click="vm.clickUser(user, $event)" ng-href="#{{::vm.getEditPath(user)}}">
                                 {{user.name}}
                             </a>
                         </td>
