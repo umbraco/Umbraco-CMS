@@ -9,15 +9,14 @@ In order to use Umbraco as a CMS and build your website with it, you should not 
 
 If the answer is yes, please read on. Otherwise, make sure to head on over [to the download page](https://our.umbraco.com/download) and start using Umbraco CMS as intended.
 
-#### Table of contents
+**Table of contents**
 
 [Building from source](#building-from-source)
-  * [The quick build](#quick!)
+  * [The quick build](#quick)
   * [Build infrastructure](#build-infrastructure)
     * [Properties](#properties)
     * [GetUmbracoVersion](#getumbracoversion)
     * [SetUmbracoVersion](#setumbracoversion)
-    * [Build](#build)
     * [Build](#build)
     * [Build-UmbracoDocs](#build-umbracodocs)
     * [Verify-NuGet](#verify-nuget)
