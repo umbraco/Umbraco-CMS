@@ -12,8 +12,8 @@ See the official [Umbraco website](https://umbraco.com) for an introduction, cor
 
 - [Getting Started](#getting-started)
 - [Documentation](#documentation)
-- [Contributing](#contributing)
 - [Community](#join-the-umbraco-community)
+- [Contributing](#contributing)
 
 Please also see our [Code of Conduct](CODE_OF_CONDUCT.md).
 
