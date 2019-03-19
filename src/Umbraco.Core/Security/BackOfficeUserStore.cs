@@ -10,11 +10,13 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using IUser = Umbraco.Core.Models.Membership.IUser;
+using Mapper = Umbraco.Core.Mapping.Mapper;
 using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Core.Security
@@ -185,7 +187,10 @@ namespace Umbraco.Core.Security
             {
                 return null;
             }
-            return await Task.FromResult(AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user)));
+
+            var m = Composing.Current.Factory.GetInstance<Mapper>();
+            //return await Task.FromResult(AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user)));
+            return await Task.FromResult(AssignLoginsCallback(m.Map<BackOfficeIdentityUser>(user)));
         }
 
         /// <summary>
@@ -202,7 +207,9 @@ namespace Umbraco.Core.Security
                 return null;
             }
 
-            var result = AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user));
+            var m = Composing.Current.Factory.GetInstance<Mapper>();
+            //var result = AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user));
+            var result = AssignLoginsCallback(m.Map<BackOfficeIdentityUser>(user));
 
             return await Task.FromResult(result);
         }
@@ -311,10 +318,12 @@ namespace Umbraco.Core.Security
         public Task<BackOfficeIdentityUser> FindByEmailAsync(string email)
         {
             ThrowIfDisposed();
+            var m = Composing.Current.Factory.GetInstance<Mapper>();
             var user = _userService.GetByEmail(email);
             var result = user == null
                 ? null
-                : Mapper.Map<BackOfficeIdentityUser>(user);
+                //: Mapper.Map<BackOfficeIdentityUser>(user);
+                : m.Map<BackOfficeIdentityUser>(user);
 
             return Task.FromResult(AssignLoginsCallback(result));
         }
@@ -391,7 +400,9 @@ namespace Umbraco.Core.Security
                     var user = _userService.GetUserById(l.UserId);
                     if (user != null)
                     {
-                        output = Mapper.Map<BackOfficeIdentityUser>(user);
+                        var m = Composing.Current.Factory.GetInstance<Mapper>();
+                        //output = Mapper.Map<BackOfficeIdentityUser>(user);
+                        output = m.Map<BackOfficeIdentityUser>(user);
                         break;
                     }
                 }

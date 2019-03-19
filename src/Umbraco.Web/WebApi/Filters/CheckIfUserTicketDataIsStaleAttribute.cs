@@ -8,10 +8,12 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Security;
+using Mapper = Umbraco.Core.Mapping.Mapper;
 using UserExtensions = Umbraco.Core.Models.UserExtensions;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -112,7 +114,9 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 var signInManager = owinCtx.Result.GetBackOfficeSignInManager();
 
-                var backOfficeIdentityUser = Mapper.Map<BackOfficeIdentityUser>(user);
+                var m = Composing.Current.Factory.GetInstance<Mapper>();
+                //var backOfficeIdentityUser = Mapper.Map<BackOfficeIdentityUser>(user);
+                var backOfficeIdentityUser = m.Map<BackOfficeIdentityUser>(user);
                 await signInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true, rememberBrowser: false);
 
                 //ensure the remainder of the request has the correct principal set

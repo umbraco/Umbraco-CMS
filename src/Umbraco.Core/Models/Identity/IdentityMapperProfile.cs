@@ -1,53 +1,72 @@
 ﻿using System;
-using System.Linq;
-using AutoMapper;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.Identity
 {
-    public class IdentityMapperProfile : Profile
+    public class IdentityMapper : IMapperProfile
     {
-        public IdentityMapperProfile(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
+        private readonly ILocalizedTextService _textService;
+        private readonly IEntityService _entityService;
+        private readonly IGlobalSettings _globalSettings;
+
+        public IdentityMapper(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
         {
-            CreateMap<IUser, BackOfficeIdentityUser>()
-                .BeforeMap((src, dest) =>
-                {
-                    dest.DisableChangeTracking();
-                })
-                .ConstructUsing(src => new BackOfficeIdentityUser(src.Id, src.Groups))
-                .ForMember(dest => dest.LastLoginDateUtc, opt => opt.MapFrom(src => src.LastLoginDate.ToUniversalTime()))
-                .ForMember(user => user.LastPasswordChangeDateUtc, expression => expression.MapFrom(user => user.LastPasswordChangeDate.ToUniversalTime()))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-                .ForMember(dest => dest.EmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmedDate.HasValue))
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.LockoutEndDateUtc, opt => opt.MapFrom(src => src.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?) null))
-                .ForMember(dest => dest.IsApproved, opt => opt.MapFrom(src => src.IsApproved))
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Username))
-                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(user => GetPasswordHash(user.RawPasswordValue)))
-                .ForMember(dest => dest.Culture, opt => opt.MapFrom(src => src.GetUserCulture(textService, globalSettings)))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.StartMediaIds, opt => opt.MapFrom(src => src.StartMediaIds))
-                .ForMember(dest => dest.StartContentIds, opt => opt.MapFrom(src => src.StartContentIds))
-                .ForMember(dest => dest.AccessFailedCount, opt => opt.MapFrom(src => src.FailedPasswordAttempts))
-                .ForMember(dest => dest.CalculatedContentStartNodeIds, opt => opt.MapFrom(src => src.CalculateContentStartNodeIds(entityService)))
-                .ForMember(dest => dest.CalculatedMediaStartNodeIds, opt => opt.MapFrom(src => src.CalculateMediaStartNodeIds(entityService)))
-                .ForMember(dest => dest.AllowedSections, opt => opt.MapFrom(src => src.AllowedSections.ToArray()))
-                .ForMember(dest => dest.LockoutEnabled, opt => opt.Ignore())
-                .ForMember(dest => dest.Logins, opt => opt.Ignore())
-                .ForMember(dest => dest.EmailConfirmed, opt => opt.Ignore())
-                .ForMember(dest => dest.PhoneNumber, opt => opt.Ignore())
-                .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.Ignore())
-                .ForMember(dest => dest.TwoFactorEnabled, opt => opt.Ignore())
-                .ForMember(dest => dest.Roles, opt => opt.Ignore())
-                .ForMember(dest => dest.Claims, opt => opt.Ignore())
-                .AfterMap((src, dest) =>
-                {
-                    dest.ResetDirtyProperties(true);
-                    dest.EnableChangeTracking();
-                });
+            _textService = textService;
+            _entityService = entityService;
+            _globalSettings = globalSettings;
+        }
+
+        public void SetMaps(Mapper mapper)
+        {
+            mapper.SetMap<IUser, BackOfficeIdentityUser>(Map);
+        }
+
+        public BackOfficeIdentityUser Map(IUser source)
+        {
+            // AssignAll enable
+            var target = new BackOfficeIdentityUser(source.Id, source.Groups)
+            {
+                // ignored
+                //Groups = ,
+                //LockoutEnabled = ,
+                //PhoneNumber = ,
+                //PhoneNumberConfirmed = ,
+                //TwoFactorEnabled = ,
+
+                Id = source.Id, // also in ctor but required, BackOfficeIdentityUser is weird
+                CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService),
+                CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService),
+                Email = source.Email,
+                UserName = source.Username,
+                LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime(),
+                LastLoginDateUtc = source.LastLoginDate.ToUniversalTime(),
+                EmailConfirmed = source.EmailConfirmedDate.HasValue,
+                Name = source.Name,
+                AccessFailedCount = source.FailedPasswordAttempts,
+                PasswordHash = GetPasswordHash(source.RawPasswordValue),
+                StartContentIds = source.StartContentIds,
+                StartMediaIds = source.StartMediaIds,
+                Culture = source.GetUserCulture(_textService, _globalSettings).ToString(), // project CultureInfo to string
+                IsApproved = source.IsApproved,
+                SecurityStamp = source.SecurityStamp,
+                LockoutEndDateUtc = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null,
+
+                // this was in AutoMapper but does not have a setter anyways
+                //AllowedSections = source.AllowedSections.ToArray(),
+
+                // these were marked as ignored for AutoMapper but don't have a setter anyways
+                //Logins =,
+                //Claims =,
+                //Roles =,
+            };
+
+            target.ResetDirtyProperties(true);
+            target.EnableChangeTracking(); // fixme but how can we disable it?
+
+            return target;
         }
 
         private static string GetPasswordHash(string storedPass)
