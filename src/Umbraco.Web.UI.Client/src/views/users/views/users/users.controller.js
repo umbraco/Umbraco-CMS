@@ -1,7 +1,9 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper, editorService) {
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource, 
+        userGroupsResource, userService, localizationService, usersHelper, formHelper, 
+        dateHelper, editorService, $cookies) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -63,10 +65,18 @@
                 "selected": true
             }
         ];
-
-        // Set card layout to active by default
-        vm.activeLayout = vm.layouts[0];
-
+        
+        var cookieUmbUserLayout = $cookies.get("umbUserLayout");
+        
+        if (cookieUmbUserLayout) {
+            vm.activeLayout = vm.layouts.find(x => x.path === cookieUmbUserLayout);
+        }
+        if (vm.activeLayout === undefined) {
+            // Set card layout to active by default
+            vm.activeLayout = vm.layouts[0];
+        }
+        
+        
         // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
@@ -96,9 +106,11 @@
         vm.toggleFilter = toggleFilter;
         vm.setUsersViewState = setUsersViewState;
         vm.selectLayout = selectLayout;
+        vm.isSelectable = isSelectable;
         vm.selectUser = selectUser;
         vm.clearSelection = clearSelection;
         vm.clickUser = clickUser;
+        vm.getEditPath = getEditPath;
         vm.disableUsers = disableUsers;
         vm.enableUsers = enableUsers;
         vm.unlockUsers = unlockUsers;
@@ -199,11 +211,19 @@
             });
             selectedLayout.active = true;
             vm.activeLayout = selectedLayout;
+            
+            var expireDate = new Date();
+            expireDate.setDate(expireDate.getDate() + 365);
+            $cookies.put("umbUserLayout", selectedLayout.path, {path: "/", expires: expireDate});
         }
-
+        
+        function isSelectable(user) {
+            return !user.isCurrentUser;
+        }
+        
         function selectUser(user) {
             
-            if (user.isCurrentUser) {
+            if (!isSelectable(user)) {
                 return;
             }
             
@@ -226,9 +246,26 @@
             });
             vm.selection = [];
         }
+        
+        function clickUser(user, $event) {
+            
+            $event.stopPropagation();
+            
+            if ($event) {
+                // targeting a new tab/window?
+                if ($event.ctrlKey || 
+                    $event.shiftKey ||
+                    $event.metaKey || // apple
+                    ($event.button && $event.button === 1) // middle click, >IE9 + everyone else
+                ) {
+                    // yes, let the link open itself
+                    return;
+                }
+            }
+            
+            goToUser(user);
+            $event.preventDefault();
 
-        function clickUser(user) {
-            goToUser(user.id);
         }
 
         function disableUsers() {
@@ -551,8 +588,16 @@
             vm.page.copyPasswordButtonState = "init";
         }
 
-        function goToUser(userId) {
-            $location.path('users/users/user/' + userId).search("create", null).search("invite", null);
+        function goToUser(user) {
+            $location.path(pathToUser(user)).search("create", null).search("invite", null);
+        }
+        
+        function getEditPath(user) {
+            return pathToUser(user) + "?mculture=" + $location.search().mculture;
+        }
+        
+        function pathToUser(user) {
+            return "/users/users/user/" + user.id;
         }
 
         // helpers
@@ -569,7 +614,7 @@
                 vm.usersOptions.pageSize = data.pageSize;
                 vm.usersOptions.totalItems = data.totalItems;
                 vm.usersOptions.totalPages = data.totalPages;
-
+                
                 formatDates(vm.users);
                 setUserDisplayState(vm.users);
                 vm.userStatesFilter = usersHelper.getUserStatesFilter(data.userStates);
