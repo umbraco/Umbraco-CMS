@@ -2,8 +2,9 @@
     "use strict";
 
     function UsersController($scope, $timeout, $location, $routeParams, usersResource, 
-        userGroupsResource, userService, localizationService, usersHelper, formHelper, 
-        dateHelper, editorService, $cookies) {
+        userGroupsResource, userService, localizationService, contentEditingHelper, 
+        usersHelper, formHelper, notificationsService, dateHelper, editorService, 
+        listViewHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -65,18 +66,10 @@
                 "selected": true
             }
         ];
-        
-        var cookieUmbUserLayout = $cookies.get("umbUserLayout");
-        
-        if (cookieUmbUserLayout) {
-            vm.activeLayout = vm.layouts.find(x => x.path === cookieUmbUserLayout);
-        }
-        if (vm.activeLayout === undefined) {
-            // Set card layout to active by default
-            vm.activeLayout = vm.layouts[0];
-        }
-        
-        
+
+        // Get last selected layout for "users" (defaults to first layout = card layout)
+        vm.activeLayout = listViewHelper.getLayout("users", vm.layouts); 
+
         // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
@@ -206,15 +199,8 @@
         }
 
         function selectLayout(selectedLayout) {
-            angular.forEach(vm.layouts, function (layout) {
-                layout.active = false;
-            });
-            selectedLayout.active = true;
-            vm.activeLayout = selectedLayout;
-            
-            var expireDate = new Date();
-            expireDate.setDate(expireDate.getDate() + 365);
-            $cookies.put("umbUserLayout", selectedLayout.path, {path: "/", expires: expireDate});
+            // save the selected layout for "users" so it's applied next time the user visits this section
+            vm.activeLayout = listViewHelper.setLayout("users", selectedLayout, vm.layouts); 
         }
         
         function isSelectable(user) {
