@@ -15,21 +15,35 @@
    border-radius: 3px;
 }
 
-.umb-content-grid__item.-selected {    
-    &::before {
-        content: "";
-        position: absolute;
-        z-index:2;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        border: 2px solid @ui-selected-border;
-        border-radius: 5px;
-        box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
-        pointer-events: none;
+.umb-content-grid__item {
+    &.-selected, &:hover {
+        &::before {
+            content: "";
+            position: absolute;
+            z-index: 2;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 2px solid @ui-selected-border;
+            border-radius: 5px;
+            box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+            pointer-events: none;
+        }
+        
     }
-    
+}
+
+
+.umb-content-grid__item:hover {    
+    &::before {
+        opacity: .33;
+    }
+}
+.umb-content-grid__item.-selected:hover {    
+    &::before {
+        opacity: .66;
+    }
 }
 
 .umb-content-grid__icon-container {
