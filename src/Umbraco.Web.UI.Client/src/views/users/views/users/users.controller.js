@@ -1,7 +1,9 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, usersHelper, formHelper, dateHelper, editorService) {
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource, 
+        userGroupsResource, userService, localizationService, usersHelper, formHelper, 
+        dateHelper, editorService, $cookies) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -63,10 +65,18 @@
                 "selected": true
             }
         ];
-
-        // Set card layout to active by default
-        vm.activeLayout = vm.layouts[0];
-
+        
+        var cookieUmbUserLayout = $cookies.get("umbUserLayout");
+        
+        if (cookieUmbUserLayout) {
+            vm.activeLayout = vm.layouts.find(x => x.path === cookieUmbUserLayout);
+        }
+        if (vm.activeLayout === undefined) {
+            // Set card layout to active by default
+            vm.activeLayout = vm.layouts[0];
+        }
+        
+        
         // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
@@ -100,6 +110,7 @@
         vm.selectUser = selectUser;
         vm.clearSelection = clearSelection;
         vm.clickUser = clickUser;
+        vm.getEditPath = getEditPath;
         vm.disableUsers = disableUsers;
         vm.enableUsers = enableUsers;
         vm.unlockUsers = unlockUsers;
@@ -200,6 +211,10 @@
             });
             selectedLayout.active = true;
             vm.activeLayout = selectedLayout;
+            
+            var expireDate = new Date();
+            expireDate.setDate(expireDate.getDate() + 365);
+            $cookies.put("umbUserLayout", selectedLayout.path, {path: "/", expires: expireDate});
         }
         
         function isSelectable(user) {
@@ -574,15 +589,15 @@
         }
 
         function goToUser(user) {
-            $location.path(pathToUser(user.id).search("create", null).search("invite", null));
+            $location.path(pathToUser(user)).search("create", null).search("invite", null);
         }
         
         function getEditPath(user) {
-            return pathToUser(userId) + "?mculture=" + $location.search().mculture;
+            return pathToUser(user) + "?mculture=" + $location.search().mculture;
         }
         
-        function pathToUser(userId) {
-            return "/users/users/user/" + userId;
+        function pathToUser(user) {
+            return "/users/users/user/" + user.id;
         }
 
         // helpers
