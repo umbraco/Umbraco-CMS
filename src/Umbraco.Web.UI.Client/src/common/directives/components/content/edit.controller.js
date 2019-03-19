@@ -3,8 +3,8 @@
 
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
-        serverValidationManager, contentEditingHelper, treeService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, relationResource, overlayService, $location) {
+        serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
+        editorState, $http, eventsService, overlayService, $location) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -331,8 +331,35 @@
 
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
-
-
+            
+            // Check that all variants for publishing have a name.
+            if (args.action === "publish" || args.action === "sendToPublish") {
+                
+                if ($scope.content.variants) {
+                    var iVariant;
+                    for (var i = 0; i < $scope.content.variants.length; i++) {
+                        iVariant = $scope.content.variants[i];
+                        
+                        iVariant.notifications = [];// maybe not needed, need to investigate.
+                        
+                        if(iVariant.publish === true) {
+                            if (iVariant.name == null) {
+                                
+                                var tokens = [iVariant.language.name];
+                                
+                                localizationService.localize("publish_contentPublishedFailedByMissingName", tokens).then(function (value) {
+                                    iVariant.notifications.push({"message": value, "type": 1});
+                                });
+                                
+                                return $q.reject();
+                            }
+                        }
+                    }
+                }
+                
+            }
+            
+            
             //Used to check validility of nested form - coming from Content Apps mostly
             //Set them all to be invalid
             var fieldsToRollback = checkValidility();
@@ -408,6 +435,20 @@
                     }
                 }
             }
+        }
+
+        /** Just shows a simple notification that there are client side validation issues to be fixed */
+        function showValidationNotification() {
+            //TODO: We need to make the validation UI much better, there's a lot of inconsistencies in v8 including colors, issues with the property groups and validation errors between variants
+
+            //need to show a notification else it's not clear there was an error.
+            localizationService.localizeMany([
+                    "speechBubbles_validationFailedHeader",
+                    "speechBubbles_validationFailedMessage"
+                ]
+            ).then(function (data) {
+                notificationsService.error(data[0], data[1]);
+            });
         }
 
         if ($scope.page.isNew) {
@@ -491,7 +532,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_saveToPublish",
-                        submit: function (model) {
+                        submit: function(model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -499,27 +540,31 @@
                                 saveMethod: contentResource.sendToPublish,
                                 action: "sendToPublish",
                                 showNotifications: false
-                            }).then(function (data) {
-                                //show all notifications manually here since we disabled showing them automatically in the save method
-                                formHelper.showNotifications(data);
-                                clearNotifications($scope.content);
-                                overlayService.close();
-                                return $q.when(data);
-                            }, function (err) {
-                                clearDirtyState($scope.content.variants);
-                                model.submitButtonState = "error";
-                                //re-map the dialog model since we've re-bound the properties
-                                dialog.variants = $scope.content.variants;
-                                //don't reject, we've handled the error
-                                return $q.when(err);
-                            });
+                            }).then(function(data) {
+                                    //show all notifications manually here since we disabled showing them automatically in the save method
+                                    formHelper.showNotifications(data);
+                                    clearNotifications($scope.content);
+                                    overlayService.close();
+                                    return $q.when(data);
+                                },
+                                function(err) {
+                                    clearDirtyState($scope.content.variants);
+                                    model.submitButtonState = "error";
+                                    //re-map the dialog model since we've re-bound the properties
+                                    dialog.variants = $scope.content.variants;
+                                    //don't reject, we've handled the error
+                                    return $q.when(err);
+                                });
                         },
-                        close: function () {
+                        close: function() {
                             overlayService.close();
                         }
                     };
 
                     overlayService.open(dialog);
+                }
+                else {
+                    showValidationNotification();
                 }
             }
             else {
@@ -547,7 +592,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_saveAndPublish",
-                        submit: function (model) {
+                        submit: function(model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -555,14 +600,14 @@
                                 saveMethod: contentResource.publish,
                                 action: "publish",
                                 showNotifications: false
-                            }).then(function (data) {
-                                //show all notifications manually here since we disabled showing them automatically in the save method
-                                formHelper.showNotifications(data);
-                                clearNotifications($scope.content);
-                                overlayService.close();
-                                return $q.when(data);
-                            },
-                                function (err) {
+                            }).then(function(data) {
+                                    //show all notifications manually here since we disabled showing them automatically in the save method
+                                    formHelper.showNotifications(data);
+                                    clearNotifications($scope.content);
+                                    overlayService.close();
+                                    return $q.when(data);
+                                },
+                                function(err) {
                                     clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
@@ -571,12 +616,15 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function () {
+                        close: function() {
                             overlayService.close();
                         }
                     };
 
                     overlayService.open(dialog);
+                }
+                else {
+                    showValidationNotification();
                 }
             }
             else {
@@ -608,7 +656,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_save",
-                        submit: function (model) {
+                        submit: function(model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -616,27 +664,31 @@
                                 saveMethod: $scope.saveMethod(),
                                 action: "save",
                                 showNotifications: false
-                            }).then(function (data) {
-                                //show all notifications manually here since we disabled showing them automatically in the save method
-                                formHelper.showNotifications(data);
-                                clearNotifications($scope.content);
-                                overlayService.close();
-                                return $q.when(data);
-                            }, function (err) {
-                                clearDirtyState($scope.content.variants);
-                                model.submitButtonState = "error";
-                                //re-map the dialog model since we've re-bound the properties
-                                dialog.variants = $scope.content.variants;
-                                //don't reject, we've handled the error
-                                return $q.when(err);
-                            });
+                            }).then(function(data) {
+                                    //show all notifications manually here since we disabled showing them automatically in the save method
+                                    formHelper.showNotifications(data);
+                                    clearNotifications($scope.content);
+                                    overlayService.close();
+                                    return $q.when(data);
+                                },
+                                function(err) {
+                                    clearDirtyState($scope.content.variants);
+                                    model.submitButtonState = "error";
+                                    //re-map the dialog model since we've re-bound the properties
+                                    dialog.variants = $scope.content.variants;
+                                    //don't reject, we've handled the error
+                                    return $q.when(err);
+                                });
                         },
-                        close: function (oldModel) {
+                        close: function(oldModel) {
                             overlayService.close();
                         }
                     };
 
                     overlayService.open(dialog);
+                }
+                else {
+                    showValidationNotification();
                 }
             }
             else {
@@ -720,6 +772,9 @@
                 };
                 overlayService.open(dialog);
             }
+            else {
+                showValidationNotification();
+            }
         };
 
         $scope.publishDescendants = function() {
@@ -776,50 +831,48 @@
                 };
                 overlayService.open(dialog);
             }
+            else {
+                showValidationNotification();
+            }
         };
 
         $scope.preview = function (content) {
+            // Chromes popup blocker will kick in if a window is opened
+            // without the initial scoped request. This trick will fix that.
+            //
+            var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
+            // Build the correct path so both /#/ and #/ work.
+            var query = 'id=' + content.id;
+            if ($scope.culture) {
+                query += "#?culture=" + $scope.culture;
+            }
+            var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
-            if (!$scope.busy) {
-
-                // Chromes popup blocker will kick in if a window is opened
-                // without the initial scoped request. This trick will fix that.
-                //
-                var previewWindow = $window.open('preview/?init=true', 'umbpreview');
-
-                // Build the correct path so both /#/ and #/ work.
-                var query = 'id=' + content.id;
+            //The user cannot save if they don't have access to do that, in which case we just want to preview
+            //and that's it otherwise they'll get an unauthorized access message
+            if (!_.contains(content.allowedActions, "A")) {
+                previewWindow.location.href = redirect;
+            }
+            else {
+                var selectedVariant = $scope.content.variants[0];
                 if ($scope.culture) {
-                    query += "#?culture=" + $scope.culture;
-                }
-                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
-
-                //The user cannot save if they don't have access to do that, in which case we just want to preview
-                //and that's it otherwise they'll get an unauthorized access message
-                if (!_.contains(content.allowedActions, "A")) {
-                    previewWindow.location.href = redirect;
-                }
-                else {
-                    var selectedVariant = $scope.content.variants[0];
-                    if ($scope.culture) {
-                        var found = _.find($scope.content.variants, function (v) {
-                            return (v.language && v.language.culture === $scope.culture);
-                        });
-
-                        if(found){
-                            selectedVariant = found;
-                        }
-                    }
-
-                    //ensure the save flag is set
-                    selectedVariant.save = true;
-                    performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
-                        previewWindow.location.href = redirect;
-                    }, function (err) {
-                        //validation issues ....
+                    var found = _.find($scope.content.variants, function (v) {
+                        return (v.language && v.language.culture === $scope.culture);
                     });
+
+                    if (found) {
+                        selectedVariant = found;
+                    }
                 }
+
+                //ensure the save flag is set
+                selectedVariant.save = true;
+                performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
+                    previewWindow.location.href = redirect;
+                }, function (err) {
+                    //validation issues ....
+                });
             }
         };
 

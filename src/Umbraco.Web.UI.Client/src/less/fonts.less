@@ -9,7 +9,6 @@
 */
 @fontPath: '../fonts';
 @latoPath: '@{fontPath}/lato';
-@openSansPath: '@{fontPath}/opensans';
 
 /* Webfont: LatoLatin-Black */
 @font-face {
@@ -113,35 +112,4 @@
     font-weight: 300;
     font-display: swap;
     text-rendering: optimizeLegibility;
-}
-
-
-/*
-  Open Sans
-
-  Normal: font-weight: 400;
-  Semi-bold: font-weight: 600;
-
-*/
-
-@font-face {
-    font-family: 'Open Sans';
-    src: local('Open Sans'),
-         local('OpenSans'),
-         url('@{openSansPath}/OpenSans-Regular.woff2') format('woff2'), /* Super Modern Browsers */
-         url('@{openSansPath}/OpenSans-Regular.woff') format('woff'); /* Modern Browsers */
-    font-weight: 400;
-    font-display: swap;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Open Sans';
-    src: local('Open Sans'),
-         local('OpenSans'),
-         url('@{openSansPath}/OpenSans-Semibold.woff2') format('woff2'), /* Super Modern Browsers */
-         url('@{openSansPath}/OpenSans-Semibold.woff') format('woff'); /* Modern Browsers */
-    font-weight: 600;
-    font-display: swap;
-    font-style: normal;
 }

@@ -46,7 +46,7 @@ Use this directive to generate a list of breadcrumbs.
 (function () {
     'use strict';
 
-    function BreadcrumbsDirective() {
+    function BreadcrumbsDirective($location, navigationService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -57,6 +57,28 @@ Use this directive to generate a list of breadcrumbs.
                     scope.onOpen({'ancestor': ancestor});
                 }
             };
+
+            scope.openPath = function (ancestor, event) {
+                // targeting a new tab/window?
+                if (event.ctrlKey || 
+                    event.shiftKey ||
+                    event.metaKey || // apple
+                    (event.button && event.button === 1) // middle click, >IE9 + everyone else
+                ) {
+                    // yes, let the link open itself
+                    return;
+                }
+                event.stopPropagation();
+                event.preventDefault();
+
+                var path = scope.pathTo(ancestor);
+                $location.path(path);
+                navigationService.clearSearch(["cculture"]);
+            }
+
+            scope.pathTo = function (ancestor) {
+                return "/" + scope.entityType + "/" + scope.entityType + "/edit/" + ancestor.id;
+            }
 
             function onInit() {
                 if ("onOpen" in attr) {

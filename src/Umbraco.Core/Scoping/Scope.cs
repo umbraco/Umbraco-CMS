@@ -75,7 +75,7 @@ namespace Umbraco.Core.Scoping
 
                 // see note below
                 if (scopeFileSystems == true)
-                    _fscope = fileSystems.Shadow(Guid.NewGuid());
+                    _fscope = fileSystems.Shadow();
 
                 return;
             }
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Scoping
                 // every scoped FS to trigger the creation of shadow FS "on demand", and that would be
                 // pretty pointless since if scopeFileSystems is true, we *know* we want to shadow
                 if (scopeFileSystems == true)
-                    _fscope = fileSystems.Shadow(Guid.NewGuid());
+                    _fscope = fileSystems.Shadow();
             }
         }
 

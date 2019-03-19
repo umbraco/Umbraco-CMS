@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 TestObjects.GetUmbracoSettings(),
                 globalSettings,
-                Enumerable.Empty<IUrlProvider>(),
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 TestObjects.GetUmbracoSettings(),
                 globalSettings,
-                Enumerable.Empty<IUrlProvider>(),
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 globalSettings,
-                Enumerable.Empty<IUrlProvider>(),
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
                 globalSettings,
-                Enumerable.Empty<IUrlProvider>(),
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());

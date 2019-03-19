@@ -30,7 +30,7 @@ namespace Umbraco.Core.Composing
 
         protected override IComponent CreateItem(IFactory factory, Type itemType)
         {
-            using (_logger.DebugDuration<Composers>($"Creating {itemType.FullName}.", $"Created {itemType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+            using (_logger.DebugDuration<ComponentCollectionBuilder>($"Creating {itemType.FullName}.", $"Created {itemType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
             {
                 return base.CreateItem(factory, itemType);
             }
