@@ -24,7 +24,9 @@ using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidato
 
 namespace Umbraco.Core.Runtime
 {
-    public class CoreRuntimeComposer : ComponentComposer<CoreRuntimeComponent>, IRuntimeComposer
+    // core's initial composer composes before all core composers
+    [ComposeBefore(typeof(ICoreComposer))]
+    public class CoreInitialComposer : ComponentComposer<CoreInitialComponent>
     {
         public override void Compose(Composition composition)
         {

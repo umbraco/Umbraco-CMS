@@ -21,6 +21,7 @@ function ScriptsDeleteController($scope, codefileResource, treeService, navigati
                 // TODO: Need to sync tree, etc...
                 treeService.removeNode($scope.currentNode);
                 navigationService.hideMenu();
+
             });
     };
 

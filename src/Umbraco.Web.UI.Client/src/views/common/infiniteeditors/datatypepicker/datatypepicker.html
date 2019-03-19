@@ -79,13 +79,13 @@
                         </umb-tab-content>
                     </div>
                     <!-- FILTER RESULTS -->
-                    <div ng-if="vm.showFilterResult">
+                    <div ng-if="vm.filterResult">
                         <h5 class="-border-bottom -black"><localize key="contentTypeEditor_reuse"></localize></h5>
-                        <div ng-repeat="(key,value) in vm.userConfigured">
-                            <div ng-if="(value | filter:vm.searchTerm).length > 0">
-                                <h5>{{key}}</h5>
+                        <div ng-repeat="result in vm.filterResult.userConfigured">
+                            <div ng-if="result.dataTypes.length > 0">
+                                <h5>{{result.group}}</h5>
                                 <ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
-                                    <li ng-repeat="dataType in value | orderBy:'name' | filter: vm.searchTerm"
+                                    <li ng-repeat="dataType in result.dataTypes | orderBy:'name'"
                                         ng-mouseover="vm.showDetailsOverlay(dataType)"
                                         ng-click="vm.pickDataType(dataType)"
                                         class="-four-in-row">
@@ -101,11 +101,11 @@
                             </div>
                         </div>
                         <h5 class="-border-bottom -black"><localize key="contentTypeEditor_availableEditors"></localize></h5>
-                        <div ng-repeat="(key,value) in vm.typesAndEditors">
-                            <div ng-if="(value | filter:vm.searchTerm).length > 0">
-                                <h5>{{key}}</h5>
+                        <div ng-repeat="result in vm.filterResult.typesAndEditors">
+                            <div ng-if="result.dataTypes.length > 0">
+                                <h5>{{result.group}}</h5>
                                 <ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
-                                    <li ng-repeat="systemDataType in value | orderBy:'name' | filter: vm.searchTerm"
+                                    <li ng-repeat="systemDataType in result.dataTypes | orderBy:'name'"
                                         ng-mouseover="vm.showDetailsOverlay(systemDataType)"
                                         ng-click="vm.pickEditor(systemDataType)"
                                         class="-four-in-row">
