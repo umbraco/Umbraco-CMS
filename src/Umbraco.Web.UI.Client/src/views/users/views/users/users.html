@@ -196,7 +196,7 @@
                     <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
                         {{ user.userDisplayState.name }}
                     </umb-badge>
-                    <a class="umb-user-card__goToUser" ng-click="vm.clickUser(user)" ng-href="{{'#' + user.editPath}}">
+                    <a class="umb-user-card__goToUser" ng-click="vm.clickUser(user, $event)" ng-href="{{'#' + user.editPath}}">
                         <div class="umb-user-card__avatar">
                             <umb-avatar size="l" color="secondary" name="{{user.name}}" img-src="{{user.avatars[2]}}" img-srcset="{{user.avatars[3]}} 2x, {{user.avatars[4]}} 3x">
                             </umb-avatar>
@@ -258,7 +258,7 @@
                             </div>
                         </td>
                         <td scope="row">
-                            <a ng-click="vm.clickUser(user)" ng-href="{{'#' + user.editPath}}">
+                            <a ng-click="vm.clickUser(user, $event)" ng-href="{{'#' + user.editPath}}">
                                 <umb-avatar
                                     size="xs"
                                     color="secondary"
@@ -269,7 +269,7 @@
                             </a>
                         </td>
                         <td class="bold">
-                            <a ng-click="vm.clickUser(user)" ng-href="{{'#' + user.editPath}}">
+                            <a ng-click="vm.clickUser(user, $event)" ng-href="{{'#' + user.editPath}}">
                                 {{user.name}}
                             </a>
                         </td>
