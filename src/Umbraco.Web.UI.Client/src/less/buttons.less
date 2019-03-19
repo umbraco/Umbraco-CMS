@@ -195,21 +195,13 @@ input[type="button"] {
 }
 // Made for Umbraco, 2019
 .btn-action {
-  .buttonBackground(@blueExtraDark, @blueDark, @white, @u-white);
-}
-// Made for Umbraco, 2019
-.btn-selection {
-    @btnSelectionBackgroundHover: darken(@pinkLight, 10%);
-  .buttonBackground(@pinkLight, @btnSelectionBackgroundHover, @blueExtraDark, @blueDark);
+  .buttonBackground(@blueExtraDark, lighten(@blueExtraDark, 10), @white, @u-white);
+  transition: background-color 240ms;
+  font-weight: 700;
 }
 // Made for Umbraco, 2019, used for buttons that has to stand back.
 .btn-white {
   .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType, @btnWhiteTypeHover);
-}
-// Made for Umbraco, 2019, used for buttons on grey background.
-.btn-white-shadow {
-  .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType, @btnWhiteTypeHover);
-  box-shadow: 0 1px 1px 0 rgba(0,0,0,.16);
 }
 // Inverse appears as dark gray
 .btn-inverse {
