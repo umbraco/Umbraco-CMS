@@ -509,7 +509,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
             string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
         {
-            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter, null);
+            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter, null);
         }
 
         /// <summary>

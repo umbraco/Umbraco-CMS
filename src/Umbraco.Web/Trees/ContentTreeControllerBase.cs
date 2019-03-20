@@ -15,6 +15,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using System.Globalization;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
@@ -30,8 +31,7 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        [HttpQueryStringFilter("queryStrings")]
-        public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
+        public TreeNode GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             int asInt;
             Guid asGuid = Guid.Empty;
@@ -346,8 +346,15 @@ namespace Umbraco.Web.Trees
         {
             if (RecycleBinId.ToInvariantString() == id)
             {
+                // get the default assigned permissions for this user
+                var actions = ActionsResolver.Current.FromActionSymbols(Security.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, Services.UserService)).ToList();
+
                 var menu = new MenuItemCollection();
-                menu.Items.Add<ActionEmptyTranscan>(ui.Text("actions", "emptyTrashcan"));
+                // only add empty recycle bin if the current user is allowed to delete by default 
+                if (actions.Contains(ActionDelete.Instance))
+                {
+                    menu.Items.Add<ActionEmptyTranscan>(ui.Text("actions", "emptyTrashcan"));
+                }
                 menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }

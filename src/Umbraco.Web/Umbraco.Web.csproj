@@ -338,6 +338,7 @@
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Features\EnabledFeatures.cs" />
+    <Compile Include="HealthCheck\Checks\Services\Tls12Check.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
@@ -419,6 +420,7 @@
     <Compile Include="Models\ContentEditing\ContentTypeSave.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeSave.cs" />
     <Compile Include="Models\ContentEditing\InstalledPackageModel.cs" />
+    <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MediaTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MediaTypeSave.cs" />
     <Compile Include="Models\ContentEditing\MemberPropertyTypeBasic.cs" />
@@ -444,6 +446,8 @@
     <Compile Include="Models\DetachedPublishedProperty.cs" />
     <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\ContentEditing\UserSave.cs" />
+    <Compile Include="Models\Link.cs" />
+    <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
     <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
@@ -485,6 +489,7 @@
     <Compile Include="PropertyEditors\MediaPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MultiUrlPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\NestedContentController.cs" />
     <Compile Include="PropertyEditors\NestedContentHelper.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
@@ -499,6 +504,7 @@
     <Compile Include="PropertyEditors\ValueConverters\MemberPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\LegacyMediaPickerPropertyConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MultiUrlPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentPublishedPropertyTypeExtensions.cs" />
@@ -826,6 +832,7 @@
     <Compile Include="WebApi\Binders\BlueprintItemBinder.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
+    <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\AppendCurrentEventMessagesAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
@@ -834,6 +841,7 @@
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
+    <Compile Include="WebApi\Filters\HttpQueryStringModelBinder.cs" />
     <Compile Include="WebApi\Filters\LegacyTreeAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingEditorModelEventAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />

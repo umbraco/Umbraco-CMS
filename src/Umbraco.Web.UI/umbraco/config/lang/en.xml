@@ -188,6 +188,11 @@
         <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
         <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
     </area>
+    <area alias="codefile">
+        <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
+        <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
+        <key alias="deleteItemFailed">Failed to delete item: %0%</key>
+    </area>
     <area alias="content">
         <key alias="isPublished" version="7.2">Is Published</key>
         <key alias="about">About this page</key>
@@ -290,6 +295,7 @@
         <key alias="chooseNode">Where do you want to create the new %0%</key>
         <key alias="createUnder">Create an item under</key>
         <key alias="createContentBlueprint">Select the document type you want to make a content template for</key>
+        <key alias="enterFolderName">Enter a folder name</key>
         <key alias="updateData">Choose a type and a title</key>
         <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
         <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
@@ -1483,6 +1489,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
 
     <area alias="template">
+        <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>
         <key alias="edittemplate">Edit template</key>
 
         <key alias="insertSections">Sections</key>
@@ -2199,6 +2206,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
         <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
         <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
+
+        <key alias="tls12HealthCheckSuccess">Your site can use the TLS 1.2 security protocol when making outbound connections to HTTPS endpoints.</key>
+        <key alias="tls12HealthCheckWarn">Your site isn't configured to allow the TLS 1.2 security protocol when making outbound connections: some HTTPS endpoints might not be reachable using a less secure protocol.</key>
     </area>
     <area alias="redirectUrls">
         <key alias="disableUrlTracker">Disable URL tracker</key>
