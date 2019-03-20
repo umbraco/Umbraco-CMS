@@ -18,7 +18,16 @@
 
 	&-push {
 		float:right;
-	}
+    }
+
+    &--list{
+        float: left;
+    }
+
+    &__item{
+        line-height: 1;
+        margin: 0 0 5px;
+    }
 }
 
 .umb-property-editor-tiny {
@@ -68,6 +77,11 @@
 		}
 	}
 }
+
+.umb-property .alert {
+	border-radius: 3px;
+}
+
 
 
 //
@@ -213,7 +227,7 @@
         margin: 24px 0 0;
         display: flex;
     }
-    
+
     &__input {
         width: 100%;
         &-wrap{

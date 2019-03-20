@@ -261,6 +261,7 @@
 
 .umb-package-details {
     display: flex;
+    flex-flow: row wrap;
 }
 
 a.umb-package-details__back-link {
@@ -280,6 +281,7 @@ a.umb-package-details__back-link {
     flex: 1 1 auto;
     margin-right: 20px;
     width: calc(~'100%' - ~'@{sidebarwidth}' - ~'20px'); // Make sure that the main content area doesn't gets affected by inline styling
+    min-width: 500px;
 }
 
 .umb-package-details__sidebar {

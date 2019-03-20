@@ -292,7 +292,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     if (psql.Arguments[i] is string s && s == "[[[ISOCODE]]]")
                     {
                         psql.Arguments[i] = ordering.Culture;
-                        break;
                     }
                 }
             }
