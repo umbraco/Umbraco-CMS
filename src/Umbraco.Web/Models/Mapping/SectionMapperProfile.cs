@@ -1,19 +1,48 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using Umbraco.Core.Manifest;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Sections;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Sections;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class SectionMapperProfile : Profile
+    internal class SectionMapperProfile : IMapperProfile
     {
+        private readonly ILocalizedTextService _textService;
         public SectionMapperProfile(ILocalizedTextService textService)
         {
-            CreateMap<ISection, Section>()
-                .ForMember(dest => dest.RoutePath, opt => opt.Ignore())
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => textService.Localize("sections/" + src.Alias, (IDictionary<string, string>)null)))
-                .ReverseMap(); //backwards too!
+            _textService = textService;
+        }
+
+        public void SetMaps(Mapper mapper)
+        {
+            mapper.SetMap<ISection, Section>(source => new Section(), Map);
+
+            // this is for AutoMapper ReverseMap - but really?
+            mapper.SetMap<Section, ContentSection>();
+            mapper.SetMap<Section, ContentSection>();
+            mapper.SetMap<Section, ManifestSection>(Map);
+            mapper.SetMap<Section, MediaSection>();
+            mapper.SetMap<Section, MembersSection>();
+            mapper.SetMap<Section, PackagesSection>();
+            mapper.SetMap<Section, SettingsSection>();
+            mapper.SetMap<Section, TranslationSection>();
+            mapper.SetMap<Section, UsersSection>();
+        }
+
+        // Umbraco.Code.MapAll -RoutePath
+        private void Map(ISection source, Section target)
+        {
+            target.Alias = source.Alias;
+            target.Name = _textService.Localize("sections/" + source.Alias);
+        }
+
+        // Umbraco.Code.MapAll
+        private void Map(Section source, ManifestSection target)
+        {
+            target.Alias = source.Alias;
+            target.Name = source.Name;
         }
     }
 }

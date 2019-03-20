@@ -21,18 +21,19 @@ namespace Umbraco.Core.Models.Identity
 
         public void SetMaps(Mapper mapper)
         {
-            mapper.SetMap<IUser, BackOfficeIdentityUser>(Map);
-        }
-
-        public BackOfficeIdentityUser Map(IUser source)
-        {
-            var target = new BackOfficeIdentityUser(source.Id, source.Groups);
-            target.DisableChangeTracking();
-            Map(source, target);
-            target.ResetDirtyProperties(true);
-            target.EnableChangeTracking();
-
-            return target;
+            mapper.SetMap<IUser, BackOfficeIdentityUser>(
+                source =>
+                {
+                    var target = new BackOfficeIdentityUser(source.Id, source.Groups);
+                    target.DisableChangeTracking();
+                    return target;
+                },
+                (source, target) =>
+                {
+                    Map(source, target);
+                    target.ResetDirtyProperties(true);
+                    target.EnableChangeTracking();
+                });
         }
 
         // Umbraco.Code.MapAll -Id -Groups -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled

@@ -1,13 +1,22 @@
-﻿using AutoMapper;
+﻿using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TagMapperProfile : Profile
+    internal class TagMapperProfile : IMapperProfile
     {
-        public TagMapperProfile()
+        public void SetMaps(Mapper mapper)
         {
-            CreateMap<ITag, TagModel>();
+            mapper.SetMap<ITag, TagModel>(source => new TagModel(), Map);
+        }
+
+        // Umbraco.Code.MapAll
+        private void Map(ITag source, TagModel target)
+        {
+            target.Id = source.Id;
+            target.Text = source.Text;
+            target.Group = source.Group;
+            target.NodeCount = source.NodeCount;
         }
     }
 }

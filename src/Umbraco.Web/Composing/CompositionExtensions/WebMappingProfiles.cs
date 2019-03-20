@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -12,8 +13,14 @@ namespace Umbraco.Web.Composing.CompositionExtensions
     {
         public static Composition ComposeWebMappingProfiles(this Composition composition)
         {
+            // register the profiles
+            composition.WithCollectionBuilder<MapperProfileCollectionBuilder>()
+                .Append<AuditMapperProfile>()
+                .Append<SectionMapperProfile>()
+                .Append<TagMapperProfile>();
+
             //register the profiles
-            composition.Register<Profile, AuditMapperProfile>();
+            //composition.Register<Profile, AuditMapperProfile>();
             composition.Register<Profile, CodeFileMapperProfile>();
             composition.Register<Profile, ContentMapperProfile>();
             composition.Register<Profile, ContentPropertyMapperProfile>();
@@ -26,8 +33,8 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             composition.Register<Profile, MemberMapperProfile>();
             composition.Register<Profile, RedirectUrlMapperProfile>();
             composition.Register<Profile, RelationMapperProfile>();
-            composition.Register<Profile, SectionMapperProfile>();
-            composition.Register<Profile, TagMapperProfile>();
+            //composition.Register<Profile, SectionMapperProfile>();
+            //composition.Register<Profile, TagMapperProfile>();
             composition.Register<Profile, TemplateMapperProfile>();
             composition.Register<Profile, UserMapperProfile>();
             composition.Register<Profile, LanguageMapperProfile>();
