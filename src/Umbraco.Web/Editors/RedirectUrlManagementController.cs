@@ -152,13 +152,13 @@ namespace Umbraco.Web.Editors
             //ensure url does not point to a file as redirector adds a trailing slash
             if (url.IndexOf('.') > -1)
             {
-                return BadRequest("Url can not contain a dot.");
+                return BadRequest("Url cannot contain a dot.");
             }
 
             //ensure url does not have a query string            
             if (url.IndexOf("?") > -1)
             {
-                return BadRequest("Url can not contain a querystring.");
+                return BadRequest("Url cannot contain a querystring.");
             }
 
             var target = Services.ContentService.GetById(contentId);
