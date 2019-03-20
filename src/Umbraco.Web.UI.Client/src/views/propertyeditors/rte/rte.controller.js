@@ -375,9 +375,6 @@ angular.module("umbraco")
                     if (tinyMceEditor !== undefined && tinyMceEditor != null && !$scope.isLoading) {
                         $scope.model.value = tinyMceEditor.getContent();
                     }
-					                    
-                    //Allow RTE to set form dirty again
-                    alreadyDirty = false;
                 });
 
                 //when the element is disposed we need to unsubscribe!
@@ -386,8 +383,8 @@ angular.module("umbraco")
                 $scope.$on('$destroy', function () {
                     unsubscribe();
 					if (tinyMceEditor !== undefined && tinyMceEditor != null) {
-						tinyMceEditor.destroy()
-					}
+                        tinyMceEditor.destroy();
+                    }
                 });
             });
         });
