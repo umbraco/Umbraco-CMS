@@ -10,7 +10,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         {
             composition.RegisterUnique<Mapper>();
             composition.WithCollectionBuilder<MapperProfileCollectionBuilder>()
-                .Append<IdentityMapper>();
+                .Append<IdentityMapperProfile>();
             return composition;
         }
     }

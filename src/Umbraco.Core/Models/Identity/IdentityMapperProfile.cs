@@ -6,13 +6,13 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.Identity
 {
-    public class IdentityMapper : IMapperProfile
+    public class IdentityMapperProfile : IMapperProfile
     {
         private readonly ILocalizedTextService _textService;
         private readonly IEntityService _entityService;
         private readonly IGlobalSettings _globalSettings;
 
-        public IdentityMapper(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
+        public IdentityMapperProfile(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
         {
             _textService = textService;
             _entityService = entityService;
@@ -26,47 +26,43 @@ namespace Umbraco.Core.Models.Identity
 
         public BackOfficeIdentityUser Map(IUser source)
         {
-            // AssignAll enable
-            var target = new BackOfficeIdentityUser(source.Id, source.Groups)
-            {
-                // ignored
-                //Groups = ,
-                //LockoutEnabled = ,
-                //PhoneNumber = ,
-                //PhoneNumberConfirmed = ,
-                //TwoFactorEnabled = ,
-
-                Id = source.Id, // also in ctor but required, BackOfficeIdentityUser is weird
-                CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService),
-                CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService),
-                Email = source.Email,
-                UserName = source.Username,
-                LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime(),
-                LastLoginDateUtc = source.LastLoginDate.ToUniversalTime(),
-                EmailConfirmed = source.EmailConfirmedDate.HasValue,
-                Name = source.Name,
-                AccessFailedCount = source.FailedPasswordAttempts,
-                PasswordHash = GetPasswordHash(source.RawPasswordValue),
-                StartContentIds = source.StartContentIds,
-                StartMediaIds = source.StartMediaIds,
-                Culture = source.GetUserCulture(_textService, _globalSettings).ToString(), // project CultureInfo to string
-                IsApproved = source.IsApproved,
-                SecurityStamp = source.SecurityStamp,
-                LockoutEndDateUtc = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null,
-
-                // this was in AutoMapper but does not have a setter anyways
-                //AllowedSections = source.AllowedSections.ToArray(),
-
-                // these were marked as ignored for AutoMapper but don't have a setter anyways
-                //Logins =,
-                //Claims =,
-                //Roles =,
-            };
-
+            var target = new BackOfficeIdentityUser(source.Id, source.Groups);
+            target.DisableChangeTracking();
+            Map(source, target);
             target.ResetDirtyProperties(true);
-            target.EnableChangeTracking(); // fixme but how can we disable it?
+            target.EnableChangeTracking();
 
             return target;
+        }
+
+        // Umbraco.Code.MapAll -Groups -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled
+        private void Map(IUser source, BackOfficeIdentityUser target)
+        {
+            target.Id = source.Id; // also in ctor but required; BackOfficeIdentityUser is weird
+            target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService);
+            target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService);
+            target.Email = source.Email;
+            target.UserName = source.Username;
+            target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
+            target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
+            target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
+            target.Name = source.Name;
+            target.AccessFailedCount = source.FailedPasswordAttempts;
+            target.PasswordHash = GetPasswordHash(source.RawPasswordValue);
+            target.StartContentIds = source.StartContentIds;
+            target.StartMediaIds = source.StartMediaIds;
+            target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
+            target.IsApproved = source.IsApproved;
+            target.SecurityStamp = source.SecurityStamp;
+            target.LockoutEndDateUtc = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?) null;
+
+            // this was in AutoMapper but does not have a setter anyways
+            //target.AllowedSections = source.AllowedSections.ToArray(),
+
+            // these were marked as ignored for AutoMapper but don't have a setter anyways
+            //target.Logins =;
+            //target.Claims =;
+            //target.Roles =;
         }
 
         private static string GetPasswordHash(string storedPass)
