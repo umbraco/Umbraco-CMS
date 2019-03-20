@@ -1344,13 +1344,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="httpsCheckInvalidCertificate">Cerficaat validatie foutmelding: '%0%'</key>
     <key alias="healthCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">De site wordt momenteel %0% bekeken via HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">De appSetting 'umbracoUseSSL' in web.config staat op 'false'. Indien HTTPS gebruikt wordt moet deze op 'true' staan.</key>
-    <key alias="httpsCheckConfigurationCheckResult">De appSetting 'umbracoUseSSL' in web.config is ingesteld op '%0%'. Cookies zijn %1% ingesteld als secure.</key>
-    <key alias="httpsCheckEnableHttpsError">De 'umbracoUseSSL' waarde in web.config kon niet aangepast worden. Foutmelding: %0%</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">De appSetting 'Umbraco.Core.UseHttps' in web.config staat op 'false'. Indien HTTPS gebruikt wordt moet deze op 'true' staan.</key>
+    <key alias="httpsCheckConfigurationCheckResult">De appSetting 'Umbraco.Core.UseHttps' in web.config is ingesteld op '%0%'. Cookies zijn %1% ingesteld als secure.</key>
+    <key alias="httpsCheckEnableHttpsError">De 'Umbraco.Core.UseHttps' waarde in web.config kon niet aangepast worden. Foutmelding: %0%</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">HTTPS inschakelen</key>
     <key alias="httpsCheckEnableHttpsDescription">Zet in de appSettings van de web.config de umbracoSSL instelling op 'true'.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">De appSetting 'umbracoUseSSL' is nu ingesteld op 'true', cookies zullen als 'secure' worden aangemerkt.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">De appSetting 'Umbraco.Core.UseHttps' is nu ingesteld op 'true', cookies zullen als 'secure' worden aangemerkt.</key>
     <key alias="rectifyButton">Herstellen</key>
     <key alias="cannotRectifyShouldNotEqual">Kan een controle met vergelijkingstype 'ShouldNotEqual' niet herstellen.</key>
     <key alias="cannotRectifyShouldEqualWithValue">Kan een controle met vergelijkingstype 'ShouldNotEqual' en gedefinieerde waarde niet herstellen.</key>

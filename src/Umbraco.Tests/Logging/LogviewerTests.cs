@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
@@ -47,7 +48,8 @@ namespace Umbraco.Tests.Logging
             File.Copy(exampleLogfilePath, _newLogfilePath, true);
             File.Copy(exampleSearchfilePath, _newSearchfilePath, true);
 
-            _logViewer = new JsonLogViewer(logsPath: _newLogfileDirPath, searchPath: _newSearchfilePath);
+            var logger = Mock.Of<Core.Logging.ILogger>();
+            _logViewer = new JsonLogViewer(logger, logsPath: _newLogfileDirPath, searchPath: _newSearchfilePath);
         }
 
         [OneTimeTearDown]

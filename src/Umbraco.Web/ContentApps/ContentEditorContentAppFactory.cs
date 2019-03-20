@@ -28,7 +28,7 @@ namespace Umbraco.Web.ContentApps
                         Weight = Weight
                     });
 
-                case IMedia media when !media.ContentType.IsContainer && media.ContentType.Alias != Core.Constants.Conventions.MediaTypes.Folder:
+                case IMedia media when !media.ContentType.IsContainer || media.Properties.Count > 0:
                     return _mediaApp ?? (_mediaApp = new ContentApp
                     {
                         Alias = "umbContent",

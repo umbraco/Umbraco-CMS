@@ -28,13 +28,13 @@ namespace Umbraco.Web
 
         private readonly IUmbracoSettingsSection _umbracoSettings;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IEnumerable<IUrlProvider> _urlProviders;
+        private readonly UrlProviderCollection _urlProviders;
         private readonly IUserService _userService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextFactory"/> class.
         /// </summary>
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, IEnumerable<IUrlProvider> urlProviders, IUserService userService)
+        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, UrlProviderCollection urlProviders, IUserService userService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -65,7 +65,7 @@ namespace Umbraco.Web
             if (currentUmbracoContext != null)
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
 
-            
+
             httpContext = httpContext ?? new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
 
             var umbracoContext = CreateUmbracoContext(httpContext);

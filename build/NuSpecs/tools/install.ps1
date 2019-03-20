@@ -11,37 +11,15 @@ if ($project) {
 	# Create paths and list them
 	$projectPath = (Get-Item $project.Properties.Item("FullPath").Value).FullName
 	Write-Host "projectPath:" "${projectPath}"
-	$backupPath = Join-Path $projectPath "App_Data\NuGetBackup\$dateTime"
-	Write-Host "backupPath:" "${backupPath}"
-	$copyLogsPath = Join-Path $backupPath "CopyLogs"
-	Write-Host "copyLogsPath:" "${copyLogsPath}"	
 	$webConfigSource = Join-Path $projectPath "Web.config"
 	Write-Host "webConfigSource:" "${webConfigSource}"
 	$configFolder = Join-Path $projectPath "Config"
 	Write-Host "configFolder:" "${configFolder}"
 
-	# Create backup folder and logs folder if it doesn't exist yet
-	New-Item -ItemType Directory -Force -Path $backupPath
-	New-Item -ItemType Directory -Force -Path $copyLogsPath
-	
-	# Create a backup of original web.config
-	Copy-Item $webConfigSource $backupPath -Force
-	
-	# Backup config files folder	
-	if(Test-Path $configFolder) {
-		$umbracoBackupPath = Join-Path $backupPath "Config"
-		New-Item -ItemType Directory -Force -Path $umbracoBackupPath
-		
-		robocopy $configFolder $umbracoBackupPath /e /LOG:$copyLogsPath\ConfigBackup.log
-	}
-	
 	# Copy umbraco and umbraco_files from package to project folder
 	$umbracoFolder = Join-Path $projectPath "Umbraco"
 	New-Item -ItemType Directory -Force -Path $umbracoFolder
 	$umbracoFolderSource = Join-Path $installPath "UmbracoFiles\Umbraco"		
-	$umbracoBackupPath = Join-Path $backupPath "Umbraco"
-	New-Item -ItemType Directory -Force -Path $umbracoBackupPath		
-	robocopy $umbracoFolder $umbracoBackupPath /e /LOG:$copyLogsPath\UmbracoBackup.log
 	robocopy $umbracoFolderSource $umbracoFolder /is /it /e /xf UI.xml /LOG:$copyLogsPath\UmbracoCopy.log
 
 	$copyWebconfig = $true
@@ -98,11 +76,6 @@ if ($project) {
 		{
 			# Not a big problem if this fails, let it go
 		}
-	}
-	
-	$installFolder = Join-Path $projectPath "Install"
-	if(Test-Path $installFolder) {
-		Remove-Item $installFolder -Force -Recurse -Confirm:$false
 	}
 	
 	# Open appropriate readme

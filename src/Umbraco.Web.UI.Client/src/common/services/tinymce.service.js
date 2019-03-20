@@ -427,8 +427,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     data["rel"] = img.id;
                     data["data-id"] = img.id;
                 }
-
-                editor.insertContent(editor.dom.createHTML('img', data));
+                
+                editor.selection.setContent(editor.dom.createHTML('img', data));
 
                 $timeout(function () {
                     var imgElm = editor.dom.get('__mcenew');
