@@ -35,10 +35,16 @@ namespace Umbraco.Core.Models.Identity
             return target;
         }
 
-        // Umbraco.Code.MapAll -Groups -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled
+        // Umbraco.Code.MapAll -Id -Groups -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled
         private void Map(IUser source, BackOfficeIdentityUser target)
         {
-            target.Id = source.Id; // also in ctor but required; BackOfficeIdentityUser is weird
+            // well, the ctor has been fixed
+            /*
+            // these two are already set in ctor but BackOfficeIdentityUser ctor is CompletelyBroken
+            target.Id = source.Id;
+            target.Groups = source.Groups.ToArray();
+            */
+
             target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService);
             target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService);
             target.Email = source.Email;
