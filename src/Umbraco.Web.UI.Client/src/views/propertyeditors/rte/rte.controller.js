@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, editorService, macroService, editorState) {
+        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper) {
 
             // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
@@ -13,15 +13,16 @@ angular.module("umbraco")
             var n = d.getTime();
             $scope.textAreaHtmlId = $scope.model.alias + "_" + n + "_rte";
 
-            var editorConfig = $scope.model.config.editor;
+            var editorConfig = $scope.model.config ? $scope.model.config.editor : null;
             if (!editorConfig || angular.isString(editorConfig)) {
                 editorConfig = tinyMceService.defaultPrevalues();
             }
-
-            var promises = [];
-            if (!editorConfig.maxImageSize && editorConfig.maxImageSize != 0) {
+            //make sure there's a max image size
+            if (!editorConfig.maxImageSize && editorConfig.maxImageSize !== 0) {
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
+
+            var promises = [];
 
             //queue file loading
             if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
@@ -43,7 +44,7 @@ angular.module("umbraco")
 
                 var standardConfig = result[promises.length - 1];
 
-                //create a baseline Config to exten upon
+                //create a baseline Config to extend upon
                 var baseLineConfigObj = {
                     maxImageSize: editorConfig.maxImageSize
                 };

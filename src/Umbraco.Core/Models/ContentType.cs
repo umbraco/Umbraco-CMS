@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class ContentType : ContentTypeCompositionBase, IContentType
     {
-        public const bool IsPublishingConst = true;
+        public const bool SupportsPublishingConst = true;
 
         private int _defaultTemplate;
         private IEnumerable<ITemplate> _allowedTemplates;
@@ -42,7 +42,10 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public override bool IsPublishing => IsPublishingConst;
+        public override ISimpleContentType ToSimple() => new SimpleContentType(this);
+
+        /// <inheritdoc />
+        public override bool SupportsPublishing => SupportsPublishingConst;
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
@@ -97,8 +100,8 @@ namespace Umbraco.Core.Models
         /// <returns>True if AllowedTemplates contains the templateId else False</returns>
         public bool IsAllowedTemplate(int templateId)
         {
-            return AllowedTemplates == null 
-                ? false 
+            return AllowedTemplates == null
+                ? false
                 : AllowedTemplates.Any(t => t.Id == templateId);
         }
 

@@ -49,7 +49,8 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
-        public MediaController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public MediaController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
@@ -870,8 +871,10 @@ namespace Umbraco.Web.Editors
             }
             if (model.ParentId < 0)
             {
-                //cannot move if the content item is not allowed at the root
-                if (toMove.ContentType.AllowedAsRoot == false)
+                //cannot move if the content item is not allowed at the root unless there are
+                //none allowed at root (in which case all should be allowed at root)
+                var mediaTypeService = Services.MediaTypeService;
+                if (toMove.ContentType.AllowedAsRoot == false && mediaTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
                 {
                     var notificationModel = new SimpleNotificationModel();
                     notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedAtRoot"), "");
@@ -887,7 +890,8 @@ namespace Umbraco.Web.Editors
                 }
 
                 //check if the item is allowed under this one
-                if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
+                var parentContentType = Services.MediaTypeService.Get(parent.ContentTypeId);
+                if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                     .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
                     var notificationModel = new SimpleNotificationModel();

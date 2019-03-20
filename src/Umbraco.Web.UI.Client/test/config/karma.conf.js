@@ -1,7 +1,7 @@
 module.exports = function (config) {
 
     config.set({
-                
+
         // base path, that will be used to resolve files and exclude
         basePath: '../..',
 
@@ -24,17 +24,19 @@ module.exports = function (config) {
             'node_modules/moment/min/moment-with-locales.js',
             'lib/umbraco/Extensions.js',
             'node_modules/lazyload-js/lazyload.min.js',
+            'node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js',
 
             //app bootstrap and loader
             'test/config/app.unit.js',
 
             //application files
-            'src/common/directives/*.js',
-            'src/common/filters/*.js',
-            'src/common/services/*.js',
-            'src/common/interceptors/*.js',
-            'src/common/resources/*.js',
-            'src/views/**/*.controller.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.controllers.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.directives.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.filters.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.services.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.interceptors.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.security.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.resources.js',
 
             //mocked data and routing
             'src/common/mocks/umbraco.servervariables.js',
@@ -50,7 +52,7 @@ module.exports = function (config) {
         // use dolts reporter, as travis terminal does not support escaping sequences
         // possible values: 'dots', 'progress', 'junit', 'teamcity'
         // CLI --reporters progress
-        reporters: ['progress'],
+        reporters: ['progress', 'junit'],
 
         // web server port
         // CLI --port 9876
@@ -58,7 +60,7 @@ module.exports = function (config) {
 
         // cli runner port
         // CLI --runner-port 9100
-    runnerPort: 9100,
+        runnerPort: 9100,
 
         // enable / disable colors in the output (reporters and logs)
         // CLI --colors --no-colors
@@ -87,7 +89,7 @@ module.exports = function (config) {
         // allow waiting a bit longer, some machines require this
 
         browserNoActivityTimeout: 100000,     // default 10,000ms
-        
+
         // Auto run tests on start (when browsers are captured) and exit
         // CLI --single-run --no-single-run
         singleRun: true,
@@ -98,7 +100,25 @@ module.exports = function (config) {
 
         plugins: [
             require('karma-jasmine'),
-            require('karma-phantomjs-launcher')
-        ]
+            require('karma-phantomjs-launcher'),
+            require('karma-junit-reporter')
+        ],
+
+        // the default configuration
+        junitReporter: {
+            outputDir: '', // results will be saved as $outputDir/$browserName.xml
+            outputFile: undefined, // if included, results will be saved as $outputDir/$browserName/$outputFile
+            suite: '', // suite will become the package name attribute in xml testsuite element
+            useBrowserName: true, // add browser name to report and classes names
+            nameFormatter: undefined, // function (browser, result) to customize the name attribute in xml testcase element
+            classNameFormatter: undefined, // function (browser, result) to customize the classname attribute in xml testcase element
+            properties: {} // key value pair of properties to add to the <properties> section of the report
+        },
+
+        client: {
+            jasmine: {
+                random: false
+            }
+        }
     });
 };

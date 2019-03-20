@@ -15,7 +15,7 @@ angular.module('umbraco')
         }
         if (!$scope.model.config) {
             $scope.model.config = {
-                idType: "int"
+                idType: "udi"
             };
         }
 

@@ -33,10 +33,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<IDomain> PerformGetAll(params int[] ids)
         {
-            var sql = GetBaseQuery(false).Where("umbracoDomains.id > 0");
+            var sql = GetBaseQuery(false).Where("umbracoDomain.id > 0");
             if (ids.Any())
             {
-                sql.Where("umbracoDomains.id in (@ids)", new { ids = ids });
+                sql.Where("umbracoDomain.id in (@ids)", new { ids = ids });
             }
 
             return Database.Fetch<DomainDto>(sql).Select(ConvertFromDto);
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             else
             {
-                sql.Select("umbracoDomains.*, umbracoLanguage.languageISOCode")
+                sql.Select("umbracoDomain.*, umbracoLanguage.languageISOCode")
                     .From<DomainDto>()
                     .LeftJoin<LanguageDto>()
                     .On<DomainDto, LanguageDto>(dto => dto.DefaultLanguage, dto => dto.Id);
@@ -67,14 +67,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoDomains.id = @id";
+            return "umbracoDomain.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
                 {
-                    "DELETE FROM umbracoDomains WHERE id = @id"
+                    "DELETE FROM umbracoDomain WHERE id = @id"
                 };
             return list;
         }
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IDomain entity)
         {
-            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomains WHERE domainName = @domainName", new { domainName = entity.DomainName });
+            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomain WHERE domainName = @domainName", new { domainName = entity.DomainName });
             if (exists > 0) throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
 
             if (entity.RootContentId.HasValue)
@@ -122,7 +122,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             ((UmbracoDomain)entity).UpdatingEntity();
 
-            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomains WHERE domainName = @domainName AND umbracoDomains.id <> @id",
+            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomain WHERE domainName = @domainName AND umbracoDomain.id <> @id",
                 new { domainName = entity.DomainName, id = entity.Id });
             //ensure there is no other domain with the same name on another entity
             if (exists > 0) throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));

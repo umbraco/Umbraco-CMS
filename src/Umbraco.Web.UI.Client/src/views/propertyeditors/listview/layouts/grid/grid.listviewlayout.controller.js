@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper) {
+    function ListViewGridLayoutController($scope, mediaHelper, $location, listViewHelper, mediaTypeHelper) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -115,7 +115,7 @@
         function selectFolder(folder, $event, $index) {
             listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
         }
-
+        
         function goToItem(item, $event, $index) {
             $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
         }

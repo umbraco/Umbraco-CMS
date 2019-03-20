@@ -10,18 +10,12 @@
    flex: 0 1 200px;
    cursor: pointer;
    position: relative;
-   //margin: 10px;
    user-select: none;
    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
    border-radius: 3px;
-   
 }
 
-.umb-content-grid__item.-selected {
-    //box-shadow: 0 2px 8px 0 rgba(0,0,0,0.35);
-    
-    //color:@ui-selected-type;
-    
+.umb-content-grid__item.-selected {    
     &::before {
         content: "";
         position: absolute;
@@ -49,14 +43,8 @@
 .umb-content-grid__icon[class^="icon-"],
 .umb-content-grid__icon[class*=" icon-"] {
    font-size: 20px;
-//color: @gray-8;
    margin-right: 5px;
 }
-
-.umb-content-grid__icon.-light {
-   //color: @gray-5;
-}
-
 
 .umb-content-grid__content {
    box-sizing: border-box;
@@ -70,7 +58,8 @@
    display: inline-flex;
    
    color: @ui-option-type;
-   &:hover {
+   &:hover, &:focus {
+       text-decoration: none;
        color:@ui-option-type-hover;
    }
 }

@@ -41,7 +41,7 @@
             "treeHeaders_templates",
             "main_sections",
             "shortcuts_navigateSections",
-            "shortcuts_addTab",
+            "shortcuts_addGroup",
             "shortcuts_addProperty",
             "shortcuts_addEditor",
             "shortcuts_editDataType",
@@ -74,7 +74,7 @@
             // keyboard shortcuts
             vm.labels.sections = values[4];
             vm.labels.navigateSections = values[5];
-            vm.labels.addTab = values[6];
+            vm.labels.addGroup = values[6];
             vm.labels.addProperty = values[7];
             vm.labels.addEditor = values[8];
             vm.labels.editDataType = values[9];
@@ -127,8 +127,8 @@
                     "name": vm.labels.design,
                     "shortcuts": [
                         {
-                            "description": vm.labels.addTab,
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                            "description": vm.labels.addGroup,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "g" }]
                         },
                         {
                             "description": vm.labels.addProperty,
@@ -480,6 +480,15 @@
             loadDocumentType();
         }));
 
+        evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
+            if(args.documentType.allowedTemplates.length > 0){
+                navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
+                    .then(function (syncArgs) {
+                        navigationService.reloadNode(syncArgs.node)
+                    });
+            }
+        }));
+
         //ensure to unregister from all events!
         $scope.$on('$destroy', function () {
             for (var e in evts) {
@@ -488,13 +497,17 @@
         });
 
         // #3368 - changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty 
-        $scope.$watch("vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.allowedTemplates.length + vm.contentType.isContainer", function (newVal, oldVal) {
-            if (oldVal === undefined) {
-                // still initializing, ignore
-                return;
+        $scope.$watch(
+            "vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.allowCultureVariant + vm.contentType.isElement + " +
+            "vm.contentType.allowedTemplates.length + vm.contentType.isContainer + vm.contentType.compositeContentTypes.length",
+            function(newVal, oldVal) {
+                if (oldVal === undefined) {
+                    // still initializing, ignore
+                    return;
+                }
+                angularHelper.getCurrentForm($scope).$setDirty();
             }
-            angularHelper.getCurrentForm($scope).$setDirty();
-        });
+        );
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.DocumentTypes.EditController", DocumentTypesEditController);

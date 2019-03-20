@@ -48,6 +48,7 @@
         vm.externalLoginInfo = externalLoginInfo;
         vm.resetPasswordCodeInfo = resetPasswordCodeInfo;
         vm.backgroundImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;
+        vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
 
         vm.$onInit = onInit;
         vm.togglePassword = togglePassword;
@@ -60,6 +61,15 @@
         vm.loginSubmit = loginSubmit;
         vm.requestPasswordResetSubmit = requestPasswordResetSubmit;
         vm.setPasswordSubmit = setPasswordSubmit;
+
+        vm.labels = {};
+        localizationService.localizeMany([
+            vm.usernameIsEmail ? "general_email" : "general_username", 
+            vm.usernameIsEmail ? "placeholders_email" : "placeholders_usernameHint"]
+        ).then(function (data) {
+            vm.labels.usernameLabel = data[0];
+            vm.labels.usernamePlaceholder = data[1];
+        })                        
 
         function onInit() {
 

@@ -44,7 +44,10 @@ namespace Umbraco.Web.Composing
             CoreCurrent.Resetted += (sender, args) =>
             {
                 if (_umbracoContextAccessor != null)
-                    ClearUmbracoContext();
+                {
+                    var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+                    umbracoContext?.Dispose();
+                }
                 _umbracoContextAccessor = null;
             };
         }
@@ -73,18 +76,6 @@ namespace Umbraco.Web.Composing
                 return _umbracoContextAccessor = Factory.GetInstance<IUmbracoContextAccessor>();
             }
             set => _umbracoContextAccessor = value; // for tests
-        }
-
-        // clears the "current" umbraco context
-        // at the moment the "current" umbraco context can end up being disposed and should get cleared
-        // in the accessor - this should be done differently but for the time being we have to support it
-        public static void ClearUmbracoContext()
-        {
-            lock (Locker)
-            {
-                UmbracoContextAccessor.UmbracoContext?.Dispose(); // dispose the one that is being cleared, if any
-                UmbracoContextAccessor.UmbracoContext = null;
-            }
         }
 
         #endregion

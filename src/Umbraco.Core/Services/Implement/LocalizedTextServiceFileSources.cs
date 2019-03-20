@@ -61,7 +61,7 @@ namespace Umbraco.Core.Services.Implement
                     var filename = Path.GetFileNameWithoutExtension(localCopy.FullName).Replace("_", "-");
 
                     // TODO: Fix this nonsense... would have to wait until v8 to store the language files with their correct
-                    // names instead of storing them as 2 letters but actually having a 4 letter culture. wtf. So now, we
+                    // names instead of storing them as 2 letters but actually having a 4 letter culture. So now, we
                     // need to check if the file is 2 letters, then open it to try to find it's 4 letter culture, then use that
                     // if it's successful. We're going to assume (though it seems assuming in the legacy logic is never a great idea)
                     // that any 4 letter file is named with the actual culture that it is!

@@ -8,14 +8,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class DatePickerValueConverter : PropertyValueConverterBase
     {
-        private static readonly string[] PropertyEditorAliases =
-        {
-            Constants.PropertyEditors.Aliases.DateTime,
-            Constants.PropertyEditors.Aliases.Date
-        };
-
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => PropertyEditorAliases.Contains(propertyType.EditorAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.DateTime);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (DateTime);

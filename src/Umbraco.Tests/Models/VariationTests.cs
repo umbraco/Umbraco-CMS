@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Models
             Assert.Throws<NotSupportedException>(() => prop.PublishValues());
 
             // change
-            propertyType.IsPublishing = true;
+            propertyType.SupportsPublishing = true;
 
             // can get value
             // and now published value is null
@@ -226,6 +226,9 @@ namespace Umbraco.Tests.Models
 
             // now it will work
             contentType.Variations = ContentVariation.Culture;
+
+            // recreate content to re-capture content type variations
+            content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             // invariant name works
             content.Name = "name";
@@ -361,6 +364,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ContentPublishValuesWithMixedPropertyTypeVariations()
         {
+            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
             const string langFr = "fr-FR";
 
             // content type varies by Culture
@@ -380,11 +384,15 @@ namespace Umbraco.Tests.Models
 
             content.SetCultureName("hello", langFr);
 
-            Assert.IsFalse(content.PublishCulture(langFr)); // fails because prop1 is mandatory
+            Assert.IsTrue(content.PublishCulture(langFr)); // succeeds because names are ok (not validating properties here)
+            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop1 is mandatory
+
             content.SetValue("prop1", "a", langFr);
-            Assert.IsFalse(content.PublishCulture(langFr)); // fails because prop2 is mandatory and invariant
+            Assert.IsTrue(content.PublishCulture(langFr)); // succeeds because names are ok (not validating properties here)
+            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop2 is mandatory and invariant
             content.SetValue("prop2", "x");
-            Assert.IsTrue(content.PublishCulture(langFr)); // now it's ok
+            Assert.IsTrue(content.PublishCulture(langFr)); // still ok...
+            Assert.IsTrue(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// now it's ok
 
             Assert.AreEqual("a", content.GetValue("prop1", langFr, published: true));
             Assert.AreEqual("x", content.GetValue("prop2", published: true));
@@ -477,20 +485,21 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ValidationTests()
         {
-            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop", IsPublishing = true };
+            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop", SupportsPublishing = true };
             var prop = new Property(propertyType);
 
             prop.SetValue("a");
             Assert.AreEqual("a", prop.GetValue());
             Assert.IsNull(prop.GetValue(published: true));
+            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
 
-            Assert.IsTrue(prop.IsValid());
+            Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
 
             propertyType.Mandatory = true;
-            Assert.IsTrue(prop.IsValid());
+            Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
 
             prop.SetValue(null);
-            Assert.IsFalse(prop.IsValid());
+            Assert.IsFalse(propertyValidationService.IsPropertyValid(prop));
 
             // can publish, even though invalid
             prop.PublishValues();

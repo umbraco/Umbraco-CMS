@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
                 }
             }
             //Get all allowed sections for the current user
-            var allowedSections = UmbracoContext.Current.Security.CurrentUser.AllowedSections.ToList();
+            var allowedSections = Composing.Current.UmbracoContext.Security.CurrentUser.AllowedSections.ToList();
 
             var toursToBeRemoved = new List<BackOfficeTourFile>();
 

@@ -99,7 +99,6 @@ namespace Umbraco.Core.Services
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method which can be
         /// used during Member creation.
         /// </summary>
-        /// <remarks>
         /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update
         /// this will not work for updating members in most cases (depends on your membership provider settings)
         ///

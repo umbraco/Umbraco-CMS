@@ -22,23 +22,23 @@ namespace Umbraco.Web.Install
         // so... either access them via Current service locator, OR use an action filter alongside this attribute (see articles).
         // the second solution is nicer BUT for the time being, let's use the first (simpler).
 
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtimeState;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
+        private UmbracoContext UmbracoContext => _umbracoContextAccessor?.UmbracoContext ?? Current.UmbracoContext;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
-        /// <param name="umbracoContext"></param>
+        /// <param name="umbracoContextAccessor"></param>
         /// <param name="runtimeState"></param>
-        public HttpInstallAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
+        public HttpInstallAuthorizeAttribute(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtimeState)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _runtimeState = runtimeState;
         }
 

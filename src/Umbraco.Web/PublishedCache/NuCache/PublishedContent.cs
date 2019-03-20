@@ -13,7 +13,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class PublishedContent : PublishedContentBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentNode _contentNode;
         private readonly string _urlSegment;
 
@@ -24,15 +23,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor) :base(umbracoContextAccessor)
+            IUmbracoContextAccessor umbracoContextAccessor)
+            : base(umbracoContextAccessor)
         {
-            _contentNode = contentNode;
-            ContentData = contentData;
-            _publishedSnapshotAccessor = publishedSnapshotAccessor;
-            _umbracoContextAccessor = umbracoContextAccessor;
-            VariationContextAccessor = variationContextAccessor;
+            _contentNode = contentNode ?? throw new ArgumentNullException(nameof(contentNode));
+            ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
+            _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
+            VariationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
 
-            _urlSegment = ContentData.Name.ToUrlSegment();
+            _urlSegment = ContentData.UrlSegment;
             IsPreviewing = ContentData.Published == false;
 
             var properties = new List<IPublishedProperty>();
@@ -72,7 +71,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public PublishedContent(
             ContentNode contentNode,
             PublishedContent origin,
-            IUmbracoContextAccessor umbracoContextAccessor) :base(umbracoContextAccessor)
+            IUmbracoContextAccessor umbracoContextAccessor)
+            : base(umbracoContextAccessor)
         {
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
@@ -91,7 +91,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // clone for previewing as draft a published content that is published and has no draft
         private PublishedContent(
             PublishedContent origin,
-            IUmbracoContextAccessor umbracoContextAccessor) :base(umbracoContextAccessor)
+            IUmbracoContextAccessor umbracoContextAccessor)
+            : base(umbracoContextAccessor)
         {
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             VariationContextAccessor = origin.VariationContextAccessor;
@@ -275,8 +276,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (ContentData.CultureInfos == null)
                     throw new Exception("oops: _contentDate.CultureInfos is null.");
+
                 return _cultureInfos = ContentData.CultureInfos
-                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date), StringComparer.OrdinalIgnoreCase);
+                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date), StringComparer.OrdinalIgnoreCase);
             }
         }
 
@@ -468,8 +470,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return this;
 
             var cache = GetAppropriateCache();
-            if (cache == null) return new PublishedContent(this, _umbracoContextAccessor).CreateModel();
-            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this, _umbracoContextAccessor).CreateModel());
+            if (cache == null) return new PublishedContent(this, UmbracoContextAccessor).CreateModel();
+            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this, UmbracoContextAccessor).CreateModel());
         }
 
         // used by Navigable.Source,...

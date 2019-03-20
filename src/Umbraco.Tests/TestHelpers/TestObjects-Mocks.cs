@@ -116,11 +116,21 @@ namespace Umbraco.Tests.TestHelpers
 
             var umbracoSettings = GetUmbracoSettings();
             var globalSettings = GetGlobalSettings();
-            var webSecurity = new Mock<WebSecurity>(null, null, globalSettings).Object;
-            var urlProviders = Enumerable.Empty<IUrlProvider>();
+            var urlProviders = new UrlProviderCollection(Enumerable.Empty<IUrlProvider>());
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
-            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, new TestVariationContextAccessor(), true);
+
+            var umbracoContextFactory = new UmbracoContextFactory(
+                accessor,
+                publishedSnapshotService,
+                new TestVariationContextAccessor(),
+                new TestDefaultCultureAccessor(),
+                umbracoSettings,
+                globalSettings,
+                urlProviders,
+                Mock.Of<IUserService>());
+
+            return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
         }
 
         public IUmbracoSettingsSection GetUmbracoSettings()
@@ -143,7 +153,7 @@ namespace Umbraco.Tests.TestHelpers
         public IFileSystems GetFileSystemsMock()
         {
             var fileSystems = Mock.Of<IFileSystems>();
-            
+
             MockFs(fileSystems, x => x.MacroPartialsFileSystem);
             MockFs(fileSystems, x => x.MvcViewsFileSystem);
             MockFs(fileSystems, x => x.PartialViewsFileSystem);

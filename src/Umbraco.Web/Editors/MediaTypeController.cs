@@ -37,7 +37,8 @@ namespace Umbraco.Web.Editors
     [MediaTypeControllerControllerConfiguration]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
-        public MediaTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public MediaTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
         }
 
@@ -230,7 +231,8 @@ namespace Umbraco.Web.Editors
                     return Enumerable.Empty<ContentTypeBasic>();
                 }
 
-                var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var contentType = Services.MediaTypeService.Get(contentItem.ContentTypeId);
+                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
@@ -312,6 +314,6 @@ namespace Umbraco.Web.Editors
                 doCopy: (type, i) => Services.MediaTypeService.Copy(type, i));
         }
 
-        
+
     }
 }

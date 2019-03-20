@@ -9,6 +9,7 @@ using System.Linq;
 using HtmlAgilityPack;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -56,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         macroAlias,
                         umbracoContext.PublishedRequest?.PublishedContent,
                         //needs to be explicitly casted to Dictionary<string, object>
-                        macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
+                        macroAttributes.ConvertTo(x => (string)x, x => x)).GetAsText()));
 
                 return sb.ToString();
             }
@@ -72,7 +73,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, UmbracoContext.Current);
+            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, Current.UmbracoContext);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly

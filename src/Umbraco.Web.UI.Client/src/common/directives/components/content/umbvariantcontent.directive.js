@@ -16,7 +16,10 @@
             onCloseSplitView: "&",
             onSelectVariant: "&",
             onOpenSplitView: "&",
-            onSelectApp: "&"
+            onSelectApp: "&",
+            onSelectAppAnchor: "&",
+            onBack: "&?",
+            showBack: "<?"
         },
         controllerAs: 'vm',
         controller: umbVariantContentController
@@ -35,6 +38,8 @@
         vm.selectVariant = selectVariant;
         vm.openSplitView = openSplitView;
         vm.selectApp = selectApp;
+        vm.selectAppAnchor = selectAppAnchor;
+        vm.showBackButton = showBackButton;
 
         function onInit() {
             // disable the name field if the active content app is not "Content"
@@ -44,6 +49,10 @@
                     vm.nameDisabled = true;
                 }
             });
+        }
+        
+        function showBackButton() {
+            return vm.page.listViewPath !== null && vm.showBack;
         }
         
         /** Called when the component has linked all elements, this is when the form controller is available */
@@ -78,14 +87,29 @@
          * @param {any} item
          */
         function selectApp(item) {
-            // disable the name field if the active content app is not "Content" or "Info"
-            vm.nameDisabled = false;
-            if(item && item.alias !== "umbContent" && item.alias !== "umbInfo") {
-                vm.nameDisabled = true;
-            }
             // call the callback if any is registered
             if(vm.onSelectApp) {
                 vm.onSelectApp({"app": item});
+            }
+        }
+        
+        $scope.$on("editors.apps.appChanged", function($event, $args) {
+            var app = $args.app;
+            // disable the name field if the active content app is not "Content" or "Info"
+            vm.nameDisabled = false;
+            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+                vm.nameDisabled = true;
+            }
+        });
+
+        /**
+         * Used to proxy a callback
+         * @param {any} item
+         */
+        function selectAppAnchor(item, anchor) {
+            // call the callback if any is registered
+            if(vm.onSelectAppAnchor) {
+                vm.onSelectAppAnchor({"app": item, "anchor": anchor});
             }
         }
 

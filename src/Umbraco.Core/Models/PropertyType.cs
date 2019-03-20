@@ -82,9 +82,22 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether the content type, owning this property type, is publishing.
+        /// Gets a value indicating whether the content type owning this property type is publishing.
         /// </summary>
-        public bool IsPublishing { get; internal set; }
+        /// <remarks>
+        /// <para>A publishing content type supports draft and published values for properties.
+        /// It is possible to retrieve either the draft (default) or published value of a property.
+        /// Setting the value always sets the draft value, which then needs to be published.</para>
+        /// <para>A non-publishing content type only supports one value for properties. Getting
+        /// the draft or published value of a property returns the same thing, and publishing
+        /// a value property has no effect.</para>
+        /// <para>When true, getting the property value returns the edited value by default, but
+        /// it is possible to get the published value using the appropriate 'published' method
+        /// parameter.</para>
+        /// <para>When false, getting the property value always return the edited value,
+        /// regardless of the 'published' method parameter.</para>
+        /// </remarks>
+        public bool SupportsPublishing { get; internal set; }
 
         /// <summary>
         /// Gets of sets the name of the property type.
@@ -354,18 +367,6 @@ namespace Umbraco.Core.Models
             throw new InvalidOperationException($"Cannot assign value \"{value}\" of type \"{value.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
         }
 
-
-        // TODO: this and other value validation methods should be a service level (not a model) thing. Changing this to internal for now
-        /// <summary>
-        /// Determines whether a value is valid for this property type.
-        /// </summary>
-        internal bool IsPropertyValueValid(object value)
-        {
-            var editor = Current.PropertyEditors[_propertyEditorAlias]; // TODO: inject
-            var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // TODO: inject
-            var valueEditor = editor.GetValueEditor(configuration);
-            return !valueEditor.Validate(value, Mandatory, ValidationRegExp).Any();
-        }
 
         /// <summary>
         /// Sanitizes a property type alias.

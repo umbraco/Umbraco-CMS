@@ -23,18 +23,18 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         internal Action OnAdd;
 
-        internal PropertyTypeCollection(bool isPublishing)
+        internal PropertyTypeCollection(bool supportsPublishing)
         {
-            IsPublishing = isPublishing;
+            SupportsPublishing = supportsPublishing;
         }
 
-        public PropertyTypeCollection(bool isPublishing, IEnumerable<PropertyType> properties)
-            : this(isPublishing)
+        public PropertyTypeCollection(bool supportsPublishing, IEnumerable<PropertyType> properties)
+            : this(supportsPublishing)
         {
             Reset(properties);
         }
 
-        public bool IsPublishing { get; }
+        public bool SupportsPublishing { get; }
 
         /// <summary>
         /// Resets the collection to only contain the <see cref="PropertyType"/> instances referenced in the <paramref name="properties"/> parameter.
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Models
 
         protected override void SetItem(int index, PropertyType item)
         {
-            item.IsPublishing = IsPublishing;
+            item.SupportsPublishing = SupportsPublishing;
             base.SetItem(index, item);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
         }
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Models
 
         protected override void InsertItem(int index, PropertyType item)
         {
-            item.IsPublishing = IsPublishing;
+            item.SupportsPublishing = SupportsPublishing;
             base.InsertItem(index, item);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Models
         // TODO: Instead of 'new' this should explicitly implement one of the collection interfaces members
         internal new void Add(PropertyType item)
         {
-            item.IsPublishing = IsPublishing;
+            item.SupportsPublishing = SupportsPublishing;
 
             // TODO: this is not pretty and should be refactored
             try
@@ -155,7 +155,7 @@ namespace Umbraco.Core.Models
 
         public object DeepClone()
         {
-            var clone = new PropertyTypeCollection(IsPublishing);
+            var clone = new PropertyTypeCollection(SupportsPublishing);
             foreach (var propertyType in this)
                 clone.Add((PropertyType) propertyType.DeepClone());
             return clone;

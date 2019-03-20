@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services.Implement;
@@ -32,7 +32,6 @@ namespace Umbraco.Web.PropertyEditors
         private static void Initialize(FileUploadPropertyEditor fileUpload)
         {
             MediaService.Saving += fileUpload.MediaServiceSaving;
-            MediaService.Created += fileUpload.MediaServiceCreated;
             ContentService.Copied += fileUpload.ContentServiceCopied;
 
             MediaService.Deleted += (sender, args)
@@ -46,7 +45,6 @@ namespace Umbraco.Web.PropertyEditors
         private static void Initialize(ImageCropperPropertyEditor imageCropper)
         {
             MediaService.Saving += imageCropper.MediaServiceSaving;
-            MediaService.Created += imageCropper.MediaServiceCreated;
             ContentService.Copied += imageCropper.ContentServiceCopied;
 
             MediaService.Deleted += (sender, args)

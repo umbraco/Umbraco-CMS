@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeUdiResolver = new ContentTypeUdiResolver();
 
             CreateMap<IEntitySlim, EntityBasic>()
-                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NameResolver>())
+                .ForMember(dest => dest.Name, opt => opt.MapFrom<NameResolver>())
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(ObjectTypes.GetUdiType(src.NodeObjectType), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => GetContentTypeIcon(src)))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
@@ -42,17 +42,17 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<PropertyType, EntityBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.UseValue("icon-box"))
-                .ForMember(dest => dest.Path, opt => opt.UseValue(""))
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(_ => "icon-box"))
+                .ForMember(dest => dest.Path, opt => opt.MapFrom(_ => ""))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
             CreateMap<PropertyGroup, EntityBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.UseValue("icon-tab"))
-                .ForMember(dest => dest.Path, opt => opt.UseValue(""))
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(_ => "icon-tab"))
+                .ForMember(dest => dest.Path, opt => opt.MapFrom(_ => ""))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 //in v6 the 'alias' is it's lower cased name so we'll stick to that.
                 .ForMember(dest => dest.Alias, opt => opt.MapFrom(src => src.Name.ToLowerInvariant()))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
@@ -60,18 +60,18 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<IUser, EntityBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.UseValue("icon-user"))
-                .ForMember(dest => dest.Path, opt => opt.UseValue(""))
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(_ => "icon-user"))
+                .ForMember(dest => dest.Path, opt => opt.MapFrom(_ => ""))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 .ForMember(dest => dest.Alias, opt => opt.MapFrom(src => src.Username))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
             CreateMap<ITemplate, EntityBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.Template, src.Key)))
-               .ForMember(dest => dest.Icon, opt => opt.UseValue("icon-layout"))
+               .ForMember(dest => dest.Icon, opt => opt.MapFrom(_ => "icon-layout"))
                .ForMember(dest => dest.Path, opt => opt.MapFrom(src => src.Path))
-               .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+               .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.SortOrder, opt => opt.Ignore());
 
             CreateMap<IContentTypeComposition, EntityBasic>()
-                .ForMember(dest => dest.Udi, opt => opt.ResolveUsing(src => contentTypeUdiResolver.Resolve(src)))
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => contentTypeUdiResolver.Resolve(src)))
                 .ForMember(dest => dest.Path, opt => opt.MapFrom(src => src.Path))
                 .ForMember(dest => dest.ParentId, opt => opt.MapFrom(src => src.ParentId))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
@@ -209,7 +209,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 // if we don't have a name for a culture, it means the culture is not available, and
                 // hey we should probably not be mapping it, but it's too late, return a fallback name
-                return doc.CultureNames.TryGetValue(culture, out var name) && !name.IsNullOrWhiteSpace() ? name : $"(({source.Name}))";
+                return doc.CultureNames.TryGetValue(culture, out var name) && !name.IsNullOrWhiteSpace() ? name : $"({source.Name})";
             }
         }
     }

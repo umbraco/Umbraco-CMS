@@ -20,6 +20,7 @@
             vm.diff = null;
             vm.currentVersion = null;
             vm.rollbackButtonDisabled = true;
+            vm.labels = {};
 
             // find the current version for invariant nodes
             if($scope.model.node.variants.length === 1) {
@@ -39,12 +40,13 @@
                 }
             }
 
-            // set default title
-            if(!$scope.model.title) {
-                localizationService.localize("actions_rollback").then(function(value){
-                    $scope.model.title = value;
-                });
-            }
+            localizationService.localizeMany(["actions_rollback", "general_choose"]).then(function (data) {
+                // set default title
+                if (!$scope.model.title) {
+                    $scope.model.title = data[0];
+                }
+                vm.labels.choose = data[1];
+            });
 
             // Load in diff library
             assetsService.loadJs('lib/jsdiff/diff.min.js', $scope).then(function () {

@@ -69,7 +69,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (tableName.Equals(Constants.DatabaseSchema.Tables.RelationType))
                 CreateRelationTypeData();
-            
+
             if (tableName.Equals(Constants.DatabaseSchema.Tables.KeyValue))
                 CreateKeyValueData();
 
@@ -210,12 +210,12 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreatePropertyTypeData()
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 6, UniqueId = 6.ToGuid(), DataTypeId = 1043, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.File, Name = "Upload image", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 6, UniqueId = 6.ToGuid(), DataTypeId = 1043, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.File, Name = "Upload image", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 7, UniqueId = 7.ToGuid(), DataTypeId = Constants.DataTypes.LabelInt, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Width, Name = "Width", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in pixels", Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 8, UniqueId = 8.ToGuid(), DataTypeId = Constants.DataTypes.LabelInt, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Height, Name = "Height", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in pixels", Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 9, UniqueId = 9.ToGuid(), DataTypeId = Constants.DataTypes.LabelBigint, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in bytes", Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 10, UniqueId = 10.ToGuid(), DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 24, UniqueId = 24.ToGuid(), DataTypeId = -90, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.File, Name = "Upload file", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 24, UniqueId = 24.ToGuid(), DataTypeId = -90, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.File, Name = "Upload file", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 25, UniqueId = 25.ToGuid(), DataTypeId = -92, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 26, UniqueId = 26.ToGuid(), DataTypeId = Constants.DataTypes.LabelBigint, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in bytes", Variations = (byte) ContentVariation.Nothing });
             //membership property types
@@ -271,17 +271,17 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -88, EditorAlias = Constants.PropertyEditors.Aliases.TextBox, DbType = "Nvarchar" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -89, EditorAlias = Constants.PropertyEditors.Aliases.TextArea, DbType = "Ntext" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -90, EditorAlias = Constants.PropertyEditors.Aliases.UploadField, DbType = "Nvarchar" });
-            InsertDataTypeDto(Constants.DataTypes.LabelString, Constants.PropertyEditors.Aliases.NoEdit, "Nvarchar", "{\"umbracoDataValueType\":\"STRING\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelInt, Constants.PropertyEditors.Aliases.NoEdit, "Integer", "{\"umbracoDataValueType\":\"INT\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelBigint, Constants.PropertyEditors.Aliases.NoEdit, "Nvarchar", "{\"umbracoDataValueType\":\"BIGINT\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelDateTime, Constants.PropertyEditors.Aliases.NoEdit, "Date", "{\"umbracoDataValueType\":\"DATETIME\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelDecimal, Constants.PropertyEditors.Aliases.NoEdit, "Decimal", "{\"umbracoDataValueType\":\"DECIMAL\"}");
-            InsertDataTypeDto(Constants.DataTypes.LabelTime, Constants.PropertyEditors.Aliases.NoEdit, "Date", "{\"umbracoDataValueType\":\"TIME\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelString, Constants.PropertyEditors.Aliases.Label, "Nvarchar", "{\"umbracoDataValueType\":\"STRING\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelInt, Constants.PropertyEditors.Aliases.Label, "Integer", "{\"umbracoDataValueType\":\"INT\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelBigint, Constants.PropertyEditors.Aliases.Label, "Nvarchar", "{\"umbracoDataValueType\":\"BIGINT\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelDateTime, Constants.PropertyEditors.Aliases.Label, "Date", "{\"umbracoDataValueType\":\"DATETIME\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelDecimal, Constants.PropertyEditors.Aliases.Label, "Decimal", "{\"umbracoDataValueType\":\"DECIMAL\"}");
+            InsertDataTypeDto(Constants.DataTypes.LabelTime, Constants.PropertyEditors.Aliases.Label, "Date", "{\"umbracoDataValueType\":\"TIME\"}");
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -36, EditorAlias = Constants.PropertyEditors.Aliases.DateTime, DbType = "Date" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -37, EditorAlias = Constants.PropertyEditors.Aliases.ColorPicker, DbType = "Nvarchar" });
             InsertDataTypeDto(Constants.DataTypes.DropDownSingle, Constants.PropertyEditors.Aliases.DropDownListFlexible, "Nvarchar", "{\"multiple\":false}");
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -40, EditorAlias = Constants.PropertyEditors.Aliases.RadioButtonList, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -41, EditorAlias = Constants.PropertyEditors.Aliases.Date, DbType = "Date" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -41, EditorAlias = "Umbraco.DateTime", DbType = "Date", Configuration = "{\"format\":\"YYYY-MM-DD\"}" });
             InsertDataTypeDto(Constants.DataTypes.DropDownMultiple, Constants.PropertyEditors.Aliases.DropDownListFlexible, "Nvarchar", "{\"multiple\":true}");
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -43, EditorAlias = Constants.PropertyEditors.Aliases.CheckBoxList, DbType = "Nvarchar" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1041, EditorAlias = Constants.PropertyEditors.Aliases.Tags, DbType = "Ntext",
@@ -321,7 +321,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             // on install, initialize the umbraco migration plan with the final state
 
-            var upgrader = new UmbracoUpgrader();
+            var upgrader = new Upgrader(new UmbracoPlan());
             var stateValueKey = upgrader.StateValueKey;
             var finalState = upgrader.Plan.FinalState;
 

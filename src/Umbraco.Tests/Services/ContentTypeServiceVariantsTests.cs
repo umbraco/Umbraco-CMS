@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -70,8 +71,10 @@ namespace Umbraco.Tests.Services
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(), contentTypeServiceBaseFactory,
-                Factory.GetInstance<IEntityXmlSerializer>());
+                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IEntityXmlSerializer>(),
+                Mock.Of<IPublishedModelFactory>(),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
         }
 
         public class LocalServerMessenger : ServerMessengerBase

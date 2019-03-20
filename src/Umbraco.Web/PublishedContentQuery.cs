@@ -2,41 +2,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Xml.XPath;
 using Examine;
 using Examine.Search;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Examine;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
 {
-    using Examine = global::Examine;
-
     /// <summary>
     /// A class used to query for published content, media items
     /// </summary>
     public class PublishedContentQuery : IPublishedContentQuery
     {
-        private readonly IPublishedContentCache _contentCache;
-        private readonly IPublishedMediaCache _mediaCache;
+        private readonly IPublishedSnapshot _publishedSnapshot;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
-        /// Constructor used to return results from the caches
+        /// Initializes a new instance of the <see cref="PublishedContentQuery"/> class.
         /// </summary>
-        /// <param name="contentCache"></param>
-        /// <param name="mediaCache"></param>
-        /// <param name="variationContextAccessor"></param>
-        public PublishedContentQuery(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, IVariationContextAccessor variationContextAccessor)
+        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor)
         {
-            _contentCache = contentCache ?? throw new ArgumentNullException(nameof(contentCache));
-            _mediaCache = mediaCache ?? throw new ArgumentNullException(nameof(mediaCache));
+            _publishedSnapshot = publishedSnapshot ?? throw new ArgumentNullException(nameof(publishedSnapshot));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
         }
 
@@ -44,48 +34,48 @@ namespace Umbraco.Web
 
         public IPublishedContent Content(int id)
         {
-            return ItemById(id, _contentCache);
+            return ItemById(id, _publishedSnapshot.Content);
         }
 
         public IPublishedContent Content(Guid id)
         {
-            return ItemById(id, _contentCache);
+            return ItemById(id, _publishedSnapshot.Content);
         }
 
         public IPublishedContent Content(Udi id)
         {
             if (!(id is GuidUdi udi)) return null;
-            return ItemById(udi.Guid, _contentCache);
+            return ItemById(udi.Guid, _publishedSnapshot.Content);
         }
 
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return ItemByXPath(xpath, vars, _contentCache);
+            return ItemByXPath(xpath, vars, _publishedSnapshot.Content);
         }
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
         {
-            return ItemsByIds(_contentCache, ids);
+            return ItemsByIds(_publishedSnapshot.Content, ids);
         }
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids)
         {
-            return ItemsByIds(_contentCache, ids);
+            return ItemsByIds(_publishedSnapshot.Content, ids);
         }
 
         public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return ItemsByXPath(xpath, vars, _contentCache);
+            return ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
         }
 
         public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return ItemsByXPath(xpath, vars, _contentCache);
+            return ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
         }
 
         public IEnumerable<IPublishedContent> ContentAtRoot()
         {
-            return ItemsAtRoot(_contentCache);
+            return ItemsAtRoot(_publishedSnapshot.Content);
         }
 
         #endregion
@@ -94,33 +84,33 @@ namespace Umbraco.Web
 
         public IPublishedContent Media(int id)
         {
-            return ItemById(id, _mediaCache);
+            return ItemById(id, _publishedSnapshot.Media);
         }
 
         public IPublishedContent Media(Guid id)
         {
-            return ItemById(id, _mediaCache);
+            return ItemById(id, _publishedSnapshot.Media);
         }
 
         public IPublishedContent Media(Udi id)
         {
             if (!(id is GuidUdi udi)) return null;
-            return ItemById(udi.Guid, _mediaCache);
+            return ItemById(udi.Guid, _publishedSnapshot.Media);
         }
 
         public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
         {
-            return ItemsByIds(_mediaCache, ids);
+            return ItemsByIds(_publishedSnapshot.Media, ids);
         }
 
         public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids)
         {
-            return ItemsByIds(_mediaCache, ids);
+            return ItemsByIds(_publishedSnapshot.Media, ids);
         }
 
         public IEnumerable<IPublishedContent> MediaAtRoot()
         {
-            return ItemsAtRoot(_mediaCache);
+            return ItemsAtRoot(_publishedSnapshot.Media);
         }
 
 
@@ -224,7 +214,7 @@ namespace Umbraco.Web
 
             totalRecords = results.TotalItemCount;
 
-            return new CultureContextualSearchResults(results.ToPublishedSearchResults(_contentCache), _variationContextAccessor, culture);
+            return new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
         }
 
         /// <inheritdoc />
@@ -241,7 +231,7 @@ namespace Umbraco.Web
                 : query.Execute(maxResults: skip + take);
 
             totalRecords = results.TotalItemCount;
-            return results.ToPublishedSearchResults(_contentCache);
+            return results.ToPublishedSearchResults(_publishedSnapshot.Content);
         }
 
         /// <summary>

@@ -164,21 +164,19 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.Save(memberType);
-                
 
                 var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.Save(member);
-                
 
                 var sut = repository.Get(member.Id);
 
-                Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(2));
-                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
+                Assert.That(memberType.CompositionPropertyGroups.Count(), Is.EqualTo(2));
+                Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
                 Assert.That(sut.Properties.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
-                var grp = sut.PropertyGroups.FirstOrDefault(x => x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
+                var grp = memberType.CompositionPropertyGroups.FirstOrDefault(x => x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
                 Assert.IsNotNull(grp);
                 var aliases = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
-                foreach (var p in sut.PropertyTypes.Where(x => aliases.Contains(x.Alias)))
+                foreach (var p in memberType.CompositionPropertyTypes.Where(x => aliases.Contains(x.Alias)))
                 {
                     Assert.AreEqual(grp.Id, p.PropertyGroupId.Value);
                 }

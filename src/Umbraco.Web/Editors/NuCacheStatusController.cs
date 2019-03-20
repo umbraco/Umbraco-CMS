@@ -14,8 +14,7 @@ namespace Umbraco.Web.Editors
 
         public NuCacheStatusController(IPublishedSnapshotService publishedSnapshotService)
         {
-            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
-            _publishedSnapshotService = publishedSnapshotService;
+            _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
         }
 
         private PublishedSnapshotService PublishedSnapshotService

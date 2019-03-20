@@ -48,7 +48,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (actionExecutedContext.Response == null) return;
 
-            var user = UmbracoContext.Current.Security.CurrentUser;
+            var user = Composing.Current.UmbracoContext.Security.CurrentUser;
             if (user == null) return;
 
             var objectContent = actionExecutedContext.Response.Content as ObjectContent;

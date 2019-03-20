@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.Packaging
 {
@@ -12,6 +13,7 @@ namespace Umbraco.Core.Models.Packaging
         Version UmbracoVersion { get; }
         string Author { get; }
         string AuthorUrl { get; }
+        IList<string> Contributors { get; }
         string Readme { get; }
 
         /// <summary>

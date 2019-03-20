@@ -15,6 +15,14 @@ namespace Umbraco.Tests.CoreThings
             Assert.AreEqual(GuidUtils.Combine(a, b).ToByteArray(), Combine(a, b));
         }
 
+        [Test]
+        public void GuidThingTest()
+        {
+            var guid = new Guid("f918382f-2bba-453f-a3e2-1f594016ed3b");
+            Assert.AreEqual("f22br4n0fm5fli5c", GuidUtils.ToBase32String(guid, 16));
+            Assert.AreEqual("f22br4n0f", GuidUtils.ToBase32String(guid, 9));
+        }
+
         // Reference implementation taken from original code.
         private static byte[] Combine(Guid guid1, Guid guid2)
         {

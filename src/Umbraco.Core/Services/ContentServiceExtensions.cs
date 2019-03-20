@@ -31,16 +31,16 @@ namespace Umbraco.Core.Services
         /// <param name="contentService"></param>
         /// <param name="name"></param>
         /// <param name="parentId"></param>
-        /// <param name="mediaTypeAlias"></param>
+        /// <param name="contentTypeAlias"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string mediaTypeAlias, int userId = 0)
+        public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             var guidUdi = parentId as GuidUdi;
             if (guidUdi == null)
                 throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by content");
             var parent = contentService.GetById(guidUdi.Guid);
-            return contentService.Create(name, parent, mediaTypeAlias, userId);
+            return contentService.Create(name, parent, contentTypeAlias, userId);
         }
 
         /// <summary>

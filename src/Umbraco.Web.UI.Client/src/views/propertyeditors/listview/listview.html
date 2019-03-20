@@ -6,7 +6,7 @@
 
    <div class="row-fluid" ng-switch-when="false">
 
-       <umb-editor-sub-header>
+       <umb-editor-sub-header ng-class="{'--state-selection':(selection.length > 0)}">
 
            <umb-editor-sub-header-content-left>
 
@@ -85,7 +85,7 @@
                        type="button"
                        label="Clear selection"
                        label-key="buttons_clearSelection"
-                       button-style="selection"
+                       button-style="white"
                        action="clearSelection()"
                        disabled="actionInProgress">
                    </umb-button>
@@ -140,7 +140,7 @@
                        ng-if="options.allowBulkPublish && (buttonPermissions == null || buttonPermissions.canPublish)"
                        style="margin-right: 5px;"
                        type="button"
-                       button-style="selection"
+                       button-style="white"
                        label-key="actions_publish"
                        icon="icon-globe"
                        action="publish()"
@@ -153,7 +153,7 @@
                        ng-if="options.allowBulkUnpublish && (buttonPermissions == null || buttonPermissions.canUnpublish)"
                        style="margin-right: 5px;"
                        type="button"
-                       button-style="selection"
+                       button-style="white"
                        label-key="actions_unpublish"
                        icon="icon-block"
                        action="unpublish()"
@@ -166,7 +166,7 @@
                        ng-if="options.allowBulkCopy && (buttonPermissions == null || buttonPermissions.canCopy)"
                        style="margin-right: 5px;"
                        type="button"
-                       button-style="selection"
+                       button-style="white"
                        label-key="actions_copy"
                        icon="icon-documents"
                        action="copy()"
@@ -179,7 +179,7 @@
                        ng-if="options.allowBulkMove && (buttonPermissions == null || buttonPermissions.canMove)"
                        style="margin-right: 5px;"
                        type="button"
-                       button-style="selection"
+                       button-style="white"
                        label-key="actions_move"
                        icon="icon-enter"
                        action="move()"
@@ -191,7 +191,7 @@
                    <umb-button
                        ng-if="options.allowBulkDelete && (buttonPermissions == null || buttonPermissions.canDelete)"
                        type="button"
-                       button-style="selection"
+                       button-style="white"
                        label-key="actions_delete"
                        icon="icon-trash"
                        action="delete()"

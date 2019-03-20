@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -13,10 +14,12 @@ namespace Umbraco.Web.Models.Mapping
     internal class MemberBasicPropertiesResolver : IValueResolver<IMember, MemberBasic, IEnumerable<ContentPropertyBasic>>
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IMemberTypeService _memberTypeService;
 
-        public MemberBasicPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor)
+        public MemberBasicPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService)
         {
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         }
 
         public IEnumerable<ContentPropertyBasic> Resolve(IMember source, MemberBasic destination, IEnumerable<ContentPropertyBasic> destMember, ResolutionContext context)
@@ -29,7 +32,7 @@ namespace Umbraco.Web.Models.Mapping
                     source.Properties.OrderBy(prop => prop.PropertyType.SortOrder))
                 .ToList();
 
-            var memberType = source.ContentType;
+            var memberType = _memberTypeService.Get(source.ContentTypeId);
 
             //now update the IsSensitive value
             foreach (var prop in result)

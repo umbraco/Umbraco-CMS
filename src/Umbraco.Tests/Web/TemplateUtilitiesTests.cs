@@ -19,6 +19,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.Web
 {
@@ -39,7 +40,7 @@ namespace Umbraco.Tests.Web
             // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
             var factory = new Mock<IFactory>();
             factory.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(NoAppCache.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+                new TypeLoader(NoAppCache.Instance, IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             factory.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
 
             var settings = SettingsForTests.GetDefaultUmbracoSettings();
@@ -96,20 +97,19 @@ namespace Umbraco.Tests.Web
             var snapshotService = Mock.Of<IPublishedSnapshotService>();
             Mock.Get(snapshotService).Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot);
 
-            using (var umbCtx = UmbracoContext.EnsureContext(
+            var umbracoContextFactory = new UmbracoContextFactory(
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor,
-                Mock.Of<HttpContextBase>(),
                 snapshotService,
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                //setup a quick mock of the WebRouting section
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
-                //pass in the custom url provider
-                new[]{ testUrlProvider.Object },
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true))
+                new TestDefaultCultureAccessor(),
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
+                globalSettings,
+                new UrlProviderCollection(new[] { testUrlProvider.Object }),
+                Mock.Of<IUserService>());
+
+            using (var reference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>()))
             {
-                var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider);
+                var output = TemplateUtilities.ParseInternalLinks(input, reference.UmbracoContext.UrlProvider);
 
                 Assert.AreEqual(result, output);
             }

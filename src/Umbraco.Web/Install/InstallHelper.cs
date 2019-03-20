@@ -26,11 +26,11 @@ namespace Umbraco.Web.Install
         private readonly IGlobalSettings _globalSettings;
         private InstallationType? _installationType;
 
-        public InstallHelper(UmbracoContext umbracoContext,
+        public InstallHelper(IUmbracoContextAccessor umbracoContextAccessor,
             DatabaseBuilder databaseBuilder,
             ILogger logger, IGlobalSettings globalSettings)
         {
-            _httpContext = umbracoContext.HttpContext;
+            _httpContext = umbracoContextAccessor.UmbracoContext.HttpContext;
             _logger = logger;
             _globalSettings = globalSettings;
             _databaseBuilder = databaseBuilder;

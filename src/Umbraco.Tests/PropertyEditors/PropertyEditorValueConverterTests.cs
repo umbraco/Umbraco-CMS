@@ -65,9 +65,9 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(expected, result);
         }
 
-        [TestCase("apples", new[] { "apples" })]
-        [TestCase("apples,oranges", new[] { "apples", "oranges" })]
-        [TestCase(" apples, oranges, pears ", new[] { "apples", "oranges", "pears" })]
+        [TestCase("[\"apples\"]", new[] { "apples" })]
+        [TestCase("[\"apples\",\"oranges\"]", new[] { "apples", "oranges" })]
+        [TestCase("[\"apples\",\"oranges\",\"pears\"]", new[] { "apples", "oranges", "pears" })]
         [TestCase("", new string[] { })]
         [TestCase(null, new string[] { })]
         public void CanConvertCheckboxListPropertyEditor(object value, IEnumerable<string> expected)
@@ -78,9 +78,9 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(expected, result);
         }
 
-        [TestCase("apples", new[] { "apples" })]
-        [TestCase("apples,oranges", new[] { "apples", "oranges" })]
-        [TestCase("apples , oranges, pears ", new[] { "apples", "oranges", "pears" })]
+        [TestCase("[\"apples\"]", new[] { "apples" })]
+        [TestCase("[\"apples\",\"oranges\"]", new[] { "apples", "oranges" })]
+        [TestCase("[\"apples\",\"oranges\",\"pears\"]", new[] { "apples", "oranges", "pears" })]
         [TestCase("", new string[] { })]
         [TestCase(null, new string[] { })]
         public void CanConvertDropdownListMultiplePropertyEditor(object value, IEnumerable<string> expected)
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             Assert.AreEqual(expected, result);
         }
-        
+
         [TestCase("1", 1)]
         [TestCase("1", 1)]
         [TestCase("0", 0)]

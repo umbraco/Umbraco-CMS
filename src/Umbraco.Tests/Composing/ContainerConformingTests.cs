@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Composing
