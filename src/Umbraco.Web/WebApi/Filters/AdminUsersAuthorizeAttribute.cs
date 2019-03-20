@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -48,9 +49,9 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (userIds.Length == 0) return base.IsAuthorized(actionContext);
 
-            var users = ApplicationContext.Current.Services.UserService.GetUsersById(userIds);
-            var authHelper = new UserEditorAuthorizationHelper(ApplicationContext.Current.Services.ContentService, ApplicationContext.Current.Services.MediaService, ApplicationContext.Current.Services.UserService, ApplicationContext.Current.Services.EntityService);
-            return users.All(user => authHelper.IsAuthorized(UmbracoContext.Current.Security.CurrentUser, user, null, null, null) != false);
+            var users = Current.Services.UserService.GetUsersById(userIds);
+            var authHelper = new UserEditorAuthorizationHelper(Current.Services.ContentService, Current.Services.MediaService, Current.Services.UserService, Current.Services.EntityService);
+            return users.All(user => authHelper.IsAuthorized(Current.UmbracoContext.Security.CurrentUser, user, null, null, null) != false);
         }
     }
 }
