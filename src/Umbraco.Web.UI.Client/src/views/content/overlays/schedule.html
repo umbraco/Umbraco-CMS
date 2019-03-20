@@ -87,12 +87,13 @@
             <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter">
                 <ng-form name="scheduleSelectorForm">
                     <div class="flex">
-                        <input id="{{'saveVariantSelector_' + variant.language.culture}}"
-                               name="saveVariantSelector"
-                               type="checkbox"
-                               ng-model="variant.save"
-                               ng-change="vm.changeSelection(variant)"
-                               style="margin-right: 8px;" />
+
+                        <umb-checkbox
+                            input-id="{{'saveVariantSelector_' + variant.language.culture}}"
+                            name="saveVariantSelector"
+                            model="variant.save"
+                            on-change="vm.changeSelection(variant)"/>
+
                         <div>
 
                             <label for="{{'saveVariantSelector_' + variant.language.culture}}" style="margin-bottom: 2px;">
@@ -166,11 +167,11 @@
                                    val-server-field="{{variant.htmlId}}" />
 
                             <div ng-messages="scheduleSelectorForm.saveVariantReleaseDate.$error" show-validation-on-submit>
-                                <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
+                                <div class="umb-permission__description text-error" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
                             </div>
 
                             <div ng-repeat="notification in variant.notifications">
-                                <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                                <div class="umb-permission__description text-success">{{notification.message}}</div>
                             </div>
 
                         </div>

@@ -13,13 +13,14 @@
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.modifiedVariantFilter">
             <ng-form name="publishVariantSelectorForm">
                 <div class="flex">
-                    <input id="{{variant.htmlId}}"
-                           name="publishVariantSelector"
-                           type="checkbox"
-                           ng-model="variant.save"
-                           ng-change="vm.changeSelection(variant)"
-                           style="margin-right: 8px;"
-                           val-server-field="{{variant.htmlId}}" />
+
+                    <umb-checkbox
+                        input-id="{{variant.htmlId}}"
+                        name="publishVariantSelector"
+                        model="variant.save"
+                        on-change="vm.changeSelection(variant)"
+                        server-validation-field="{{variant.htmlId}}"/>
+
                     <div>
                         <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                             <span>{{ variant.language.name }}</span>
@@ -30,11 +31,11 @@
                             </span>
 
                             <span class="db" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
-                                <span class="db umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
+                                <span class="db umb-permission__description text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
                             </span>
 
                             <span class="db" ng-repeat="notification in variant.notifications">
-                                <span class="db umb-permission__description" style="color: #1FB572;">{{notification.message}}</span>
+                                <span class="db umb-permission__description text-success">{{notification.message}}</span>
                             </span>
                         </label>
                     </div>

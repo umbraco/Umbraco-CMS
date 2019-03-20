@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UnpublishController($scope, localizationService) {
+    function UnpublishController($scope, localizationService, contentEditingHelper) {
 
         var vm = this;
         var autoSelectedVariants = [];
@@ -23,7 +23,7 @@
 
             _.each(vm.variants,
                 function (variant) {
-                    variant.compositeId = variant.language.culture + "_" + (variant.segment ? variant.segment : "");
+                    variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
                     variant.htmlId = "_content_variant_" + variant.compositeId;
                 });
 
@@ -57,7 +57,7 @@
             });
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
 
-            // if a mandatory variant is selected we want to selet all other variants 
+            // if a mandatory variant is selected we want to select all other variants 
             // and disable selection for the others
             if(selectedVariant.save && selectedVariant.language.isMandatory) {
 

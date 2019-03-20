@@ -23,6 +23,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -46,7 +47,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
-        private readonly IPublishedModelFactory _publishedModelFactory;
+        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -89,7 +90,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper,
-            IEntityXmlSerializer entitySerializer, IPublishedModelFactory publishedModelFactory)
+            IEntityXmlSerializer entitySerializer, IPublishedModelFactory publishedModelFactory,
+            UrlSegmentProviderCollection urlSegmentProviders)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -107,7 +109,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
-            _publishedModelFactory = publishedModelFactory;
+            _urlSegmentProviders = urlSegmentProviders;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -167,7 +169,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _domainStore = new SnapDictionary<int, Domain>();
 
-            _publishedModelFactory.WithSafeLiveFactory(LoadCaches);
+            publishedModelFactory.WithSafeLiveFactory(LoadCaches);
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
@@ -1269,7 +1271,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 foreach (var cultureInfo in infos)
                 {
                     var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
-                    cultureData[cultureInfo.Culture] = new CultureVariation { Name = cultureInfo.Name, Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
+                    cultureData[cultureInfo.Culture] = new CultureVariation
+                    {
+                        Name = cultureInfo.Name,
+                        UrlSegment = content.GetUrlSegment(_urlSegmentProviders, cultureInfo.Culture),
+                        Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
+                        IsDraft = cultureIsDraft
+                    };
                 }
             }
 
@@ -1277,7 +1285,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var nestedData = new ContentNestedData
             {
                 PropertyData = propertyData,
-                CultureData = cultureData
+                CultureData = cultureData,
+                UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
             };
 
             var dto = new ContentNuDto
