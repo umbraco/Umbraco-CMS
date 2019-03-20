@@ -42,7 +42,7 @@
                 item: '=',
                 onOpen: '&',
                 onOpenAnchor: '&',
-                index: '@'
+                hotkey: '<'
             }
         });
 

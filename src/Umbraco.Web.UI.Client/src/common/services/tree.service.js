@@ -350,6 +350,9 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             parent.children.splice(parent.children.indexOf(treeNode), 1);
 
             parent.hasChildren = parent.children.length !== 0;
+            
+            //Notify that the node has been removed
+            eventsService.emit("treeService.removeNode", { node: treeNode });
         },
 
         /**
