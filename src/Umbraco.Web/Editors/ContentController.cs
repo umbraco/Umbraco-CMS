@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,34 +10,33 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Validation;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
+using Umbraco.Web.Composing;
+using Umbraco.Web.ContentApps;
+using Umbraco.Web.Editors.Binders;
+using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Validation;
-using Umbraco.Web.Composing;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Actions;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Editors.Binders;
-using Umbraco.Web.Editors.Filters;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Editors
 {
@@ -359,7 +359,7 @@ namespace Umbraco.Web.Editors
             // translate the content type name if applicable
             mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
             // if your user type doesn't have access to the Settings section it would not get this property mapped
-            if(mapped.DocumentType != null)
+            if (mapped.DocumentType != null)
                 mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
 
             //remove the listview app if it exists
@@ -816,7 +816,10 @@ namespace Umbraco.Web.Editors
 
             if (wasCancelled)
             {
-                AddCancelMessage(display);
+                if (contentItem.Action != ContentSaveAction.Save && contentItem.Action != ContentSaveAction.SaveNew)
+                {
+                    AddCancelMessage(display);
+                }
                 if (IsCreatingAction(contentItem.Action))
                 {
                     //If the item is new and the operation was cancelled, we need to return a different
@@ -850,25 +853,35 @@ namespace Umbraco.Web.Editors
             string invariantSavedLocalizationKey, string variantSavedLocalizationKey,
             out bool wasCancelled)
         {
-            var saveResult = saveMethod(contentItem.PersistedContent);
-            wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
-            if (saveResult.Success)
+            if (contentItem.PersistedContent.Name.Length > 255)
             {
-                if (variantCount > 1)
+                wasCancelled = true;
+                globalNotifications.AddErrorNotification(
+                      Services.TextService.Localize("speechBubbles/editContentNotSaved"),
+                      Services.TextService.Localize("speechBubbles/editContentNotSavedTooLongName"));
+            }
+            else
+            {
+                var saveResult = saveMethod(contentItem.PersistedContent);
+                wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
+                if (saveResult.Success)
                 {
-                    var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
-                    foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
+                    if (variantCount > 1)
                     {
-                        AddSuccessNotification(notifications, c,
-                            Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                            Services.TextService.Localize(variantSavedLocalizationKey, new[] { _allLangs.Value[c].CultureName }));
-                    }
-                }
-                else if (ModelState.IsValid)
-                {
-                    globalNotifications.AddSuccessNotification(
+                        var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+                        foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
+                        {
+                            AddSuccessNotification(notifications, c,
                         Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                        Services.TextService.Localize(invariantSavedLocalizationKey));
+                        Services.TextService.Localize(variantSavedLocalizationKey, new[] { _allLangs.Value[c].CultureName }));
+                        }
+                    }
+                    else if (ModelState.IsValid)
+                    {
+                        globalNotifications.AddSuccessNotification(
+         Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+         Services.TextService.Localize(invariantSavedLocalizationKey));
+                    }
                 }
             }
         }
@@ -1336,7 +1349,7 @@ namespace Umbraco.Web.Editors
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
-                AddMessageForPublishStatus(new [] { publishResult }, notificationModel);
+                AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
                 return Request.CreateValidationErrorResponse(notificationModel);
             }
 
@@ -1920,6 +1933,8 @@ namespace Umbraco.Web.Editors
                     case PublishResultType.FailedPublishMandatoryCultureMissing:
                         //the rest that we are looking for each belong in their own group
                         return x.Result;
+                    case PublishResultType.FailedPublishTooLongName:
+                        return x.Result;
                     default:
                         throw new IndexOutOfRangeException($"{x.Result}\" was not expected.");
                 }
@@ -2043,6 +2058,15 @@ namespace Umbraco.Web.Editors
                         display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             "publish/contentPublishedFailedByCulture");
+                        break;
+                    case PublishResultType.FailedPublishTooLongName:
+                        {
+                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            display.AddErrorNotification(
+                               Services.TextService.Localize("publish"),
+                               Services.TextService.Localize("publish/contentPublishedFailedByContentTitle",
+                                   new[] { names }).Trim());
+                        }
                         break;
                     default:
                         throw new IndexOutOfRangeException($"PublishedResultType \"{status.Key}\" was not expected.");

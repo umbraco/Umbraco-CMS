@@ -868,6 +868,10 @@ namespace Umbraco.Core.Services.Implement
                 if (!culture.IsNullOrWhiteSpace() && culture != "*")
                     throw new NotSupportedException($"Culture \"{culture}\" is not supported by invariant content types.");
             }
+            if (content.Name.Length > 255)
+            {
+                return new PublishResult(PublishResultType.FailedPublishTooLongName, evtMsgs, content);
+            }
 
             using (var scope = ScopeProvider.CreateScope())
             {
