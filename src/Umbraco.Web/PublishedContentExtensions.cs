@@ -41,9 +41,16 @@ namespace Umbraco.Web
         /// Gets the absolute url for the content.
         /// </summary>
         /// <param name="content">The content.</param>
-        /// <param name="culture">The culture to get the url for (defaults to current culture)</param>
         /// <returns>The absolute url for the content.</returns>
-        public static string UrlAbsolute(this IPublishedContent content, string culture = null)
+        public static string UrlAbsolute(this IPublishedContent content) => content.UrlAbsolute(null);
+
+        /// <summary>
+        /// Gets the absolute url for the content.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="culture">The culture to get the url for</param>
+        /// <returns>The absolute url for the content.</returns>
+        public static string UrlAbsolute(this IPublishedContent content, string culture)
         {
             // adapted from PublishedContentBase.Url
             switch (content.ItemType)
