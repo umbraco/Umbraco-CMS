@@ -170,5 +170,23 @@ namespace Umbraco.Web
         }
 
         #endregion
+
+        #region IsSomething
+
+        /// <summary>
+        /// Gets a value indicating whether the content is visible.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <returns>A value indicating whether the content is visible.</returns>
+        /// <remarks>A content is not visible if it has an umbracoNaviHide property with a value of "1". Otherwise,
+        /// the content is visible.</remarks>
+        public static bool IsVisible(this IPublishedElement content)
+        {
+            // rely on the property converter - will return default bool value, ie false, if property
+            // is not defined, or has no value, else will return its value.
+            return content.Value<bool>(Constants.Conventions.Content.NaviHide) == false;
+        }
+
+        #endregion
     }
 }
