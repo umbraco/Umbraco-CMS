@@ -91,12 +91,17 @@ input.umb-table__input {
 .umb-table-body .umb-table-row {
     color: @gray-5;
     border-top: 1px solid @gray-9;
-    cursor: pointer;
     font-size: 14px;
     position: relative;
     min-height: 52px;
+}
+.umb-table-body .umb-table-row.-selectable {
+    
+    cursor: pointer;
+    
     &:hover {
-        background-color: @ui-option-hover;
+        //background-color: @ui-option-hover;
+        
     }
 }
 
@@ -122,7 +127,7 @@ input.umb-table__input {
     margin: 0 auto;
     font-size: 20px;
     line-height: 20px;
-    color: @gray-7;
+    color: @ui-option-type;
 }
 
 .umb-table-body__checkicon,
@@ -135,9 +140,30 @@ input.umb-table__input {
 }
 
 .umb-table-body .umb-table__name {
-    color: @black;
+    color: @ui-option-type;
     font-size: 14px;
     font-weight: bold;
+    a {
+        color: @ui-option-type;
+        &:hover, &:focus {
+            color: @ui-option-type-hover;
+            text-decoration: underline;
+        }
+    }
+}
+.umb-table-body .umb-table-row.-light {
+    .umb-table-body__icon {
+        color: @ui-option-disabled-type;
+    }
+    .umb-table__name {
+        color: @ui-option-disabled-type;
+        a {
+            color: @ui-option-disabled-type;
+            &:hover, &:focus {
+                color: @ui-option-disabled-type-hover;
+            }
+        }
+    }
 }
 
 // Styles of no items in the listview
