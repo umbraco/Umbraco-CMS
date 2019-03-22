@@ -105,7 +105,7 @@ namespace Umbraco.Web.Editors
 
             // the localization service might return the generic language even when queried for specific ones (e.g. "da" when queried for "da-DK")
             // - we need to handle that explicitly
-            if (existing.IsoCode != language.IsoCode)
+            if (existing?.IsoCode != language.IsoCode)
             {
                 existing = null;
             }
