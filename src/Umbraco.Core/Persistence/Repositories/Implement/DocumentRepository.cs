@@ -230,8 +230,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sql = GetBaseQuery(QueryType.Many, false)
                 .Where<NodeDto>(x => x.NodeId == nodeId)
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
-                .AndByDescending<ContentVersionDto>(x => x.VersionDate)
-                ;
+                .AndByDescending<ContentVersionDto>(x => x.VersionDate);
+
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true, true).Skip(skip).Take(take);
         }
 
