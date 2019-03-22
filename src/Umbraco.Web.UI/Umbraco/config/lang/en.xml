@@ -96,9 +96,8 @@
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
-    <key alias="domainHelp"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
-        "https://www.example.com/". One-level paths in domains are supported, eg. "example.com/en". However, they
-        should be avoided. Better use the culture setting above.]]></key>
+      <key alias="domainHelpWithVariants"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
+     Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
         <key alias="setLanguageHelp">
