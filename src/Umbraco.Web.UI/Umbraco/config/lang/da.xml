@@ -95,7 +95,8 @@
     <key alias="domainExists">Domænet '%0%' er oprettet</key>
     <key alias="domainUpdated">Domænet '%0%' er nu opdateret</key>
     <key alias="orEdit">eller rediger nuværende domæner</key>
-    <key alias="domainHelp">f.eks. ditdomaene.com, www.ditdomaene.com</key>
+    <key alias="domainHelpWithVariants"><![CDATA[Gyldige domænenavne er: "example.com", "www.example.com", "example.com:8080" eller "https://www.example.com/".
+     Yderlgiere understøttes også første niveau af stien efter domænet, f.eks. "Example.com/en" eller "/en". ]]></key>
     <key alias="inherit">Nedarv</key>
     <key alias="setLanguage">Sprog</key>
     <key alias="setLanguageHelp"><![CDATA[Indstil sproget for noder under den aktuelle node,<br /> eller nedarv sprog fra forældre noder. Gælder også<br />

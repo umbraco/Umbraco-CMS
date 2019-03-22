@@ -41,7 +41,6 @@
     <key alias="domainCreated"><![CDATA[Il dominio '%0%' è stato creato]]></key>
     <key alias="domainDeleted"><![CDATA[Il dominio '%0%' è stato cancellato]]></key>
     <key alias="domainExists"><![CDATA[Il dominio '%0%' è già stato assegnato]]></key>
-    <key alias="domainHelp"><![CDATA[per esempio: yourdomain.com, www.yourdomain.com]]></key>
     <key alias="domainUpdated"><![CDATA[Il dominio '%0%' è stato aggiornato]]></key>
     <key alias="invalidDomain">Hostname non valido</key>
     <key alias="orEdit">Modifica il dominio corrente</key>
