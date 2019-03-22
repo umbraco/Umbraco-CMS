@@ -47,8 +47,6 @@
     <key alias="domainCreated">Nová doména '%0%' byla vytvořena</key>
     <key alias="domainDeleted">Doména '%0%' je odstraněna</key>
     <key alias="domainExists">Doména '%0%' už byla přiřazena</key>
-    <key alias="domainHelp"><![CDATA[Platná doménová jména jsou: "example.com", "www.example.com", "example.com:8080" nebo
-        "https://www.example.com/".<br /><br />Jednoúrovňové cesty v doménách jsou podporovány, např. "example.com/en". Měli byste se jich nicméně vyvarovat. Raději použijte nastavení kultury výše.]]></key>
     <key alias="domainUpdated">Doména '%0%' byla aktualizována</key>
     <key alias="orEdit">Editace aktuálních domén</key>
     <key alias="inherit">Dědit</key>

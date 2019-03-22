@@ -103,6 +103,13 @@ namespace Umbraco.Web.Editors
             // this is prone to race conditions but the service will not let us proceed anyways
             var existing = Services.LocalizationService.GetLanguageByIsoCode(language.IsoCode);
 
+            // the localization service might return the generic language even when queried for specific ones (e.g. "da" when queried for "da-DK")
+            // - we need to handle that explicitly
+            if (existing?.IsoCode != language.IsoCode)
+            {
+                existing = null;
+            }
+
             if (existing != null && language.Id != existing.Id)
             {
                 //someone is trying to create a language that already exist
