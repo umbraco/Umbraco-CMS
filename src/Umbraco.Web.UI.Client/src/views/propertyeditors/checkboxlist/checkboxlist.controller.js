@@ -48,7 +48,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             
             //if the length is zero, then we are in sync, just exit.
             if (_.difference($scope.model.value, selectedVals).length === 0) {
-                debugger;
                 return;
             }
 
