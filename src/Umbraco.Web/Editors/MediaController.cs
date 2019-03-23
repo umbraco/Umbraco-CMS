@@ -322,6 +322,7 @@ namespace Umbraco.Web.Editors
         /// <param name="orderDirection"></param>
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Guid id,
@@ -351,6 +352,7 @@ namespace Umbraco.Web.Editors
         /// <param name="orderDirection"></param>
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Udi id,

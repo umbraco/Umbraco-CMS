@@ -79,8 +79,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         protected virtual void FilterItems(IUser user, IList items)
         {
-            bool ignoreUserStartNodes = false;
-            bool.TryParse(HttpContext.Current.Request.QueryString.Get(TreeQueryStringParameters.IgnoreUserStartNodes), out ignoreUserStartNodes);
+            bool.TryParse(HttpContext.Current.Request.QueryString.Get(TreeQueryStringParameters.IgnoreUserStartNodes), out var ignoreUserStartNodes);
 
             if (ignoreUserStartNodes == false)
             {

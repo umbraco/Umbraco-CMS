@@ -71,7 +71,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         $scope.linkPickerOverlay = {
             view: "linkpicker",
             currentTarget: target,
-            ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === '1',
+            ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === "1",
             show: true,
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {

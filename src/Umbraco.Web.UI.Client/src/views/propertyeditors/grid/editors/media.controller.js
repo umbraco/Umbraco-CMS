@@ -2,7 +2,7 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
     function ($scope, $rootScope, $timeout, userService) {
         
-        var ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === '1' ? true : false;
+        var ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === "1" ? true : false;
 
         if (!$scope.model.config.startNodeId) {
             if (ignoreUserStartNodes === true) {

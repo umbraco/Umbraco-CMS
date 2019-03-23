@@ -27,6 +27,7 @@ namespace Umbraco.Web.Search
         /// </param>
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         public IEnumerable<SearchResultItem> ExamineSearch(
             UmbracoHelper umbracoHelper,

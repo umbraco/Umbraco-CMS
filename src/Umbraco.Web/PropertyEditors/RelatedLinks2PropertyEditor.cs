@@ -33,7 +33,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class RelatedLinksPreValueEditor : PreValueEditor
         {
-            [PreValueField("ignoreUserStartNodes", "Ignore user start nodes", "boolean", Description = "If set, user and group start node permissions will be ignored.")]
+            [PreValueField("ignoreUserStartNodes", "Ignore user start nodes", "boolean", Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
             public bool IgnoreUserStartNodes { get; set; }
 
             [PreValueField("max", "Maximum number of links", "number", Description = "Enter the maximum amount of links to be added, enter 0 for unlimited")]

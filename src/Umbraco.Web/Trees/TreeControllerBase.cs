@@ -350,7 +350,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// If the request should ignore user permissions
+        /// If the request should allows a user to choose nodes that they normally don't have access to
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>

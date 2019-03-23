@@ -315,7 +315,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * 
           * @param {Int} id id of content item to return
           * @param {Object} options optional options object
-          * @param {Bool} options.ignoreUserStartNodes set to true to ignore user permissions
+          * @param {Bool} options.ignoreUserStartNodes set to true to allows a user to choose nodes that they normally don't have access to
           * @returns {Promise} resourcePromise object containing the content item.
           *
           */

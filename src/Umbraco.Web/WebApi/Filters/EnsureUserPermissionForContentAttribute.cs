@@ -73,9 +73,8 @@ namespace Umbraco.Web.WebApi.Filters
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
             
-            bool ignoreUserStartNodes = actionContext.ActionArguments.ContainsKey("ignoreUserStartNodes")
-                    ? bool.Parse(actionContext.ActionArguments.GetValueAsString("ignoreUserStartNodes"))
-                    : false;
+            var ignoreUserStartNodes = actionContext.ActionArguments.ContainsKey("ignoreUserStartNodes") &&
+                                       bool.Parse(actionContext.ActionArguments.GetValueAsString("ignoreUserStartNodes"));
 
             int nodeId;
             if (_nodeId.HasValue == false)

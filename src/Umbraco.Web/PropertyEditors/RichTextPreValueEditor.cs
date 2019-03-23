@@ -28,7 +28,7 @@ namespace Umbraco.Web.PropertyEditors
                 Key = "ignoreUserStartNodes",
                 View = "boolean",
                 Name = "Ignore user start nodes",
-                Description = "If set, user and group start node permissions will be ignored."
+                Description = "Selecting this option allows a user to choose nodes that they normally don't have access to."
             });
 
             Fields.Add(new PreValueField()

@@ -7,7 +7,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
-        var ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === '1' ? true : false;
+        var ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === "1" ? true : false;
 
         if (!$scope.model.config.startNodeId) {
             if (ignoreUserStartNodes === true) {
