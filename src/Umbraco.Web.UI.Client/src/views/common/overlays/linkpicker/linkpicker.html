@@ -50,6 +50,7 @@
                                  search-from-id="{{searchInfo.searchFromId}}"
                                  search-from-name="{{searchInfo.searchFromName}}"
                                  show-search="{{searchInfo.showSearch}}"
+								 ignore-user-startnodes="{{searchInfo.ignoreUserStartNodes}}"
                                  section="{{section}}">
             </umb-tree-search-box>
 
@@ -64,6 +65,7 @@
                 <umb-tree section="content"
                           hideheader="true"
                           hideoptions="true"
+						  customtreeparams="{{customTreeParams}}"
                           eventhandler="dialogTreeEventHandler"
                           enablelistviewexpand="true"
                           isdialog="true"
