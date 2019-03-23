@@ -315,13 +315,13 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * 
           * @param {Int} id id of content item to return
           * @param {Object} options optional options object
-          * @param {Bool} options.bypassUserPermissions set to true to bypass user permissions
+          * @param {Bool} options.ignoreUserStartNodes set to true to ignore user permissions
           * @returns {Promise} resourcePromise object containing the content item.
           *
           */
         getById: function (id, options) {
             var defaults = {
-                bypassUserPermissions: false
+                ignoreUserStartNodes: false
             };
             if (options === undefined) {
                 options = {};
@@ -336,7 +336,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         umbRequestHelper.getApiUrl(
                               "contentApiBaseUrl",
                               "GetById",
-                              [{ id: id }, { bypassUserPermissions: options.bypassUserPermissions }])),
+                              [{ id: id }, { ignoreUserStartNodes: options.ignoreUserStartNodes }])),
                   'Failed to retrieve data for content id ' + id);
         },
 

@@ -294,7 +294,7 @@ function entityResource($q, $http, umbRequestHelper) {
          */
         getAncestors: function (id, type, options) {    
             var defaults = {
-                bypassUserPermissions: false
+                ignoreUserStartNodes: false
             };
             if (options === undefined) {
                 options = {};
@@ -312,7 +312,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        [
                            { id: id },
                            { type: type },
-                           { bypassUserPermissions: options.bypassUserPermissions }
+                           { ignoreUserStartNodes: options.ignoreUserStartNodes }
                        ])),
                        'Failed to retrieve ancestor data for id ' + id);
         },
@@ -447,7 +447,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 filter: '',
                 orderDirection: "Ascending",
                 orderBy: "SortOrder",
-                bypassUserPermissions: false
+                ignoreUserStartNodes: false
             };
             if (options === undefined) {
                 options = {};
@@ -477,7 +477,7 @@ function entityResource($q, $http, umbRequestHelper) {
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
                             filter: encodeURIComponent(options.filter),
-                            bypassUserPermissions: options.bypassUserPermissions
+                            ignoreUserStartNodes: options.ignoreUserStartNodes
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);
@@ -509,7 +509,7 @@ function entityResource($q, $http, umbRequestHelper) {
 
             var defaults = {
                 searchFrom: null,
-                bypassUserPermissions: false
+                ignoreUserStartNodes: false
             };
             if (options === undefined) {
                 options = {};
@@ -533,7 +533,7 @@ function entityResource($q, $http, umbRequestHelper) {
                             query: query,
                             type: type,
                             searchFrom: options.searchFrom,
-                            bypassUserPermissions: options.bypassUserPermissions
+                            ignoreUserStartNodes: options.ignoreUserStartNodes
                         }),
                     httpConfig),
                 'Failed to retrieve entity data for query ' + query);

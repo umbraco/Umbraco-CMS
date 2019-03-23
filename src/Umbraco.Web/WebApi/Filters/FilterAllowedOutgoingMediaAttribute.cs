@@ -79,10 +79,10 @@ namespace Umbraco.Web.WebApi.Filters
 
         protected virtual void FilterItems(IUser user, IList items)
         {
-            bool bypassUserPermissions = false;
-            bool.TryParse(HttpContext.Current.Request.QueryString.Get(TreeQueryStringParameters.BypassUserPermissions), out bypassUserPermissions);
+            bool ignoreUserStartNodes = false;
+            bool.TryParse(HttpContext.Current.Request.QueryString.Get(TreeQueryStringParameters.IgnoreUserStartNodes), out ignoreUserStartNodes);
 
-            if (bypassUserPermissions == false)
+            if (ignoreUserStartNodes == false)
             {
                 FilterBasedOnStartNode(items, user);
             }

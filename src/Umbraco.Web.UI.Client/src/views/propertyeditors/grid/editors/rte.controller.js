@@ -16,7 +16,7 @@
                 view: "linkpicker",
                 currentTarget: currentTarget,
 				anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
-                bypassUserPermissions: $scope.model.config.bypassUserPermissions === '1',
+                ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === '1',
                 show: true,
                 submit: function(model) {
                     tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
@@ -27,12 +27,12 @@
         }
 
         function openMediaPicker(editor, currentTarget, userData) {
-            var bypassUserPermissions = false;
+            var ignoreUserStartNodes = false;
             var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
             var startNodeIsVirtual = userData.startMediaIds.length !== 1;
 
-            if ($scope.model.config.bypassUserPermissions === '1') {
-                bypassUserPermissions = true;
+            if ($scope.model.config.ignoreUserStartNodes === '1') {
+                ignoreUserStartNodes = true;
                 startNodeId = -1;
                 startNodeIsVirtual = true;
             }
@@ -43,7 +43,7 @@
                 showDetails: true,                
                 startNodeId: startNodeId,
                 startNodeIsVirtual: startNodeIsVirtual,
-                bypassUserPermissions: bypassUserPermissions,
+                ignoreUserStartNodes: ignoreUserStartNodes,
                 view: "mediapicker",
                 show: true,
                 submit: function(model) {

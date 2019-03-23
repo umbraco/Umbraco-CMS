@@ -58,10 +58,10 @@ namespace Umbraco.Web.PropertyEditors
                 });
                 Fields.Add(new PreValueField()
                 {
-                    Key = "bypassUserPermissions",
+                    Key = "ignoreUserStartNodes",
                     View = "boolean",
-                    Name = "Bypass User Permissions",
-                    Description = "If set, user and group start node permissions will be bypassed."
+                    Name = "Ignore user start nodes",
+                    Description = "If set, user and group start node permissions will be ignored."
                 });
                 Fields.Add(new PreValueField()
                 {

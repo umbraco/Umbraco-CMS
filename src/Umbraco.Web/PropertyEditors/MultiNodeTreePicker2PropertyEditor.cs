@@ -16,7 +16,7 @@ namespace Umbraco.Web.PropertyEditors
                 {"showOpenButton", "0"},
                 {"showEditButton", "0"},
                 {"showPathOnHover", "0"},
-                {"bypassUserPermissions", "0"},
+                {"ignoreUserStartNodes", "0"},
                 {"idType", "udi"}
             };
         }
@@ -40,10 +40,10 @@ namespace Umbraco.Web.PropertyEditors
                 //create the fields
                 Fields.Add(new PreValueField()
                 {
-                    Key = "bypassUserPermissions",
+                    Key = "ignoreUserStartNodes",
                     View = "boolean",
-                    Name = "Bypass User Permissions",
-                    Description = "If set, user and group start node permissions will be bypassed."
+                    Name = "Ignore user start nodes",
+                    Description = "If set, user and group start node permissions will be ignored."
                 });
                 Fields.Add(new PreValueField()
                 {

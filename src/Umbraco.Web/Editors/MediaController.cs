@@ -265,11 +265,11 @@ namespace Umbraco.Web.Editors
             Direction orderDirection = Direction.Ascending,
             bool orderBySystemField = true,
             string filter = "",
-            bool bypassUserPermissions = false)
+            bool ignoreUserStartNodes = false)
         {
             //if a request is made for the root node data but the user's start node is not the default, then
             // we need to return their start nodes
-            if (id == Constants.System.Root && UserStartNodes.Length > 0 && (UserStartNodes.Contains(Constants.System.Root) == false && bypassUserPermissions == false))
+            if (id == Constants.System.Root && UserStartNodes.Length > 0 && (UserStartNodes.Contains(Constants.System.Root) == false && ignoreUserStartNodes == false))
             {
                 if (pageNumber > 0)
                     return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
@@ -331,12 +331,12 @@ namespace Umbraco.Web.Editors
            Direction orderDirection = Direction.Ascending,
            bool orderBySystemField = true,
            string filter = "",
-           bool bypassUserPermissions = false)
+           bool ignoreUserStartNodes = false)
         {
             var entity = Services.EntityService.GetByKey(id);
             if (entity != null)
             {
-                return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter, bypassUserPermissions);
+                return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter, ignoreUserStartNodes);
             }
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
@@ -360,7 +360,7 @@ namespace Umbraco.Web.Editors
            Direction orderDirection = Direction.Ascending,
            bool orderBySystemField = true,
            string filter = "",
-           bool bypassUserPermissions = false)
+           bool ignoreUserStartNodes = false)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
@@ -368,7 +368,7 @@ namespace Umbraco.Web.Editors
                 var entity = Services.EntityService.GetByKey(guidUdi.Guid);
                 if (entity != null)
                 {
-                    return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter, bypassUserPermissions);
+                    return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter, ignoreUserStartNodes);
                 }
             }
 
@@ -385,7 +385,7 @@ namespace Umbraco.Web.Editors
            Direction orderDirection = Direction.Ascending,
            bool orderBySystemField = true,
            string filter = "",
-           bool bypassUserPermissions = false)
+           bool ignoreUserStartNodes = false)
         {
             foreach (var type in new[] { typeof(int), typeof(Guid) })
             {

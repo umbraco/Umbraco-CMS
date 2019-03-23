@@ -84,7 +84,7 @@ namespace Umbraco.Web.Editors
         /// </param>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, bool bypassUserPermissions = false)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             //TODO: Should we restrict search results based on what app the user has access to?
             // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
-            return ExamineSearch(query, type, searchFrom, bypassUserPermissions);
+            return ExamineSearch(query, type, searchFrom, ignoreUserStartNodes);
         }
 
         /// <summary>
@@ -535,7 +535,7 @@ namespace Umbraco.Web.Editors
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
             string filter = "",
-            bool bypassUserPermissions = false)
+            bool ignoreUserStartNodes = false)
         {
             if (pageNumber <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -563,7 +563,7 @@ namespace Umbraco.Web.Editors
                             break;
                     }
 
-                    entities = aids == null || aids.Contains(Constants.System.Root) || bypassUserPermissions == true
+                    entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes == true
                         ? Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false)
                         : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
                 }
@@ -599,9 +599,9 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, bool bypassUserPermissions = false)
+        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, bool ignoreUserStartNodes = false)
         {
-            return GetResultForAncestors(id, type, bypassUserPermissions);
+            return GetResultForAncestors(id, type, ignoreUserStartNodes);
         }
 
         public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter, [FromUri]IDictionary<string, object> postFilterParams)
@@ -616,10 +616,10 @@ namespace Umbraco.Web.Editors
         /// <param name="entityType"></param>
         /// <param name="searchFrom"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool bypassUserPermissions = false)
+        private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             long total;
-            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom, bypassUserPermissions);
+            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom, ignoreUserStartNodes);
         }
         
 
@@ -646,7 +646,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType, bool bypassUserPermissions = false)
+        private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType, bool ignoreUserStartNodes = false)
         {
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
@@ -655,7 +655,7 @@ namespace Umbraco.Web.Editors
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
 
-                if (bypassUserPermissions == false)
+                if (ignoreUserStartNodes == false)
                 {
                     int[] aids = null;
                     switch (entityType)

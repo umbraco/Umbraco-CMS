@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             InternalPreValues = new Dictionary<string, object>
             {
-                {"bypassUserPermissions", "0"},
+                {"ignoreUserStartNodes", "0"},
                 {"idType", "udi"}
             };
         }
@@ -33,8 +33,8 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class RelatedLinksPreValueEditor : PreValueEditor
         {
-            [PreValueField("bypassUserPermissions", "Bypass User Permissions", "boolean", Description = "If set, user and group start node permissions will be bypassed.")]
-            public bool BypassUserPermissions { get; set; }
+            [PreValueField("ignoreUserStartNodes", "Ignore user start nodes", "boolean", Description = "If set, user and group start node permissions will be ignored.")]
+            public bool IgnoreUserStartNodes { get; set; }
 
             [PreValueField("max", "Maximum number of links", "number", Description = "Enter the maximum amount of links to be added, enter 0 for unlimited")]
             public int Maximum { get; set; }            

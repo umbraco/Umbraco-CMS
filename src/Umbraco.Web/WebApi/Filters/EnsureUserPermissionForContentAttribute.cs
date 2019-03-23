@@ -73,8 +73,8 @@ namespace Umbraco.Web.WebApi.Filters
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
             
-            bool bypassUserPermissions = actionContext.ActionArguments.ContainsKey("bypassUserPermissions")
-                    ? bool.Parse(actionContext.ActionArguments.GetValueAsString("bypassUserPermissions"))
+            bool ignoreUserStartNodes = actionContext.ActionArguments.ContainsKey("ignoreUserStartNodes")
+                    ? bool.Parse(actionContext.ActionArguments.GetValueAsString("ignoreUserStartNodes"))
                     : false;
 
             int nodeId;
@@ -132,7 +132,7 @@ namespace Umbraco.Web.WebApi.Filters
                 ApplicationContext.Current.Services.EntityService, 
                 nodeId,
                 _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null,
-                bypassUserPermissions: bypassUserPermissions))
+                ignoreUserStartNodes: ignoreUserStartNodes))
             {
                 base.OnActionExecuting(actionContext);
             }

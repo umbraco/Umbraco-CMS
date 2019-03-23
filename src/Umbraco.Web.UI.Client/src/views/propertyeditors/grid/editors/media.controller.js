@@ -2,10 +2,10 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
     function ($scope, $rootScope, $timeout, userService) {
         
-        var bypassUserPermissions = $scope.model.config.bypassUserPermissions === '1' ? true : false;
+        var ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === '1' ? true : false;
 
         if (!$scope.model.config.startNodeId) {
-            if (bypassUserPermissions === true) {
+            if (ignoreUserStartNodes === true) {
                 $scope.model.config.startNodeId = -1;
                 $scope.model.config.startNodeIsVirtual = true;
 
@@ -22,7 +22,7 @@ angular.module("umbraco")
             $scope.mediaPickerOverlay.view = "mediapicker";
             $scope.mediaPickerOverlay.startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
             $scope.mediaPickerOverlay.startNodeIsVirtual = $scope.mediaPickerOverlay.startNodeId ? $scope.model.config.startNodeIsVirtual : undefined;
-            $scope.mediaPickerOverlay.bypassUserPermissions = bypassUserPermissions;
+            $scope.mediaPickerOverlay.ignoreUserStartNodes = ignoreUserStartNodes;
             $scope.mediaPickerOverlay.cropSize = $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined;
             $scope.mediaPickerOverlay.showDetails = true;
             $scope.mediaPickerOverlay.disableFolderSelect = true;

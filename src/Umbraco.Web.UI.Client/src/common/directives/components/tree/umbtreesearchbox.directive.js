@@ -12,7 +12,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             searchFromName: "@",
             showSearch: "@",
             section: "@",
-            bypassUserPermissions: "@",
+            ignoreUserStartNodes: "@",
             hideSearchCallback: "=",
             searchCallback: "="
         },
@@ -62,9 +62,9 @@ function treeSearchBox(localizationService, searchService, $q) {
                         searchArgs["searchFrom"] = scope.searchFromId;
                     }
 
-                    //append bypassUserPermissions value if there is one
-                    if (scope.bypassUserPermissions) {                        
-                        searchArgs["bypassUserPermissions"] = scope.bypassUserPermissions;
+                    //append ignoreUserStartNodes value if there is one
+                    if (scope.ignoreUserStartNodes) {                        
+                        searchArgs["ignoreUserStartNodes"] = scope.ignoreUserStartNodes;
                     }                   
 
                     searcher(searchArgs).then(function (data) {

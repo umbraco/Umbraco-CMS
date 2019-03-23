@@ -73,7 +73,7 @@ angular.module('umbraco.services')
 
                 var options = {
                     searchFrom: args.searchFrom,
-                    bypassUserPermissions: args.bypassUserPermissions
+                    ignoreUserStartNodes: args.ignoreUserStartNodes
                 }
 
                 return entityResource.search(args.term, "Document", options, args.canceler).then(function (data) {
@@ -103,7 +103,7 @@ angular.module('umbraco.services')
 
                 var options = {
                     searchFrom: args.searchFrom,
-                    bypassUserPermissions: args.bypassUserPermissions
+                    ignoreUserStartNodes: args.ignoreUserStartNodes
                 }
 
                 return entityResource.search(args.term, "Media", options).then(function (data) {

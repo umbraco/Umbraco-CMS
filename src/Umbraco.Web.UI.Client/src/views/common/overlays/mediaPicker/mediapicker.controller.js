@@ -50,7 +50,7 @@ angular.module("umbraco")
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
-                bypassUserPermissions: $scope.model.bypassUserPermissions
+                ignoreUserStartNodes: $scope.model.ignoreUserStartNodes
             };
 
             //preload selected item
@@ -157,7 +157,7 @@ angular.module("umbraco")
                 }
 
                 if (folder.id > 0) {
-                    entityResource.getAncestors(folder.id, "media", { bypassUserPermissions: $scope.model.bypassUserPermissions })
+                    entityResource.getAncestors(folder.id, "media", { ignoreUserStartNodes: $scope.model.ignoreUserStartNodes })
                         .then(function(anc) {              
                             $scope.path = _.filter(anc,
                                 function(f) {
@@ -316,7 +316,7 @@ angular.module("umbraco")
                                 totalItems: 0,
                                 totalPages: 0,
                                 filter: '',
-                                bypassUserPermissions: $scope.model.bypassUserPermissions
+                                ignoreUserStartNodes: $scope.model.ignoreUserStartNodes
                             };
                             getChildren($scope.currentFolder.id);
                         }
@@ -388,7 +388,7 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 $scope.loading = true;
-                return mediaResource.getChildren(id, { bypassUserPermissions: $scope.model.bypassUserPermissions })
+                return mediaResource.getChildren(id, { ignoreUserStartNodes: $scope.model.ignoreUserStartNodes })
                     .then(function(data) {
                         $scope.searchOptions.filter = "";
                         $scope.images = data.items ? data.items : [];

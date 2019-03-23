@@ -350,13 +350,13 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// If the request should bypass user permissions
+        /// If the request should ignore user permissions
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected bool BypassUserPermissions(FormDataCollection queryStrings)
+        protected bool IgnoreUserStartNodes(FormDataCollection queryStrings)
         {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.BypassUserPermissions);
+            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IgnoreUserStartNodes);
         }
 
         /// <summary>

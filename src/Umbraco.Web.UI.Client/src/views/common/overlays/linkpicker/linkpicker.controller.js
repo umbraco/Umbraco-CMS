@@ -18,11 +18,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             searchFromId: null,
             searchFromName: null,
             showSearch: false,
-            bypassUserPermissions: dialogOptions.bypassUserPermissions,
+            ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes,
             results: [],
             selectedSearchResults: []
         };
-        $scope.customTreeParams = dialogOptions.bypassUserPermissions ? "bypassUserPermissions=" + dialogOptions.bypassUserPermissions : "";
+        $scope.customTreeParams = dialogOptions.ignoreUserStartNodes ? "ignoreUserStartNodes=" + dialogOptions.ignoreUserStartNodes : "";
         $scope.showTarget = $scope.model.hideTarget !== true;
 
         if (dialogOptions.currentTarget) {
@@ -46,7 +46,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                     });
 
                     // if a link exists, get the properties to build the anchor name list
-                    contentResource.getById(id, { bypassUserPermissions: dialogOptions.bypassUserPermissions }).then(function (resp) {
+                    contentResource.getById(id, { ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes }).then(function (resp) {
                         $scope.model.target.url = resp.urls[0];
                         $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
                     });
@@ -88,7 +88,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             if (args.node.id < 0) {
                 $scope.model.target.url = "/";
             } else {
-                contentResource.getById(args.node.id, { bypassUserPermissions: dialogOptions.bypassUserPermissions }).then(function (resp) {
+                contentResource.getById(args.node.id, { ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes }).then(function (resp) {
                     $scope.model.target.url = resp.urls[0];
                     $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
                 });
@@ -111,7 +111,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                 var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
                 var startNodeIsVirtual = userData.startMediaIds.length !== 1;
 
-                if (dialogOptions.bypassUserPermissions) {
+                if (dialogOptions.ignoreUserStartNodes) {
                     startNodeId = -1;
                     startNodeIsVirtual = true;
                 }
@@ -120,7 +120,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
                     show: true,
-                    bypassUserPermissions: dialogOptions.bypassUserPermissions,
+                    ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes,
                     submit: function (model) {
                         var media = model.selectedImages[0];
 

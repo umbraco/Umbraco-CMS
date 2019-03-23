@@ -265,7 +265,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(int id, [FromUri]bool bypassUserPermissions = false)
+        public ContentItemDisplay GetById(int id, [FromUri]bool ignoreUserStartNodes = false)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
             if (foundContent == null)
@@ -1126,7 +1126,7 @@ namespace Umbraco.Web.Editors
                 int nodeId,
                 char[] permissionsToCheck = null,
                 IContent contentItem = null,
-                bool bypassUserPermissions = false)
+                bool ignoreUserStartNodes = false)
         {
             if (storage == null) throw new ArgumentNullException("storage");
             if (user == null) throw new ArgumentNullException("user");
@@ -1147,7 +1147,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            if(bypassUserPermissions == true)
+            if(ignoreUserStartNodes == true)
             {
                 return true;
             }
