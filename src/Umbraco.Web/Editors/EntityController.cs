@@ -85,7 +85,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, bool ignoreUserStartNodes = false)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, bool? ignoreUserStartNodes = false)
         {
             //TODO: Should we restrict search results based on what app the user has access to?
             // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
-            return ExamineSearch(query, type, searchFrom, ignoreUserStartNodes);
+            return ExamineSearch(query, type, searchFrom, ignoreUserStartNodes != null && ignoreUserStartNodes.Value);
         }
 
         /// <summary>
