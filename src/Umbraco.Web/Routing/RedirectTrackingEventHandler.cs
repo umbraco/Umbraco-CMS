@@ -177,11 +177,13 @@ namespace Umbraco.Web.Routing
                     // change the IUrlSegmentProvider to support being able to determine if a
                     // segment is going to change for an entity. See notes in IUrlSegmentProvider.
 
-                    var oldEntity = ApplicationContext.Current.Services.ContentService.GetById(entity.Id);
-                    if (oldEntity == null) continue;
-                    var oldSegment = oldEntity.GetUrlSegment();
+                    // we want the last published version, not the last saved
+                    // otherwise redirects aren't created if content is saved, with save+publish happening later
+                    var publishedEntity = ApplicationContext.Current.Services.ContentService.GetPublishedVersion(entity.Id);
+                    if (publishedEntity == null) continue;
+                    var publishedSegment = publishedEntity.GetUrlSegment();
                     var newSegment = entity.GetUrlSegment();
-                    process = oldSegment != newSegment;
+                    process = publishedSegment != newSegment;
                 }
 
                 // skip if no segment change

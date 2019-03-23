@@ -675,7 +675,20 @@ namespace Umbraco.Web
         public IEnumerable<IPublishedContent> TypedContent(params object[] ids)
         {
             return TypedContentForObjects(ids);
+        }   
+
+
+
+        /// <summary>
+        /// Gets the content corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The unique identifiers, or the keys, of the content items.</param>
+        /// <returns>The content items that were found in the cache</returns>
+        public IEnumerable<IPublishedContent> TypedContent(params Udi[] ids)
+        {
+            return TypedContentForObjects(ids);
         }
+
 
         private IEnumerable<IPublishedContent> TypedContentForObjects(IEnumerable<object> ids)
         {
@@ -751,6 +764,17 @@ namespace Umbraco.Web
         public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
         {
             return ContentQuery.TypedContent(ids);
+        }
+
+
+        /// <summary>
+        /// Gets the content corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The unique identifiers, or the keys, of the content items.</param>
+        /// <returns>The content items that were found in the cache</returns>
+        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<Udi> ids)
+        {
+            return TypedContentForObjects(ids);
         }
 
         public IEnumerable<IPublishedContent> TypedContentAtXPath(string xpath, params XPathVariable[] vars)
@@ -936,6 +960,10 @@ namespace Umbraco.Web
 
                 case Guid g:
                     guidId = g;
+                    return true;
+
+                case Udi u:
+                    guidId = new GuidUdi(u.UriValue).Guid;
                     return true;
 
                 default:
