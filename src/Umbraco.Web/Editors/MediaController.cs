@@ -88,7 +88,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, UmbracoUser.Id);
+            var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, Security.CurrentUser.Id);
             var mapped = AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(emptyContent, UmbracoContext);
 
             //remove this tab if it exists: umbContainerView
@@ -422,7 +422,7 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundMedia.IsInRecycleBin() == false)
             {
-                var moveResult = Services.MediaService.WithResult().MoveToRecycleBin(foundMedia, (int)Security.CurrentUser.Id);
+                var moveResult = Services.MediaService.WithResult().MoveToRecycleBin(foundMedia, Security.CurrentUser.Id);
                 if (moveResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -432,7 +432,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = Services.MediaService.WithResult().Delete(foundMedia, (int)Security.CurrentUser.Id);
+                var deleteResult = Services.MediaService.WithResult().Delete(foundMedia, Security.CurrentUser.Id);
                 if (deleteResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -456,7 +456,7 @@ namespace Umbraco.Web.Editors
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
             
-            var moveResult = Services.MediaService.WithResult().Move(toMove, move.ParentId);
+            var moveResult = Services.MediaService.WithResult().Move(toMove, move.ParentId, Security.CurrentUser.Id);
 
             if (sourceParentID == destinationParentID)
             {
@@ -525,7 +525,7 @@ namespace Umbraco.Web.Editors
             }
 
             //save the item
-            var saveStatus = Services.MediaService.WithResult().Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
+            var saveStatus = Services.MediaService.WithResult().Save(contentItem.PersistedContent, Security.CurrentUser.Id);
 
             //return the updated model
             var display = AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(contentItem.PersistedContent, UmbracoContext);
