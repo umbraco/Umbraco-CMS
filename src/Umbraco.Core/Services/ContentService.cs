@@ -1741,7 +1741,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
-        public void EmptyRecycleBin()
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
+        public void EmptyRecycleBin() => EmptyRecycleBin(0);
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
+        /// </summary>
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        public void EmptyRecycleBin(int userId = 0)
         {
             using (new WriteLock(Locker))
             {
@@ -1771,7 +1779,7 @@ namespace Umbraco.Core.Services
                     recycleBinEventArgs.RecycleBinEmptiedSuccessfully = success;
                     uow.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
 
-                    Audit(uow, AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
+                    Audit(uow, AuditType.Delete, "Empty Content Recycle Bin performed by user", userId, Constants.System.RecycleBinContent);
                     uow.Commit();
                 }
             }
