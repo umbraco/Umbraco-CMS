@@ -246,7 +246,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
-            return _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current));
+            return _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current) ?? Enumerable.Empty<UrlInfo>());
         }
 
         #endregion

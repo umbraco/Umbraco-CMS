@@ -15,13 +15,13 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
         private readonly HttpContextBase _httContext;
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IPackagingService _packagingService;
 
-        public StarterKitInstallStep(HttpContextBase httContext, UmbracoContext umbracoContext, IPackagingService packagingService)
+        public StarterKitInstallStep(HttpContextBase httContext, IUmbracoContextAccessor umbracoContextAccessor, IPackagingService packagingService)
         {
             _httContext = httContext;
-            _umbracoContext = umbracoContext;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _packagingService = packagingService;
         }
 
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var packageFile = new FileInfo(definition.PackagePath);
 
-            _packagingService.InstallCompiledPackageData(definition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(-1));
+            _packagingService.InstallCompiledPackageData(definition, packageFile, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(-1));
         }
 
         public override bool RequiresExecution(object model)

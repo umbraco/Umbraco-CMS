@@ -28,6 +28,8 @@ namespace Umbraco.Examine
         /// </remarks>
         internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new Regex("^([_\\w]+)_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
 
+        //TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
+
         /// <summary>
         /// Returns all index fields that are culture specific (suffixed)
         /// </summary>

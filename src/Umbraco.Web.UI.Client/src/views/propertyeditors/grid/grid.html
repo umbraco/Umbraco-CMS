@@ -1,10 +1,9 @@
 <div ng-controller="Umbraco.PropertyEditors.GridController" class="umb-grid umb-property-editor clearfix" id="umb-grid">
 
-    <umb-editor-sub-header style="background-color: white;">
+    <umb-editor-sub-header ng-if="showReorderButton()" style="background-color: white; border-color: white;">
 
         <umb-editor-sub-header-content-right>
             <umb-button
-                ng-if="showReorderButton()"
                 type="button"
                 icon="icon-navigation"
                 button-style="link"
@@ -159,7 +158,7 @@
                                                          </div>
                                                       </div>
 
-                                                      <div class="umb-cell-inner" ui-sortable="sortableOptionsCell" ng-model="area.controls">
+                                                      <div class="umb-cell-inner" ui-sortable="sortableOptionsCell" umb-grid-hack-scope ng-model="area.controls">
 
                                                           <!-- Control placeholder -->
                                                           <div class="umb-cell-placeholder" ng-if="area.controls.length === 0" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">
@@ -171,6 +170,7 @@
 
                                                           <!-- for each control in areas -->
                                                           <div class="umb-control"
+                                                              umb-grid-hack-scope
                                                               ng-repeat="control in area.controls"
                                                               ng-click="clickControl($index, area.controls, area)"
                                                               ng-class="{'-active': control.active}"

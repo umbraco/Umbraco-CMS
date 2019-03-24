@@ -33,49 +33,48 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
         }
 
         function updateViewModel(configItems) {
-
-            //check if it's already in sync
-
+            
             //get the checked vals from the view model
-            var selectedVals = _.map(_.filter($scope.selectedItems,
+            var selectedVals = _.map(
+                _.filter($scope.selectedItems,
                     function(f) {
                         return f.checked;
-                    }),
+                    }
+                ),
                 function(m) {
                     return m.value;
-                });
-            //get all of the same values between the arrays
-            var same = _.intersection($scope.model.value, selectedVals);
-            //if the lengths are the same as the value, then we are in sync, just exit
-            if (same.length == $scope.model.value.length === selectedVals.length) {
-                return; 
+                }
+            );
+            
+            //if the length is zero, then we are in sync, just exit.
+            if (_.difference($scope.model.value, selectedVals).length === 0) {
+                return;
             }
 
             $scope.selectedItems = [];
-
+            
+            var iConfigItem;
             for (var i = 0; i < configItems.length; i++) {
-                var isChecked = _.contains($scope.model.value, configItems[i].value);
+                iConfigItem = configItems[i];
+                var isChecked = _.contains($scope.model.value, iConfigItem.value);
                 $scope.selectedItems.push({
                     checked: isChecked,
-                    key: configItems[i].id,
-                    val: configItems[i].value
+                    key: iConfigItem.id,
+                    val: iConfigItem.value
                 });
             }
         }
 
-        function changed(item) {
-            var index = _.findIndex($scope.model.value,
-                function (v) {
-                    return v === item.val;
-                });
+        function changed(model, value) {
             
-            if (item.checked) {
+            var index = $scope.model.value.indexOf(value);
+            
+            if (model) {
                 //if it doesn't exist in the model, then add it
                 if (index < 0) {
-                    $scope.model.value.push(item.val);
+                    $scope.model.value.push(value);
                 }
-            }
-            else {
+            } else {
                 //if it exists in the model, then remove it
                 if (index >= 0) {
                     $scope.model.value.splice(index, 1);

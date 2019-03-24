@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function SendToPublishController($scope, localizationService) {
+    function SendToPublishController($scope, localizationService, contentEditingHelper) {
 
         var vm = this;
         vm.loading = true;
@@ -23,6 +23,12 @@
 
 
             if (vm.variants.length !== 0) {
+                _.each(vm.variants,
+                    function (variant) {
+                        variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
+                        variant.htmlId = "_content_variant_" + variant.compositeId;
+                    });
+
                 //now sort it so that the current one is at the top
                 vm.variants = _.sortBy(vm.variants, function (v) {
                     return v.active ? 0 : 1;

@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             : base(scopeAccessor, cache, logger)
         { }
 
-        protected override bool IsPublishing => MemberType.IsPublishingConst;
+        protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;
 
         protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy()
         {

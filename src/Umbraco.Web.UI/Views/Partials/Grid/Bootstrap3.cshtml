@@ -5,7 +5,7 @@
 @if (Model != null && Model.sections != null)
 {
     var oneColumn = ((System.Collections.ICollection)Model.sections).Count == 1;
-    
+
     <div class="umb-grid">
         @if (oneColumn)
         {
@@ -15,8 +15,8 @@
                         @renderRow(row, true);
                     }
                 </div>
-            }   
-        }else { 
+            }
+        }else {
             <div class="container">
                 <div class="row clearfix">
                     @foreach (var s in Model.sections) {
@@ -29,14 +29,14 @@
                         </div>
                     }
                 </div>
-            </div>   
+            </div>
         }
     </div>
 }
 
 @helper renderRow(dynamic row, bool singleColumn){
     <div @RenderElementAttributes(row)>
-        @Umbraco.If(singleColumn, "<div class='container'>")
+        @Html.If(singleColumn, "<div class='container'>")
         <div class="row clearfix">
             @foreach ( var area in row.areas ) {
             <div class="col-md-@area.grid column">
@@ -49,7 +49,7 @@
                 </div>
             </div>}
         </div>
-        @Umbraco.If(singleColumn, "</div>")
+        @Html.If(singleColumn, "</div>")
     </div>
 }
 

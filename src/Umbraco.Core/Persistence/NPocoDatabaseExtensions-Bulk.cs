@@ -4,10 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NPoco;
-using StackExchange.Profiling.Data;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence

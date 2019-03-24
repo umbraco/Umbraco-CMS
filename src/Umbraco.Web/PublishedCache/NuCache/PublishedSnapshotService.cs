@@ -23,6 +23,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -44,9 +45,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
-        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
+        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -88,8 +89,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IEntityXmlSerializer entitySerializer)
+            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper,
+            IEntityXmlSerializer entitySerializer, IPublishedModelFactory publishedModelFactory,
+            UrlSegmentProviderCollection urlSegmentProviders)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -107,7 +109,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _urlSegmentProviders = urlSegmentProviders;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -167,7 +169,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _domainStore = new SnapDictionary<int, Domain>();
 
-            LoadCaches();
+            publishedModelFactory.WithSafeLiveFactory(LoadCaches);
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
@@ -328,14 +330,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadContent(Action<IScope> action)
         {
-            using (_contentStore.GetWriter(_scopeProvider))
+            // first get a writer, then a scope
+            // if there already is a scope, the writer will attach to it
+            // otherwise, it will only exist here - cheap
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.ContentTree);
-                    action(scope);
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.ContentTree);
+                action(scope);
+                scope.Complete();
             }
         }
 
@@ -397,14 +400,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadMedia(Action<IScope> action)
         {
-            using (_mediaStore.GetWriter(_scopeProvider))
+            // see note in LockAndLoadContent
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.MediaTree);
-                    action(scope);
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.MediaTree);
+                action(scope);
+                scope.Complete();
             }
         }
 
@@ -526,14 +528,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadDomains()
         {
-            using (_domainStore.GetWriter(_scopeProvider))
+            // see note in LockAndLoadContent
+            using (_domainStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.Domains);
-                    LoadDomainsLocked();
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.Domains);
+                LoadDomainsLocked();
+                scope.Complete();
             }
         }
 
@@ -571,6 +572,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // because now we should ALWAYS run with the database server messenger, and then the RefreshAll will
         // be processed as soon as we are configured and the messenger processes instructions.
 
+        // note: notifications for content type and data type changes should be invoked with the
+        // pure live model factory, if any, locked and refreshed - see ContentTypeCacheRefresher and
+        // DataTypeCacheRefresher
+
         public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
             // no cache, trash everything
@@ -581,7 +586,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
             }
 
-            using (_contentStore.GetWriter(_scopeProvider))
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
             {
                 NotifyLocked(payloads, out bool draftChanged2, out bool publishedChanged2);
                 draftChanged = draftChanged2;
@@ -677,7 +682,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
             }
 
-            using (_mediaStore.GetWriter(_scopeProvider))
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
                 NotifyLocked(payloads, out bool anythingChanged2);
                 anythingChanged = anythingChanged2;
@@ -798,7 +803,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (removedIds.Count == 0 && refreshedIds.Count == 0 && otherIds.Count == 0 && newIds.Count == 0) return;
 
-            using (store.GetWriter(_scopeProvider))
+            using (store.GetScopedWriteLock(_scopeProvider))
             {
                 // ReSharper disable AccessToModifiedClosure
                 action(removedIds, refreshedIds, otherIds, newIds);
@@ -819,8 +824,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     payload.Removed ? "Removed" : "Refreshed",
                     payload.Id);
 
-            using (_contentStore.GetWriter(_scopeProvider))
-            using (_mediaStore.GetWriter(_scopeProvider))
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
                 // TODO: need to add a datatype lock
                 // this is triggering datatypes reload in the factory, and right after we create some
@@ -852,7 +857,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_isReady == false)
                 return;
 
-            using (_domainStore.GetWriter(_scopeProvider))
+            // see note in LockAndLoadContent
+            using (_domainStore.GetScopedWriteLock(_scopeProvider))
             {
                 foreach (var payload in payloads)
                 {
@@ -946,8 +952,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.ContentTypes);
+
                 var typesA = CreateContentTypes(PublishedItemType.Content, refreshedIdsA).ToArray();
                 var kits = _dataSource.GetTypeContentSources(scope, refreshedIdsA);
+
                 _contentStore.UpdateContentTypes(removedIds, typesA, kits);
                 _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()).ToArray());
                 _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()).ToArray());
@@ -967,8 +975,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.MediaTypes);
+
                 var typesA = CreateContentTypes(PublishedItemType.Media, refreshedIdsA).ToArray();
                 var kits = _dataSource.GetTypeMediaSources(scope, refreshedIdsA);
+
                 _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
                 _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
                 _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
@@ -1261,7 +1271,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 foreach (var cultureInfo in infos)
                 {
                     var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
-                    cultureData[cultureInfo.Culture] = new CultureVariation { Name = cultureInfo.Name, Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
+                    cultureData[cultureInfo.Culture] = new CultureVariation
+                    {
+                        Name = cultureInfo.Name,
+                        UrlSegment = content.GetUrlSegment(_urlSegmentProviders, cultureInfo.Culture),
+                        Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
+                        IsDraft = cultureIsDraft
+                    };
                 }
             }
 
@@ -1269,7 +1285,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var nestedData = new ContentNestedData
             {
                 PropertyData = propertyData,
-                CultureData = cultureData
+                CultureData = cultureData,
+                UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
             };
 
             var dto = new ContentNuDto

@@ -15,7 +15,7 @@ namespace Umbraco.Web
         {
         }
 
-        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, ServiceContext service, IProfilingLogger plogger) : base(umbracoContext, umbracoHelper, service, plogger)
+        protected UmbracoAuthorizedHttpHandler(IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper umbracoHelper, ServiceContext service, IProfilingLogger plogger) : base(umbracoContextAccessor, umbracoHelper, service, plogger)
         {
         }
 
@@ -26,7 +26,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         protected bool ValidateUserContextId(string currentUmbracoUserContextId)
         {
-            return UmbracoContext.Security.ValidateCurrentUser();
+            return Security.ValidateCurrentUser();
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         protected bool ValidateCredentials(string username, string password)
         {
-            return UmbracoContext.Security.ValidateBackOfficeCredentials(username, password);
+            return Security.ValidateBackOfficeCredentials(username, password);
         }
 
         /// <summary>

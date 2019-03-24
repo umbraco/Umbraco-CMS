@@ -52,7 +52,6 @@
     <key alias="domainExists">ドメイン '%0%' は既に割り当てられています</key>
     <key alias="domainUpdated">ドメイン '%0%' は更新されました</key>
     <key alias="orEdit">ドメインの編集</key>
-    <key alias="domainHelp"><![CDATA[有効なドメイン名は、"example.com"、"www.example.com"、"example.com:8080"、"https://www.example.com/" などです。ドメインで 1 レベル パスがサポートされます。ただし、それらは回避する必要があります。代わりに上記のカルチャ設定を使用してください。]]></key>
     <key alias="inherit">継承</key>
     <key alias="setLanguage">カルチャの割り当て</key>
     <key alias="setLanguageHelp"><![CDATA[現在のノードの下のノードのカルチャを設定または親ノードからカルチャを継承。以下のドメインが適用されない場合、現在のノードにも適用します。]]></key>
@@ -466,7 +465,7 @@
     <key alias="blue">ブルー</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">タブの追加</key>
+    <key alias="addGroup">タブの追加</key>
     <key alias="addProperty">プロパティの追加</key>
     <key alias="addEditor">エディターの追加</key>
     <key alias="addTemplate">テンプレートの追加</key>
@@ -932,7 +931,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">構成</key>
-    <key alias="noTabs">タブが追加されていません</key>
+    <key alias="noGroups">タブが追加されていません</key>
     <key alias="inheritedFrom">次から継承:</key>
     <key alias="addProperty">プロパティの追加</key>
     <key alias="requiredLabel">必要なラベル</key>

@@ -82,6 +82,10 @@
 .umb-editor-header__name-wrapper {
 	position: relative;
 	display: flex;
+	border: 1px solid @inputBorder;
+    &:focus-within {
+        border-color: @inputBorderFocus;
+    }
 }
 
 .umb-editor-header__name-and-description {
@@ -109,7 +113,9 @@ input.umb-editor-header__name-input {
 	width: 100%;
 	padding: 0 10px;
 	background: @white;
-	border: 1px solid @gray-8;
+    &:focus {
+        border-color: transparent;
+    }
 }
 
 input.umb-editor-header__name-input:disabled {
@@ -156,13 +162,12 @@ a.umb-editor-header__close-split-view:hover {
 	align-items: center;
 	padding: 0 10px; 
     margin: 1px 1px;
-    position: absolute;
     right: 0;
     height: 30px;
 	text-decoration: none !important;
 	font-size: 13px;
 	//color: @gray-4;
-    color: @ui-action-disgrete-type;
+    color: @ui-action-discreet-type;
 	//background-color: @white;
 }
 
@@ -170,15 +175,15 @@ a.umb-variant-switcher__toggle {
 	transition: color 0.2s ease-in-out;
 	&:hover {
 		//background-color: @gray-10;
-        color: @ui-action-disgrete-type-hover;
+        color: @ui-action-discreet-type-hover;
         .umb-variant-switcher__expand {
-            color: @ui-action-disgrete-type-hover;
+            color: @ui-action-discreet-type-hover;
         }
 	}
 }
 
 .umb-variant-switcher__expand {
-    color: @ui-action-disgrete-type;
+    color: @ui-action-discreet-type;
 	margin-top: 3px;
 	margin-left: 5px;
 	margin-right: -5px;
@@ -190,6 +195,7 @@ a.umb-variant-switcher__toggle {
     justify-content: space-between;
 	align-items: center;
 	border-bottom: 1px solid @gray-9;
+    position: relative;
     &:hover .umb-variant-switcher__name-wrapper {
         
     }
@@ -241,10 +247,15 @@ a.umb-variant-switcher__toggle {
 }
 
 .umb-variant-switcher__split-view {
-	font-size: 13px;
-	display: none;
-	padding: 16px 20px;
-    
+    font-size: 13px;
+    display: none;
+    padding: 16px 20px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: @white;
+
     &:hover {
         background-color: @ui-option-hover;
         color: @ui-option-type-hover;

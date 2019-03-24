@@ -116,7 +116,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var umbracoSettings = GetUmbracoSettings();
             var globalSettings = GetGlobalSettings();
-            var urlProviders = Enumerable.Empty<IUrlProvider>();
+            var urlProviders = new UrlProviderCollection(Enumerable.Empty<IUrlProvider>());
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
 

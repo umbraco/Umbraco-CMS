@@ -25,7 +25,7 @@
         var labelKeys = [
             "general_design",
             "shortcuts_shortcut",
-            "shortcuts_addTab",
+            "shortcuts_addGroup",
             "shortcuts_addProperty",
             "shortcuts_addEditor",
             "shortcuts_editDataType"
@@ -35,7 +35,7 @@
 
             vm.labels.design = values[0];
             vm.labels.shortcut = values[1];
-            vm.labels.addTab = values[2];
+            vm.labels.addGroup = values[2];
             vm.labels.addProperty = values[3];
             vm.labels.addEditor = values[4];
             vm.labels.editDataType = values[5];
@@ -54,8 +54,8 @@
                     "name": vm.labels.shortcut,
                     "shortcuts": [
                         {
-                            "description": vm.labels.addTab,
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                            "description": vm.labels.addGroup,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "g" }]
                         },
                         {
                             "description": vm.labels.addProperty,

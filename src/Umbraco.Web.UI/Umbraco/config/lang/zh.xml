@@ -55,9 +55,6 @@
     <key alias="domainExists">域名 '%0%' 已使用</key>
     <key alias="domainUpdated">域名 '%0%' 已更新</key>
     <key alias="orEdit">编辑当前域名</key>
-    <key alias="domainHelp"><![CDATA[例如：example.com、www.example.com、example.com:8080、<br/>
-        https://www.example.com/、example.com/en、……使用 * 代表任意域名，<br/>
-        只需要设置语言部分即可。]]></key>
     <key alias="inherit">继承</key>
     <key alias="setLanguage">语言</key>
     <key alias="setLanguageHelp"><![CDATA[为当前节点及子节点设置语言，<br />
@@ -490,7 +487,7 @@
     <key alias="blue">蓝色</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">添加选项卡</key>
+    <key alias="addGroup">添加选项卡</key>
     <key alias="addProperty">添加属性</key>
     <key alias="addEditor">添加编辑器</key>
     <key alias="addTemplate">添加模板</key>
@@ -980,7 +977,7 @@
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">组合</key>
-    <key alias="noTabs">您没有添加任何选项卡</key>
+    <key alias="noGroups">您没有添加任何选项卡</key>
     <key alias="inheritedFrom">继承自</key>
     <key alias="addProperty">添加属性</key>
     <key alias="requiredLabel">必需的标签</key>
@@ -1208,13 +1205,13 @@
     <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
     <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'umbracoUseSSL' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
-    <key alias="httpsCheckEnableHttpsError">Could not update the 'umbracoUseSSL' setting in your web.config file. Error: %0%</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco.Core.UseHttps' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco.Core.UseHttps' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
+    <key alias="httpsCheckEnableHttpsError">Could not update the 'Umbraco.Core.UseHttps' setting in your web.config file. Error: %0%</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
     <key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'Umbraco.Core.UseHttps' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
     <key alias="rectifyButton">Fix</key>
     <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
     <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>

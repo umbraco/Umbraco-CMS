@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             : base(scopeAccessor, cache, logger)
         { }
 
-        protected abstract bool IsPublishing { get; }
+        protected abstract bool SupportsPublishing { get; }
 
         public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
         {
@@ -1021,7 +1021,7 @@ AND umbracoNode.id <> @id",
             var dtos = Database
                 .Fetch<PropertyTypeGroupDto>(sql);
 
-            var propertyGroups = PropertyGroupFactory.BuildEntity(dtos, IsPublishing, id, createDate, updateDate,CreatePropertyType);
+            var propertyGroups = PropertyGroupFactory.BuildEntity(dtos, SupportsPublishing, id, createDate, updateDate,CreatePropertyType);
 
             return new PropertyGroupCollection(propertyGroups);
         }
@@ -1057,7 +1057,7 @@ AND umbracoNode.id <> @id",
             //Reset dirty properties
             Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties(false));
 
-            return new PropertyTypeCollection(IsPublishing, list);
+            return new PropertyTypeCollection(SupportsPublishing, list);
         }
 
         protected void ValidateAlias(PropertyType pt)

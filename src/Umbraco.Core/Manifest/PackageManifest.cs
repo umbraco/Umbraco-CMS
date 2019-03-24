@@ -55,6 +55,6 @@ namespace Umbraco.Core.Manifest
         /// Gets or sets the sections listed in the manifest.
         /// </summary>
         [JsonProperty("sections")]
-        public ManifestBackOfficeSection[] Sections { get; set; } = Array.Empty<ManifestBackOfficeSection>();
+        public ManifestSection[] Sections { get; set; } = Array.Empty<ManifestSection>();
     }
 }
