@@ -50,13 +50,24 @@ function addFocusTrapInfiniteMode () {
     var appHeader = $('.umb-app-header');
     var leftColumn = $('#leftcolumn');
     var contentColumn = $('#contentcolumn > div:first-child');
+    var editors = $('.umb-editors');
 
+    // Remove focus from any interactive elements in the appHeader, leftColumn and the first child in the contentColumn
     appHeader.attr('inert','');
     leftColumn.attr('inert','');
     contentColumn.attr('inert','');
-    var editors = $('.umb-editors'); // Keep an eye on the added / removed editors... not sure if watch is needed? But always add inert/aria-hidden to the prev siblings...
 
     console.log('add the focus trap for the INFINITE mode, hehehehe');
+    
+    // Make sure the DOM has been updated before dealing with how many children there are...
+    // TODO: Make sure that all children, if there are more than one, get the inert attribute - Except that last one!
+    // This means we'll need to check in the "removeEditor" method whether or not the array of editors is greater than one... and then add/remove the inert attribute accordingly
+    // This scenario might need it's own set of methods...
+
+    // Currently just seeing if children are available with each call to the "addEditor" method
+    setTimeout(function(){
+        console.log(editors.children());
+    }, 100);
 }
 
 angular.module('umbraco.services').factory('focusTrapService', focusTrapService);
