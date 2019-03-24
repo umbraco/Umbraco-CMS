@@ -5,7 +5,6 @@ LazyLoad.js([
     'lib/angular-touch/angular-touch.js',
     'lib/angular-sanitize/angular-sanitize.js',
     'lib/angular-messages/angular-messages.js',
-    'lib/wicg-inert/dist/inert.min.js',
     'lib/underscore/underscore-min.js',
     'lib/angular-ui-sortable/sortable.js', 
     'js/installer.app.js',
