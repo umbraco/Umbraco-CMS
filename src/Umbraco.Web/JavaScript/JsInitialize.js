@@ -27,6 +27,8 @@
     'lib/chart.js/chart.min.js',
     'lib/angular-chart.js/angular-chart.min.js',
 
+    'lib/wicg-inert/dist/inert.min.js',
+
     'lib/umbraco/Extensions.js',
 
     'lib/umbraco/NamespaceManager.js',

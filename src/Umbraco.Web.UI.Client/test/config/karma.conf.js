@@ -21,6 +21,7 @@ module.exports = function (config) {
             'node_modules/angular-mocks/angular-mocks.js',
             'node_modules/angular-ui-sortable/dist/sortable.js',
             'node_modules/underscore/underscore-min.js',
+            'node_modules/wicg-inert/dist/inert.min.js',
             'node_modules/moment/min/moment-with-locales.js',
             'lib/umbraco/Extensions.js',
             'node_modules/lazyload-js/lazyload.min.js',
