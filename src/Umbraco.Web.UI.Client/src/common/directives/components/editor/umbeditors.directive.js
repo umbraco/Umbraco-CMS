@@ -7,7 +7,7 @@
 (function () {
     'use strict';
 
-    function EditorsDirective($timeout, eventsService) {
+    function EditorsDirective($timeout, eventsService, focusTrapService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -17,7 +17,6 @@
             scope.editors = [];
             
             function addEditor(editor) {
-
                 editor.inFront = true;
                 editor.moveRight = true;
                 editor.level = 0;
@@ -36,11 +35,9 @@
                 setTimeout(revealEditorContent.bind(this, editor), 400);
                 
                 updateEditors();
-
             }
             
             function removeEditor(editor) {
-                
                 editor.moveRight = true;
                 
                 editor.animating = true;
@@ -81,6 +78,7 @@
                 var ceiling = Math.min(calcLen, allowedNumberOfVisibleEditors);
                 var origin = Math.max(calcLen-1, 0)-ceiling;
                 var i = 0;
+
                 while(i<len) {
                     var iEditor = scope.editors[i];
                     iEditor.styleIndex = Math.min(i+1, allowedNumberOfVisibleEditors);
@@ -89,6 +87,12 @@
                     i++;
                 }
 
+                if(len > 0){
+                    focusTrapService.addFocusTrap('infinite');
+                }
+                else{
+                    focusTrapService.removeFocusTrap();
+                }
             }
             
             evts.push(eventsService.on("appState.editors.open", function (name, args) {
