@@ -6,7 +6,7 @@
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
-                    <li ng-repeat="url in node.urls">
+                    <li ng-repeat="url in node.urls track by $index">
                         <a ng-if="node.hasPublishedVersion" href="{{url}}" target="_blank">
                             <i class="icon icon-window-popin"></i>
                             <span>{{url}}</span>

@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -77,7 +79,12 @@ namespace Umbraco.Web.WebApi.Filters
 
         protected virtual void FilterItems(IUser user, IList items)
         {
-            FilterBasedOnStartNode(items, user);
+            bool.TryParse(HttpContext.Current.Request.QueryString.Get(TreeQueryStringParameters.IgnoreUserStartNodes), out var ignoreUserStartNodes);
+
+            if (ignoreUserStartNodes == false)
+            {
+                FilterBasedOnStartNode(items, user);
+            }
         }
 
         internal void FilterBasedOnStartNode(IList items, IUser user)
