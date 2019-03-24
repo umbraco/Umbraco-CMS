@@ -583,7 +583,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage EmptyRecycleBin()
         {
-            Services.MediaService.EmptyRecycleBin();
+            Services.MediaService.EmptyRecycleBin(Security.CurrentUser.Id);
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
