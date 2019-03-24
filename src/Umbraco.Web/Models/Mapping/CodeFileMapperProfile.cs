@@ -1,65 +1,75 @@
-﻿using AutoMapper;
+﻿using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Stylesheet = Umbraco.Core.Models.Stylesheet;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    public class CodeFileMapperProfile : Profile
+    public class CodeFileMapperProfile : IMapperProfile
     {
-        public CodeFileMapperProfile()
+        public void SetMaps(Mapper mapper)
         {
-            CreateMap<Stylesheet, EntityBasic>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(sheet => sheet.Id))
-                .ForMember(dest => dest.Alias, opt => opt.MapFrom(sheet => sheet.Alias))
-                .ForMember(dest => dest.Key, opt => opt.MapFrom(sheet => sheet.Key))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(sheet => sheet.Name))
-                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
-                .ForMember(dest => dest.Path, opt => opt.MapFrom(sheet => sheet.Path))
-                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.Udi, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.Ignore());
+            mapper.SetMap<Stylesheet, EntityBasic>(source => new EntityBasic(), Map);
+            mapper.SetMap<IPartialView, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
+            mapper.SetMap<Script, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
+            mapper.SetMap<Stylesheet, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
+            mapper.SetMap<CodeFileDisplay, IPartialView>(Map);
+            mapper.SetMap<CodeFileDisplay, Script>(Map);
 
-            CreateMap<IPartialView, CodeFileDisplay>()
-                .ForMember(dest => dest.FileType, opt => opt.Ignore())
-                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.Snippet, opt => opt.Ignore());
+        }
 
-            CreateMap<Script, CodeFileDisplay>()
-                .ForMember(dest => dest.FileType, opt => opt.Ignore())
-                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.Snippet, opt => opt.Ignore());
+        // Umbraco.Code.MapAll -Trashed -Udi -Icon
+        private static void Map(Stylesheet source, EntityBasic target)
+        {
+            target.Alias = source.Alias;
+            target.Id = source.Id;
+            target.Key = source.Key;
+            target.Name = source.Name;
+            target.ParentId = -1;
+            target.Path = source.Path;
+        }
 
-            CreateMap<Stylesheet, CodeFileDisplay>()
-                .ForMember(dest => dest.FileType, opt => opt.Ignore())
-                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.Snippet, opt => opt.Ignore());
+        // Umbraco.Code.MapAll -FileType -Notifications -Path -Snippet
+        private static void Map(IPartialView source, CodeFileDisplay target)
+        {
+            target.Content = source.Content;
+            target.Id = source.Id.ToString();
+            target.Name = source.Name;
+            target.VirtualPath = source.VirtualPath;
+        }
 
-            CreateMap<CodeFileDisplay, IPartialView>()
-                .IgnoreEntityCommonProperties()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Key, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.Name, opt => opt.Ignore())
-                .ForMember(dest => dest.OriginalPath, opt => opt.Ignore())
-                .ForMember(dest => dest.HasIdentity, opt => opt.Ignore());
+        // Umbraco.Code.MapAll -FileType -Notifications -Path -Snippet
+        private static void Map(Script source, CodeFileDisplay target)
+        {
+            target.Content = source.Content;
+            target.Id = source.Id.ToString();
+            target.Name = source.Name;
+            target.VirtualPath = source.VirtualPath;
+        }
 
-            CreateMap<CodeFileDisplay, Script>()
-                .IgnoreEntityCommonProperties()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Key, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.Name, opt => opt.Ignore())
-                .ForMember(dest => dest.OriginalPath, opt => opt.Ignore())
-                .ForMember(dest => dest.HasIdentity, opt => opt.Ignore());
+        // Umbraco.Code.MapAll -FileType -Notifications -Path -Snippet
+        private static void Map(Stylesheet source, CodeFileDisplay target)
+        {
+            target.Content = source.Content;
+            target.Id = source.Id.ToString();
+            target.Name = source.Name;
+            target.VirtualPath = source.VirtualPath;
+        }
+
+        // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
+        // Umbraco.Code.MapAll -Id -Key -Alias -Name -OriginalPath -Path
+        private static void Map(CodeFileDisplay source, IPartialView target)
+        {
+            target.Content = source.Content;
+            target.VirtualPath = source.VirtualPath;
+        }
+
+        // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate -GetFileContent
+        // Umbraco.Code.MapAll -Id -Key -Alias -Name -OriginalPath -Path
+        private static void Map(CodeFileDisplay source, Script target)
+        {
+            target.Content = source.Content;
+            target.VirtualPath = source.VirtualPath;
         }
     }
 }

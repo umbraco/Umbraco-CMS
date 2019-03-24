@@ -16,12 +16,18 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             // register the profiles
             composition.WithCollectionBuilder<MapperProfileCollectionBuilder>()
                 .Append<AuditMapperProfile>()
+                .Append<CodeFileMapperProfile>()
+                .Append<RedirectUrlMapperProfile>()
+                .Append<RelationMapperProfile>()
                 .Append<SectionMapperProfile>()
-                .Append<TagMapperProfile>();
+                .Append<TagMapperProfile>()
+                .Append<TemplateMapperProfile>()
+                .Append<UserMapperProfile>()
+                .Append<LanguageMapperProfile>();
 
             //register the profiles
             //composition.Register<Profile, AuditMapperProfile>();
-            composition.Register<Profile, CodeFileMapperProfile>();
+            //composition.Register<Profile, CodeFileMapperProfile>();
             composition.Register<Profile, ContentMapperProfile>();
             composition.Register<Profile, ContentPropertyMapperProfile>();
             composition.Register<Profile, ContentTypeMapperProfile>();
@@ -31,13 +37,13 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             composition.Register<Profile, MacroMapperProfile>();
             composition.Register<Profile, MediaMapperProfile>();
             composition.Register<Profile, MemberMapperProfile>();
-            composition.Register<Profile, RedirectUrlMapperProfile>();
-            composition.Register<Profile, RelationMapperProfile>();
+            //composition.Register<Profile, RedirectUrlMapperProfile>();
+            //composition.Register<Profile, RelationMapperProfile>();
             //composition.Register<Profile, SectionMapperProfile>();
             //composition.Register<Profile, TagMapperProfile>();
-            composition.Register<Profile, TemplateMapperProfile>();
-            composition.Register<Profile, UserMapperProfile>();
-            composition.Register<Profile, LanguageMapperProfile>();
+            //composition.Register<Profile, TemplateMapperProfile>();
+            //composition.Register<Profile, UserMapperProfile>();
+            //composition.Register<Profile, LanguageMapperProfile>();
 
             //register any resolvers, etc.. that the profiles use
             composition.Register<ContentUrlResolver>();

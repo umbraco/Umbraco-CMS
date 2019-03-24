@@ -1,24 +1,42 @@
-﻿using AutoMapper;
+﻿using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TemplateMapperProfile : Profile
+    internal class TemplateMapperProfile : IMapperProfile
     {
-        public TemplateMapperProfile()
+        public void SetMaps(Mapper mapper)
         {
-            CreateMap<ITemplate, TemplateDisplay>()
-                .ForMember(dest => dest.Notifications, opt => opt.Ignore());
+            mapper.SetMap<ITemplate, TemplateDisplay>(source => new TemplateDisplay(), Map);
+            mapper.SetMap<TemplateDisplay, Template>(source => new Template(source.Name, source.Alias), Map);
+        }
 
-            CreateMap<TemplateDisplay, Template>()
-                .IgnoreEntityCommonProperties()
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.VirtualPath, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.MasterTemplateId, opt => opt.Ignore()) // ok, assigned when creating the template
-                .ForMember(dest => dest.IsMasterTemplate, opt => opt.Ignore())
-                .ForMember(dest => dest.HasIdentity, opt => opt.Ignore());
+        // Umbraco.Code.MapAll
+        private static void Map(ITemplate source, TemplateDisplay target)
+        {
+            target.Id = source.Id;
+            target.Name = source.Name;
+            target.Alias = source.Alias;
+            target.Key = source.Key;
+            target.Content = source.Content;
+            target.Path = source.Path;
+            target.VirtualPath = source.VirtualPath;
+            target.MasterTemplateAlias = source.MasterTemplateAlias;
+            target.IsMasterTemplate = source.IsMasterTemplate;
+        }
+
+        // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
+        // Umbraco.Code.MapAll -Path -VirtualPath -MasterTemplateId -IsMasterTemplate
+        // Umbraco.Code.MapAll -GetFileContent
+        private static void Map(TemplateDisplay source, Template target)
+        {
+            target.MasterTemplateAlias = source.MasterTemplateAlias;
+            target.Name = source.Name;
+            target.Alias = source.Alias;
+            target.Content = source.Content;
+            target.Id = source.Id;
+            target.Key = source.Key;
         }
     }
 }

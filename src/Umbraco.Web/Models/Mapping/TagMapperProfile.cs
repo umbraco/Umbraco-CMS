@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll
-        private void Map(ITag source, TagModel target)
+        private static void Map(ITag source, TagModel target)
         {
             target.Id = source.Id;
             target.Text = source.Text;

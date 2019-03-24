@@ -87,7 +87,7 @@
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
     <PackageReference Include="Umbraco.Code">
-      <Version>1.0.0</Version>
+      <Version>1.0.5</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -446,7 +446,6 @@
     <Compile Include="Models\Mapping\PropertyTypeVariationsResolver.cs" />
     <Compile Include="Models\Mapping\RedirectUrlMapperProfile.cs" />
     <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
-    <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
     <Compile Include="Models\PublishedContent\HttpContextVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />

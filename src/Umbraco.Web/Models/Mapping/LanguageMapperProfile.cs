@@ -1,61 +1,56 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class LanguageMapperProfile : Profile
+    internal class LanguageMapperProfile : IMapperProfile
     {
-        public LanguageMapperProfile()
+        public void SetMaps(Mapper mapper)
         {
-            CreateMap<ILanguage, EntityBasic>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.CultureName))
-                .ForMember(dest => dest.Key, opt => opt.MapFrom(x => x.Key))
-                .ForMember(dest => dest.Alias, opt => opt.MapFrom(x => x.IsoCode))
-                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.Udi, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.Ignore());
-
-            CreateMap<ILanguage, Language>()
-                .ForMember(l => l.Name, expression => expression.MapFrom(x => x.CultureInfo.DisplayName));
-
-            CreateMap<IEnumerable<ILanguage>, IEnumerable<Language>>()
-                .ConvertUsing<LanguageCollectionTypeConverter>();
-
+            mapper.SetMap<ILanguage, EntityBasic>(source => new EntityBasic(), Map);
+            mapper.SetMap<ILanguage, Language>(source => new Language(), Map);
+            mapper.SetMap<IEnumerable<ILanguage>, IEnumerable<Language>>(source => new List<Language>(), (source, target) => Map(source, target, mapper));
         }
 
-        /// <summary>
-        /// Converts a list of <see cref="ILanguage"/> to a list of <see cref="Language"/> and ensures the correct order and defaults are set
-        /// </summary>
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class LanguageCollectionTypeConverter : ITypeConverter<IEnumerable<ILanguage>, IEnumerable<Language>>
+        // Umbraco.Code.MapAll -Udi -Path -Trashed -AdditionalData -Icon
+        private static void Map(ILanguage source, EntityBasic target)
         {
-            public IEnumerable<Language> Convert(IEnumerable<ILanguage> source, IEnumerable<Language> destination, ResolutionContext context)
-            {
-                var langs = source.Select(x => context.Mapper.Map<ILanguage, Language>(x, null, context)).ToList();
+            target.Name = source.CultureName;
+            target.Key = source.Key;
+            target.ParentId = -1;
+            target.Alias = source.IsoCode;
+            target.Id = source.Id;
+        }
 
-                //Put the default language first in the list & then sort rest by a-z
-                var defaultLang = langs.SingleOrDefault(x => x.IsDefault);
+        // Umbraco.Code.MapAll
+        private static void Map(ILanguage source, Language target)
+        {
+            target.Id = source.Id;
+            target.IsoCode = source.IsoCode;
+            target.Name = source.CultureInfo.DisplayName;
+            target.IsDefault = source.IsDefault;
+            target.IsMandatory = source.IsMandatory;
+            target.FallbackLanguageId = source.FallbackLanguageId;
+        }
 
-                //Remove the default language from the list for now
-                langs.Remove(defaultLang);
+        private static void Map(IEnumerable<ILanguage> source, IEnumerable<Language> target, Mapper mapper)
+        {
+            if (!(target is List<Language> list))
+                throw new NotSupportedException($"{nameof(target)} must be a List<Language>.");
 
-                //Sort the remaining languages a-z
-                langs = langs.OrderBy(x => x.Name).ToList();
+            var temp = source.Select(mapper.Map<ILanguage, Language>).ToList();
 
-                //Insert the default language as the first item
-                langs.Insert(0, defaultLang);
+            //Put the default language first in the list & then sort rest by a-z
+            var defaultLang = temp.SingleOrDefault(x => x.IsDefault);
 
-                return langs;
-            }
+            // insert default lang first, then remaining language a-z
+            list.Add(defaultLang);
+            list.AddRange(temp.Where(x => x != defaultLang).OrderBy(x => x.Name));
         }
     }
 }

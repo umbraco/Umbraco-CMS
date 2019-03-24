@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll
-        private void Map(Section source, ManifestSection target)
+        private static void Map(Section source, ManifestSection target)
         {
             target.Alias = source.Alias;
             target.Name = source.Name;

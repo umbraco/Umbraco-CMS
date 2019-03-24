@@ -1,47 +1,56 @@
-﻿using AutoMapper;
-using Umbraco.Core;
+﻿using Umbraco.Core;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class RelationMapperProfile : Profile
+    internal class RelationMapperProfile : IMapperProfile
     {
-        public RelationMapperProfile()
+        public void SetMaps(Mapper mapper)
         {
-            // FROM IRelationType to RelationTypeDisplay
-            CreateMap<IRelationType, RelationTypeDisplay>()
-                .ForMember(dest => dest.Icon, opt => opt.Ignore())
-                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.ChildObjectTypeName, opt => opt.Ignore())
-                .ForMember(dest => dest.ParentObjectTypeName, opt => opt.Ignore())
-                .ForMember(dest => dest.Relations, opt => opt.Ignore())
-                .ForMember(dest => dest.ParentId, opt => opt.Ignore())
-                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.RelationType, content.Key)))
-                .AfterMap((src, dest) =>
-                {
-                    // Build up the path
-                    dest.Path = "-1," + src.Id;
+            mapper.SetMap<IRelationType, RelationTypeDisplay>(source => new RelationTypeDisplay(), Map);
+            mapper.SetMap<IRelation, RelationDisplay>(source => new RelationDisplay(), Map);
+            mapper.SetMap<RelationTypeSave, IRelationType>(Map);
+        }
 
-                    // Set the "friendly" names for the parent and child object types
-                    dest.ParentObjectTypeName = ObjectTypes.GetUmbracoObjectType(src.ParentObjectType).GetFriendlyName();
-                    dest.ChildObjectTypeName = ObjectTypes.GetUmbracoObjectType(src.ChildObjectType).GetFriendlyName();
-                });
+        // Umbraco.Code.MapAll -Icon -Trashed -Alias -AdditionalData
+        // Umbraco.Code.MapAll -Relations -ParentId -Notifications
+        private static void Map(IRelationType source, RelationTypeDisplay target)
+        {
+            target.ChildObjectType = source.ChildObjectType;
+            target.Id = source.Id;
+            target.IsBidirectional = source.IsBidirectional;
+            target.Key = source.Key;
+            target.Name = source.Name;
+            target.ParentObjectType = source.ParentObjectType;
+            target.Udi = Udi.Create(Constants.UdiEntityType.RelationType, source.Key);
+            target.Path = "-1," + source.Id;
 
-            // FROM IRelation to RelationDisplay
-            CreateMap<IRelation, RelationDisplay>()
-                .ForMember(dest => dest.ParentName, opt => opt.Ignore())
-                .ForMember(dest => dest.ChildName, opt => opt.Ignore());
+            // Set the "friendly" names for the parent and child object types
+            target.ParentObjectTypeName = ObjectTypes.GetUmbracoObjectType(source.ParentObjectType).GetFriendlyName();
+            target.ChildObjectTypeName = ObjectTypes.GetUmbracoObjectType(source.ChildObjectType).GetFriendlyName();
+        }
 
-            // FROM RelationTypeSave to IRelationType
-            CreateMap<RelationTypeSave, IRelationType>()
-                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdateDate, opt => opt.Ignore())
-                .ForMember(dest => dest.DeleteDate, opt => opt.Ignore());
+        // Umbraco.Code.MapAll -ParentName -ChildName
+        private static void Map(IRelation source, RelationDisplay target)
+        {
+            target.ChildId = source.ChildId;
+            target.Comment = source.Comment;
+            target.CreateDate = source.CreateDate;
+            target.ParentId = source.ParentId;
+        }
+
+        // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
+        private static void Map(RelationTypeSave source, IRelationType target)
+        {
+            target.Alias = source.Alias;
+            target.ChildObjectType = source.ChildObjectType;
+            target.Id = source.Id.TryConvertTo<int>().Result;
+            target.IsBidirectional = source.IsBidirectional;
+            target.Key = source.Key;
+            target.Name = source.Name;
+            target.ParentObjectType = source.ParentObjectType;
         }
     }
 }

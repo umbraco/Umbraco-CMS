@@ -9,6 +9,10 @@ namespace Umbraco.Core.Mapping
     // FIXME in order to transition, this should also handle AutoMapper?
     // FIXME we might have to manage a 'context' for some contextual mappings?
     // FIXME we have an infinite loop problem w/ logging in due to mapping issues
+    // FIXME refactor
+    //  ctor: (source, context) =>
+    //  map:  (source, target, context) =>
+    // and context.Mapper is mapper
 
     public class Mapper
     {

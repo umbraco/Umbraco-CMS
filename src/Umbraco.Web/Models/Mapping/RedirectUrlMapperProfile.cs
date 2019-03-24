@@ -1,22 +1,34 @@
-﻿using AutoMapper;
+﻿using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class RedirectUrlMapperProfile : Profile
+    internal class RedirectUrlMapperProfile : IMapperProfile
     {
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         public RedirectUrlMapperProfile(IUmbracoContextAccessor umbracoContextAccessor)
         {
-            CreateMap<IRedirectUrl, ContentRedirectUrl>()
-                .ForMember(x => x.OriginalUrl, expression => expression.MapFrom(item => Current.UmbracoContext.UrlProvider.GetUrlFromRoute(item.ContentId, item.Url, item.Culture)))
-                .ForMember(x => x.DestinationUrl, expression => expression.MapFrom(item => item.ContentId > 0 ? GetUrl(umbracoContextAccessor, item) : "#"))
-                .ForMember(x => x.RedirectId, expression => expression.MapFrom(item => item.Key));
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
-        private static string GetUrl(IUmbracoContextAccessor umbracoContextAccessor, IRedirectUrl item) => umbracoContextAccessor?.UmbracoContext?.UrlProvider?.GetUrl(item.ContentId, item.Culture);
+        private UmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
+
+        public void SetMaps(Mapper mapper)
+        {
+            mapper.SetMap<IRedirectUrl, ContentRedirectUrl>(source => new ContentRedirectUrl(), Map);
+        }
+
+        // Umbraco.Code.MapAll
+        private void Map(IRedirectUrl source, ContentRedirectUrl target)
+        {
+            target.ContentId = source.ContentId;
+            target.CreateDateUtc = source.CreateDateUtc;
+            target.Culture = source.Culture;
+            target.DestinationUrl = source.ContentId > 0 ? UmbracoContext?.UrlProvider?.GetUrl(source.ContentId, source.Culture) : "#";
+            target.OriginalUrl = UmbracoContext?.UrlProvider?.GetUrlFromRoute(source.ContentId, source.Url, source.Culture);
+            target.RedirectId = source.Key;
+        }
     }
 }
