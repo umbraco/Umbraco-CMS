@@ -13,10 +13,10 @@
         </span>
 
         <div class="help" ng-if="model.count >= (model.config.maxChars*.8) && model.count <= model.config.maxChars">
-            <localize key="textbox_characters_left" tokens="[model.config.maxChars - model.count]">characters left</localize>
+            <localize key="textbox_characters_left" tokens="[model.config.maxChars - model.count]">%0% characters left.</localize>
         </div>
         <div class="help text-error" ng-if="model.count > model.config.maxChars">
-            <localize key="textbox_characters_exceed" tokens="[model.config.maxChars, model.count - model.config.maxChars]">Maximum {0} characters ({1} too many)</localize>
+            <localize key="textbox_characters_exceed" tokens="[model.config.maxChars, model.count - model.config.maxChars]">Maximum %0% characters, <strong>%1%</strong> too many.</localize>
         </div>
 
     </ng-form>

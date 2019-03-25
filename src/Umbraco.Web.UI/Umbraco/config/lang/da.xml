@@ -1569,8 +1569,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="emptyDictionaryTree">Ingen ordbog elementer at vælge imellem</key>
   </area>
   <area alias="textbox">
-    <key alias="characters_left"><![CDATA[<strong>{0}</strong> tegn tilbage.]]></key>
-    <key alias="characters_exceed"><![CDATA[Maksimum {0} tegn, <strong>{1}</strong> for mange.]]></key>
+    <key alias="characters_left"><![CDATA[<strong>%0%</strong> tegn tilbage.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maksimum %0% tegn, <strong>%1%</strong> for mange.]]></key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>

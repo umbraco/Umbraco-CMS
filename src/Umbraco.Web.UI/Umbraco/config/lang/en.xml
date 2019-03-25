@@ -2079,8 +2079,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
   </area>
   <area alias="textbox">
-    <key alias="characters_left"><![CDATA[<strong>{0}</strong> characters left.]]></key>
-    <key alias="characters_exceed"><![CDATA[Maximum {0} characters, <strong>{1}</strong> too many.]]></key>
+    <key alias="characters_left"><![CDATA[<strong>%0%</strong> characters left.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maximum %0% characters, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>
