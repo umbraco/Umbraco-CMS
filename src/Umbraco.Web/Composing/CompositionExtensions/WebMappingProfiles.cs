@@ -17,6 +17,9 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             composition.WithCollectionBuilder<MapperProfileCollectionBuilder>()
                 .Append<AuditMapperProfile>()
                 .Append<CodeFileMapperProfile>()
+                .Append<DataTypeMapperProfile>()
+                .Append<DictionaryMapperProfile>()
+                .Append<MacroMapperProfile>()
                 .Append<RedirectUrlMapperProfile>()
                 .Append<RelationMapperProfile>()
                 .Append<SectionMapperProfile>()
@@ -31,10 +34,10 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             composition.Register<Profile, ContentMapperProfile>();
             composition.Register<Profile, ContentPropertyMapperProfile>();
             composition.Register<Profile, ContentTypeMapperProfile>();
-            composition.Register<Profile, DataTypeMapperProfile>();
+            //composition.Register<Profile, DataTypeMapperProfile>();
             composition.Register<Profile, EntityMapperProfile>();
-            composition.Register<Profile, DictionaryMapperProfile>();
-            composition.Register<Profile, MacroMapperProfile>();
+            //composition.Register<Profile, DictionaryMapperProfile>();
+            //composition.Register<Profile, MacroMapperProfile>();
             composition.Register<Profile, MediaMapperProfile>();
             composition.Register<Profile, MemberMapperProfile>();
             //composition.Register<Profile, RedirectUrlMapperProfile>();

@@ -8,7 +8,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.SetMap<IAuditItem, AuditLog>(source => new AuditLog(), (source, target) => Map(source, target));
+            mapper.Define<IAuditItem, AuditLog>(source => new AuditLog(), (source, target) => Map(source, target));
         }
 
         // Umbraco.Code.MapAll -UserAvatars -UserName

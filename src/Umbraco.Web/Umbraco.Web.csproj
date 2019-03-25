@@ -856,11 +856,8 @@
     <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
-    <Compile Include="Models\Mapping\AvailablePropertyEditorsResolver.cs" />
-    <Compile Include="Models\Mapping\DatabaseTypeResolver.cs" />
     <Compile Include="Models\Mapping\DataTypeMapperProfile.cs" />
     <Compile Include="Models\Mapping\EntityMapperProfile.cs" />
-    <Compile Include="Models\Mapping\DataTypeConfigurationFieldDisplayResolver.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />

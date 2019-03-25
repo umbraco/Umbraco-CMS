@@ -40,23 +40,23 @@ namespace Umbraco.Web.Models.Mapping
 
         public void SetMaps(Mapper mapper)
         {
-            mapper.SetMap<UserGroupSave, IUserGroup>(source => new UserGroup { CreateDate = DateTime.UtcNow }, Map);
-            mapper.SetMap<UserInvite, IUser>(Map);
-            mapper.SetMap<IProfile, ContentEditing.UserProfile>(Map);
-            mapper.SetMap<IReadOnlyUserGroup, UserGroupBasic>(source => new UserGroupBasic(), (source, target) => Map(source, target, mapper));
-            mapper.SetMap<IUserGroup, UserGroupBasic>(source => new UserGroupBasic(), (source, target) => Map(source, target, mapper));
-            mapper.SetMap<IUserGroup, AssignedUserGroupPermissions>(source => new AssignedUserGroupPermissions(), Map);
-            mapper.SetMap<EntitySlim, AssignedContentPermissions>(source => new AssignedContentPermissions(), Map);
-            mapper.SetMap<IUserGroup, UserGroupDisplay>(source => new UserGroupDisplay(), (source, target) => Map(source, target, mapper));
-            mapper.SetMap<IUser, UserBasic>(source => new UserBasic(), (source, target) => Map(source, target, mapper));
-            mapper.SetMap<IUser, UserDetail>(source => new UserDetail(), Map);
+            mapper.Define<UserGroupSave, IUserGroup>(source => new UserGroup { CreateDate = DateTime.UtcNow }, Map);
+            mapper.Define<UserInvite, IUser>(Map);
+            mapper.Define<IProfile, ContentEditing.UserProfile>(Map);
+            mapper.Define<IReadOnlyUserGroup, UserGroupBasic>(source => new UserGroupBasic(), (source, target) => Map(source, target, mapper));
+            mapper.Define<IUserGroup, UserGroupBasic>(source => new UserGroupBasic(), (source, target) => Map(source, target, mapper));
+            mapper.Define<IUserGroup, AssignedUserGroupPermissions>(source => new AssignedUserGroupPermissions(), Map);
+            mapper.Define<EntitySlim, AssignedContentPermissions>(source => new AssignedContentPermissions(), Map);
+            mapper.Define<IUserGroup, UserGroupDisplay>(source => new UserGroupDisplay(), (source, target) => Map(source, target, mapper));
+            mapper.Define<IUser, UserBasic>(source => new UserBasic(), (source, target) => Map(source, target, mapper));
+            mapper.Define<IUser, UserDetail>(source => new UserDetail(), Map);
 
             // used for merging existing UserSave to an existing IUser instance - this will not create an IUser instance!
-            mapper.SetMap<UserSave, IUser>(Map);
+            mapper.Define<UserSave, IUser>(Map);
 
             // important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
-            mapper.SetMap<IUser, UserDisplay>(source => new UserDisplay(), (source, target) => Map(source, target, mapper));
+            mapper.Define<IUser, UserDisplay>(source => new UserDisplay(), (source, target) => Map(source, target, mapper));
         }
 
         // mappers

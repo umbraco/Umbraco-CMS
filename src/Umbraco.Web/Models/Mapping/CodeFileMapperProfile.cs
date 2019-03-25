@@ -9,12 +9,12 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.SetMap<Stylesheet, EntityBasic>(source => new EntityBasic(), Map);
-            mapper.SetMap<IPartialView, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
-            mapper.SetMap<Script, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
-            mapper.SetMap<Stylesheet, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
-            mapper.SetMap<CodeFileDisplay, IPartialView>(Map);
-            mapper.SetMap<CodeFileDisplay, Script>(Map);
+            mapper.Define<Stylesheet, EntityBasic>(source => new EntityBasic(), Map);
+            mapper.Define<IPartialView, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
+            mapper.Define<Script, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
+            mapper.Define<Stylesheet, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
+            mapper.Define<CodeFileDisplay, IPartialView>(Map);
+            mapper.Define<CodeFileDisplay, Script>(Map);
 
         }
 

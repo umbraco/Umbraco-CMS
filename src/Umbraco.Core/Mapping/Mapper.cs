@@ -25,16 +25,16 @@ namespace Umbraco.Core.Mapping
                 profile.SetMaps(this);
         }
 
-        public void SetMap<TSource, TTarget>()
-            => SetMap<TSource, TTarget>((source, target) => { });
+        public void Define<TSource, TTarget>()
+            => Define<TSource, TTarget>((source, target) => { });
 
-        public void SetMap<TSource, TTarget>(Action<TSource, TTarget> map)
-            => SetMap(source => throw new NotSupportedException($"Don't know how to create {typeof(TTarget)} instances."), map);
+        public void Define<TSource, TTarget>(Action<TSource, TTarget> map)
+            => Define(source => throw new NotSupportedException($"Don't know how to create {typeof(TTarget)} instances."), map);
 
-        public void SetMap<TSource, TTarget>(Func<TSource, TTarget> ctor)
-            => SetMap(ctor, (source, target) => { });
+        public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor)
+            => Define(ctor, (source, target) => { });
 
-        public void SetMap<TSource, TTarget>(Func<TSource, TTarget> ctor, Action<TSource, TTarget> map)
+        public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor, Action<TSource, TTarget> map)
         {
             var sourceType = typeof(TSource);
             var targetType = typeof(TTarget);

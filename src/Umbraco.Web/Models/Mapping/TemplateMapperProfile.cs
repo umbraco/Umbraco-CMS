@@ -8,8 +8,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.SetMap<ITemplate, TemplateDisplay>(source => new TemplateDisplay(), Map);
-            mapper.SetMap<TemplateDisplay, Template>(source => new Template(source.Name, source.Alias), Map);
+            mapper.Define<ITemplate, TemplateDisplay>(source => new TemplateDisplay(), Map);
+            mapper.Define<TemplateDisplay, Template>(source => new Template(source.Name, source.Alias), Map);
         }
 
         // Umbraco.Code.MapAll

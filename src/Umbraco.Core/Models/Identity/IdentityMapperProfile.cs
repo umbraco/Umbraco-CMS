@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models.Identity
 
         public void SetMaps(Mapper mapper)
         {
-            mapper.SetMap<IUser, BackOfficeIdentityUser>(
+            mapper.Define<IUser, BackOfficeIdentityUser>(
                 source =>
                 {
                     var target = new BackOfficeIdentityUser(source.Id, source.Groups);

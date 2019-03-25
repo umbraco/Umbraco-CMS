@@ -12,9 +12,9 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.SetMap<ILanguage, EntityBasic>(source => new EntityBasic(), Map);
-            mapper.SetMap<ILanguage, Language>(source => new Language(), Map);
-            mapper.SetMap<IEnumerable<ILanguage>, IEnumerable<Language>>(source => new List<Language>(), (source, target) => Map(source, target, mapper));
+            mapper.Define<ILanguage, EntityBasic>(source => new EntityBasic(), Map);
+            mapper.Define<ILanguage, Language>(source => new Language(), Map);
+            mapper.Define<IEnumerable<ILanguage>, IEnumerable<Language>>(source => new List<Language>(), (source, target) => Map(source, target, mapper));
         }
 
         // Umbraco.Code.MapAll -Udi -Path -Trashed -AdditionalData -Icon

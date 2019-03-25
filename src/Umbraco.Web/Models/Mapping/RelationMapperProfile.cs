@@ -9,9 +9,9 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.SetMap<IRelationType, RelationTypeDisplay>(source => new RelationTypeDisplay(), Map);
-            mapper.SetMap<IRelation, RelationDisplay>(source => new RelationDisplay(), Map);
-            mapper.SetMap<RelationTypeSave, IRelationType>(Map);
+            mapper.Define<IRelationType, RelationTypeDisplay>(source => new RelationTypeDisplay(), Map);
+            mapper.Define<IRelation, RelationDisplay>(source => new RelationDisplay(), Map);
+            mapper.Define<RelationTypeSave, IRelationType>(Map);
         }
 
         // Umbraco.Code.MapAll -Icon -Trashed -Alias -AdditionalData

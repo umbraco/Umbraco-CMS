@@ -7,7 +7,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.SetMap<ITag, TagModel>(source => new TagModel(), Map);
+            mapper.Define<ITag, TagModel>(source => new TagModel(), Map);
         }
 
         // Umbraco.Code.MapAll
