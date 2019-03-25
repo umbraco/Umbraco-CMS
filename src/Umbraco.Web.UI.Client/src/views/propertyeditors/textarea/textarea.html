@@ -7,9 +7,12 @@
             <span class="help-inline" ng-message="valServer">{{textareaFieldForm.textarea.errorMsg}}</span>
         </span>
 
-        <div class="help" ng-if="model.maxlength">
-            <strong>{{model.count}}</strong>
-            <localize key="textbox_characters_left">characters left</localize>
+        <div class="help" ng-if="model.maxlength === true && model.count >= (model.config.maxChars*.8) && model.count <= model.config.maxChars">
+            <localize key="textbox_characters_left" tokens="[model.count, model.config.maxChars]">characters left</localize>
         </div>
+        <div class="help text-error" ng-if="model.maxlength === true && model.count > model.config.maxChars">
+            <localize key="textbox_characters_exceed" tokens="[model.count, model.config.maxChars]">Maximum {0} characters ({1} too many)</localize>
+        </div>
+
     </ng-form>
 </div>
