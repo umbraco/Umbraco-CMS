@@ -48,7 +48,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         if (configuredStylesheets) {
             angular.forEach(configuredStylesheets, function (val, key) {
 
-                stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css");
+                if (val.indexOf(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/") === 0) {
+                    // current format (full path to stylesheet)
+                    stylesheets.push(val);
+                }
+                else {
+                    // legacy format (stylesheet name only) - must prefix with stylesheet folder and postfix with ".css"
+                    stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css");
+                }
 
                 promises.push(stylesheetResource.getRulesByName(val).then(function (rules) {
                     angular.forEach(rules, function (rule) {
