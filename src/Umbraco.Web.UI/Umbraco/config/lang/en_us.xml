@@ -1625,6 +1625,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="enterMacroName">Enter macro name</key>
     <key alias="parameters">Parameters</key>
     <key alias="parametersDescription">Define the parameters that should be available when using this macro.</key>
+    <key alias="selectViewFile">Select partial view macro file</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>
