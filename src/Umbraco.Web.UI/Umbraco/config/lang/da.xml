@@ -1338,6 +1338,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="enterMacroName">Indtast makronavn</key>
     <key alias="parameters">Parametre</key>
     <key alias="parametersDescription">Definer de parametre, der skal være tilgængelige, når du bruger denne makro.</key>
+    <key alias="selectViewFile">Vælg partial view makrofil</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>
