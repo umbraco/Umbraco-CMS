@@ -99,6 +99,11 @@ namespace Umbraco.Web.ContentApps
                 if (configTabName != null && String.IsNullOrWhiteSpace(configTabName.ToString()) == false)
                     contentApp.Name = configTabName.ToString();
             }
+            // if the list view is configured to show umbContent first, update the list view content app weight accordingly
+            if(listViewConfig.ContainsKey("showContentFirst") && listViewConfig["showContentFirst"]?.ToString() == "True")
+            {
+                contentApp.Weight = ContentEditorContentAppFactory.Weight + 1;
+            }
 
             //This is the view model used for the list view app
             contentApp.ViewModel = new List<ContentPropertyDisplay>
