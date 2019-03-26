@@ -523,13 +523,6 @@
     <key alias="generatingAlias">Generating alias...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Allowed child node types</key>
-    <key alias="create">Create</key>
-    <key alias="deletetab">Delete tab</key>
-    <key alias="description">Description</key>
-    <key alias="newtab">New tab</key>
-    <key alias="tab">Tab</key>
-    <key alias="thumbnail">Thumbnail</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
     <key alias="aliasAlreadyExists">A content type, media type or member type with this alias already exists</key>
