@@ -163,7 +163,6 @@
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\AdvancedMigrationTests.cs" />
-    <Compile Include="Models\Mapping\AutoMapper6Tests.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
     <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
@@ -271,7 +270,6 @@
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
     <Compile Include="Testing\TestingTests\MockTests.cs" />
     <Compile Include="Models\MacroTests.cs" />
-    <Compile Include="Models\Mapping\AutoMapperTests.cs" />
     <Compile Include="Models\Collections\Item.cs" />
     <Compile Include="Models\Collections\OrderItem.cs" />
     <Compile Include="Models\Collections\SimpleOrder.cs" />

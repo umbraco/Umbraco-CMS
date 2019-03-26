@@ -31,7 +31,7 @@ namespace Umbraco.Web.Models.Mapping
         /// Assigns the PropertyEditor, Id, Alias and Value to the property
         /// </summary>
         /// <returns></returns>
-        public virtual TDestination Map(Property property, TDestination dest, MapperContext context)
+        public virtual void Map(Property property, TDestination dest, MapperContext context)
         {
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null)
@@ -44,19 +44,16 @@ namespace Umbraco.Web.Models.Mapping
                 editor = _propertyEditors[Constants.PropertyEditors.Aliases.Label];
             }
 
-            var result = new TDestination
-                {
-                    Id = property.Id,
-                    Alias = property.Alias,
-                    PropertyEditor = editor,
-                    Editor = editor.Alias
-                };
+            dest.Id = property.Id;
+            dest.Alias = property.Alias;
+            dest.PropertyEditor = editor;
+            dest.Editor = editor.Alias;
 
             // if there's a set of property aliases specified, we will check if the current property's value should be mapped.
             // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.
             var includedProperties = context.GetIncludedProperties();
             if (includedProperties != null && !includedProperties.Contains(property.Alias))
-                return result;
+                return;
 
             //Get the culture from the context which will be set during the mapping operation for each property
             var culture = context.GetCulture();
@@ -68,11 +65,10 @@ namespace Umbraco.Web.Models.Mapping
             //set the culture to null if it's an invariant property type
             culture = !property.PropertyType.VariesByCulture() ? null : culture;
 
-            result.Culture = culture;
+            dest.Culture = culture;
 
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
-            result.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
-            return result;
+            dest.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
         }
     }
 }

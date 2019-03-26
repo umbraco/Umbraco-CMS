@@ -383,9 +383,12 @@ namespace Umbraco.Web.Models.Mapping
             target.AllowedAsRoot = source.AllowAsRoot;
             target.AllowedContentTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
 
-            target.Variations = ContentVariation.Nothing;
-            if (!(target is IMemberType) && source.AllowCultureVariant)
-                target.Variations |= ContentVariation.Culture;
+            if (!(target is IMemberType))
+            {
+                target.Variations = ContentVariation.Nothing;
+                if (source.AllowCultureVariant)
+                    target.Variations |= ContentVariation.Culture;
+            }
 
             // handle property groups and property types
             // note that ContentTypeSave has

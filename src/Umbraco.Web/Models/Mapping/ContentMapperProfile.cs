@@ -55,9 +55,16 @@ namespace Umbraco.Web.Models.Mapping
 
         public void SetMaps(Mapper mapper)
         {
+            mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
             mapper.Define<IContent, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);
             mapper.Define<IContent, ContentVariantDisplay>((source, context) => new ContentVariantDisplay(), Map);
             mapper.Define<IContent, ContentItemBasic<ContentPropertyBasic>>((source, context) => new ContentItemBasic<ContentPropertyBasic>(), Map);
+        }
+
+        // Umbraco.Code.MapAll
+        private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context)
+        {
+            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyDto>);
         }
 
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
@@ -120,7 +127,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Owner = _commonMapper.GetOwner(source, context.Mapper);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = context.Mapper.Map<IEnumerable<ContentPropertyBasic>>(source.Properties);
+            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyBasic>);
             target.SortOrder = source.SortOrder;
             target.State = _basicStateMapper.Map(source, context);
             target.Trashed = source.Trashed;

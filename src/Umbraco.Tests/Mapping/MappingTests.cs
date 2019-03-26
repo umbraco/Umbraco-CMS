@@ -65,10 +65,38 @@ namespace Umbraco.Tests.Mapping
             //Assert.AreEqual("value", thing2.Value);
         }
 
+        [Test]
+        public void InheritedMap()
+        {
+            var profiles = new MapperProfileCollection(new IMapperProfile[]
+            {
+                new Profile1(),
+            });
+            var mapper = new Mapper(profiles);
+
+            var thing3 = new Thing3 { Value = "value" };
+            var thing2 = mapper.Map<Thing3, Thing2>(thing3);
+
+            Assert.IsNotNull(thing2);
+            Assert.AreEqual("value", thing2.Value);
+
+            thing2 = mapper.Map<Thing2>(thing3);
+
+            Assert.IsNotNull(thing2);
+            Assert.AreEqual("value", thing2.Value);
+
+            thing2 = new Thing2();
+            mapper.Map(thing3, thing2);
+            Assert.AreEqual("value", thing2.Value);
+        }
+
         private class Thing1
         {
             public string Value { get; set; }
         }
+
+        private class Thing3 : Thing1
+        { }
 
         private class Thing2
         {

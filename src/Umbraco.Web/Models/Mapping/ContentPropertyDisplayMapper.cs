@@ -19,9 +19,9 @@ namespace Umbraco.Web.Models.Mapping
         {
             _textService = textService;
         }
-        public override ContentPropertyDisplay Map(Property originalProp, ContentPropertyDisplay dest, MapperContext context)
+        public override void Map(Property originalProp, ContentPropertyDisplay dest, MapperContext context)
         {
-            var display = base.Map(originalProp, dest, context);
+            base.Map(originalProp, dest, context);
 
             var config = DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId).Configuration;
 
@@ -32,37 +32,35 @@ namespace Umbraco.Web.Models.Mapping
             // - does it make any sense to use a IDataValueEditor without configuring it?
 
             // configure the editor for display with configuration
-            var valEditor = display.PropertyEditor.GetValueEditor(config);
+            var valEditor = dest.PropertyEditor.GetValueEditor(config);
 
             //set the display properties after mapping
-            display.Alias = originalProp.Alias;
-            display.Description = originalProp.PropertyType.Description;
-            display.Label = originalProp.PropertyType.Name;
-            display.HideLabel = valEditor.HideLabel;
+            dest.Alias = originalProp.Alias;
+            dest.Description = originalProp.PropertyType.Description;
+            dest.Label = originalProp.PropertyType.Name;
+            dest.HideLabel = valEditor.HideLabel;
 
             //add the validation information
-            display.Validation.Mandatory = originalProp.PropertyType.Mandatory;
-            display.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
+            dest.Validation.Mandatory = originalProp.PropertyType.Mandatory;
+            dest.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
 
-            if (display.PropertyEditor == null)
+            if (dest.PropertyEditor == null)
             {
                 //display.Config = PreValueCollection.AsDictionary(preVals);
                 //if there is no property editor it means that it is a legacy data type
                 // we cannot support editing with that so we'll just render the readonly value view.
-                display.View = "views/propertyeditors/readonlyvalue/readonlyvalue.html";
+                dest.View = "views/propertyeditors/readonlyvalue/readonlyvalue.html";
             }
             else
             {
                 //let the property editor format the pre-values
-                display.Config = display.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
-                display.View = valEditor.View;
+                dest.Config = dest.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
+                dest.View = valEditor.View;
             }
 
             //Translate
-            display.Label = _textService.UmbracoDictionaryTranslate(display.Label);
-            display.Description = _textService.UmbracoDictionaryTranslate(display.Description);
-
-            return display;
+            dest.Label = _textService.UmbracoDictionaryTranslate(dest.Label);
+            dest.Description = _textService.UmbracoDictionaryTranslate(dest.Description);
         }
     }
 }

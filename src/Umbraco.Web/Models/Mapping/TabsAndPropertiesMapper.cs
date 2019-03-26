@@ -105,14 +105,8 @@ namespace Umbraco.Web.Models.Mapping
         /// <returns></returns>
         protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, MapperContext context)
         {
-            //we need to map this way to pass the context through, I don't like it but we'll see what AutoMapper says: https://github.com/AutoMapper/AutoMapper/issues/2588
-            var result = context.Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
-                    properties.OrderBy(prop => prop.PropertyType.SortOrder),
-                    null,
-                    context)
-                .ToList();
-
-            return result;
+            // must pass the context through
+            return properties.OrderBy(x => x.PropertyType.SortOrder).Select(x => context.Mapper.Map<ContentPropertyDisplay>(x, context)).ToList();
         }
     }
 

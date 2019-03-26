@@ -16,17 +16,15 @@ namespace Umbraco.Web.Models.Mapping
             : base(dataTypeService, logger, propertyEditors)
         { }
 
-        public override ContentPropertyDto Map(Property property, ContentPropertyDto dest, MapperContext context)
+        public override void Map(Property property, ContentPropertyDto dest, MapperContext context)
         {
-            var propertyDto = base.Map(property, dest, context);
+            base.Map(property, dest, context);
 
-            propertyDto.IsRequired = property.PropertyType.Mandatory;
-            propertyDto.ValidationRegExp = property.PropertyType.ValidationRegExp;
-            propertyDto.Description = property.PropertyType.Description;
-            propertyDto.Label = property.PropertyType.Name;
-            propertyDto.DataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
-
-            return propertyDto;
+            dest.IsRequired = property.PropertyType.Mandatory;
+            dest.ValidationRegExp = property.PropertyType.ValidationRegExp;
+            dest.Description = property.PropertyType.Description;
+            dest.Label = property.PropertyType.Name;
+            dest.DataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
         }
     }
 }

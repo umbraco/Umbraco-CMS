@@ -42,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             mapper.Define<UserGroupSave, IUserGroup>((source, context) => new UserGroup { CreateDate = DateTime.UtcNow }, Map);
             mapper.Define<UserInvite, IUser>(Map);
-            mapper.Define<IProfile, ContentEditing.UserProfile>(Map);
+            mapper.Define<IProfile, ContentEditing.UserProfile>((source, context) => new ContentEditing.UserProfile(), Map);
             mapper.Define<IReadOnlyUserGroup, UserGroupBasic>((source, context) => new UserGroupBasic(), Map);
             mapper.Define<IUserGroup, UserGroupBasic>((source, context) => new UserGroupBasic(), Map);
             mapper.Define<IUserGroup, AssignedUserGroupPermissions>((source, context) => new AssignedUserGroupPermissions(), Map);
@@ -115,8 +115,8 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(UserSave source, IUser target, MapperContext context)
         {
             target.Name = source.Name;
-            target.StartContentIds = source.StartContentIds;
-            target.StartMediaIds = source.StartMediaIds;
+            target.StartContentIds = source.StartContentIds ?? Array.Empty<int>();
+            target.StartMediaIds = source.StartMediaIds ?? Array.Empty<int>();
             target.Language = source.Culture;
             target.Email = source.Email;
             target.Key = source.Key;
