@@ -3,10 +3,14 @@
     <umb-control-group label="Toolbar" hide-label="false">
         <div ng-repeat="cmd in tinyMceConfig.commands">
             <label>
-                <input type="checkbox"
+                <umb-checkbox
+                    model="cmd.selected"
+                    on-change="selected(cmd, cmd.alias, model.value.toolbar)" />
+
+                <!--<input type="checkbox"
                        ng-checked="selected(cmd, cmd.alias, model.value.toolbar)"
                        ng-model="cmd.selected"
-                       ng-change="selectCommand(cmd)" />
+                       ng-change="selectCommand(cmd)"/>-->
 
                 <!--<img ng-src="{{cmd.icon}}" />-->
                 <i class="mce-ico" ng-class="(cmd.isCustom ? ' mce-i-custom ' : ' mce-i-') + cmd.fontIcon"></i>
@@ -18,13 +22,18 @@
 
     <umb-control-group label="Stylesheets" hide-label="0">
         <div ng-repeat="css in stylesheets">
-            <label>
+            <umb-checkbox
+                model="css.selected"
+                on-change="selected(css, css.name, model.value.stylesheets)"
+                text="{{css.name}}"/>
+
+            <!--<label>
                 <input type="checkbox"
                        ng-checked="selected(css, css.name, model.value.stylesheets)"
                        ng-model="css.selected"
-                       ng-change="selectStylesheet(css)" />
+                       ng-change="selectStylesheet(css)"/>
                 {{css.name}}
-            </label>
+            </label>-->
         </div>
     </umb-control-group>
 

@@ -31,13 +31,18 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 var icon = getFontIcon(obj.alias);
                 return angular.extend(obj, {
                     fontIcon: icon.name,
-                    isCustom: icon.isCustom
+                    isCustom: icon.isCustom,
+                    selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0
                 });
             });
         });
 
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
+
+            _.each($scope.stylesheets, function(stylesheet) {
+                stylesheet.selected = $scope.model.value.stylesheets.indexOf(stylesheet.name) >= 0;
+            });
         });
 
         $scope.selected = function(cmd, alias, lookup){
