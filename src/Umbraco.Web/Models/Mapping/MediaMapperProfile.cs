@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -7,6 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.ContentApps;
@@ -21,26 +23,19 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MediaMapperProfile : IMapperProfile
     {
+        private readonly CommonMapper _commonMapper;
         private readonly ILogger _logger;
-        private readonly IUserService _userService;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
-        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly ContentAppFactoryCollection _contentAppDefinitions;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
 
-        public MediaMapperProfile(ILogger logger, IUserService userService, IMediaService mediaService, IMediaTypeService mediaTypeService,
-            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ContentAppFactoryCollection contentAppDefinitions,
-            IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService)
+        public MediaMapperProfile(ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
+            ILocalizedTextService localizedTextService)
         {
             _logger = logger;
-            _userService = userService;
+            _commonMapper = commonMapper;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _contentAppDefinitions = contentAppDefinitions;
-            _umbracoContextAccessor = umbracoContextAccessor;
 
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(localizedTextService);
         }
@@ -54,8 +49,8 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsContainer
         private void Map(IMedia source, MediaItemDisplay target, MapperContext context)
         {
-            target.ContentApps = _contentAppDefinitions.GetContentAppsFor(source);
-            target.ContentType = GetContentType(source, context.Mapper);
+            target.ContentApps = _commonMapper.GetContentApps(source);
+            target.ContentType = _commonMapper.GetContentType(source, context.Mapper);
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = source.ContentType.Name;
             target.CreateDate = source.CreateDate;
@@ -65,14 +60,14 @@ namespace Umbraco.Web.Models.Mapping
             target.Key = source.Key;
             target.MediaLink = string.Join(",", source.GetUrls(Current.Configs.Settings().Content, _logger));
             target.Name = source.Name;
-            target.Owner = GetOwner(source, context.Mapper);
+            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
             target.SortOrder = source.SortOrder;
             target.State = null;
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.Trashed = source.Trashed;
-            target.TreeNodeUrl = GetTreeNodeUrl<MediaTreeController>(source);
+            target.TreeNodeUrl = _commonMapper.GetTreeNodeUrl<MediaTreeController>(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Media, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.VariesByCulture = source.ContentType.VariesByCulture();
@@ -87,7 +82,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
-            target.Owner = GetOwner(source, context.Mapper);
+            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
             target.Properties = context.Mapper.Map<IEnumerable<ContentPropertyBasic>>(source.Properties);
@@ -99,20 +94,46 @@ namespace Umbraco.Web.Models.Mapping
             target.VariesByCulture = source.ContentType.VariesByCulture();
         }
 
-        private UserProfile GetOwner(IContentBase source, Mapper mapper)
-        {
-            var profile = source.GetCreatorProfile(_userService);
-            return profile == null ? null : mapper.Map<IProfile, UserProfile>(profile);
-        }
-
         private bool DermineIsChildOfListView(IMedia source)
         {
             // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             var parent = _mediaService.GetParent(source);
             return parent != null && (parent.ContentType.IsContainer || _mediaTypeService.HasContainerInPath(parent.Path));
         }
+    }
 
-        private ContentTypeBasic GetContentType(IContentBase source, Mapper mapper)
+    // fixme temp + rename
+    internal class CommonMapper
+    {
+        private readonly IUserService _userService;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ContentAppFactoryCollection _contentAppDefinitions;
+        private readonly ILocalizedTextService _localizedTextService;
+
+        public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor,
+            ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService)
+        {
+            _userService = userService;
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _contentAppDefinitions = contentAppDefinitions;
+            _localizedTextService = localizedTextService;
+        }
+
+        public UserProfile GetOwner(IContentBase source, Mapper mapper)
+        {
+            var profile = source.GetCreatorProfile(_userService);
+            return profile == null ? null : mapper.Map<IProfile, UserProfile>(profile);
+        }
+
+        public UserProfile GetCreator(IContent source, Mapper mapper)
+        {
+            var profile = source.GetWriterProfile(_userService);
+            return profile == null ? null : mapper.Map<IProfile, UserProfile>(profile);
+        }
+
+        public ContentTypeBasic GetContentType(IContentBase source, Mapper mapper)
         {
             // TODO: We can resolve the UmbracoContext from the IValueResolver options!
             // OMG
@@ -128,7 +149,7 @@ namespace Umbraco.Web.Models.Mapping
             return null;
         }
 
-        private string GetTreeNodeUrl<TController>(IContentBase source)
+        public string GetTreeNodeUrl<TController>(IContentBase source)
             where TController : ContentTreeControllerBase
         {
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
@@ -136,6 +157,32 @@ namespace Umbraco.Web.Models.Mapping
 
             var urlHelper = new UrlHelper(umbracoContext.HttpContext.Request.RequestContext);
             return urlHelper.GetUmbracoApiService<TController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
+        }
+
+        public string GetMemberTreeNodeUrl(IContentBase source)
+        {
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            if (umbracoContext == null) return null;
+
+            var urlHelper = new UrlHelper(umbracoContext.HttpContext.Request.RequestContext);
+            return urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
+        }
+
+        public IEnumerable<ContentApp> GetContentApps(IContentBase source)
+        {
+            var apps = _contentAppDefinitions.GetContentAppsFor(source).ToArray();
+
+            // localize content app names
+            foreach (var app in apps)
+            {
+                var localizedAppName = _localizedTextService.Localize($"apps/{app.Alias}");
+                if (localizedAppName.Equals($"[{app.Alias}]", StringComparison.OrdinalIgnoreCase) == false)
+                {
+                    app.Name = localizedAppName;
+                }
+            }
+
+            return apps;
         }
     }
 }

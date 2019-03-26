@@ -9,17 +9,17 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.Define<Stylesheet, EntityBasic>(source => new EntityBasic(), Map);
-            mapper.Define<IPartialView, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
-            mapper.Define<Script, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
-            mapper.Define<Stylesheet, CodeFileDisplay>(source => new CodeFileDisplay(), Map);
+            mapper.Define<Stylesheet, EntityBasic>((source, context) => new EntityBasic(), Map);
+            mapper.Define<IPartialView, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);
+            mapper.Define<Script, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);
+            mapper.Define<Stylesheet, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);
             mapper.Define<CodeFileDisplay, IPartialView>(Map);
             mapper.Define<CodeFileDisplay, Script>(Map);
 
         }
 
         // Umbraco.Code.MapAll -Trashed -Udi -Icon
-        private static void Map(Stylesheet source, EntityBasic target)
+        private static void Map(Stylesheet source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.Id = source.Id;
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -FileType -Notifications -Path -Snippet
-        private static void Map(IPartialView source, CodeFileDisplay target)
+        private static void Map(IPartialView source, CodeFileDisplay target, MapperContext context)
         {
             target.Content = source.Content;
             target.Id = source.Id.ToString();
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -FileType -Notifications -Path -Snippet
-        private static void Map(Script source, CodeFileDisplay target)
+        private static void Map(Script source, CodeFileDisplay target, MapperContext context)
         {
             target.Content = source.Content;
             target.Id = source.Id.ToString();
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -FileType -Notifications -Path -Snippet
-        private static void Map(Stylesheet source, CodeFileDisplay target)
+        private static void Map(Stylesheet source, CodeFileDisplay target, MapperContext context)
         {
             target.Content = source.Content;
             target.Id = source.Id.ToString();
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Models.Mapping
 
         // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
         // Umbraco.Code.MapAll -Id -Key -Alias -Name -OriginalPath -Path
-        private static void Map(CodeFileDisplay source, IPartialView target)
+        private static void Map(CodeFileDisplay source, IPartialView target, MapperContext context)
         {
             target.Content = source.Content;
             target.VirtualPath = source.VirtualPath;
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Models.Mapping
 
         // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate -GetFileContent
         // Umbraco.Code.MapAll -Id -Key -Alias -Name -OriginalPath -Path
-        private static void Map(CodeFileDisplay source, Script target)
+        private static void Map(CodeFileDisplay source, Script target, MapperContext context)
         {
             target.Content = source.Content;
             target.VirtualPath = source.VirtualPath;

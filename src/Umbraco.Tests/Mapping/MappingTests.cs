@@ -79,13 +79,12 @@ namespace Umbraco.Tests.Mapping
         {
             public void SetMaps(Mapper mapper)
             {
-                mapper.Define<Thing1, Thing2>(source => new Thing2(), (source, target) => Map(source, target));
+                mapper.Define<Thing1, Thing2>((source, context) => new Thing2(), Map);
             }
 
-            private Thing2 Map(Thing1 source, Thing2 target)
+            private void Map(Thing1 source, Thing2 target, MapperContext context)
             {
                 target.Value = source.Value;
-                return target;
             }
         }
     }

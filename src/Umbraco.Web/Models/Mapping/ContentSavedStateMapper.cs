@@ -1,24 +1,23 @@
 ﻿using System;
-using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-
     /// <summary>
     /// Returns the <see cref="ContentSavedState?"/> for an <see cref="IContent"/> item
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class ContentBasicSavedStateResolver<T> : IValueResolver<IContent, IContentProperties<T>, ContentSavedState?>
+    internal class ContentBasicSavedStateMapper<T>
         where T : ContentPropertyBasic
     {
-        private readonly ContentSavedStateResolver<T> _inner = new ContentSavedStateResolver<T>();
+        private readonly ContentSavedStateMapper<T> _inner = new ContentSavedStateMapper<T>();
 
-        public ContentSavedState? Resolve(IContent source, IContentProperties<T> destination, ContentSavedState? destMember, ResolutionContext context)
+        public ContentSavedState? Map(IContent source, MapperContext context)
         {
-            return _inner.Resolve(source, destination, default, context);
+            return _inner.Map(source, context);
         }
     }
 
@@ -26,10 +25,10 @@ namespace Umbraco.Web.Models.Mapping
     /// Returns the <see cref="ContentSavedState"/> for an <see cref="IContent"/> item
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class ContentSavedStateResolver<T> : IValueResolver<IContent, IContentProperties<T>, ContentSavedState>
+    internal class ContentSavedStateMapper<T>
         where T : ContentPropertyBasic
     {
-        public ContentSavedState Resolve(IContent source, IContentProperties<T> destination, ContentSavedState destMember, ResolutionContext context)
+        public ContentSavedState Map(IContent source, MapperContext context)
         {
             PublishedState publishedState;
             bool isEdited;
@@ -38,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
             if (source.ContentType.VariesByCulture())
             {
                 //Get the culture from the context which will be set during the mapping operation for each variant
-                var culture = context.Options.GetCulture();
+                var culture = context.GetCulture();
 
                 //a culture needs to be in the context for a variant content item
                 if (culture == null)

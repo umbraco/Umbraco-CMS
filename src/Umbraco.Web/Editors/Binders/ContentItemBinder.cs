@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

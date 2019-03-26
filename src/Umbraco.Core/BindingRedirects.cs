@@ -27,11 +27,14 @@ namespace Umbraco.Core
         /// <returns></returns>
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
+            // keep here for reference - we don't use AutoMapper
+            /*
             //AutoMapper:
             // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
             // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stackoverflow
             if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
                 return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
+            */
 
             return null;
 

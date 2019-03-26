@@ -1,19 +1,11 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Umbraco.Core.Mapping
 {
-    // FIXME we should inject the mapper
-    // FIXME in order to transition, this should also handle AutoMapper?
-    // FIXME we might have to manage a 'context' for some contextual mappings?
-    // FIXME we have an infinite loop problem w/ logging in due to mapping issues
-    // FIXME refactor
-    //  ctor: (source, context) =>
-    //  map:  (source, target, context) =>
-    // and context.Mapper is mapper
+    // FIXME needs documentation and cleanup!
 
     public class Mapper
     {
@@ -31,20 +23,11 @@ namespace Umbraco.Core.Mapping
 
         #region Define
 
-        //public void Define<TSource, TTarget>()
-        //    => Define<TSource, TTarget>((source, target) => { });
-
         public void Define<TSource, TTarget>()
             => Define<TSource, TTarget>((source, target, context) => { });
 
-        //public void Define<TSource, TTarget>(Action<TSource, TTarget> map)
-        //    => Define(source => throw new NotSupportedException($"Don't know how to create {typeof(TTarget)} instances."), map);
-
         public void Define<TSource, TTarget>(Action<TSource, TTarget, MapperContext> map)
             => Define((source, context) => throw new NotSupportedException($"Don't know how to create {typeof(TTarget)} instances."), map);
-
-        //public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor)
-        //    => Define(ctor, (source, target) => { });
 
         public void Define<TSource, TTarget>(Func<TSource, MapperContext, TTarget> ctor)
             => Define(ctor, (source, target, context) => { });
@@ -62,42 +45,6 @@ namespace Umbraco.Core.Mapping
                 sourceMap = _maps[sourceType] = new Dictionary<Type, Action<object, object, MapperContext>>();
             return sourceMap;
         }
-
-        //public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor, Action<TSource, TTarget> map)
-        //{
-        //    var sourceType = typeof(TSource);
-        //    var targetType = typeof(TTarget);
-
-        //    var sourceCtors = DefineCtors(sourceType);
-        //    sourceCtors[targetType] = (source, context) => ctor((TSource) source);
-
-        //    var sourceMaps = DefineMaps(sourceType);
-        //    sourceMaps[targetType] = (source, target, context) => map((TSource) source, (TTarget) target);
-        //}
-
-        //public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor, Action<TSource, TTarget, MapperContext> map)
-        //{
-        //    var sourceType = typeof(TSource);
-        //    var targetType = typeof(TTarget);
-
-        //    var sourceCtors = DefineCtors(sourceType);
-        //    sourceCtors[targetType] = (source, context) => ctor((TSource)source);
-
-        //    var sourceMaps = DefineMaps(sourceType);
-        //    sourceMaps[targetType] = (source, target, context) => map((TSource)source, (TTarget)target, context);
-        //}
-
-        //public void Define<TSource, TTarget>(Func<TSource, MapperContext, TTarget> ctor, Action<TSource, TTarget> map)
-        //{
-        //    var sourceType = typeof(TSource);
-        //    var targetType = typeof(TTarget);
-
-        //    var sourceCtors = DefineCtors(sourceType);
-        //    sourceCtors[targetType] = (source, context) => ctor((TSource)source, context);
-
-        //    var sourceMaps = DefineMaps(sourceType);
-        //    sourceMaps[targetType] = (source, target, context) => map((TSource)source, (TTarget)target);
-        //}
 
         public void Define<TSource, TTarget>(Func<TSource, MapperContext, TTarget> ctor, Action<TSource, TTarget, MapperContext> map)
         {
@@ -186,15 +133,10 @@ namespace Umbraco.Core.Mapping
 
                         return (TTarget)targetEnumerable;
                     }
-
-                    // fixme - temp
-                    return AutoMapper.Mapper.Map<TTarget>(source);
                 }
             }
 
-            // fixme this is temp
-            //throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
-            return AutoMapper.Mapper.Map<TTarget>(source);
+            throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
         }
 
         // TODO: when AutoMapper is completely gone these two methods can merge
@@ -254,15 +196,10 @@ namespace Umbraco.Core.Mapping
 
                         return (TTarget)targetEnumerable;
                     }
-
-                    // fixme - temp
-                    return AutoMapper.Mapper.Map<TSource, TTarget>(source);
                 }
             }
 
-            // fixme this is temp
-            //throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
-            return AutoMapper.Mapper.Map<TSource, TTarget>(source);
+            throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
         }
 
         public TTarget Map<TSource, TTarget>(TSource source, TTarget target)
@@ -275,7 +212,6 @@ namespace Umbraco.Core.Mapping
             return Map(source, target, context);
         }
 
-
         public TTarget Map<TSource, TTarget>(TSource source, TTarget target, MapperContext context)
         {
             // fixme should we deal with enumerables?
@@ -283,9 +219,7 @@ namespace Umbraco.Core.Mapping
             var map = GetMap(source.GetType(), typeof(TTarget));
             if (map == null)
             {
-                // fixme this is temp
-                //throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
-                return AutoMapper.Mapper.Map(source, target);
+                throw new InvalidOperationException($"Don't know how to map {typeof(TSource).FullName} to {typeof(TTarget).FullName}.");
             }
 
             map(source, target, context);

@@ -78,7 +78,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="Castle.Core" Version="4.3.1" />
     <PackageReference Include="Examine" Version="1.0.0" />
     <PackageReference Include="HtmlAgilityPack">

@@ -1,154 +1,185 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web.Security;
-using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services.Implement;
+using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
     /// Declares model mappings for members.
     /// </summary>
-    internal class MemberMapperProfile : Profile
+    internal class MemberMapperProfile : IMapperProfile
     {
-        public MemberMapperProfile(
-            MemberTabsAndPropertiesMapper tabsAndPropertiesMapper,
-            MemberTreeNodeUrlResolver memberTreeNodeUrlResolver,
-            MemberBasicPropertiesResolver memberBasicPropertiesResolver,
-            IUserService userService,
-            IMemberTypeService memberTypeService,
-            IMemberService memberService)
+        private readonly CommonMapper _commonMapper;
+        private readonly IMemberTypeService _memberTypeService;
+        private readonly TabsAndPropertiesMapper<IMember> _tabsAndPropertiesMapper;
+
+        public MemberMapperProfile(CommonMapper commonMapper, IMemberTypeService memberTypeService, ILocalizedTextService localizedTextService)
         {
-            // create, capture, cache
-            var memberOwnerResolver = new OwnerResolver<IMember>(userService);
-            var memberProfiderFieldMappingResolver = new MemberProviderFieldResolver();
-            var membershipScenarioMappingResolver = new MembershipScenarioResolver(memberTypeService);
-            var memberDtoPropertiesResolver = new MemberDtoPropertiesResolver();
+            _commonMapper = commonMapper;
+            _memberTypeService = memberTypeService;
 
-            //FROM MembershipUser TO MediaItemDisplay - used when using a non-umbraco membership provider
-            CreateMap<MembershipUser, MemberDisplay>().ConvertUsing<MembershipUserTypeConverter>();
+            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMember>(localizedTextService);
+        }
 
-            //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
-            CreateMap<MembershipUser, IMember>()
-                .ConstructUsing(src => MemberService.CreateGenericMembershipProviderMember(src.UserName, src.Email, src.UserName, ""))
-                //we're giving this entity an ID of int.MaxValue - TODO: SD: I can't remember why this mapping is here?
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => int.MaxValue))
-                .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comment))
-                .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreationDate))
-                .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.LastActivityDate))
-                .ForMember(dest => dest.LastPasswordChangeDate, opt => opt.MapFrom(src => src.LastPasswordChangedDate))
-                .ForMember(dest => dest.Key, opt => opt.MapFrom(src => src.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
-                //This is a special case for password - we don't actually care what the password is but it either needs to be something or nothing
-                // so we'll set it to something if the member is actually created, otherwise nothing if it is a new member.
-                .ForMember(dest => dest.RawPasswordValue, opt => opt.MapFrom(src => src.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : ""))
-                .ForMember(dest => dest.Properties, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
-                .ForMember(dest => dest.Level, opt => opt.Ignore())
-                .ForMember(dest => dest.Name, opt => opt.Ignore())
-                .ForMember(dest => dest.CultureInfos, opt => opt.Ignore())
-                .ForMember(dest => dest.ParentId, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.FailedPasswordAttempts, opt => opt.Ignore())
-                .ForMember(dest => dest.DeleteDate, opt => opt.Ignore())
-                .ForMember(dest => dest.WriterId, opt => opt.Ignore())
-                .ForMember(dest => dest.VersionId, opt => opt.Ignore())
-                // TODO: Support these eventually
-                .ForMember(dest => dest.PasswordQuestion, opt => opt.Ignore())
-                .ForMember(dest => dest.RawPasswordAnswerValue, opt => opt.Ignore());
+        public void SetMaps(Mapper mapper)
+        {
+            mapper.Define<MembershipUser, MemberDisplay>((source, context) => new MemberDisplay(), Map);
+            mapper.Define<MembershipUser, IMember>((source, context) => MemberService.CreateGenericMembershipProviderMember(source.UserName, source.Email, source.UserName, ""), Map);
+            mapper.Define<IMember, MemberDisplay>((source, context) => new MemberDisplay(), Map);
+            mapper.Define<IMember, MemberBasic>((source, context) => new MemberBasic(), Map);
+            mapper.Define<MembershipUser, MemberBasic>((source, context) => new MemberBasic(), Map);
+            mapper.Define<IMemberGroup, MemberGroupDisplay>((source, context) => new MemberGroupDisplay(), Map);
+        }
 
-            //FROM IMember TO MemberDisplay
-            CreateMap<IMember, MemberDisplay>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
-                .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => memberOwnerResolver.Resolve(src)))
-                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
-                .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
-                .ForMember(dest => dest.ContentTypeName, opt => opt.MapFrom(src => src.ContentType.Name))
-                .ForMember(dest => dest.Properties, opt => opt.Ignore())
-                .ForMember(dest => dest.Tabs, opt => opt.MapFrom(tabsAndPropertiesMapper))
-                .ForMember(dest => dest.MemberProviderFieldMapping, opt => opt.MapFrom(src => memberProfiderFieldMappingResolver.Resolve(src)))
-                .ForMember(dest => dest.MembershipScenario, opt => opt.MapFrom(src => membershipScenarioMappingResolver.Resolve(src)))
-                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
-                .ForMember(dest => dest.Errors, opt => opt.Ignore())
-                .ForMember(dest => dest.State, opt => opt.MapFrom<ContentSavedState?>(_ => null))
-                .ForMember(dest => dest.Edited, opt => opt.Ignore())
-                .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.IsChildOfListView, opt => opt.Ignore())
-                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.IsContainer, opt => opt.Ignore())
-                .ForMember(dest => dest.TreeNodeUrl, opt => opt.MapFrom(memberTreeNodeUrlResolver))
-                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore());
+        private void Map(MembershipUser source, MemberDisplay target, MapperContext context)
+        {
+            //first convert to IMember
+            var member = context.Mapper.Map<IMember>(source);
+            //then convert to MemberDisplay
+            context.Mapper.Map<IMember, MemberDisplay>(member);
+        }
 
-            //FROM IMember TO MemberBasic
-            CreateMap<IMember, MemberBasic>()
-                //we're giving this entity an ID of int.MaxValue - this is kind of a hack to force angular to use the Key instead of the Id in list views
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => int.MaxValue))
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
-                .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => memberOwnerResolver.Resolve(src)))
-                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
-                .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
-                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.State, opt => opt.MapFrom<ContentSavedState?>(_ => null))
-                .ForMember(dest => dest.Edited, opt => opt.Ignore())
-                .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dto => dto.Properties, expression => expression.MapFrom(memberBasicPropertiesResolver))
-                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore());
+        // TODO: SD: I can't remember why this mapping is here?
+        // Umbraco.Code.MapAll -Properties -CreatorId -Level -Name -CultureInfos -ParentId
+        // Umbraco.Code.MapAll -Path -SortOrder -DeleteDate -WriterId -VersionId -PasswordQuestion
+        // Umbraco.Code.MapAll -RawPasswordAnswerValue -FailedPasswordAttempts
+        private void Map(MembershipUser source, IMember target, MapperContext context)
+        {
+            target.Comments = source.Comment;
+            target.CreateDate = source.CreationDate;
+            target.Email = source.Email;
+            target.Id = int.MaxValue;
+            target.IsApproved = source.IsApproved;
+            target.IsLockedOut = source.IsLockedOut;
+            target.Key = source.ProviderUserKey.TryConvertTo<Guid>().Result;
+            target.LastLockoutDate = source.LastLockoutDate;
+            target.LastLoginDate = source.LastLoginDate;
+            target.LastPasswordChangeDate = source.LastPasswordChangedDate;
+            target.ProviderUserKey = source.ProviderUserKey;
+            target.RawPasswordValue = source.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : "";
+            target.UpdateDate = source.LastActivityDate;
+            target.Username = source.UserName;
+        }
 
-            //FROM MembershipUser TO MemberBasic
-            CreateMap<MembershipUser, MemberBasic>()
-                //we're giving this entity an ID of int.MaxValue - TODO: SD: I can't remember why this mapping is here?
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => int.MaxValue))
-                .ForMember(dest => dest.Udi, opt => opt.Ignore())
-                .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreationDate))
-                .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.LastActivityDate))
-                .ForMember(dest => dest.Key, opt => opt.MapFrom(src => src.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
-                .ForMember(dest => dest.Owner, opt => opt.MapFrom(_ => new UserProfile {Name = "Admin", UserId = -1 }))
-                .ForMember(dest => dest.Icon, opt => opt.MapFrom(_ => "icon-user"))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UserName))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.UserName))
-                .ForMember(dest => dest.Properties, opt => opt.Ignore())
-                .ForMember(dest => dest.ParentId, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.State, opt => opt.MapFrom(_ => ContentSavedState.Draft))
-                .ForMember(dest => dest.Edited, opt => opt.Ignore())
-                .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore())
-                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore());
+        // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsChildOfListView
+        // Umbraco.Code.MapAll -Trashed -IsContainer -VariesByCulture
+        private void Map(IMember source, MemberDisplay target, MapperContext context)
+        {
+            target.ContentTypeAlias = source.ContentType.Alias;
+            target.ContentTypeName = source.ContentType.Name;
+            target.CreateDate = source.CreateDate;
+            target.Email = source.Email;
+            target.Icon = source.ContentType.Icon;
+            target.Id = source.Id;
+            target.Key = source.Key;
+            target.MemberProviderFieldMapping = GetMemberProviderFieldMapping();
+            target.MembershipScenario = GetMembershipScenario();
+            target.Name = source.Name;
+            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
+            target.ParentId = source.ParentId;
+            target.Path = source.Path;
+            target.SortOrder = source.SortOrder;
+            target.State = null;
+            target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
+            target.TreeNodeUrl = _commonMapper.GetMemberTreeNodeUrl(source);
+            target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
+            target.UpdateDate = source.UpdateDate;
+            target.Username = source.Username;
+        }
 
-            //FROM IMember TO ContentItemDto<IMember>
-            CreateMap<IMember, ContentPropertyCollectionDto>()
-                //.ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
-                //.ForMember(dest => dest.Owner, opt => opt.MapFrom(src => memberOwnerResolver.Resolve(src)))
-                //.ForMember(dest => dest.Published, opt => opt.Ignore())
-                //.ForMember(dest => dest.Edited, opt => opt.Ignore())
-                //.ForMember(dest => dest.Updater, opt => opt.Ignore())
-                //.ForMember(dest => dest.Icon, opt => opt.Ignore())
-                //.ForMember(dest => dest.Alias, opt => opt.Ignore())
-                //do no map the custom member properties (currently anyways, they were never there in 6.x)
-                .ForMember(dest => dest.Properties, opt => opt.MapFrom(src => memberDtoPropertiesResolver.Resolve(src)));
+        // Umbraco.Code.MapAll -Trashed -Edited -Updater -Alias -VariesByCulture
+        private void Map(IMember source, MemberBasic target, MapperContext context)
+        {
+            target.ContentTypeAlias = source.ContentType.Alias;
+            target.CreateDate = source.CreateDate;
+            target.Email = source.Email;
+            target.Icon = source.ContentType.Icon;
+            target.Id = int.MaxValue;
+            target.Key = source.Key;
+            target.Name = source.Name;
+            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
+            target.ParentId = source.ParentId;
+            target.Path = source.Path;
+            target.Properties = context.Mapper.Map<IEnumerable<ContentPropertyBasic>>(source.Properties);
+            target.SortOrder = source.SortOrder;
+            target.State = null;
+            target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
+            target.UpdateDate = source.UpdateDate;
+            target.Username = source.Username;
+        }
 
-            //FROM IMemberGroup TO MemberGroupDisplay
-            CreateMap<IMemberGroup, MemberGroupDisplay>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.MemberGroup, src.Key)))
-                .ForMember(dest => dest.Path, opt => opt.MapFrom(group => "-1," + group.Id))
-                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.Ignore())
-                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.ParentId, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore());
+        //TODO: SD: I can't remember why this mapping is here?
+        // Umbraco.Code.MapAll -Udi -Properties -ParentId -Path -SortOrder -Edited -Updater
+        // Umbraco.Code.MapAll -Trashed -Alias -ContentTypeAlias -VariesByCulture
+        private void Map(MembershipUser source, MemberBasic target, MapperContext context)
+        {
+            target.CreateDate = source.CreationDate;
+            target.Email = source.Email;
+            target.Icon = "icon-user";
+            target.Id = int.MaxValue;
+            target.Key = source.ProviderUserKey.TryConvertTo<Guid>().Result;
+            target.Name = source.UserName;
+            target.Owner = new UserProfile { Name = "Admin", UserId = -1 };
+            target.State = ContentSavedState.Draft;
+            target.UpdateDate = source.LastActivityDate;
+            target.Username = source.UserName;
+}
+
+        // Umbraco.Code.MapAll -Icon -Trashed -ParentId -Alias
+        private void Map(IMemberGroup source, MemberGroupDisplay target, MapperContext context)
+        {
+            target.Id = source.Id;
+            target.Key = source.Key;
+            target.Name = source.Name;
+            target.Path = "-1" + source.Id;
+            target.Udi = Udi.Create(Constants.UdiEntityType.MemberGroup, source.Key);
+        }
+
+        private MembershipScenario GetMembershipScenario()
+        {
+            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider())
+            {
+                return MembershipScenario.NativeUmbraco;
+            }
+            var memberType = _memberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
+            return memberType != null
+                ? MembershipScenario.CustomProviderWithUmbracoLink
+                : MembershipScenario.StandaloneCustomProvider;
+        }
+
+        private static IDictionary<string, string> GetMemberProviderFieldMapping()
+        {
+            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider() == false)
+            {
+                return new Dictionary<string, string>
+                {
+                    {Constants.Conventions.Member.IsLockedOut, Constants.Conventions.Member.IsLockedOut},
+                    {Constants.Conventions.Member.IsApproved, Constants.Conventions.Member.IsApproved},
+                    {Constants.Conventions.Member.Comments, Constants.Conventions.Member.Comments}
+                };
+            }
+
+            var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
+
+            return new Dictionary<string, string>
+            {
+                {Constants.Conventions.Member.IsLockedOut, umbracoProvider.LockPropertyTypeAlias},
+                {Constants.Conventions.Member.IsApproved, umbracoProvider.ApprovedPropertyTypeAlias},
+                {Constants.Conventions.Member.Comments, umbracoProvider.CommentPropertyTypeAlias}
+            };
         }
     }
 }

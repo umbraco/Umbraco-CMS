@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
 using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Composing.CompositionExtensions
 {
@@ -12,10 +9,10 @@ namespace Umbraco.Web.Composing.CompositionExtensions
     {
         public static Composition ComposeWebMappingProfiles(this Composition composition)
         {
-            // register the profiles
             composition.WithCollectionBuilder<MapperProfileCollectionBuilder>()
                 .Append<AuditMapperProfile>()
                 .Append<CodeFileMapperProfile>()
+                .Append<ContentMapperProfile>()
                 .Append<ContentPropertyMapperProfile>()
                 .Append<ContentTypeMapperProfile>()
                 .Append<DataTypeMapperProfile>()
@@ -23,6 +20,7 @@ namespace Umbraco.Web.Composing.CompositionExtensions
                 .Append<DictionaryMapperProfile>()
                 .Append<MacroMapperProfile>()
                 .Append<MediaMapperProfile>()
+                .Append<MemberMapperProfile>()
                 .Append<RedirectUrlMapperProfile>()
                 .Append<RelationMapperProfile>()
                 .Append<SectionMapperProfile>()
@@ -31,37 +29,7 @@ namespace Umbraco.Web.Composing.CompositionExtensions
                 .Append<UserMapperProfile>()
                 .Append<LanguageMapperProfile>();
 
-            //register the profiles
-            //composition.Register<Profile, AuditMapperProfile>();
-            //composition.Register<Profile, CodeFileMapperProfile>();
-            composition.Register<Profile, ContentMapperProfile>();
-            //composition.Register<Profile, ContentPropertyMapperProfile>();
-            //composition.Register<Profile, ContentTypeMapperProfile>();
-            //composition.Register<Profile, DataTypeMapperProfile>();
-            //composition.Register<Profile, EntityMapperProfile>();
-            //composition.Register<Profile, DictionaryMapperProfile>();
-            //composition.Register<Profile, MacroMapperProfile>();
-            //composition.Register<Profile, MediaMapperProfile>();
-            composition.Register<Profile, MemberMapperProfile>();
-            //composition.Register<Profile, RedirectUrlMapperProfile>();
-            //composition.Register<Profile, RelationMapperProfile>();
-            //composition.Register<Profile, SectionMapperProfile>();
-            //composition.Register<Profile, TagMapperProfile>();
-            //composition.Register<Profile, TemplateMapperProfile>();
-            //composition.Register<Profile, UserMapperProfile>();
-            //composition.Register<Profile, LanguageMapperProfile>();
-
-            //register any resolvers, etc.. that the profiles use
-            composition.Register<ContentUrlResolver>();
-            composition.Register<ContentTreeNodeUrlResolver<IContent, ContentTreeController>>();
-            composition.Register<TabsAndPropertiesMapper<IContent>>();
-            composition.Register<TabsAndPropertiesMapper<IMedia>>();
-            composition.Register<ContentTreeNodeUrlResolver<IMedia, MediaTreeController>>();
-            composition.Register<MemberTabsAndPropertiesMapper>();
-            composition.Register<MemberTreeNodeUrlResolver>();
-            composition.Register<MemberBasicPropertiesResolver>();
-            composition.Register<MediaAppResolver>();
-            composition.Register<ContentAppResolver>();
+            composition.Register<CommonMapper>();
 
             return composition;
         }

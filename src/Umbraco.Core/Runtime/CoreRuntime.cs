@@ -217,10 +217,13 @@ namespace Umbraco.Core.Runtime
             // This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
+                // here for reference - we don't use automapper anymore + see BindingRedirects ??
+                /*
                 // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
                 // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stack overflow
                 if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
                     return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
+                */
                 return null;
             };
         }

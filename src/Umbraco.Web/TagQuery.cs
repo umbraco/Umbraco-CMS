@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
@@ -64,37 +64,37 @@ namespace Umbraco.Web
         /// <inheritdoc />
         public IEnumerable<TagModel> GetAllTags(string group = null, string culture = null)
         {
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllTags(group, culture));
+            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllTags(group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetAllContentTags(string group = null, string culture = null)
         {
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllContentTags(group, culture));
+            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllContentTags(group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetAllMediaTags(string group = null, string culture = null)
         {
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMediaTags(group, culture));
+            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMediaTags(group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetAllMemberTags(string group = null, string culture = null)
         {
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMemberTags(group, culture));
+            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMemberTags(group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null, string culture = null)
         {
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, group, culture));
+            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetTagsForEntity(int contentId, string group = null, string culture = null)
         {
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForEntity(contentId, group, culture));
+            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForEntity(contentId, group, culture));
         }
     }
 }
