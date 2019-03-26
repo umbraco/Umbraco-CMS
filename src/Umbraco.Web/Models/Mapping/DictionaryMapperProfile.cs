@@ -24,12 +24,13 @@ namespace Umbraco.Web.Models.Mapping
 
         public void SetMaps(Mapper mapper)
         {
-            mapper.Define<IDictionaryItem, EntityBasic>(source => new EntityBasic(), Map);
-            mapper.Define<IDictionaryItem, DictionaryDisplay>(source => new DictionaryDisplay(), Map);
+            mapper.Define<IDictionaryItem, EntityBasic>((source, context) => new EntityBasic(), Map);
+            mapper.Define<IDictionaryItem, DictionaryDisplay>((source, context) => new DictionaryDisplay(), Map);
+            mapper.Define<IDictionaryItem, DictionaryOverviewDisplay>((source, context) => new DictionaryOverviewDisplay(), Map);
         }
 
         // Umbraco.Code.MapAll -ParentId -Path -Trashed -Udi -Icon
-        private static void Map(IDictionaryItem source, EntityBasic target)
+        private static void Map(IDictionaryItem source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.ItemKey;
             target.Id = source.Id;
@@ -38,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -Icon -Trashed -Alias
-        private void Map(IDictionaryItem source, DictionaryDisplay target)
+        private void Map(IDictionaryItem source, DictionaryDisplay target, MapperContext context)
         {
             target.Id = source.Id;
             target.Key = source.Key;
@@ -80,7 +81,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -Level -Translations
-        private void Map(IDictionaryItem source, DictionaryOverviewDisplay target)
+        private void Map(IDictionaryItem source, DictionaryOverviewDisplay target, MapperContext context)
         {
             target.Id = source.Id;
             target.Name = source.ItemKey;

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Security;
-using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.Mapping
     /// This also ensures that the IsLocked out property is readonly when the member is not locked out - this is because
     /// an admin cannot actually set isLockedOut = true, they can only unlock.
     /// </remarks>
-    internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver<IMember, MemberDisplay>
+    internal class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _localizedTextService;
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberService _memberService;
         private readonly IUserService _userService;
 
-        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService, IMemberTypeService memberTypeService)
+        public MemberTabsAndPropertiesMapper(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService, IMemberTypeService memberTypeService)
             : base(localizedTextService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Models.Mapping
 
         /// <inheritdoc />
         /// <remarks>Overridden to deal with custom member properties and permissions.</remarks>
-        public override IEnumerable<Tab<ContentPropertyDisplay>> Resolve(IMember source, MemberDisplay destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)
+        public override IEnumerable<Tab<ContentPropertyDisplay>> Map(IMember source, MapperContext context)
         {
             var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Models.Mapping
                 .Select(x => x.Alias)
                 .ToArray();
 
-            var resolved = base.Resolve(source, destination, destMember, context);
+            var resolved = base.Map(source, context);
 
             if (provider.IsUmbracoMembershipProvider() == false)
             {
@@ -176,7 +176,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="properties"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, ResolutionContext context)
+        protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, MapperContext context)
         {
             var result = base.MapProperties(content, properties, context);
             var member = (IMember)content;

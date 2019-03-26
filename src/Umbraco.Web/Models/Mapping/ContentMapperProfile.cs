@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.Mapping
         public ContentMapperProfile(
             ContentUrlResolver contentUrlResolver,
             ContentTreeNodeUrlResolver<IContent, ContentTreeController> contentTreeNodeUrlResolver,
-            TabsAndPropertiesResolver<IContent, ContentVariantDisplay> tabsAndPropertiesResolver,
+            TabsAndPropertiesMapper<IContent> tabsAndPropertiesMapper,
             ContentAppResolver contentAppResolver,
             IUserService userService,
             IContentService contentService,
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.State, opt => opt.MapFrom<ContentSavedStateResolver<ContentPropertyDisplay>>())
-                .ForMember(dest => dest.Tabs, opt => opt.MapFrom(tabsAndPropertiesResolver));
+                .ForMember(dest => dest.Tabs, opt => opt.MapFrom(tabsAndPropertiesMapper));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             CreateMap<IContent, ContentItemBasic<ContentPropertyBasic>>()

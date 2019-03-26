@@ -1,29 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
-using ContentVariation = Umbraco.Core.Models.ContentVariation;
 
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
     /// Creates a base generic ContentPropertyBasic from a Property
     /// </summary>
-    internal class ContentPropertyBasicConverter<TDestination> : ITypeConverter<Property, TDestination>
+    internal class ContentPropertyBasicMapper<TDestination>
         where TDestination : ContentPropertyBasic, new()
     {
         private readonly ILogger _logger;
         private readonly PropertyEditorCollection _propertyEditors;
         protected IDataTypeService DataTypeService { get; }
 
-        public ContentPropertyBasicConverter(IDataTypeService dataTypeService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyBasicMapper(IDataTypeService dataTypeService, ILogger logger, PropertyEditorCollection propertyEditors)
         {
             _logger = logger;
             _propertyEditors = propertyEditors;
@@ -34,12 +31,12 @@ namespace Umbraco.Web.Models.Mapping
         /// Assigns the PropertyEditor, Id, Alias and Value to the property
         /// </summary>
         /// <returns></returns>
-        public virtual TDestination Convert(Property property, TDestination dest, ResolutionContext context)
+        public virtual TDestination Map(Property property, TDestination dest, MapperContext context)
         {
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null)
             {
-                _logger.Error<ContentPropertyBasicConverter<TDestination>>(
+                _logger.Error<ContentPropertyBasicMapper<TDestination>>(
                     new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"),
                     "No property editor '{PropertyEditorAlias}' found, converting to a Label",
                     property.PropertyType.PropertyEditorAlias);
@@ -57,12 +54,12 @@ namespace Umbraco.Web.Models.Mapping
 
             // if there's a set of property aliases specified, we will check if the current property's value should be mapped.
             // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.
-            var includedProperties = context.Options.GetIncludedProperties();
+            var includedProperties = context.GetIncludedProperties();
             if (includedProperties != null && !includedProperties.Contains(property.Alias))
                 return result;
 
             //Get the culture from the context which will be set during the mapping operation for each property
-            var culture = context.Options.GetCulture();
+            var culture = context.GetCulture();
 
             //a culture needs to be in the context for a property type that can vary
             if (culture == null && property.PropertyType.VariesByCulture())

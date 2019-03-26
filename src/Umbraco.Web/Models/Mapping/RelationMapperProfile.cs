@@ -9,14 +9,14 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.Define<IRelationType, RelationTypeDisplay>(source => new RelationTypeDisplay(), Map);
-            mapper.Define<IRelation, RelationDisplay>(source => new RelationDisplay(), Map);
+            mapper.Define<IRelationType, RelationTypeDisplay>((source, context) => new RelationTypeDisplay(), Map);
+            mapper.Define<IRelation, RelationDisplay>((source, context) => new RelationDisplay(), Map);
             mapper.Define<RelationTypeSave, IRelationType>(Map);
         }
 
         // Umbraco.Code.MapAll -Icon -Trashed -Alias -AdditionalData
         // Umbraco.Code.MapAll -Relations -ParentId -Notifications
-        private static void Map(IRelationType source, RelationTypeDisplay target)
+        private static void Map(IRelationType source, RelationTypeDisplay target, MapperContext context)
         {
             target.ChildObjectType = source.ChildObjectType;
             target.Id = source.Id;
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -ParentName -ChildName
-        private static void Map(IRelation source, RelationDisplay target)
+        private static void Map(IRelation source, RelationDisplay target, MapperContext context)
         {
             target.ChildId = source.ChildId;
             target.Comment = source.Comment;
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
-        private static void Map(RelationTypeSave source, IRelationType target)
+        private static void Map(RelationTypeSave source, IRelationType target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.ChildObjectType = source.ChildObjectType;

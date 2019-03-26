@@ -1,9 +1,5 @@
-﻿using System;
-using System.Linq;
-using AutoMapper;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -14,18 +10,18 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Creates a ContentPropertyDisplay from a Property
     /// </summary>
-    internal class ContentPropertyDisplayConverter : ContentPropertyBasicConverter<ContentPropertyDisplay>
+    internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<ContentPropertyDisplay>
     {
         private readonly ILocalizedTextService _textService;
 
-        public ContentPropertyDisplayConverter(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyDisplayMapper(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
             : base(dataTypeService, logger, propertyEditors)
         {
             _textService = textService;
         }
-        public override ContentPropertyDisplay Convert(Property originalProp, ContentPropertyDisplay dest, ResolutionContext context)
+        public override ContentPropertyDisplay Map(Property originalProp, ContentPropertyDisplay dest, MapperContext context)
         {
-            var display = base.Convert(originalProp, dest, context);
+            var display = base.Map(originalProp, dest, context);
 
             var config = DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId).Configuration;
 

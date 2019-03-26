@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
@@ -507,13 +506,15 @@ namespace Umbraco.Web.Editors
                 var culture = ClientCulture();
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
-                    Items = entities.Select(entity => AutoMapper.Mapper.Map<IEntitySlim, EntityBasic>(entity, options =>
-                            {
-                                options.SetCulture(culture);
-                                options.AfterMap((src, dest) => { dest.AdditionalData["hasChildren"] = src.HasChildren; });
-                            }
-                        )
-                    )
+                    Items = entities.Select(source =>
+                    {
+                        var target = Mapper.Map<IEntitySlim, EntityBasic>(source, context =>
+                        {
+                            context.SetCulture(culture);
+                        });
+                        target.AdditionalData["hasChildren"] = source.HasChildren;
+                        return target;
+                    })
                 };
 
                 return pagedResult;
@@ -1052,7 +1053,7 @@ namespace Umbraco.Web.Editors
         private EntityBasic MapEntity(object entity, string culture = null)
         {
             culture = culture ?? ClientCulture();
-            return AutoMapper.Mapper.Map<EntityBasic>(entity, opts => { opts.SetCulture(culture); });
+            return Mapper.Map<EntityBasic>(entity, context => { context.SetCulture(culture); });
         }
 
         private string ClientCulture() => Request.ClientCulture();

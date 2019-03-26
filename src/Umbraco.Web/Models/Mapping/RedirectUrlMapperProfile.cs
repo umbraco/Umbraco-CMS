@@ -17,11 +17,11 @@ namespace Umbraco.Web.Models.Mapping
 
         public void SetMaps(Mapper mapper)
         {
-            mapper.Define<IRedirectUrl, ContentRedirectUrl>(source => new ContentRedirectUrl(), Map);
+            mapper.Define<IRedirectUrl, ContentRedirectUrl>((source, context) => new ContentRedirectUrl(), Map);
         }
 
         // Umbraco.Code.MapAll
-        private void Map(IRedirectUrl source, ContentRedirectUrl target)
+        private void Map(IRedirectUrl source, ContentRedirectUrl target, MapperContext context)
         {
             target.ContentId = source.ContentId;
             target.CreateDateUtc = source.CreateDateUtc;

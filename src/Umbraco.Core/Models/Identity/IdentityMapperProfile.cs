@@ -22,13 +22,13 @@ namespace Umbraco.Core.Models.Identity
         public void SetMaps(Mapper mapper)
         {
             mapper.Define<IUser, BackOfficeIdentityUser>(
-                source =>
+                (source, context) =>
                 {
                     var target = new BackOfficeIdentityUser(source.Id, source.Groups);
                     target.DisableChangeTracking();
                     return target;
                 },
-                (source, target) =>
+                (source, target, context) =>
                 {
                     Map(source, target);
                     target.ResetDirtyProperties(true);

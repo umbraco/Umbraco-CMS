@@ -8,12 +8,12 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.Define<ITemplate, TemplateDisplay>(source => new TemplateDisplay(), Map);
-            mapper.Define<TemplateDisplay, Template>(source => new Template(source.Name, source.Alias), Map);
+            mapper.Define<ITemplate, TemplateDisplay>((source, context) => new TemplateDisplay(), Map);
+            mapper.Define<TemplateDisplay, Template>((source, context) => new Template(source.Name, source.Alias), Map);
         }
 
         // Umbraco.Code.MapAll
-        private static void Map(ITemplate source, TemplateDisplay target)
+        private static void Map(ITemplate source, TemplateDisplay target, MapperContext context)
         {
             target.Id = source.Id;
             target.Name = source.Name;
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
         // Umbraco.Code.MapAll -Path -VirtualPath -MasterTemplateId -IsMasterTemplate
         // Umbraco.Code.MapAll -GetFileContent
-        private static void Map(TemplateDisplay source, Template target)
+        private static void Map(TemplateDisplay source, Template target, MapperContext context)
         {
             target.MasterTemplateAlias = source.MasterTemplateAlias;
             target.Name = source.Name;

@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models.Mapping
     internal class MemberMapperProfile : Profile
     {
         public MemberMapperProfile(
-            MemberTabsAndPropertiesResolver tabsAndPropertiesResolver,
+            MemberTabsAndPropertiesMapper tabsAndPropertiesMapper,
             MemberTreeNodeUrlResolver memberTreeNodeUrlResolver,
             MemberBasicPropertiesResolver memberBasicPropertiesResolver,
             IUserService userService,
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.ContentTypeName, opt => opt.MapFrom(src => src.ContentType.Name))
                 .ForMember(dest => dest.Properties, opt => opt.Ignore())
-                .ForMember(dest => dest.Tabs, opt => opt.MapFrom(tabsAndPropertiesResolver))
+                .ForMember(dest => dest.Tabs, opt => opt.MapFrom(tabsAndPropertiesMapper))
                 .ForMember(dest => dest.MemberProviderFieldMapping, opt => opt.MapFrom(src => memberProfiderFieldMappingResolver.Resolve(src)))
                 .ForMember(dest => dest.MembershipScenario, opt => opt.MapFrom(src => membershipScenarioMappingResolver.Resolve(src)))
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,11 @@ namespace Umbraco.Core.Mapping
 
     public class Mapper
     {
-        private readonly Dictionary<Type, Dictionary<Type, Func<object, object>>> _ctors = new Dictionary<Type, Dictionary<Type, Func<object, object>>>();
-        private readonly Dictionary<Type, Dictionary<Type, Action<object, object>>> _maps = new Dictionary<Type, Dictionary<Type, Action<object, object>>>();
+        private readonly Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors
+            = new Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>>();
+
+        private readonly Dictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
+            = new Dictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
 
         public Mapper(MapperProfileCollection profiles)
         {
@@ -25,32 +29,103 @@ namespace Umbraco.Core.Mapping
                 profile.SetMaps(this);
         }
 
+        #region Define
+
+        //public void Define<TSource, TTarget>()
+        //    => Define<TSource, TTarget>((source, target) => { });
+
         public void Define<TSource, TTarget>()
-            => Define<TSource, TTarget>((source, target) => { });
+            => Define<TSource, TTarget>((source, target, context) => { });
 
-        public void Define<TSource, TTarget>(Action<TSource, TTarget> map)
-            => Define(source => throw new NotSupportedException($"Don't know how to create {typeof(TTarget)} instances."), map);
+        //public void Define<TSource, TTarget>(Action<TSource, TTarget> map)
+        //    => Define(source => throw new NotSupportedException($"Don't know how to create {typeof(TTarget)} instances."), map);
 
-        public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor)
-            => Define(ctor, (source, target) => { });
+        public void Define<TSource, TTarget>(Action<TSource, TTarget, MapperContext> map)
+            => Define((source, context) => throw new NotSupportedException($"Don't know how to create {typeof(TTarget)} instances."), map);
 
-        public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor, Action<TSource, TTarget> map)
+        //public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor)
+        //    => Define(ctor, (source, target) => { });
+
+        public void Define<TSource, TTarget>(Func<TSource, MapperContext, TTarget> ctor)
+            => Define(ctor, (source, target, context) => { });
+
+        private Dictionary<Type, Func<object, MapperContext, object>> DefineCtors(Type sourceType)
+        {
+            if (!_ctors.TryGetValue(sourceType, out var sourceCtor))
+                sourceCtor = _ctors[sourceType] = new Dictionary<Type, Func<object, MapperContext, object>>();
+            return sourceCtor;
+        }
+
+        private Dictionary<Type, Action<object, object, MapperContext>> DefineMaps(Type sourceType)
+        {
+            if (!_maps.TryGetValue(sourceType, out var sourceMap))
+                sourceMap = _maps[sourceType] = new Dictionary<Type, Action<object, object, MapperContext>>();
+            return sourceMap;
+        }
+
+        //public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor, Action<TSource, TTarget> map)
+        //{
+        //    var sourceType = typeof(TSource);
+        //    var targetType = typeof(TTarget);
+
+        //    var sourceCtors = DefineCtors(sourceType);
+        //    sourceCtors[targetType] = (source, context) => ctor((TSource) source);
+
+        //    var sourceMaps = DefineMaps(sourceType);
+        //    sourceMaps[targetType] = (source, target, context) => map((TSource) source, (TTarget) target);
+        //}
+
+        //public void Define<TSource, TTarget>(Func<TSource, TTarget> ctor, Action<TSource, TTarget, MapperContext> map)
+        //{
+        //    var sourceType = typeof(TSource);
+        //    var targetType = typeof(TTarget);
+
+        //    var sourceCtors = DefineCtors(sourceType);
+        //    sourceCtors[targetType] = (source, context) => ctor((TSource)source);
+
+        //    var sourceMaps = DefineMaps(sourceType);
+        //    sourceMaps[targetType] = (source, target, context) => map((TSource)source, (TTarget)target, context);
+        //}
+
+        //public void Define<TSource, TTarget>(Func<TSource, MapperContext, TTarget> ctor, Action<TSource, TTarget> map)
+        //{
+        //    var sourceType = typeof(TSource);
+        //    var targetType = typeof(TTarget);
+
+        //    var sourceCtors = DefineCtors(sourceType);
+        //    sourceCtors[targetType] = (source, context) => ctor((TSource)source, context);
+
+        //    var sourceMaps = DefineMaps(sourceType);
+        //    sourceMaps[targetType] = (source, target, context) => map((TSource)source, (TTarget)target);
+        //}
+
+        public void Define<TSource, TTarget>(Func<TSource, MapperContext, TTarget> ctor, Action<TSource, TTarget, MapperContext> map)
         {
             var sourceType = typeof(TSource);
             var targetType = typeof(TTarget);
 
-            if (!_ctors.TryGetValue(sourceType, out var sourceCtor))
-                sourceCtor = _ctors[sourceType] = new Dictionary<Type, Func<object, object>>();
+            var sourceCtors = DefineCtors(sourceType);
+            sourceCtors[targetType] = (source, context) => ctor((TSource)source, context);
 
-            sourceCtor[targetType] = source => ctor((TSource) source);
-
-            if (!_maps.TryGetValue(sourceType, out var sourceMap))
-                sourceMap = _maps[sourceType] = new Dictionary<Type, Action<object, object>>();
-
-            sourceMap[targetType] = (source, target) => map((TSource) source, (TTarget) target);
+            var sourceMaps = DefineMaps(sourceType);
+            sourceMaps[targetType] = (source, target, context) => map((TSource)source, (TTarget)target, context);
         }
 
+        #endregion
+
+        #region Map
+
         public TTarget Map<TTarget>(object source)
+            => Map<TTarget>(source, new MapperContext(this));
+
+        public TTarget Map<TTarget>(object source, Action<MapperContext> f)
+        {
+            var context = new MapperContext(this);
+            f(context);
+            return Map<TTarget>(source, context);
+        }
+
+        public TTarget Map<TTarget>(object source, MapperContext context)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -62,8 +137,8 @@ namespace Umbraco.Core.Mapping
             var map = GetMap(sourceType, typeof(TTarget));
             if (ctor != null && map != null)
             {
-                var target = ctor(source);
-                map(source, target);
+                var target = ctor(source, context);
+                map(source, target, context);
                 return (TTarget)target;
             }
 
@@ -104,8 +179,8 @@ namespace Umbraco.Core.Mapping
 
                         foreach (var sourceItem in sourceEnumerable)
                         {
-                            var targetItem = ctor(sourceItem);
-                            map(sourceItem, targetItem);
+                            var targetItem = ctor(sourceItem, context);
+                            map(sourceItem, targetItem, context);
                             targetEnumerable.Add(targetItem);
                         }
 
@@ -125,6 +200,16 @@ namespace Umbraco.Core.Mapping
         // TODO: when AutoMapper is completely gone these two methods can merge
 
         public TTarget Map<TSource, TTarget>(TSource source)
+            => Map<TSource, TTarget>(source, new MapperContext(this));
+
+        public TTarget Map<TSource, TTarget>(TSource source, Action<MapperContext> f)
+        {
+            var context = new MapperContext(this);
+            f(context);
+            return Map<TSource, TTarget>(source, context);
+        }
+
+        public TTarget Map<TSource, TTarget>(TSource source, MapperContext context)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -136,8 +221,8 @@ namespace Umbraco.Core.Mapping
             var map = GetMap(sourceType, targetType);
             if (ctor != null && map != null)
             {
-                var target = ctor(source);
-                map(source, target);
+                var target = ctor(source, context);
+                map(source, target, context);
                 return (TTarget) target;
             }
 
@@ -162,8 +247,8 @@ namespace Umbraco.Core.Mapping
 
                         foreach (var sourceItem in sourceEnumerable)
                         {
-                            var targetItem = ctor(sourceItem);
-                            map(sourceItem, targetItem);
+                            var targetItem = ctor(sourceItem, context);
+                            map(sourceItem, targetItem, context);
                             targetEnumerable.Add(targetItem);
                         }
 
@@ -181,6 +266,17 @@ namespace Umbraco.Core.Mapping
         }
 
         public TTarget Map<TSource, TTarget>(TSource source, TTarget target)
+            => Map(source, target, new MapperContext(this));
+
+        public TTarget Map<TSource, TTarget>(TSource source, TTarget target, Action<MapperContext> f)
+        {
+            var context = new MapperContext(this);
+            f(context);
+            return Map(source, target, context);
+        }
+
+
+        public TTarget Map<TSource, TTarget>(TSource source, TTarget target, MapperContext context)
         {
             // fixme should we deal with enumerables?
 
@@ -192,11 +288,11 @@ namespace Umbraco.Core.Mapping
                 return AutoMapper.Mapper.Map(source, target);
             }
 
-            map(source, target);
+            map(source, target, context);
             return target;
         }
 
-        private Func<object, object> GetCtor(Type sourceType, Type targetType)
+        private Func<object, MapperContext, object> GetCtor(Type sourceType, Type targetType)
         {
             if (!_ctors.TryGetValue(sourceType, out var sourceCtor))
             {
@@ -209,7 +305,7 @@ namespace Umbraco.Core.Mapping
             return sourceCtor.TryGetValue(targetType, out var ctor) ? ctor : null;
         }
 
-        private Action<object, object> GetMap(Type sourceType, Type targetType)
+        private Action<object, object, MapperContext> GetMap(Type sourceType, Type targetType)
         {
             if (!_maps.TryGetValue(sourceType, out var sourceMap))
             {
@@ -221,5 +317,7 @@ namespace Umbraco.Core.Mapping
 
             return sourceMap.TryGetValue(targetType, out var map) ? map : null;
         }
+
+        #endregion
     }
 }

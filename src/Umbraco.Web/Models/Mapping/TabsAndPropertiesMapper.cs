@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -10,18 +10,18 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal abstract class TabsAndPropertiesResolver
+    internal abstract class TabsAndPropertiesMapper
     {
         protected ILocalizedTextService LocalizedTextService { get; }
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
-        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
+        protected TabsAndPropertiesMapper(ILocalizedTextService localizedTextService)
         {
             LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             IgnoreProperties = new List<string>();
         }
 
-        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
+        protected TabsAndPropertiesMapper(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
             : this(localizedTextService)
         {
             IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Models.Mapping
         /// The generic properties tab is responsible for
         /// setting up the properties such as Created date, updated date, template selected, etc...
         /// </remarks>
-        protected virtual void MapGenericProperties(IContentBase content, List<Tab<ContentPropertyDisplay>> tabs, ResolutionContext context)
+        protected virtual void MapGenericProperties(IContentBase content, List<Tab<ContentPropertyDisplay>> tabs, MapperContext context)
         {
             // add the generic properties tab, for properties that don't belong to a tab
             // get the properties, map and translate them, then add the tab
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="properties"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, ResolutionContext context)
+        protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, MapperContext context)
         {
             //we need to map this way to pass the context through, I don't like it but we'll see what AutoMapper says: https://github.com/AutoMapper/AutoMapper/issues/2588
             var result = context.Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
@@ -119,14 +119,14 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Creates the tabs collection with properties assigned for display models
     /// </summary>
-    internal class TabsAndPropertiesResolver<TSource, TDestination> : TabsAndPropertiesResolver, IValueResolver<TSource, TDestination, IEnumerable<Tab<ContentPropertyDisplay>>>
+    internal class TabsAndPropertiesMapper<TSource> : TabsAndPropertiesMapper
         where TSource : IContentBase
     {
-        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
+        public TabsAndPropertiesMapper(ILocalizedTextService localizedTextService)
             : base(localizedTextService)
         { }
 
-        public virtual IEnumerable<Tab<ContentPropertyDisplay>> Resolve(TSource source, TDestination destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)
+        public virtual IEnumerable<Tab<ContentPropertyDisplay>> Map(TSource source, MapperContext context)
         {
             var tabs = new List<Tab<ContentPropertyDisplay>>();
 

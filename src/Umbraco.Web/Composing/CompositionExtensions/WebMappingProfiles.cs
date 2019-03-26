@@ -3,7 +3,6 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Trees;
 
@@ -17,9 +16,13 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             composition.WithCollectionBuilder<MapperProfileCollectionBuilder>()
                 .Append<AuditMapperProfile>()
                 .Append<CodeFileMapperProfile>()
+                .Append<ContentPropertyMapperProfile>()
+                .Append<ContentTypeMapperProfile>()
                 .Append<DataTypeMapperProfile>()
+                .Append<EntityMapperProfile>()
                 .Append<DictionaryMapperProfile>()
                 .Append<MacroMapperProfile>()
+                .Append<MediaMapperProfile>()
                 .Append<RedirectUrlMapperProfile>()
                 .Append<RelationMapperProfile>()
                 .Append<SectionMapperProfile>()
@@ -32,13 +35,13 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             //composition.Register<Profile, AuditMapperProfile>();
             //composition.Register<Profile, CodeFileMapperProfile>();
             composition.Register<Profile, ContentMapperProfile>();
-            composition.Register<Profile, ContentPropertyMapperProfile>();
-            composition.Register<Profile, ContentTypeMapperProfile>();
+            //composition.Register<Profile, ContentPropertyMapperProfile>();
+            //composition.Register<Profile, ContentTypeMapperProfile>();
             //composition.Register<Profile, DataTypeMapperProfile>();
-            composition.Register<Profile, EntityMapperProfile>();
+            //composition.Register<Profile, EntityMapperProfile>();
             //composition.Register<Profile, DictionaryMapperProfile>();
             //composition.Register<Profile, MacroMapperProfile>();
-            composition.Register<Profile, MediaMapperProfile>();
+            //composition.Register<Profile, MediaMapperProfile>();
             composition.Register<Profile, MemberMapperProfile>();
             //composition.Register<Profile, RedirectUrlMapperProfile>();
             //composition.Register<Profile, RelationMapperProfile>();
@@ -51,10 +54,10 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             //register any resolvers, etc.. that the profiles use
             composition.Register<ContentUrlResolver>();
             composition.Register<ContentTreeNodeUrlResolver<IContent, ContentTreeController>>();
-            composition.Register<TabsAndPropertiesResolver<IContent, ContentVariantDisplay>>();
-            composition.Register<TabsAndPropertiesResolver<IMedia, MediaItemDisplay>>();
+            composition.Register<TabsAndPropertiesMapper<IContent>>();
+            composition.Register<TabsAndPropertiesMapper<IMedia>>();
             composition.Register<ContentTreeNodeUrlResolver<IMedia, MediaTreeController>>();
-            composition.Register<MemberTabsAndPropertiesResolver>();
+            composition.Register<MemberTabsAndPropertiesMapper>();
             composition.Register<MemberTreeNodeUrlResolver>();
             composition.Register<MemberBasicPropertiesResolver>();
             composition.Register<MediaAppResolver>();

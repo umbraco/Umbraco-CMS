@@ -8,11 +8,11 @@ namespace Umbraco.Web.Models.Mapping
     {
         public void SetMaps(Mapper mapper)
         {
-            mapper.Define<IAuditItem, AuditLog>(source => new AuditLog(), (source, target) => Map(source, target));
+            mapper.Define<IAuditItem, AuditLog>(source => new AuditLog(), Map);
         }
 
         // Umbraco.Code.MapAll -UserAvatars -UserName
-        private AuditLog Map(IAuditItem source, AuditLog target)
+        private void Map(IAuditItem source, AuditLog target)
         {
             target.UserId = source.UserId;
             target.NodeId = source.Id;
@@ -21,7 +21,6 @@ namespace Umbraco.Web.Models.Mapping
             target.EntityType = source.EntityType;
             target.Comment = source.Comment;
             target.Parameters = source.Parameters;
-            return target;
         }
     }
 }

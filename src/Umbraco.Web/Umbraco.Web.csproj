@@ -205,6 +205,7 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
+    <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
@@ -423,7 +424,6 @@
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
     <Compile Include="Models\Mapping\ContentAppResolver.cs" />
-    <Compile Include="Models\Mapping\ContentTypeVariationsResolver.cs" />
     <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
     <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />
@@ -433,7 +433,6 @@
     <Compile Include="Models\Mapping\MediaChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\CodeFileMapperProfile.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
-    <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
     <Compile Include="Models\Mapping\EntityProfileExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTypeBasicResolver.cs" />
     <Compile Include="Models\Mapping\MemberBasicPropertiesResolver.cs" />
@@ -441,7 +440,7 @@
     <Compile Include="Models\Mapping\MemberProviderFieldResolver.cs" />
     <Compile Include="Models\Mapping\MembershipScenarioResolver.cs" />
     <Compile Include="Models\Mapping\MembershipUserTypeConverter.cs" />
-    <Compile Include="Models\Mapping\MemberTabsAndPropertiesResolver.cs" />
+    <Compile Include="Models\Mapping\MemberTabsAndPropertiesMapper.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Mapping\PropertyTypeVariationsResolver.cs" />
     <Compile Include="Models\Mapping\RedirectUrlMapperProfile.cs" />
@@ -653,7 +652,6 @@
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
-    <Compile Include="Models\Mapping\ContentTypeProfileExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\PackageInstallResult.cs" />
@@ -685,7 +683,7 @@
     <Compile Include="Models\ContentEditing\PropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupDisplay.cs" />
     <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
-    <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
+    <Compile Include="Models\Mapping\PropertyTypeGroupMapper.cs" />
     <Compile Include="Services\TreeService.cs" />
     <Compile Include="Security\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
@@ -965,9 +963,9 @@
     <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\ContentEditing\UserDetail.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
-    <Compile Include="Models\Mapping\ContentPropertyBasicConverter.cs" />
-    <Compile Include="Models\Mapping\ContentPropertyDisplayConverter.cs" />
-    <Compile Include="Models\Mapping\ContentPropertyDtoConverter.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyBasicMapper.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyDisplayMapper.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyDtoMapper.cs" />
     <Compile Include="Models\Mapping\ContentPropertyMapperProfile.cs" />
     <Compile Include="Models\Mapping\CreatorResolver.cs" />
     <Compile Include="Models\Mapping\MediaMapperProfile.cs" />
@@ -975,7 +973,7 @@
     <Compile Include="Models\Mapping\ContentMapperProfile.cs" />
     <Compile Include="Models\Mapping\OwnerResolver.cs" />
     <Compile Include="Models\Mapping\SectionMapperProfile.cs" />
-    <Compile Include="Models\Mapping\TabsAndPropertiesResolver.cs" />
+    <Compile Include="Models\Mapping\TabsAndPropertiesMapper.cs" />
     <Compile Include="Models\Mapping\UserMapperProfile.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyValueEditor.cs" />

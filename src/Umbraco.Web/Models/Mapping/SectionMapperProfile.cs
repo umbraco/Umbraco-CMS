@@ -17,7 +17,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public void SetMaps(Mapper mapper)
         {
-            mapper.Define<ISection, Section>(source => new Section(), Map);
+            mapper.Define<ISection, Section>((source, context) => new Section(), Map);
 
             // this is for AutoMapper ReverseMap - but really?
             mapper.Define<Section, ContentSection>();
@@ -32,14 +32,14 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -RoutePath
-        private void Map(ISection source, Section target)
+        private void Map(ISection source, Section target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.Name = _textService.Localize("sections/" + source.Alias);
         }
 
         // Umbraco.Code.MapAll
-        private static void Map(Section source, ManifestSection target)
+        private static void Map(Section source, ManifestSection target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.Name = source.Name;

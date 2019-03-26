@@ -53,14 +53,14 @@ namespace Umbraco.Web.Editors.Binders
                     if (variant.Culture.IsNullOrWhiteSpace())
                     {
                         //map the property dto collection (no culture is passed to the mapping context so it will be invariant)
-                        variant.PropertyCollectionDto = Mapper.Map<ContentPropertyCollectionDto>(model.PersistedContent);
+                        variant.PropertyCollectionDto = Current.Mapper.Map<ContentPropertyCollectionDto>(model.PersistedContent);
                     }
                     else
                     {
                         //map the property dto collection with the culture of the current variant
-                        variant.PropertyCollectionDto = Mapper.Map<ContentPropertyCollectionDto>(
+                        variant.PropertyCollectionDto = Current.Mapper.Map<ContentPropertyCollectionDto>(
                             model.PersistedContent,
-                            options => options.SetCulture(variant.Culture));
+                            context => context.SetCulture(variant.Culture));
                     }
 
                     //now map all of the saved values to the dto

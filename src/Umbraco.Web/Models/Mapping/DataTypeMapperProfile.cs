@@ -31,18 +31,18 @@ namespace Umbraco.Web.Models.Mapping
 
         public void SetMaps(Mapper mapper)
         {
-            mapper.Define<IDataEditor, PropertyEditorBasic>(source => new PropertyEditorBasic(), Map);
-            mapper.Define<ConfigurationField, DataTypeConfigurationFieldDisplay>(source => new DataTypeConfigurationFieldDisplay(), Map);
-            mapper.Define<IDataEditor, DataTypeBasic>(source => new DataTypeBasic(), Map);
-            mapper.Define<IDataType, DataTypeBasic>(source => new DataTypeBasic(), Map);
-            mapper.Define<IDataType, DataTypeDisplay>(source => new DataTypeDisplay(), (source, target) => Map(source, target, mapper));
-            mapper.Define<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(source => MapPreValues(source, mapper));
+            mapper.Define<IDataEditor, PropertyEditorBasic>((source, context) => new PropertyEditorBasic(), Map);
+            mapper.Define<ConfigurationField, DataTypeConfigurationFieldDisplay>((source, context) => new DataTypeConfigurationFieldDisplay(), Map);
+            mapper.Define<IDataEditor, DataTypeBasic>((source, context) => new DataTypeBasic(), Map);
+            mapper.Define<IDataType, DataTypeBasic>((source, context) => new DataTypeBasic(), Map);
+            mapper.Define<IDataType, DataTypeDisplay>((source, context) => new DataTypeDisplay(), Map);
+            mapper.Define<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>((source, context) => MapPreValues(source, mapper));
             mapper.Define<DataTypeSave, IDataType>(Map);
-            mapper.Define<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(source => MapPreValues(source, mapper));
+            mapper.Define<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>((source, context) => MapPreValues(source, mapper));
         }
 
         // Umbraco.Code.MapAll
-        private static void Map(IDataEditor source, PropertyEditorBasic target)
+        private static void Map(IDataEditor source, PropertyEditorBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.Icon = source.Icon;
@@ -50,7 +50,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -Value
-        private static void Map(ConfigurationField source, DataTypeConfigurationFieldDisplay target)
+        private static void Map(ConfigurationField source, DataTypeConfigurationFieldDisplay target, MapperContext context)
         {
             target.Config = source.Config;
             target.Description = source.Description;
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Models.Mapping
 
         // Umbraco.Code.MapAll -Udi -HasPrevalues -IsSystemDataType -Id -Trashed -Key
         // Umbraco.Code.MapAll -ParentId -Path
-        private static void Map(IDataEditor source, DataTypeBasic target)
+        private static void Map(IDataEditor source, DataTypeBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.Group = source.Group;
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -HasPrevalues
-        private void Map(IDataType source, DataTypeBasic target)
+        private void Map(IDataType source, DataTypeBasic target, MapperContext context)
         {
             target.Id = source.Id;
             target.IsSystemDataType = SystemIds.Contains(source.Id);
@@ -91,16 +91,16 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -HasPrevalues
-        private void Map(IDataType source, DataTypeDisplay target, Mapper mapper)
+        private void Map(IDataType source, DataTypeDisplay target, MapperContext context)
         {
-            target.AvailableEditors = MapAvailableEditors(source, mapper);
+            target.AvailableEditors = MapAvailableEditors(source, context.Mapper);
             target.Id = source.Id;
             target.IsSystemDataType = SystemIds.Contains(source.Id);
             target.Key = source.Key;
             target.Name = source.Name;
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.PreValues = MapPreValues(source, mapper);
+            target.PreValues = MapPreValues(source, context.Mapper);
             target.SelectedEditor = source.EditorAlias.IsNullOrWhiteSpace() ? null : source.EditorAlias;
             target.Trashed = source.Trashed;
             target.Udi = Udi.Create(Constants.UdiEntityType.DataType, source.Key);
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Models.Mapping
 
         // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
         // Umbraco.Code.MapAll -Key -Path -CreatorId -Level -SortOrder -Configuration
-        private void Map(DataTypeSave source, IDataType target)
+        private void Map(DataTypeSave source, IDataType target, MapperContext context)
         {
             target.DatabaseType = MapDatabaseType(source);
             target.Editor = _propertyEditors[source.EditorAlias];

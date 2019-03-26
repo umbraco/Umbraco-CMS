@@ -2,6 +2,7 @@
 
 namespace Umbraco.Web.Models.Mapping
 {
+    // FIXME KILLE THIS CLASS
     /// <summary>
     /// Provides extension methods for AutoMapper's <see cref="IMappingOperationOptions"/>.
     /// </summary>
@@ -32,14 +33,6 @@ namespace Umbraco.Web.Models.Mapping
         public static string[] GetIncludedProperties(this IMappingOperationOptions options)
         {
             return options.Items.TryGetValue(IncludedPropertiesKey, out var obj) && obj is string[] s ? s : null;
-        }
-
-        /// <summary>
-        /// Sets included properties.
-        /// </summary>
-        public static void SetIncludedProperties(this IMappingOperationOptions options, string[] properties)
-        {
-            options.Items[IncludedPropertiesKey] = properties;
         }
     }
 }

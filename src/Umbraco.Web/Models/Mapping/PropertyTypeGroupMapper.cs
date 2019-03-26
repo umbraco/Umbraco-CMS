@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -11,14 +10,14 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class PropertyTypeGroupResolver<TPropertyType>
+    internal class PropertyTypeGroupMapper<TPropertyType>
         where TPropertyType : PropertyTypeDisplay, new()
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILogger _logger;
 
-        public PropertyTypeGroupResolver(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILogger logger)
+        public PropertyTypeGroupMapper(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILogger logger)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
@@ -65,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
                 .FirstOrDefault(x => x != null);
         }
 
-        public IEnumerable<PropertyGroupDisplay<TPropertyType>> Resolve(IContentTypeComposition source)
+        public IEnumerable<PropertyGroupDisplay<TPropertyType>> Map(IContentTypeComposition source)
         {
             // deal with groups
             var groups = new List<PropertyGroupDisplay<TPropertyType>>();

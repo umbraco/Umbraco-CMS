@@ -5,7 +5,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -23,13 +22,13 @@ namespace Umbraco.Web.Models.Mapping
 
         public void SetMaps(Mapper mapper)
         {
-            mapper.Define<IMacro, EntityBasic>(source => new EntityBasic(), Map);
-            mapper.Define<IMacro, IEnumerable<MacroParameter>>(source => source.Properties.Values.Select(mapper.Map<MacroParameter>).ToList());
-            mapper.Define<IMacroProperty, MacroParameter>(source => new MacroParameter(), Map);
+            mapper.Define<IMacro, EntityBasic>((source, context) => new EntityBasic(), Map);
+            mapper.Define<IMacro, IEnumerable<MacroParameter>>((source, context) => source.Properties.Values.Select(context.Mapper.Map<MacroParameter>).ToList());
+            mapper.Define<IMacroProperty, MacroParameter>((source, context) => new MacroParameter(), Map);
         }
 
         // Umbraco.Code.MapAll -Trashed -AdditionalData
-        private static void Map(IMacro source, EntityBasic target)
+        private static void Map(IMacro source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.Icon = "icon-settings-alt";
@@ -42,7 +41,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -Value
-        private void Map(IMacroProperty source, MacroParameter target)
+        private void Map(IMacroProperty source, MacroParameter target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.Name = source.Name;
