@@ -294,11 +294,6 @@ namespace Umbraco.Web.Security
             return keys?.Select(GetByProviderKey).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
         }
 
-        public virtual IEnumerable<IPublishedContent> GetByProviderKeys(params object[] keys)
-        {
-            return keys?.Select(GetByProviderKey).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
-        }
-
         public virtual IPublishedContent GetById(int memberId)
         {
             return MemberCache.GetById(memberId);
@@ -309,22 +304,12 @@ namespace Umbraco.Web.Security
             return memberIds?.Select(GetById).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
         }
 
-        public virtual IEnumerable<IPublishedContent> GetByIds(params int[] memberIds)
-        {
-            return memberIds?.Select(GetById).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
-        }
-
         public virtual IPublishedContent GetById(Guid memberId)
         {
             return GetByProviderKey(memberId);
         }
 
         public virtual IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> memberIds)
-        {
-            return GetByProviderKeys(memberIds.OfType<object>());
-        }
-
-        public virtual IEnumerable<IPublishedContent> GetByIds(params Guid[] memberIds)
         {
             return GetByProviderKeys(memberIds.OfType<object>());
         }
