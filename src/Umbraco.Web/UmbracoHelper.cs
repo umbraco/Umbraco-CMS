@@ -291,7 +291,7 @@ namespace Umbraco.Web
 
         public IEnumerable<IPublishedContent> Member(IEnumerable<int> ids)
         {
-            return MembershipHelper.GetById(ids);
+            return MembershipHelper.GetByIds(ids);
         }
 
         public IEnumerable<IPublishedContent> Member(IEnumerable<string> ids)
@@ -301,7 +301,7 @@ namespace Umbraco.Web
 
         public IEnumerable<IPublishedContent> Member(IEnumerable<Guid> ids)
         {
-            return MembershipHelper.GetById(ids);
+            return MembershipHelper.GetByIds(ids);
         }
 
         public IEnumerable<IPublishedContent> Member(IEnumerable<Udi> ids)
@@ -326,7 +326,7 @@ namespace Umbraco.Web
 
         public IEnumerable<IPublishedContent> Member(params Guid[] ids)
         {
-            return MembershipHelper.GetById(ids);
+            return MembershipHelper.GetByIds(ids);
         }
 
         public IEnumerable<IPublishedContent> Member(params Udi[] ids)

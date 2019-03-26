@@ -289,14 +289,14 @@ namespace Umbraco.Web.Security
             return MemberCache.GetByProviderKey(key);
         }
 
-        public virtual IEnumerable<IPublishedContent> GetByProviderKey(IEnumerable<object> keys)
+        public virtual IEnumerable<IPublishedContent> GetByProviderKeys(IEnumerable<object> keys)
         {
-            return keys?.Select(GetByProviderKey).WhereNotNull() ?? new IPublishedContent[0];
+            return keys?.Select(GetByProviderKey).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
         }
 
-        public virtual IEnumerable<IPublishedContent> GetByProviderKey(params object[] keys)
+        public virtual IEnumerable<IPublishedContent> GetByProviderKeys(params object[] keys)
         {
-            return keys?.Select(GetByProviderKey).WhereNotNull() ?? new IPublishedContent[0];
+            return keys?.Select(GetByProviderKey).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
         }
 
         public virtual IPublishedContent GetById(int memberId)
@@ -304,14 +304,14 @@ namespace Umbraco.Web.Security
             return MemberCache.GetById(memberId);
         }
 
-        public virtual IEnumerable<IPublishedContent> GetById(IEnumerable<int> memberIds)
+        public virtual IEnumerable<IPublishedContent> GetByIds(IEnumerable<int> memberIds)
         {
-            return memberIds?.Select(GetById).WhereNotNull() ?? new IPublishedContent[0];
+            return memberIds?.Select(GetById).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
         }
 
-        public virtual IEnumerable<IPublishedContent> GetById(params int[] memberIds)
+        public virtual IEnumerable<IPublishedContent> GetByIds(params int[] memberIds)
         {
-            return memberIds?.Select(GetById).WhereNotNull() ?? new IPublishedContent[0];
+            return memberIds?.Select(GetById).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
         }
 
         public virtual IPublishedContent GetById(Guid memberId)
@@ -319,14 +319,14 @@ namespace Umbraco.Web.Security
             return GetByProviderKey(memberId);
         }
 
-        public virtual IEnumerable<IPublishedContent> GetById(IEnumerable<Guid> memberIds)
+        public virtual IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> memberIds)
         {
-            return GetByProviderKey(memberIds.OfType<object>());
+            return GetByProviderKeys(memberIds.OfType<object>());
         }
 
-        public virtual IEnumerable<IPublishedContent> GetById(params Guid[] memberIds)
+        public virtual IEnumerable<IPublishedContent> GetByIds(params Guid[] memberIds)
         {
-            return GetByProviderKey(memberIds.OfType<object>());
+            return GetByProviderKeys(memberIds.OfType<object>());
         }
 
         public virtual IPublishedContent GetByUsername(string username)
