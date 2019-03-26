@@ -632,6 +632,7 @@
     <key alias="first">First</key>
     <key alias="general">General</key>
     <key alias="groups">Groups</key>
+    <key alias="group">Group</key>
     <key alias="height">Height</key>
     <key alias="help">Help</key>
     <key alias="hide">Hide</key>

@@ -609,6 +609,7 @@
     <key alias="first">Første</key>
     <key alias="general">Generelt</key>
     <key alias="groups">Grupper</key>
+    <key alias="group">Gruppe</key>
     <key alias="height">Højde</key>
     <key alias="help">Hjælp</key>
     <key alias="hide">Skjul</key>
