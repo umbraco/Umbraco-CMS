@@ -41,10 +41,8 @@
                                     <span class="db umb-permission__description text-error" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
                                 </span>
 
-                                <span class="db" ng-repeat="notification in variant.notifications">
-                                    <!-- These are server side notifications for successful messages, non successful messages are returned via validation errors -->
-                                    <span class="db umb-permission__description text-success">{{notification.message}}</span>
-                                </span>
+                                <umb-notification-list notifications="variant.notifications" />
+
                             </label>
                         </div>
                     </div>

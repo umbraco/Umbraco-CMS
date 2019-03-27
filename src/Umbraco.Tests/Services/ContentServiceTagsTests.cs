@@ -517,7 +517,7 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content1.PublishCulture();
+            content1.PublishCulture(CultureType.Invariant);
             contentService.SaveAndPublish(content1);
 
             Assert.IsTrue(content1.Published);
@@ -601,7 +601,7 @@ namespace Umbraco.Tests.Services
             var allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content1.PublishCulture();
+            content1.PublishCulture(CultureType.Invariant);
             contentService.SaveAndPublish(content1);
 
             tags = tagService.GetTagsForEntity(content2.Id);

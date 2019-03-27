@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
@@ -886,12 +887,13 @@ namespace Umbraco.Core.Services.Implement
                 if (!culture.IsNullOrWhiteSpace() && culture != "*")
                 {
                     // publish the invariant values
+                    // fixme: really? shouldn't we only publish invariant values if the culture is the default?
                     var publishInvariant = content.PublishCulture(null);
                     if (!publishInvariant)
                         return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
                     //validate the property values
-                    if (!_propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties))
+                    if (!_propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, CultureType.Single(culture, _languageRepository.IsDefault(culture))))
                         return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
                         {
                             InvalidProperties = invalidProperties
@@ -899,12 +901,12 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 // publish the culture(s)
-                var publishCulture = content.PublishCulture(culture);
+                var publishCulture = content.PublishCulture(CultureType.All);
                 if (!publishCulture)
                     return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
                 //validate the property values
-                if (!_propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties))
+                if (!_propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, CultureType.All))
                     return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
                     {
                         InvalidProperties = invalidProperties
@@ -941,14 +943,17 @@ namespace Umbraco.Core.Services.Implement
                         : new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
                 }
 
+                //fixme: Shouldn't we makes ure that all string cultures here are valid? i.e. no * or null is allowed when using this method
 
-                if (cultures.Select(content.PublishCulture).Any(isValid => !isValid))
+                var cultureTypes = cultures.ToDictionary(x => x, x => CultureType.Single(x, _languageRepository.IsDefault(x)));
+
+                if (cultureTypes.Select(x => content.PublishCulture(x.Value)).Any(isValid => !isValid))
                     return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
                 //validate the property values on the cultures trying to be published
-                foreach (var culture in cultures)
+                foreach (var culture in cultureTypes)
                 {
-                    if (!_propertyValidationService.Value.IsPropertyDataValid(content, out var invalidProperties, culture))
+                    if (!_propertyValidationService.Value.IsPropertyDataValid(content, out var invalidProperties, culture.Value))
                         return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
                         {
                             InvalidProperties = invalidProperties
@@ -1333,7 +1338,8 @@ namespace Umbraco.Core.Services.Implement
 
                             //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                             Property[] invalidProperties = null;
-                            var tryPublish = d.PublishCulture(culture) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties);
+                            var cultureType = CultureType.Single(culture, _languageRepository.IsDefault(culture));
+                            var tryPublish = d.PublishCulture(cultureType) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, cultureType);
                             if (invalidProperties != null && invalidProperties.Length > 0)
                                 Logger.Warn<ContentService>("Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
                                     d.Id, culture, string.Join(",", invalidProperties.Select(x => x.Alias)));
@@ -1429,9 +1435,16 @@ namespace Umbraco.Core.Services.Implement
 
             // variant content type - publish specified cultures
             // invariant content type - publish only the invariant culture
-            return content.ContentType.VariesByCulture()
-                ? culturesToPublish.All(culture => content.PublishCulture(culture) && _propertyValidationService.Value.IsPropertyDataValid(content, out _))
-                : content.PublishCulture() && _propertyValidationService.Value.IsPropertyDataValid(content, out _);
+            if (content.ContentType.VariesByCulture())
+            {                
+                return culturesToPublish.All(culture =>
+                {
+                    var cultureType = CultureType.Single(culture, _languageRepository.IsDefault(culture));
+                    return content.PublishCulture(cultureType) && _propertyValidationService.Value.IsPropertyDataValid(content, out _, cultureType);
+                });
+            }
+
+            return content.PublishCulture(CultureType.Invariant) && _propertyValidationService.Value.IsPropertyDataValid(content, out _, CultureType.Invariant);
         }
 
         // utility 'ShouldPublish' func used by SaveAndPublishBranch

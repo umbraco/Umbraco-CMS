@@ -31,9 +31,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Validates the content item's properties pass validation rules
         /// </summary>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
-        public bool IsPropertyDataValid(IContentBase content, out Property[] invalidProperties, string culture = "*")
+        public bool IsPropertyDataValid(IContent content, out Property[] invalidProperties, CultureType culture)
         {
             // select invalid properties
             invalidProperties = content.Properties.Where(x =>
@@ -44,17 +42,35 @@ namespace Umbraco.Core.Services
 
                 var varies = x.PropertyType.VariesByCulture();
 
-                if (culture == null)
-                    return !(varies || IsPropertyValid(x, null)); // validate invariant property, invariant culture
+                switch (culture.CultureBehavior)
+                {
+                    case CultureType.Behavior.Invariant:
+                        return !(varies || IsPropertyValid(x, null)); // validate invariant property, invariant culture
+                    case CultureType.Behavior.All:
+                        return !IsPropertyValid(x, culture.Culture); // validate property, all cultures
+                    case CultureType.Behavior.Explicit:
+                        if (varies)
+                        {
+                            return !IsPropertyValid(x, culture.Culture); // validate variant property, explicit culture
+                        }
+                        else
+                        {
+                            //We only want to validate the invariant property against an explicit culture if:
+                            // * The culture is the default OR
+                            // * The content item isn't published
 
-                if (culture == "*")
-                    return !IsPropertyValid(x, culture); // validate property, all cultures
+                            //This is because an invariant property is only edited on the default culture, but if the
+                            //content item isn't published, we can't allow publishing of the specific non default culture
+                            //if the invariant property data is invalid.
 
-                return varies
-                    ? !IsPropertyValid(x, culture) // validate variant property, explicit culture
-                    : !IsPropertyValid(x, null); // validate invariant property, explicit culture
-            })
-                .ToArray();
+                            return (culture.IsDefaultCulture || !content.Published)
+                                   && !IsPropertyValid(x, null); // validate invariant property, explicit culture
+                        }
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                
+            }).ToArray();
 
             return invalidProperties.Length == 0;
         }

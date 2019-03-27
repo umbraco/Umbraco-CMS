@@ -728,7 +728,7 @@ namespace Umbraco.Web.Editors
                             break;
                         }
 
-                        var publishStatus = PublishBranchInternal(contentItem, false, out wasCancelled, out var successfulCultures);
+                        var publishStatus = PublishBranchInternal(contentItem, false, out wasCancelled, out var successfulCultures).ToList();
 
                         //global notifications
                         AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
@@ -749,7 +749,7 @@ namespace Umbraco.Web.Editors
                             break;
                         }
 
-                        var publishStatus = PublishBranchInternal(contentItem, true, out wasCancelled, out var successfulCultures);
+                        var publishStatus = PublishBranchInternal(contentItem, true, out wasCancelled, out var successfulCultures).ToList();
 
                         //global notifications
                         AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
@@ -1341,7 +1341,7 @@ namespace Umbraco.Web.Editors
             foreach (var variant in cultureVariants.Where(x => x.Publish))
             {
                 // publishing any culture, implies the invariant culture
-                var valid = persistentContent.PublishCulture(variant.Culture);
+                var valid = persistentContent.PublishCulture(CultureType.Single(variant.Culture, IsDefaultCulture(variant.Culture)));
                 if (!valid)
                 {
                     AddCultureValidationError(variant.Culture, "speechBubbles/contentCultureValidationError");
@@ -1942,12 +1942,12 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Adds notification messages to the outbound display model for a given published status
         /// </summary>
-        /// <param name="status"></param>
+        /// <param name="statuses"></param>
         /// <param name="display"></param>
         /// <param name="successfulCultures">
         /// This is null when dealing with invariant content, else it's the cultures that were successfully published
         /// </param>
-        private void AddMessageForPublishStatus(IEnumerable<PublishResult> statuses, INotificationModel display, string[] successfulCultures = null)
+        private void AddMessageForPublishStatus(IReadOnlyCollection<PublishResult> statuses, INotificationModel display, string[] successfulCultures = null)
         {
             var totalStatusCount = statuses.Count();
 
@@ -2046,7 +2046,7 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishPathNotPublished:
                         {
-                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            var names = string.Join(", ", status.Select(x => x.Content.Name));
                             display.AddWarningNotification(
                                 Services.TextService.Localize("publish"),
                                 Services.TextService.Localize("publish/contentPublishedFailedByParent",
@@ -2055,13 +2055,13 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishCancelledByEvent:
                         {
-                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            var names = string.Join(", ", status.Select(x => x.Content.Name));
                             AddCancelMessage(display, message: "publish/contentPublishedFailedByEvent", messageParams: new[] { names });
                         }
                         break;
                     case PublishResultType.FailedPublishAwaitingRelease:
                         {
-                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            var names = string.Join(", ", status.Select(x => x.Content.Name));
                             display.AddWarningNotification(
                                     Services.TextService.Localize("publish"),
                                     Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
@@ -2070,7 +2070,7 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishHasExpired:
                         {
-                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            var names = string.Join(", ", status.Select(x => x.Content.Name));
                             display.AddWarningNotification(
                                 Services.TextService.Localize("publish"),
                                 Services.TextService.Localize("publish/contentPublishedFailedExpired",
@@ -2079,7 +2079,7 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishIsTrashed:
                         {
-                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            var names = string.Join(", ", status.Select(x => x.Content.Name));
                             display.AddWarningNotification(
                                 Services.TextService.Localize("publish"),
                                 Services.TextService.Localize("publish/contentPublishedFailedIsTrashed",
@@ -2088,7 +2088,7 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishContentInvalid:
                         {
-                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            var names = string.Join(", ", status.Select(x => x.Content.Name));
                             display.AddWarningNotification(
                                 Services.TextService.Localize("publish"),
                                 Services.TextService.Localize("publish/contentPublishedFailedInvalid",
@@ -2104,6 +2104,16 @@ namespace Umbraco.Web.Editors
                         throw new IndexOutOfRangeException($"PublishedResultType \"{status.Key}\" was not expected.");
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns true if the culture specified is the default culture
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        private bool IsDefaultCulture(string culture)
+        {
+            return _allLangs.Value.Any(x => x.Value.IsDefault && x.Key.InvariantEquals(culture));
         }
 
         /// <summary>

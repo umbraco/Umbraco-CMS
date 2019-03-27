@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Collections;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -173,46 +169,55 @@ namespace Umbraco.Core.Models
         /// <param name="culture"></param>
         /// <returns>A value indicating whether it was possible to publish the names and values for the specified
         /// culture(s). The method may fail if required names are not set, but it does NOT validate property data</returns>
-        public static bool PublishCulture(this IContent content, string culture = "*")
+        public static bool PublishCulture(this IContent content, CultureType culture = null)
         {
-            culture = culture.NullOrWhiteSpaceAsNull();
+            culture = culture ?? CultureType.All;
 
             // the variation should be supported by the content type properties
             //  if the content type is invariant, only '*' and 'null' is ok
             //  if the content type varies, everything is ok because some properties may be invariant
-            if (!content.ContentType.SupportsPropertyVariation(culture, "*", true))
+            if (!content.ContentType.SupportsPropertyVariation(culture.Culture, "*", true))
                 throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
 
             var alsoInvariant = false;
-            if (culture == "*") // all cultures
+
+            switch (culture.CultureBehavior)
             {
-                foreach (var c in content.AvailableCultures)
+                case CultureType.Behavior.All:
                 {
-                    var name = content.GetCultureName(c);
+                    foreach (var c in content.AvailableCultures)
+                    {
+                        var name = content.GetCultureName(c);
+                        if (string.IsNullOrWhiteSpace(name))
+                            return false;
+                        content.SetPublishInfo(c, name, DateTime.Now);
+                    }
+                    break;
+                }
+                case CultureType.Behavior.Invariant:
+                {
+                    if (string.IsNullOrWhiteSpace(content.Name))
+                        return false;
+                    // PublishName set by repository - nothing to do here
+                    break;
+                }
+                case CultureType.Behavior.Explicit:
+                {
+                    var name = content.GetCultureName(culture.Culture);
                     if (string.IsNullOrWhiteSpace(name))
                         return false;
-                    content.SetPublishInfo(c, name, DateTime.Now);
+                    content.SetPublishInfo(culture.Culture, name, DateTime.Now);
+                    alsoInvariant = culture.IsDefaultCulture; // we also want to publish invariant values
+                    break;
                 }
-            }
-            else if (culture == null) // invariant culture
-            {
-                if (string.IsNullOrWhiteSpace(content.Name))
-                    return false;
-                // PublishName set by repository - nothing to do here
-            }
-            else // one single culture
-            {
-                var name = content.GetCultureName(culture);
-                if (string.IsNullOrWhiteSpace(name))
-                    return false;
-                content.SetPublishInfo(culture, name, DateTime.Now);
-                alsoInvariant = true; // we also want to publish invariant values
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             // property.PublishValues only publishes what is valid, variation-wise
             foreach (var property in content.Properties)
             {
-                property.PublishValues(culture);
+                property.PublishValues(culture.Culture);
                 if (alsoInvariant)
                     property.PublishValues(null);
             }

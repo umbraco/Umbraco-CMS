@@ -170,10 +170,7 @@
                                 <div class="umb-permission__description text-error" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
                             </div>
 
-                            <div ng-repeat="notification in variant.notifications">
-                                <!-- These are server side notifications for successful messages, non successful messages are returned via validation errors -->
-                                <div class="umb-permission__description text-success">{{notification.message}}</div>
-                            </div>
+                            <umb-notification-list notifications="variant.notifications" />
 
                         </div>
                     </div>

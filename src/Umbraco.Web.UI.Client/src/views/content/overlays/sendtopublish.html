@@ -34,9 +34,8 @@
                                 <span class="db umb-permission__description text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
                             </span>
 
-                            <span class="db" ng-repeat="notification in variant.notifications">
-                                <span class="db umb-permission__description text-success">{{notification.message}}</span>
-                            </span>
+                            <umb-notification-list notifications="variant.notifications" />
+
                         </label>
                     </div>
                 </div>

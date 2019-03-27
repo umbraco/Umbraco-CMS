@@ -275,7 +275,7 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
-            Assert.IsTrue(content.PublishCulture());
+            Assert.IsTrue(content.PublishCulture(CultureType.Invariant));
             Assert.AreEqual("a", content.GetValue("prop"));
             Assert.AreEqual("a", content.GetValue("prop", published: true));
 
@@ -305,9 +305,9 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
-            Assert.IsFalse(content.PublishCulture(langFr)); // no name
+            Assert.IsFalse(content.PublishCulture(CultureType.Single(langFr, false))); // no name
             content.SetCultureName("name-fr", langFr);
-            Assert.IsTrue(content.PublishCulture(langFr));
+            Assert.IsTrue(content.PublishCulture(CultureType.Single(langFr, false)));
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -321,7 +321,7 @@ namespace Umbraco.Tests.Models
             Assert.IsNull(content.GetValue("prop", langFr, published: true));
 
             // can publish all
-            Assert.IsTrue(content.PublishCulture("*"));
+            Assert.IsTrue(content.PublishCulture(CultureType.All));
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -331,14 +331,14 @@ namespace Umbraco.Tests.Models
             content.UnpublishCulture(langFr);
             Assert.AreEqual("c", content.GetValue("prop", langFr));
             Assert.IsNull(content.GetValue("prop", langFr, published: true));
-            content.PublishCulture(langFr);
+            content.PublishCulture(CultureType.Single(langFr, false));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
             Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
 
             content.UnpublishCulture(); // clears invariant props if any
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
-            content.PublishCulture(); // publishes invariant props if any
+            content.PublishCulture(CultureType.Invariant); // publishes invariant props if any
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
 
@@ -384,15 +384,19 @@ namespace Umbraco.Tests.Models
 
             content.SetCultureName("hello", langFr);
 
-            Assert.IsTrue(content.PublishCulture(langFr)); // succeeds because names are ok (not validating properties here)
-            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop1 is mandatory
+            var langFrCultureType = CultureType.Single(langFr, false);
+
+            Assert.IsTrue(content.PublishCulture(CultureType.Single(langFr, false))); // succeeds because names are ok (not validating properties here)
+            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFrCultureType));// fails because prop1 is mandatory
 
             content.SetValue("prop1", "a", langFr);
-            Assert.IsTrue(content.PublishCulture(langFr)); // succeeds because names are ok (not validating properties here)
-            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop2 is mandatory and invariant
+            Assert.IsTrue(content.PublishCulture(CultureType.Single(langFr, false))); // succeeds because names are ok (not validating properties here)
+            // fails because prop2 is mandatory and invariant and the item isn't published.
+            // Invariant is validated against the default language except when there isn't a published version, in that case it's always validated.
+            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFrCultureType));
             content.SetValue("prop2", "x");
-            Assert.IsTrue(content.PublishCulture(langFr)); // still ok...
-            Assert.IsTrue(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// now it's ok
+            Assert.IsTrue(content.PublishCulture(CultureType.Single(langFr, false))); // still ok...
+            Assert.IsTrue(propertyValidationService.IsPropertyDataValid(content, out _, langFrCultureType));// now it's ok
 
             Assert.AreEqual("a", content.GetValue("prop1", langFr, published: true));
             Assert.AreEqual("x", content.GetValue("prop2", published: true));
@@ -423,12 +427,12 @@ namespace Umbraco.Tests.Models
             content.SetValue("prop", "a-es", langEs);
 
             // cannot publish without a name
-            Assert.IsFalse(content.PublishCulture(langFr));
+            Assert.IsFalse(content.PublishCulture(CultureType.Single(langFr, false)));
 
             // works with a name
             // and then FR is available, and published
             content.SetCultureName("name-fr", langFr);
-            Assert.IsTrue(content.PublishCulture(langFr));
+            Assert.IsTrue(content.PublishCulture(CultureType.Single(langFr, false)));
 
             // now UK is available too
             content.SetCultureName("name-uk", langUk);
