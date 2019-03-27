@@ -59,6 +59,17 @@ angular.module("umbraco.directives")
 
                     scope.setup = function (slider) {
                         sliderRef = slider;
+
+                        // Set slider handle position
+                        sliderRef.noUiSlider.set(scope.dimensions.scale.current);
+
+                        // Update slider range min/max
+                        sliderRef.noUiSlider.updateOptions({
+                            "range": {
+                                "min": scope.dimensions.scale.min,
+                                "max": scope.dimensions.scale.max
+                            }
+                        });
                     };
 
                     scope.slide = function (values) {
@@ -169,20 +180,20 @@ angular.module("umbraco.directives")
 						// Update min and max based on original width/height
 						scope.dimensions.scale.min = ratioCalculation.ratio;
                         scope.dimensions.scale.max = 2;
+                        
+                        //if (sliderRef) {
 
-                        if (sliderRef) {
-
-                            // Set slider handle position
-                            sliderRef.noUiSlider.set(scope.dimensions.scale.current);
-
-                            // Update slider range min/max
-                            sliderRef.noUiSlider.updateOptions({
-                                "range": {
-                                    "min": scope.dimensions.scale.min,
-                                    "max": scope.dimensions.scale.max
-                                }
-                            });
-                        }
+                        //    // Set slider handle position
+                        //    sliderRef.noUiSlider.set(scope.dimensions.scale.current);
+                            
+                        //    // Update slider range min/max
+                        //    sliderRef.noUiSlider.updateOptions({
+                        //        "range": {
+                        //            "min": scope.dimensions.scale.min,
+                        //            "max": scope.dimensions.scale.max
+                        //        }
+                        //    });
+                        //}
 					};
 
 					var validatePosition = function(left, top){
