@@ -33,9 +33,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
         }
 
         function updateViewModel(configItems) {
-
-            //check if it's already in sync
-
+            
             //get the checked vals from the view model
             var selectedVals = _.map(
                 _.filter($scope.selectedItems,
@@ -47,22 +45,22 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                     return m.value;
                 }
             );
-            //get all of the same values between the arrays
-            var same = _.intersection($scope.model.value, selectedVals);
-            //if the lengths are the same as the value, then we are in sync, just exit
-
-            if (same.length === $scope.model.value.length === selectedVals.length) {
+            
+            //if the length is zero, then we are in sync, just exit.
+            if (_.difference($scope.model.value, selectedVals).length === 0) {
                 return;
             }
 
             $scope.selectedItems = [];
-
+            
+            var iConfigItem;
             for (var i = 0; i < configItems.length; i++) {
-                var isChecked = _.contains($scope.model.value, configItems[i].value);
+                iConfigItem = configItems[i];
+                var isChecked = _.contains($scope.model.value, iConfigItem.value);
                 $scope.selectedItems.push({
                     checked: isChecked,
-                    key: configItems[i].id,
-                    val: configItems[i].value
+                    key: iConfigItem.id,
+                    val: iConfigItem.value
                 });
             }
         }
