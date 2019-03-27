@@ -86,7 +86,7 @@
 
             <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter">
                 <ng-form name="scheduleSelectorForm">
-                    <div class="flex">
+                    <div class="flex" ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid}">
 
                         <umb-checkbox
                             input-id="{{'saveVariantSelector_' + variant.language.culture}}"
@@ -96,11 +96,11 @@
 
                         <div>
 
-                            <label for="{{'saveVariantSelector_' + variant.language.culture}}" style="margin-bottom: 2px; " ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid && variant.save}">
+                            <label for="{{'saveVariantSelector_' + variant.language.culture}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
 
                                 <span class="db umb-permission__description"
-                                      ng-if="(!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)) || variant.save === false">
+                                      ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                     <umb-variant-state variant="variant"></umb-variant-state>
                                     <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                                 </span>
@@ -166,7 +166,7 @@
                                    name="saveVariantReleaseDate"
                                    val-server-field="{{variant.htmlId}}" />
 
-                            <div ng-if="variant.save" ng-messages="scheduleSelectorForm.saveVariantReleaseDate.$error" show-validation-on-submit>
+                            <div ng-messages="scheduleSelectorForm.saveVariantReleaseDate.$error" show-validation-on-submit>
                                 <div class="umb-permission__description text-error" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
                             </div>
 

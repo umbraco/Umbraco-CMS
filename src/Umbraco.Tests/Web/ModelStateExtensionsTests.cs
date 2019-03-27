@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Http.ModelBinding;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 
@@ -19,10 +17,7 @@ namespace Umbraco.Tests.Web
         {
             var ms = new ModelStateDictionary();
             var localizationService = new Mock<ILocalizationService>();
-            var languageList = new List<ILanguage> { new Language("en-US") };
-
-            localizationService.Setup(x => x.GetAllLanguages()).Returns(languageList);
-            localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-us");
+            localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
             ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); //invariant property
             ms.AddPropertyError(new ValidationResult("title missing"), "title", "en-US"); //variant property
@@ -47,9 +42,6 @@ namespace Umbraco.Tests.Web
         {
             var ms = new ModelStateDictionary();
             var localizationService = new Mock<ILocalizationService>();
-            var languageList = new List<ILanguage> { new Language("en-US") };
-
-            localizationService.Setup(x => x.GetAllLanguages()).Returns(languageList);
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
             ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); //invariant property

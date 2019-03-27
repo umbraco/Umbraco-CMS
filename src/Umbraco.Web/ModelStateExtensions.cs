@@ -5,7 +5,6 @@ using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web
 {
@@ -40,7 +39,7 @@ namespace Umbraco.Web
         {
             return state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value.Errors.Any());
         }
-
+        
         /// <summary>
         /// Adds the error to model state correctly for a property so we can use it on the client side.
         /// </summary>
@@ -86,15 +85,12 @@ namespace Umbraco.Web
                 .Select(x => x.Split('.')) //split into parts
                 .Where(x => x.Length >= 3 && x[0] == "_Properties") //only choose _Properties errors
                 .Select(x => x[2]) //select the culture part
-                .Where(x => !x.IsNullOrWhiteSpace()).ToList(); //if it has a value
-
-            var invariantProperty = cultureErrors.Any(x => x == "invariant");
-
-            // if invariant property, get all the languages as we need to show validation errors 
-            // even if the property is only editable on the default language
-            cultureErrors = invariantProperty
-                ? localizationService.GetAllLanguages().Select(x => x.IsoCode).ToList()
-                : cultureErrors.Distinct().ToList();
+                .Where(x => !x.IsNullOrWhiteSpace()) //if it has a value
+                //if it's marked "invariant" than return the default language, this is because we can only edit invariant properties on the default language
+                //so errors for those must show up under the default lang.
+                .Select(x => x == "invariant" ? localizationService.GetDefaultLanguageIsoCode() : x) 
+                .Distinct()
+                .ToList();
 
             return cultureErrors;
         }
@@ -173,22 +169,22 @@ namespace Umbraco.Web
         public static JsonResult ToJsonErrors(this ModelStateDictionary state)
         {
             return new JsonResult
-            {
-                Data = new
                 {
-                    success = state.IsValid.ToString().ToLower(),
-                    failureType = "ValidationError",
-                    validationErrors = from e in state
-                                       where e.Value.Errors.Count > 0
-                                       select new
-                                       {
-                                           name = e.Key,
-                                           errors = e.Value.Errors.Select(x => x.ErrorMessage)
-                                           .Concat(
-                                               e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception.Message))
-                                       }
-                }
-            };
+                    Data = new
+                        {
+                            success = state.IsValid.ToString().ToLower(),
+                            failureType = "ValidationError",
+                            validationErrors = from e in state
+                                               where e.Value.Errors.Count > 0
+                                               select new
+                                                   {
+                                                       name = e.Key,
+                                                       errors = e.Value.Errors.Select(x => x.ErrorMessage)
+                                                   .Concat(
+                                                       e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception.Message))
+                                                   }
+                        }
+                };
         }
 
     }
