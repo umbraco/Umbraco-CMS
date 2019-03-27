@@ -10,6 +10,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Composing;
 using Moq;
+using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -32,6 +33,8 @@ namespace Umbraco.Tests.PublishedContent
         protected override void Compose()
         {
             base.Compose();
+            _publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
+            Composition.RegisterUnique<IPublishedSnapshotAccessor>(_publishedSnapshotAccessorMock.Object);
 
             Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
             Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
@@ -87,6 +90,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         private readonly Guid _node1173Guid = Guid.NewGuid();
+        private Mock<IPublishedSnapshotAccessor> _publishedSnapshotAccessorMock;
 
         protected override string GetXmlContent(int templateId)
         {
@@ -792,6 +796,91 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsTrue(customDoc3.IsDescendantOrSelf(customDoc3));
         }
 
+        [Test]
+        public void SiblingsAndSelf()
+        {
+            // Structure:
+            // - Root : 1046 (no parent)
+            // -- Level1.1: 1173 (parent 1046)
+            // --- Level1.1.1: 1174 (parent 1173)
+            // --- Level1.1.2: 117 (parent 1173)
+            // --- Level1.1.3: 1177 (parent 1173)
+            // --- Level1.1.4: 1178 (parent 1173)
+            // --- Level1.1.5: 1176 (parent 1173)
+            // -- Level1.2: 1175 (parent 1046)
+            // -- Level1.3: 4444 (parent 1046)
+            var root = GetNode(1046);
+            var level1_1 = GetNode(1173);
+            var level1_1_1 = GetNode(1174);
+            var level1_1_2 = GetNode(117);
+            var level1_1_3 = GetNode(1177);
+            var level1_1_4 = GetNode(1178);
+            var level1_1_5 = GetNode(1176);
+            var level1_2 = GetNode(1175);
+            var level1_3 = GetNode(4444);
+
+            _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot()).Returns(new []{root});
+
+            CollectionAssertAreEqual(new []{root}, root.SiblingsAndSelf());
+
+            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_1.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_2.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_3.SiblingsAndSelf());
+
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_1.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_2.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_3.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_4.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_5.SiblingsAndSelf());
+
+        }
+
+         [Test]
+        public void Siblings()
+        {
+            // Structure:
+            // - Root : 1046 (no parent)
+            // -- Level1.1: 1173 (parent 1046)
+            // --- Level1.1.1: 1174 (parent 1173)
+            // --- Level1.1.2: 117 (parent 1173)
+            // --- Level1.1.3: 1177 (parent 1173)
+            // --- Level1.1.4: 1178 (parent 1173)
+            // --- Level1.1.5: 1176 (parent 1173)
+            // -- Level1.2: 1175 (parent 1046)
+            // -- Level1.3: 4444 (parent 1046)
+            var root = GetNode(1046);
+            var level1_1 = GetNode(1173);
+            var level1_1_1 = GetNode(1174);
+            var level1_1_2 = GetNode(117);
+            var level1_1_3 = GetNode(1177);
+            var level1_1_4 = GetNode(1178);
+            var level1_1_5 = GetNode(1176);
+            var level1_2 = GetNode(1175);
+            var level1_3 = GetNode(4444);
+
+            _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot()).Returns(new []{root});
+
+            CollectionAssertAreEqual(new IPublishedContent[0], root.Siblings());
+
+            CollectionAssertAreEqual( new []{level1_2, level1_3}, level1_1.Siblings());
+            CollectionAssertAreEqual( new []{level1_1,  level1_3}, level1_2.Siblings());
+            CollectionAssertAreEqual( new []{level1_1, level1_2}, level1_3.Siblings());
+
+            CollectionAssertAreEqual( new []{ level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_1.Siblings());
+            CollectionAssertAreEqual( new []{level1_1_1,  level1_1_3, level1_1_4, level1_1_5}, level1_1_2.Siblings());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2,  level1_1_4, level1_1_5}, level1_1_3.Siblings());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3,  level1_1_5}, level1_1_4.Siblings());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4}, level1_1_5.Siblings());
+
+        }
+
+        private void CollectionAssertAreEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual)
+        where T: IPublishedContent
+        {
+            var e = expected.Select(x => x.Id);
+            var a = actual.Select(x => x.Id);
+            CollectionAssert.AreEquivalent(e, a, $"\nExpected:\n{string.Join(", ", e)}\n\nActual:\n{string.Join(", ", a)}");
+        }
 
         [Test]
         public void FragmentProperty()
