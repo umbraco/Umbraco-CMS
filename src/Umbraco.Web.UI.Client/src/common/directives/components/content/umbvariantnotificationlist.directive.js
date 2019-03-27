@@ -8,7 +8,7 @@
     }
 
     var umbNotificationListComponent = {
-        templateUrl: 'views/components/content/umb-notification-list.html',
+        templateUrl: 'views/components/content/umb-variant-notification-list.html',
         bindings: {
             notifications: "<"
         },
@@ -17,6 +17,6 @@
     };
 
     angular.module("umbraco.directives")
-        .component('umbNotificationList', umbNotificationListComponent);
+        .component('umbVariantNotificationList', umbNotificationListComponent);
 
 })();

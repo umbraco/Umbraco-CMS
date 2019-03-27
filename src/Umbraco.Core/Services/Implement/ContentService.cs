@@ -884,19 +884,9 @@ namespace Umbraco.Core.Services.Implement
                 //this will create the correct culture type even if culture is * or null
                 var cultureType = CultureType.Single(culture, _languageRepository.IsDefault(culture));
 
-                //fixme: if PublishCulture or IsPropertyDataValid fails we still need to save!
-
                 // publish the culture(s)
-                var publishCulture = content.PublishCulture(cultureType);
-                if (!publishCulture)
-                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
-
-                //validate the property values
-                if (!_propertyValidationService.Value.IsPropertyDataValid(content, out var invalidProperties, cultureType))
-                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
-                    {
-                        InvalidProperties = invalidProperties
-                    };
+                // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+                content.PublishCulture(cultureType);
 
                 var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, userId, raiseEvents);
                 scope.Complete();
@@ -931,23 +921,13 @@ namespace Umbraco.Core.Services.Implement
 
                 //fixme: Shouldn't we makes ure that all string cultures here are valid? i.e. no * or null is allowed when using this method
 
-                var cultureTypes = cultures.ToDictionary(x => x, x => CultureType.Single(x, _languageRepository.IsDefault(x)));
+                var cultureTypes = cultures.Select(x => CultureType.Single(x, _languageRepository.IsDefault(x)));
 
-                //fixme: if PublishCulture or IsPropertyDataValid fails we still need to save!
-
-                if (cultureTypes.Select(x => content.PublishCulture(x.Value)).Any(isValid => !isValid))
-                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
-
-                //validate the property values on the cultures trying to be published
-                foreach (var culture in cultureTypes)
-                {
-                    if (!_propertyValidationService.Value.IsPropertyDataValid(content, out var invalidProperties, culture.Value))
-                        return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
-                        {
-                            InvalidProperties = invalidProperties
-                        };
-                }
-
+                // publish the culture(s)
+                // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+                foreach (var cultureType in cultureTypes)
+                    content.PublishCulture(cultureType); 
+                
                 var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, userId, raiseEvents);
                 scope.Complete();
                 return result;
@@ -1092,6 +1072,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (publishing)
             {
+                //determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
                 culturesUnpublishing = content.GetCulturesUnpublishing();
                 culturesPublishing = variesByCulture
                         ? content.PublishCultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
@@ -2505,7 +2486,21 @@ namespace Umbraco.Core.Services.Implement
 
             var variesByCulture = content.ContentType.VariesByCulture();
 
-            //First check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
+            var cultureTypesToPublish = culturesPublishing.ToDictionary(x => x, x => CultureType.Single(x, _languageRepository.IsDefault(x)));
+
+            // publish the culture(s)
+            if (!cultureTypesToPublish.All(x => content.PublishCulture(x.Value)))
+                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
+
+            //validate the property values
+            Property[] invalidProperties = null;
+            if (!cultureTypesToPublish.All(x => _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x.Value)))
+                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
+                {
+                    InvalidProperties = invalidProperties
+                };
+            
+            //Check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
             // be changed to Unpublished and any culture currently published will not be visible.
             if (variesByCulture)
             {
