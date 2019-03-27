@@ -878,35 +878,21 @@ namespace Umbraco.Core.Services.Implement
                 if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
 
-                Property[] invalidProperties;
-
                 // if culture is specific, first publish the invariant values, then publish the culture itself.
                 // if culture is '*', then publish them all (including variants)
 
-                // explicitly SaveAndPublish a specific culture also publishes invariant values
-                if (!culture.IsNullOrWhiteSpace() && culture != "*")
-                {
-                    // publish the invariant values
-                    // fixme: really? shouldn't we only publish invariant values if the culture is the default?
-                    var publishInvariant = content.PublishCulture(null);
-                    if (!publishInvariant)
-                        return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
+                //this will create the correct culture type even if culture is * or null
+                var cultureType = CultureType.Single(culture, _languageRepository.IsDefault(culture));
 
-                    //validate the property values
-                    if (!_propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, CultureType.Single(culture, _languageRepository.IsDefault(culture))))
-                        return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
-                        {
-                            InvalidProperties = invalidProperties
-                        };
-                }
+                //fixme: if PublishCulture or IsPropertyDataValid fails we still need to save!
 
                 // publish the culture(s)
-                var publishCulture = content.PublishCulture(CultureType.All);
+                var publishCulture = content.PublishCulture(cultureType);
                 if (!publishCulture)
                     return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
                 //validate the property values
-                if (!_propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, CultureType.All))
+                if (!_propertyValidationService.Value.IsPropertyDataValid(content, out var invalidProperties, cultureType))
                     return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
                     {
                         InvalidProperties = invalidProperties
@@ -946,6 +932,8 @@ namespace Umbraco.Core.Services.Implement
                 //fixme: Shouldn't we makes ure that all string cultures here are valid? i.e. no * or null is allowed when using this method
 
                 var cultureTypes = cultures.ToDictionary(x => x, x => CultureType.Single(x, _languageRepository.IsDefault(x)));
+
+                //fixme: if PublishCulture or IsPropertyDataValid fails we still need to save!
 
                 if (cultureTypes.Select(x => content.PublishCulture(x.Value)).Any(isValid => !isValid))
                     return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
@@ -1444,7 +1432,8 @@ namespace Umbraco.Core.Services.Implement
                 });
             }
 
-            return content.PublishCulture(CultureType.Invariant) && _propertyValidationService.Value.IsPropertyDataValid(content, out _, CultureType.Invariant);
+            return content.PublishCulture(CultureType.Invariant)
+                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, CultureType.Invariant);
         }
 
         // utility 'ShouldPublish' func used by SaveAndPublishBranch

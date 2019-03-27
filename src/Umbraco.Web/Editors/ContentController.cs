@@ -2046,7 +2046,8 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishPathNotPublished:
                         {
-                            var names = string.Join(", ", status.Select(x => x.Content.Name));
+                            //TODO: This doesn't take into account variations with the successfulCultures param
+                            var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
                                 Services.TextService.Localize("publish"),
                                 Services.TextService.Localize("publish/contentPublishedFailedByParent",
@@ -2055,13 +2056,15 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishCancelledByEvent:
                         {
-                            var names = string.Join(", ", status.Select(x => x.Content.Name));
+                            //TODO: This doesn't take into account variations with the successfulCultures param
+                            var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             AddCancelMessage(display, message: "publish/contentPublishedFailedByEvent", messageParams: new[] { names });
                         }
                         break;
                     case PublishResultType.FailedPublishAwaitingRelease:
                         {
-                            var names = string.Join(", ", status.Select(x => x.Content.Name));
+                            //TODO: This doesn't take into account variations with the successfulCultures param
+                            var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
                                     Services.TextService.Localize("publish"),
                                     Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
@@ -2070,7 +2073,8 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishHasExpired:
                         {
-                            var names = string.Join(", ", status.Select(x => x.Content.Name));
+                            //TODO: This doesn't take into account variations with the successfulCultures param
+                            var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
                                 Services.TextService.Localize("publish"),
                                 Services.TextService.Localize("publish/contentPublishedFailedExpired",
@@ -2079,7 +2083,8 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishIsTrashed:
                         {
-                            var names = string.Join(", ", status.Select(x => x.Content.Name));
+                            //TODO: This doesn't take into account variations with the successfulCultures param
+                            var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
                                 Services.TextService.Localize("publish"),
                                 Services.TextService.Localize("publish/contentPublishedFailedIsTrashed",
@@ -2088,11 +2093,25 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishContentInvalid:
                         {
-                            var names = string.Join(", ", status.Select(x => x.Content.Name));
-                            display.AddWarningNotification(
-                                Services.TextService.Localize("publish"),
-                                Services.TextService.Localize("publish/contentPublishedFailedInvalid",
-                                    new[] { names }).Trim());
+                            if (successfulCultures == null)
+                            {
+                                var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
+                                display.AddWarningNotification(
+                                    Services.TextService.Localize("publish"),
+                                    Services.TextService.Localize("publish/contentPublishedFailedInvalid",
+                                        new[] { names }).Trim());
+                            }
+                            else
+                            {
+                                foreach (var c in successfulCultures)
+                                {
+                                    var names = string.Join(", ", status.Select(x => $"'{x.Content.GetCultureName(c)}'"));
+                                    display.AddWarningNotification(
+                                        Services.TextService.Localize("publish"),
+                                        Services.TextService.Localize("publish/contentPublishedFailedInvalid",
+                                            new[] { names }).Trim());
+                                }
+                            }
                         }
                         break;
                     case PublishResultType.FailedPublishMandatoryCultureMissing:

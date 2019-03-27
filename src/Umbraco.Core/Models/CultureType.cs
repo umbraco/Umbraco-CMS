@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models
+﻿using System;
+
+namespace Umbraco.Core.Models
 {
     /// <summary>
     /// A <see cref="CultureType"/> represents either All cultures, a Single culture or the Invariant culture
@@ -33,14 +35,31 @@
         }
 
         public string Culture { get; }
-        public Behavior CultureBehavior => Culture == "*" ? Behavior.All : Culture == null ? Behavior.Invariant : Behavior.Explicit;
+        public Behavior CultureBehavior
+        {
+            get
+            {
+                if (Culture == "*") return Behavior.All;
+                if (Culture == null) return Behavior.Invariant;
+
+                var result = Behavior.Explicit;
+
+                //if the explicit culture is the default, then the behavior is also Invariant
+                if (IsDefaultCulture)
+                    result |= Behavior.Invariant;
+
+                return result;
+            }
+        }
+
         public bool IsDefaultCulture { get; }
 
-        public enum Behavior
+        [Flags]
+        public enum Behavior : byte
         {
-            All,
-            Invariant,
-            Explicit
+            All = 0,
+            Invariant = 1,
+            Explicit = 2
         }
     }
 }

@@ -169,9 +169,9 @@ namespace Umbraco.Core.Models
         /// <param name="culture"></param>
         /// <returns>A value indicating whether it was possible to publish the names and values for the specified
         /// culture(s). The method may fail if required names are not set, but it does NOT validate property data</returns>
-        public static bool PublishCulture(this IContent content, CultureType culture = null)
+        public static bool PublishCulture(this IContent content, CultureType culture)
         {
-            culture = culture ?? CultureType.All;
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
 
             // the variation should be supported by the content type properties
             //  if the content type is invariant, only '*' and 'null' is ok
@@ -201,13 +201,13 @@ namespace Umbraco.Core.Models
                     // PublishName set by repository - nothing to do here
                     break;
                 }
-                case CultureType.Behavior.Explicit:
+                case var behavior when behavior.HasFlag(CultureType.Behavior.Explicit):
                 {
                     var name = content.GetCultureName(culture.Culture);
                     if (string.IsNullOrWhiteSpace(name))
                         return false;
                     content.SetPublishInfo(culture.Culture, name, DateTime.Now);
-                    alsoInvariant = culture.IsDefaultCulture; // we also want to publish invariant values
+                    alsoInvariant = behavior.HasFlag(CultureType.Behavior.Invariant); // we also want to publish invariant values
                     break;
                 }
                 default:
