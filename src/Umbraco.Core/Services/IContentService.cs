@@ -124,6 +124,8 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         XmlDocument BuildXmlCache();
 
+        XmlDocument BuildPreviewXmlCache();
+
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
