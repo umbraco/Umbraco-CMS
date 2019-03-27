@@ -33,7 +33,7 @@ angular.module("umbraco.directives")
 						viewport:{},
 						margin: 20,
 						scale: {
-							min: 0.3,
+							min: 0, //0.3,
 							max: 3,
 							current: 1
 						}
