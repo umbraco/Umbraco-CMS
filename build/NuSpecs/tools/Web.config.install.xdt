@@ -126,45 +126,55 @@
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.CodeAnalysis.CSharp')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='log4net')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Data.SqlServerCe')" xdt:Transform="Remove" />
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.ValueTuple')" xdt:Transform="Remove" />
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http.Formatting')" xdt:Transform="Remove" />
     </assemblyBinding>
   </runtime>
 
-  <runtime>
-    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
-        <dependentAssembly xdt:Transform="Insert">
-            <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-            <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
-        </dependentAssembly>
-        <dependentAssembly xdt:Transform="Insert">
-            <assemblyIdentity name="Microsoft.Owin.Security" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-            <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
-        </dependentAssembly>
-        <dependentAssembly xdt:Transform="Insert">
-            <assemblyIdentity name="Microsoft.Owin.Security.Cookies" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-            <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
-        </dependentAssembly>
-        <dependentAssembly xdt:Transform="Insert">
-            <assemblyIdentity name="Microsoft.Owin.Security.OAuth" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-            <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
-        </dependentAssembly>
-        <dependentAssembly xdt:Transform="Insert">
-            <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
-            <bindingRedirect oldVersion="0.0.0.0-11.0.0.0" newVersion="11.0.0.0" />
-        </dependentAssembly>
-        <dependentAssembly xdt:Transform="Insert">
-            <assemblyIdentity name="System.Collections.Immutable" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-            <bindingRedirect oldVersion="0.0.0.0-1.2.1.0" newVersion="1.2.1.0" />
-        </dependentAssembly>
-        <dependentAssembly xdt:Transform="Insert">
-            <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-            <bindingRedirect oldVersion="0.0.0.0-5.2.6.0" newVersion="5.2.6.0" />
-        </dependentAssembly>
-        <dependentAssembly xdt:Transform="Insert">
-            <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-            <bindingRedirect oldVersion="0.0.0.0-5.2.6.0" newVersion="5.2.6.0" />
-        </dependentAssembly>
-    </assemblyBinding>
-  </runtime>
+ <runtime>
+        <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-4.0.1.0" newVersion="4.0.1.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="Microsoft.Owin.Security" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-4.0.1.0" newVersion="4.0.1.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="Microsoft.Owin.Security.Cookies" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-4.0.1.0" newVersion="4.0.1.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="Microsoft.Owin.Security.OAuth" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-4.0.1.0" newVersion="4.0.1.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-12.0.0.0" newVersion="12.0.0.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Collections.Immutable" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-1.2.3.0" newVersion="1.2.3.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-5.2.7.0" newVersion="5.2.7.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-5.2.7.0" newVersion="5.2.7.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.ValueTuple" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-4.0.3.0" newVersion="4.0.3.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Net.Http.Formatting" publicKeyToken="31bf3856ad364e35" />
+                <bindingRedirect oldVersion="0.0.0.0-5.2.7.0" newVersion="5.2.7.0" />
+            </dependentAssembly>
+        </assemblyBinding>
+    </runtime>
 
   <system.web.webPages.razor xdt:Transform="Remove" />
 

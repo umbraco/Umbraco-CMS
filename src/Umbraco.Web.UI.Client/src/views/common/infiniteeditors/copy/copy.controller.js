@@ -78,7 +78,7 @@
       // method to select a search result
       function selectResult(evt, result) {
           result.selected = result.selected === true ? false : true;
-          nodeSelectHandler(evt, { event: evt, node: result });
+          nodeSelectHandler({ event: evt, node: result });
       }
 
       //callback when there are search results
@@ -96,7 +96,7 @@
       // Mini list view
       $scope.selectListViewNode = function (node) {
           node.selected = node.selected === true ? false : true;
-		  nodeSelectHandler({}, { node: node });
+		  nodeSelectHandler({ node: node });
       };
 
       $scope.closeMiniListView = function () {

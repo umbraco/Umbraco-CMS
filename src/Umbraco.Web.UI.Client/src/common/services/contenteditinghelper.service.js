@@ -301,6 +301,19 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             return allProps;
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.contentEditingHelper#buildCompositeVariantId
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns a id for the variant that is unique between all variants on the content
+         */
+        buildCompositeVariantId: function (variant) {
+            return (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "");
+        },
+
 
         /**
          * @ngdoc method

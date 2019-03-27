@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ListViewListLayoutController($scope, listViewHelper, mediaHelper, mediaTypeHelper, editorService) {
+    function ListViewListLayoutController($scope, listViewHelper, $location, mediaHelper, mediaTypeHelper) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -19,7 +19,7 @@
         vm.activeDrag = false;
         vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
         vm.acceptedMediatypes = [];
-
+        
         vm.selectItem = selectItem;
         vm.clickItem = clickItem;
         vm.selectAll = selectAll;
@@ -52,30 +52,10 @@
             listViewHelper.selectHandler(selectedItem, $index, $scope.items, $scope.selection, $event);
         }
 
-        function clickItem(node) {
-            
-            var contentEditor = {
-                id: node.id,
-                submit: function (model) {
-                    // update the node
-                    node.name = model.contentNode.name;
-                    // TODO: node.description = model.contentNode.description;
-                    node.published = model.contentNode.hasPublishedVersion;
-                    if (entityType !== "Member") {
-                        entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
-                            node.url = data;
-                        });
-                    }
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.contentEditor(contentEditor);
-            
+        function clickItem(item) {
+            // if item.id is 2147483647 (int.MaxValue) use item.key
+            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id));
         }
-
 
         function isSortDirection(col, direction) {
             return listViewHelper.setSortingDirection(col, direction, $scope.options);

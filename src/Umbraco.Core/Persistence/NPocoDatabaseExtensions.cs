@@ -147,8 +147,23 @@ namespace Umbraco.Core.Persistence
         private static TConnection GetTypedConnection<TConnection>(IDbConnection connection)
             where TConnection : class, IDbConnection
         {
-            var profiled = connection as ProfiledDbConnection;
-            return profiled == null ? connection as TConnection : profiled.WrappedConnection as TConnection;
+            var c = connection;
+            for (;;)
+            {
+                switch (c)
+                {
+                    case TConnection ofType:
+                        return ofType;
+                    case RetryDbConnection retry:
+                        c = retry.Inner;
+                        break;
+                    case ProfiledDbConnection profiled:
+                        c = profiled.WrappedConnection;
+                        break;
+                    default:
+                        throw new NotSupportedException(connection.GetType().FullName);
+                }
+            }
         }
 
         /// <summary>
@@ -160,8 +175,20 @@ namespace Umbraco.Core.Persistence
         private static TTransaction GetTypedTransaction<TTransaction>(IDbTransaction transaction)
             where TTransaction : class, IDbTransaction
         {
-            var profiled = transaction as ProfiledDbTransaction;
-            return profiled == null ? transaction as TTransaction : profiled.WrappedTransaction as TTransaction;
+            var t = transaction;
+            for (;;)
+            {
+                switch (t)
+                {
+                    case TTransaction ofType:
+                        return ofType;
+                    case ProfiledDbTransaction profiled:
+                        t = profiled.WrappedTransaction;
+                        break;
+                    default:
+                        throw new NotSupportedException(transaction.GetType().FullName);
+                }
+            }
         }
 
         /// <summary>
@@ -173,11 +200,23 @@ namespace Umbraco.Core.Persistence
         private static TCommand GetTypedCommand<TCommand>(IDbCommand command)
             where TCommand : class, IDbCommand
         {
-            var faultHandling = command as FaultHandlingDbCommand;
-            if (faultHandling != null) command = faultHandling.Inner;
-            var profiled = command as ProfiledDbCommand;
-            if (profiled != null) command = profiled.InternalCommand;
-            return command as TCommand;
+            var c = command;
+            for (;;)
+            {
+                switch (c)
+                {
+                    case TCommand ofType:
+                        return ofType;
+                    case FaultHandlingDbCommand faultHandling:
+                        c = faultHandling.Inner;
+                        break;
+                    case ProfiledDbCommand profiled:
+                        c = profiled.InternalCommand;
+                        break;
+                    default:
+                        throw new NotSupportedException(command.GetType().FullName);
+                }
+            }
         }
 
         public static void TruncateTable(this IDatabase db, ISqlSyntaxProvider sqlSyntax, string tableName)

@@ -95,7 +95,8 @@
     <key alias="domainExists">Domænet '%0%' er oprettet</key>
     <key alias="domainUpdated">Domænet '%0%' er nu opdateret</key>
     <key alias="orEdit">eller rediger nuværende domæner</key>
-    <key alias="domainHelp">f.eks. ditdomaene.com, www.ditdomaene.com</key>
+    <key alias="domainHelpWithVariants"><![CDATA[Gyldige domænenavne er: "example.com", "www.example.com", "example.com:8080" eller "https://www.example.com/".
+     Yderlgiere understøttes også første niveau af stien efter domænet, f.eks. "Example.com/en" eller "/en". ]]></key>
     <key alias="inherit">Nedarv</key>
     <key alias="setLanguage">Sprog</key>
     <key alias="setLanguageHelp"><![CDATA[Indstil sproget for noder under den aktuelle node,<br /> eller nedarv sprog fra forældre noder. Gælder også<br />
@@ -271,13 +272,14 @@
     <key alias="languagesToPublishForFirstTime">Hvilke sprog vil du gerne udgive? Alle sprog med indhold gemmes!</key>
     <key alias="languagesToPublish">Hvilke sprog vil du gerne udgive?</key>
     <key alias="languagesToSave">Hvilke sprog vil du gerne gemme?</key>
-    <key alias="languagesToSaveForFirstTime">Alle sprog med indhold gemmes ved oprettelsen!</key>
+    <key alias="languagesToSaveForFirstTime">Hvilke sprog vil du gerne gemme?</key>
     <key alias="languagesToSendForApproval">Hvilke sprog vil du gerne sende til godkendelse?</key>
     <key alias="languagesToSchedule">Hvilke sprog vil du gerne planlægge?</key>
     <key alias="languagesToUnpublish">Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil afpublicere alle sprog.</key>
     <key alias="publishedLanguages">Udgivne sprog</key>
     <key alias="unpublishedLanguages">Ikke-udgivne sprog</key>
     <key alias="unmodifiedLanguages">Uændrede sprog</key>
+    <key alias="untouchedLanguagesForFirstTime">Disse sprog er ikke blevet oprettet</key>
     <key alias="readyToPublish">Klar til at udgive?</key>
     <key alias="readyToSave">Klar til at gemme?</key>
     <key alias="sendForApproval">Send til godkendelse</key>
@@ -702,7 +704,7 @@
     <key alias="blue">Blå</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Tilføj fane</key>
+    <key alias="addGroup">Tilføj fane</key>
     <key alias="addProperty">Tilføj egenskab</key>
     <key alias="addEditor">Tilføj editor</key>
     <key alias="addTemplate">Tilføj skabelon</key>
@@ -986,6 +988,7 @@ Mange hilsner fra Umbraco robotten
     %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
     ]]></key>
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
+    <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% kan ikke udgives, fordi det mangler et navn.]]></key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
     <key alias="inProgress">Publicerer - vent venligst...</key>
     <key alias="inProgressCounter">%0% ud af %1% sider er blevet udgivet...</key>
@@ -1276,7 +1279,7 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompositioner</key>
-    <key alias="noTabs">Du har ikke tilføjet nogle faner</key>
+    <key alias="noGroups">Du har ikke tilføjet nogle grupper</key>
     <key alias="addGroup">Tilføj gruppe</key>
     <key alias="inheritedFrom">Nedarvet fra</key>
     <key alias="addProperty">Tilføj egenskab</key>

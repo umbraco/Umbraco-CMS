@@ -23,27 +23,32 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        public IGlobalSettings GlobalSettings { get; set; }
+        public IGlobalSettings GlobalSettings { get; }
 
         /// <summary>
-        /// Gets or sets the Umbraco context.
+        /// Gets the Umbraco context.
         /// </summary>
-        public virtual UmbracoContext UmbracoContext { get; set; }
+        public virtual UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+
+        /// <summary>
+        /// Gets or sets the Umbraco context accessor.
+        /// </summary>
+        public virtual IUmbracoContextAccessor UmbracoContextAccessor { get; set; }
 
         /// <summary>
         /// Gets or sets the services context.
         /// </summary>
-        public ServiceContext Services { get; set; }
+        public ServiceContext Services { get; }
 
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public AppCaches AppCaches { get; set; }
+        public AppCaches AppCaches { get; }
 
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILogger Logger { get; set; }
+        public ILogger Logger { get; }
 
         /// <summary>
         /// Gets or sets the profiling logger.
@@ -70,7 +75,7 @@ namespace Umbraco.Web.Mvc
         protected UmbracoController()
             : this(
                   Current.Factory.GetInstance<IGlobalSettings>(),
-                  Current.Factory.GetInstance<UmbracoContext>(),
+                  Current.Factory.GetInstance<IUmbracoContextAccessor>(),
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
                   Current.Factory.GetInstance<IProfilingLogger>(),
@@ -79,10 +84,10 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+        protected UmbracoController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
         {
             GlobalSettings = globalSettings;
-            UmbracoContext = umbracoContext;
+            UmbracoContextAccessor = umbracoContextAccessor;
             Services = services;
             AppCaches = appCaches;
             Logger = profilingLogger;
