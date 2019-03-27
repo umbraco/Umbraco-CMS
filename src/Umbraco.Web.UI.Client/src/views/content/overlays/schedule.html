@@ -84,8 +84,8 @@
 
         <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter">
-                <ng-form name="scheduleSelectorForm">
+            <div class="umb-list-item" ng-repeat="variant in vm.variants">
+                <ng-form name="scheduleSelectorForm" style="width:100%;">
                     <div class="flex">
 
                         <umb-checkbox
@@ -106,9 +106,9 @@
                                 </span>
                             </label>
 
-                            <div class="flex items-center" style="margin-top: 10px; margin-bottom: 10px;">
+                            <div class="date-wrapper-mini">
+                                <div class="date-wrapper-mini__date" ng-if="vm.dirtyVariantFilter(variant) && (variant.releaseDate || variant.save)">
 
-                                <div class="flex items-center" ng-if="variant.releaseDate || variant.save">
                                     <div style="font-size: 13px; margin-right: 5px;">Publish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.releaseDateFormatted}}</em></div>
 
                                     <div class="btn-group flex" style="font-size: 14px; margin-right: 10px;" ng-if="variant.save">
@@ -134,7 +134,7 @@
                                     </div>
                                 </div>
 
-                                <div class="flex items-center" ng-if="variant.expireDate || variant.save">
+                                <div class="date-wrapper-mini__date" ng-if="variant.expireDate || variant.save">
                                     <div style="font-size: 13px; margin-right: 5px;">Unpublish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.expireDateFormatted}}</em></div>
 
                                     <div class="btn-group flex" style="font-size: 14px;" ng-if="variant.save">
@@ -180,24 +180,6 @@
                 </ng-form>
             </div>
             <br />
-        </div>
-
-        <div class="umb-list umb-list--condensed" ng-if="vm.hasPristineVariants">
-            <div style="margin-bottom: 15px; font-weight: bold;">
-                <p><localize key="content_publishedLanguages"></localize></p>
-            </div>
-
-            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter track by variant.language.culture">
-                <div>
-                    <div style="margin-bottom: 2px;">
-                        <span>{{ variant.language.name }}</span>
-                    </div>
-                    <div class="umb-permission__description">
-                        <umb-variant-state variant="variant"></umb-variant-state>
-                        <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>
