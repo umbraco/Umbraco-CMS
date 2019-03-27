@@ -7,7 +7,6 @@ namespace Umbraco.Core.Mapping
 {
     // notes:
     // AutoMapper maps null to empty arrays, lists, etc
-    // AutoMapper maps derived types - we have to be explicit (see DefineAs) - fixme / really?
 
     /// <summary>
     /// Umbraco Mapper.
@@ -82,34 +81,6 @@ namespace Umbraco.Core.Mapping
 
             var sourceMaps = DefineMaps(sourceType);
             sourceMaps[targetType] = (source, target, context) => map((TSource)source, (TTarget)target, context);
-        }
-
-        /// <summary>
-        /// Defines a mapping as a clone of an already defined mapping.
-        /// </summary>
-        /// <typeparam name="TSource">The source type.</typeparam>
-        /// <typeparam name="TTarget">The target type.</typeparam>
-        /// <typeparam name="TAsSource">The equivalent source type.</typeparam>
-        /// <typeparam name="TAsTarget">The equivalent target type.</typeparam>
-        public void DefineAs<TSource, TTarget, TAsSource, TAsTarget>()
-        {
-            var sourceType = typeof(TSource);
-            var targetType = typeof(TTarget);
-
-            var asSourceType = typeof(TAsSource);
-            var asTargetType = typeof(TAsTarget);
-
-            var asCtors = DefineCtors(asSourceType);
-            var asMaps = DefineMaps(asSourceType);
-
-            var sourceCtors = DefineCtors(sourceType);
-            var sourceMaps = DefineMaps(sourceType);
-
-            if (!asCtors.TryGetValue(asTargetType, out var ctor) || !asMaps.TryGetValue(asTargetType, out var map))
-                throw new InvalidOperationException($"Don't know hwo to map from {asSourceType.FullName} to {targetType.FullName}.");
-
-            sourceCtors[targetType] = ctor;
-            sourceMaps[targetType] = map;
         }
 
         private Dictionary<Type, Func<object, MapperContext, object>> DefineCtors(Type sourceType)
@@ -217,40 +188,66 @@ namespace Umbraco.Core.Mapping
                 return (TTarget)target;
             }
 
-            // else, handle enumerable-to-enumerable mapping
-            if (IsGenericOrArray(sourceType) && IsGenericOrArray(targetType))
+            // otherwise, see if we can deal with enumerable
+
+            var ienumerableOfT = typeof(IEnumerable<>);
+
+            bool IsIEnumerableOfT(Type type) =>
+                type.IsGenericType &&
+                type.GenericTypeArguments.Length == 1 &&
+                type.GetGenericTypeDefinition() == ienumerableOfT;
+
+            // try to get source as an IEnumerable<T>
+            var sourceIEnumerable = IsIEnumerableOfT(sourceType) ? sourceType : sourceType.GetInterfaces().FirstOrDefault(IsIEnumerableOfT);
+
+            // if source is an IEnumerable<T> and target is T[] or IEnumerable<T>, we can create a map
+            if (sourceIEnumerable != null && IsEnumerableOrArrayOfType(targetType))
             {
-                var sourceGenericArg = GetGenericOrArrayArg(sourceType);
-                var targetGenericArg = GetGenericOrArrayArg(targetType);
+                var sourceGenericArg = sourceIEnumerable.GenericTypeArguments[0];
+                var targetGenericArg = GetEnumerableOrArrayTypeArgument(targetType);
 
-                var sourceEnumerableType = typeof(IEnumerable<>).MakeGenericType(sourceGenericArg);
-                var targetEnumerableType = typeof(IEnumerable<>).MakeGenericType(targetGenericArg);
+                ctor = GetCtor(sourceGenericArg, targetGenericArg);
+                map = GetMap(sourceGenericArg, targetGenericArg);
 
-                // if both are ienumerable
-                if (sourceEnumerableType.IsAssignableFrom(sourceType) && targetEnumerableType.IsAssignableFrom(targetType))
+                // if there is a constructor for the underlying type, create & invoke the map
+                if (ctor != null && map != null)
                 {
-                    ctor = GetCtor(sourceGenericArg, targetGenericArg);
-                    map = GetMap(sourceGenericArg, targetGenericArg);
-
-                    // if there is a constructor for the underlying type, map
-                    if (ctor != null && map != null)
-                    {
-                        var sourceEnumerable = (IEnumerable)source;
-                        var targetEnumerable = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
-
-                        foreach (var sourceItem in sourceEnumerable)
-                        {
-                            var targetItem = ctor(sourceItem, context);
-                            map(sourceItem, targetItem, context);
-                            targetEnumerable.Add(targetItem);
-                        }
-
-                        return (TTarget)targetEnumerable;
-                    }
+                    // register (for next time) and do it now (for this time)
+                    object NCtor(object s, MapperContext c) => MapEnumerable<TTarget>((IEnumerable) s, targetGenericArg, ctor, map, c);
+                    DefineCtors(sourceType)[targetType] = NCtor;
+                    DefineMaps(sourceType)[targetType] = Identity;
+                    return (TTarget) NCtor(source, context);
                 }
+
+                throw new InvalidOperationException($"Don't know how to map {sourceGenericArg.FullName} to {targetGenericArg.FullName}, so don't know how to map {sourceType.FullName} to {targetType.FullName}.");
             }
 
             throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
+        }
+
+        private TTarget MapEnumerable<TTarget>(IEnumerable source, Type targetGenericArg, Func<object, MapperContext, object> ctor, Action<object, object, MapperContext> map, MapperContext context)
+        {
+            var targetList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
+
+            foreach (var sourceItem in source)
+            {
+                var targetItem = ctor(sourceItem, context);
+                map(sourceItem, targetItem, context);
+                targetList.Add(targetItem);
+            }
+
+            object target = targetList;
+
+            if (typeof(TTarget).IsArray)
+            {
+                var elementType = typeof(TTarget).GetElementType();
+                if (elementType == null) throw new Exception("panic");
+                var targetArray = Array.CreateInstance(elementType, targetList.Count);
+                targetList.CopyTo(targetArray, 0);
+                target = targetArray;
+            }
+
+            return (TTarget) target;
         }
 
         /// <summary>
@@ -310,41 +307,54 @@ namespace Umbraco.Core.Mapping
 
         private Func<object, MapperContext, object> GetCtor(Type sourceType, Type targetType)
         {
-            if (!_ctors.TryGetValue(sourceType, out var sourceCtor))
+            if (_ctors.TryGetValue(sourceType, out var sourceCtor) && sourceCtor.TryGetValue(targetType, out var ctor))
+                return ctor;
+
+            ctor = null;
+            foreach (var (stype, sctors) in _ctors)
             {
-                var type = _maps.Keys.FirstOrDefault(x => x.IsAssignableFrom(sourceType));
-                if (type == null)
-                    return null;
-                sourceCtor = _ctors[sourceType] = _ctors[type];
+                if (!stype.IsAssignableFrom(sourceType)) continue;
+                if (!sctors.TryGetValue(targetType, out ctor)) continue;
+
+                sourceCtor = sctors;
+                break;
             }
 
-            return sourceCtor.TryGetValue(targetType, out var ctor) ? ctor : null;
+            if (ctor == null) return null;
+
+            _ctors[sourceType] = sourceCtor;
+            return ctor;
         }
 
         private Action<object, object, MapperContext> GetMap(Type sourceType, Type targetType)
         {
-            if (!_maps.TryGetValue(sourceType, out var sourceMap))
+            if (_maps.TryGetValue(sourceType, out var sourceMap) && sourceMap.TryGetValue(targetType, out var map))
+                return map;
+
+            map = null;
+            foreach (var (stype, smap) in _maps)
             {
-                var type = _maps.Keys.FirstOrDefault(x => x.IsAssignableFrom(sourceType));
-                if (type == null)
-                    return null;
-                sourceMap = _maps[sourceType] = _maps[type];
+                if (!stype.IsAssignableFrom(sourceType)) continue;
+                if (!smap.TryGetValue(targetType, out map)) continue;
+
+                sourceMap = smap;
+                break;
             }
 
-            return sourceMap.TryGetValue(targetType, out var map) ? map : null;
+            if (map == null) return null;
+
+            _maps[sourceType] = sourceMap;
+            return map;
         }
 
-        private static bool IsGenericOrArray(Type type)
+        private static bool IsEnumerableOrArrayOfType(Type type)
         {
-            // note: we're not going to work with just plain enumerables of anything,
-            // only on arrays or anything that is generic and implements IEnumerable<>
-
             if (type.IsArray && type.GetArrayRank() == 1) return true;
             if (type.IsGenericType && type.GenericTypeArguments.Length == 1) return true;
             return false;
         }
 
-        private static Type GetGenericOrArrayArg(Type type)
+        private static Type GetEnumerableOrArrayTypeArgument(Type type)
         {
             if (type.IsArray) return type.GetElementType();
             if (type.IsGenericType) return type.GenericTypeArguments[0];
