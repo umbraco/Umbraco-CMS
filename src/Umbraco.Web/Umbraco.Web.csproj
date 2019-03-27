@@ -207,6 +207,9 @@
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
+    <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
+    <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
+    <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
@@ -215,6 +218,7 @@
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="UmbracoContextReference.cs" />
+    <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />

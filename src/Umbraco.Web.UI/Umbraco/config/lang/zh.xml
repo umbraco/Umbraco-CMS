@@ -55,9 +55,6 @@
     <key alias="domainExists">域名 '%0%' 已使用</key>
     <key alias="domainUpdated">域名 '%0%' 已更新</key>
     <key alias="orEdit">编辑当前域名</key>
-    <key alias="domainHelp"><![CDATA[例如：example.com、www.example.com、example.com:8080、<br/>
-        https://www.example.com/、example.com/en、……使用 * 代表任意域名，<br/>
-        只需要设置语言部分即可。]]></key>
     <key alias="inherit">继承</key>
     <key alias="setLanguage">语言</key>
     <key alias="setLanguageHelp"><![CDATA[为当前节点及子节点设置语言，<br />
