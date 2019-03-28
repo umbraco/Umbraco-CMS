@@ -124,7 +124,7 @@ namespace Umbraco.Tests.Services
             p3.SetValue("Hello", "en-US"); //ignored since this is variant
             var p4 = new Property(new PropertyType(dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
             p4.SetValue(null, null); //invalid
-
+             
             var content = Mock.Of<IContent>(
                 x => x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
