@@ -179,34 +179,26 @@ namespace Umbraco.Core.Models
             if (!content.ContentType.SupportsPropertyVariation(culture.Culture, "*", true))
                 throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
 
-            switch (culture.CultureBehavior)
-            {
-                case CultureType.Behavior.AllCultures:
+            if (culture.CultureBehavior.HasFlag(CultureType.Behavior.AllCultures))
+                foreach (var c in content.AvailableCultures)
                 {
-                    foreach (var c in content.AvailableCultures)
-                    {
-                        var name = content.GetCultureName(c);
-                        if (string.IsNullOrWhiteSpace(name))
-                            return false;
-                        content.SetPublishInfo(c, name, DateTime.Now);
-                    }
-                    break;
-                }
-                case CultureType.Behavior.InvariantCulture:
-                {
-                    if (string.IsNullOrWhiteSpace(content.Name))
-                        return false;
-                    // PublishName set by repository - nothing to do here
-                    break;
-                }
-                case CultureType.Behavior.ExplicitCulture:
-                {
-                    var name = content.GetCultureName(culture.Culture);
+                    var name = content.GetCultureName(c);
                     if (string.IsNullOrWhiteSpace(name))
                         return false;
-                    content.SetPublishInfo(culture.Culture, name, DateTime.Now);
-                    break;
+                    content.SetPublishInfo(c, name, DateTime.Now);
                 }
+            else if (culture.CultureBehavior.HasFlag(CultureType.Behavior.InvariantCulture))
+            {
+                if (string.IsNullOrWhiteSpace(content.Name))
+                    return false;
+                // PublishName set by repository - nothing to do here
+            }
+            else if (culture.CultureBehavior.HasFlag(CultureType.Behavior.ExplicitCulture))
+            {
+                var name = content.GetCultureName(culture.Culture);
+                if (string.IsNullOrWhiteSpace(name))
+                    return false;
+                content.SetPublishInfo(culture.Culture, name, DateTime.Now);
             }
 
             // property.PublishValues only publishes what is valid, variation-wise
