@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Xml;
@@ -11,11 +12,57 @@ using Umbraco.Core.Logging;
 
 namespace umbraco.presentation.preview
 {
-    //TODO : Migrate this to a new API!
+    public enum PreviewMode
+    {
+        Unknown = 0, // default value
+        Vintage,
+        SinglePreview
+    }
 
     public class PreviewContent
     {
-        // zb-00004 #29956 : refactor cookies names & handling
+        private static PreviewMode _previewMode;
+        private const PreviewMode DefaultPreviewMode = PreviewMode.SinglePreview;
+        private static int _singlePreviewCacheDurationSeconds = -1;
+        private const int DefaultSinglePreviewCacheDurationSeconds = 60;
+
+        public static PreviewMode PreviewMode
+        {
+            get
+            {
+                if (_previewMode != PreviewMode.Unknown)
+                    return _previewMode;
+
+                var appSettings = ConfigurationManager.AppSettings;
+                var setting = appSettings["Umbraco.Preview.Mode"];
+                if (setting.IsNullOrWhiteSpace())
+                    return _previewMode = DefaultPreviewMode;
+                if (Enum<PreviewMode>.TryParse(setting, false, out _previewMode))
+                    return _previewMode;
+                throw new ConfigurationErrorsException($"Failed to parse Umbraco.Preview.Mode appSetting, {setting} is not a valid value. "
+                    + "Valid values are: Vintage (default), SinglePreview.");
+            }
+        }
+
+        public static int SinglePreviewCacheDurationSeconds
+        {
+            get
+            {
+                if (_singlePreviewCacheDurationSeconds >= 0)
+                    return _singlePreviewCacheDurationSeconds;
+
+                var appSettings = ConfigurationManager.AppSettings;
+                var setting = appSettings["Umbraco.Preview.SinglePreview.CacheDurationSeconds"];
+                if (setting.IsNullOrWhiteSpace())
+                    return _singlePreviewCacheDurationSeconds = DefaultSinglePreviewCacheDurationSeconds;
+                if (int.TryParse(setting, out _singlePreviewCacheDurationSeconds))
+                    return _singlePreviewCacheDurationSeconds;
+                throw new ConfigurationErrorsException($"Failed to parse Umbraco.Preview.SinglePreview.CacheDurationSeconds appSetting, {setting} is not a valid value. "
+                    + "Valid values are positive integers.");
+            }
+        }
+
+        public static bool IsSinglePreview => PreviewMode == PreviewMode.SinglePreview;
 
         public XmlDocument XmlContent { get; set; }
         public Guid PreviewSet { get; set; }
@@ -35,6 +82,8 @@ namespace umbraco.presentation.preview
 
         public void EnsureInitialized(User user, string previewSet, bool validate, Action initialize)
         {
+            if (IsSinglePreview) return;
+
             lock (_initLock)
             {
                 if (_initialized) return;
@@ -53,17 +102,19 @@ namespace umbraco.presentation.preview
 
         public PreviewContent(Guid previewSet)
         {
-            ValidPreviewSet = UpdatePreviewPaths(previewSet, true);
+            ValidPreviewSet = IsSinglePreview || UpdatePreviewPaths(previewSet, true);
         }
         public PreviewContent(User user, Guid previewSet, bool validate)
         {
             _userId = user.Id;
-            ValidPreviewSet = UpdatePreviewPaths(previewSet, validate);
+            ValidPreviewSet = IsSinglePreview || UpdatePreviewPaths(previewSet, validate);
         }
 
 
         public void PrepareDocument(User user, Document documentObject, bool includeSubs)
         {
+            if (IsSinglePreview) return;
+
             _userId = user.Id;
 
             // clone xml
@@ -144,6 +195,8 @@ namespace umbraco.presentation.preview
         /// <returns></returns>
         public bool ValidatePreviewPath()
         {
+            if (IsSinglePreview) return true;
+
             if (!File.Exists(PreviewsetPath))
                 return false;
 
@@ -154,12 +207,21 @@ namespace umbraco.presentation.preview
 
         public void LoadPreviewset()
         {
-            XmlContent = new XmlDocument();
-            XmlContent.Load(PreviewsetPath);
+            if (IsSinglePreview)
+            {
+                XmlContent = content.Instance.PreviewXmlContent;
+            }
+            else
+            {
+                XmlContent = new XmlDocument();
+                XmlContent.Load(PreviewsetPath);
+            }
         }
 
         public void SavePreviewSet()
         {
+            if (IsSinglePreview) return;
+
             //make sure the preview folder exists first
             var dir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Preview));
             if (!dir.Exists)
@@ -211,7 +273,7 @@ namespace umbraco.presentation.preview
         public static void ClearPreviewCookie()
         {
             // zb-00004 #29956 : refactor cookies names & handling
-            if (UmbracoContext.Current.UmbracoUser != null)
+            if (!IsSinglePreview && UmbracoContext.Current.UmbracoUser != null)
             {
                 if (StateHelper.Cookies.Preview.HasValue)
                 {
