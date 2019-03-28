@@ -53,7 +53,7 @@ namespace Umbraco.Web.Models.Mapping
             _contentVariantMapper = new ContentVariantMapper(_localizationService);
         }
 
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
             mapper.Define<IContent, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);

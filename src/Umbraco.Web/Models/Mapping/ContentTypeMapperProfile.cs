@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
             _logger = logger;
         }
 
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<DocumentTypeSave, IContentType>((source, context) => new ContentType(source.ParentId), Map);
             mapper.Define<MediaTypeSave, IMediaType>((source, context) => new MediaType(source.ParentId), Map);

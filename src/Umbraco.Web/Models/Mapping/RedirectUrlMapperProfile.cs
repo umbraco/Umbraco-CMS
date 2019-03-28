@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models.Mapping
 
         private UmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
 
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<IRedirectUrl, ContentRedirectUrl>((source, context) => new ContentRedirectUrl(), Map);
         }

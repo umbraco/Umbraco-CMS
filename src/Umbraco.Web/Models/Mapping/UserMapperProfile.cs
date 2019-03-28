@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             _globalSettings = globalSettings;
         }
 
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<UserGroupSave, IUserGroup>((source, context) => new UserGroup { CreateDate = DateTime.UtcNow }, Map);
             mapper.Define<UserInvite, IUser>(Map);

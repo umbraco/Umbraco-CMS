@@ -6,7 +6,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class TemplateMapperProfile : IMapperProfile
     {
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<ITemplate, TemplateDisplay>((source, context) => new TemplateDisplay(), Map);
             mapper.Define<TemplateDisplay, Template>((source, context) => new Template(source.Name, source.Alias), Map);

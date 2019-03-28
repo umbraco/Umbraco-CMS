@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Mapping
 
         private class Profile1 : IMapperProfile
         {
-            public void SetMaps(Mapper mapper)
+            public void DefineMaps(Mapper mapper)
             {
                 mapper.Define<Thing1, Thing2>((source, context) => new Thing2(), Map);
             }

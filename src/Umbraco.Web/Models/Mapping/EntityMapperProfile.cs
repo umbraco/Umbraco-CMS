@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class EntityMapperProfile : IMapperProfile
     {
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<IEntitySlim, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<PropertyType, EntityBasic>((source, context) => new EntityBasic(), Map);

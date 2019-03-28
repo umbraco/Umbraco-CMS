@@ -30,7 +30,7 @@ namespace Umbraco.Web.Models.Mapping
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMember>(localizedTextService);
         }
 
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<MembershipUser, MemberDisplay>((source, context) => new MemberDisplay(), Map);
             mapper.Define<MembershipUser, IMember>((source, context) => MemberService.CreateGenericMembershipProviderMember(source.UserName, source.Email, source.UserName, ""), Map);

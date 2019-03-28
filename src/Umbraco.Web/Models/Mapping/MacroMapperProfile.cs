@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models.Mapping
             _logger = logger;
         }
 
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<IMacro, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IMacro, IEnumerable<MacroParameter>>((source, context) => source.Properties.Values.Select(context.Mapper.Map<MacroParameter>).ToList());

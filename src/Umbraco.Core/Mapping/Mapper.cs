@@ -26,7 +26,7 @@ namespace Umbraco.Core.Mapping
         public Mapper(MapperProfileCollection profiles)
         {
             foreach (var profile in profiles)
-                profile.SetMaps(this);
+                profile.DefineMaps(this);
         }
 
         #region Define

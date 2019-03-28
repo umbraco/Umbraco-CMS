@@ -5,7 +5,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class TagMapperProfile : IMapperProfile
     {
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<ITag, TagModel>((source, context) => new TagModel(), Map);
         }

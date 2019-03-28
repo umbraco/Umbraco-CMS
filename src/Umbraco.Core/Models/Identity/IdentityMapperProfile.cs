@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models.Identity
             _globalSettings = globalSettings;
         }
 
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>

@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
             _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(dataTypeService, textService, logger, propertyEditors);
         }
 
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<PropertyGroup, Tab<ContentPropertyDisplay>>((source, context) => new Tab<ContentPropertyDisplay>(), Map);
             mapper.Define<Property, ContentPropertyBasic>((source, context) => new ContentPropertyBasic(), Map);

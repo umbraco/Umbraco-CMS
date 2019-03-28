@@ -6,7 +6,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class AuditMapperProfile : IMapperProfile
     {
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<IAuditItem, AuditLog>((source, context) => new AuditLog(), Map);
         }

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Mapping
 {
-    public class MapperProfileCollectionBuilder : OrderedCollectionBuilderBase<MapperProfileCollectionBuilder, MapperProfileCollection, IMapperProfile>
+    public class MapperProfileCollectionBuilder : SetCollectionBuilderBase<MapperProfileCollectionBuilder, MapperProfileCollection, IMapperProfile>
     {
         protected override MapperProfileCollectionBuilder This => this;
 

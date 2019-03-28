@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class LanguageMapperProfile : IMapperProfile
     {
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<ILanguage, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<ILanguage, Language>((source, context) => new Language(), Map);

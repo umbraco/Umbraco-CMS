@@ -7,7 +7,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     public class CodeFileMapperProfile : IMapperProfile
     {
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<Stylesheet, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IPartialView, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);

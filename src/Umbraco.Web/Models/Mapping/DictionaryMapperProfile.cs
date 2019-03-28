@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.Mapping
             _localizationService = localizationService;
         }
 
-        public void SetMaps(Mapper mapper)
+        public void DefineMaps(Mapper mapper)
         {
             mapper.Define<IDictionaryItem, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IDictionaryItem, DictionaryDisplay>((source, context) => new DictionaryDisplay(), Map);
