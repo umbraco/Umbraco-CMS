@@ -54,8 +54,8 @@
                             <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%;" placeholder="Search logs&hellip;" />
 
                             <!-- Save Search & Clear Search icon buttons -->
-                            <ins class="icon-rate" ng-if="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 160px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
-                            <ins class="icon-wrong" ng-if="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 140px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
+                            <ins class="icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="position: absolute; top: 0; line-height: 32px; right: 20px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
+                            <ins class="icon-wrong" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="position: absolute; top: 0; line-height: 32px; right: 0px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
 
                             <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top:0;">
                                 <span class="ng-binding">Example Searches</span>
