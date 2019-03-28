@@ -24,7 +24,8 @@
                             <umb-permission ng-repeat="option in vm.notifyOptions"
                                             name="option.name"
                                             description="option.description"
-                                            selected="option.checked">
+                                            selected="option.checked"
+                                            on-change="vm.notificationChanged()">
                             </umb-permission>
                         </umb-control-group>
                     </div>
@@ -42,7 +43,8 @@
                     type="button"
                     action="vm.save(vm.notifyOptions)"
                     state="vm.saveState"
-                    button-style="action">
+                    button-style="success"
+                    disabled="!vm.canSave">
         </umb-button>
     </div>
 </div>

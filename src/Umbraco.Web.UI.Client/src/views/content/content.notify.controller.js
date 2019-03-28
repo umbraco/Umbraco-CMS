@@ -3,13 +3,12 @@
         $scope,
         contentResource,
         navigationService,
-        angularHelper,
         localizationService) {
         var vm = this;
-        var currentForm;
         vm.notifyOptions = [];
         vm.save = save;
         vm.cancel = cancel;
+        vm.notificationChanged = notificationChanged;
         vm.message = {
             name: $scope.currentNode.name
         };
@@ -17,7 +16,6 @@
         function onInit() {
             vm.loading = true;
             contentResource.getNotifySettingsById($scope.currentNode.id).then(function (options) {
-                currentForm = angularHelper.getCurrentForm($scope);
                 vm.loading = false;
                 vm.notifyOptions = options;
             });
@@ -46,6 +44,9 @@
                 vm.saveState = "error";
                 vm.saveError = error;
             });
+        }
+        function notificationChanged() {
+            vm.canSave = true;
         }
         onInit();
     }
