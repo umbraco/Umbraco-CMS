@@ -882,7 +882,7 @@ namespace Umbraco.Core.Services.Implement
                 // if culture is '*', then publish them all (including variants)
 
                 //this will create the correct culture type even if culture is * or null
-                var cultureType = CultureType.Single(culture, _languageRepository.IsDefault(culture));
+                var cultureType = CultureType.Create(content, culture, _languageRepository.IsDefault(culture));
 
                 // publish the culture(s)
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -919,9 +919,10 @@ namespace Umbraco.Core.Services.Implement
                         : new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
                 }
 
-                //fixme: Shouldn't we makes ure that all string cultures here are valid? i.e. no * or null is allowed when using this method
+                if (cultures.Any(x => x == null || x == "*"))
+                    throw new InvalidOperationException("Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
 
-                var cultureTypes = cultures.Select(x => CultureType.Single(x, _languageRepository.IsDefault(x)));
+                var cultureTypes = cultures.Select(x => CultureType.Explicit(x, _languageRepository.IsDefault(x)));
 
                 // publish the culture(s)
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1307,7 +1308,7 @@ namespace Umbraco.Core.Services.Implement
 
                             //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                             Property[] invalidProperties = null;
-                            var cultureType = CultureType.Single(culture, _languageRepository.IsDefault(culture));
+                            var cultureType = CultureType.Explicit(culture, _languageRepository.IsDefault(culture));
                             var tryPublish = d.PublishCulture(cultureType) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, cultureType);
                             if (invalidProperties != null && invalidProperties.Length > 0)
                                 Logger.Warn<ContentService>("Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
@@ -1408,7 +1409,7 @@ namespace Umbraco.Core.Services.Implement
             {                
                 return culturesToPublish.All(culture =>
                 {
-                    var cultureType = CultureType.Single(culture, _languageRepository.IsDefault(culture));
+                    var cultureType = CultureType.Explicit(culture, _languageRepository.IsDefault(culture));
                     return content.PublishCulture(cultureType) && _propertyValidationService.Value.IsPropertyDataValid(content, out _, cultureType);
                 });
             }
@@ -2486,15 +2487,17 @@ namespace Umbraco.Core.Services.Implement
 
             var variesByCulture = content.ContentType.VariesByCulture();
 
-            var cultureTypesToPublish = culturesPublishing.ToDictionary(x => x, x => CultureType.Single(x, _languageRepository.IsDefault(x)));
+            var cultureTypesToPublish = culturesPublishing == null
+                ? new[] {CultureType.Invariant} //if it's null it's invariant
+                : culturesPublishing.Select(x => CultureType.Explicit(x, _languageRepository.IsDefault(x))).ToArray();
 
             // publish the culture(s)
-            if (!cultureTypesToPublish.All(x => content.PublishCulture(x.Value)))
+            if (!cultureTypesToPublish.All(content.PublishCulture))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
             //validate the property values
             Property[] invalidProperties = null;
-            if (!cultureTypesToPublish.All(x => _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x.Value)))
+            if (!cultureTypesToPublish.All(x => _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x)))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
                 {
                     InvalidProperties = invalidProperties
@@ -2504,6 +2507,8 @@ namespace Umbraco.Core.Services.Implement
             // be changed to Unpublished and any culture currently published will not be visible.
             if (variesByCulture)
             {
+                //fixme: culturesPublishing can be null here, it shouldn't be at this point since that would indicate its invariant but we should check
+
                 if (content.Published && culturesPublishing.Count == 0 && culturesUnpublishing.Count == 0) // no published cultures = cannot be published
                     return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
 

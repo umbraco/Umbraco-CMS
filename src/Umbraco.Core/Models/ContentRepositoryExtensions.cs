@@ -179,11 +179,9 @@ namespace Umbraco.Core.Models
             if (!content.ContentType.SupportsPropertyVariation(culture.Culture, "*", true))
                 throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
 
-            var alsoInvariant = false;
-
             switch (culture.CultureBehavior)
             {
-                case CultureType.Behavior.All:
+                case CultureType.Behavior.AllCultures:
                 {
                     foreach (var c in content.AvailableCultures)
                     {
@@ -194,31 +192,28 @@ namespace Umbraco.Core.Models
                     }
                     break;
                 }
-                case CultureType.Behavior.Invariant:
+                case CultureType.Behavior.InvariantCulture:
                 {
                     if (string.IsNullOrWhiteSpace(content.Name))
                         return false;
                     // PublishName set by repository - nothing to do here
                     break;
                 }
-                case var behavior when behavior.HasFlag(CultureType.Behavior.Explicit):
+                case CultureType.Behavior.ExplicitCulture:
                 {
                     var name = content.GetCultureName(culture.Culture);
                     if (string.IsNullOrWhiteSpace(name))
                         return false;
                     content.SetPublishInfo(culture.Culture, name, DateTime.Now);
-                    alsoInvariant = behavior.HasFlag(CultureType.Behavior.Invariant); // we also want to publish invariant values
                     break;
                 }
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
 
             // property.PublishValues only publishes what is valid, variation-wise
             foreach (var property in content.Properties)
             {
                 property.PublishValues(culture.Culture);
-                if (alsoInvariant)
+                if (culture.CultureBehavior.HasFlag(CultureType.Behavior.InvariantProperties))
                     property.PublishValues(null);
             }
 

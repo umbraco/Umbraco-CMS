@@ -305,9 +305,9 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
-            Assert.IsFalse(content.PublishCulture(CultureType.Single(langFr, false))); // no name
+            Assert.IsFalse(content.PublishCulture(CultureType.Explicit(langFr, false))); // no name
             content.SetCultureName("name-fr", langFr);
-            Assert.IsTrue(content.PublishCulture(CultureType.Single(langFr, false)));
+            Assert.IsTrue(content.PublishCulture(CultureType.Explicit(langFr, false)));
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Models
             content.UnpublishCulture(langFr);
             Assert.AreEqual("c", content.GetValue("prop", langFr));
             Assert.IsNull(content.GetValue("prop", langFr, published: true));
-            Assert.IsTrue(content.PublishCulture(CultureType.Single(langFr, false)));
+            Assert.IsTrue(content.PublishCulture(CultureType.Explicit(langFr, false)));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
             Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
 
@@ -385,7 +385,7 @@ namespace Umbraco.Tests.Models
             content.SetCultureName("hello", langFr);
 
             //for this test we'll make the french culture the default one - this is needed for publishing invariant property values
-            var langFrCultureType = CultureType.Single(langFr, true);
+            var langFrCultureType = CultureType.Explicit(langFr, true);
 
             Assert.IsTrue(content.PublishCulture(langFrCultureType)); // succeeds because names are ok (not validating properties here)
             Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFrCultureType));// fails because prop1 is mandatory
@@ -428,12 +428,12 @@ namespace Umbraco.Tests.Models
             content.SetValue("prop", "a-es", langEs);
 
             // cannot publish without a name
-            Assert.IsFalse(content.PublishCulture(CultureType.Single(langFr, false)));
+            Assert.IsFalse(content.PublishCulture(CultureType.Explicit(langFr, false)));
 
             // works with a name
             // and then FR is available, and published
             content.SetCultureName("name-fr", langFr);
-            Assert.IsTrue(content.PublishCulture(CultureType.Single(langFr, false)));
+            Assert.IsTrue(content.PublishCulture(CultureType.Explicit(langFr, false)));
 
             // now UK is available too
             content.SetCultureName("name-uk", langUk);

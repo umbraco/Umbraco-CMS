@@ -42,34 +42,25 @@ namespace Umbraco.Core.Services
 
                 var propertyTypeVaries = x.PropertyType.VariesByCulture();
 
-                switch (culture.CultureBehavior)
-                {
-                    case CultureType.Behavior.Invariant:
-                        return !(propertyTypeVaries || IsPropertyValid(x, null)); // validate invariant property, invariant culture
-                    case CultureType.Behavior.All:
-                        return !IsPropertyValid(x, culture.Culture); // validate property, all cultures
-                    case var behavior when behavior.HasFlag(CultureType.Behavior.Explicit):
-                        if (propertyTypeVaries)
-                        {
-                            return !IsPropertyValid(x, culture.Culture); // validate variant property, explicit culture
-                        }
-                        else
-                        {
-                            //We only want to validate the invariant property against an explicit culture if:
-                            // * The culture is the default (which means it will have the Behavior.Invariant flag) OR
-                            // * The content item isn't published
+                if (culture.CultureBehavior.HasFlag(CultureType.Behavior.InvariantCulture))
+                    return !(propertyTypeVaries || IsPropertyValid(x, null)); // validate invariant property, invariant culture
 
-                            //This is because an invariant property is only edited on the default culture, but if the
-                            //content item isn't published, we can't allow publishing of the specific non default culture
-                            //if the invariant property data is invalid.
+                if (culture.CultureBehavior.HasFlag(CultureType.Behavior.AllCultures))
+                    return !IsPropertyValid(x, culture.Culture); // validate property, all cultures
 
-                            return (behavior.HasFlag(CultureType.Behavior.Invariant) || !content.Published)
-                                   && !IsPropertyValid(x, null); // validate invariant property, explicit culture
-                        }
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                
+                //we're dealing with Behavior.Explicit now...
+
+                if (propertyTypeVaries)
+                    return !IsPropertyValid(x, culture.Culture); // validate variant property, explicit culture
+
+                //Validate invariant properties on the default language (will have the Behavior.InvariantProperties)
+                // or if there is no published version of the content, in which case it doesn't matter which culture is publishing
+
+                var shouldValidate = culture.CultureBehavior.HasFlag(CultureType.Behavior.InvariantProperties) //default language
+                                     || !content.Published; //non-default language but no published version
+
+                return shouldValidate && !IsPropertyValid(x, null); // validate invariant property, explicit culture
+
             }).ToArray();
 
             return invalidProperties.Length == 0;
