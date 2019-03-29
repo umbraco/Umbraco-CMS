@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -8,16 +9,13 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(UmbracoDomain))]
     public sealed class DomainMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        public DomainMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
         {
-            CacheMap<UmbracoDomain, DomainDto>(src => src.Id, dto => dto.Id);
-            CacheMap<UmbracoDomain, DomainDto>(src => src.RootContentId, dto => dto.RootStructureId);
-            CacheMap<UmbracoDomain, DomainDto>(src => src.LanguageId, dto => dto.DefaultLanguage);
-            CacheMap<UmbracoDomain, DomainDto>(src => src.DomainName, dto => dto.DomainName);
+            DefineMap<UmbracoDomain, DomainDto>(nameof(UmbracoDomain.Id), nameof(DomainDto.Id));
+            DefineMap<UmbracoDomain, DomainDto>(nameof(UmbracoDomain.RootContentId), nameof(DomainDto.RootStructureId));
+            DefineMap<UmbracoDomain, DomainDto>(nameof(UmbracoDomain.LanguageId), nameof(DomainDto.DefaultLanguage));
+            DefineMap<UmbracoDomain, DomainDto>(nameof(UmbracoDomain.DomainName), nameof(DomainDto.DomainName));
         }
     }
 }

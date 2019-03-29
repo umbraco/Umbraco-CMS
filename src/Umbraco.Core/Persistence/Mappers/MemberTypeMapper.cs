@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -12,31 +13,26 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof (IMemberType))]
     public sealed class MemberTypeMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        public MemberTypeMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
         {
-            if (PropertyInfoCache.IsEmpty == false) return;
-
-            CacheMap<MemberType, NodeDto>(src => src.Id, dto => dto.NodeId);
-            CacheMap<MemberType, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
-            CacheMap<MemberType, NodeDto>(src => src.Level, dto => dto.Level);
-            CacheMap<MemberType, NodeDto>(src => src.ParentId, dto => dto.ParentId);
-            CacheMap<MemberType, NodeDto>(src => src.Path, dto => dto.Path);
-            CacheMap<MemberType, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
-            CacheMap<MemberType, NodeDto>(src => src.Name, dto => dto.Text);
-            CacheMap<MemberType, NodeDto>(src => src.Trashed, dto => dto.Trashed);
-            CacheMap<MemberType, NodeDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<MemberType, NodeDto>(src => src.CreatorId, dto => dto.UserId);
-            CacheMap<MemberType, ContentTypeDto>(src => src.Alias, dto => dto.Alias);
-            CacheMap<MemberType, ContentTypeDto>(src => src.AllowedAsRoot, dto => dto.AllowAtRoot);
-            CacheMap<MemberType, ContentTypeDto>(src => src.Description, dto => dto.Description);
-            CacheMap<MemberType, ContentTypeDto>(src => src.Icon, dto => dto.Icon);
-            CacheMap<MemberType, ContentTypeDto>(src => src.IsContainer, dto => dto.IsContainer);
-            CacheMap<MemberType, ContentTypeDto>(src => src.IsElement, dto => dto.IsElement);
-            CacheMap<MemberType, ContentTypeDto>(src => src.Thumbnail, dto => dto.Thumbnail);
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.Id), nameof(NodeDto.NodeId));
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.CreateDate), nameof(NodeDto.CreateDate));
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.Level), nameof(NodeDto.Level));
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.ParentId), nameof(NodeDto.ParentId));
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.Path), nameof(NodeDto.Path));
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.SortOrder), nameof(NodeDto.SortOrder));
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.Name), nameof(NodeDto.Text));
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.Trashed), nameof(NodeDto.Trashed));
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.Key), nameof(NodeDto.UniqueId));
+            DefineMap<MemberType, NodeDto>(nameof(MemberType.CreatorId), nameof(NodeDto.UserId));
+            DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.Alias), nameof(ContentTypeDto.Alias));
+            DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.AllowedAsRoot), nameof(ContentTypeDto.AllowAtRoot));
+            DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.Description), nameof(ContentTypeDto.Description));
+            DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.Icon), nameof(ContentTypeDto.Icon));
+            DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.IsContainer), nameof(ContentTypeDto.IsContainer));
+            DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.IsElement), nameof(ContentTypeDto.IsElement));
+            DefineMap<MemberType, ContentTypeDto>(nameof(MemberType.Thumbnail), nameof(ContentTypeDto.Thumbnail));
         }
     }
 }

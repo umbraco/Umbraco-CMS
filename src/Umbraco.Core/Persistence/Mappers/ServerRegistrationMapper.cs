@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -8,19 +9,16 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IServerRegistration))]
     internal sealed class ServerRegistrationMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        public ServerRegistrationMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
         {
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.Id, dto => dto.Id);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.IsActive, dto => dto.IsActive);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.IsMaster, dto => dto.IsMaster);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerAddress, dto => dto.ServerAddress);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.CreateDate, dto => dto.DateRegistered);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.UpdateDate, dto => dto.DateAccessed);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerIdentity, dto => dto.ServerIdentity);
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.Id), nameof(ServerRegistrationDto.Id));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.IsActive), nameof(ServerRegistrationDto.IsActive));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.IsMaster), nameof(ServerRegistrationDto.IsMaster));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.ServerAddress), nameof(ServerRegistrationDto.ServerAddress));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.CreateDate), nameof(ServerRegistrationDto.DateRegistered));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.UpdateDate), nameof(ServerRegistrationDto.DateAccessed));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.ServerIdentity), nameof(ServerRegistrationDto.ServerIdentity));
         }
     }
 }

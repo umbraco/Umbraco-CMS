@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
-using System.Reflection;
 using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Composing;
@@ -10,22 +8,38 @@ namespace Umbraco.Core.Persistence.Mappers
 {
     public abstract class BaseMapper : IDiscoverable
     {
-        protected BaseMapper()
+        private readonly ISqlSyntaxProvider _sqlSyntax;
+        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _maps;
+
+        protected BaseMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
         {
-            Build();
+            _sqlSyntax = sqlContext.SqlSyntax;
+            _maps = maps;
         }
 
-        internal abstract ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache { get; }
-
-        private void Build()
+        internal string Map(string propertyName, bool throws = false)
         {
-            BuildMap();
+            if (!_maps.TryGetValue(GetType(), out var mapperMaps))
+                throw new InvalidOperationException($"No maps defined for mapper {GetType().FullName}.");
+            if (!mapperMaps.TryGetValue(propertyName, out var mappedName))
+                throw new InvalidOperationException($"No map defined by mapper {GetType().FullName} for property {propertyName}.");
+            return mappedName;
         }
 
-        protected abstract void BuildMap();
-
+        // fixme kill
+        /*
         internal string Map(ISqlSyntaxProvider sqlSyntax, string propertyName, bool throws = false)
         {
+            // fixme mapping a string to a string - should be a dictionary!
+            // and then why have the other dictionary? should BuildMap(syntax) => directly build the correct string
+
+            /-*
+            var propertyInfo = PropertyInfoCache[propertyName].PropertyInfo; // fixme - tryGet
+            var tableName = propertyInfo.DeclaringType.FirstAttribute<TableNameAttribute>().Value;
+            var columnName = propertyInfo.FirstAttribute<ColumnAttribute>().Name;
+            var mapped = sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(columnName);
+            *-/
+
             if (PropertyInfoCache.TryGetValue(propertyName, out var dtoTypeProperty))
                 return GetColumnName(sqlSyntax, dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
 
@@ -40,8 +54,36 @@ namespace Umbraco.Core.Persistence.Mappers
             var property = ResolveMapping(sourceMember, destinationMember);
             PropertyInfoCache.AddOrUpdate(property.SourcePropertyName, property, (x, y) => property);
         }
+        */
 
-        internal DtoMapModel ResolveMapping<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
+        //protected void DefineMap<TSource, TTarget>(string sourceName, Expression<Func<TTarget, object>> targetMember)
+        protected void DefineMap<TSource, TTarget>(string sourceName, string targetName)
+        {
+            var sourceType = typeof(TSource);
+            var targetType = typeof(TTarget);
+
+            // TODO ensure that sourceName is a valid sourceType property (but, slow?)
+
+            var tableNameAttribute = targetType.FirstAttribute<TableNameAttribute>();
+            if (tableNameAttribute == null) throw new InvalidOperationException($"Type {targetType.FullName} is not marked with a TableName attribute.");
+            var tableName = tableNameAttribute.Value;
+
+            // TODO maybe get all properties once and then index them
+            var targetProperty = targetType.GetProperty(targetName);
+            if (targetProperty == null) throw new InvalidOperationException($"Type {targetType.FullName} does not have a property named {targetName}.");
+            var columnAttribute = targetProperty.FirstAttribute<ColumnAttribute>();
+            if (columnAttribute == null) throw new InvalidOperationException($"Property {targetType.FullName}.{targetName} is not marked with a Column attribute.");
+
+            var columnName = columnAttribute.Name;
+            var columnMap = _sqlSyntax.GetQuotedTableName(tableName) + "." + _sqlSyntax.GetQuotedColumnName(columnName);
+
+            var mapperMaps = _maps.GetOrAdd(GetType(), type => new ConcurrentDictionary<string, string>());
+            mapperMaps[sourceName] = columnMap;
+        }
+
+        // fixme kill
+        /*
+        private static DtoMapModel ResolveMapping<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
         {
             var source = ExpressionHelper.FindProperty(sourceMember);
             var destination = (PropertyInfo) ExpressionHelper.FindProperty(destinationMember).Item1;
@@ -54,7 +96,7 @@ namespace Umbraco.Core.Persistence.Mappers
             return new DtoMapModel(typeof(TDestination), destination, source.Item1.Name);
         }
 
-        internal virtual string GetColumnName(ISqlSyntaxProvider sqlSyntax, Type dtoType, PropertyInfo dtoProperty)
+        private static string GetColumnName(ISqlSyntaxProvider sqlSyntax, Type dtoType, PropertyInfo dtoProperty)
         {
             var tableNameAttribute = dtoType.FirstAttribute<TableNameAttribute>();
             var tableName = tableNameAttribute.Value;
@@ -65,5 +107,6 @@ namespace Umbraco.Core.Persistence.Mappers
             var columnMap = sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(columnName);
             return columnMap;
         }
+        */
     }
 }

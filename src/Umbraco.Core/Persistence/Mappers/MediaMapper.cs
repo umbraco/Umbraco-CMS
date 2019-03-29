@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -12,29 +13,24 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Umbraco.Core.Models.Media))]
     public sealed class MediaMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        public MediaMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
         {
-            if (PropertyInfoCache.IsEmpty == false) return;
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Id), nameof(NodeDto.NodeId));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Key), nameof(NodeDto.UniqueId));
 
-            CacheMap<Models.Media, NodeDto>(src => src.Id, dto => dto.NodeId);
-            CacheMap<Models.Media, NodeDto>(src => src.Key, dto => dto.UniqueId);
+            DefineMap<Content, ContentVersionDto>(nameof(Content.VersionId), nameof(ContentVersionDto.Id));
 
-            CacheMap<Content, ContentVersionDto>(src => src.VersionId, dto => dto.Id);
-
-            CacheMap<Models.Media, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
-            CacheMap<Models.Media, NodeDto>(src => src.Level, dto => dto.Level);
-            CacheMap<Models.Media, NodeDto>(src => src.ParentId, dto => dto.ParentId);
-            CacheMap<Models.Media, NodeDto>(src => src.Path, dto => dto.Path);
-            CacheMap<Models.Media, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
-            CacheMap<Models.Media, NodeDto>(src => src.Name, dto => dto.Text);
-            CacheMap<Models.Media, NodeDto>(src => src.Trashed, dto => dto.Trashed);
-            CacheMap<Models.Media, NodeDto>(src => src.CreatorId, dto => dto.UserId);
-            CacheMap<Models.Media, ContentDto>(src => src.ContentTypeId, dto => dto.ContentTypeId);
-            CacheMap<Models.Media, ContentVersionDto>(src => src.UpdateDate, dto => dto.VersionDate);
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.CreateDate), nameof(NodeDto.CreateDate));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Level), nameof(NodeDto.Level));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.ParentId), nameof(NodeDto.ParentId));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Path), nameof(NodeDto.Path));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.SortOrder), nameof(NodeDto.SortOrder));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Name), nameof(NodeDto.Text));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Trashed), nameof(NodeDto.Trashed));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.CreatorId), nameof(NodeDto.UserId));
+            DefineMap<Models.Media, ContentDto>(nameof(Models.Media.ContentTypeId), nameof(ContentDto.ContentTypeId));
+            DefineMap<Models.Media, ContentVersionDto>(nameof(Models.Media.UpdateDate), nameof(ContentVersionDto.VersionDate));
         }
     }
 }

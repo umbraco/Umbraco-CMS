@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -8,17 +9,14 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof (MemberGroup))]
     public sealed class MemberGroupMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        public MemberGroupMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
         {
-            CacheMap<MemberGroup, NodeDto>(src => src.Id, dto => dto.NodeId);
-            CacheMap<MemberGroup, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
-            CacheMap<MemberGroup, NodeDto>(src => src.CreatorId, dto => dto.UserId);
-            CacheMap<MemberGroup, NodeDto>(src => src.Name, dto => dto.Text);
-            CacheMap<MemberGroup, NodeDto>(src => src.Key, dto => dto.UniqueId);
+            DefineMap<MemberGroup, NodeDto>(nameof(MemberGroup.Id), nameof(NodeDto.NodeId));
+            DefineMap<MemberGroup, NodeDto>(nameof(MemberGroup.CreateDate), nameof(NodeDto.CreateDate));
+            DefineMap<MemberGroup, NodeDto>(nameof(MemberGroup.CreatorId), nameof(NodeDto.UserId));
+            DefineMap<MemberGroup, NodeDto>(nameof(MemberGroup.Name), nameof(NodeDto.Text));
+            DefineMap<MemberGroup, NodeDto>(nameof(MemberGroup.Key), nameof(NodeDto.UniqueId));
         }
     }
 }

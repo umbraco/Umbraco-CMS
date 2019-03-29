@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
@@ -123,7 +125,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             var mappers = new MapperCollection(new []
             {
-                new UserMapper()
+                new UserMapper(Current.SqlContext, new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>())
             });
 
             Mock.Get(Current.SqlContext)

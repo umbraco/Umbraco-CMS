@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -11,25 +12,20 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(PropertyType))]
     public sealed class PropertyTypeMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        public PropertyTypeMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
         {
-            if (PropertyInfoCache.IsEmpty == false) return;
-
-            CacheMap<PropertyType, PropertyTypeDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<PropertyType, PropertyTypeDto>(src => src.Id, dto => dto.Id);
-            CacheMap<PropertyType, PropertyTypeDto>(src => src.Alias, dto => dto.Alias);
-            CacheMap<PropertyType, PropertyTypeDto>(src => src.DataTypeId, dto => dto.DataTypeId);
-            CacheMap<PropertyType, PropertyTypeDto>(src => src.Description, dto => dto.Description);
-            CacheMap<PropertyType, PropertyTypeDto>(src => src.Mandatory, dto => dto.Mandatory);
-            CacheMap<PropertyType, PropertyTypeDto>(src => src.Name, dto => dto.Name);
-            CacheMap<PropertyType, PropertyTypeDto>(src => src.SortOrder, dto => dto.SortOrder);
-            CacheMap<PropertyType, PropertyTypeDto>(src => src.ValidationRegExp, dto => dto.ValidationRegExp);
-            CacheMap<PropertyType, DataTypeDto>(src => src.PropertyEditorAlias, dto => dto.EditorAlias);
-            CacheMap<PropertyType, DataTypeDto>(src => src.ValueStorageType, dto => dto.DbType);
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Key), nameof(PropertyTypeDto.UniqueId));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Id), nameof(PropertyTypeDto.Id));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Alias), nameof(PropertyTypeDto.Alias));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.DataTypeId), nameof(PropertyTypeDto.DataTypeId));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Description), nameof(PropertyTypeDto.Description));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Mandatory), nameof(PropertyTypeDto.Mandatory));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Name), nameof(PropertyTypeDto.Name));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.SortOrder), nameof(PropertyTypeDto.SortOrder));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExp), nameof(PropertyTypeDto.ValidationRegExp));
+            DefineMap<PropertyType, DataTypeDto>(nameof(PropertyType.PropertyEditorAlias), nameof(DataTypeDto.EditorAlias));
+            DefineMap<PropertyType, DataTypeDto>(nameof(PropertyType.ValueStorageType), nameof(DataTypeDto.DbType));
         }
     }
 }

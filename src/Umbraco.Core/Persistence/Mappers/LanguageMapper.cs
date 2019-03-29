@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -12,15 +13,12 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Language))]
     public sealed class LanguageMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        public LanguageMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
         {
-            CacheMap<Language, LanguageDto>(src => src.Id, dto => dto.Id);
-            CacheMap<Language, LanguageDto>(src => src.IsoCode, dto => dto.IsoCode);
-            CacheMap<Language, LanguageDto>(src => src.CultureName, dto => dto.CultureName);
+            DefineMap<Language, LanguageDto>(nameof(Language.Id), nameof(LanguageDto.Id));
+            DefineMap<Language, LanguageDto>(nameof(Language.IsoCode), nameof(LanguageDto.IsoCode));
+            DefineMap<Language, LanguageDto>(nameof(Language.CultureName), nameof(LanguageDto.CultureName));
         }
     }
 }
