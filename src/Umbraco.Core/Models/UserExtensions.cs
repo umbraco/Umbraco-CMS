@@ -156,7 +156,7 @@ namespace Umbraco.Core.Models
 
         internal static bool HasContentBinAccess(this IUser user, IEntityService entityService)
         {
-            return ContentPermissionsHelper.HasPathAccess(Constants.System.RecycleBinContent.ToInvariantString(), user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
+            return ContentPermissionsHelper.HasPathAccess(Constants.System.RecycleBinContentString, user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
 
         internal static bool HasMediaRootAccess(this IUser user, IEntityService entityService)
