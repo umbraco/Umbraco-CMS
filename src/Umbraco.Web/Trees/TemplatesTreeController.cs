@@ -44,7 +44,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            var found = id == Constants.System.Root.ToInvariantString()
+            var found = id == Constants.System.RootString
                 ? Services.FileService.GetTemplates(-1)
                 : Services.FileService.GetTemplates(int.Parse(id));
 
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Trees
             var item = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
             item.NavigateToRoute($"{queryStrings.GetRequiredValue<string>("application")}/templates/edit/{id}?create=true");
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 //refresh action
                 menu.Items.Add(new RefreshNode(Services.TextService, true));

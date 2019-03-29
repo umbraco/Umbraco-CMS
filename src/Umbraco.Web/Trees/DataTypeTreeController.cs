@@ -96,7 +96,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
