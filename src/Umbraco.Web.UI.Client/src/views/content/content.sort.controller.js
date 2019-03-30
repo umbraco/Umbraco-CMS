@@ -31,7 +31,7 @@
 
         function onInit() {
             vm.loading = true;
-            contentResource.getChildren(id, { cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture })
+            contentResource.getChildren(id, { cultureName: $routeParams.mculture })
                 .then(function(data){
                     vm.children = data.items;
                     vm.loading = false;
