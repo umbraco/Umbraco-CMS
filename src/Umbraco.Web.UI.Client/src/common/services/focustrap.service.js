@@ -1,6 +1,6 @@
 /** Used to improve accesibility ensuring that the focus is trapped inside the active overlay and also ensuring aria-hidden is set accordingly so potential screen readers don't get confused about the context either */
 
-function focusTrapService(eventsService) {
+function focusTrapService() {
 
     // TODO: If possible I would like to store all the needed DOM references in an elements object, wich could then be passed to the methods so we don't need to reference and store them in each method
     // But some of the elements are not available untill the app.authenticated event happens... Not sure about the best practice around this...
@@ -8,39 +8,22 @@ function focusTrapService(eventsService) {
     
     return {
         addFocusTrap: function(mode){
-
-            if(mode === 'overlay'){
+            if(mode === 'modal'){
                 addFocusTrapOverlayMode();
             }
 
             if(mode === 'infinite'){
                 addFocusTrapInfiniteMode();
             }
-
-            //TODO:
-            // addFocusTrap
-            // Check if there is at least 1 item (infinite or modal) and then add the trap
-
-            // removeFocusTrap
-            // If there are 0 items then by all means remove the focus trap
-
-            // updateFocusTrap
-            // If we're in infinite editing mode then whenever a there is more than 1 item we need to update the focus trap to target the correct infinite modal
-            // Also ensuring that we don't touch the DOM for those fixed elements where the inert and aria-hidden attributes have already been added
-
-            // Maybe add a "infinte editor check" and a "modal" check. Maybe just add a "type" param that needs to be either "modal" or "infinite editor" in order for calling the correct method to deal with the DOM manipulation?
         },
         removeFocusTrap: function (mode) {
-            console.log('Remove that trap!');
-        
-            if (mode === 'overlay') {
+            if (mode === 'modal') {
                 removeFocusTrapOverlayMode();
             }
 
             if (mode === 'infinite') {
                 removeFocusTrapInfiniteMode();
             }
-            //TODO: Simply find all inert and aria-hidden attributes and remove them?....
         }
 	};
 }
@@ -48,17 +31,13 @@ function focusTrapService(eventsService) {
 function addFocusTrapOverlayMode () {
     var mainWrapper = $('#mainwrapper');
 
-    // TODO: Add inert and aria-hidden attributes to the mainWrapper and remove it again once the modal is removed
-
-    console.log('ADD the focus trap for the OVERLAY mode, hehehehe');
+    mainWrapper.attr('inert','');
 }
 
 function removeFocusTrapOverlayMode () {
     var mainWrapper = $('#mainwrapper');
 
-    // TODO: Add inert and aria-hidden attributes to the mainWrapper and remove it again once the modal is removed
-
-    console.log('REMOVE the focus trap for the OVERLAY mode, hehehehe');
+    mainWrapper.removeAttr('inert');
 }
 
 function addFocusTrapInfiniteMode () {
@@ -83,19 +62,12 @@ function removeFocusTrapInfiniteMode () {
     var leftColumn = $('#leftcolumn');
     var contentColumn = $('#contentcolumn > div:first-child');
 
-    console.log(appHeader);
-    console.log(leftColumn);
-    console.log(contentColumn);
-
     // Remove the inert attribute from the key elements so they're tabable once the infinite editing mode has been deactivated
     appHeader.removeAttr('inert');
     leftColumn.removeAttr('inert');
     contentColumn.removeAttr('inert');
-
-    console.log('inert removed and everything is back to normal....as you were!');
 }
 
-// TODO: Make sure to set focus on the first focusable element in the focusable overlay (There is a method for that somewhere :-))
 // TODO: Consider adding a tablock method to avoid the possibility of escaping to the browser address bar - But maybe have a discussion about this in the PR instead?...
 
 function toggleInert (editors) {
@@ -105,6 +77,21 @@ function toggleInert (editors) {
 
     editorChildren.attr('inert','');
     lastEditorChild.removeAttr('inert');
+
+    // Add focus to the first element in the potential infinite overlay that lays behind the one that we just closed
+    setFocusableElement(lastEditorChild);
+}
+
+function setFocusableElement(element) {
+    var focusableElementsString = 'a[href], area[href], input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), iframe, object, embed, [tabindex="0"], [contenteditable]';
+    var focusableElements = element.find(focusableElementsString);
+
+    if(focusableElements.length){
+        var firstFocusableElement = $(focusableElements[0]);
+        console.log(firstFocusableElement);
+
+        // TODO: Figure out how to make sure that the first element receives focus...
+    }
 }
 
 angular.module('umbraco.services').factory('focusTrapService', focusTrapService);
