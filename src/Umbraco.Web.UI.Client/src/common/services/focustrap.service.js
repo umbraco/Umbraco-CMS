@@ -87,10 +87,13 @@ function setFocusableElement(element) {
     var focusableElements = element.find(focusableElementsString);
 
     if(focusableElements.length){
-        var firstFocusableElement = $(focusableElements[0]);
-        console.log(firstFocusableElement);
+        var firstFocusableElement = focusableElements[0];
 
-        // TODO: Figure out how to make sure that the first element receives focus...
+        // TODO: Figure out why it's necessary to make use of setTimeout and why it's necessary to remove the focus attributes
+        setTimeout(function(){
+            $(firstFocusableElement).removeAttr('auto-umb-focus').removeAttr('focus-on-filled').focus();
+            $(firstFocusableElement).attr('auto-umb-focus');
+        },100);
     }
 }
 
