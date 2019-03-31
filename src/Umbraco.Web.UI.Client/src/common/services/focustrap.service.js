@@ -52,22 +52,28 @@ function addFocusTrapInfiniteMode () {
     var contentColumn = $('#contentcolumn > div:first-child');
     var editors = $('.umb-editors');
 
-    // Remove focus from any interactive elements in the appHeader, leftColumn and the first child in the contentColumn
+    // Remove focus from any interactive elements in the "appHeader", "leftColumn" and the first child in the "contentColumn"
     appHeader.attr('inert','');
     leftColumn.attr('inert','');
     contentColumn.attr('inert','');
 
-    console.log('add the focus trap for the INFINITE mode, hehehehe');
-    
-    // Make sure the DOM has been updated before dealing with how many children there are...
-    // TODO: Make sure that all children, if there are more than one, get the inert attribute - Except that last one!
-    // This means we'll need to check in the "removeEditor" method whether or not the array of editors is greater than one... and then add/remove the inert attribute accordingly
-    // This scenario might need it's own set of methods...
-
-    // Currently just seeing if children are available with each call to the "addEditor" method
+    // TODO: Maybe this can be refactored into being a watch thingy detecting when add/remove of an infinite overlay is done so we can skip the timeout function - But it works for now
     setTimeout(function(){
-        console.log(editors.children());
+        toggleInert(editors);
     }, 100);
+}
+
+// TODO: Make sure to set focus on the first focusable element in the focusable overlay (There is a method for that somewhere :-))
+// TODO: Consider adding a tablock method to avoid the possibility of escaping to the browser address bar - But maybe have a discussion about this in the PR instead?...
+
+function toggleInert (editors) {
+    const editorChildren = editors.children();
+    const lastEditorChildIndex = editorChildren.length - 1;
+    const lastEditorChild = $(editorChildren[lastEditorChildIndex]);
+
+    editorChildren.attr('inert','');
+    lastEditorChild.removeAttr('inert');
+
 }
 
 angular.module('umbraco.services').factory('focusTrapService', focusTrapService);
