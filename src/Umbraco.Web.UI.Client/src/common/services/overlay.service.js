@@ -8,7 +8,7 @@
 (function () {
     "use strict";
 
-    function overlayService(eventsService, backdropService) {
+    function overlayService(eventsService, backdropService, focusTrapService) {
 
         var currentOverlay = null;
 
@@ -37,6 +37,9 @@
                 backdropOptions.disableEventsOnClick = true;
             }
 
+            // Add focus trap
+            focusTrapService.addFocusTrap('modal');
+
             overlay.show = true;
             backdropService.open(backdropOptions);
             currentOverlay = overlay;
@@ -46,6 +49,10 @@
         function close() {
             backdropService.close();
             currentOverlay = null;
+
+            // Remove focus trap
+            focusTrapService.removeFocusTrap('modal');
+
             eventsService.emit("appState.overlay", null);
         }
 
