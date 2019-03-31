@@ -87,11 +87,13 @@
                     i++;
                 }
 
+                // If there are any active editors we call the addFocusTrap method
                 if(len > 0){
                     focusTrapService.addFocusTrap('infinite');
                 }
+                // Otherwise we make sure to remove the focus trap
                 else{
-                    focusTrapService.removeFocusTrap();
+                    focusTrapService.removeFocusTrap('infinite');
                 }
             }
             
