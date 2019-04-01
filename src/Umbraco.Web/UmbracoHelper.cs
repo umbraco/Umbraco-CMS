@@ -264,7 +264,7 @@ namespace Umbraco.Web
 
         public IPublishedContent Member(Guid id)
         {
-            return MembershipHelper.GetByProviderKey(id);
+            return MembershipHelper.GetById(id);
         }
 
         public IPublishedContent Member(object id)
@@ -287,6 +287,56 @@ namespace Umbraco.Web
         {
             var asInt = id.TryConvertTo<int>();
             return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
+        }
+
+        public IEnumerable<IPublishedContent> Members(IEnumerable<int> ids)
+        {
+            return MembershipHelper.GetByIds(ids);
+        }
+
+        public IEnumerable<IPublishedContent> Members(IEnumerable<string> ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        public IEnumerable<IPublishedContent> Members(IEnumerable<Guid> ids)
+        {
+            return MembershipHelper.GetByIds(ids);
+        }
+
+        public IEnumerable<IPublishedContent> Members(IEnumerable<Udi> ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        public IEnumerable<IPublishedContent> Members(IEnumerable<object> ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        public IEnumerable<IPublishedContent> Members(params int[] ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        public IEnumerable<IPublishedContent> Members(params string[] ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        public IEnumerable<IPublishedContent> Members(params Guid[] ids)
+        {
+            return MembershipHelper.GetByIds(ids);
+        }
+
+        public IEnumerable<IPublishedContent> Members(params Udi[] ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        public IEnumerable<IPublishedContent> Members(params object[] ids)
+        {
+            return ids.Select(Member).WhereNotNull();
         }
 
         #endregion

@@ -116,6 +116,13 @@
         function isContentCultureVariant() {
             return $scope.content.variants.length > 1;
         }
+        
+        function reload() {
+            $scope.page.loading = true;
+            loadContent().then(function() {
+                $scope.page.loading = false;
+            });
+        }
 
         function bindEvents() {
             //bindEvents can be called more than once and we don't want to have multiple bound events
@@ -123,13 +130,10 @@
                 eventsService.unsubscribe(evts[e]);
             }
 
-            evts.push(eventsService.on("editors.content.reload", function (name, args) {
+            evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
                 // if this content item uses the updated doc type we need to reload the content item
-                if(args && args.node && args.node.key === $scope.content.key) {
-                    $scope.page.loading = true;
-                    loadContent().then(function() {
-                        $scope.page.loading = false;
-                    });
+                if(args && args.documentType && $scope.content.documentType.id === args.documentType.id) {
+                    reload();
                 }
             }));
 

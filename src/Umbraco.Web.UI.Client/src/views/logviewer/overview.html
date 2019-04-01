@@ -1,4 +1,4 @@
-<div data-element="editor-logs" ng-controller="Umbraco.Editors.LogViewer.OverviewController as vm" class="clearfix">
+<div data-element="editor-logs" ng-controller="Umbraco.Editors.LogViewer.OverviewController as vm" class="clearfix" id="logview">
 
     <umb-editor-view footer="false">
 
@@ -24,8 +24,8 @@
                 </umb-box>
             </div>
 
-            <div class="umb-package-details" ng-show="!vm.loading && vm.canLoadLogs">
-                <div class="umb-package-details__main-content">
+            <div class="umb-logviewer" ng-show="!vm.loading && vm.canLoadLogs">
+                <div class="umb-logviewer__main-content">
                     <!-- Saved Searches -->
                     <umb-box>
                         <umb-box-header title="Saved Searches"></umb-box-header>
@@ -68,7 +68,7 @@
                     </umb-box>
                 </div>
 
-                <div class="umb-package-details__sidebar">
+                <div class="umb-logviewer__sidebar">
                     <!-- No of Errors -->
                     <umb-box ng-click="vm.searchLogQuery('Has(@Exception)')" style="cursor:pointer;">
                         <umb-box-header title="Number of Errors"></umb-box-header>

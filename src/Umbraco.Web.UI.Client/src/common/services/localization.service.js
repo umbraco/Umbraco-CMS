@@ -43,16 +43,11 @@ angular.module('umbraco.services')
 
         var entry = dictionary[value];
         if (entry) {
-            if (tokens) {
-                for (var i = 0; i < tokens.length; i++) {
-                    entry = entry.replace("%" + i + "%", tokens[i]);
-                }
-            }
-            return entry;
+            return service.tokenReplace(entry, tokens);
         }
         return "[" + value + "]";
     }
-
+    
     var service = {
         // array to hold the localized resource string entries
         dictionary: [],
@@ -127,7 +122,29 @@ angular.module('umbraco.services')
             }
             return value;
         },
-
+        
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.services.localizationService#tokenReplace
+         * @methodOf umbraco.services.localizationService
+         *
+         * @description
+         * Helper to replace tokens
+         * @param {String} value the text-string to manipulate
+         * @param {Array} tekens An array of tokens values 
+         * @returns {String} Replaced test-string
+         */
+        tokenReplace: function (text, tokens) {
+            if (tokens) {
+                for (var i = 0; i < tokens.length; i++) {
+                    text = text.replace("%" + i + "%", tokens[i]);
+                }
+            }
+            return text;
+        },
+        
+        
         /**
          * @ngdoc method
          * @name umbraco.services.localizationService#localize
@@ -146,8 +163,7 @@ angular.module('umbraco.services')
          */
         localize: function (value, tokens) {
             return service.initLocalizedResources().then(function (dic) {
-                var val = _lookup(value, tokens, dic);
-                return val;
+                return _lookup(value, tokens, dic);
             });
         },
 
