@@ -55,6 +55,16 @@
 	position: absolute;	
 }
 
+.--notInFront .umb-modalcolumn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: rgba(0,0,0,.4);
+}
+
 /* re-align loader */
 .umb-modal .umb-loader-wrapper, .umb-modalcolumn .umb-loader-wrapper, .umb-dialog .umb-loader-wrapper{
     position:relative; 
