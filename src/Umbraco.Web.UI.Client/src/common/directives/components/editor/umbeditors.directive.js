@@ -1,9 +1,3 @@
-/** TODO
- * Make some reusable code that can set all other relevant areas to have the "inert" attribute apart from the infinite overlay
- * Keep in mind that the code setting the inert attribute is also highly relevant for being used in overlay's that appear when deleting / browsing away from something
- * However that might be for another PR if/once this current PR is accepted
- */
-
 (function () {
     'use strict';
 
