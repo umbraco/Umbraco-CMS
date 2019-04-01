@@ -279,6 +279,10 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
         }
     }
 
+    $scope.showBack = function () {
+        return !infiniteMode && !!$scope.page.listViewPath;
+    }
+
     /** Callback for when user clicks the back-icon */
     $scope.onBack = function() {
         if ($scope.page.listViewPath) {
