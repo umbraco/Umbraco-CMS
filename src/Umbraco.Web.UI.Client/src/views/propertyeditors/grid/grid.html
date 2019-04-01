@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.PropertyEditors.GridController" class="umb-grid umb-property-editor clearfix" id="umb-grid">
 
-    <umb-editor-sub-header ng-if="showReorderButton()" style="background-color: white; border-color: white;">
+    <umb-editor-sub-header ng-if="showReorderButton()" style="background-color: white;">
 
         <umb-editor-sub-header-content-right>
             <umb-button
@@ -187,10 +187,10 @@
 
                                                               <div class="umb-control-inner" ng-hide="sortMode">
 
-                                                                   <div class="umb-control-bar umb-control-handle">
+                                                                  <div class="umb-control-bar umb-control-handle">
 
                                                                       <div class="umb-control-title" ng-if="control.active">
-                                                                         {{control.editor.name}}
+                                                                          {{control.editor.name}}
                                                                       </div>
 
                                                                       <div class="umb-tools" ng-if="control.active">
@@ -199,25 +199,24 @@
                                                                               <i class="umb-control-tool-icon icon-settings" ng-click="editGridItemSettings(control, 'control')"></i>
                                                                           </div>
 
-                                                                        <div class="umb-control-tool">
-                                                                            <i class="umb-control-tool-icon icon-trash"  ng-click="togglePrompt(control)"></i>
-                                                                            <umb-confirm-action
-                                                                                ng-if="control.deletePrompt"
-                                                                                direction="left"
-                                                                                on-confirm="removeControl(area, $index)"
-                                                                                on-cancel="hidePrompt(control)">
-                                                                            </umb-confirm-action>
-                                                                        </div>
+                                                                          <div class="umb-control-tool">
+                                                                              <i class="umb-control-tool-icon icon-trash" ng-click="togglePrompt(control)"></i>
+                                                                              <umb-confirm-action ng-if="control.deletePrompt"
+                                                                                                  direction="left"
+                                                                                                  on-confirm="removeControl(area, $index)"
+                                                                                                  on-cancel="hidePrompt(control)">
+                                                                              </umb-confirm-action>
+                                                                          </div>
 
                                                                       </div>
 
-                                                                   </div>
+                                                                  </div>
 
-                                                                 <!-- Redering the editor for specific control -->
-                                                                 <div ng-if="control && control.$editorPath"
+                                                                  <!-- Redering the editor for specific control -->
+                                                                  <div ng-if="control && control.$editorPath"
                                                                        ng-include="control.$editorPath"
                                                                        class="umb-cell-{{control.editor.view}}">
-                                                                 </div>
+                                                                  </div>
 
                                                               </div>
                                                           </div>
