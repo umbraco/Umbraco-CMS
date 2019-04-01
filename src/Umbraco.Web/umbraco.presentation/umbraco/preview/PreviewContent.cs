@@ -15,14 +15,14 @@ namespace umbraco.presentation.preview
     public enum PreviewMode
     {
         Unknown = 0, // default value
-        Vintage,
-        SinglePreview
+        Legacy,
+        Default
     }
 
     public class PreviewContent
     {
         private static PreviewMode _previewMode;
-        private const PreviewMode DefaultPreviewMode = PreviewMode.SinglePreview;
+        private const PreviewMode DefaultPreviewMode = PreviewMode.Default;
         private static int _singlePreviewCacheDurationSeconds = -1;
         private const int DefaultSinglePreviewCacheDurationSeconds = 60;
 
@@ -62,7 +62,7 @@ namespace umbraco.presentation.preview
             }
         }
 
-        public static bool IsSinglePreview => PreviewMode == PreviewMode.SinglePreview;
+        public static bool IsSinglePreview => PreviewMode == PreviewMode.Default;
 
         public XmlDocument XmlContent { get; set; }
         public Guid PreviewSet { get; set; }
