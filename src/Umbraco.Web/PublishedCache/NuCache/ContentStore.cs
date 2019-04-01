@@ -8,7 +8,6 @@ using CSharpTest.Net.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
-using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -30,8 +29,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private readonly ILogger _logger;
         private BPlusTree<int, ContentNodeKit> _localDb;
-        private readonly ConcurrentQueue<GenObj> _genObjs;
-        private GenObj _genObj;
+        private readonly ConcurrentQueue<GenRefRef> _genRefRefs;
+        private GenRefRef _genRefRef;
         private readonly object _wlocko = new object();
         private readonly object _rlocko = new object();
         private long _liveGen, _floorGen;
@@ -65,8 +64,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _contentTypesByAlias = new ConcurrentDictionary<string, LinkedNode<PublishedContentType>>(StringComparer.InvariantCultureIgnoreCase);
             _xmap = new ConcurrentDictionary<Guid, int>();
 
-            _genObjs = new ConcurrentQueue<GenObj>();
-            _genObj = null; // no initial gen exists
+            _genRefRefs = new ConcurrentQueue<GenRefRef>();
+            _genRefRef = null; // no initial gen exists
             _liveGen = _floorGen = 0;
             _nextGen = false; // first time, must create a snapshot
             _collectAuto = true; // collect automatically by default
@@ -92,13 +91,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // a scope contextual that represents a locked writer to the dictionary
-        private class ScopedWriteLock : ScopeContextualBase
+        private class ContentStoreWriter : ScopeContextualBase
         {
             private readonly WriteLockInfo _lockinfo = new WriteLockInfo();
-            private readonly ContentStore _store;
-            private int _released;
+            private ContentStore _store;
 
-            public ScopedWriteLock(ContentStore store, bool scoped)
+            public ContentStoreWriter(ContentStore store, bool scoped)
             {
                 _store = store;
                 store.Lock(_lockinfo, scoped);
@@ -106,17 +104,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             public override void Release(bool completed)
             {
-                if (Interlocked.CompareExchange(ref _released, 1, 0) != 0)
-                    return;
+                if (_store== null) return;
                 _store.Release(_lockinfo, completed);
+                _store = null;
             }
         }
 
         // gets a scope contextual representing a locked writer to the dictionary
         // TODO: GetScopedWriter? should the dict have a ref onto the scope provider?
-        public IDisposable GetScopedWriteLock(IScopeProvider scopeProvider)
+        public IDisposable GetWriter(IScopeProvider scopeProvider)
         {
-            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
+            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ContentStoreWriter(this, scoped));
         }
 
         private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
@@ -133,14 +131,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     _wlocked++;
                     lockInfo.Count = true;
-                    if (_nextGen == false || (forceGen && _wlocked == 1))
+                    if (_nextGen == false || (forceGen && _wlocked == 1)) // if true already... ok to have "holes" in generation objects
                     {
                         // because we are changing things, a new generation
                         // is created, which will trigger a new snapshot
-                        if (_nextGen)
-                            _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
-                        _liveGen += 1;
                         _nextGen = true;
+                        _liveGen += 1;
                     }
                 }
             }
@@ -216,6 +212,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 else
                     dictionary.TryUpdate(key, link.Next, link);
             }
+
         }
 
         #endregion
@@ -839,8 +836,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 // if no next generation is required, and we already have one,
                 // use it and create a new snapshot
-                if (_nextGen == false && _genObj != null)
-                    return new Snapshot(this, _genObj.GetGenRef()
+                if (_nextGen == false && _genRefRef != null)
+                    return new Snapshot(this, _genRefRef.GetGenRef()
 #if DEBUG
                         , _logger
 #endif
@@ -855,15 +852,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     var snapGen = _nextGen ? _liveGen - 1 : _liveGen;
 
                     // create a new gen ref unless we already have it
-                    if (_genObj == null)
-                        _genObjs.Enqueue(_genObj = new GenObj(snapGen));
-                    else if (_genObj.Gen != snapGen)
+                    if (_genRefRef == null)
+                        _genRefRefs.Enqueue(_genRefRef = new GenRefRef(snapGen));
+                    else if (_genRefRef.Gen != snapGen)
                         throw new Exception("panic");
                 }
                 else
                 {
                     // not write-locked, can use latest gen, create a new gen ref
-                    _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
+                    _genRefRefs.Enqueue(_genRefRef = new GenRefRef(_liveGen));
                     _nextGen = false; // this is the ONLY thing that triggers a _liveGen++
                 }
 
@@ -876,7 +873,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // - the genRefRef weak ref is dead because all snapshots have been collected
                 // in both cases, we will dequeue and collect
 
-                var snapshot = new Snapshot(this, _genObj.GetGenRef()
+                var snapshot = new Snapshot(this, _genRefRef.GetGenRef()
 #if DEBUG
                     , _logger
 #endif
@@ -933,10 +930,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 #if DEBUG
             _logger.Debug<ContentStore>("Collect.");
 #endif
-            while (_genObjs.TryPeek(out var genObj) && (genObj.Count == 0 || genObj.WeakGenRef.IsAlive == false))
+            while (_genRefRefs.TryPeek(out GenRefRef genRefRef) && (genRefRef.Count == 0 || genRefRef.WGenRef.IsAlive == false))
             {
-                _genObjs.TryDequeue(out genObj); // cannot fail since TryPeek has succeeded
-                _floorGen = genObj.Gen;
+                _genRefRefs.TryDequeue(out genRefRef); // cannot fail since TryPeek has succeeded
+                _floorGen = genRefRef.Gen;
 #if DEBUG
                 //_logger.Debug<ContentStore>("_floorGen=" + _floorGen + ", _liveGen=" + _liveGen);
 #endif
@@ -1012,9 +1009,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 await task;
         }
 
-        public long GenCount => _genObjs.Count;
+        public long GenCount => _genRefRefs.Count;
 
-        public long SnapCount => _genObjs.Sum(x => x.Count);
+        public long SnapCount => _genRefRefs.Sum(x => x.Count);
 
         #endregion
 
@@ -1064,6 +1061,24 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Classes
 
+        private class LinkedNode<TValue>
+            where TValue: class
+        {
+            public LinkedNode(TValue value, long gen, LinkedNode<TValue> next = null)
+            {
+                Value = value;
+                Gen = gen;
+                Next = next;
+            }
+
+            internal readonly long Gen;
+
+            // reading & writing references is thread-safe on all .NET platforms
+            // mark as volatile to ensure we always read the correct value
+            internal volatile TValue Value;
+            internal volatile LinkedNode<TValue> Next;
+        }
+
         public class Snapshot : IDisposable
         {
             private readonly ContentStore _store;
@@ -1085,7 +1100,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _store = store;
                 _genRef = genRef;
                 _gen = genRef.Gen;
-                Interlocked.Increment(ref genRef.GenObj.Count);
+                Interlocked.Increment(ref genRef.GenRefRef.Count);
                 //_thisCount = _count++;
 
 #if DEBUG
@@ -1186,13 +1201,47 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0) return;
 #if DEBUG
-                _logger.Debug<Snapshot>("Dispose snapshot ({Snapshot})", _genRef?.GenObj.Count.ToString() ?? "live");
+                _logger.Debug<Snapshot>("Dispose snapshot ({Snapshot})", _genRef?.GenRefRef.Count.ToString() ?? "live");
 #endif
                 _gen = -1;
                 if (_genRef != null)
-                    Interlocked.Decrement(ref _genRef.GenObj.Count);
+                    Interlocked.Decrement(ref _genRef.GenRefRef.Count);
                 GC.SuppressFinalize(this);
             }
+        }
+
+        internal class GenRefRef
+        {
+            public GenRefRef(long gen)
+            {
+                Gen = gen;
+                WGenRef = new WeakReference(null);
+            }
+
+            public GenRef GetGenRef()
+            {
+                // not thread-safe but always invoked from within a lock
+                var genRef = (GenRef) WGenRef.Target;
+                if (genRef == null)
+                    WGenRef.Target = genRef = new GenRef(this, Gen);
+                return genRef;
+            }
+
+            public readonly long Gen;
+            public readonly WeakReference WGenRef;
+            public int Count;
+        }
+
+        internal class GenRef
+        {
+            public GenRef(GenRefRef genRefRef, long gen)
+            {
+                GenRefRef = genRefRef;
+                Gen = gen;
+            }
+
+            public readonly GenRefRef GenRefRef;
+            public readonly long Gen;
         }
 
         #endregion
