@@ -26,36 +26,6 @@ namespace Umbraco.Core.Persistence.Mappers
             return mappedName;
         }
 
-        // fixme kill
-        /*
-        internal string Map(ISqlSyntaxProvider sqlSyntax, string propertyName, bool throws = false)
-        {
-            // fixme mapping a string to a string - should be a dictionary!
-            // and then why have the other dictionary? should BuildMap(syntax) => directly build the correct string
-
-            /-*
-            var propertyInfo = PropertyInfoCache[propertyName].PropertyInfo; // fixme - tryGet
-            var tableName = propertyInfo.DeclaringType.FirstAttribute<TableNameAttribute>().Value;
-            var columnName = propertyInfo.FirstAttribute<ColumnAttribute>().Name;
-            var mapped = sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(columnName);
-            *-/
-
-            if (PropertyInfoCache.TryGetValue(propertyName, out var dtoTypeProperty))
-                return GetColumnName(sqlSyntax, dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
-
-            if (throws)
-                throw new InvalidOperationException("Could not get the value with the key " + propertyName + " from the property info cache, keys available: " + string.Join(", ", PropertyInfoCache.Keys));
-
-            return string.Empty;
-        }
-
-        internal void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
-        {
-            var property = ResolveMapping(sourceMember, destinationMember);
-            PropertyInfoCache.AddOrUpdate(property.SourcePropertyName, property, (x, y) => property);
-        }
-        */
-
         //protected void DefineMap<TSource, TTarget>(string sourceName, Expression<Func<TTarget, object>> targetMember)
         protected void DefineMap<TSource, TTarget>(string sourceName, string targetName)
         {
@@ -80,33 +50,5 @@ namespace Umbraco.Core.Persistence.Mappers
             var mapperMaps = _maps.GetOrAdd(GetType(), type => new ConcurrentDictionary<string, string>());
             mapperMaps[sourceName] = columnMap;
         }
-
-        // fixme kill
-        /*
-        private static DtoMapModel ResolveMapping<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
-        {
-            var source = ExpressionHelper.FindProperty(sourceMember);
-            var destination = (PropertyInfo) ExpressionHelper.FindProperty(destinationMember).Item1;
-
-            if (destination == null)
-            {
-                throw new InvalidOperationException("The 'destination' returned was null, cannot resolve the mapping");
-            }
-
-            return new DtoMapModel(typeof(TDestination), destination, source.Item1.Name);
-        }
-
-        private static string GetColumnName(ISqlSyntaxProvider sqlSyntax, Type dtoType, PropertyInfo dtoProperty)
-        {
-            var tableNameAttribute = dtoType.FirstAttribute<TableNameAttribute>();
-            var tableName = tableNameAttribute.Value;
-
-            var columnAttribute = dtoProperty.FirstAttribute<ColumnAttribute>();
-            var columnName = columnAttribute.Name;
-
-            var columnMap = sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(columnName);
-            return columnMap;
-        }
-        */
     }
 }
