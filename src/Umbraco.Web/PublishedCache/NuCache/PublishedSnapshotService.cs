@@ -330,14 +330,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadContent(Action<IScope> action)
         {
-            using (_contentStore.GetWriter(_scopeProvider))
+            // first get a writer, then a scope
+            // if there already is a scope, the writer will attach to it
+            // otherwise, it will only exist here - cheap
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.ContentTree);
-                    action(scope);
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.ContentTree);
+                action(scope);
+                scope.Complete();
             }
         }
 
@@ -399,14 +400,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadMedia(Action<IScope> action)
         {
-            using (_mediaStore.GetWriter(_scopeProvider))
+            // see note in LockAndLoadContent
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.MediaTree);
-                    action(scope);
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.MediaTree);
+                action(scope);
+                scope.Complete();
             }
         }
 
@@ -528,14 +528,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadDomains()
         {
-            using (_domainStore.GetWriter(_scopeProvider))
+            // see note in LockAndLoadContent
+            using (_domainStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.Domains);
-                    LoadDomainsLocked();
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.Domains);
+                LoadDomainsLocked();
+                scope.Complete();
             }
         }
 
@@ -587,7 +586,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
             }
 
-            using (_contentStore.GetWriter(_scopeProvider))
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
             {
                 NotifyLocked(payloads, out bool draftChanged2, out bool publishedChanged2);
                 draftChanged = draftChanged2;
@@ -683,7 +682,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
             }
 
-            using (_mediaStore.GetWriter(_scopeProvider))
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
                 NotifyLocked(payloads, out bool anythingChanged2);
                 anythingChanged = anythingChanged2;
@@ -804,7 +803,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (removedIds.Count == 0 && refreshedIds.Count == 0 && otherIds.Count == 0 && newIds.Count == 0) return;
 
-            using (store.GetWriter(_scopeProvider))
+            using (store.GetScopedWriteLock(_scopeProvider))
             {
                 // ReSharper disable AccessToModifiedClosure
                 action(removedIds, refreshedIds, otherIds, newIds);
@@ -825,8 +824,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     payload.Removed ? "Removed" : "Refreshed",
                     payload.Id);
 
-            using (_contentStore.GetWriter(_scopeProvider))
-            using (_mediaStore.GetWriter(_scopeProvider))
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
                 // TODO: need to add a datatype lock
                 // this is triggering datatypes reload in the factory, and right after we create some
@@ -858,7 +857,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_isReady == false)
                 return;
 
-            using (_domainStore.GetWriter(_scopeProvider))
+            // see note in LockAndLoadContent
+            using (_domainStore.GetScopedWriteLock(_scopeProvider))
             {
                 foreach (var payload in payloads)
                 {

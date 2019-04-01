@@ -78,9 +78,6 @@
     <key alias="domainCreated">Создан новый домен '%0%'</key>
     <key alias="domainDeleted">Домен '%0%' удален</key>
     <key alias="domainExists">Домен с именем '%0%' уже существует</key>
-    <key alias="domainHelp"><![CDATA[Примеры допустимых доменных имен: "example.com", "www.example.com", "example.com:8080" или
-        "https://www.example.com/".<br /><br />Также здесь допустимы части адресов URL первого уровня, например "example.com/en",
-        однако их следует по возможности избегать. Рекомендуется использовать настройку культуры (языка), расположенную выше.]]></key>
     <key alias="domainUpdated">Домен '%0%' обновлен</key>
     <key alias="duplicateDomain">Такой домен уже назначен.</key>
     <key alias="inherit">Унаследовать</key>

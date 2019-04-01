@@ -15,11 +15,12 @@ angular.module("umbraco")
             if (!editorConfig || angular.isString(editorConfig)) {
                 editorConfig = tinyMceService.defaultPrevalues();
             }
-
-            var promises = [];
-            if (!editorConfig.maxImageSize && editorConfig.maxImageSize != 0) {
+            //make sure there's a max image size
+            if (!editorConfig.maxImageSize && editorConfig.maxImageSize !== 0) {
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
+
+            var promises = [];
 
             //queue file loading
             if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
@@ -41,7 +42,7 @@ angular.module("umbraco")
 
                 var standardConfig = result[promises.length - 1];
 
-                //create a baseline Config to exten upon
+                //create a baseline Config to extend upon
                 var baseLineConfigObj = {
                     maxImageSize: editorConfig.maxImageSize
                 };

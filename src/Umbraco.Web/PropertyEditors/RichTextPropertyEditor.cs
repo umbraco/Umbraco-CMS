@@ -8,6 +8,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Macros;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -73,7 +74,8 @@ namespace Umbraco.Web.PropertyEditors
                 if (val == null)
                     return null;
 
-                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(val.ToString(), new Dictionary<string, string>());
+                var propertyValueWithMediaResolved = TemplateUtilities.ResolveMediaFromTextString(val.ToString());
+                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(propertyValueWithMediaResolved, new Dictionary<string, string>());
                 return parsed;
             }
 
