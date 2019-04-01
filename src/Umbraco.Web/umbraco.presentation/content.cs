@@ -1285,13 +1285,17 @@ namespace umbraco
         #region Preview
 
         private const string PreviewCacheKey = "umbraco.content.preview";
+        private readonly object _previewLock = new object();
 
         internal void ClearPreviewXmlContent()
         {
             if (PreviewContent.IsSinglePreview == false) return;
 
             var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
-            runtimeCache.ClearCacheItem(PreviewCacheKey);
+            lock (_previewLock)
+            {
+                runtimeCache.ClearCacheItem(PreviewCacheKey);
+            }
         }
 
         internal void ClearPreviewXmlContent(int id)
@@ -1299,17 +1303,21 @@ namespace umbraco
             if (PreviewContent.IsSinglePreview == false) return;
 
             var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
-            var xml = runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey);
-            if (xml == null) return;
 
-            // Check if node present, before cloning
-            var x = xml.GetElementById(id.ToString());
-            if (x == null)
-                return;
+            lock (_previewLock)
+            {
+                var xml = runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey);
+                if (xml == null) return;
 
-            // Find the document in the xml cache
-            // The document already exists in cache, so repopulate it
-            x.ParentNode.RemoveChild(x);
+                // Check if node present, before cloning
+                var x = xml.GetElementById(id.ToString());
+                if (x == null)
+                    return;
+
+                // Find the document in the xml cache
+                // The document already exists in cache, so repopulate it
+                x.ParentNode.RemoveChild(x);
+            }
         }
 
         internal void UpdatePreviewXmlContent(Document d)
@@ -1317,13 +1325,17 @@ namespace umbraco
             if (PreviewContent.IsSinglePreview == false) return;
 
             var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
-            var xml = runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey);
-            if (xml == null) return;
 
-            var pnode = GetPreviewOrPublishedNode(d, xml, true);
-            var pattr = ((XmlElement)pnode).GetAttributeNode("sortOrder");
-            pattr.Value = d.sortOrder.ToString();
-            AddOrUpdatePreviewXmlNode(d.Id, d.Level, d.Level == 1 ? -1 : d.ParentId, pnode);
+            lock (_previewLock)
+            {
+                var xml = runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey);
+                if (xml == null) return;
+
+                var pnode = GetPreviewOrPublishedNode(d, xml, true);
+                var pattr = ((XmlElement)pnode).GetAttributeNode("sortOrder");
+                pattr.Value = d.sortOrder.ToString();
+                AddOrUpdatePreviewXmlNode(d.Id, d.Level, d.Level == 1 ? -1 : d.ParentId, pnode);
+            }
         }
 
         private void AddOrUpdatePreviewXmlNode(int id, int level, int parentId, XmlNode docNode)
@@ -1461,8 +1473,12 @@ namespace umbraco
                     throw new InvalidOperationException();
 
                 var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
-                return runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey, LoadPreviewXmlContent, TimeSpan.FromSeconds(PreviewContent.SinglePreviewCacheDurationSeconds), true,
-                    removedCallback: (key, removed, reason) => LogHelper.Debug<content>($"Removed preview xml from cache ({reason})"));
+
+                lock (_previewLock)
+                {
+                    return runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey, LoadPreviewXmlContent, TimeSpan.FromSeconds(PreviewContent.SinglePreviewCacheDurationSeconds), true,
+                        removedCallback: (key, removed, reason) => LogHelper.Debug<content>($"Removed preview xml from cache ({reason})"));
+                }
             }
         }
 
