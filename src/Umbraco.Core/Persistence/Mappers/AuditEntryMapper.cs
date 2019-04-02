@@ -12,8 +12,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(AuditEntry))]
     public sealed class AuditEntryMapper : BaseMapper
     {
-        public AuditEntryMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public AuditEntryMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.Id), nameof(AuditEntryDto.Id));
             DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingUserId), nameof(AuditEntryDto.PerformingUserId));

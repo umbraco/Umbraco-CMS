@@ -13,8 +13,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Umbraco.Core.Models.Media))]
     public sealed class MediaMapper : BaseMapper
     {
-        public MediaMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public MediaMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Id), nameof(NodeDto.NodeId));
             DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Key), nameof(NodeDto.UniqueId));

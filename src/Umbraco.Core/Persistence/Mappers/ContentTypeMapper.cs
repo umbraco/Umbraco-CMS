@@ -13,8 +13,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IContentType))]
     public sealed class ContentTypeMapper : BaseMapper
     {
-        public ContentTypeMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public ContentTypeMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<ContentType, NodeDto>(nameof(ContentType.Id), nameof(NodeDto.NodeId));
             DefineMap<ContentType, NodeDto>(nameof(ContentType.CreateDate), nameof(NodeDto.CreateDate));

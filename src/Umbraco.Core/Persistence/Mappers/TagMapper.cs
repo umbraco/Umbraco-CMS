@@ -13,8 +13,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(ITag))]
     public sealed class TagMapper : BaseMapper
     {
-        public TagMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public TagMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<Tag, TagDto>(nameof(Tag.Id), nameof(TagDto.Id));
             DefineMap<Tag, TagDto>(nameof(Tag.Text), nameof(TagDto.Text));

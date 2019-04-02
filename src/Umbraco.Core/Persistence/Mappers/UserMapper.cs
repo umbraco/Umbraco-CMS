@@ -9,8 +9,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(User))]
     public sealed class UserMapper : BaseMapper
     {
-        public UserMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public UserMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<User, UserDto>(nameof(User.Id), nameof(UserDto.Id));
             DefineMap<User, UserDto>(nameof(User.Email), nameof(UserDto.Email));

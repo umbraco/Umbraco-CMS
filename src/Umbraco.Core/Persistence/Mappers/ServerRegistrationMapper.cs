@@ -9,8 +9,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IServerRegistration))]
     internal sealed class ServerRegistrationMapper : BaseMapper
     {
-        public ServerRegistrationMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public ServerRegistrationMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.Id), nameof(ServerRegistrationDto.Id));
             DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.IsActive), nameof(ServerRegistrationDto.IsActive));

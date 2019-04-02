@@ -13,8 +13,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IDictionaryItem))]
     public sealed class DictionaryMapper : BaseMapper
     {
-        public DictionaryMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public DictionaryMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<DictionaryItem, DictionaryDto>(nameof(DictionaryItem.Id), nameof(DictionaryDto.PrimaryKey));
             DefineMap<DictionaryItem, DictionaryDto>(nameof(DictionaryItem.Key), nameof(DictionaryDto.UniqueId));

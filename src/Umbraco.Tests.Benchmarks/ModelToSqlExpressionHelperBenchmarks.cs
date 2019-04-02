@@ -15,12 +15,12 @@ namespace Umbraco.Tests.Benchmarks
     [MemoryDiagnoser]
     public class ModelToSqlExpressionHelperBenchmarks
     {
-        protected ISqlContext MockSqlContext()
+        protected Lazy<ISqlContext> MockSqlContext()
         {
             var sqlContext = Mock.Of<ISqlContext>();
             var syntax = new SqlCeSyntaxProvider();
             Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(syntax);
-            return sqlContext;
+            return new Lazy<ISqlContext>(() => sqlContext);
         }
 
         protected ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> CreateMaps()

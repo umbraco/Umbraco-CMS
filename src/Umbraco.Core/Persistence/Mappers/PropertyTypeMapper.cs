@@ -12,8 +12,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(PropertyType))]
     public sealed class PropertyTypeMapper : BaseMapper
     {
-        public PropertyTypeMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public PropertyTypeMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Key), nameof(PropertyTypeDto.UniqueId));
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Id), nameof(PropertyTypeDto.Id));

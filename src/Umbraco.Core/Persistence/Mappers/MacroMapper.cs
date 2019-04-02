@@ -9,8 +9,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IMacro))]
     internal sealed class MacroMapper : BaseMapper
     {
-        public MacroMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public MacroMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<Macro, MacroDto>(nameof(Macro.Id), nameof(MacroDto.Id));
             DefineMap<Macro, MacroDto>(nameof(Macro.Alias), nameof(MacroDto.Alias));

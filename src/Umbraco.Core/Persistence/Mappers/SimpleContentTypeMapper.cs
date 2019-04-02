@@ -9,8 +9,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(SimpleContentType))]
     public sealed class SimpleContentTypeMapper : BaseMapper
     {
-        public SimpleContentTypeMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public SimpleContentTypeMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<ContentType, NodeDto>(nameof(ContentType.Id), nameof(NodeDto.NodeId));
             DefineMap<ContentType, NodeDto>(nameof(ContentType.CreateDate), nameof(NodeDto.CreateDate));

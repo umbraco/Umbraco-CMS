@@ -8,8 +8,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(PublicAccessEntry))]
     public sealed class AccessMapper : BaseMapper
     {
-        public AccessMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public AccessMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<PublicAccessEntry, AccessDto>(nameof(PublicAccessEntry.Key), nameof(AccessDto.Id));
             DefineMap<PublicAccessEntry, AccessDto>(nameof(PublicAccessEntry.LoginNodeId), nameof(AccessDto.LoginNodeId));

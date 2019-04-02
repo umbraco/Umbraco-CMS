@@ -12,8 +12,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Consent))]
     public sealed class ConsentMapper : BaseMapper
     {
-        public ConsentMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public ConsentMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<Consent, ConsentDto>(nameof(Consent.Id), nameof(ConsentDto.Id));
             DefineMap<Consent, ConsentDto>(nameof(Consent.Current), nameof(ConsentDto.Current));

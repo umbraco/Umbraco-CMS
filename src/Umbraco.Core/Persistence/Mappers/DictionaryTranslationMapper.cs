@@ -13,8 +13,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IDictionaryTranslation))]
     public sealed class DictionaryTranslationMapper : BaseMapper
     {
-        public DictionaryTranslationMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public DictionaryTranslationMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Id), nameof(LanguageTextDto.PrimaryKey));
             DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Key), nameof(LanguageTextDto.UniqueId));

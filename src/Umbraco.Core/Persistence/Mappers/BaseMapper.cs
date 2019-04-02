@@ -8,17 +8,43 @@ namespace Umbraco.Core.Persistence.Mappers
 {
     public abstract class BaseMapper : IDiscoverable
     {
-        private readonly ISqlSyntaxProvider _sqlSyntax;
+        // note: using a Lazy<ISqlContext> here because during installs, we are resolving the
+        // mappers way before we have a configured IUmbracoDatabaseFactory, ie way before we
+        // have an ISqlContext - this is some nasty temporal coupling which we might want to
+        // cleanup eventually.
+
+        private readonly Lazy<ISqlContext> _sqlContext;
+        private readonly object _definedLock = new object();
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _maps;
 
-        protected BaseMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        private ISqlSyntaxProvider _sqlSyntax;
+        private bool _defined;
+
+        protected BaseMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
         {
-            _sqlSyntax = sqlContext.SqlSyntax;
+            _sqlContext = sqlContext;
             _maps = maps;
         }
 
+        protected abstract void DefineMaps();
+
         internal string Map(string propertyName, bool throws = false)
         {
+            lock (_definedLock)
+            {
+                if (!_defined)
+                {
+                    var sqlContext = _sqlContext.Value;
+                    if (sqlContext == null)
+                        throw new InvalidOperationException("Could not get an ISqlContext.");
+                    _sqlSyntax = sqlContext.SqlSyntax;
+
+                    DefineMaps();
+
+                    _defined = true;
+                }
+            }
+
             if (!_maps.TryGetValue(GetType(), out var mapperMaps))
                 throw new InvalidOperationException($"No maps defined for mapper {GetType().FullName}.");
             if (!mapperMaps.TryGetValue(propertyName, out var mappedName))
@@ -26,9 +52,11 @@ namespace Umbraco.Core.Persistence.Mappers
             return mappedName;
         }
 
-        //protected void DefineMap<TSource, TTarget>(string sourceName, Expression<Func<TTarget, object>> targetMember)
         protected void DefineMap<TSource, TTarget>(string sourceName, string targetName)
         {
+            if (_sqlSyntax == null)
+                throw new InvalidOperationException("Do not define maps outside of DefineMaps.");
+
             var sourceType = typeof(TSource);
             var targetType = typeof(TTarget);
 

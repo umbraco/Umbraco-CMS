@@ -13,8 +13,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Relation))]
     public sealed class RelationMapper : BaseMapper
     {
-        public RelationMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public RelationMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<Relation, RelationDto>(nameof(Relation.Id), nameof(RelationDto.Id));
             DefineMap<Relation, RelationDto>(nameof(Relation.ChildId), nameof(RelationDto.ChildId));

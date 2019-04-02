@@ -14,8 +14,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Member))]
     public sealed class MemberMapper : BaseMapper
     {
-        public MemberMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public MemberMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<Member, NodeDto>(nameof(Member.Id), nameof(NodeDto.NodeId));
             DefineMap<Member, NodeDto>(nameof(Member.CreateDate), nameof(NodeDto.CreateDate));

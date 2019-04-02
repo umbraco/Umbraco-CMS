@@ -13,8 +13,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IDataType))]
     public sealed class DataTypeMapper : BaseMapper
     {
-        public DataTypeMapper(ISqlContext sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public DataTypeMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
             : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
             DefineMap<DataType, NodeDto>(nameof(DataType.Id), nameof(NodeDto.NodeId));
             DefineMap<DataType, NodeDto>(nameof(DataType.CreateDate), nameof(NodeDto.CreateDate));

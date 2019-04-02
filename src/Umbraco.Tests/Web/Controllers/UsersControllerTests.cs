@@ -125,7 +125,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             var mappers = new MapperCollection(new []
             {
-                new UserMapper(Current.SqlContext, new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>())
+                new UserMapper(new Lazy<ISqlContext>(() => Current.SqlContext), new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>())
             });
 
             Mock.Get(Current.SqlContext)
