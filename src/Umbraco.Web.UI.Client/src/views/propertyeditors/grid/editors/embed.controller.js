@@ -1,25 +1,26 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.EmbedController",
     function ($scope, $timeout, $sce, editorService) {
-
-        function onInit() {
-            $scope.trustedValue = null;
-            $scope.trustedValue = $sce.trustAsHtml($scope.control.value);
-
-            if(!$scope.control.value) {
-                $timeout(function(){
-                    if($scope.control.$initializing){
-                        $scope.setEmbed();
-                    }
-                }, 200);
-            }
+        
+        
+        
+    	function getEmbed() {
+            return $sce.trustAsHtml($scope.control.value);
         }
-
-    	$scope.setEmbed = function(){
+        
+        
+        $scope.embedHtml = getEmbed();
+        $scope.$watch('control.value', function(newValue, oldValue) {
+            if(angular.equals(newValue, oldValue)){
+                return; // simply skip that
+            }
+            
+            $scope.embedHtml = getEmbed();
+        }, false);
+    	$scope.setEmbed = function() {
             var embed = {
                 submit: function(model) {
                     $scope.control.value = model.embed.preview;
-                    $scope.trustedValue = $sce.trustAsHtml(model.embed.preview);
                     editorService.close();
                 },
                 close: function() {
@@ -28,6 +29,5 @@ angular.module("umbraco")
             };
             editorService.embed(embed);
         };
-
-        onInit();
+        
 });
