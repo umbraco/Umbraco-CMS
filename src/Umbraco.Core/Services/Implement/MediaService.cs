@@ -995,7 +995,7 @@ namespace Umbraco.Core.Services.Implement
             // if uow is not immediate, content.Path will be updated only when the UOW commits,
             // and because we want it now, we have to calculate it by ourselves
             //paths[media.Id] = media.Path;
-            paths[media.Id] = (parent == null ? (parentId == Constants.System.RecycleBinMedia ? "-1,-21" : "-1") : parent.Path) + "," + media.Id;
+            paths[media.Id] = (parent == null ? (parentId == Constants.System.RecycleBinMedia ? "-1,-21" : Constants.System.RootString) : parent.Path) + "," + media.Id;
 
             const int pageSize = 500;
             var page = 0;

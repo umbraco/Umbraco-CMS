@@ -52,7 +52,6 @@
     <key alias="domainExists">Die Domain '%0%' ist bereits zugeordnet</key>
     <key alias="domainUpdated">Domain '%0%' aktualisiert</key>
     <key alias="orEdit">Domains bearbeiten</key>
-    <key alias="domainHelp">Beispiel: example.com, www.example.com</key>
     <key alias="inherit">Vererben</key>
     <key alias="setLanguage">Kultur</key>
     <key alias="setLanguageHelp">Definiert die Kultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>

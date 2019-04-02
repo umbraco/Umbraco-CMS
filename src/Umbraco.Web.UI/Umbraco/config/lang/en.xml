@@ -96,9 +96,8 @@
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
-    <key alias="domainHelp"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
-        "https://www.example.com/". One-level paths in domains are supported, eg. "example.com/en". However, they
-        should be avoided. Better use the culture setting above.]]></key>
+      <key alias="domainHelpWithVariants"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
+     Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
         <key alias="setLanguageHelp">
@@ -281,13 +280,14 @@
     <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
     <key alias="languagesToPublish">What languages would you like to publish?</key>
     <key alias="languagesToSave">What languages would you like to save?</key>
-    <key alias="languagesToSaveForFirstTime">All languages with content are saved on creation!</key>
+    <key alias="languagesToSaveForFirstTime">What languages would you like to save?</key>
     <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
     <key alias="languagesToSchedule">What languages would you like to schedule?</key>
     <key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key>
     <key alias="publishedLanguages">Published Languages</key>
     <key alias="unpublishedLanguages">Unpublished Languages</key>
     <key alias="unmodifiedLanguages">Unmodified Languages</key>
+    <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
     <key alias="readyToPublish">Ready to Publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
     <key alias="sendForApproval">Send for approval</key>
@@ -1236,6 +1236,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% can not be published, because a parent page is not published.
     ]]></key>
+    <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% can not be published, because its missing a name.]]></key>
     <key alias="includeUnpublished">Include unpublished subpages</key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
@@ -2078,7 +2079,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
   </area>
   <area alias="textbox">
-    <key alias="characters_left">characters left</key>
+    <key alias="characters_left"><![CDATA[<strong>%0%</strong> characters left.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maximum %0% characters, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>

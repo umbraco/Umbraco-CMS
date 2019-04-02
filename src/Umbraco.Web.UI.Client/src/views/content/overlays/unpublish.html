@@ -16,14 +16,15 @@
             <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.publishedVariantFilter">
                 <ng-form name="unpublishVariantSelectorForm">
                     <div class="flex">
-                        <input id="{{variant.htmlId}}"
-                                name="unpublishVariantSelector"
-                                type="checkbox"
-                                ng-model="variant.save"
-                                ng-change="vm.changeSelection(variant)"
-                                ng-disabled="variant.disabled"
-                                style="margin-right: 8px;"
-                                val-server-field="{{variant.htmlId}}" />
+
+                        <umb-checkbox
+                            input-id="{{variant.htmlId}}"
+                            name="unpublishVariantSelector"
+                            model="variant.save"
+                            on-change="vm.changeSelection(variant)"
+                            disabled="variant.disabled"
+                            server-validation-field="{{variant.htmlId}}"/>
+
                         <div>
                             <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>

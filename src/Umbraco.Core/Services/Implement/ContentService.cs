@@ -533,7 +533,7 @@ namespace Umbraco.Core.Services.Implement
             //null check otherwise we get exceptions
             if (content.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IContent>();
 
-            var rootId = Constants.System.Root.ToInvariantString();
+            var rootId = Constants.System.RootString;
             var ids = content.Path.Split(',')
                 .Where(x => x != rootId && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
             if (ids.Any() == false)
@@ -1922,7 +1922,7 @@ namespace Umbraco.Core.Services.Implement
             // if uow is not immediate, content.Path will be updated only when the UOW commits,
             // and because we want it now, we have to calculate it by ourselves
             //paths[content.Id] = content.Path;
-            paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : "-1") : parent.Path) + "," + content.Id;
+            paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString) : parent.Path) + "," + content.Id;
 
             const int pageSize = 500;
             var page = 0;
@@ -2862,7 +2862,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (blueprint == null) throw new ArgumentNullException(nameof(blueprint));
 
-            var contentType = _contentTypeRepository.Get(blueprint.ContentType.Id);
+            var contentType = GetContentType(blueprint.ContentType.Alias);
             var content = new Content(name, -1, contentType);
             content.Path = string.Concat(content.ParentId.ToString(), ",", content.Id);
 
@@ -2875,7 +2875,14 @@ namespace Umbraco.Core.Services.Implement
             {
                 foreach (var property in blueprint.Properties)
                 {
-                    content.SetValue(property.Alias, property.GetValue(culture), culture);
+                    if (property.PropertyType.VariesByCulture())
+                    {
+                        content.SetValue(property.Alias, property.GetValue(culture), culture);
+                    }
+                    else
+                    {
+                        content.SetValue(property.Alias, property.GetValue());
+                    }
                 }
 
                 content.Name = blueprint.Name;

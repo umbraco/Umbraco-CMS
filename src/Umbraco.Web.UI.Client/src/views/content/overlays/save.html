@@ -6,53 +6,12 @@
         <umb-load-indicator></umb-load-indicator>
     </div>
 
-
-    <div ng-if="vm.isNew && !vm.loading">
+    <div ng-if="!vm.loading">
         <div style="margin-bottom: 15px;">
-            <p><localize key="content_languagesToSaveForFirstTime"></localize></p>
-        </div>
-
-        <div class="umb-list umb-list--condensed">
-
-            <div class="umb-list-item" ng-repeat="variant in vm.variants">
-                <ng-form name="saveVariantSelectorForm">
-                    <div class="flex">
-                        <input id="{{variant.htmlId}}"
-                               name="saveVariantSelector"
-                               type="checkbox"
-                               ng-model="variant.save"
-                               ng-disabled="vm.isNew"
-                               style="margin-right: 8px;"
-                               val-server-field="{{variant.htmlId}}" />
-                        <div>
-                            <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
-                                <span>{{ variant.language.name }}</span>
-                                <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
-
-                                <span class="db" ng-if="!saveVariantSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                                    <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
-                                </span>
-
-                                <span class="db" ng-messages="saveVariantSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
-                                    <span class="db umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
-                                </span>
-
-                                <span class="db" ng-repeat="notification in variant.notifications">
-                                    <span class="db umb-permission__description" style="color: #1FB572;">{{notification.message}}</span>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-
-                </ng-form>
-            </div>
-            <br/>
-        </div>
-    </div>
-
-    <div ng-if="!vm.isNew && !vm.loading">
-        <div style="margin-bottom: 15px;">
-            <p><localize key="content_languagesToSave"></localize></p>
+            <p>
+                <localize ng-if="!vm.isNew" key="content_languagesToSave"></localize>
+                <localize ng-if="vm.isNew" key="content_languagesToSaveForFirstTime"></localize>
+            </p>
         </div>
 
         <div class="umb-list umb-list--condensed">
@@ -60,13 +19,14 @@
             <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
                 <ng-form name="saveVariantSelectorForm">
                     <div class="flex">
-                        <input id="{{variant.htmlId}}"
-                               name="saveVariantSelector"
-                               type="checkbox"
-                               ng-model="variant.save"
-                               ng-change="vm.changeSelection(variant)"
-                               style="margin-right: 8px;"
-                               val-server-field="{{variant.htmlId}}" />
+
+                        <umb-checkbox
+                            input-id="{{variant.htmlId}}"
+                            name="saveVariantSelector"
+                            model="variant.save"
+                            on-change="vm.changeSelection(variant)"
+                            server-validation-field="{{variant.htmlId}}"/>
+
                         <div>
                             <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
@@ -77,11 +37,11 @@
                                 </span>
 
                                 <span class="db" ng-messages="saveVariantSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
-                                    <span class="db umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
+                                    <span class="db umb-permission__description text-error" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
                                 </span>
 
                                 <span class="db" ng-repeat="notification in variant.notifications">
-                                    <span class="db umb-permission__description" style="color: #1FB572;">{{notification.message}}</span>
+                                    <span class="db umb-permission__description text-success">{{notification.message}}</span>
                                 </span>
                             </label>
                         </div>
@@ -94,7 +54,10 @@
 
         <div class="umb-list umb-list--condensed" ng-if="vm.hasPristineVariants">
             <div style="margin-bottom: 15px; font-weight: bold;">
-                <p><localize key="content_unmodifiedLanguages"></localize></p>
+                <p>
+                    <localize ng-if="!vm.isNew" key="content_unmodifiedLanguages"></localize>
+                    <localize ng-if="vm.isNew" key="content_untouchedLanguagesForFirstTime"></localize>
+                </p>
             </div>
 
             <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">
@@ -109,7 +72,7 @@
                     </div>
 
                     <div ng-repeat="notification in variant.notifications">
-                        <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                        <div class="umb-permission__description text-success">{{notification.message}}</div>
                     </div>
                 </div>
             </div>

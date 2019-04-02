@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Umbraco.Core
+﻿namespace Umbraco.Core
 {
     public static partial class Constants
     {
         public static class Icons
         {
-
-
             /// <summary>
             /// System contenttype icon
             /// </summary>
@@ -42,12 +34,10 @@ namespace Umbraco.Core
             /// </summary>
             public const string MemberType = "icon-users";
 
-
             /// <summary>
             /// System member icon
             /// </summary>
             public const string Template = "icon-layout";
-
         }
     }
 }
