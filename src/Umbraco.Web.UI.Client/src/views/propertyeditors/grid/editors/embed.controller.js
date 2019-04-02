@@ -17,9 +17,6 @@ angular.module("umbraco")
             
             $scope.embedHtml = getEmbed();
         }, false);
-    	$scope.hasEmbed = function() {
-            return $scope.control.value !== null;
-        }
     	$scope.setEmbed = function() {
             var embed = {
                 submit: function(model) {
