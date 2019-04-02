@@ -1341,7 +1341,7 @@ namespace Umbraco.Web.Editors
             foreach (var variant in cultureVariants.Where(x => x.Publish))
             {
                 // publishing any culture, implies the invariant culture
-                var valid = persistentContent.PublishCulture(CultureType.Explicit(variant.Culture, IsDefaultCulture(variant.Culture)));
+                var valid = persistentContent.PublishCulture(CultureImpact.Explicit(variant.Culture, IsDefaultCulture(variant.Culture)));
                 if (!valid)
                 {
                     AddCultureValidationError(variant.Culture, "speechBubbles/contentCultureValidationError");

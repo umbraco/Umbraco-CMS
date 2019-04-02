@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // publish = new edit version
                 content1.SetValue("title", "title");
-                content1.PublishCulture(CultureType.Invariant);
+                content1.PublishCulture(CultureImpact.Invariant);
                 content1.PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = version
-                content1.PublishCulture(CultureType.Invariant);
+                content1.PublishCulture(CultureImpact.Invariant);
                 content1.PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish = new version
                 content1.Name = "name-4";
                 content1.SetValue("title", "title-4");
-                content1.PublishCulture(CultureType.Invariant);
+                content1.PublishCulture(CultureImpact.Invariant);
                 content1.PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
@@ -654,7 +654,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish them all
                 foreach (var content in result)
                 {
-                    content.PublishCulture(CultureType.Invariant);
+                    content.PublishCulture(CultureImpact.Invariant);
                     repository.Save(content);
                 }
 

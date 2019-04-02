@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Services
                 x => x.Published == true //set to published, the default culture will validate invariant anyways
                      && x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
-            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureType.Explicit("en-US", true));
+            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", true));
 
             Assert.IsFalse(result);
             Assert.AreEqual(2, invalid.Length);
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Services
                 x => x.Published == false //set to not published, the non default culture will need to validate invariant too
                      && x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
-            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureType.Explicit("en-US", false));
+            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", false));
 
             Assert.IsFalse(result);
             Assert.AreEqual(2, invalid.Length);
@@ -97,15 +97,15 @@ namespace Umbraco.Tests.Services
             var p2 = new Property(new PropertyType(dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
             p2.SetValue(null, null); //invalid
             var p3 = new Property(new PropertyType(dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
-            p3.SetValue(null, "en-US"); //ignored because the CultureType isn't the default lang + the content is published
+            p3.SetValue(null, "en-US"); //ignored because the impact isn't the default lang + the content is published
             var p4 = new Property(new PropertyType(dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
-            p4.SetValue(null, null); //ignored because the CultureType isn't the default lang + the content is published
+            p4.SetValue(null, null); //ignored because the impact isn't the default lang + the content is published
 
             var content = Mock.Of<IContent>(
                 x => x.Published == true //set to published
                      && x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
-            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureType.Explicit("en-US", false));
+            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", false));
 
             Assert.IsFalse(result);
             Assert.AreEqual(2, invalid.Length);
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Services
             var content = Mock.Of<IContent>(
                 x => x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
-            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureType.Invariant);
+            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Invariant);
 
             Assert.IsFalse(result);
             Assert.AreEqual(2, invalid.Length);
@@ -151,7 +151,7 @@ namespace Umbraco.Tests.Services
             var content = Mock.Of<IContent>(
                 x => x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
-            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureType.All);
+            var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.All);
 
             Assert.IsFalse(result);
             Assert.AreEqual(4, invalid.Length);

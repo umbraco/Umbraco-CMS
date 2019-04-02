@@ -732,8 +732,8 @@ namespace Umbraco.Tests.Services
             IContent content = new Content("content", Constants.System.Root, contentType);
             content.SetCultureName("content-fr", langFr.IsoCode);
             content.SetCultureName("content-en", langUk.IsoCode);
-            content.PublishCulture(CultureType.Explicit(langFr.IsoCode, langFr.IsDefault));
-            content.PublishCulture(CultureType.Explicit(langUk.IsoCode, langUk.IsDefault));
+            content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault));
+            content.PublishCulture(CultureImpact.Explicit(langUk.IsoCode, langUk.IsDefault));
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
@@ -1001,7 +1001,7 @@ namespace Umbraco.Tests.Services
 
             // content cannot publish values because they are invalid
             var propertyValidationService = new PropertyValidationService(Factory.GetInstance<PropertyEditorCollection>(), ServiceContext.DataTypeService);
-            var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties, CultureType.Invariant);
+            var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties, CultureImpact.Invariant);
             Assert.IsFalse(isValid);
             Assert.IsNotEmpty(invalidProperties);
 
@@ -1036,7 +1036,7 @@ namespace Umbraco.Tests.Services
             content.SetCultureName("name-fr", langFr.IsoCode);
             content.SetCultureName("name-da", langDa.IsoCode);
 
-            content.PublishCulture(CultureType.Explicit(langFr.IsoCode, langFr.IsDefault));
+            content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault));
             var result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);
             content = ServiceContext.ContentService.GetById(content.Id);
@@ -1044,7 +1044,7 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
             content.UnpublishCulture(langFr.IsoCode);
-            content.PublishCulture(CultureType.Explicit(langDa.IsoCode, langDa.IsDefault));
+            content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault));
 
             result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);

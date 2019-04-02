@@ -166,46 +166,55 @@ namespace Umbraco.Core.Models
         /// Sets the publishing values for names and properties.
         /// </summary>
         /// <param name="content"></param>
-        /// <param name="culture"></param>
+        /// <param name="impact"></param>
         /// <returns>A value indicating whether it was possible to publish the names and values for the specified
         /// culture(s). The method may fail if required names are not set, but it does NOT validate property data</returns>
-        public static bool PublishCulture(this IContent content, CultureType culture)
+        public static bool PublishCulture(this IContent content, CultureImpact impact)
         {
-            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            if (impact == null) throw new ArgumentNullException(nameof(impact));
 
             // the variation should be supported by the content type properties
             //  if the content type is invariant, only '*' and 'null' is ok
             //  if the content type varies, everything is ok because some properties may be invariant
-            if (!content.ContentType.SupportsPropertyVariation(culture.Culture, "*", true))
-                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
+            if (!content.ContentType.SupportsPropertyVariation(impact.Culture, "*", true))
+                throw new NotSupportedException($"Culture \"{impact.Culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
 
-            if (culture.CultureBehavior.HasFlag(CultureType.Behavior.AllCultures))
-                foreach (var c in content.AvailableCultures)
+            // set names
+            if (impact.ImpactsAllCultures)
+            {
+                foreach (var c in content.AvailableCultures) // does NOT contain the invariant culture
                 {
                     var name = content.GetCultureName(c);
                     if (string.IsNullOrWhiteSpace(name))
                         return false;
                     content.SetPublishInfo(c, name, DateTime.Now);
                 }
-            else if (culture.CultureBehavior.HasFlag(CultureType.Behavior.InvariantCulture))
+            }
+            else if (impact.ImpactsOnlyInvariantCulture)
             {
                 if (string.IsNullOrWhiteSpace(content.Name))
                     return false;
                 // PublishName set by repository - nothing to do here
             }
-            else if (culture.CultureBehavior.HasFlag(CultureType.Behavior.ExplicitCulture))
+            else if (impact.ImpactsExplicitCulture)
             {
-                var name = content.GetCultureName(culture.Culture);
+                var name = content.GetCultureName(impact.Culture);
                 if (string.IsNullOrWhiteSpace(name))
                     return false;
-                content.SetPublishInfo(culture.Culture, name, DateTime.Now);
+                content.SetPublishInfo(impact.Culture, name, DateTime.Now);
             }
 
-            // property.PublishValues only publishes what is valid, variation-wise
+            // set values
+            // property.PublishValues only publishes what is valid, variation-wise,
+            // but accepts any culture arg: null, all, specific
             foreach (var property in content.Properties)
             {
-                property.PublishValues(culture.Culture);
-                if (culture.CultureBehavior.HasFlag(CultureType.Behavior.InvariantProperties))
+                // for the specified culture (null or all or specific)
+                property.PublishValues(impact.Culture);
+
+                // maybe the specified culture did not impact the invariant culture, so PublishValues
+                // above would skip it, yet it *also* impacts invariant properties
+                if (impact.ImpactsAlsoInvariantProperties)
                     property.PublishValues(null);
             }
 

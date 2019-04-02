@@ -881,12 +881,12 @@ namespace Umbraco.Core.Services.Implement
                 // if culture is specific, first publish the invariant values, then publish the culture itself.
                 // if culture is '*', then publish them all (including variants)
 
-                //this will create the correct culture type even if culture is * or null
-                var cultureType = CultureType.Create(content, culture, _languageRepository.IsDefault(culture));
+                //this will create the correct culture impact even if culture is * or null
+                var impact = CultureImpact.Create(culture, _languageRepository.IsDefault(culture), content);
 
                 // publish the culture(s)
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-                content.PublishCulture(cultureType);
+                content.PublishCulture(impact);
 
                 var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, userId, raiseEvents);
                 scope.Complete();
@@ -922,12 +922,12 @@ namespace Umbraco.Core.Services.Implement
                 if (cultures.Any(x => x == null || x == "*"))
                     throw new InvalidOperationException("Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
 
-                var cultureTypes = cultures.Select(x => CultureType.Explicit(x, _languageRepository.IsDefault(x)));
+                var impacts = cultures.Select(x => CultureImpact.Explicit(x, _languageRepository.IsDefault(x)));
 
                 // publish the culture(s)
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-                foreach (var cultureType in cultureTypes)
-                    content.PublishCulture(cultureType); 
+                foreach (var impact in impacts)
+                    content.PublishCulture(impact); 
                 
                 var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, userId, raiseEvents);
                 scope.Complete();
@@ -1308,8 +1308,8 @@ namespace Umbraco.Core.Services.Implement
 
                             //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                             Property[] invalidProperties = null;
-                            var cultureType = CultureType.Explicit(culture, _languageRepository.IsDefault(culture));
-                            var tryPublish = d.PublishCulture(cultureType) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, cultureType);
+                            var impact = CultureImpact.Explicit(culture, _languageRepository.IsDefault(culture));
+                            var tryPublish = d.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                             if (invalidProperties != null && invalidProperties.Length > 0)
                                 Logger.Warn<ContentService>("Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
                                     d.Id, culture, string.Join(",", invalidProperties.Select(x => x.Alias)));
@@ -1409,13 +1409,15 @@ namespace Umbraco.Core.Services.Implement
             {                
                 return culturesToPublish.All(culture =>
                 {
-                    var cultureType = CultureType.Explicit(culture, _languageRepository.IsDefault(culture));
-                    return content.PublishCulture(cultureType) && _propertyValidationService.Value.IsPropertyDataValid(content, out _, cultureType);
+                    // fixme - not ... ah?!
+                    //var cultureType = CultureImpact.Explicit(culture, _languageRepository.IsDefault(culture));
+                    var impact = CultureImpact.Create(culture, _languageRepository.IsDefault(culture), content);
+                    return content.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
                 });
             }
 
-            return content.PublishCulture(CultureType.Invariant)
-                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, CultureType.Invariant);
+            return content.PublishCulture(CultureImpact.Invariant)
+                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, CultureImpact.Invariant);
         }
 
         // utility 'ShouldPublish' func used by SaveAndPublishBranch
@@ -2487,17 +2489,17 @@ namespace Umbraco.Core.Services.Implement
 
             var variesByCulture = content.ContentType.VariesByCulture();
 
-            var cultureTypesToPublish = culturesPublishing == null
-                ? new[] {CultureType.Invariant} //if it's null it's invariant
-                : culturesPublishing.Select(x => CultureType.Explicit(x, _languageRepository.IsDefault(x))).ToArray();
+            var impactsToPublish = culturesPublishing == null
+                ? new[] {CultureImpact.Invariant} //if it's null it's invariant
+                : culturesPublishing.Select(x => CultureImpact.Explicit(x, _languageRepository.IsDefault(x))).ToArray();
 
             // publish the culture(s)
-            if (!cultureTypesToPublish.All(content.PublishCulture))
+            if (!impactsToPublish.All(content.PublishCulture))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
             //validate the property values
             Property[] invalidProperties = null;
-            if (!cultureTypesToPublish.All(x => _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x)))
+            if (!impactsToPublish.All(x => _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x)))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
                 {
                     InvalidProperties = invalidProperties
