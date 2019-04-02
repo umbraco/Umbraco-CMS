@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
         protected abstract void DefineMaps();
 
-        internal string Map(string propertyName, bool throws = false)
+        internal string Map(string propertyName)
         {
             lock (_definedLock)
             {
@@ -57,7 +57,6 @@ namespace Umbraco.Core.Persistence.Mappers
             if (_sqlSyntax == null)
                 throw new InvalidOperationException("Do not define maps outside of DefineMaps.");
 
-            var sourceType = typeof(TSource);
             var targetType = typeof(TTarget);
 
             // TODO ensure that sourceName is a valid sourceType property (but, slow?)

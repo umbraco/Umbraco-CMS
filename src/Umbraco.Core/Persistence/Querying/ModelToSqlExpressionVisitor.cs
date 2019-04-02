@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var field = _mapper.Map(m.Member.Name, true);
+                    var field = _mapper.Map(m.Member.Name);
                     if (field.IsNullOrWhiteSpace())
                         throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}.");
                     return field;
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var field = _mapper.Map(m.Member.Name, true);
+                    var field = _mapper.Map(m.Member.Name);
                     if (field.IsNullOrWhiteSpace())
                         throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}.");
                     return field;
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Querying
                 if (Visited == false)
                 {
                     var subMapper = _mappers[m.Expression.Type]; // throws if not found
-                    var field = subMapper.Map(m.Member.Name, true);
+                    var field = subMapper.Map(m.Member.Name);
                     if (field.IsNullOrWhiteSpace())
                         throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}");
                     return field;
