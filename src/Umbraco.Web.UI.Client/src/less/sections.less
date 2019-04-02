@@ -39,7 +39,8 @@ ul.sections>li>a::after {
 	background-color: @pinkLight;
     position: absolute;
     left: 0;
-	bottom: -4px;
+    bottom: 0;
+    transform: translateY(4px);
 	border-radius: 3px 3px 0 0;
 	opacity: 0;
 	padding: 0 2px;
@@ -49,9 +50,10 @@ ul.sections>li>a::after {
 ul.sections>li.current>a {
     color:@pinkLight;
 }
+
 ul.sections>li.current>a::after {
 	opacity: 1;
-	bottom: 0;
+    transform: translateY(0);    
 }
 
 ul.sections>li.current>a .section__name,
@@ -61,7 +63,9 @@ ul.sections>li>a:focus .section__name {
     -webkit-font-smoothing: subpixel-antialiased;
 }
 
-
+ul.sections>li>a:focus .section__name {
+    color:@pinkLight;
+}
 
 /* Sections tray */
 
