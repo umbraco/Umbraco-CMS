@@ -69,7 +69,7 @@ namespace Umbraco.Core
 
                 public const string Tag = /*TableNamePrefix*/ "cms" + "Tags";
                 public const string TagRelationship = /*TableNamePrefix*/ "cms" + "TagRelationship";
-                
+
                 public const string KeyValue = TableNamePrefix + "KeyValue";
 
                 public const string AuditEntry = TableNamePrefix + "Audit";

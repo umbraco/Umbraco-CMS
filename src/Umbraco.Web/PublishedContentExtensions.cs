@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Composing;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
 {
@@ -21,6 +22,7 @@ namespace Umbraco.Web
         // see notes in PublishedElementExtensions
         //
         private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
+        private static IPublishedSnapshot PublishedSnapshot => Current.PublishedSnapshot;
 
         #region Urls
 
@@ -235,7 +237,8 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="contents">The content items.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null).</param>
-        internal static IEnumerable<IPublishedContent> WhereIsInvariantOrHasCulture(this IEnumerable<IPublishedContent> contents, string culture = null)
+        internal static IEnumerable<T> WhereIsInvariantOrHasCulture<T>(this IEnumerable<T> contents, string culture = null)
+            where T : class, IPublishedContent
         {
             if (contents == null) throw new ArgumentNullException(nameof(contents));
 
@@ -1113,6 +1116,97 @@ namespace Umbraco.Web
                 }
                 );
             return dt;
+        }
+
+        #endregion
+
+        #region Axes: Siblings
+
+        /// <summary>
+        /// Gets the siblings of the content.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
+        /// <returns>The siblings of the content.</returns>
+        /// <remarks>
+        ///   <para>Note that in V7 this method also return the content node self.</para>
+        /// </remarks>
+        public static IEnumerable<IPublishedContent> Siblings(this IPublishedContent content, string culture = null)
+        {
+            return SiblingsAndSelf(content, culture).Where(x => x.Id != content.Id);
+        }
+
+        /// <summary>
+        /// Gets the siblings of the content, of a given content type.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
+        /// <param name="contentTypeAlias">The content type alias.</param>
+        /// <returns>The siblings of the content, of the given content type.</returns>
+        /// <remarks>
+        ///   <para>Note that in V7 this method also return the content node self.</para>
+        /// </remarks>
+        public static IEnumerable<IPublishedContent> SiblingsOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        {
+            return SiblingsAndSelfOfType(content, contentTypeAlias, culture).Where(x => x.Id != content.Id);
+        }
+
+        /// <summary>
+        /// Gets the siblings of the content, of a given content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
+        /// <returns>The siblings of the content, of the given content type.</returns>
+        /// <remarks>
+        ///   <para>Note that in V7 this method also return the content node self.</para>
+        /// </remarks>
+        public static IEnumerable<IPublishedContent> Siblings<T>(this IPublishedContent content, string culture = null)
+            where T : class, IPublishedContent
+        {
+            return SiblingsAndSelf<T>(content, culture).Where(x => x.Id != content.Id);
+        }
+
+        /// <summary>
+        /// Gets the siblings of the content including the node itself to indicate the position.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
+        /// <returns>The siblings of the content including the node itself.</returns>
+        public static IEnumerable<IPublishedContent> SiblingsAndSelf(this IPublishedContent content, string culture = null)
+        {
+            return content.Parent != null
+                ? content.Parent.Children(culture)
+                : PublishedSnapshot.Content.GetAtRoot().WhereIsInvariantOrHasCulture(culture);
+        }
+
+        /// <summary>
+        /// Gets the siblings of the content including the node itself to indicate the position, of a given content type.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
+        /// <param name="contentTypeAlias">The content type alias.</param>
+        /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
+        public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        {
+            return content.Parent != null
+                ? content.Parent.ChildrenOfType(contentTypeAlias, culture)
+                : PublishedSnapshot.Content.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(culture);
+        }
+
+        /// <summary>
+        /// Gets the siblings of the content including the node itself to indicate the position, of a given content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
+        /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
+        public static IEnumerable<T> SiblingsAndSelf<T>(this IPublishedContent content, string culture = null)
+            where T : class, IPublishedContent
+        {
+            return content.Parent != null
+                ? content.Parent.Children<T>(culture)
+                : PublishedSnapshot.Content.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(culture);
         }
 
         #endregion

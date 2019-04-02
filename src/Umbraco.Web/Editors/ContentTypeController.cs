@@ -552,9 +552,15 @@ namespace Umbraco.Web.Editors
             var file = result.FileData[0];
             var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
+
+            // renaming the file because MultipartFormDataStreamProvider has created a random fileName instead of using the name from the
+            // content-disposition for more than 6 years now. Creating a CustomMultipartDataStreamProvider deriving from MultipartFormDataStreamProvider
+            // seems like a cleaner option, but I'm not sure where to put it and renaming only takes one line of code.
+            System.IO.File.Move(result.FileData[0].LocalFileName, root + "\\" + fileName);
+
             if (ext.InvariantEquals("udt"))
             {
-                model.TempFileName = Path.Combine(root, model.TempFileName);
+                model.TempFileName = Path.Combine(root, fileName);
 
                 model.UploadedFiles.Add(new ContentPropertyFile
                 {

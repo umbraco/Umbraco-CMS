@@ -95,7 +95,8 @@
     <key alias="domainExists">Domænet '%0%' er oprettet</key>
     <key alias="domainUpdated">Domænet '%0%' er nu opdateret</key>
     <key alias="orEdit">eller rediger nuværende domæner</key>
-    <key alias="domainHelp">f.eks. ditdomaene.com, www.ditdomaene.com</key>
+    <key alias="domainHelpWithVariants"><![CDATA[Gyldige domænenavne er: "example.com", "www.example.com", "example.com:8080" eller "https://www.example.com/".
+     Yderlgiere understøttes også første niveau af stien efter domænet, f.eks. "Example.com/en" eller "/en". ]]></key>
     <key alias="inherit">Nedarv</key>
     <key alias="setLanguage">Sprog</key>
     <key alias="setLanguageHelp"><![CDATA[Indstil sproget for noder under den aktuelle node,<br /> eller nedarv sprog fra forældre noder. Gælder også<br />
@@ -1568,7 +1569,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="emptyDictionaryTree">Ingen ordbog elementer at vælge imellem</key>
   </area>
   <area alias="textbox">
-    <key alias="characters_left">Karakterer tilbage</key>
+    <key alias="characters_left"><![CDATA[<strong>%0%</strong> tegn tilbage.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maksimum %0% tegn, <strong>%1%</strong> for mange.]]></key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
