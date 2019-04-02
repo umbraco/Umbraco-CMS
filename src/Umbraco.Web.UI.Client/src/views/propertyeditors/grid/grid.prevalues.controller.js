@@ -78,7 +78,7 @@ angular.module("umbraco")
 
         $scope.configureTemplate = function(template) {
 
-           var templatesCopy = angular.copy($scope.model.value.templates);
+            var index = $scope.model.value.templates.indexOf(template);
 
            if (template === undefined) {
               template = {
@@ -87,16 +87,19 @@ angular.module("umbraco")
 
                  ]
               };
-              $scope.model.value.templates.push(template);
            }
             
             var layoutConfigOverlay = {
-                currentLayout: template,
+                currentLayout: angular.copy(template),
                 rows: $scope.model.value.layouts,
                 columns: $scope.model.value.columns,
                 view: "views/propertyEditors/grid/dialogs/layoutconfig.html",
                 size: "small",
-                submit: function(model) {
+                submit: function (model) {
+                    if (index === -1)
+                        $scope.model.value.templates.push(model);
+                    else
+                        $scope.model.value.templates[index] = model;
                     editorService.close();
                 },
                 close: function(model) {
@@ -119,8 +122,8 @@ angular.module("umbraco")
 
         $scope.configureLayout = function(layout) {
 
-           var layoutsCopy = angular.copy($scope.model.value.layouts);
-
+            var index = $scope.model.value.layouts.indexOf(layout);
+            
            if(layout === undefined){
                 layout = {
                     name: "",
@@ -128,16 +131,19 @@ angular.module("umbraco")
 
                     ]
                 };
-                $scope.model.value.layouts.push(layout);
            }
            
            var rowConfigOverlay = {
-               currentRow: layout,
+               currentRow: angular.copy(layout),
                editors: $scope.editors,
                columns: $scope.model.value.columns,
                view: "views/propertyEditors/grid/dialogs/rowconfig.html",
                size: "small",
-               submit: function(model) {
+               submit: function (model) {
+                   if (index === -1)
+                       $scope.model.value.layouts.push(model);
+                   else
+                    $scope.model.value.layouts[index] = model;
                    editorService.close();
                },
                close: function(model) {
