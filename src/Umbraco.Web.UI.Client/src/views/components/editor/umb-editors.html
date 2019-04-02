@@ -16,6 +16,7 @@
         'umb-editor--level1': model.level === 1,
         'umb-editor--level2': model.level === 2,
         'umb-editor--level3': model.level === 3}"
+        umb-inert-attribute="infinite-overlay"
         >
         <div ng-if="!model.view && !model.animating" ng-transclude></div>
         <div ng-if="model.view && !model.animating" ng-include="model.view"></div>

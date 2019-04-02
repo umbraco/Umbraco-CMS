@@ -55,7 +55,7 @@
 
     <div ng-hide="!authenticated" ng-cloak>
 
-        <div style="display: none;" id="mainwrapper" class="clearfix">
+        <div style="display: none;" id="mainwrapper" class="clearfix" umb-inert-attribute="overlay">
 
             <umb-app-header></umb-app-header>
 
@@ -67,7 +67,7 @@
 
                     <div id="contentcolumn">
 
-                        <div class="umb-editor" ng-view></div>
+                        <div class="umb-editor" umb-inert-attribute="infinite-overlay" ng-view></div>
                         <div class="umb-editor__overlay" ng-if="infiniteMode"></div>
 
                         <umb-editors></umb-editors>
