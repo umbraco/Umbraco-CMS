@@ -29,7 +29,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 foreach (var macro in Services.MacroService.GetAll())
                 {
@@ -50,7 +50,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(Services.TextService);

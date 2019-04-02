@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // move to parent (or -1), update path, save
             moving.ParentId = parentId;
             var movingPath = moving.Path + ","; // save before changing
-            moving.Path = (container == null ? Constants.System.Root.ToString() : container.Path) + "," + moving.Id;
+            moving.Path = (container == null ? Constants.System.RootString : container.Path) + "," + moving.Id;
             moving.Level = container == null ? 1 : container.Level + 1;
             Save(moving);
 

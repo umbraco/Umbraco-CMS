@@ -112,7 +112,7 @@
 @blueExtraDark:         #1b264f;// added 2019
 @blueLight:             #ADD8E6;
 @blueNight:             #162335;// added 2019
-@orange:                #f79c37;// updated 2019
+//@orange:              #f79c37;// updated 2019
 @pink:                  #D93F4C;// #C3325F;// update 2019
 @pinkLight:             #f5c1bc;// added 2019
 @pinkRedLight:          #ff8a89;// added 2019
@@ -130,8 +130,12 @@
 // -------------------------
 
 @ui-option-type:        @blueExtraDark;
-@ui-option-hover:       @sand-7;
 @ui-option-type-hover:  @blueMid;
+@ui-option-hover:       @sand-7;
+
+@ui-option-disabled-type:        @gray-6;
+@ui-option-disabled-type-hover:  @gray-5;
+@ui-option-disabled-hover:       @sand-7;
 
 //@ui-active:           #346ab3;
 @ui-active:             @pinkLight;
@@ -162,12 +166,12 @@
 @ui-action-border:             @blueExtraDark;
 @ui-action-border-hover:       @blueMid;
 
-@ui-action-disgrete:              white;
-@ui-action-disgrete-hover:        @sand-7;
-@ui-action-disgrete-type:         @blueExtraDark;
-@ui-action-disgrete-type-hover:   @blueMid;
-@ui-action-disgrete-border:         @gray-7;
-@ui-action-disgrete-border-hover:   @blueMid;
+@ui-action-discreet:              white;
+@ui-action-discreet-hover:        @sand-7;
+@ui-action-discreet-type:         @blueExtraDark;
+@ui-action-discreet-type-hover:   @blueMid;
+@ui-action-discreet-border:         @gray-7;
+@ui-action-discreet-border-hover:   @blueMid;
 
 @type-white:                      @white;
 @type-black:                      @blueNight;
@@ -194,6 +198,16 @@
 .black{color: @black;}
 .turquoise{color: @turquoise;}
 .turquoise-d1{color: @turquoise-d1;}
+
+.text-warning {
+    color: @orange;
+}
+.text-error {
+    color: @red;
+}
+.text-success {
+    color: @green;
+}
 
 
 //icon colors for tree icons
