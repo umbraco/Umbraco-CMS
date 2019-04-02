@@ -45,14 +45,6 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             });
         });
 
-        $scope.selected = function(cmd, alias, lookup){
-            if (lookup && angular.isArray(lookup)) {
-                cmd.selected = lookup.indexOf(alias) >= 0;
-                return cmd.selected;
-            }
-            return false;
-        };
-
         $scope.selectCommand = function(command){
             var index = $scope.model.value.toolbar.indexOf(command.alias);
 
