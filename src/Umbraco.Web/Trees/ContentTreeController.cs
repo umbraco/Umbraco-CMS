@@ -109,7 +109,7 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 var menu = new MenuItemCollection();
 
