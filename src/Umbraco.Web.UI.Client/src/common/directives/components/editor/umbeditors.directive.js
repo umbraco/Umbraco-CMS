@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorsDirective($timeout, eventsService, focusTrapService) {
+    function EditorsDirective($timeout, eventsService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -79,15 +79,6 @@
                     iEditor.level = Math.max(i-origin, -1);
                     iEditor.inFront = iEditor.level >= ceiling;
                     i++;
-                }
-
-                // If there are any active editors we call the addFocusTrap method
-                if(len > 0){
-                    focusTrapService.addFocusTrap('infinite');
-                }
-                // Otherwise we make sure to remove the focus trap
-                else{
-                    focusTrapService.removeFocusTrap('infinite');
                 }
             }
             
