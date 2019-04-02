@@ -583,6 +583,8 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             .then(function () {
                 //executes if all is successful, let's sync the tree
                 if (newPath) {
+                    // reload the current view so the moved items are no longer shown
+                    $scope.reloadView($scope.contentId);
 
                     //we need to do a double sync here: first refresh the node where the content was moved,
                     // then refresh the node where the content was moved from
