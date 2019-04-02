@@ -57,7 +57,7 @@ Great question! The short version goes like this:
   ![Fork the repository](img/forkrepository.png)
 
   * **Clone** - when GitHub has created your fork, you can clone it in your favorite Git tool
-  
+
   ![Clone the fork](img/clonefork.png)
 
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
@@ -106,7 +106,7 @@ The pull request team consists of a member of Umbraco HQ, [Sebastiaan](https://g
 - [Emma Burstow](https://github.com/emmaburstow)
 - [Poornima Nayar](https://github.com/poornimanayar)
 
-These wonderful volunteers will provide you with a first reply to your PR, review and test out your changes and might ask more questions. After that they'll let Umbraco HQ know if everything seems okay. 
+These wonderful volunteers will provide you with a first reply to your PR, review and test out your changes and might ask more questions. After that they'll let Umbraco HQ know if everything seems okay.
 
 ### Questions?
 
@@ -122,7 +122,7 @@ You can get in touch with [the PR team](#the-pr-team) in multiple ways, we love 
 In order to build the Umbraco source code locally, first make sure you have the following installed.
 
   * Visual Studio 2017 v15.9.7+
-  * Node v10+ 
+  * Node v10+
   * npm v6.4.1+
 
 The easiest way to get started is to run `build.ps1` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`. See [this page](BUILD.md) for more details.
@@ -179,9 +179,9 @@ Then when you want to get the changes from the main repository:
 
 ```
 git fetch upstream
-git rebase upstream/dev-v8
+git rebase upstream/v8/dev
 ```
 
-In this command we're syncing with the `dev-v8` branch, but you can of course choose another one if needed.
+In this command we're syncing with the `v8/dev` branch, but you can of course choose another one if needed.
 
 (More info on how this works: [http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated](http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated))
