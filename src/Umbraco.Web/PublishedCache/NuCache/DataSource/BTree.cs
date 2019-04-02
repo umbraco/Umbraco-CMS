@@ -15,7 +15,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 CreateFile = exists ? CreatePolicy.IfNeeded : CreatePolicy.Always,
                 FileName = filepath,
 
-                // read or write but do NOT keep in memory
+                // read or write but do *not* keep in memory
                 CachePolicy = CachePolicy.None,
 
                 // default is 4096, min 2^9 = 512, max 2^16 = 64K
