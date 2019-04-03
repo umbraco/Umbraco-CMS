@@ -77,8 +77,8 @@
                 <div class="umb-table-cell"></div>
                 <div class="umb-table-cell"><localize key="general_name">Name</localize></div>
                 <div class="umb-table-cell"><localize key="main_sections">Sections</localize></div>
-                <div class="umb-table-cell"><localize key="user_startnode">Content start node</localize></div>
-                <div class="umb-table-cell"><localize key="user_mediastartnode">Media start node</localize></div>
+                <div class="umb-table-cell umb-table-cell--small"><localize key="user_startnode">Content start node</localize></div>
+                <div class="umb-table-cell umb-table-cell--small"><localize key="user_mediastartnode">Media start node</localize></div>
             </div>
         </div>
 
@@ -107,11 +107,11 @@
                         <span ng-if="group.sections.length === 0">All sections</span>
                     </div>
                 </div>
-                <div class="umb-table-cell">
+                <div class="umb-table-cell umb-table-cell--small">
                     <span ng-if="!group.contentStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
                     <span ng-if="group.contentStartNode">{{ group.contentStartNode.name }}</span>
                 </div>
-                <div class="umb-table-cell">
+                <div class="umb-table-cell umb-table-cell--small">
                     <span ng-if="!group.mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
                     <span ng-if="group.mediaStartNode">{{ group.mediaStartNode.name }}</span>
                 </div>
