@@ -14,7 +14,7 @@ namespace Umbraco.Core.Xml
     /// <summary>
     /// The XmlHelper class contains general helper methods for working with xml in umbraco.
     /// </summary>
-    internal class XmlHelper
+    public class XmlHelper
     {
         /// <summary>
         /// Creates or sets an attribute on the XmlNode if an Attributes collection is available
