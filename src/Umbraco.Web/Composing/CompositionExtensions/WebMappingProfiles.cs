@@ -30,6 +30,7 @@ namespace Umbraco.Web.Composing.CompositionExtensions
                 .Add<LanguageMapDefinition>();
 
             composition.Register<CommonMapper>();
+            composition.Register<MemberTabsAndPropertiesMapper>();
 
             return composition;
         }

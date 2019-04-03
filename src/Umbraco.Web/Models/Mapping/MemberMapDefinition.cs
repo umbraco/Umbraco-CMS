@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
@@ -20,14 +21,14 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly CommonMapper _commonMapper;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly TabsAndPropertiesMapper<IMember> _tabsAndPropertiesMapper;
+        private readonly MemberTabsAndPropertiesMapper _tabsAndPropertiesMapper;
 
-        public MemberMapDefinition(CommonMapper commonMapper, IMemberTypeService memberTypeService, ILocalizedTextService localizedTextService)
+        public MemberMapDefinition(CommonMapper commonMapper, IMemberTypeService memberTypeService, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper)
         {
             _commonMapper = commonMapper;
             _memberTypeService = memberTypeService;
 
-            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMember>(localizedTextService);
+            _tabsAndPropertiesMapper = tabsAndPropertiesMapper;
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -38,6 +39,7 @@ namespace Umbraco.Web.Models.Mapping
             mapper.Define<IMember, MemberBasic>((source, context) => new MemberBasic(), Map);
             mapper.Define<MembershipUser, MemberBasic>((source, context) => new MemberBasic(), Map);
             mapper.Define<IMemberGroup, MemberGroupDisplay>((source, context) => new MemberGroupDisplay(), Map);
+            mapper.Define<IMember, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
         }
 
         private void Map(MembershipUser source, MemberDisplay target, MapperContext context)
@@ -142,6 +144,12 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.Path = "-1" + source.Id;
             target.Udi = Udi.Create(Constants.UdiEntityType.MemberGroup, source.Key);
+        }
+
+        // Umbraco.Code.MapAll
+        private static void Map(IMember source, ContentPropertyCollectionDto target, MapperContext context)
+        {
+            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyDto>);
         }
 
         private MembershipScenario GetMembershipScenario()

@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.Mapping
                 var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
                 if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariantDisplay>(); //this should never happen
 
-                var langs = context.Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages, null, context).ToList();
+                var langs = context.Mapper.Map<IEnumerable<Language>>(allLanguages, context).ToList();
 
                 //create a variant for each language, then we'll populate the values
                 var variants = langs.Select(x =>
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Models.Mapping
                     //We need to set the culture in the mapping context since this is needed to ensure that the correct property values
                     //are resolved during the mapping
                     context.SetCulture(x.IsoCode);
-                    return context.Mapper.Map<IContent, ContentVariantDisplay>(source, null, context);
+                    return context.Mapper.Map<ContentVariantDisplay>(source, context);
                 }).ToList();
 
                 for (int i = 0; i < langs.Count; i++)
