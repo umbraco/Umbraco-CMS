@@ -257,7 +257,9 @@
                             </a>
                         </div>
                         <div class="umb-table-cell umb-table__name">
-                            <a ng-click="vm.clickUser(user, $event)" ng-href="#{{::vm.getEditPath(user)}}">
+                            <a class="umb-table-body__link"
+                               ng-click="vm.clickUser(user, $event)"
+                               ng-href="#{{::vm.getEditPath(user)}}">
                                 <span>
                                     {{user.name}}
                                 </span>
