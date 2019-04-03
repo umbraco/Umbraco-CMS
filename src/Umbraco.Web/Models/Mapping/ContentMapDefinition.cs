@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares how model mappings for content
     /// </summary>
-    internal class ContentMapperProfile : IMapperProfile
+    internal class ContentMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
         private readonly ILocalizedTextService _localizedTextService;
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ContentBasicSavedStateMapper<ContentPropertyBasic> _basicStateMapper;
         private readonly ContentVariantMapper _contentVariantMapper;
 
-        public ContentMapperProfile(CommonMapper commonMapper, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
+        public ContentMapDefinition(CommonMapper commonMapper, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
             IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILogger logger,
             IUserService userService)
         {
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Models.Mapping
             _contentVariantMapper = new ContentVariantMapper(_localizationService);
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
             mapper.Define<IContent, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);

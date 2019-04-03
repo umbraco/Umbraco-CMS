@@ -7,15 +7,15 @@ using Umbraco.Web.Sections;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class SectionMapperProfile : IMapperProfile
+    internal class SectionMapDefinition : IMapDefinition
     {
         private readonly ILocalizedTextService _textService;
-        public SectionMapperProfile(ILocalizedTextService textService)
+        public SectionMapDefinition(ILocalizedTextService textService)
         {
             _textService = textService;
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<ISection, Section>((source, context) => new Section(), Map);
 

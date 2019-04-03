@@ -127,7 +127,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the mapper.
         /// </summary>
-        public Mapper Mapper { get; }
+        public UmbracoMapper Mapper { get; }
 
         /// <summary>
         /// Gets the web security helper.

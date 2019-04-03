@@ -37,7 +37,7 @@ namespace Umbraco.Web.Security
         /// <param name="userMembershipProvider"></param>
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             ServiceContext services,
-            Mapper mapper,
+            UmbracoMapper mapper,
             IContentSection contentSettings,
             IGlobalSettings globalSettings,
             MembershipProviderBase userMembershipProvider)

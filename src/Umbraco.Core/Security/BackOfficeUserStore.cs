@@ -7,12 +7,12 @@ using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using IUser = Umbraco.Core.Models.Membership.IUser;
-using Mapper = Umbraco.Core.Mapping.Mapper;
 using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Core.Security
@@ -38,10 +38,10 @@ namespace Umbraco.Core.Security
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
         private readonly IGlobalSettings _globalSettings;
-        private readonly Mapper _mapper;
+        private readonly UmbracoMapper _mapper;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider, Mapper mapper)
+        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider, UmbracoMapper mapper)
         {
             _userService = userService;
             _memberTypeService = memberTypeService;

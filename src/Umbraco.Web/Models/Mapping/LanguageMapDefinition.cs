@@ -8,9 +8,9 @@ using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class LanguageMapperProfile : IMapperProfile
+    internal class LanguageMapDefinition : IMapDefinition
     {
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<ILanguage, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<ILanguage, Language>((source, context) => new Language(), Map);
@@ -40,6 +40,8 @@ namespace Umbraco.Web.Models.Mapping
 
         private static void Map(IEnumerable<ILanguage> source, IEnumerable<Language> target, MapperContext context)
         {
+            if (target == null)
+                throw new ArgumentNullException(nameof(target));
             if (!(target is List<Language> list))
                 throw new NotSupportedException($"{nameof(target)} must be a List<Language>.");
 

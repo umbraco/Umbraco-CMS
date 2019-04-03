@@ -29,7 +29,7 @@ namespace Umbraco.Web
         protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
-        protected Mapper Mapper => Current.Mapper;
+        protected UmbracoMapper Mapper => Current.Mapper;
 
         /// <summary>
         /// Main startup method

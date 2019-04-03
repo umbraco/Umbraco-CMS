@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for media.
     /// </summary>
-    internal class MediaMapperProfile : IMapperProfile
+    internal class MediaMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
         private readonly ILogger _logger;
@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMediaTypeService _mediaTypeService;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
 
-        public MediaMapperProfile(ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
+        public MediaMapDefinition(ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
             ILocalizedTextService localizedTextService)
         {
             _logger = logger;
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.Mapping
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(localizedTextService);
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IMedia, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
             mapper.Define<IMedia, MediaItemDisplay>((source, context) => new MediaItemDisplay(), Map);

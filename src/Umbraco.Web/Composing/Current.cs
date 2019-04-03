@@ -165,7 +165,7 @@ namespace Umbraco.Web.Composing
 
         // proxy Core for convenience
 
-        public static Mapper Mapper => CoreCurrent.Mapper;
+        public static UmbracoMapper Mapper => CoreCurrent.Mapper;
 
         public static IRuntimeState RuntimeState => CoreCurrent.RuntimeState;
 

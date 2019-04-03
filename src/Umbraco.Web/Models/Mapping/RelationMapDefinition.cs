@@ -5,9 +5,9 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class RelationMapperProfile : IMapperProfile
+    internal class RelationMapDefinition : IMapDefinition
     {
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IRelationType, RelationTypeDisplay>((source, context) => new RelationTypeDisplay(), Map);
             mapper.Define<IRelation, RelationDisplay>((source, context) => new RelationDisplay(), Map);

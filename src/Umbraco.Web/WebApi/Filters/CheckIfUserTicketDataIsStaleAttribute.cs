@@ -26,7 +26,7 @@ namespace Umbraco.Web.WebApi.Filters
     public sealed class CheckIfUserTicketDataIsStaleAttribute : ActionFilterAttribute
     {
         // this is an attribute - no choice
-        private Mapper Mapper => Current.Mapper;
+        private UmbracoMapper Mapper => Current.Mapper;
 
         public override async Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
         {

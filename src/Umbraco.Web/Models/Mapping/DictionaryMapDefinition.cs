@@ -13,16 +13,16 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// The dictionary model mapper.
     /// </summary>
-    internal class DictionaryMapperProfile : IMapperProfile
+    internal class DictionaryMapDefinition : IMapDefinition
     {
         private readonly ILocalizationService _localizationService;
 
-        public DictionaryMapperProfile(ILocalizationService localizationService)
+        public DictionaryMapDefinition(ILocalizationService localizationService)
         {
             _localizationService = localizationService;
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IDictionaryItem, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IDictionaryItem, DictionaryDisplay>((source, context) => new DictionaryDisplay(), Map);

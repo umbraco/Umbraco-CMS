@@ -16,7 +16,7 @@ using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class UserMapperProfile : IMapperProfile
+    internal class UserMapDefinition : IMapDefinition
     {
         private readonly ISectionService _sectionService;
         private readonly IEntityService _entityService;
@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly AppCaches _appCaches;
         private readonly IGlobalSettings _globalSettings;
 
-        public UserMapperProfile(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
+        public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
             AppCaches appCaches, ActionCollection actions, IGlobalSettings globalSettings)
         {
             _sectionService = sectionService;
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             _globalSettings = globalSettings;
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<UserGroupSave, IUserGroup>((source, context) => new UserGroup { CreateDate = DateTime.UtcNow }, Map);
             mapper.Define<UserInvite, IUser>(Map);
@@ -332,7 +332,7 @@ namespace Umbraco.Web.Models.Mapping
 
         // helpers
 
-        private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, Mapper mapper)
+        private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, UmbracoMapper mapper)
         {
             var allSections = _sectionService.GetSections();
             target.Sections = allSections.Where(x => sourceAllowedSections.Contains(x.Alias)).Select(mapper.Map<Section>);
@@ -376,7 +376,7 @@ namespace Umbraco.Web.Models.Mapping
         private static string MapContentTypeIcon(EntitySlim entity)
             => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
-        private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedKey, Mapper mapper)
+        private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedKey, UmbracoMapper mapper)
         {
             if (startNodeIds.Length <= 0)
                 return Enumerable.Empty<EntityBasic>();

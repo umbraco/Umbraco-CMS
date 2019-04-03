@@ -61,7 +61,7 @@ namespace Umbraco.Web.Security
             IEntityService entityService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider,
-            Mapper mapper,
+            UmbracoMapper mapper,
             IContentSection contentSectionConfig,
             IGlobalSettings globalSettings)
         {

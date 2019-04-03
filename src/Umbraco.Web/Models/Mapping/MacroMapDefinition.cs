@@ -9,18 +9,18 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class MacroMapperProfile : IMapperProfile
+    internal class MacroMapDefinition : IMapDefinition
     {
         private readonly ParameterEditorCollection _parameterEditors;
         private readonly ILogger _logger;
 
-        public MacroMapperProfile(ParameterEditorCollection parameterEditors, ILogger logger)
+        public MacroMapDefinition(ParameterEditorCollection parameterEditors, ILogger logger)
         {
             _parameterEditors = parameterEditors;
             _logger = logger;
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IMacro, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IMacro, IEnumerable<MacroParameter>>((source, context) => source.Properties.Values.Select(context.Mapper.Map<MacroParameter>).ToList());
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 //we'll just map this to a text box
                 paramEditor = _parameterEditors[Constants.PropertyEditors.Aliases.TextBox];
-                _logger.Warn<MacroMapperProfile>("Could not resolve a parameter editor with alias {PropertyEditorAlias}, a textbox will be rendered in it's place", source.EditorAlias);
+                _logger.Warn<MacroMapDefinition>("Could not resolve a parameter editor with alias {PropertyEditorAlias}, a textbox will be rendered in it's place", source.EditorAlias);
             }
 
             target.View = paramEditor.GetValueEditor().View;

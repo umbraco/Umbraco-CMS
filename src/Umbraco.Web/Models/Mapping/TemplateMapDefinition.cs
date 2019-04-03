@@ -4,9 +4,9 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TemplateMapperProfile : IMapperProfile
+    internal class TemplateMapDefinition : IMapDefinition
     {
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<ITemplate, TemplateDisplay>((source, context) => new TemplateDisplay(), Map);
             mapper.Define<TemplateDisplay, Template>((source, context) => new Template(source.Name, source.Alias), Map);

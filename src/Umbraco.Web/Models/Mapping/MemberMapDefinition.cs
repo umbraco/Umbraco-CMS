@@ -16,13 +16,13 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for members.
     /// </summary>
-    internal class MemberMapperProfile : IMapperProfile
+    internal class MemberMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
         private readonly IMemberTypeService _memberTypeService;
         private readonly TabsAndPropertiesMapper<IMember> _tabsAndPropertiesMapper;
 
-        public MemberMapperProfile(CommonMapper commonMapper, IMemberTypeService memberTypeService, ILocalizedTextService localizedTextService)
+        public MemberMapDefinition(CommonMapper commonMapper, IMemberTypeService memberTypeService, ILocalizedTextService localizedTextService)
         {
             _commonMapper = commonMapper;
             _memberTypeService = memberTypeService;
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Models.Mapping
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMember>(localizedTextService);
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<MembershipUser, MemberDisplay>((source, context) => new MemberDisplay(), Map);
             mapper.Define<MembershipUser, IMember>((source, context) => MemberService.CreateGenericMembershipProviderMember(source.UserName, source.Email, source.UserName, ""), Map);

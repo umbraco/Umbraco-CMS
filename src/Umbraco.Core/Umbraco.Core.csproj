@@ -215,10 +215,10 @@
     <Compile Include="Mapping\MapperContext.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
-    <Compile Include="Mapping\MapperProfileCollection.cs" />
-    <Compile Include="Mapping\MapperProfileCollectionBuilder.cs" />
-    <Compile Include="Mapping\IMapperProfile.cs" />
-    <Compile Include="Mapping\Mapper.cs" />
+    <Compile Include="Mapping\MapDefinitionCollection.cs" />
+    <Compile Include="Mapping\MapDefinitionCollectionBuilder.cs" />
+    <Compile Include="Mapping\IMapDefinition.cs" />
+    <Compile Include="Mapping\UmbracoMapper.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
@@ -448,7 +448,7 @@
     <Compile Include="Models\IAuditItem.cs" />
     <Compile Include="Models\IConsent.cs" />
     <Compile Include="Models\ISimpleContentType.cs" />
-    <Compile Include="Models\Identity\IdentityMapperProfile.cs" />
+    <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
     <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\NotificationEmailBodyParams.cs" />

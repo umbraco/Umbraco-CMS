@@ -1,13 +1,13 @@
 ﻿namespace Umbraco.Core.Mapping
 {
     /// <summary>
-    /// Represents a mapper profile.
+    /// Defines maps for <see cref="UmbracoMapper"/>.
     /// </summary>
-    public interface IMapperProfile
+    public interface IMapDefinition
     {
         /// <summary>
         /// Defines maps.
         /// </summary>
-        void DefineMaps(Mapper mapper);
+        void DefineMaps(UmbracoMapper mapper);
     }
 }

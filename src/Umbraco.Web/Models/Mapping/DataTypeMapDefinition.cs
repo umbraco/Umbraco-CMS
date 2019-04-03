@@ -11,12 +11,12 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class DataTypeMapperProfile : IMapperProfile
+    internal class DataTypeMapDefinition : IMapDefinition
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger _logger;
 
-        public DataTypeMapperProfile(PropertyEditorCollection propertyEditors, ILogger logger)
+        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger)
         {
             _propertyEditors = propertyEditors;
             _logger = logger;
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Models.Mapping
             Constants.DataTypes.DefaultMembersListView
         };
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IDataEditor, PropertyEditorBasic>((source, context) => new PropertyEditorBasic(), Map);
             mapper.Define<ConfigurationField, DataTypeConfigurationFieldDisplay>((source, context) => new DataTypeConfigurationFieldDisplay(), Map);
@@ -124,7 +124,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = source.ParentId;
         }
 
-        private IEnumerable<PropertyEditorBasic> MapAvailableEditors(IDataType source, Mapper mapper)
+        private IEnumerable<PropertyEditorBasic> MapAvailableEditors(IDataType source, UmbracoMapper mapper)
         {
             var contentSection = Current.Configs.Settings().Content;
             return _propertyEditors
@@ -133,7 +133,7 @@ namespace Umbraco.Web.Models.Mapping
                 .Select(mapper.Map<PropertyEditorBasic>);
         }
 
-        private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataType dataType, Mapper mapper)
+        private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataType dataType, UmbracoMapper mapper)
         {
             // in v7 it was apparently fine to have an empty .EditorAlias here, in which case we would map onto
             // an empty fields list, which made no sense since there would be nothing to map to - and besides,
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Models.Mapping
                 else
                 {
                     // weird - just leave the field without a value - but warn
-                    _logger.Warn<DataTypeMapperProfile>("Could not find a value for configuration field '{ConfigField}'", field.Key);
+                    _logger.Warn<DataTypeMapDefinition>("Could not find a value for configuration field '{ConfigField}'", field.Key);
                 }
             }
         }
@@ -181,7 +181,7 @@ namespace Umbraco.Web.Models.Mapping
             return ValueTypes.ToStorageType(valueType);
         }
 
-        private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataEditor source, Mapper mapper)
+        private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataEditor source, UmbracoMapper mapper)
         {
             // this is a new data type, initialize default configuration
             // get the configuration editor,

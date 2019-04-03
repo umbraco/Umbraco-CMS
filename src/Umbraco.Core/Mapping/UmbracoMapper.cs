@@ -11,7 +11,7 @@ namespace Umbraco.Core.Mapping
     /// <summary>
     /// Umbraco Mapper.
     /// </summary>
-    public class Mapper
+    public class UmbracoMapper
     {
         private readonly Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors
             = new Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>>();
@@ -20,10 +20,10 @@ namespace Umbraco.Core.Mapping
             = new Dictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Mapper"/> class.
+        /// Initializes a new instance of the <see cref="UmbracoMapper"/> class.
         /// </summary>
         /// <param name="profiles"></param>
-        public Mapper(MapperProfileCollection profiles)
+        public UmbracoMapper(MapDefinitionCollection profiles)
         {
             foreach (var profile in profiles)
                 profile.DefineMaps(this);

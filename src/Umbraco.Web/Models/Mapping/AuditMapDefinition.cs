@@ -4,9 +4,9 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class AuditMapperProfile : IMapperProfile
+    internal class AuditMapDefinition : IMapDefinition
     {
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IAuditItem, AuditLog>((source, context) => new AuditLog(), Map);
         }

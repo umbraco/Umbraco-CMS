@@ -6,20 +6,20 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.Identity
 {
-    public class IdentityMapperProfile : IMapperProfile
+    public class IdentityMapDefinition : IMapDefinition
     {
         private readonly ILocalizedTextService _textService;
         private readonly IEntityService _entityService;
         private readonly IGlobalSettings _globalSettings;
 
-        public IdentityMapperProfile(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
+        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
         {
             _textService = textService;
             _entityService = entityService;
             _globalSettings = globalSettings;
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>

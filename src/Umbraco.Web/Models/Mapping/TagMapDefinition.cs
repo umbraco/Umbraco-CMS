@@ -3,9 +3,9 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TagMapperProfile : IMapperProfile
+    internal class TagMapDefinition : IMapDefinition
     {
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<ITag, TagModel>((source, context) => new TagModel(), Map);
         }

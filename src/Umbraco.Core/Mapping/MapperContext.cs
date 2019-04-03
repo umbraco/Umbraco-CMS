@@ -12,7 +12,7 @@ namespace Umbraco.Core.Mapping
         /// <summary>
         /// Initializes a new instance of the <see cref="MapperContext"/> class.
         /// </summary>
-        public MapperContext(Mapper mapper)
+        public MapperContext(UmbracoMapper mapper)
         {
             Mapper = mapper;
         }
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Mapping
         /// <summary>
         /// Gets the mapper.
         /// </summary>
-        public Mapper Mapper { get;}
+        public UmbracoMapper Mapper { get;}
 
         /// <summary>
         /// Gets a value indicating whether the context has items.

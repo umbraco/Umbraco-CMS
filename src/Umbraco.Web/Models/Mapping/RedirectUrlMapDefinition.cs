@@ -4,18 +4,18 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class RedirectUrlMapperProfile : IMapperProfile
+    internal class RedirectUrlMapDefinition : IMapDefinition
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public RedirectUrlMapperProfile(IUmbracoContextAccessor umbracoContextAccessor)
+        public RedirectUrlMapDefinition(IUmbracoContextAccessor umbracoContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         private UmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IRedirectUrl, ContentRedirectUrl>((source, context) => new ContentRedirectUrl(), Map);
         }

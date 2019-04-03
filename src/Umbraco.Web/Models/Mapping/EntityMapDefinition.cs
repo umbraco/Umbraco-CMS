@@ -13,9 +13,9 @@ using Umbraco.Examine;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class EntityMapperProfile : IMapperProfile
+    internal class EntityMapDefinition : IMapDefinition
     {
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IEntitySlim, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<PropertyType, EntityBasic>((source, context) => new EntityBasic(), Map);
@@ -114,7 +114,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Udi = ContentTypeMapperProfile.MapContentTypeUdi(source);
+            target.Udi = ContentTypeMapDefinition.MapContentTypeUdi(source);
         }
 
         // Umbraco.Code.MapAll -Trashed -Alias -Score

@@ -5,9 +5,9 @@ using Stylesheet = Umbraco.Core.Models.Stylesheet;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    public class CodeFileMapperProfile : IMapperProfile
+    public class CodeFileMapDefinition : IMapDefinition
     {
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<Stylesheet, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IPartialView, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);

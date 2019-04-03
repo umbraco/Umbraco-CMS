@@ -8,9 +8,9 @@ namespace Umbraco.Core.Composing.CompositionExtensions
     {
         public static Composition ComposeCoreMappingProfiles(this Composition composition)
         {
-            composition.RegisterUnique<Mapper>();
-            composition.WithCollectionBuilder<MapperProfileCollectionBuilder>()
-                .Add<IdentityMapperProfile>();
+            composition.RegisterUnique<UmbracoMapper>();
+            composition.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
+                .Add<IdentityMapDefinition>();
             return composition;
         }
     }

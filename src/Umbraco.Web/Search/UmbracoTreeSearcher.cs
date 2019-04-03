@@ -23,13 +23,13 @@ namespace Umbraco.Web.Search
         private readonly UmbracoContext _umbracoContext;
         private readonly ILocalizationService _languageService;
         private readonly IEntityService _entityService;
-        private readonly Mapper _mapper;
+        private readonly UmbracoMapper _mapper;
 
         public UmbracoTreeSearcher(IExamineManager examineManager,
             UmbracoContext umbracoContext,
             ILocalizationService languageService,
             IEntityService entityService,
-            Mapper mapper)
+            UmbracoMapper mapper)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
             _umbracoContext = umbracoContext;

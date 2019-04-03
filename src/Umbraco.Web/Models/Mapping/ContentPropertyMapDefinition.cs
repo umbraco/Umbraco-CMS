@@ -11,20 +11,20 @@ namespace Umbraco.Web.Models.Mapping
     /// A mapper which declares how to map content properties. These mappings are shared among media (and probably members) which is
     /// why they are in their own mapper
     /// </summary>
-    internal class ContentPropertyMapperProfile : IMapperProfile
+    internal class ContentPropertyMapDefinition : IMapDefinition
     {
         private readonly ContentPropertyBasicMapper<ContentPropertyBasic> _contentPropertyBasicConverter;
         private readonly ContentPropertyDtoMapper _contentPropertyDtoConverter;
         private readonly ContentPropertyDisplayMapper _contentPropertyDisplayMapper;
 
-        public ContentPropertyMapperProfile(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyMapDefinition(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
         {
             _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(dataTypeService, logger, propertyEditors);
             _contentPropertyDtoConverter = new ContentPropertyDtoMapper(dataTypeService, logger, propertyEditors);
             _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(dataTypeService, textService, logger, propertyEditors);
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<PropertyGroup, Tab<ContentPropertyDisplay>>((source, context) => new Tab<ContentPropertyDisplay>(), Map);
             mapper.Define<Property, ContentPropertyBasic>((source, context) => new ContentPropertyBasic(), Map);

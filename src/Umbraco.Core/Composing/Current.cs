@@ -104,8 +104,8 @@ namespace Umbraco.Core.Composing
 
         #region Getters
 
-        public static Mapper Mapper
-            => _factory.GetInstance<Mapper>();
+        public static UmbracoMapper Mapper
+            => _factory.GetInstance<UmbracoMapper>();
 
         public static IShortStringHelper ShortStringHelper
             => _shortStringHelper ?? (_shortStringHelper = _factory?.TryGetInstance<IShortStringHelper>()

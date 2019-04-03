@@ -14,7 +14,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Defines mappings for content/media/members type mappings
     /// </summary>
-    internal class ContentTypeMapperProfile : IMapperProfile
+    internal class ContentTypeMapDefinition : IMapDefinition
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILogger _logger;
 
-        public ContentTypeMapperProfile(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
+        public ContentTypeMapDefinition(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
             ILogger logger)
         {
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
             _logger = logger;
         }
 
-        public void DefineMaps(Mapper mapper)
+        public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<DocumentTypeSave, IContentType>((source, context) => new ContentType(source.ParentId), Map);
             mapper.Define<MediaTypeSave, IMediaType>((source, context) => new MediaType(source.ParentId), Map);
@@ -358,7 +358,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -CreatorId -Level -SortOrder
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
         // Umbraco.Code.MapAll -ContentTypeComposition (done by AfterMapSaveToType)
-        private static void MapSaveToTypeBase<TSource, TSourcePropertyType>(TSource source, IContentTypeComposition target, Mapper mapper)
+        private static void MapSaveToTypeBase<TSource, TSourcePropertyType>(TSource source, IContentTypeComposition target, UmbracoMapper mapper)
             where TSource : ContentTypeSave<TSourcePropertyType>
             where TSourcePropertyType : PropertyTypeBasic
         {
@@ -517,7 +517,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // no MapAll - relies on the non-generic method
-        private void MapTypeToDisplayBase<TSource, TSourcePropertyType, TTarget, TTargetPropertyType>(TSource source, TTarget target, Mapper mapper)
+        private void MapTypeToDisplayBase<TSource, TSourcePropertyType, TTarget, TTargetPropertyType>(TSource source, TTarget target, UmbracoMapper mapper)
             where TSource : ContentTypeSave<TSourcePropertyType>
             where TSourcePropertyType : PropertyTypeBasic
             where TTarget : ContentTypeCompositionDisplay<TTargetPropertyType>
@@ -574,7 +574,7 @@ namespace Umbraco.Web.Models.Mapping
             return Udi.Create(udiType, source.Key);
         }
 
-        private static PropertyGroup MapSaveGroup<TPropertyType>(PropertyGroupBasic<TPropertyType> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups, Mapper mapper)
+        private static PropertyGroup MapSaveGroup<TPropertyType>(PropertyGroupBasic<TPropertyType> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups, UmbracoMapper mapper)
             where TPropertyType : PropertyTypeBasic
         {
             PropertyGroup destGroup;
@@ -600,7 +600,7 @@ namespace Umbraco.Web.Models.Mapping
             return destGroup;
         }
 
-        private static PropertyType MapSaveProperty(PropertyTypeBasic sourceProperty, IEnumerable<PropertyType> destOrigProperties, Mapper mapper)
+        private static PropertyType MapSaveProperty(PropertyTypeBasic sourceProperty, IEnumerable<PropertyType> destOrigProperties, UmbracoMapper mapper)
         {
             PropertyType destProperty;
             if (sourceProperty.Id > 0)

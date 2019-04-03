@@ -34,19 +34,19 @@ namespace Umbraco.Web.Models.Mapping
             _localizedTextService = localizedTextService;
         }
 
-        public UserProfile GetOwner(IContentBase source, Mapper mapper)
+        public UserProfile GetOwner(IContentBase source, UmbracoMapper mapper)
         {
             var profile = source.GetCreatorProfile(_userService);
             return profile == null ? null : mapper.Map<IProfile, UserProfile>(profile);
         }
 
-        public UserProfile GetCreator(IContent source, Mapper mapper)
+        public UserProfile GetCreator(IContent source, UmbracoMapper mapper)
         {
             var profile = source.GetWriterProfile(_userService);
             return profile == null ? null : mapper.Map<IProfile, UserProfile>(profile);
         }
 
-        public ContentTypeBasic GetContentType(IContentBase source, Mapper mapper)
+        public ContentTypeBasic GetContentType(IContentBase source, UmbracoMapper mapper)
         {
             // TODO: We can resolve the UmbracoContext from the IValueResolver options!
             // OMG

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
@@ -15,14 +15,16 @@ namespace Umbraco.Web
     {
         private readonly ITagService _tagService;
         private readonly IPublishedContentQuery _contentQuery;
+        private readonly UmbracoMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TagQuery"/> class.
         /// </summary>
-        public TagQuery(ITagService tagService, IPublishedContentQuery contentQuery)
+        public TagQuery(ITagService tagService, IPublishedContentQuery contentQuery, UmbracoMapper mapper)
         {
             _tagService = tagService ?? throw new ArgumentNullException(nameof(tagService));
             _contentQuery = contentQuery ?? throw new ArgumentNullException(nameof(contentQuery));
+            _mapper = mapper;
         }
 
         /// <inheritdoc />
@@ -64,37 +66,37 @@ namespace Umbraco.Web
         /// <inheritdoc />
         public IEnumerable<TagModel> GetAllTags(string group = null, string culture = null)
         {
-            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllTags(group, culture));
+            return _mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllTags(group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetAllContentTags(string group = null, string culture = null)
         {
-            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllContentTags(group, culture));
+            return _mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllContentTags(group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetAllMediaTags(string group = null, string culture = null)
         {
-            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMediaTags(group, culture));
+            return _mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMediaTags(group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetAllMemberTags(string group = null, string culture = null)
         {
-            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMemberTags(group, culture));
+            return _mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMemberTags(group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null, string culture = null)
         {
-            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, group, culture));
+            return _mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, group, culture));
         }
 
         /// <inheritdoc />
         public IEnumerable<TagModel> GetTagsForEntity(int contentId, string group = null, string culture = null)
         {
-            return Current.Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForEntity(contentId, group, culture));
+            return _mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForEntity(contentId, group, culture));
         }
     }
 }

@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Testing
 
         protected IMapperCollection Mappers => Factory.GetInstance<IMapperCollection>();
 
-        protected Mapper Mapper => Factory.GetInstance<Mapper>();
+        protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
 
         #endregion
 

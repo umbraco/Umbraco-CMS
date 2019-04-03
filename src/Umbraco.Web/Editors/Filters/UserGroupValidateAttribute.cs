@@ -27,7 +27,7 @@ namespace Umbraco.Web.Editors.Filters
             _userService = userService;
         }
 
-        private static Mapper Mapper => Current.Mapper;
+        private static UmbracoMapper Mapper => Current.Mapper;
 
         private IUserService UserService => _userService ?? Current.Services.UserService; // TODO: inject
 
