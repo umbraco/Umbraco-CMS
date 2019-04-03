@@ -9,9 +9,7 @@ angular.module("umbraco")
             //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
             // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
             // we have this mini content editor panel that can be launched with MNTP.
-            var d = new Date();
-            var n = d.getTime();
-            $scope.textAreaHtmlId = $scope.model.alias + "_" + n + "_rte";
+            $scope.textAreaHtmlId = $scope.model.alias + "_" + String.CreateGuid();
 
             var editorConfig = $scope.model.config ? $scope.model.config.editor : null;
             if (!editorConfig || angular.isString(editorConfig)) {
