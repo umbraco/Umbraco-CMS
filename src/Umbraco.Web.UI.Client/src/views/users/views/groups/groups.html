@@ -79,7 +79,6 @@
                 <div class="umb-table-cell"><localize key="main_sections">Sections</localize></div>
                 <div class="umb-table-cell"><localize key="user_startnode">Content start node</localize></div>
                 <div class="umb-table-cell"><localize key="user_mediastartnode">Media start node</localize></div>
-                <div class="umb-table-cell"><localize key="general_rights">Permissions</localize></div>
             </div>
         </div>
 
@@ -115,9 +114,6 @@
                 <div class="umb-table-cell">
                     <span ng-if="!group.mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
                     <span ng-if="group.mediaStartNode">{{ group.mediaStartNode.name }}</span>
-                </div>
-                <div class="umb-table-cell">
-                    <span ng-repeat="permission in group.permissions">{{ permission.name }}<span ng-if="!$last">, </span></span>
                 </div>
             </div>
         </div>
