@@ -159,7 +159,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish,
         allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish,
         allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy,
-        allowBulkMove: $scope.model.config.bulkActionPermissions.allowBulkMove,
+        allowBulkMove: $scope.entityType !== 'member' && $scope.model.config.bulkActionPermissions.allowBulkMove,
         allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
         cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
     };
