@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
             mapper.Define<IDataType, DataTypeBasic>((source, context) => new DataTypeBasic(), Map);
             mapper.Define<IDataType, DataTypeDisplay>((source, context) => new DataTypeDisplay(), Map);
             mapper.Define<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>((source, context) => MapPreValues(source, mapper));
-            mapper.Define<DataTypeSave, IDataType>(Map);
+            mapper.Define<DataTypeSave, IDataType>((source, context) => new DataType(_propertyEditors[source.EditorAlias]) { CreateDate = DateTime.Now },Map);
             mapper.Define<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>((source, context) => MapPreValues(source, mapper));
         }
 

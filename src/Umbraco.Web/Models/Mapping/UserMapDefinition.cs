@@ -386,7 +386,7 @@ namespace Umbraco.Web.Models.Mapping
                 startNodes.Add(CreateRootNode(_textService.Localize(localizedKey)));
 
             var mediaItems = _entityService.GetAll(objectType, startNodeIds);
-            startNodes.AddRange(mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems));
+            startNodes.AddRange(mapper.Map<IEnumerable<EntityBasic>>(mediaItems));
             return startNodes;
         }
 
