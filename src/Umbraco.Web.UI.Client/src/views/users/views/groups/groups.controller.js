@@ -9,8 +9,8 @@
         vm.userGroups = [];
         vm.selection = [];
 
+        vm.clickUserGroupName = clickUserGroupName;
         vm.createUserGroup = createUserGroup;
-        vm.goToUserGroup = goToUserGroup;
         vm.clearSelection = clearSelection;
         vm.selectUserGroup = selectUserGroup;
         vm.deleteUserGroups = deleteUserGroups;
@@ -54,6 +54,14 @@
             $location.path(getEditPath(userGroup)).search("create", null);
         }
         
+        function clickUserGroupName(item, $event) {
+           if(!($event.metaKey || $event.ctrlKey)) {
+              goToUserGroup(item, $event);
+              $event.preventDefault();
+           }
+           $event.stopPropagation();
+        };
+        
         function getEditPath(userGroup) {
             
             // only allow editing if user is member of the group or admin
@@ -65,8 +73,6 @@
         }
 
         function selectUserGroup(userGroup, $index, $event) {
-            
-            console.log(userGroup, $index);
             
             // Only allow selection if user is member of the group or admin
             if (currentUser.userGroups.indexOf(userGroup.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {

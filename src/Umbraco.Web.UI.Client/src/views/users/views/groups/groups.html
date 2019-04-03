@@ -87,16 +87,16 @@
             <div class="umb-table-row"
                 ng-repeat="group in vm.userGroups | filter:vm.filter track by $index"
                 ng-click="vm.selectUserGroup(group, $index, $event)"
-                ng-class="{'--selected': group.selected, '--selectable': group.hasAccess && group.alias !== 'admin' && group.alias !== 'translator'}">
+                ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && group.alias !== 'admin' && group.alias !== 'translator'}">
 
                 <div class="umb-table-cell">
                     <i ng-if="group.icon" class="umb-user-group-preview__icon {{ group.icon }}"></i>
                 </div>
-                <div class="umb-table-cell umb-table__name"
-                    ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess}"
-                    ng-click="vm.goToUserGroup(group)">
-                    <a href=""
+                <div class="umb-table-cell umb-table__name">
+                    <a
                         class="umb-table-body__link"
+                        ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess}"
+                        ng-click="vm.clickUserGroupName(group, $event)"
                         ng-href="#{{::vm.getEditPath(group)}}"
                         ng-bind="group.name">
                     </a>
