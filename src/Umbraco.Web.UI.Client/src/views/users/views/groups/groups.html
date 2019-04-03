@@ -90,7 +90,8 @@
                 ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && group.alias !== 'admin' && group.alias !== 'translator'}">
 
                 <div class="umb-table-cell">
-                    <i ng-if="group.icon" class="umb-user-group-preview__icon {{ group.icon }}"></i>
+                    <i ng-if="group.icon" class="umb-table-body__icon umb-table-body__fileicon {{ group.icon }}"></i>
+                    <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
                 </div>
                 <div class="umb-table-cell umb-table__name">
                     <a
