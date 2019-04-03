@@ -417,7 +417,7 @@
                 return;
             }
             
-            if (isSelectedAll()) {
+            if (isSelectedAll(items, selection)) {
                 // unselect all items
                 angular.forEach(items, function (item) {
                     item.selected = false;
@@ -440,7 +440,7 @@
                         obj.key = item.key;
                     }
                     item.selected = true;
-                    vm.selection.push(user.id);
+                    selection.push(obj);
                 });
             }
 
@@ -575,6 +575,7 @@
           deselectItem: deselectItem,
           clearSelection: clearSelection,
           selectAllItems: selectAllItems,
+          selectAllItemsToggle: selectAllItemsToggle,
           isSelectedAll: isSelectedAll,
           setSortingDirection: setSortingDirection,
           setSorting: setSorting,
