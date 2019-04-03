@@ -100,7 +100,7 @@ Use this directive to generate a pagination.
                 for (i = 0; i < scope.totalPages; i++) {
                     scope.pagination.push({
                         val: (i + 1),
-                        isActive: scope.pageNumber === (i + 1)
+                        isActive: scope.pageNumber == (i + 1)
                     });
                 }
             }
