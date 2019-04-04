@@ -2192,6 +2192,17 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public XmlDocument BuildPreviewXmlCache()
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateContentRepository(uow);
+                var result = repository.BuildPreviewXmlCache();
+                uow.Commit();
+                return result;
+            }
+        }
+
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
