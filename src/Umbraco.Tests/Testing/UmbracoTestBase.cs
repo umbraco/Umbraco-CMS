@@ -343,7 +343,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
                 Logger,
-                new Lazy<IMapperCollection>(Mock.Of<IMapperCollection>)));
+                new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>)));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty

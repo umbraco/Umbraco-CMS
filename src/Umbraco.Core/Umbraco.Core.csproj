@@ -219,7 +219,9 @@
     <Compile Include="Mapping\MapDefinitionCollectionBuilder.cs" />
     <Compile Include="Mapping\IMapDefinition.cs" />
     <Compile Include="Mapping\UmbracoMapper.cs" />
+    <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
+    <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedModelFactoryExtensions.cs" />
@@ -994,7 +996,6 @@
     <Compile Include="Persistence\Mappers\DictionaryMapper.cs" />
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
-    <Compile Include="Persistence\Mappers\DtoMapModel.cs" />
     <Compile Include="Persistence\Mappers\ExternalLoginMapper.cs" />
     <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapper.cs" />

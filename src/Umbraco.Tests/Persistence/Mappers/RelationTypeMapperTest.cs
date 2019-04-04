@@ -5,13 +5,13 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class RelationTypeMapperTest
+    public class RelationTypeMapperTest : MapperTestBase
     {
         [Test]
         public void Can_Map_Id_Property()
         {
             // Act
-            string column = new RelationTypeMapper().Map(new SqlCeSyntaxProvider(), "Id");
+            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[id]"));
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Alias_Property()
         {
             // Act
-            string column = new RelationTypeMapper().Map(new SqlCeSyntaxProvider(), "Alias");
+            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("Alias");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[alias]"));
@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new RelationTypeMapper().Map(new SqlCeSyntaxProvider(), "ChildObjectType");
+            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("ChildObjectType");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[childObjectType]"));
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new RelationTypeMapper().Map(new SqlCeSyntaxProvider(), "IsBidirectional");
+            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("IsBidirectional");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[dual]"));

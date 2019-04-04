@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Umbraco.Core.Composing
 {
     /// <summary>
-    /// Implements a set collection builder.
+    /// Implements an un-ordered collection builder.
     /// </summary>
     /// <typeparam name="TBuilder">The type of the builder.</typeparam>
     /// <typeparam name="TCollection">The type of the collection.</typeparam>
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Adds a type to the collection.
         /// </summary>
-        /// <typeparam name="T">The type to add.</typeparam>
+        /// <typeparam name="T">The type to append.</typeparam>
         /// <returns>The builder.</returns>
         public TBuilder Add<T>()
             where T : TItem
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Adds a type to the collection.
         /// </summary>
-        /// <param name="type">The type to add.</param>
+        /// <param name="type">The type to append.</param>
         /// <returns>The builder.</returns>
         public TBuilder Add(Type type)
         {
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         ///  Adds types to the collections.
         /// </summary>
-        /// <param name="types">The types to add.</param>
+        /// <param name="types">The types to append.</param>
         /// <returns>The builder.</returns>
         public TBuilder Add(IEnumerable<Type> types)
         {

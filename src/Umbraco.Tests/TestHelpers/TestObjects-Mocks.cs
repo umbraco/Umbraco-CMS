@@ -14,6 +14,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
@@ -37,10 +38,14 @@ namespace Umbraco.Tests.TestHelpers
         /// <remarks>This is just a void factory that has no actual database.</remarks>
         public IUmbracoDatabaseFactory GetDatabaseFactoryMock(bool configured = true, bool canConnect = true)
         {
+            var sqlSyntax = new SqlCeSyntaxProvider();
+            var sqlContext = Mock.Of<ISqlContext>();
+            Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(sqlSyntax);
+
             var databaseFactoryMock = new Mock<IUmbracoDatabaseFactory>();
             databaseFactoryMock.Setup(x => x.Configured).Returns(configured);
             databaseFactoryMock.Setup(x => x.CanConnect).Returns(canConnect);
-            databaseFactoryMock.Setup(x => x.SqlContext).Returns(Mock.Of<ISqlContext>());
+            databaseFactoryMock.Setup(x => x.SqlContext).Returns(sqlContext);
 
             // can create a database - but don't try to use it!
             if (configured && canConnect)
