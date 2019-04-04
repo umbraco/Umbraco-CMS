@@ -11,7 +11,6 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
 
@@ -506,7 +505,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public IEnumerable<int> GetVersionIds(int id, int maxRows)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _documentRepository.GetVersionIds(id, maxRows);
             }
@@ -927,8 +926,8 @@ namespace Umbraco.Core.Services.Implement
                 // publish the culture(s)
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
                 foreach (var impact in impacts)
-                    content.PublishCulture(impact); 
-                
+                    content.PublishCulture(impact);
+
                 var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, userId, raiseEvents);
                 scope.Complete();
                 return result;
@@ -1125,7 +1124,7 @@ namespace Umbraco.Core.Services.Implement
                     // note: This unpublishes the entire document (not different variants)
                     unpublishResult = StrategyCanUnpublish(scope, content, evtMsgs);
                     if (unpublishResult.Success)
-                        unpublishResult = StrategyUnpublish(scope, content, userId, evtMsgs);
+                        unpublishResult = StrategyUnpublish(content, evtMsgs);
                     else
                     {
                         // reset published state from temp values (publishing, unpublishing) to original value
@@ -1406,11 +1405,9 @@ namespace Umbraco.Core.Services.Implement
             // variant content type - publish specified cultures
             // invariant content type - publish only the invariant culture
             if (content.ContentType.VariesByCulture())
-            {                
+            {
                 return culturesToPublish.All(culture =>
                 {
-                    // fixme - not ... ah?!
-                    //var cultureType = CultureImpact.Explicit(culture, _languageRepository.IsDefault(culture));
                     var impact = CultureImpact.Create(culture, _languageRepository.IsDefault(culture), content);
                     return content.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
                 });
@@ -2504,12 +2501,13 @@ namespace Umbraco.Core.Services.Implement
                 {
                     InvalidProperties = invalidProperties
                 };
-            
+
             //Check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
             // be changed to Unpublished and any culture currently published will not be visible.
             if (variesByCulture)
             {
-                //fixme: culturesPublishing can be null here, it shouldn't be at this point since that would indicate its invariant but we should check
+                if (culturesPublishing == null)
+                    throw new InvalidOperationException("Internal error, variesByCulture but culturesPublishing is null.");
 
                 if (content.Published && culturesPublishing.Count == 0 && culturesUnpublishing.Count == 0) // no published cultures = cannot be published
                     return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
@@ -2646,15 +2644,13 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Unpublishes a document
         /// </summary>
-        /// <param name="scope"></param>
         /// <param name="content"></param>
-        /// <param name="userId"></param>
         /// <param name="evtMsgs"></param>
         /// <returns></returns>
         /// <remarks>
         /// It is assumed that all unpublishing checks have passed before calling this method like <see cref="StrategyCanUnpublish"/>
         /// </remarks>
-        private PublishResult StrategyUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
+        private PublishResult StrategyUnpublish(IContent content, EventMessages evtMsgs)
         {
             var attempt = new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
 
@@ -2906,7 +2902,7 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IContent>();
                 if (contentTypeId.Length > 0)
