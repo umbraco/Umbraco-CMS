@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -7,22 +8,22 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof (IUmbracoEntity))]
     public sealed class UmbracoEntityMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public UmbracoEntityMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        protected override void DefineMaps()
         {
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Id, dto => dto.NodeId);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Level, dto => dto.Level);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.ParentId, dto => dto.ParentId);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Path, dto => dto.Path);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Name, dto => dto.Text);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Trashed, dto => dto.Trashed);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.CreatorId, dto => dto.UserId);
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Id), nameof(NodeDto.NodeId));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.CreateDate), nameof(NodeDto.CreateDate));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Level), nameof(NodeDto.Level));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.ParentId), nameof(NodeDto.ParentId));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Path), nameof(NodeDto.Path));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.SortOrder), nameof(NodeDto.SortOrder));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Name), nameof(NodeDto.Text));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Trashed), nameof(NodeDto.Trashed));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Key), nameof(NodeDto.UniqueId));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.CreatorId), nameof(NodeDto.UserId));
         }
     }
 }
