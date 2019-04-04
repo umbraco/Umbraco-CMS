@@ -822,7 +822,7 @@ ORDER BY colName";
 
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             var mapper = _mapperCollection[typeof(IUser)];
-            var mappedField = mapper.Map(SqlContext.SqlSyntax, expressionMember.Name);
+            var mappedField = mapper.Map(expressionMember.Name);
 
             if (mappedField.IsNullOrWhiteSpace())
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");

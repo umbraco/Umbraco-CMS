@@ -2123,7 +2123,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="mediaFolderBrowser">Content</key>
     <key alias="settingsWelcome">Welcome</key>
     <key alias="settingsExamine">Examine Management</key>
-    <key alias="settingsPublishedStatus">Published Status</key>
+    <key alias="settingsPublishedStatus">Published Cache</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
     <key alias="memberIntro">Getting Started</key>
