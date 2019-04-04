@@ -31,7 +31,8 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -GetFileContent
         private static void Map(TemplateDisplay source, ITemplate target, MapperContext context)
         {
-            ((Template)target).MasterTemplateAlias = source.MasterTemplateAlias;
+            // don't need to worry about mapping MasterTemplateAlias here;
+            // the template controller handles any changes made to the master template
             target.Name = source.Name;
             target.Alias = source.Alias;
             target.Content = source.Content;
