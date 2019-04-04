@@ -134,6 +134,8 @@
     <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
     <Compile Include="Dashboards\SettingsDashboards.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
+    <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
@@ -307,7 +309,7 @@
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
     <Compile Include="Editors\EditorValidatorOfT.cs" />
-    <Compile Include="Editors\Filters\MemberValidationHelper.cs" />
+    <Compile Include="Editors\Filters\MemberSaveModelValidator.cs" />
     <Compile Include="Editors\ExamineManagementController.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\HelpController.cs" />
@@ -1062,7 +1064,7 @@
     <Compile Include="Editors\Binders\ContentItemBinder.cs" />
     <Compile Include="Editors\Binders\MediaItemBinder.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForContentAttribute.cs" />
-    <Compile Include="Editors\Filters\ContentItemValidationHelper.cs" />
+    <Compile Include="Editors\Filters\ContentModelValidator.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForMediaAttribute.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterAllowedOutgoingContentAttribute.cs" />

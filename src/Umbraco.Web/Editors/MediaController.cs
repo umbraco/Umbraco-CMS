@@ -489,16 +489,12 @@ namespace Umbraco.Web.Editors
                 (save, property, v) => property.SetValue(v), //set prop val
                 null); // media are all invariant
 
-            //We need to manually check the validation results here because:
-            // * We still need to save the entity even if there are validation value errors
-            // * Depending on if the entity is new, and if there are non property validation errors (i.e. the name is null)
-            //      then we cannot continue saving, we can only display errors
-            // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display
-            //      a message indicating this
-            if (ModelState.IsValid == false)
+            //we will continue to save if model state is invalid, however we cannot save if critical data is missing.
+            //TODO: Allowing media to be saved when it is invalid is odd - media doesn't have a publish phase so suddenly invalid data is allowed to be 'live'
+            if (!ModelState.IsValid)
             {
-                if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem)
-                    && (contentItem.Action == ContentSaveAction.SaveNew))
+                //check for critical data validation issues, we can't continue saving if this data is invalid
+                if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem))
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the model state to the outgoing object and throw validation response

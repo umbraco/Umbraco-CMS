@@ -141,8 +141,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // publish = new edit version
                 content1.SetValue("title", "title");
-                ((Content)content1).PublishCulture();
-                ((Content)content1).PublishedState = PublishedState.Publishing;
+                content1.PublishCulture(CultureImpact.Invariant);
+                content1.PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
                 versions.Add(content1.VersionId); // NEW VERSION
@@ -203,8 +203,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = version
-                ((Content)content1).PublishCulture();
-                ((Content)content1).PublishedState = PublishedState.Publishing;
+                content1.PublishCulture(CultureImpact.Invariant);
+                content1.PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
                 versions.Add(content1.VersionId); // NEW VERSION
@@ -239,8 +239,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish = new version
                 content1.Name = "name-4";
                 content1.SetValue("title", "title-4");
-                ((Content)content1).PublishCulture();
-                ((Content)content1).PublishedState = PublishedState.Publishing;
+                content1.PublishCulture(CultureImpact.Invariant);
+                content1.PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
                 versions.Add(content1.VersionId); // NEW VERSION
@@ -654,7 +654,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish them all
                 foreach (var content in result)
                 {
-                    content.PublishCulture();
+                    content.PublishCulture(CultureImpact.Invariant);
                     repository.Save(content);
                 }
 
