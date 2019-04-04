@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Models
@@ -6,6 +7,29 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class CultureImpactTests
     {
+        [Test]
+        public void Get_Culture_For_Invariant_Errors()
+        {
+            var result = CultureImpact.GetCultureForInvariantErrors(
+                Mock.Of<IContent>(x => x.Published == true),
+                new[] { "en-US", "fr-FR" },
+                "en-US");
+            Assert.AreEqual("en-US", result); //default culture is being saved so use it
+
+            result = CultureImpact.GetCultureForInvariantErrors(
+                Mock.Of<IContent>(x => x.Published == false),
+                new[] { "fr-FR" },
+                "en-US");
+            Assert.AreEqual("fr-FR", result); //default culture not being saved with not published version, use the first culture being saved
+
+            result = CultureImpact.GetCultureForInvariantErrors(
+                Mock.Of<IContent>(x => x.Published == true),
+                new[] { "fr-FR" },
+                "en-US");
+            Assert.AreEqual(null, result); //default culture not being saved with published version, use null
+
+        }
+
         [Test]
         public void All_Cultures()
         {

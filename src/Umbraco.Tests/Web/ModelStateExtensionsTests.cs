@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Web
             ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); //invariant property
             ms.AddPropertyError(new ValidationResult("title missing"), "title", "en-US"); //variant property
 
-            var result = ms.GetCulturesWithErrors(localizationService.Object);
+            var result = ms.GetCulturesWithErrors(localizationService.Object, "en-US");
 
             //even though there are 2 errors, they are both for en-US since that is the default language and one of the errors is for an invariant property
             Assert.AreEqual(1, result.Count);
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Web
             ms = new ModelStateDictionary();
             ms.AddCultureValidationError("en-US", "generic culture error");
 
-            result = ms.GetCulturesWithErrors(localizationService.Object);
+            result = ms.GetCulturesWithErrors(localizationService.Object, "en-US");
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("en-US", result[0]);
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Web
             ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); //invariant property
             ms.AddPropertyError(new ValidationResult("title missing"), "title", "en-US"); //variant property
 
-            var result = ms.GetCulturesWithPropertyErrors(localizationService.Object);
+            var result = ms.GetCulturesWithPropertyErrors(localizationService.Object, "en-US");
 
             //even though there are 2 errors, they are both for en-US since that is the default language and one of the errors is for an invariant property
             Assert.AreEqual(1, result.Count);

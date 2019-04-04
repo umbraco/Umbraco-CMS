@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Umbraco.Core.Models
 {
@@ -11,6 +12,31 @@ namespace Umbraco.Core.Models
     /// </remarks>
     internal class CultureImpact
     {
+        /// <summary>
+        /// Utility method to return the culture used for invariant property errors based on what cultures are being actively saved,
+        /// the default culture and the state of the current content item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="savingCultures"></param>
+        /// <param name="defaultCulture"></param>
+        /// <returns></returns>
+        public static string GetCultureForInvariantErrors(IContent content, string[] savingCultures, string defaultCulture)
+        {
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (savingCultures == null) throw new ArgumentNullException(nameof(savingCultures));
+            if (savingCultures.Length == 0) throw new ArgumentException(nameof(savingCultures));
+            if (defaultCulture == null) throw new ArgumentNullException(nameof(defaultCulture));
+
+            var cultureForInvariantErrors = savingCultures.Any(x => x.InvariantEquals(defaultCulture))
+                //the default culture is being flagged for saving so use it
+                ? defaultCulture
+                //If the content has no published version, we need to affiliate validation with the first variant being saved.
+                //If the content has a published version we will not affiliate the validation with any culture (null)
+                : !content.Published ? savingCultures[0] : null;
+
+            return cultureForInvariantErrors;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CultureImpact"/> class.
         /// </summary>
