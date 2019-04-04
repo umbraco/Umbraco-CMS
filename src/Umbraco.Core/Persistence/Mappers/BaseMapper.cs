@@ -6,7 +6,7 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    public abstract class BaseMapper : IDiscoverable
+    public abstract class BaseMapper
     {
         // note: using a Lazy<ISqlContext> here because during installs, we are resolving the
         // mappers way before we have a configured IUmbracoDatabaseFactory, ie way before we
