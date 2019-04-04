@@ -9,7 +9,6 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -505,14 +504,14 @@ namespace Umbraco.Web.Editors
             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize);
             pagedResult.Items = children.Select(content =>
                 Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content,
-                    opts =>
+                    context =>
                     {
 
-                        opts.SetCulture(cultureName);
+                        context.SetCulture(cultureName);
 
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
                         if (!includeProperties.IsNullOrWhiteSpace())
-                            opts.SetIncludedProperties(includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries));
+                            context.SetIncludedProperties(includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries));
                     }))
                 .ToList(); // evaluate now
 

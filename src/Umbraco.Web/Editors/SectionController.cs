@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using AutoMapper;
 using Umbraco.Web.Mvc;
 using System.Linq;
 using Umbraco.Core;

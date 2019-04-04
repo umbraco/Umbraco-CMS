@@ -55,7 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="Umbraco.Code">
+      <Version>1.0.5</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Web" Version="2.0.0" />
@@ -208,8 +212,13 @@
     <Compile Include="Composing\TypeHelper.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
     <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
+    <Compile Include="Mapping\MapperContext.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
+    <Compile Include="Mapping\MapDefinitionCollection.cs" />
+    <Compile Include="Mapping\MapDefinitionCollectionBuilder.cs" />
+    <Compile Include="Mapping\IMapDefinition.cs" />
+    <Compile Include="Mapping\UmbracoMapper.cs" />
     <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
@@ -441,7 +450,7 @@
     <Compile Include="Models\IAuditItem.cs" />
     <Compile Include="Models\IConsent.cs" />
     <Compile Include="Models\ISimpleContentType.cs" />
-    <Compile Include="Models\Identity\IdentityMapperProfile.cs" />
+    <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
     <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\NotificationEmailBodyParams.cs" />

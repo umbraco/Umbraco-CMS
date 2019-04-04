@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -20,7 +17,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
-    [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentTypeRepositoryTest : TestWithDatabaseBase
     {
         public override void SetUp()

@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using AutoMapper;
 using Examine;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
-using SearchResult = Examine.SearchResult;
 
 namespace Umbraco.Web.Search
 {
@@ -24,21 +21,21 @@ namespace Umbraco.Web.Search
     {
         private readonly IExamineManager _examineManager;
         private readonly UmbracoContext _umbracoContext;
-        private readonly UmbracoHelper _umbracoHelper;
         private readonly ILocalizationService _languageService;
         private readonly IEntityService _entityService;
+        private readonly UmbracoMapper _mapper;
 
         public UmbracoTreeSearcher(IExamineManager examineManager,
             UmbracoContext umbracoContext,
-            UmbracoHelper umbracoHelper,
             ILocalizationService languageService,
-            IEntityService entityService)
+            IEntityService entityService,
+            UmbracoMapper mapper)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
             _umbracoContext = umbracoContext;
-            _umbracoHelper = umbracoHelper ?? throw new ArgumentNullException(nameof(umbracoHelper));
             _languageService = languageService;
             _entityService = entityService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -64,9 +61,9 @@ namespace Umbraco.Web.Search
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = new[] { "id", "__NodeId" };
-            
+
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
-            // manipulation for things like start paths, member types, etc... 
+            // manipulation for things like start paths, member types, etc...
             //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
             //{
 
@@ -201,7 +198,7 @@ namespace Umbraco.Web.Search
                     AppendNodeNameExactWithBoost(sb, query, allLangs);
 
                     AppendNodeNameWithWildcards(sb, querywords, allLangs);
-                   
+
                     foreach (var f in fields)
                     {
                         //additional fields normally
@@ -356,14 +353,14 @@ namespace Umbraco.Web.Search
             //add additional data
             foreach (var result in results)
             {
-                var m = Mapper.Map<SearchResultEntity>(result);
+                var m = _mapper.Map<SearchResultEntity>(result);
 
                 //if no icon could be mapped, it will be set to document, so change it to picture
                 if (m.Icon == "icon-document")
                 {
                     m.Icon = "icon-user";
                 }
-                
+
                 if (result.Values.ContainsKey("email") && result.Values["email"] != null)
                 {
                     m.AdditionalData["Email"] = result.Values["email"];
@@ -390,7 +387,7 @@ namespace Umbraco.Web.Search
             //add additional data
             foreach (var result in results)
             {
-                var m = Mapper.Map<SearchResultEntity>(result);
+                var m = _mapper.Map<SearchResultEntity>(result);
                 //if no icon could be mapped, it will be set to document, so change it to picture
                 if (m.Icon == "icon-document")
                 {
@@ -411,7 +408,7 @@ namespace Umbraco.Web.Search
 
             foreach (var result in results)
             {
-                var entity = Mapper.Map<SearchResultEntity>(result);
+                var entity = _mapper.Map<SearchResultEntity>(result);
 
                 var intId = entity.Id.TryConvertTo<int>();
                 if (intId.Success)

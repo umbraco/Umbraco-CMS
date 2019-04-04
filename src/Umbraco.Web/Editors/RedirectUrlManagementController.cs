@@ -4,8 +4,6 @@ using System.Xml;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
-using AutoMapper;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
