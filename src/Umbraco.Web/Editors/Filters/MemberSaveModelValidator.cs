@@ -14,15 +14,14 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Editors.Filters
 {
-
     /// <summary>
     /// Custom validation helper so that we can exclude the Member.StandardPropertyTypeStubs from being validating for existence
     /// </summary>
-    internal class MemberValidationHelper : ContentItemValidationHelper<IMember, MemberSave>
+    internal class MemberSaveModelValidator : ContentModelValidator<IMember, MemberSave, IContentProperties<ContentPropertyBasic>>
     {
         private readonly IMemberTypeService _memberTypeService;
 
-        public MemberValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService)
+        public MemberSaveModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService)
             : base(logger, umbracoContextAccessor)
         {
             _memberTypeService = memberTypeService;
@@ -36,7 +35,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="modelState"></param>
         /// <param name="modelWithProperties"></param>
         /// <returns></returns>
-        public override bool ValidatePropertyData(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentPropertyCollectionDto dto, ModelStateDictionary modelState)
+        public override bool ValidatePropertiesData(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentPropertyCollectionDto dto, ModelStateDictionary modelState)
         {
             if (model.Username.IsNullOrWhiteSpace())
             {
@@ -71,7 +70,7 @@ namespace Umbraco.Web.Editors.Filters
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
             }
 
-            return base.ValidatePropertyData(model, modelWithProperties, dto, modelState);
+            return base.ValidatePropertiesData(model, modelWithProperties, dto, modelState);
         }
 
         /// <summary>

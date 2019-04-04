@@ -57,12 +57,12 @@ Great question! The short version goes like this:
   ![Fork the repository](img/forkrepository.png)
 
   * **Clone** - when GitHub has created your fork, you can clone it in your favorite Git tool
-  
+
   ![Clone the fork](img/clonefork.png)
 
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
   * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](#questions)
-  * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `dev-v8`, create a new branch first.
+  * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `v8/dev`, create a new branch first.
   * **Push** - great, now you can push the changes up to your fork on GitHub
   * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 
@@ -106,7 +106,7 @@ The pull request team consists of a member of Umbraco HQ, [Sebastiaan](https://g
 - [Emma Burstow](https://github.com/emmaburstow)
 - [Poornima Nayar](https://github.com/poornimanayar)
 
-These wonderful volunteers will provide you with a first reply to your PR, review and test out your changes and might ask more questions. After that they'll let Umbraco HQ know if everything seems okay. 
+These wonderful volunteers will provide you with a first reply to your PR, review and test out your changes and might ask more questions. After that they'll let Umbraco HQ know if everything seems okay.
 
 ### Questions?
 
@@ -122,7 +122,7 @@ You can get in touch with [the PR team](#the-pr-team) in multiple ways, we love 
 In order to build the Umbraco source code locally, first make sure you have the following installed.
 
   * Visual Studio 2017 v15.9.7+
-  * Node v10+ 
+  * Node v10+
   * npm v6.4.1+
 
 The easiest way to get started is to run `build.ps1` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`. See [this page](BUILD.md) for more details.
@@ -155,7 +155,7 @@ To find the general areas of something you're looking to fix or improve, have a 
 
 ### Which branch should I target for my contributions?
 
-We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `dev-v8`. Whatever the default is, that's where we'd like you to target your contributions.
+We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `v8/dev`. Whatever the default is, that's where we'd like you to target your contributions.
 
 ![Which branch should I target?](img/defaultbranch.png)
 
@@ -179,9 +179,9 @@ Then when you want to get the changes from the main repository:
 
 ```
 git fetch upstream
-git rebase upstream/dev-v8
+git rebase upstream/v8/dev
 ```
 
-In this command we're syncing with the `dev-v8` branch, but you can of course choose another one if needed.
+In this command we're syncing with the `v8/dev` branch, but you can of course choose another one if needed.
 
 (More info on how this works: [http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated](http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated))

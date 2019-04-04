@@ -1241,6 +1241,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       %0% can not be published, because a parent page is not published.
     ]]></key>
     <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% can not be published, because its missing a name.]]></key>
+    <key alias="contentPublishedFailedReqCultureValidationError">Validation failed for required language '%0%'. This language was saved but not published.</key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
     <key alias="nodePublish">%0% has been published</key>
@@ -1408,7 +1409,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="deleteUserSuccess">User %0% was deleted</key>
     <key alias="resendInviteHeader">Invite user</key>
     <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
-    <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>
+    <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>    
     <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
     <key alias="documentTypeExportedSuccess">Document type was exported to file</key>
     <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
@@ -2122,7 +2123,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="mediaFolderBrowser">Content</key>
     <key alias="settingsWelcome">Welcome</key>
     <key alias="settingsExamine">Examine Management</key>
-    <key alias="settingsPublishedStatus">Published Status</key>
+    <key alias="settingsPublishedStatus">Published Cache</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
     <key alias="memberIntro">Getting Started</key>
