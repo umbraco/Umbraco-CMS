@@ -25,7 +25,6 @@ namespace Umbraco.Core.Models
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (savingCultures == null) throw new ArgumentNullException(nameof(savingCultures));
             if (savingCultures.Length == 0) throw new ArgumentException(nameof(savingCultures));
-            if (defaultCulture == null) throw new ArgumentNullException(nameof(defaultCulture));
 
             var cultureForInvariantErrors = savingCultures.Any(x => x.InvariantEquals(defaultCulture))
                 //the default culture is being flagged for saving so use it
