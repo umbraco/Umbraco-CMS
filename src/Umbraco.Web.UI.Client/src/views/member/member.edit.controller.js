@@ -192,6 +192,17 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
     };
 
+    $scope.showBack = function () {
+        return !!$scope.page.listViewPath;
+    }
+
+    /** Callback for when user clicks the back-icon */
+    $scope.onBack = function () {
+        if ($scope.page.listViewPath) {
+            $location.path($scope.page.listViewPath);
+        }
+    };
+
     $scope.export = function() {
         var memberKey = $scope.content.key;
         memberResource.exportMemberData(memberKey);
