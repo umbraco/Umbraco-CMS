@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
-using System.Reflection;
 using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Composing;
@@ -10,60 +8,74 @@ namespace Umbraco.Core.Persistence.Mappers
 {
     public abstract class BaseMapper : IDiscoverable
     {
-        protected BaseMapper()
+        // note: using a Lazy<ISqlContext> here because during installs, we are resolving the
+        // mappers way before we have a configured IUmbracoDatabaseFactory, ie way before we
+        // have an ISqlContext - this is some nasty temporal coupling which we might want to
+        // cleanup eventually.
+
+        private readonly Lazy<ISqlContext> _sqlContext;
+        private readonly object _definedLock = new object();
+        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _maps;
+
+        private ISqlSyntaxProvider _sqlSyntax;
+        private bool _defined;
+
+        protected BaseMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
         {
-            Build();
+            _sqlContext = sqlContext;
+            _maps = maps;
         }
 
-        internal abstract ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache { get; }
+        protected abstract void DefineMaps();
 
-        private void Build()
+        internal string Map(string propertyName)
         {
-            BuildMap();
-        }
-
-        protected abstract void BuildMap();
-
-        internal string Map(ISqlSyntaxProvider sqlSyntax, string propertyName, bool throws = false)
-        {
-            if (PropertyInfoCache.TryGetValue(propertyName, out var dtoTypeProperty))
-                return GetColumnName(sqlSyntax, dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
-
-            if (throws)
-                throw new InvalidOperationException("Could not get the value with the key " + propertyName + " from the property info cache, keys available: " + string.Join(", ", PropertyInfoCache.Keys));
-
-            return string.Empty;
-        }
-
-        internal void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
-        {
-            var property = ResolveMapping(sourceMember, destinationMember);
-            PropertyInfoCache.AddOrUpdate(property.SourcePropertyName, property, (x, y) => property);
-        }
-
-        internal DtoMapModel ResolveMapping<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
-        {
-            var source = ExpressionHelper.FindProperty(sourceMember);
-            var destination = (PropertyInfo) ExpressionHelper.FindProperty(destinationMember).Item1;
-
-            if (destination == null)
+            lock (_definedLock)
             {
-                throw new InvalidOperationException("The 'destination' returned was null, cannot resolve the mapping");
+                if (!_defined)
+                {
+                    var sqlContext = _sqlContext.Value;
+                    if (sqlContext == null)
+                        throw new InvalidOperationException("Could not get an ISqlContext.");
+                    _sqlSyntax = sqlContext.SqlSyntax;
+
+                    DefineMaps();
+
+                    _defined = true;
+                }
             }
 
-            return new DtoMapModel(typeof(TDestination), destination, source.Item1.Name);
+            if (!_maps.TryGetValue(GetType(), out var mapperMaps))
+                throw new InvalidOperationException($"No maps defined for mapper {GetType().FullName}.");
+            if (!mapperMaps.TryGetValue(propertyName, out var mappedName))
+                throw new InvalidOperationException($"No map defined by mapper {GetType().FullName} for property {propertyName}.");
+            return mappedName;
         }
 
-        internal virtual string GetColumnName(ISqlSyntaxProvider sqlSyntax, Type dtoType, PropertyInfo dtoProperty)
+        protected void DefineMap<TSource, TTarget>(string sourceName, string targetName)
         {
-            var tableNameAttribute = dtoType.FirstAttribute<TableNameAttribute>();
+            if (_sqlSyntax == null)
+                throw new InvalidOperationException("Do not define maps outside of DefineMaps.");
+
+            var targetType = typeof(TTarget);
+
+            // TODO ensure that sourceName is a valid sourceType property (but, slow?)
+
+            var tableNameAttribute = targetType.FirstAttribute<TableNameAttribute>();
+            if (tableNameAttribute == null) throw new InvalidOperationException($"Type {targetType.FullName} is not marked with a TableName attribute.");
             var tableName = tableNameAttribute.Value;
 
-            var columnAttribute = dtoProperty.FirstAttribute<ColumnAttribute>();
-            var columnName = columnAttribute.Name;
+            // TODO maybe get all properties once and then index them
+            var targetProperty = targetType.GetProperty(targetName);
+            if (targetProperty == null) throw new InvalidOperationException($"Type {targetType.FullName} does not have a property named {targetName}.");
+            var columnAttribute = targetProperty.FirstAttribute<ColumnAttribute>();
+            if (columnAttribute == null) throw new InvalidOperationException($"Property {targetType.FullName}.{targetName} is not marked with a Column attribute.");
 
-            var columnMap = sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(columnName);
-            return columnMap;
+            var columnName = columnAttribute.Name;
+            var columnMap = _sqlSyntax.GetQuotedTableName(tableName) + "." + _sqlSyntax.GetQuotedColumnName(columnName);
+
+            var mapperMaps = _maps.GetOrAdd(GetType(), type => new ConcurrentDictionary<string, string>());
+            mapperMaps[sourceName] = columnMap;
         }
     }
 }

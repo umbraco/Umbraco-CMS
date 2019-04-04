@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -12,18 +13,16 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(ITemplate))]
     public sealed class TemplateMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public TemplateMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        protected override void DefineMaps()
         {
-            if (PropertyInfoCache.IsEmpty == false) return;
-
-            CacheMap<Template, TemplateDto>(src => src.Id, dto => dto.NodeId);
-            CacheMap<Template, NodeDto>(src => src.MasterTemplateId, dto => dto.ParentId);
-            CacheMap<Template, NodeDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<Template, TemplateDto>(src => src.Alias, dto => dto.Alias);
+            DefineMap<Template, TemplateDto>(nameof(Template.Id), nameof(TemplateDto.NodeId));
+            DefineMap<Template, NodeDto>(nameof(Template.MasterTemplateId), nameof(NodeDto.ParentId));
+            DefineMap<Template, NodeDto>(nameof(Template.Key), nameof(NodeDto.UniqueId));
+            DefineMap<Template, TemplateDto>(nameof(Template.Alias), nameof(TemplateDto.Alias));
         }
     }
 }
