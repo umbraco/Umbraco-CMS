@@ -2,8 +2,8 @@
 {
     public enum ProvidedValueValidation
     {
-        None,
-        Email,
-        Regex
+        None = 1,
+        Email = 2,
+        Regex = 3
     }
 }
