@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.Mapping
         public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<ITemplate, TemplateDisplay>((source, context) => new TemplateDisplay(), Map);
-            mapper.Define<TemplateDisplay, Template>((source, context) => new Template(source.Name, source.Alias), Map);
+            mapper.Define<TemplateDisplay, ITemplate>((source, context) => new Template(source.Name, source.Alias), Map);
         }
 
         // Umbraco.Code.MapAll
@@ -29,9 +29,10 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
         // Umbraco.Code.MapAll -Path -VirtualPath -MasterTemplateId -IsMasterTemplate
         // Umbraco.Code.MapAll -GetFileContent
-        private static void Map(TemplateDisplay source, Template target, MapperContext context)
+        private static void Map(TemplateDisplay source, ITemplate target, MapperContext context)
         {
-            target.MasterTemplateAlias = source.MasterTemplateAlias;
+            // don't need to worry about mapping MasterTemplateAlias here;
+            // the template controller handles any changes made to the master template
             target.Name = source.Name;
             target.Alias = source.Alias;
             target.Content = source.Content;
