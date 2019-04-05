@@ -246,7 +246,13 @@ namespace Umbraco.Web.Models.Mapping
             {
                 var templates = _fileService.GetTemplates(source.AllowedTemplates.ToArray());
                 target.AllowedTemplates = source.AllowedTemplates
-                    .Select(x => context.Mapper.Map<EntityBasic>(templates.SingleOrDefault(t => t.Alias == x)))
+                    .Select(x =>
+                    {
+                        var template = templates.SingleOrDefault(t => t.Alias == x);
+                        return template != null
+                            ? context.Mapper.Map<EntityBasic>(template)
+                            : null;
+                    })
                     .WhereNotNull()
                     .ToArray();
             }
