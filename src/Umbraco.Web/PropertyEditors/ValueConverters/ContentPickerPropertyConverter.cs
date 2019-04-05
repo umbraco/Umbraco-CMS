@@ -7,7 +7,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -16,7 +15,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Extensions;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -57,6 +55,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias);
             }
+
             return false;
         }
 
@@ -80,9 +79,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var attemptConvertInt = source.TryConvertTo<int>();
             if (attemptConvertInt.Success)
                 return attemptConvertInt.Result;
+
             var attemptConvertUdi = source.TryConvertTo<Udi>();
             if (attemptConvertUdi.Success)
                 return attemptConvertUdi.Result;
+
             return null;
         }
 
@@ -104,32 +105,29 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null)
-            {
                 return null;
-            }
 
-            if (UmbracoContext.Current == null) return source;
+            var umbracoContext = UmbracoContext.Current;
+            if (umbracoContext == null)
+                return source;
 
             if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
             {
                 IPublishedContent content;
-                if (source is int)
+                if (source is int sourceInt)
                 {
-                    var sourceInt = (int)source;
-                    content = UmbracoContext.Current.ContentCache.GetById(sourceInt);
-                    if(content != null)
+                    content = umbracoContext.ContentCache.GetById(sourceInt);
+                    if (content != null)
                         return content;
                 }
-                else
+                else if (source is Udi sourceUdi)
                 {
-                    var sourceUdi = source as Udi;
-                    if (sourceUdi == null) return null;
-                    var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-                    content = umbHelper.TypedContent(sourceUdi);
+                    content = umbracoContext.ContentCache.GetById(sourceUdi);
                     if (content != null)
                         return content;
                 }
             }
+
             return source;
         }
 
@@ -152,6 +150,5 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             return source.ToString();
         }
-
     }
 }

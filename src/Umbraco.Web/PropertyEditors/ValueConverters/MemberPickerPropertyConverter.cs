@@ -3,7 +3,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Extensions;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -24,6 +23,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MemberPickerAlias);
             }
+
             return false;
         }
 
@@ -32,9 +32,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var attemptConvertInt = source.TryConvertTo<int>();
             if (attemptConvertInt.Success)
                 return attemptConvertInt.Result;
+
             var attemptConvertUdi = source.TryConvertTo<Udi>();
             if (attemptConvertUdi.Success)
                 return attemptConvertUdi.Result;
+
             return null;
         }
 
@@ -43,20 +45,22 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (source == null)
                 return null;
 
-            if (UmbracoContext.Current == null) return source;
+            var umbracoContext = UmbracoContext.Current;
+            if (umbracoContext == null)
+                return source;
 
-            var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
+            var membershipHelper = new MembershipHelper(umbracoContext);
+
             IPublishedContent member;
-            if (source is int)
-            {                    
-                member = umbracoHelper.TypedMember((int)source);
+            if (source is int sourceInt)
+            {
+                member = membershipHelper.GetById(sourceInt);
                 if (member != null)
                     return member;
             }
-            else
+            else if (source is GuidUdi sourceUdi)
             {
-                var sourceUdi = source as Udi;
-                member = umbracoHelper.TypedMember(sourceUdi);
+                member = membershipHelper.GetByProviderKey(sourceUdi.Guid);
                 if (member != null)
                     return member;
             }

@@ -12,12 +12,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Web.Extensions;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -37,8 +35,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public MediaPickerPropertyConverter(IDataTypeService dataTypeService)
         {
-            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
-            _dataTypeService = dataTypeService;
+            _dataTypeService = dataTypeService ?? throw new ArgumentNullException("dataTypeService");
         }
 
         public Type GetPropertyValueType(PublishedPropertyType propertyType)
@@ -150,6 +147,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(Udi.Parse)
                 .ToArray();
+
             return nodeIds;
         }
 
@@ -171,22 +169,23 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null)
-            {
                 return null;
-            }
+
+            var umbracoContext = UmbracoContext.Current;
+            if (umbracoContext == null)
+                return source;
 
             var udis = (Udi[])source;
-            var mediaItems = new List<IPublishedContent>();
-            if (UmbracoContext.Current == null) return source;
-            var helper = new UmbracoHelper(UmbracoContext.Current);
-            if (udis.Any())
+            if (udis.Length > 0)
             {
+                var mediaItems = new List<IPublishedContent>();
                 foreach (var udi in udis)
                 {
-                    var item = helper.TypedMedia(udi);
+                    var item = umbracoContext.MediaCache.GetById(udi);
                     if (item != null)
                         mediaItems.Add(item);
                 }
+
                 if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
                 {
                     return mediaItems;

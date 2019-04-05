@@ -20,8 +20,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public MultiUrlPickerPropertyConverter(IDataTypeService dataTypeService)
         {
-            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
-            _dataTypeService = dataTypeService;
+            _dataTypeService = dataTypeService ?? throw new ArgumentNullException("dataTypeService");
         }
 
         //TODO: Remove this ctor in v8 since the other one will use IoC
@@ -50,6 +49,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 LogHelper.Error<MultiUrlPickerPropertyConverter>("Error parsing JSON", ex);
             }
+
             return null;
         }
 
@@ -61,14 +61,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     ? Enumerable.Empty<Link>()
                     : null;
 
-            //TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
-            if (UmbracoContext.Current == null)
+            var umbracoContext = UmbracoContext.Current;
+            if (umbracoContext == null)
                 return source;
 
-            var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-
             var links = new List<Link>();
-            var dtos = ((JArray) source).ToObject<IEnumerable<MultiUrlPickerPropertyEditor.LinkDto>>();
+            var dtos = ((JArray)source).ToObject<IEnumerable<MultiUrlPickerPropertyEditor.LinkDto>>();
 
             foreach (var dto in dtos)
             {
@@ -82,16 +80,18 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
                     if (type == LinkType.Media)
                     {
-                        var media = umbHelper.TypedMedia(dto.Udi);
+                        var media = umbracoContext.MediaCache.GetById(dto.Udi);
                         if (media == null)
                             continue;
+
                         url = media.Url;
                     }
                     else
                     {
-                        var content = umbHelper.TypedContent(dto.Udi);
+                        var content = umbracoContext.ContentCache.GetById(dto.Udi);
                         if (content == null)
                             continue;
+
                         url = content.Url;
                     }
                 }
@@ -110,6 +110,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             if (isMultiple == false)
                 return links.FirstOrDefault();
+
             if (maxNumber > 0)
                 return links.Take(maxNumber);
 

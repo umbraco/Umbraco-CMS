@@ -16,7 +16,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Web.Extensions;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 
@@ -38,8 +37,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public RelatedLinksPropertyConverter(UrlProvider urlProvider)
         {
-            if (urlProvider == null) throw new ArgumentNullException("urlProvider");
-            _urlProvider = urlProvider;
+            _urlProvider = urlProvider ?? throw new ArgumentNullException("urlProvider");
         }
 
         /// <summary>
@@ -60,6 +58,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias);
             }
+
             return false;
         }
 
@@ -90,9 +89,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var relatedLinksData = JsonConvert.DeserializeObject<IEnumerable<RelatedLink>>(sourceString);
             var relatedLinks = new List<RelatedLink>();
 
-            if (UmbracoContext.Current == null) return source;
-
-            var helper = new UmbracoHelper(UmbracoContext.Current);
+            var umbracoContext = UmbracoContext.Current;
+            if (umbracoContext == null)
+                return source;
 
             foreach (var linkData in relatedLinksData)
             {
@@ -105,12 +104,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     Link = linkData.Link
                 };
 
-                int contentId;
-                if (int.TryParse(relatedLink.Link, out contentId))
+                if (int.TryParse(relatedLink.Link, out var contentId))
                 {
                     relatedLink.Id = contentId;
-                    relatedLink = CreateLink(relatedLink);
-                    relatedLink.Content = UmbracoContext.Current.ContentCache.GetById(contentId);
+                    relatedLink = CreateLink(relatedLink, _urlProvider ?? umbracoContext.UrlProvider);
+                    relatedLink.Content = umbracoContext.ContentCache.GetById(contentId);
                 }
                 else
                 {
@@ -118,11 +116,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var udiAttempt = strLinkId.TryConvertTo<Udi>();
                     if (udiAttempt.Success && udiAttempt.Result != null)
                     {
-                        var content = helper.TypedContent(udiAttempt.Result);
+                        var content = umbracoContext.ContentCache.GetById(udiAttempt.Result);
                         if (content != null)
                         {
                             relatedLink.Id = content.Id;
-                            relatedLink = CreateLink(relatedLink);
+                            relatedLink = CreateLink(relatedLink, _urlProvider ?? umbracoContext.UrlProvider);
                             relatedLink.Content = content;
                         }
                     }
@@ -142,22 +140,15 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return new RelatedLinks(relatedLinks, sourceString);
         }
 
-        private RelatedLink CreateLink(RelatedLink link)
+        private static RelatedLink CreateLink(RelatedLink link, UrlProvider urlProvider)
         {
-            if (link.IsInternal && link.Id != null)
+            if (link.IsInternal && link.Id is int linkId)
             {
-                if (_urlProvider == null && UmbracoContext.Current == null)
-                {
-                    return null;
-                }
-
-                var urlProvider = _urlProvider ?? UmbracoContext.Current.UrlProvider;
-
-                link.Link = urlProvider.GetUrl((int)link.Id);
+                link.Link = urlProvider.GetUrl(linkId);
                 if (link.Link.Equals("#"))
                 {
                     link.IsDeleted = true;
-                    link.Link = link.Id.ToString();
+                    link.Link = linkId.ToString();
                 }
                 else
                 {

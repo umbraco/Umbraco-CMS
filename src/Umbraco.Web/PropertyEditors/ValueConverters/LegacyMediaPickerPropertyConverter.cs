@@ -39,8 +39,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public LegacyMediaPickerPropertyConverter(IDataTypeService dataTypeService)
         {
-            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
-            _dataTypeService = dataTypeService;
+            _dataTypeService = dataTypeService ?? throw new ArgumentNullException("dataTypeService");
         }
 
         /// <summary>
@@ -145,16 +144,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null)
-            {
                 return null;
-            }
 
-            if (UmbracoContext.Current == null)
-            {
+            var umbracoContext = UmbracoContext.Current;
+            if (umbracoContext == null)
                 return null;
-            }
-
-            var umbHelper = new UmbracoHelper(UmbracoContext.Current);
 
             if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
             {
@@ -162,7 +156,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var multiMediaPicker = Enumerable.Empty<IPublishedContent>();
                 if (nodeIds.Length > 0)
                 {
-                    multiMediaPicker =  umbHelper.TypedMedia(nodeIds).Where(x => x != null);
+                    multiMediaPicker = nodeIds.Select(umbracoContext.MediaCache.GetById).Where(x => x != null);
                 }
 
                 // in v8 should return multiNodeTreePickerEnumerable but for v7 need to return as PublishedContentEnumerable so that string can be returned for legacy compatibility
@@ -171,8 +165,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             // single value picker
             var nodeId = (int)source;
-            
-            return umbHelper.TypedMedia(nodeId);
+
+            return umbracoContext.MediaCache.GetById(nodeId);
         }
 
         /// <summary>
@@ -251,7 +245,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
                     return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
                 }
-                
+
                 //in some odd cases, the pre-values in the db won't exist but their default pre-values contain this key so check there 
                 var propertyEditor = PropertyEditorResolver.Current.GetByAlias(propertyEditorAlias);
                 if (propertyEditor != null)

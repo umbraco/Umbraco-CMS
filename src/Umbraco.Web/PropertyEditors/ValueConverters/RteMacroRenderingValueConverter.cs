@@ -1,15 +1,13 @@
-using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Web;
+using HtmlAgilityPack;
 using Umbraco.Core;
 using Umbraco.Core.Macros;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Templates;
-using System.Linq;
-using HtmlAgilityPack;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -27,37 +25,40 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [PropertyValueType(typeof(IHtmlString))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
     public class RteMacroRenderingValueConverter : TinyMceValueConverter
-	{
+    {
         // NOT thread-safe over a request because it modifies the
         // global UmbracoContext.Current.InPreviewMode status. So it
         // should never execute in // over the same UmbracoContext with
         // different preview modes.
-	    static string RenderRteMacros(string source, bool preview)
+        private static string RenderRteMacros(string source, bool preview)
         {
+            var umbracoContext = UmbracoContext.Current;
+
             // save and set for macro rendering
-            var inPreviewMode = UmbracoContext.Current.InPreviewMode;
-	        UmbracoContext.Current.InPreviewMode = preview;
+            var inPreviewMode = umbracoContext.InPreviewMode;
+            umbracoContext.InPreviewMode = preview;
 
             var sb = new StringBuilder();
-            
+
             try
-	        {
-	            var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
-	            MacroTagParser.ParseMacros(
-	                source,
-	                //callback for when text block is found
-	                textBlock => sb.Append(textBlock),
-	                //callback for when macro syntax is found
-	                (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
-	                    macroAlias,
-	                    //needs to be explicitly casted to Dictionary<string, object>
-	                    macroAttributes.ConvertTo(x => (string) x, x => x)).ToString()));
-	        }
-	        finally
-	        {
+            {
+                var componentRenderer = new UmbracoComponentRenderer(umbracoContext);
+
+                MacroTagParser.ParseMacros(
+                    source,
+                    //callback for when text block is found
+                    textBlock => sb.Append(textBlock),
+                    //callback for when macro syntax is found
+                    (macroAlias, macroAttributes) => sb.Append(componentRenderer.RenderMacro(
+                        macroAlias,
+                        //needs to be explicitly casted to Dictionary<string, object>
+                        macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
+            }
+            finally
+            {
                 // restore
-                UmbracoContext.Current.InPreviewMode = inPreviewMode;	            
-	        }
+                umbracoContext.InPreviewMode = inPreviewMode;
+            }
 
             return sb.ToString();
         }
@@ -100,8 +101,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             var rel = firstOrDefault.Value;
 
                             // Check that the rel attribute is a integer before removing
-                            int nodeId;
-                            if (int.TryParse(rel, out nodeId))
+                            if (int.TryParse(rel, out var nodeId))
                             {
                                 img.Attributes.Remove("rel");
                                 modified = true;
