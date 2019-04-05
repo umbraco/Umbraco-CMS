@@ -22,6 +22,7 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.CreateDate), nameof(ServerRegistrationDto.DateRegistered));
             DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.UpdateDate), nameof(ServerRegistrationDto.DateAccessed));
             DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.ServerIdentity), nameof(ServerRegistrationDto.ServerIdentity));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.LastCacheInstructionId), nameof(ServerRegistrationDto.LastCacheInstructionId));
         }
     }
 }

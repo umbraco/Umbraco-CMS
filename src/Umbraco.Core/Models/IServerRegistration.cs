@@ -32,5 +32,10 @@ namespace Umbraco.Core.Models
         /// Gets the date and time the registration was last accessed.
         /// </summary>
         DateTime Accessed { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value of the last executed cache instruction.
+        /// </summary>
+        int LastCacheInstructionId { get; set; }
     }
 }

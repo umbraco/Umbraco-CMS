@@ -86,6 +86,7 @@ namespace Umbraco.Core.Runtime
                         new DatabaseServerRegistrarOptions());
             });
 
+            composition.RegisterUnique<IServerMessengerSyncRepository, LocalTempFileServerMessengerSyncRepository>();
             // by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden by the db thing in the corresponding components in the web
             // project
@@ -95,7 +96,7 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IScopeProvider>(),
                     factory.GetInstance<ISqlContext>(),
                     factory.GetInstance<IProfilingLogger>(),
-                    factory.GetInstance<IGlobalSettings>(),
+                    factory.GetInstance<IServerMessengerSyncRepository>(),
                     true, new DatabaseServerMessengerOptions()));
 
             composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()

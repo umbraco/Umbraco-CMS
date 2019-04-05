@@ -13,6 +13,7 @@ namespace Umbraco.Core.Models
         private string _serverIdentity;
         private bool _isActive;
         private bool _isMaster;
+        private int _lastCacheInstructionId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
@@ -30,7 +31,8 @@ namespace Umbraco.Core.Models
         /// <param name="accessed">The date and time the registration was last accessed.</param>
         /// <param name="isActive">A value indicating whether the registration is active.</param>
         /// <param name="isMaster">A value indicating whether the registration is master.</param>
-        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isMaster)
+        /// <param name="lastCacheInstructionId">A value indicating the id of the last executed cache instruction.</param>
+        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isMaster, int lastCacheInstructionId)
         {
             UpdateDate = accessed;
             CreateDate = registered;
@@ -40,6 +42,7 @@ namespace Umbraco.Core.Models
             ServerIdentity = serverIdentity;
             IsActive = isActive;
             IsMaster = isMaster;
+            LastCacheInstructionId = lastCacheInstructionId;
         }
 
         /// <summary>
@@ -55,6 +58,7 @@ namespace Umbraco.Core.Models
             Key = 0.ToString(CultureInfo.InvariantCulture).EncodeAsGuid();
             ServerAddress = serverAddress;
             ServerIdentity = serverIdentity;
+            LastCacheInstructionId = -1;
         }
 
         /// <summary>
@@ -111,13 +115,20 @@ namespace Umbraco.Core.Models
             set => UpdateDate = value;
         }
 
+        public int LastCacheInstructionId
+        {
+            get => _lastCacheInstructionId;
+            set => SetPropertyValueAndDetectChanges(value, ref _lastCacheInstructionId, nameof(_lastCacheInstructionId));
+        }
+
         /// <summary>
         /// Converts the value of this instance to its equivalent string representation.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("{{\"{0}\", \"{1}\", {2}active, {3}master}}", ServerAddress, ServerIdentity, IsActive ? "" : "!", IsMaster ? "" : "!");
+            return
+                $"{{\"{ServerAddress}\", \"{ServerIdentity}\", {(IsActive ? "" : "!")}active, {(IsMaster ? "" : "!")}master, {LastCacheInstructionId}}}";
         }
     }
 }

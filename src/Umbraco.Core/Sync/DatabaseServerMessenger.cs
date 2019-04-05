@@ -34,9 +34,9 @@ namespace Umbraco.Core.Sync
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly IProfilingLogger _profilingLogger;
+        private readonly IServerMessengerSyncRepository _serverMessengerSyncRepository;
         private readonly ISqlContext _sqlContext;
-        private readonly Lazy<string> _distCacheFilePath;
-        private int _lastId = -1;
+
         private DateTime _lastSync;
         private DateTime _lastPruned;
         private bool _initialized;
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Sync
         public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings,
+            IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IServerMessengerSyncRepository serverMessengerSyncRepository,
             bool distributedEnabled, DatabaseServerMessengerOptions options)
             : base(distributedEnabled)
         {
@@ -54,11 +54,11 @@ namespace Umbraco.Core.Sync
             _sqlContext = sqlContext;
             _runtime = runtime;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
+            _serverMessengerSyncRepository = serverMessengerSyncRepository;
             Logger = proflog;
             Options = options ?? throw new ArgumentNullException(nameof(options));
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
-            _distCacheFilePath = new Lazy<string>(() => GetDistCacheFilePath(globalSettings));
         }
 
         protected ILogger Logger { get; }
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Sync
 
         protected Sql<ISqlContext> Sql() => _sqlContext.Sql();
 
-        private string DistCacheFilePath => _distCacheFilePath.Value;
+
 
         #region Messenger
 
@@ -150,7 +150,7 @@ namespace Umbraco.Core.Sync
             if (registered == false)
                 return;
 
-            ReadLastSynced(); // get _lastId
+            _serverMessengerSyncRepository.Read(); // get _lastId
             using (var scope = ScopeProvider.CreateScope())
             {
                 EnsureInstructions(scope.Database); // reset _lastId if instructions are missing
@@ -174,7 +174,7 @@ namespace Umbraco.Core.Sync
                 if (_released) return;
 
                 var coldboot = false;
-                if (_lastId < 0) // never synced before
+                if (_serverMessengerSyncRepository.Value < 0) // never synced before
                 {
                     // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
                     // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
@@ -188,7 +188,7 @@ namespace Umbraco.Core.Sync
                 {
                     //check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
                     //row so we will sum these numbers to get the actual count.
-                    var count = database.ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
+                    var count = database.ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _serverMessengerSyncRepository.Value});
                     if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
@@ -210,8 +210,11 @@ namespace Umbraco.Core.Sync
                     var maxId = database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
 
                     //if there is a max currently, or if we've never synced
-                    if (maxId > 0 || _lastId < 0)
-                        SaveLastSynced(maxId);
+                    if (maxId > 0 || _serverMessengerSyncRepository.Value < 0)
+                    {
+                        _serverMessengerSyncRepository.Save(maxId);
+                    }
+
 
                     // execute initializing callbacks
                     if (Options.InitializingCallbacks != null)
@@ -306,7 +309,7 @@ namespace Umbraco.Core.Sync
 
             var sql = Sql().SelectAll()
                 .From<CacheInstructionDto>()
-                .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
+                .Where<CacheInstructionDto>(dto => dto.Id > _serverMessengerSyncRepository.Value)
                 .OrderBy<CacheInstructionDto>(dto => dto.Id);
 
             //only retrieve the top 100 (just in case there's tons)
@@ -375,7 +378,7 @@ namespace Umbraco.Core.Sync
             }
 
             if (lastId > 0)
-                SaveLastSynced(lastId);
+                _serverMessengerSyncRepository.Save(lastId);
         }
 
         /// <summary>
@@ -461,7 +464,7 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void EnsureInstructions(IUmbracoDatabase database)
         {
-            if (_lastId == 0)
+            if (_serverMessengerSyncRepository.Value == 0)
             {
                 var sql = Sql().Select("COUNT(*)")
                     .From<CacheInstructionDto>();
@@ -470,48 +473,20 @@ namespace Umbraco.Core.Sync
 
                 //if there are instructions but we haven't synced, then a cold boot is necessary
                 if (count > 0)
-                    _lastId = -1;
+                    _serverMessengerSyncRepository.Reset();
             }
             else
             {
                 var sql = Sql().SelectAll()
                     .From<CacheInstructionDto>()
-                    .Where<CacheInstructionDto>(dto => dto.Id == _lastId);
+                    .Where<CacheInstructionDto>(dto => dto.Id == _serverMessengerSyncRepository.Value);
 
                 var dtos = database.Fetch<CacheInstructionDto>(sql);
 
                 //if the last synced instruction is not found in the db, then a cold boot is necessary
                 if (dtos.Count == 0)
-                    _lastId = -1;
+                    _serverMessengerSyncRepository.Reset();
             }
-        }
-
-        /// <summary>
-        /// Reads the last-synced id from file into memory.
-        /// </summary>
-        /// <remarks>
-        /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
-        /// </remarks>
-        private void ReadLastSynced()
-        {
-            if (File.Exists(DistCacheFilePath) == false) return;
-
-            var content = File.ReadAllText(DistCacheFilePath);
-            if (int.TryParse(content, out var last))
-                _lastId = last;
-        }
-
-        /// <summary>
-        /// Updates the in-memory last-synced id and persists it to file.
-        /// </summary>
-        /// <param name="id">The id.</param>
-        /// <remarks>
-        /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
-        /// </remarks>
-        private void SaveLastSynced(int id)
-        {
-            File.WriteAllText(DistCacheFilePath, id.ToString(CultureInfo.InvariantCulture));
-            _lastId = id;
         }
 
         /// <summary>
@@ -530,21 +505,7 @@ namespace Umbraco.Core.Sync
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
             + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
 
-        private string GetDistCacheFilePath(IGlobalSettings globalSettings)
-        {
-            var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
 
-            var distCacheFilePath = Path.Combine(globalSettings.LocalTempPath, "DistCache", fileName);
-
-            //ensure the folder exists
-            var folder = Path.GetDirectoryName(distCacheFilePath);
-            if (folder == null)
-                throw new InvalidOperationException("The folder could not be determined for the file " + distCacheFilePath);
-            if (Directory.Exists(folder) == false)
-                Directory.CreateDirectory(folder);
-
-            return distCacheFilePath;
-        }
 
         #endregion
 
