@@ -503,6 +503,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        // IMPORTANT kits must be sorted out by LEVEL
         public void SetAll(IEnumerable<ContentNodeKit> kits)
         {
             var lockInfo = new WriteLockInfo();
@@ -533,6 +534,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        // IMPORTANT kits must be sorted out by LEVEL
         public void SetBranch(int rootContentId, IEnumerable<ContentNodeKit> kits)
         {
             var lockInfo = new WriteLockInfo();

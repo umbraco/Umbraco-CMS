@@ -30,11 +30,11 @@ namespace Umbraco.Web.Editors.Filters
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var model = (MemberSave)actionContext.ActionArguments["contentItem"];
-            var contentItemValidator = new MemberValidationHelper(_logger, _umbracoContextAccessor, _memberTypeService);
+            var contentItemValidator = new MemberSaveModelValidator(_logger, _umbracoContextAccessor, _memberTypeService);
             //now do each validation step
             if (contentItemValidator.ValidateExistingContent(model, actionContext))
                 if (contentItemValidator.ValidateProperties(model, model, actionContext))
-                    contentItemValidator.ValidatePropertyData(model, model, model.PropertyCollectionDto, actionContext.ModelState);
+                    contentItemValidator.ValidatePropertiesData(model, model, model.PropertyCollectionDto, actionContext.ModelState);
         }
     }
 }

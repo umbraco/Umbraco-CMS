@@ -1600,7 +1600,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="mediaFolderBrowser">Indhold</key>
     <key alias="settingsWelcome">Velkommen</key>
     <key alias="settingsExamine">Examine Management</key>
-    <key alias="settingsPublishedStatus">Published Status</key>
+    <key alias="settingsPublishedStatus">Published Cache</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
     <key alias="memberIntro">Kom godt i gang</key>

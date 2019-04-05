@@ -5,6 +5,7 @@ function textAreaController($scope) {
     if (!$scope.model.config) {
         $scope.model.config = {};
     }
+    $scope.model.count = 0;
 
     if (!$scope.model.config.maxChars) {
         $scope.model.config.maxChars = false;
@@ -16,7 +17,9 @@ function textAreaController($scope) {
     }
     
     $scope.model.change = function () {
-        $scope.model.count = $scope.model.value.length;
+        if ($scope.model.value) {
+            $scope.model.count = $scope.model.value.length;
+        }
     }
     $scope.model.change();
 }
