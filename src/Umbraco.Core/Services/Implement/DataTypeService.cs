@@ -424,7 +424,6 @@ namespace Umbraco.Core.Services.Implement
                     return;
                 }
 
-
                 // find ContentTypes using this IDataTypeDefinition on a PropertyType, and delete
                 // TODO: media and members?!
                 // TODO: non-group properties?!
