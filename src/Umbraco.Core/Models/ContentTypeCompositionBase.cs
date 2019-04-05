@@ -43,9 +43,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets the property groups for the entire composition.
-        /// </summary>
+        /// <inheritdoc />
         [IgnoreDataMember]
         public IEnumerable<PropertyGroup> CompositionPropertyGroups
         {
@@ -76,9 +74,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets the property types for the entire composition.
-        /// </summary>
+        /// <inheritdoc />
         [IgnoreDataMember]
         public IEnumerable<PropertyType> CompositionPropertyTypes
         {
