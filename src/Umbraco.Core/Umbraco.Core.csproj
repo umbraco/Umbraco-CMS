@@ -219,6 +219,8 @@
     <Compile Include="Mapping\MapDefinitionCollectionBuilder.cs" />
     <Compile Include="Mapping\IMapDefinition.cs" />
     <Compile Include="Mapping\UmbracoMapper.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_1_0\AddLastCacheInstructionColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_1_0\ChangeNuCacheJsonFormat.cs" />
     <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />

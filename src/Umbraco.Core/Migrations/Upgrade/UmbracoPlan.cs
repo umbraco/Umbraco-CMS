@@ -5,7 +5,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Upgrade.V_7_12_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_14_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
+using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
+using ChangeNuCacheJsonFormat = Umbraco.Core.Migrations.Upgrade.V_8_0_1.ChangeNuCacheJsonFormat;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -139,8 +140,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<RenameLabelAndRichTextPropertyEditorAliases>("{E0CBE54D-A84F-4A8F-9B13-900945FD7ED9}");
             To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}");
             To<ChangeNuCacheJsonFormat>("{80C0A0CB-0DD5-4573-B000-C4B7C313C70D}");
+            To<AddLastCacheInstructionColumn>("{4D0DF167-66CC-4D7B-826A-FFF8ABFCC45A}");
 
-            //FIXME add migration to add the column
             //FINAL
 
 

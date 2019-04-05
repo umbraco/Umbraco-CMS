@@ -37,6 +37,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("isMaster")]
         public bool IsMaster { get; set; }
 
+        [Constraint(Default = -1)]
         [Column("lastCacheInstructionId")]
         public int LastCacheInstructionId { get; set; }
     }
