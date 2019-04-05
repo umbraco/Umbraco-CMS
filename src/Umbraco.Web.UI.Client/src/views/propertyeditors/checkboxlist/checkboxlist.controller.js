@@ -1,8 +1,14 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListController",
     function ($scope) {
-
+        
+        var vm = this;
+        
+        vm.selectedItems = [];
+        vm.configItems = [];
+        vm.changed = changed;
+        
         function init() {
-
+            
             //we can't really do anything if the config isn't an object
             if (angular.isObject($scope.model.config.items)) {
 
@@ -17,17 +23,20 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                 //ensure the items are sorted by the provided sort order
                 configItems.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
 
+                vm.configItems = configItems;
+                
                 if ($scope.model.value === null || $scope.model.value === undefined) {
                     $scope.model.value = [];
                 }
-
+                
                 updateViewModel(configItems);
 
                 //watch the model.value in case it changes so that we can keep our view model in sync
                 $scope.$watchCollection("model.value",
                     function (newVal) {
                         updateViewModel(configItems);
-                    });
+                    }
+                );
             }
             
         }
@@ -81,9 +90,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                 }
             }
         }
-
-        $scope.selectedItems = [];
-        $scope.changed = changed;
 
         init();
 
