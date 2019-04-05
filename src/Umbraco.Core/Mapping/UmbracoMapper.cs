@@ -8,9 +8,25 @@ namespace Umbraco.Core.Mapping
     // notes:
     // AutoMapper maps null to empty arrays, lists, etc
 
+    // TODO:
+    // when mapping from TSource, and no map is found, consider the actual source.GetType()?
+    // when mapping to TTarget, and no map is found, consider the actual target.GetType()?
+    // not sure we want to add magic to this simple mapper class, though
+
     /// <summary>
     /// Umbraco Mapper.
     /// </summary>
+    /// <remarks>
+    /// <para>When a map is defined from TSource to TTarget, the mapper automatically knows how to map
+    /// from IEnumerable{TSource} to IEnumerable{TTarget} (using a List{TTarget}) and to TTarget[].</para>
+    /// <para>When a map is defined from TSource to TTarget, the mapper automatically uses that map
+    /// for any source type that inherits from, or implements, TSource.</para>
+    /// <para>When a map is defined from TSource to TTarget, the mapper can map to TTarget exclusively
+    /// and cannot re-use that map for types that would inherit from, or implement, TTarget.</para>
+    /// <para>When using the Map{TSource, TTarget}(TSource source, ...) overloads, TSource is explicit. When
+    /// using the Map{TTarget}(object source, ...) TSource is defined as source.GetType().</para>
+    /// <para>In both cases, TTarget is explicit and not typeof(target).</para>
+    /// </remarks>
     public class UmbracoMapper
     {
         private readonly Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors
@@ -31,10 +47,10 @@ namespace Umbraco.Core.Mapping
 
         #region Define
 
-        private TTarget ThrowCtor<TSource, TTarget>(TSource source, MapperContext context)
+        private static TTarget ThrowCtor<TSource, TTarget>(TSource source, MapperContext context)
             => throw new InvalidOperationException($"Don't know how to create {typeof(TTarget).FullName} instances.");
 
-        private void Identity<TSource, TTarget>(TSource source, TTarget target, MapperContext context)
+        private static void Identity<TSource, TTarget>(TSource source, TTarget target, MapperContext context)
         { }
 
         /// <summary>
@@ -335,6 +351,8 @@ namespace Umbraco.Core.Mapping
             foreach (var (stype, smap) in _maps)
             {
                 if (!stype.IsAssignableFrom(sourceType)) continue;
+
+                // TODO: consider looking for assignable types for target too?
                 if (!smap.TryGetValue(targetType, out map)) continue;
 
                 sourceMap = smap;
