@@ -225,7 +225,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             // Assert
             Assert.That(commands[0].CommandText,
-                        Is.EqualTo("INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive], [umbracoServer].[isMaster]) VALUES (@0,@1,@2,@3,@4,@5), (@6,@7,@8,@9,@10,@11)"));
+                        Is.EqualTo("INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive], [umbracoServer].[isMaster], [umbracoServer].[lastCacheInstructionId]) VALUES (@0,@1,@2,@3,@4,@5,@6), (@7,@8,@9,@10,@11,@12,@13)"));
         }
 
 
@@ -242,7 +242,8 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                     DateRegistered = DateTime.Now,
                     IsActive = true,
                     DateAccessed = DateTime.Now,
-                    IsMaster = true
+                    IsMaster = true,
+                    LastCacheInstructionId = -1
                 });
             }
 
@@ -254,7 +255,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             }
 
             // Assert
-            Assert.That(commands.Length, Is.EqualTo(5));
+            Assert.That(commands.Length, Is.EqualTo(6));
             foreach (var s in commands.Select(x => x.CommandText))
             {
                 Assert.LessOrEqual(Regex.Matches(s, "@\\d+").Count, 2000);
