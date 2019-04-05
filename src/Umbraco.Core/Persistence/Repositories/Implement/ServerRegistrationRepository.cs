@@ -61,7 +61,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<IServerRegistration> PerformGetByQuery(IQuery<IServerRegistration> query)
         {
-            throw new NotSupportedException("This repository does not support this method.");
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<IServerRegistration>(sqlClause, query);
+            var sql = translator.Translate();
+
+            var dtos = Database.Fetch<ServerRegistrationDto>(sql);
+
+            return dtos.Select(x => ServerRegistrationFactory.BuildEntity(x));
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -109,7 +115,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IServerRegistration entity)
         {
             ((ServerRegistration)entity).UpdatingEntity();
-            
+
             var dto = ServerRegistrationFactory.BuildDto(entity);
 
             Database.Update(dto);
