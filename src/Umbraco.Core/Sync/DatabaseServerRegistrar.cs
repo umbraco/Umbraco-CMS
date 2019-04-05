@@ -1,9 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Sync
 {
+
+    public class MasterServerRegistrar : IServerRegistrar
+    {
+        public IEnumerable<IServerAddress> Registrations
+        {
+            get { return Enumerable.Empty<IServerAddress>(); }
+        }
+        public ServerRole GetCurrentServerRole()
+        {
+            return ServerRole.Master;
+        }
+        public string GetCurrentServerUmbracoApplicationUrl()
+        {
+            // NOTE: If you want to explicitly define the URL that your application is running on,
+            // this will be used for the server to communicate with itself, you can return the
+            // custom path here and it needs to be in this format:
+            // http://www.mysite.com/umbraco
+
+            return null;
+        }
+    }
+
     /// <summary>
     /// A registrar that stores registered server nodes in the database.
     /// </summary>
