@@ -322,6 +322,23 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        public TemplateDisplay PostCreateDefaultTemplate(int id)
+        {
+            var contentType = Services.ContentTypeService.Get(id);
+            if (contentType == null)
+            {
+                throw new NullReferenceException("No content type found with id " + id);
+            }
+
+            var template = CreateTemplateForContentType(contentType.Alias, contentType.Name);
+            if (template == null)
+            {
+                throw new NullReferenceException("Could not create default template for content type with id " + id);
+            }
+
+            return Mapper.Map<TemplateDisplay>(template);
+        }
+
         private ITemplate CreateTemplateForContentType(string contentTypeAlias, string contentTypeName)
         {
             var template = Services.FileService.GetTemplate(contentTypeAlias);
