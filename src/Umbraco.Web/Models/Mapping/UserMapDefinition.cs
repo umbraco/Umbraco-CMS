@@ -167,6 +167,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -Id -AssignedPermissions
         private void Map(IUserGroup source, AssignedUserGroupPermissions target, MapperContext context)
         {
+            target.Id = source.Id;
             target.Alias = source.Alias;
             target.Icon = source.Icon;
             target.Key = source.Key;
