@@ -64,7 +64,8 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyDto>);
+            // must pass the context through
+            target.Properties = source.Properties.Select(p => context.Mapper.Map<ContentPropertyDto>(p, context));
         }
 
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
