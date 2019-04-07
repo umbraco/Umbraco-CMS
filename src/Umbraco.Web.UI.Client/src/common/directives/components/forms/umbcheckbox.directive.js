@@ -25,6 +25,7 @@
 @param {string} value Set the value of the checkbox.
 @param {string} name Set the name of the checkbox.
 @param {string} text Set the text for the checkbox label.
+@param {string} localize Pass a localization key (Optional).
 
 
 **/
@@ -42,6 +43,7 @@
                 value: "@",
                 name: "@",
                 text: "@",
+                localize: "@",
                 required: "="
             }
         };

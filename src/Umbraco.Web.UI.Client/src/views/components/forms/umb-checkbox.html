@@ -10,5 +10,11 @@
             <i class="umb-form-check__icon icon-check"></i>
         </div>
     </div>
-    <span class="umb-form-check__text">{{text}}</span>
+    <!-- If no localize key has been passed let's just render the text value as it is -->
+    <span class="umb-form-check__text" ng-if="localize.length === 0">{{text}}</span>
+
+    <!-- If a localize key has been passed let's use the localize directive -->
+    <span class="umb-form-check__text" ng-if="localize.length > 0">
+        <localize key="{{localize}}">{{text}}</localize>
+    </span>
 </label>
