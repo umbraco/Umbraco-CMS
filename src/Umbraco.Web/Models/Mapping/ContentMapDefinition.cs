@@ -64,7 +64,6 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            // must pass the context through
             target.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
         }
 
@@ -128,7 +127,6 @@ namespace Umbraco.Web.Models.Mapping
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            // must pass the context through
             target.Properties = source.Properties.Select(context.Map<ContentPropertyBasic>);
             target.SortOrder = source.SortOrder;
             target.State = _basicStateMapper.Map(source, context);
