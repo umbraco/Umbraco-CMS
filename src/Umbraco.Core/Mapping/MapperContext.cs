@@ -40,6 +40,8 @@ namespace Umbraco.Core.Mapping
         public TTarget Map<TTarget>(object source)
             => _mapper.Map<TTarget>(source, this);
 
+        // let's say this is a bad (dangerous) idea, and leave it out for now
+        /*
         /// <summary>
         /// Maps a source object to a new target object.
         /// </summary>
@@ -52,6 +54,7 @@ namespace Umbraco.Core.Mapping
             f(this);
             return _mapper.Map<TTarget>(source, this);
         }
+        */
 
         /// <summary>
         /// Maps a source object to a new target object.
@@ -63,6 +66,8 @@ namespace Umbraco.Core.Mapping
         public TTarget Map<TSource, TTarget>(TSource source)
             => _mapper.Map<TSource, TTarget>(source, this);
 
+        // let's say this is a bad (dangerous) idea, and leave it out for now
+        /*
         /// <summary>
         /// Maps a source object to a new target object.
         /// </summary>
@@ -76,6 +81,7 @@ namespace Umbraco.Core.Mapping
             f(this);
             return _mapper.Map<TSource, TTarget>(source, this);
         }
+        */
 
         /// <summary>
         /// Maps a source object to an existing target object.
@@ -88,6 +94,8 @@ namespace Umbraco.Core.Mapping
         public TTarget Map<TSource, TTarget>(TSource source, TTarget target)
             => _mapper.Map(source, target, this);
 
+        // let's say this is a bad (dangerous) idea, and leave it out for now
+        /*
         /// <summary>
         /// Maps a source object to an existing target object.
         /// </summary>
@@ -102,6 +110,7 @@ namespace Umbraco.Core.Mapping
             f(this);
             return _mapper.Map(source, target, this);
         }
+        */
 
         #endregion
     }
