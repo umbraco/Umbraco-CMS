@@ -65,10 +65,15 @@
 
        <h5><localize key="validation_validation"></localize></h5>
 
-      <label class="checkbox no-indent">
-         <input type="checkbox" ng-model="model.property.validation.mandatory" focus-when="{{vm.focusOnMandatoryField}}">
-         <localize key="validation_fieldIsMandatory"></localize>
-      </label>
+      <umb-checkbox
+        name="property-validation"
+        value="model.property.validation.mandatory"
+        model="model.property.validation.mandatory"
+        required="false"
+        localize="@validation_fieldIsMandatory"
+        text="Field is mandatory"
+        >
+     </umb-checkbox>
 
       <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
          <option value=""><localize key="validation_validation">Validation</localize></option>
@@ -91,7 +96,7 @@
    <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
 
        <h5><localize key="general_options"></localize></h5>
-       
+
        <label class="checkbox no-indent">
            <input type="checkbox" ng-model="model.property.showOnMemberProfile">
            <localize key="contentTypeEditor_showOnMemberProfile"></localize>
