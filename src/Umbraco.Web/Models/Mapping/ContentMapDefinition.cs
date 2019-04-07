@@ -128,7 +128,8 @@ namespace Umbraco.Web.Models.Mapping
             target.Owner = _commonMapper.GetOwner(source, context.Mapper);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyBasic>);
+            // must pass the context through
+            target.Properties = source.Properties.Select(p => context.Mapper.Map<ContentPropertyBasic>(p, context));
             target.SortOrder = source.SortOrder;
             target.State = _basicStateMapper.Map(source, context);
             target.Trashed = source.Trashed;
