@@ -45,9 +45,9 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(MembershipUser source, MemberDisplay target, MapperContext context)
         {
             //first convert to IMember
-            var member = context.Mapper.Map<IMember>(source);
+            var member = context.Map<IMember>(source);
             //then convert to MemberDisplay
-            context.Mapper.Map<IMember, MemberDisplay>(member);
+            context.Map<IMember, MemberDisplay>(member);
         }
 
         // TODO: SD: I can't remember why this mapping is here?
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Models.Mapping
             target.MemberProviderFieldMapping = GetMemberProviderFieldMapping();
             target.MembershipScenario = GetMembershipScenario();
             target.Name = source.Name;
-            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
+            target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
             target.SortOrder = source.SortOrder;
@@ -108,10 +108,10 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = int.MaxValue;
             target.Key = source.Key;
             target.Name = source.Name;
-            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
+            target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = context.Mapper.Map<IEnumerable<ContentPropertyBasic>>(source.Properties);
+            target.Properties = context.Map<IEnumerable<ContentPropertyBasic>>(source.Properties);
             target.SortOrder = source.SortOrder;
             target.State = null;
             target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
@@ -149,7 +149,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IMember source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyDto>);
+            target.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
         }
 
         private MembershipScenario GetMembershipScenario()

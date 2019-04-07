@@ -34,19 +34,19 @@ namespace Umbraco.Web.Models.Mapping
             _localizedTextService = localizedTextService;
         }
 
-        public UserProfile GetOwner(IContentBase source, UmbracoMapper mapper)
+        public UserProfile GetOwner(IContentBase source, MapperContext context)
         {
             var profile = source.GetCreatorProfile(_userService);
-            return profile == null ? null : mapper.Map<IProfile, UserProfile>(profile);
+            return profile == null ? null : context.Map<IProfile, UserProfile>(profile);
         }
 
-        public UserProfile GetCreator(IContent source, UmbracoMapper mapper)
+        public UserProfile GetCreator(IContent source, MapperContext context)
         {
             var profile = source.GetWriterProfile(_userService);
-            return profile == null ? null : mapper.Map<IProfile, UserProfile>(profile);
+            return profile == null ? null : context.Map<IProfile, UserProfile>(profile);
         }
 
-        public ContentTypeBasic GetContentType(IContentBase source, UmbracoMapper mapper)
+        public ContentTypeBasic GetContentType(IContentBase source, MapperContext context)
         {
             // TODO: We can resolve the UmbracoContext from the IValueResolver options!
             // OMG
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Models.Mapping
                 && Composing.Current.UmbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
             {
                 var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
-                var contentTypeBasic = mapper.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
+                var contentTypeBasic = context.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
 
                 return contentTypeBasic;
             }

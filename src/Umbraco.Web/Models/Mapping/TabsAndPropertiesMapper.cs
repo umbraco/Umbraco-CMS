@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
-        
+
         /// <summary>
         /// Returns a collection of custom generic properties that exist on the generic properties tab
         /// </summary>
@@ -105,8 +105,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <returns></returns>
         protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, MapperContext context)
         {
-            // must pass the context through
-            return properties.OrderBy(x => x.PropertyType.SortOrder).Select(x => context.Mapper.Map<ContentPropertyDisplay>(x, context)).ToList();
+            return properties.OrderBy(x => x.PropertyType.SortOrder).Select(context.Map<ContentPropertyDisplay>).ToList();
         }
     }
 
