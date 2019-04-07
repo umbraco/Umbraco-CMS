@@ -149,7 +149,9 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IMember source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
+            // must evaluate this collection immediately, otherwise it gets re-evaluated on every access
+            // to the collection and any subsequent changes potentially overwritten 
+            target.Properties = source.Properties.Select(context.Map<ContentPropertyDto>).ToArray();
         }
 
         private MembershipScenario GetMembershipScenario()
