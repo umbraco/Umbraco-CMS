@@ -13,8 +13,15 @@
     <!-- If no localize key has been passed let's just render the text value as it is -->
     <span class="umb-form-check__text" ng-if="localize.length === 0">{{text}}</span>
 
-    <!-- If a localize key has been passed let's use the localize directive -->
-    <span class="umb-form-check__text" ng-if="localize.length > 0">
+    <!-- If a localize key has been passed and the genericText is not let's use the localize directive -->
+    <span class="umb-form-check__text" ng-if="localize.length > 0 && nodetext === undefined">
         <localize key="{{localize}}">{{text}}</localize>
     </span>
+
+    <!-- If a localise key AND a nodetext has been passed let's use them here-->
+    <span class="umb-form-check__text" ng-if="localize.length > 0 && nodetext.length > 0">
+            <localize key="{{localize.split('|')[0]}}">{{text.split('|')[0]}}</localize>
+                {{nodetext}}
+            <localize key="{{localize.split('|')[1]}}">{{text.split('|')[1]}}</localize>
+        </span>
 </label>

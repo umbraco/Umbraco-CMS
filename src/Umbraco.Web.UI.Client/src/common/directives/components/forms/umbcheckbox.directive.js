@@ -24,8 +24,9 @@
 @param {boolean} model Set to <code>true</code> or <code>false</code> to set the checkbox to checked or unchecked.
 @param {string} value Set the value of the checkbox.
 @param {string} name Set the name of the checkbox.
-@param {string} text Set the text for the checkbox label.
-@param {string} localize Pass a localization key (Optional).
+@param {string} text Set up to two texts for the checkbox label.
+@param {string} localize Set up to two localization keys seperated by a pipe (Optional).
+@param {string} nodetext Pass a current node so we can have {{localizedText1}} {{nodeName}} {{localizedText2}}
 
 
 **/
@@ -44,6 +45,7 @@
                 name: "@",
                 text: "@",
                 localize: "@",
+                nodetext: "=",
                 required: "="
             }
         };
