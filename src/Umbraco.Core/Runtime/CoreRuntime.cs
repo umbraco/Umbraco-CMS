@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Web;
+using System.Web.Hosting;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -70,10 +71,15 @@ namespace Umbraco.Core.Runtime
             // objects.
 
             using (var timer = profilingLogger.TraceDuration<CoreRuntime>(
-                $"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()} on {NetworkHelper.MachineName}.",
+                $"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()}.",
                 "Booted.",
                 "Boot failed."))
             {
+                logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationID}', path '{HostingPhysicalPath}', server '{MachineName}'.",
+                    HostingEnvironment.SiteName,
+                    HostingEnvironment.ApplicationID,
+                    HostingEnvironment.ApplicationPhysicalPath,
+                    NetworkHelper.MachineName);
                 logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
