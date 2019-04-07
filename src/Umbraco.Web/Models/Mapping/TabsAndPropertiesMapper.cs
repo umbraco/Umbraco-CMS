@@ -106,7 +106,7 @@ namespace Umbraco.Web.Models.Mapping
         protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, MapperContext context)
         {
             // must pass the context through
-            return properties.OrderBy(x => x.PropertyType.SortOrder).Select(x => context.Mapper.Map<ContentPropertyDisplay>(x, context)).ToList();
+            return properties.OrderBy(x => x.PropertyType.SortOrder).Select(x => context.Map<ContentPropertyDisplay>(x)).ToList();
         }
     }
 

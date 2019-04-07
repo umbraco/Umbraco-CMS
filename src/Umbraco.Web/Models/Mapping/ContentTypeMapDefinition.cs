@@ -78,7 +78,7 @@ namespace Umbraco.Web.Models.Mapping
         // no MapAll - take care
         private void Map(DocumentTypeSave source, IContentType target, MapperContext context)
         {
-            MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context.Mapper);
+            MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _contentTypeService.Get(alias));
 
             target.AllowedTemplates = source.AllowedTemplates
@@ -93,14 +93,14 @@ namespace Umbraco.Web.Models.Mapping
         // no MapAll - take care
         private void Map(MediaTypeSave source, IMediaType target, MapperContext context)
         {
-            MapSaveToTypeBase<MediaTypeSave, PropertyTypeBasic>(source, target, context.Mapper);
+            MapSaveToTypeBase<MediaTypeSave, PropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _mediaTypeService.Get(alias));
         }
 
         // no MapAll - take care
         private void Map(MemberTypeSave source, IMemberType target, MapperContext context)
         {
-            MapSaveToTypeBase<MemberTypeSave, MemberPropertyTypeBasic>(source, target, context.Mapper);
+            MapSaveToTypeBase<MemberTypeSave, MemberPropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _memberTypeService.Get(alias));
 
             foreach (var propertyType in source.Groups.SelectMany(x => x.Properties))
@@ -122,10 +122,10 @@ namespace Umbraco.Web.Models.Mapping
             target.AllowCultureVariant = source.VariesByCulture();
 
             //sync templates
-            target.AllowedTemplates = source.AllowedTemplates.Select(context.Mapper.Map<EntityBasic>).ToArray();
+            target.AllowedTemplates = source.AllowedTemplates.Select(context.Map<EntityBasic>).ToArray();
 
             if (source.DefaultTemplate != null)
-                target.DefaultTemplate = context.Mapper.Map<EntityBasic>(source.DefaultTemplate);
+                target.DefaultTemplate = context.Map<EntityBasic>(source.DefaultTemplate);
 
             //default listview
             target.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Content";
@@ -237,7 +237,7 @@ namespace Umbraco.Web.Models.Mapping
         // no MapAll - take care
         private void Map(DocumentTypeSave source, DocumentTypeDisplay target, MapperContext context)
         {
-            MapTypeToDisplayBase<DocumentTypeSave, PropertyTypeBasic, DocumentTypeDisplay, PropertyTypeDisplay>(source, target, context.Mapper);
+            MapTypeToDisplayBase<DocumentTypeSave, PropertyTypeBasic, DocumentTypeDisplay, PropertyTypeDisplay>(source, target, context);
 
             //sync templates
             var destAllowedTemplateAliases = target.AllowedTemplates.Select(x => x.Alias);
@@ -250,7 +250,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         var template = templates.SingleOrDefault(t => t.Alias == x);
                         return template != null
-                            ? context.Mapper.Map<EntityBasic>(template)
+                            ? context.Map<EntityBasic>(template)
                             : null;
                     })
                     .WhereNotNull()
@@ -263,7 +263,7 @@ namespace Umbraco.Web.Models.Mapping
                 if (target.DefaultTemplate == null || source.DefaultTemplate != target.DefaultTemplate.Alias)
                 {
                     var template = _fileService.GetTemplate(source.DefaultTemplate);
-                    target.DefaultTemplate = template == null ? null : context.Mapper.Map<EntityBasic>(template);
+                    target.DefaultTemplate = template == null ? null : context.Map<EntityBasic>(template);
                 }
             }
             else
@@ -275,13 +275,13 @@ namespace Umbraco.Web.Models.Mapping
         // no MapAll - take care
         private void Map(MediaTypeSave source, MediaTypeDisplay target, MapperContext context)
         {
-            MapTypeToDisplayBase<MediaTypeSave, PropertyTypeBasic, MediaTypeDisplay, PropertyTypeDisplay>(source, target, context.Mapper);
+            MapTypeToDisplayBase<MediaTypeSave, PropertyTypeBasic, MediaTypeDisplay, PropertyTypeDisplay>(source, target, context);
         }
 
         // no MapAll - take care
         private void Map(MemberTypeSave source, MemberTypeDisplay target, MapperContext context)
         {
-            MapTypeToDisplayBase<MemberTypeSave, MemberPropertyTypeBasic, MemberTypeDisplay, MemberPropertyTypeDisplay>(source, target, context.Mapper);
+            MapTypeToDisplayBase<MemberTypeSave, MemberPropertyTypeBasic, MemberTypeDisplay, MemberPropertyTypeDisplay>(source, target, context);
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate -Key -PropertyTypes
@@ -312,7 +312,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
 
-            target.Properties = source.Properties.Select(context.Mapper.Map<PropertyTypeDisplay>);
+            target.Properties = source.Properties.Select(context.Map<PropertyTypeDisplay>);
         }
 
         // Umbraco.Code.MapAll -ContentTypeId -ParentTabContentTypes -ParentTabContentTypeNames
@@ -325,7 +325,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
 
-            target.Properties = source.Properties.Select(context.Mapper.Map<MemberPropertyTypeDisplay>);
+            target.Properties = source.Properties.Select(context.Map<MemberPropertyTypeDisplay>);
         }
 
         // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked
@@ -364,7 +364,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -CreatorId -Level -SortOrder
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
         // Umbraco.Code.MapAll -ContentTypeComposition (done by AfterMapSaveToType)
-        private static void MapSaveToTypeBase<TSource, TSourcePropertyType>(TSource source, IContentTypeComposition target, UmbracoMapper mapper)
+        private static void MapSaveToTypeBase<TSource, TSourcePropertyType>(TSource source, IContentTypeComposition target, MapperContext context)
             where TSource : ContentTypeSave<TSourcePropertyType>
             where TSourcePropertyType : PropertyTypeBasic
         {
@@ -420,12 +420,12 @@ namespace Umbraco.Web.Models.Mapping
             foreach (var sourceGroup in sourceGroups)
             {
                 // get the dest group
-                var destGroup = MapSaveGroup(sourceGroup, destOrigGroups, mapper);
+                var destGroup = MapSaveGroup(sourceGroup, destOrigGroups, context);
 
                 // handle local properties
                 var destProperties = sourceGroup.Properties
                     .Where(x => x.Inherited == false)
-                    .Select(x => MapSaveProperty(x, destOrigProperties, mapper))
+                    .Select(x => MapSaveProperty(x, destOrigProperties, context))
                     .ToArray();
 
                 // if the group has no local properties, skip it, ie sort-of garbage-collect
@@ -453,7 +453,7 @@ namespace Umbraco.Web.Models.Mapping
                 // handle local properties
                 var destProperties = genericPropertiesGroup.Properties
                     .Where(x => x.Inherited == false)
-                    .Select(x => MapSaveProperty(x, destOrigProperties, mapper))
+                    .Select(x => MapSaveProperty(x, destOrigProperties, context))
                     .ToArray();
 
                 // ensure no duplicate alias, then assign the generic properties collection
@@ -523,7 +523,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // no MapAll - relies on the non-generic method
-        private void MapTypeToDisplayBase<TSource, TSourcePropertyType, TTarget, TTargetPropertyType>(TSource source, TTarget target, UmbracoMapper mapper)
+        private void MapTypeToDisplayBase<TSource, TSourcePropertyType, TTarget, TTargetPropertyType>(TSource source, TTarget target, MapperContext context)
             where TSource : ContentTypeSave<TSourcePropertyType>
             where TSourcePropertyType : PropertyTypeBasic
             where TTarget : ContentTypeCompositionDisplay<TTargetPropertyType>
@@ -531,7 +531,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             MapTypeToDisplayBase(source, target);
 
-            target.Groups = source.Groups.Select(mapper.Map<PropertyGroupDisplay<TTargetPropertyType>>);
+            target.Groups = source.Groups.Select(context.Map<PropertyGroupDisplay<TTargetPropertyType>>);
         }
 
         private IEnumerable<string> MapLockedCompositions(IContentTypeComposition source)
@@ -580,7 +580,7 @@ namespace Umbraco.Web.Models.Mapping
             return Udi.Create(udiType, source.Key);
         }
 
-        private static PropertyGroup MapSaveGroup<TPropertyType>(PropertyGroupBasic<TPropertyType> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups, UmbracoMapper mapper)
+        private static PropertyGroup MapSaveGroup<TPropertyType>(PropertyGroupBasic<TPropertyType> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups, MapperContext context)
             where TPropertyType : PropertyTypeBasic
         {
             PropertyGroup destGroup;
@@ -591,7 +591,7 @@ namespace Umbraco.Web.Models.Mapping
                 destGroup = destOrigGroups.FirstOrDefault(x => x.Id == sourceGroup.Id);
                 if (destGroup != null)
                 {
-                    mapper.Map(sourceGroup, destGroup);
+                    context.Map(sourceGroup, destGroup);
                     return destGroup;
                 }
 
@@ -602,11 +602,11 @@ namespace Umbraco.Web.Models.Mapping
             // insert a new group, or update an existing group that has
             // been deleted in the meantime and we need to re-create
             // map/create
-            destGroup = mapper.Map<PropertyGroup>(sourceGroup);
+            destGroup = context.Map<PropertyGroup>(sourceGroup);
             return destGroup;
         }
 
-        private static PropertyType MapSaveProperty(PropertyTypeBasic sourceProperty, IEnumerable<PropertyType> destOrigProperties, UmbracoMapper mapper)
+        private static PropertyType MapSaveProperty(PropertyTypeBasic sourceProperty, IEnumerable<PropertyType> destOrigProperties, MapperContext context)
         {
             PropertyType destProperty;
             if (sourceProperty.Id > 0)
@@ -616,7 +616,7 @@ namespace Umbraco.Web.Models.Mapping
                 destProperty = destOrigProperties.FirstOrDefault(x => x.Id == sourceProperty.Id);
                 if (destProperty != null)
                 {
-                    mapper.Map(sourceProperty, destProperty);
+                    context.Map(sourceProperty, destProperty);
                     return destProperty;
                 }
 
@@ -627,7 +627,7 @@ namespace Umbraco.Web.Models.Mapping
             // insert a new property, or update an existing property that has
             // been deleted in the meantime and we need to re-create
             // map/create
-            destProperty = mapper.Map<PropertyType>(sourceProperty);
+            destProperty = context.Map<PropertyType>(sourceProperty);
             return destProperty;
         }
 
