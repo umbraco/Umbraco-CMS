@@ -397,6 +397,54 @@
             }
 
         }
+        
+        
+        /**
+        * @ngdoc method
+        * @name umbraco.services.listViewHelper#selectAllItemsToggle
+        * @methodOf umbraco.services.listViewHelper
+        *
+        * @description
+        * Helper method for toggling the select state on all items.
+        *
+        * @param {Array} items Items to toggle selection on, should be $scope.items
+        * @param {Array} selection Listview selection, available as $scope.selection
+        */
+        
+        function selectAllItemsToggle(items, selection) {
+            
+            if (!angular.isArray(items)) {
+                return;
+            }
+            
+            if (isSelectedAll(items, selection)) {
+                // unselect all items
+                angular.forEach(items, function (item) {
+                    item.selected = false;
+                });
+                
+                // reset selection without loosing reference.
+                selection.length = 0;
+                
+            } else {
+                
+                // reset selection without loosing reference.
+                selection.length = 0;
+                
+                // select all items
+                angular.forEach(items, function (item) {
+                    var obj = {
+                        id: item.id
+                    };
+                    if (item.key) {
+                        obj.key = item.key;
+                    }
+                    item.selected = true;
+                    selection.push(obj);
+                });
+            }
+
+        }
 
         /**
         * @ngdoc method
@@ -527,6 +575,7 @@
           deselectItem: deselectItem,
           clearSelection: clearSelection,
           selectAllItems: selectAllItems,
+          selectAllItemsToggle: selectAllItemsToggle,
           isSelectedAll: isSelectedAll,
           setSortingDirection: setSortingDirection,
           setSorting: setSorting,

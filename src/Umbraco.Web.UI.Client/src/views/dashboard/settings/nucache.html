@@ -10,10 +10,10 @@
     </p>
 
     <div>
-        <button type="button" ng-click="vm.verify()" class="btn btn-warning">Refresh status</button>
+        <button type="button" ng-click="vm.verify($event)" class="btn btn-warning">Refresh status</button>
     </div>
 
-    <h4 style="margin-top: 30px;">Memory Cache</h4>
+    <h4 class="mt4">Memory Cache</h4>
 
     <p>
         This button lets you reload the in-memory cache, by entirely reloading it from the database
@@ -27,7 +27,7 @@
         <button type="button" ng-click="vm.reload($event)" class="btn btn-warning">Reload</button>
     </div>
 
-    <h4 style="margin-top: 30px;">Database Cache</h4>
+    <h4 class="mt4">Database Cache</h4>
 
     <p>
         This button lets you rebuild the database cache, ie the content of the cmsContentNu table.
@@ -37,10 +37,10 @@
     </p>
 
     <div>
-        <button type="button" ng-click="vm.rebuild()" class="btn btn-warning">Rebuild</button>
+        <button type="button" ng-click="vm.rebuild($event)" class="btn btn-warning">Rebuild</button>
     </div>
 
-    <h4 style="margin-top: 30px;">Internals</h4>
+    <h4 class="mt4">Internals</h4>
 
     <p>
         This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC).
@@ -48,7 +48,7 @@
     </p>
 
     <div>
-        <button type="button" ng-click="vm.collect()" class="btn btn-warning">Collect</button>
+        <button type="button" ng-click="vm.collect($event)" class="btn btn-warning">Collect</button>
     </div>
 
 </div>
