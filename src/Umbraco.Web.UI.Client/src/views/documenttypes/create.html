@@ -85,16 +85,30 @@
             <umb-control-group label="Name of the Parent Document Type" hide-label="false">
                 <input type="text" name="collectionName" ng-model="model.collectionName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
                 <span ng-if="model.disableTemplates === false">
-                    <input id="collectionCreateTemplate" name="collectionCreateTemplate" type="checkbox" ng-model="model.collectionCreateTemplate" style="margin-top: 0;" />
-                    <label for="collectionCreateTemplate" style="margin-bottom: 0; padding-left: 2px;">Create template for the Parent Document Type</label>
+                    <umb-checkbox
+                        name="collectionCreateTemplate"
+                        value="model.collectionCreateTemplate"
+                        model="model.collectionCreateTemplate"
+                        required="false"
+                        localize=""
+                        text="Create template for the Parent Document Type"
+                        >
+                    </umb-checkbox>
                 </span>
             </umb-control-group>
 
             <umb-control-group label="Name of the Item Document Type" hide-label="false">
                 <input type="text" name="collectionItemName" ng-model="model.collectionItemName" class="umb-textstring textstring input-block-level" required />
                 <span ng-if="model.disableTemplates === false">
-                    <input id="collectionItemCreateTemplate" name="collectionItemCreateTemplate" type="checkbox" ng-model="model.collectionItemCreateTemplate" style="margin-top: 0;" />
-                    <label for="collectionItemCreateTemplate" style="margin-bottom: 0; padding-left: 2px;">Create template for the Item Document Type</label>
+                    <umb-checkbox
+                        name="collectionItemCreateTemplate"
+                        value="model.collectionItemCreateTemplate"
+                        model="model.collectionItemCreateTemplate"
+                        required="false"
+                        localize=""
+                        text="Create template for the Item Document Type"
+                        >
+                    </umb-checkbox>
                 </span>
             </umb-control-group>
 
