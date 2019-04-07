@@ -21,7 +21,7 @@
     <!-- If a localise key AND a nodetext has been passed let's use them here-->
     <span class="umb-form-check__text" ng-if="localize.length > 0 && nodetext.length > 0">
             <localize key="{{localize.split('|')[0]}}">{{text.split('|')[0]}}</localize>
-                {{nodetext}}
+                <strong>{{nodetext}}</strong>
             <localize key="{{localize.split('|')[1]}}">{{text.split('|')[1]}}</localize>
         </span>
 </label>
