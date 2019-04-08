@@ -146,7 +146,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context.Mapper);
+            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
 
         // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications
@@ -161,12 +161,13 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
             target.UserCount = source.UserCount;
-            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context.Mapper);
+            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
 
-        // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -Id -AssignedPermissions
+        // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -AssignedPermissions
         private void Map(IUserGroup source, AssignedUserGroupPermissions target, MapperContext context)
         {
+            target.Id = source.Id;
             target.Alias = source.Alias;
             target.Icon = source.Icon;
             target.Key = source.Key;
@@ -209,12 +210,12 @@ namespace Umbraco.Web.Models.Mapping
             target.Path = "-1," + source.Id;
             target.UserCount = source.UserCount;
 
-            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context.Mapper);
+            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
 
             //Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
             var users = _userService.GetAllInGroup(source.Id);
-            target.Users = context.Mapper.Map<IEnumerable<UserBasic>>(users);
+            target.Users = context.Map<IEnumerable<UserBasic>>(users);
 
             //Deal with assigned permissions:
 
@@ -243,7 +244,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 var contentPermissions = allContentPermissions[entity.Id];
 
-                var assignedContentPermissions = context.Mapper.Map<AssignedContentPermissions>(entity);
+                var assignedContentPermissions = context.Map<AssignedContentPermissions>(entity);
                 assignedContentPermissions.AssignedPermissions = AssignedUserGroupPermissions.ClonePermissions(target.DefaultPermissions);
 
                 //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
@@ -266,8 +267,8 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.AvailableCultures = _textService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName);
             target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache);
-            target.CalculatedStartContentIds = GetStartNodes(source.CalculateContentStartNodeIds(_entityService), UmbracoObjectTypes.Document, "content/contentRoot", context.Mapper);
-            target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService), UmbracoObjectTypes.Media, "media/mediaRoot", context.Mapper);
+            target.CalculatedStartContentIds = GetStartNodes(source.CalculateContentStartNodeIds(_entityService), UmbracoObjectTypes.Document, "content/contentRoot", context);
+            target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService), UmbracoObjectTypes.Media, "media/mediaRoot", context);
             target.CreateDate = source.CreateDate;
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
@@ -282,10 +283,10 @@ namespace Umbraco.Web.Models.Mapping
             target.Navigation = CreateUserEditorNavigation();
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            target.StartContentIds = GetStartNodes(source.StartContentIds.ToArray(), UmbracoObjectTypes.Document, "content/contentRoot", context.Mapper);
-            target.StartMediaIds = GetStartNodes(source.StartMediaIds.ToArray(), UmbracoObjectTypes.Media, "media/mediaRoot", context.Mapper);
+            target.StartContentIds = GetStartNodes(source.StartContentIds.ToArray(), UmbracoObjectTypes.Document, "content/contentRoot", context);
+            target.StartMediaIds = GetStartNodes(source.StartMediaIds.ToArray(), UmbracoObjectTypes.Media, "media/mediaRoot", context);
             target.UpdateDate = source.UpdateDate;
-            target.UserGroups = source.Groups.Select(context.Mapper.Map<UserGroupBasic>);
+            target.UserGroups = source.Groups.Select(context.Map<UserGroupBasic>);
             target.Username = source.Username;
             target.UserState = source.UserState;
         }
@@ -306,7 +307,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            target.UserGroups = source.Groups.Select(context.Mapper.Map<UserGroupBasic>);
+            target.UserGroups = source.Groups.Select(context.Map<UserGroupBasic>);
             target.Username = source.Username;
             target.UserState = source.UserState;
         }
@@ -332,18 +333,18 @@ namespace Umbraco.Web.Models.Mapping
 
         // helpers
 
-        private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, UmbracoMapper mapper)
+        private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
         {
             var allSections = _sectionService.GetSections();
-            target.Sections = allSections.Where(x => sourceAllowedSections.Contains(x.Alias)).Select(mapper.Map<Section>);
+            target.Sections = allSections.Where(x => sourceAllowedSections.Contains(x.Alias)).Select(context.Map<Section>);
 
             if (sourceStartMediaId > 0)
-                target.MediaStartNode = mapper.Map<EntityBasic>(_entityService.Get(sourceStartMediaId.Value, UmbracoObjectTypes.Media));
+                target.MediaStartNode = context.Map<EntityBasic>(_entityService.Get(sourceStartMediaId.Value, UmbracoObjectTypes.Media));
             else if (sourceStartMediaId == -1)
                 target.MediaStartNode = CreateRootNode(_textService.Localize("media/mediaRoot"));
 
             if (sourceStartContentId > 0)
-                target.ContentStartNode = mapper.Map<EntityBasic>(_entityService.Get(sourceStartContentId.Value, UmbracoObjectTypes.Document));
+                target.ContentStartNode = context.Map<EntityBasic>(_entityService.Get(sourceStartContentId.Value, UmbracoObjectTypes.Document));
             else if (sourceStartContentId == -1)
                 target.ContentStartNode = CreateRootNode(_textService.Localize("content/contentRoot"));
 
@@ -376,7 +377,7 @@ namespace Umbraco.Web.Models.Mapping
         private static string MapContentTypeIcon(EntitySlim entity)
             => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
-        private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedKey, UmbracoMapper mapper)
+        private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedKey, MapperContext context)
         {
             if (startNodeIds.Length <= 0)
                 return Enumerable.Empty<EntityBasic>();
@@ -386,7 +387,7 @@ namespace Umbraco.Web.Models.Mapping
                 startNodes.Add(CreateRootNode(_textService.Localize(localizedKey)));
 
             var mediaItems = _entityService.GetAll(objectType, startNodeIds);
-            startNodes.AddRange(mapper.Map<IEnumerable<EntityBasic>>(mediaItems));
+            startNodes.AddRange(context.Map<IEnumerable<EntityBasic>>(mediaItems));
             return startNodes;
         }
 

@@ -64,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyDto>);
+            target.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
         }
 
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(source.ContentType.Name);
-            target.DocumentType = _commonMapper.GetContentType(source, context.Mapper);
+            target.DocumentType = _commonMapper.GetContentType(source, context);
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
             target.IsBlueprint = source.Blueprint;
@@ -83,7 +83,7 @@ namespace Umbraco.Web.Models.Mapping
             target.IsContainer = source.ContentType.IsContainer;
             target.IsElement = source.ContentType.IsElement;
             target.Key = source.Key;
-            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
+            target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
             target.SortOrder = source.SortOrder;
@@ -93,12 +93,12 @@ namespace Umbraco.Web.Models.Mapping
             target.TreeNodeUrl = _commonMapper.GetTreeNodeUrl<ContentTreeController>(source);
             target.Udi = Udi.Create(source.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, source.Key);
             target.UpdateDate = source.UpdateDate;
-            target.Updater = _commonMapper.GetCreator(source, context.Mapper);
+            target.Updater = _commonMapper.GetCreator(source, context);
             target.Urls = GetUrls(source);
             target.Variants = _contentVariantMapper.Map(source, context);
 
             target.ContentDto = new ContentPropertyCollectionDto();
-            target.ContentDto.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyDto>);
+            target.ContentDto.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
         }
 
         // Umbraco.Code.MapAll -Segment -Language
@@ -124,16 +124,16 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = GetName(source, context);
-            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
+            target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyBasic>);
+            target.Properties = source.Properties.Select(context.Map<ContentPropertyBasic>);
             target.SortOrder = source.SortOrder;
             target.State = _basicStateMapper.Map(source, context);
             target.Trashed = source.Trashed;
             target.Udi = Udi.Create(source.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, source.Key);
             target.UpdateDate = GetUpdateDate(source, context);
-            target.Updater = _commonMapper.GetCreator(source, context.Mapper);
+            target.Updater = _commonMapper.GetCreator(source, context);
             target.VariesByCulture = source.ContentType.VariesByCulture();
         }
 

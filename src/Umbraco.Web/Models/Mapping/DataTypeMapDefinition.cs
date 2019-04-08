@@ -36,9 +36,9 @@ namespace Umbraco.Web.Models.Mapping
             mapper.Define<IDataEditor, DataTypeBasic>((source, context) => new DataTypeBasic(), Map);
             mapper.Define<IDataType, DataTypeBasic>((source, context) => new DataTypeBasic(), Map);
             mapper.Define<IDataType, DataTypeDisplay>((source, context) => new DataTypeDisplay(), Map);
-            mapper.Define<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>((source, context) => MapPreValues(source, mapper));
+            mapper.Define<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(MapPreValues);
             mapper.Define<DataTypeSave, IDataType>((source, context) => new DataType(_propertyEditors[source.EditorAlias]) { CreateDate = DateTime.Now },Map);
-            mapper.Define<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>((source, context) => MapPreValues(source, mapper));
+            mapper.Define<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(MapPreValues);
         }
 
         // Umbraco.Code.MapAll
@@ -93,14 +93,14 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -HasPrevalues
         private void Map(IDataType source, DataTypeDisplay target, MapperContext context)
         {
-            target.AvailableEditors = MapAvailableEditors(source, context.Mapper);
+            target.AvailableEditors = MapAvailableEditors(source, context);
             target.Id = source.Id;
             target.IsSystemDataType = SystemIds.Contains(source.Id);
             target.Key = source.Key;
             target.Name = source.Name;
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.PreValues = MapPreValues(source, context.Mapper);
+            target.PreValues = MapPreValues(source, context);
             target.SelectedEditor = source.EditorAlias.IsNullOrWhiteSpace() ? null : source.EditorAlias;
             target.Trashed = source.Trashed;
             target.Udi = Udi.Create(Constants.UdiEntityType.DataType, source.Key);
@@ -124,16 +124,16 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = source.ParentId;
         }
 
-        private IEnumerable<PropertyEditorBasic> MapAvailableEditors(IDataType source, UmbracoMapper mapper)
+        private IEnumerable<PropertyEditorBasic> MapAvailableEditors(IDataType source, MapperContext context)
         {
             var contentSection = Current.Configs.Settings().Content;
             return _propertyEditors
                 .Where(x => !x.IsDeprecated || contentSection.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
                 .OrderBy(x => x.Name)
-                .Select(mapper.Map<PropertyEditorBasic>);
+                .Select(context.Map<PropertyEditorBasic>);
         }
 
-        private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataType dataType, UmbracoMapper mapper)
+        private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataType dataType, MapperContext context)
         {
             // in v7 it was apparently fine to have an empty .EditorAlias here, in which case we would map onto
             // an empty fields list, which made no sense since there would be nothing to map to - and besides,
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Models.Mapping
                 throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
 
             var configurationEditor = editor.GetConfigurationEditor();
-            var fields = configurationEditor.Fields.Select(mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+            var fields = configurationEditor.Fields.Select(context.Map<DataTypeConfigurationFieldDisplay>).ToArray();
             var configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.Configuration);
 
             MapConfigurationFields(fields, configurationDictionary);
@@ -181,7 +181,7 @@ namespace Umbraco.Web.Models.Mapping
             return ValueTypes.ToStorageType(valueType);
         }
 
-        private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataEditor source, UmbracoMapper mapper)
+        private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataEditor source, MapperContext context)
         {
             // this is a new data type, initialize default configuration
             // get the configuration editor,
@@ -190,7 +190,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var configurationEditor = source.GetConfigurationEditor();
 
-            var fields = configurationEditor.Fields.Select(mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+            var fields = configurationEditor.Fields.Select(context.Map<DataTypeConfigurationFieldDisplay>).ToArray();
 
             var defaultConfiguration = configurationEditor.DefaultConfiguration;
             if (defaultConfiguration != null)

@@ -42,14 +42,14 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IMedia source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyDto>);
+            target.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
         }
 
         // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsContainer
         private void Map(IMedia source, MediaItemDisplay target, MapperContext context)
         {
             target.ContentApps = _commonMapper.GetContentApps(source);
-            target.ContentType = _commonMapper.GetContentType(source, context.Mapper);
+            target.ContentType = _commonMapper.GetContentType(source, context);
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = source.ContentType.Name;
             target.CreateDate = source.CreateDate;
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Key = source.Key;
             target.MediaLink = string.Join(",", source.GetUrls(Current.Configs.Settings().Content, _logger));
             target.Name = source.Name;
-            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
+            target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
             target.SortOrder = source.SortOrder;
@@ -81,10 +81,10 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
-            target.Owner = _commonMapper.GetOwner(source, context.Mapper);
+            target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = source.Properties.Select(context.Mapper.Map<ContentPropertyBasic>);
+            target.Properties = source.Properties.Select(context.Map<ContentPropertyBasic>);
             target.SortOrder = source.SortOrder;
             target.State = null;
             target.Trashed = source.Trashed;
