@@ -917,7 +917,7 @@ namespace Umbraco.Web.Editors
                                                 .SelectMany(x => x.PropertyTypes)
                                                 .DistinctBy(composition => composition.Alias);
                     var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter);
-                    return Mapper.Map<IEnumerable<PropertyType>, IEnumerable<EntityBasic>>(filteredPropertyTypes);
+                    return Mapper.MapEnumerable<PropertyType, EntityBasic>(filteredPropertyTypes);
 
                 case UmbracoEntityTypes.PropertyGroup:
 
@@ -928,13 +928,13 @@ namespace Umbraco.Web.Editors
                                                 .SelectMany(x => x.PropertyGroups)
                                                 .DistinctBy(composition => composition.Name);
                     var filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter);
-                    return Mapper.Map<IEnumerable<PropertyGroup>, IEnumerable<EntityBasic>>(filteredpropertyGroups);
+                    return Mapper.MapEnumerable<PropertyGroup, EntityBasic>(filteredpropertyGroups);
 
                 case UmbracoEntityTypes.User:
 
                     var users = Services.UserService.GetAll(0, int.MaxValue, out _);
                     var filteredUsers = ExecutePostFilter(users, postFilter);
-                    return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
+                    return Mapper.MapEnumerable<IUser, EntityBasic>(filteredUsers);
 
                 case UmbracoEntityTypes.Stylesheet:
 

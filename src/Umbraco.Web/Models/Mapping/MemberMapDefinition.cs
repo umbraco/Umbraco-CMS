@@ -111,7 +111,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = context.Map<IEnumerable<ContentPropertyBasic>>(source.Properties);
+            target.Properties = context.MapEnumerable<Property, ContentPropertyBasic>(source.Properties);
             target.SortOrder = source.SortOrder;
             target.State = null;
             target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);

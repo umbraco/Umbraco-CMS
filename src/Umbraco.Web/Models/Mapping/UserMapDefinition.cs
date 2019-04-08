@@ -216,7 +216,7 @@ namespace Umbraco.Web.Models.Mapping
             //Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
             var users = _userService.GetAllInGroup(source.Id);
-            target.Users = context.Map<IEnumerable<UserBasic>>(users);
+            target.Users = context.MapEnumerable<IUser, UserBasic>(users);
 
             //Deal with assigned permissions:
 
@@ -388,7 +388,7 @@ namespace Umbraco.Web.Models.Mapping
                 startNodes.Add(CreateRootNode(_textService.Localize(localizedKey)));
 
             var mediaItems = _entityService.GetAll(objectType, startNodeIds);
-            startNodes.AddRange(context.Map<IEnumerable<EntityBasic>>(mediaItems));
+            startNodes.AddRange(context.MapEnumerable<IEntitySlim, EntityBasic>(mediaItems));
             return startNodes;
         }
 

@@ -60,6 +60,13 @@ namespace Umbraco.Tests.Mapping
             Assert.AreEqual(2, thing2.Count);
             Assert.AreEqual("valueA", thing2[0].Value);
             Assert.AreEqual("valueB", thing2[1].Value);
+
+            thing2 = mapper.MapEnumerable<Thing1, Thing2>(thing1).ToList();
+
+            Assert.IsNotNull(thing2);
+            Assert.AreEqual(2, thing2.Count);
+            Assert.AreEqual("valueA", thing2[0].Value);
+            Assert.AreEqual("valueB", thing2[1].Value);
         }
 
         [Test]

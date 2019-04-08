@@ -122,7 +122,7 @@ namespace Umbraco.Web.Models.Mapping
             target.AllowCultureVariant = source.VariesByCulture();
 
             //sync templates
-            target.AllowedTemplates = context.Map<IEnumerable<EntityBasic>>(source.AllowedTemplates);
+            target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);
 
             if (source.DefaultTemplate != null)
                 target.DefaultTemplate = context.Map<EntityBasic>(source.DefaultTemplate);
@@ -312,7 +312,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
 
-            target.Properties = context.Map<IEnumerable<PropertyTypeDisplay>>(source.Properties);
+            target.Properties = context.MapEnumerable<PropertyTypeBasic, PropertyTypeDisplay>(source.Properties);
         }
 
         // Umbraco.Code.MapAll -ContentTypeId -ParentTabContentTypes -ParentTabContentTypeNames
@@ -325,7 +325,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
 
-            target.Properties = context.Map<IEnumerable<MemberPropertyTypeDisplay>>(source.Properties);
+            target.Properties = context.MapEnumerable<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>(source.Properties);
         }
 
         // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked
@@ -531,7 +531,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             MapTypeToDisplayBase(source, target);
 
-            target.Groups = context.Map<IEnumerable<PropertyGroupDisplay<TTargetPropertyType>>>(source.Groups);
+            target.Groups = context.MapEnumerable<PropertyGroupBasic<TSourcePropertyType>, PropertyGroupDisplay<TTargetPropertyType>>(source.Groups);
         }
 
         private IEnumerable<string> MapLockedCompositions(IContentTypeComposition source)

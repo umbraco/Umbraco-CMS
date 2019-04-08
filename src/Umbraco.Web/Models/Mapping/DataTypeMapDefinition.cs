@@ -130,7 +130,7 @@ namespace Umbraco.Web.Models.Mapping
             var properties = _propertyEditors
                 .Where(x => !x.IsDeprecated || contentSection.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
                 .OrderBy(x => x.Name);
-            return context.Map<IEnumerable<PropertyEditorBasic>>(properties);
+            return context.MapEnumerable<IDataEditor, PropertyEditorBasic>(properties);
         }
 
         private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataType dataType, MapperContext context)
