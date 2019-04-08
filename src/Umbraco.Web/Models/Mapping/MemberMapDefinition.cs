@@ -149,7 +149,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IMember source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
+            target.Properties = context.MapEnumerable<Property, ContentPropertyDto>(source.Properties);
         }
 
         private MembershipScenario GetMembershipScenario()

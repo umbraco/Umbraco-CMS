@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.Sections;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Services;
@@ -286,7 +287,7 @@ namespace Umbraco.Web.Models.Mapping
             target.StartContentIds = GetStartNodes(source.StartContentIds.ToArray(), UmbracoObjectTypes.Document, "content/contentRoot", context);
             target.StartMediaIds = GetStartNodes(source.StartMediaIds.ToArray(), UmbracoObjectTypes.Media, "media/mediaRoot", context);
             target.UpdateDate = source.UpdateDate;
-            target.UserGroups = source.Groups.Select(context.Map<UserGroupBasic>);
+            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups);
             target.Username = source.Username;
             target.UserState = source.UserState;
         }
@@ -307,7 +308,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            target.UserGroups = source.Groups.Select(context.Map<UserGroupBasic>);
+            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups);
             target.Username = source.Username;
             target.UserState = source.UserState;
         }
@@ -336,7 +337,7 @@ namespace Umbraco.Web.Models.Mapping
         private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
         {
             var allSections = _sectionService.GetSections();
-            target.Sections = allSections.Where(x => sourceAllowedSections.Contains(x.Alias)).Select(context.Map<Section>);
+            target.Sections = context.MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias)));
 
             if (sourceStartMediaId > 0)
                 target.MediaStartNode = context.Map<EntityBasic>(_entityService.Get(sourceStartMediaId.Value, UmbracoObjectTypes.Media));

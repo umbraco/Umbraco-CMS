@@ -42,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IMedia source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
+            target.Properties = context.MapEnumerable<Property, ContentPropertyDto>(source.Properties);
         }
 
         // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsContainer
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = source.Properties.Select(context.Map<ContentPropertyBasic>);
+            target.Properties = context.MapEnumerable<Property, ContentPropertyBasic>(source.Properties);
             target.SortOrder = source.SortOrder;
             target.State = null;
             target.Trashed = source.Trashed;
