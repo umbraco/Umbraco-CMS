@@ -327,13 +327,13 @@ namespace Umbraco.Web.Editors
             var contentType = Services.ContentTypeService.Get(id);
             if (contentType == null)
             {
-                throw new NullReferenceException("No content type found with id " + id);
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound, "No content type found with id " + id));
             }
 
             var template = CreateTemplateForContentType(contentType.Alias, contentType.Name);
             if (template == null)
             {
-                throw new NullReferenceException("Could not create default template for content type with id " + id);
+                throw new InvalidOperationException("Could not create default template for content type with id " + id);
             }
 
             return Mapper.Map<TemplateDisplay>(template);
