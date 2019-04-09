@@ -986,8 +986,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 return;
             }
 
-            //if we have an id, it must be a locallink:id, aslong as the isMedia flag is not set
-            if (id && (angular.isUndefined(target.isMedia) || !target.isMedia)) {
+            //if we have an id, it must be a locallink:id
+            if (id) {
 
                 href = "/{localLink:" + id + "}";
 
