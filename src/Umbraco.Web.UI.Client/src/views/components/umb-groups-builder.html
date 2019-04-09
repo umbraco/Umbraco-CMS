@@ -116,7 +116,7 @@
                         <!-- Add new property -->
                         <a href=""
                             data-element="property-add"
-                            class="btn btn-info"
+                            class="umb-group-builder__group-add-property"
                             ng-if="property.propertyState=='init' && !sortingMode"
                             hotkey="alt+shift+p"
                             hotkey-when="{{tab.tabState === 'active' && property.propertyState=='init'}}"
@@ -183,7 +183,7 @@
                             </div>
 
 
-                            <div tabindex="-1" class="umb-group-builder__property-preview" ng-click="editPropertyTypeSettings(property, tab)" ng-if="!sortingMode" ng-class="{'-not-clickable': !sortingMode && (property.inherited || property.locked)}">
+                            <div tabindex="-1" class="umb-group-builder__property-preview" ng-if="!sortingMode" ng-class="{'-not-clickable': !sortingMode && (property.inherited || property.locked)}">
 
                                 <div class="umb-group-builder__property-tags">
 
@@ -234,7 +234,7 @@
 
                                 </div>
 
-                                <ng-form name="propertyEditorPreviewForm" umb-disable-form-validation>
+                                <ng-form  class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="editPropertyTypeSettings(property, tab)">
                                         <umb-property-editor
                                             ng-if="property.view !== undefined"
                                             model="property"
@@ -242,10 +242,12 @@
                                         </umb-property-editor>
                                 </ng-form>
 
+                                <button class="umb-group-builder__open-settings" ng-if="!property.inherited && !property.locked" ng-click="editPropertyTypeSettings(property, tab)"></button>
+
                             </div>
 
                             <!-- row tools -->
-                            <div class="umb-group-builder__property-actions" ng-if="!sortingMode">
+                            <div class="umb-group-builder__property-actions">
 
                                 <div ng-if="!property.inherited">
 

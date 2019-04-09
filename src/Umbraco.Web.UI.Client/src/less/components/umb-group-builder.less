@@ -135,6 +135,28 @@ input.umb-group-builder__group-title-input:disabled:hover {
     margin-left: auto;
 }
 
+.umb-group-builder__group-add-property {
+    min-height: 46px;
+    margin-right: 30px;
+    margin-left: 270px;
+    border-radius: 3px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px dashed @gray-7;
+    background-color: transparent;
+    color: @ui-action-type;
+    font-weight: bold;
+    position: relative;
+    &:hover {
+        color:@ui-action-type-hover;
+        text-decoration: none;
+        border-color: @ui-active-type-hover;
+    }
+}
+
 /* ---------- PROPERTIES ---------- */
 
 .umb-group-builder__properties {
@@ -270,7 +292,7 @@ input.umb-group-builder__group-title-input:disabled:hover {
     }
 }
 
-.umb-group-builder__property-preview:hover {
+.umb-group-builder__property-preview:not(.-not-clickable):hover {
     &::after {
         opacity: .8;
     }
@@ -301,14 +323,29 @@ input.umb-group-builder__group-title-input:disabled:hover {
   opacity: 0.8
 }
 
+
+.umb-group-builder__open-settings {
+    position: absolute;
+    z-index:1;
+    top: 0;
+    bottom:0;
+    left: 0;
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    &:focus {
+        outline:0;
+    }
+}
+
 .umb-group-builder__property-actions {
-  flex: 0 0 40px;
-  text-align: center;
-  margin: 15px 0 0 15px;
+    flex: 0 0 30px;
+    text-align: right;
+    margin-top: 9px;
 }
 
 .umb-group-builder__property-action {
-  margin: 0 0 10px 0;
+  margin: 10px 0 10px 0;
   display: block;
   font-size: 18px;
   position: relative;
