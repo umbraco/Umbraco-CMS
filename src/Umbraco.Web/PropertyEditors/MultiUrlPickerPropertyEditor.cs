@@ -72,7 +72,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 try
                 {
-                    var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+                    var umbracoContext = UmbracoContext.Current;
                     var services = ApplicationContext.Current.Services;
                     var entityService = services.EntityService;
                     var contentTypeService = services.ContentTypeService;
@@ -167,7 +167,7 @@ namespace Umbraco.Web.PropertyEditors
                                 link.Published = Equals(entity.AdditionalData["IsPublished"], true);
 
                                 if (link.Trashed == false)
-                                    link.Url = umbHelper.Url(entity.Id, UrlProviderMode.Relative);
+                                    link.Url = umbracoContext.UrlProvider.GetUrl(entity.Id, UrlProviderMode.Relative);
                             }
                             else
                             {
@@ -183,7 +183,7 @@ namespace Umbraco.Web.PropertyEditors
                                 if (link.Trashed)
                                     continue;
 
-                                var media = umbHelper.TypedMedia(entity.Id);
+                                var media = umbracoContext.MediaCache.GetById(entity.Id);
                                 if (media != null)
                                     link.Url = media.Url;
                             }

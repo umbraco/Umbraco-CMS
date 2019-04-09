@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Extensions
 {
@@ -16,24 +17,20 @@ namespace Umbraco.Web.Extensions
             var guidUdi = udi as GuidUdi;
             if (guidUdi == null) return null;
 
+            var umbracoContext = UmbracoContext.Current;
+            if (umbracoContext == null) return null;
+
             var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(guidUdi.EntityType);
 
-            var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
-            var entityService = ApplicationContext.Current.Services.EntityService;
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Document:
-                    return umbracoHelper.TypedContent(guidUdi.Guid);
+                    return umbracoContext.ContentCache.GetById(guidUdi.Guid);
                 case UmbracoObjectTypes.Media:
-                    var mediaAttempt = entityService.GetIdForKey(guidUdi.Guid, umbracoType);
-                    if (mediaAttempt.Success)
-                        return umbracoHelper.TypedMedia(mediaAttempt.Result);
-                    break;
+                    return umbracoContext.MediaCache.GetById(guidUdi.Guid);
                 case UmbracoObjectTypes.Member:
-                    var memberAttempt = entityService.GetIdForKey(guidUdi.Guid, umbracoType);
-                    if (memberAttempt.Success)
-                        return umbracoHelper.TypedMember(memberAttempt.Result);
-                    break;
+                    var membershipHelper = new MembershipHelper(umbracoContext);
+                    return membershipHelper.GetByProviderKey(guidUdi.Guid);
             }
 
             return null;

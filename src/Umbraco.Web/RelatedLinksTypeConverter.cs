@@ -7,25 +7,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web
 {
     public class RelatedLinksTypeConverter : TypeConverter
     {
-        private readonly UmbracoHelper _umbracoHelper;
-
-        public RelatedLinksTypeConverter(UmbracoHelper umbracoHelper)
-        {
-            _umbracoHelper = umbracoHelper;
-        }
-
-        public RelatedLinksTypeConverter()
-        {
-            
-        }
-
         private static readonly Type[] ConvertableTypes = new[]
         {
             typeof(JArray)
@@ -50,48 +37,29 @@ namespace Umbraco.Web
             if (TypeHelper.IsTypeAssignableFrom<JArray>(destinationType))
             {
                 // Conversion to JArray taken from old value converter
-
                 var obj = JsonConvert.DeserializeObject<JArray>(relatedLinks.PropertyData);
 
-                var umbracoHelper = GetUmbracoHelper();
-
-                //update the internal links if we have a context
-                if (umbracoHelper != null)
+                // Update the internal links if we have a context
+                var umbracoContext = UmbracoContext.Current;
+                if (umbracoContext != null)
                 {
                     foreach (var a in obj)
                     {
                         var type = a.Value<string>("type");
-                        if (type.IsNullOrWhiteSpace() == false)
+                        if (type.IsNullOrWhiteSpace() == false && type == "internal")
                         {
-                            if (type == "internal")
-                            {
-                                var linkId = a.Value<int>("link");
-                                var link = umbracoHelper.NiceUrl(linkId);
-                                a["link"] = link;
-                            }
+                            var linkId = a.Value<int>("link");
+                            var link = umbracoContext.UrlProvider.GetUrl(linkId);
+                            a["link"] = link;
                         }
                     }
                 }
+
                 return obj;
 
             }
 
             return base.ConvertTo(context, culture, value, destinationType);
-        }
-
-        private UmbracoHelper GetUmbracoHelper()
-        {
-            if (_umbracoHelper != null)
-                return _umbracoHelper;
-
-            if (UmbracoContext.Current == null)
-            {
-                LogHelper.Warn<RelatedLinksTypeConverter>("Cannot create an UmbracoHelper the UmbracoContext is null");
-                return null;
-            }
-
-            //DO NOT assign to _umbracoHelper variable, this is a singleton class and we cannot assign this based on an UmbracoHelper which is request based
-            return new UmbracoHelper(UmbracoContext.Current);
         }
     }
 }

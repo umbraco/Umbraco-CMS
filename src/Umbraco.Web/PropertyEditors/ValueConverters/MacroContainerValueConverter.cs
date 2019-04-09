@@ -36,13 +36,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             try
             {
-                var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
+                var umbracoComponentRenderer = new UmbracoComponentRenderer(UmbracoContext.Current);
                 MacroTagParser.ParseMacros(
                     source,
                     //callback for when text block is found
                     textBlock => sb.Append(textBlock),
                     //callback for when macro syntax is found
-                    (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
+                    (macroAlias, macroAttributes) => sb.Append(umbracoComponentRenderer.RenderMacro(
                         macroAlias,
                         //needs to be explicitly casted to Dictionary<string, object>
                         macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
