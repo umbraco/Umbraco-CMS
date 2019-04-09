@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
                 ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
                 : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
-            searchResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
+            searchResult.SearchResults = Mapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
@@ -71,9 +71,10 @@ namespace Umbraco.Web.Editors
             {
                 var redirectUrlService = Services.RedirectUrlService;
                 var redirects = redirectUrlService.GetContentRedirectUrls(guidIdi.Guid);
-                redirectsResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
+                var mapped = Mapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
+                redirectsResult.SearchResults = mapped;
                 //not doing paging 'yet'
-                redirectsResult.TotalCount = redirects.Count();
+                redirectsResult.TotalCount = mapped.Count();
                 redirectsResult.CurrentPage = 1;
                 redirectsResult.PageCount = 1;
             }

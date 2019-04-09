@@ -190,7 +190,7 @@ namespace Umbraco.Web.Editors
             //get all user groups and map their default permissions to the AssignedUserGroupPermissions model.
             //we do this because not all groups will have true assigned permissions for this node so if they don't have assigned permissions, we need to show the defaults.
 
-            var defaultPermissionsByGroup = Mapper.Map<IEnumerable<AssignedUserGroupPermissions>>(allUserGroups).ToArray();
+            var defaultPermissionsByGroup = Mapper.MapEnumerable<IUserGroup, AssignedUserGroupPermissions>(allUserGroups);
 
             var defaultPermissionsAsDictionary = defaultPermissionsByGroup
                 .ToDictionary(x => Convert.ToInt32(x.Id), x => x);

@@ -2,6 +2,8 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Models;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Mapping
 {
@@ -11,11 +13,11 @@ namespace Umbraco.Tests.Mapping
         [Test]
         public void SimpleMap()
         {
-            var profiles = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(new IMapDefinition[]
             {
-                new Profile1(),
+                new MapperDefinition1(),
             });
-            var mapper = new UmbracoMapper(profiles);
+            var mapper = new UmbracoMapper(definitions);
 
             var thing1 = new Thing1 { Value = "value" };
             var thing2 = mapper.Map<Thing1, Thing2>(thing1);
@@ -36,11 +38,11 @@ namespace Umbraco.Tests.Mapping
         [Test]
         public void EnumerableMap()
         {
-            var profiles = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(new IMapDefinition[]
             {
-                new Profile1(),
+                new MapperDefinition1(),
             });
-            var mapper = new UmbracoMapper(profiles);
+            var mapper = new UmbracoMapper(definitions);
 
             var thing1A = new Thing1 { Value = "valueA" };
             var thing1B = new Thing1 { Value = "valueB" };
@@ -58,16 +60,23 @@ namespace Umbraco.Tests.Mapping
             Assert.AreEqual(2, thing2.Count);
             Assert.AreEqual("valueA", thing2[0].Value);
             Assert.AreEqual("valueB", thing2[1].Value);
+
+            thing2 = mapper.MapEnumerable<Thing1, Thing2>(thing1).ToList();
+
+            Assert.IsNotNull(thing2);
+            Assert.AreEqual(2, thing2.Count);
+            Assert.AreEqual("valueA", thing2[0].Value);
+            Assert.AreEqual("valueB", thing2[1].Value);
         }
 
         [Test]
         public void InheritedMap()
         {
-            var profiles = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(new IMapDefinition[]
             {
-                new Profile1(),
+                new MapperDefinition1(),
             });
-            var mapper = new UmbracoMapper(profiles);
+            var mapper = new UmbracoMapper(definitions);
 
             var thing3 = new Thing3 { Value = "value" };
             var thing2 = mapper.Map<Thing3, Thing2>(thing3);
@@ -85,6 +94,20 @@ namespace Umbraco.Tests.Mapping
             Assert.AreEqual("value", thing2.Value);
         }
 
+        [Test]
+        public void CollectionsMap()
+        {
+            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            {
+                new MapperDefinition2(),
+            });
+            var mapper = new UmbracoMapper(definitions);
+
+            // can map a PropertyCollection
+            var source = new PropertyCollection();
+            var target = mapper.Map<IEnumerable<ContentPropertyDto>>(source);
+        }
+
         private class Thing1
         {
             public string Value { get; set; }
@@ -98,7 +121,7 @@ namespace Umbraco.Tests.Mapping
             public string Value { get; set; }
         }
 
-        private class Profile1 : IMapDefinition
+        private class MapperDefinition1 : IMapDefinition
         {
             public void DefineMaps(UmbracoMapper mapper)
             {
@@ -109,6 +132,17 @@ namespace Umbraco.Tests.Mapping
             {
                 target.Value = source.Value;
             }
+        }
+
+        private class MapperDefinition2 : IMapDefinition
+        {
+            public void DefineMaps(UmbracoMapper mapper)
+            {
+                mapper.Define<Property, ContentPropertyDto>((source, context) => new ContentPropertyDto(), Map);
+            }
+
+            private static void Map(Property source, ContentPropertyDto target, MapperContext context)
+            { }
         }
     }
 }

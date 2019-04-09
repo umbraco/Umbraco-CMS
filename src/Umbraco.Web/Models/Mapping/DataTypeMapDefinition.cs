@@ -127,10 +127,10 @@ namespace Umbraco.Web.Models.Mapping
         private IEnumerable<PropertyEditorBasic> MapAvailableEditors(IDataType source, MapperContext context)
         {
             var contentSection = Current.Configs.Settings().Content;
-            return _propertyEditors
+            var properties = _propertyEditors
                 .Where(x => !x.IsDeprecated || contentSection.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
-                .OrderBy(x => x.Name)
-                .Select(context.Map<PropertyEditorBasic>);
+                .OrderBy(x => x.Name);
+            return context.MapEnumerable<IDataEditor, PropertyEditorBasic>(properties);
         }
 
         private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataType dataType, MapperContext context)
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Models.Mapping
                 throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
 
             var configurationEditor = editor.GetConfigurationEditor();
-            var fields = configurationEditor.Fields.Select(context.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+            var fields = context.MapEnumerable<ConfigurationField,DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
             var configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.Configuration);
 
             MapConfigurationFields(fields, configurationDictionary);
@@ -151,7 +151,7 @@ namespace Umbraco.Web.Models.Mapping
             return fields;
         }
 
-        private void MapConfigurationFields(DataTypeConfigurationFieldDisplay[] fields, IDictionary<string, object> configuration)
+        private void MapConfigurationFields(List<DataTypeConfigurationFieldDisplay> fields, IDictionary<string, object> configuration)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -190,7 +190,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var configurationEditor = source.GetConfigurationEditor();
 
-            var fields = configurationEditor.Fields.Select(context.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+            var fields = context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
 
             var defaultConfiguration = configurationEditor.DefaultConfiguration;
             if (defaultConfiguration != null)

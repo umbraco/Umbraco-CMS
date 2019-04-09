@@ -34,11 +34,11 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrWhiteSpace(relationTypeAlias) == false)
             {
                 return
-                    Mapper.Map<IEnumerable<IRelation>, IEnumerable<RelationDisplay>>(
+                    Mapper.MapEnumerable<IRelation, RelationDisplay>(
                         relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)));
             }
 
-            return Mapper.Map<IEnumerable<IRelation>, IEnumerable<RelationDisplay>>(relations);
+            return Mapper.MapEnumerable<IRelation, RelationDisplay>(relations);
         }
 
         [HttpDelete]

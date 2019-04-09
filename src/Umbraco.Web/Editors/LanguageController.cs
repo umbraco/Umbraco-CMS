@@ -46,7 +46,7 @@ namespace Umbraco.Web.Editors
         {
             var allLanguages = Services.LocalizationService.GetAllLanguages();
 
-            return Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages);
+            return Mapper.MapEnumerable<ILanguage, Language>(allLanguages);
         }
 
         [HttpGet]

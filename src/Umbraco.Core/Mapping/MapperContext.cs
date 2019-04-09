@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Mapping
 {
@@ -111,6 +112,18 @@ namespace Umbraco.Core.Mapping
             return _mapper.Map(source, target, this);
         }
         */
+
+        /// <summary>
+        /// Maps an enumerable of source objects to a new list of target objects.
+        /// </summary>
+        /// <typeparam name="TSourceElement">The type of the source objects.</typeparam>
+        /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
+        /// <param name="source">The source objects.</param>
+        /// <returns>A list containing the target objects.</returns>
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
+        {
+            return source.Select(Map<TSourceElement, TTargetElement>).ToList();
+        }
 
         #endregion
     }

@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
             var relations = Services.RelationService.GetByRelationTypeId(relationType.Id);
 
             var display = Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
-            display.Relations = Mapper.Map<IEnumerable<IRelation>, IEnumerable<RelationDisplay>>(relations);
+            display.Relations = Mapper.MapEnumerable<IRelation, RelationDisplay>(relations);
 
             return display;
         }

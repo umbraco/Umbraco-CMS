@@ -229,7 +229,7 @@ namespace Umbraco.Core.Mapping
                 if (ctor != null && map != null)
                 {
                     // register (for next time) and do it now (for this time)
-                    object NCtor(object s, MapperContext c) => MapEnumerable<TTarget>((IEnumerable) s, targetGenericArg, ctor, map, c);
+                    object NCtor(object s, MapperContext c) => MapEnumerableInternal<TTarget>((IEnumerable) s, targetGenericArg, ctor, map, c);
                     DefineCtors(sourceType)[targetType] = NCtor;
                     DefineMaps(sourceType)[targetType] = Identity;
                     return (TTarget) NCtor(source, context);
@@ -241,7 +241,7 @@ namespace Umbraco.Core.Mapping
             throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
         }
 
-        private TTarget MapEnumerable<TTarget>(IEnumerable source, Type targetGenericArg, Func<object, MapperContext, object> ctor, Action<object, object, MapperContext> map, MapperContext context)
+        private TTarget MapEnumerableInternal<TTarget>(IEnumerable source, Type targetGenericArg, Func<object, MapperContext, object> ctor, Action<object, object, MapperContext> map, MapperContext context)
         {
             var targetList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
 
@@ -377,6 +377,46 @@ namespace Umbraco.Core.Mapping
             if (type.IsArray) return type.GetElementType();
             if (type.IsGenericType) return type.GenericTypeArguments[0];
             throw new Exception("panic");
+        }
+
+        /// <summary>
+        /// Maps an enumerable of source objects to a new list of target objects.
+        /// </summary>
+        /// <typeparam name="TSourceElement">The type of the source objects.</typeparam>
+        /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
+        /// <param name="source">The source objects.</param>
+        /// <returns>A list containing the target objects.</returns>
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
+        {
+            return source.Select(Map<TSourceElement, TTargetElement>).ToList();
+        }
+
+        /// <summary>
+        /// Maps an enumerable of source objects to a new list of target objects.
+        /// </summary>
+        /// <typeparam name="TSourceElement">The type of the source objects.</typeparam>
+        /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
+        /// <param name="source">The source objects.</param>
+        /// <param name="f">A mapper context preparation method.</param>
+        /// <returns>A list containing the target objects.</returns>
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, Action<MapperContext> f)
+        {
+            var context = new MapperContext(this);
+            f(context);
+            return source.Select(x => Map<TSourceElement, TTargetElement>(x, context)).ToList();
+        }
+
+        /// <summary>
+        /// Maps an enumerable of source objects to a new list of target objects.
+        /// </summary>
+        /// <typeparam name="TSourceElement">The type of the source objects.</typeparam>
+        /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
+        /// <param name="source">The source objects.</param>
+        /// <param name="context">A mapper context.</param>
+        /// <returns>A list containing the target objects.</returns>
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, MapperContext context)
+        {
+            return source.Select(x => Map<TSourceElement, TTargetElement>(x, context)).ToList();
         }
 
         #endregion
