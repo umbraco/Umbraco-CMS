@@ -7,7 +7,7 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '?^^umbProperty'],
+        require: ['ngModel', '^^umbProperty', '?^^umbVariantContent'],
         restrict: "A",
         scope: {},
         link: function (scope, element, attr, ctrls) {
@@ -18,9 +18,21 @@ function valServer(serverValidationManager) {
                 //we cannot proceed, this validator will be disabled
                 return;
             }
+            
+            // optional reference to the varaint-content-controller, needed to avoid validation when the field is invariant on non-default languages.
+            var umbVariantCtrl = ctrls.length > 2 ? ctrls[2] : null;
 
             var currentProperty = umbPropCtrl.property;
             var currentCulture = currentProperty.culture;
+            
+            var currentVariant = umbVariantCtrl.content.variants.filter( (x) => x.active )[0];
+            
+            if(umbVariantCtrl && umbVariantCtrl.content.variants.length > 1 && !currentVariant.language.isDefault && !currentCulture && !currentProperty.unlockInvariantValue) {
+                //This property is locked cause its a invariant property shown on a non-default language.
+                //Therefor do not validate this field.
+                return;
+            }
+            
             var watcher = null;
             var unsubscribe = [];
 
