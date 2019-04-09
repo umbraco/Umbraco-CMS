@@ -45,7 +45,7 @@ angular.module('umbraco.security.interceptor')
                     }
 
                     //A 401 means that the user is not logged in
-                    if (originalResponse.status === 401 && !originalResponse.config.url.endsWith("umbraco/backoffice/UmbracoApi/Authentication/GetCurrentUser")) {
+                    if (originalResponse.status === 401 && !originalResponse.config.url.endsWith("/backoffice/UmbracoApi/Authentication/GetCurrentUser")) {
 
                       var userService = $injector.get('userService'); // see above
 
