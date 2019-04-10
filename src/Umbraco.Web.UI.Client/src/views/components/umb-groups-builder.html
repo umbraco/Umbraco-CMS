@@ -234,12 +234,12 @@
 
                                 </div>
 
-                                <ng-form  class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="editPropertyTypeSettings(property, tab)">
-                                        <umb-property-editor
-                                            ng-if="property.view !== undefined"
-                                            model="property"
-                                            preview="true">
-                                        </umb-property-editor>
+                                <ng-form inert class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="editPropertyTypeSettings(property, tab)">
+                                    <umb-property-editor
+                                        ng-if="property.view !== undefined"
+                                        model="property"
+                                        preview="true">
+                                    </umb-property-editor>
                                 </ng-form>
 
                                 <button class="umb-group-builder__open-settings" ng-if="!property.inherited && !property.locked" ng-click="editPropertyTypeSettings(property, tab)"></button>
@@ -252,13 +252,13 @@
                                 <div ng-if="!property.inherited">
 
                                     <!-- settings for property -->
-                                    <div class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property, tab)">
-                                        <i class="icon icon-settings"></i>
+                                    <div class="umb-group-builder__property-action">
+                                        <button class="icon icon-settings" ng-click="editPropertyTypeSettings(property, tab)"></button>
                                     </div>
 
                                     <!-- delete property -->
                                     <div ng-if="!property.locked" class="umb-group-builder__property-action">
-                                        <i class="icon-trash" ng-click="togglePrompt(property)"></i>
+                                        <button class="icon-trash" ng-click="togglePrompt(property)"></button>
                                         <umb-confirm-action
                                             ng-if="property.deletePrompt"
                                             direction="left"
