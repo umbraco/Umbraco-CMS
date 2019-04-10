@@ -81,6 +81,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
+        ignoreUserStartNodes: false,
         maxNumber: 1,
         minNumber: 0,
         startNode: {
@@ -118,7 +119,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = Object.toBoolean($scope.model.config.showOpenButton);
     $scope.model.config.showEditButton = Object.toBoolean($scope.model.config.showEditButton);
     $scope.model.config.showPathOnHover = Object.toBoolean($scope.model.config.showPathOnHover);
-
+    $scope.model.config.ignoreUserStartNodes = Object.toBoolean($scope.model.config.ignoreUserStartNodes);
+    
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"

@@ -365,17 +365,29 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * </pre>
           *
           * @param {Int} id id of content item to return
-          * @param {Int} culture optional culture to retrieve the item in
+          * @param {Object} options optional options object
+          * @param {Bool} options.ignoreUserStartNodes set to true to allow a user to choose nodes that they normally don't have access to
           * @returns {Promise} resourcePromise object containing the content item.
           *
           */
-        getById: function (id) {
+        getById: function (id, options) {
+            var defaults = {
+                ignoreUserStartNodes: false
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetById",
-                        { id: id })),
+                              [{ id: id }, { ignoreUserStartNodes: options.ignoreUserStartNodes }])),
                 'Failed to retrieve data for content id ' + id)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));

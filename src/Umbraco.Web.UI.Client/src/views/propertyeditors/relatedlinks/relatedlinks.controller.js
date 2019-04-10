@@ -25,6 +25,7 @@
                     section: "content",
                     treeAlias: "content",
                     multiPicker: false,
+                    ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === "1" ? true :  false;
                     idType: $scope.model.config.idType ? $scope.model.config.idType : "int",
                     submit: function (model) {
                         select(model.selection[0]);
@@ -47,6 +48,7 @@
                     section: "content",
                     treeAlias: "content",
                     multiPicker: false,
+                    ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === "1" ? true : false;
                     idType: $scope.model.config.idType ? $scope.model.config.idType : "udi",
                     submit: function (model) {
                         select(model.selection[0]);

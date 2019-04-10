@@ -69,9 +69,10 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             url: link.url,
             target: link.target
         } : null;
-
+        
         var linkPicker = {
             currentTarget: target,
+            ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === "1",
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed

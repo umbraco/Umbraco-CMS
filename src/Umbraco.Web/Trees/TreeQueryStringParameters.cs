@@ -8,6 +8,7 @@
         public const string IsDialog = "isDialog";
         public const string Application = "application";
         public const string StartNodeId = "startNodeId";
+        public const string IgnoreUserStartNodes = "ignoreUserStartNodes";        
         //public const string OnNodeClick = "OnNodeClick";
         //public const string RenderParent = "RenderParent";
     }

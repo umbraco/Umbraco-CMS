@@ -15,5 +15,9 @@ namespace Umbraco.Web.PropertyEditors
         // TODO: Make these strongly typed, for now this works though
         [ConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
         public JObject Rte { get; set; }
+
+        [ConfigurationField("ignoreUserStartNodes", "Ignore user start nodes", "boolean",
+            Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
+        public bool IgnoreUserStartNodes { get; set; }
     }
 }

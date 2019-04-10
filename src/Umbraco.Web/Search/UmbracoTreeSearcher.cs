@@ -52,12 +52,13 @@ namespace Umbraco.Web.Search
         /// </param>
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         public IEnumerable<SearchResultEntity> ExamineSearch(
             string query,
             UmbracoEntityTypes entityType,
             int pageSize,
-            long pageIndex, out long totalFound, string searchFrom = null)
+            long pageIndex, out long totalFound, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             var sb = new StringBuilder();
 
@@ -88,12 +89,12 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Media:
                     type = "media";
                     var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
-                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, _entityService);
+                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
                     var allContentStartNodes = _umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
-                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, _entityService);
+                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
@@ -291,7 +292,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[] startNodeIds, string searchFrom, IEntityService entityService)
+        private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[] startNodeIds, string searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
             if (entityService == null) throw new ArgumentNullException(nameof(entityService));
@@ -314,7 +315,7 @@ namespace Umbraco.Web.Search
                 // make sure we don't find anything
                 sb.Append("+__Path:none ");
             }
-            else if (startNodeIds.Contains(-1) == false) // -1 = no restriction
+            else if (startNodeIds.Contains(-1) == false && ignoreUserStartNodes == false) // -1 = no restriction
             {
                 var entityPaths = entityService.GetAllPaths(objectType, startNodeIds);
 

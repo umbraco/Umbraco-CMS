@@ -66,6 +66,9 @@ namespace Umbraco.Web.WebApi.Filters
                 //not logged in
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
+            
+            var ignoreUserStartNodes = actionContext.ActionArguments.ContainsKey("ignoreUserStartNodes") &&
+                                       bool.Parse(actionContext.ActionArguments.GetValueAsString("ignoreUserStartNodes"));
 
             int nodeId;
             if (_nodeId.HasValue == false)
@@ -121,8 +124,9 @@ namespace Umbraco.Web.WebApi.Filters
                 Current.Services.UserService,
                 Current.Services.ContentService,
                 Current.Services.EntityService,
-                out var contentItem,
-                _permissionToCheck.HasValue ? new[] { _permissionToCheck.Value } : null);
+				out var contentItem,
+				_permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null,
+                ignoreUserStartNodes: ignoreUserStartNodes);
 
             if (permissionResult == ContentPermissionsHelper.ContentAccess.NotFound)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
