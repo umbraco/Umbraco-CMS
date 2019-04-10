@@ -14,9 +14,9 @@
     cursor: pointer;
     align-items: center;
     display: flex;
-    width: 48px;
-    height: 24px;
-    border-radius: 3px;
+    width: 38px;
+    height: 18px;
+    border-radius: 10px;
     border: 1px solid @inputBorder;
     background-color: @inputBorder;
     position: relative;
@@ -49,14 +49,14 @@
     top: 1px;
     left: 1px;
     display: block;
-    width: 22px;
-    height: 22px;
+    width: 16px;
+    height: 16px;
     background-color: @white;
-    border-radius: 2px;
+    border-radius: 8px;
     transition: transform 120ms ease-in-out, background-color 120ms;
     
     .umb-toggle.umb-toggle--checked & {
-        transform: translateX(24px);
+        transform: translateX(20px);
         background-color: white;
     }
     
@@ -67,20 +67,22 @@
 
 .umb-toggle__icon {
     position: absolute;
+    font-size: 12px;
     line-height: 1em;
     text-decoration: none;
     transition: all 0.2s ease;
 }
 
 .umb-toggle__icon--left {
-    left: 6px;
-    color: @ui-btn;
-    transition: color 120ms;
+    left: 5px;
+    color: white;
+    transition: opacity 120ms;
+    opacity: 0;
     // .umb-toggle:hover & {
     //     color: @ui-btn-hover;
     // }
     .umb-toggle--checked & {
-        color: white;
+        opacity: 1;
     }
     .umb-toggle.umb-toggle--checked:hover & {
         color: white;
@@ -90,6 +92,10 @@
 .umb-toggle__icon--right {
     right: 5px;
     color: @ui-btn;
+    transition: opacity 120ms;
+    .umb-toggle--checked & {
+        opacity: 0;
+    }
     .umb-toggle:hover & {
         color: @ui-btn-hover;
     }
