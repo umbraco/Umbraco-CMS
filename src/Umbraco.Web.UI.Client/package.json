@@ -41,6 +41,7 @@
     "spectrum-colorpicker": "1.8.0",
     "tinymce": "4.9.2",
     "typeahead.js": "0.11.1",
+    "typescript": "^3.2.1",
     "underscore": "1.9.1"
   },
   "devDependencies": {
@@ -64,6 +65,7 @@
     "gulp-postcss": "8.0.0",
     "gulp-rename": "1.4.0",
     "gulp-sort": "2.0.0",
+    "gulp-typescript": "^5.0.1",
     "gulp-watch": "5.0.1",
     "gulp-wrap": "0.14.0",
     "gulp-wrap-js": "0.4.1",

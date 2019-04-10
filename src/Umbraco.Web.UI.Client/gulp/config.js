@@ -25,6 +25,10 @@ module.exports = {
             security: { files: ["./src/common/interceptors/**/*.js"], out: "umbraco.interceptors.js" }
         },
 
+        ts: {
+            services: { files: ["./src/common/services/**/*.ts"], out: "./src/common/services/build/temp/" }
+        },
+
         //selectors for copying all views into the build
         //processed in the views task
         views:{

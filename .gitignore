@@ -157,6 +157,7 @@ build.tmp/
 build/hooks/
 build/temp/
 
+/src/Umbraco.Web.UI.Client/src/common/**/build/temp/
 
 
 # eof
