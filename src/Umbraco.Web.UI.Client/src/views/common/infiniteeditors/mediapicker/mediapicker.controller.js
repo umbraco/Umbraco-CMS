@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function($scope, mediaResource, entityResource, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
+        function($scope, mediaResource, entityResource, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService) {
 
             if (!$scope.model.title) {
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
@@ -23,7 +23,6 @@ angular.module("umbraco")
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
-            $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
@@ -204,9 +203,12 @@ angular.module("umbraco")
                 }
             };
 
-            $scope.clickItemName = function(item) {
+            $scope.clickItemName = function(item, event, index) {
                 if (item.isFolder) {
                     $scope.gotoFolder(item);
+                }
+                else {
+                    $scope.clickHandler(item, event, index);
                 }
             };
 
@@ -401,31 +403,6 @@ angular.module("umbraco")
                     }
                 }
             }
-
-            $scope.editMediaItem = function(item) {
-                var mediaEditor = {
-                    id: item.id,
-                    submit: function(model) {
-                        editorService.close()
-                        // update the media picker item in the picker so it matched the saved media item
-                        // the media picker is using media entities so we get the 
-                        // entity so we easily can format it for use in the media grid
-                        if(model && model.mediaNode) {
-                            entityResource.getById(model.mediaNode.id, "media")
-                                .then(function (mediaEntity) {
-                                    angular.extend(item, mediaEntity);
-                                    setMediaMetaData(item);
-                                    setUpdatedMediaNodes(item);
-                                });
-                        }
-                    },
-                    close: function(model) {
-                        setUpdatedMediaNodes(item);
-                        editorService.close();
-                    }
-                };
-                editorService.mediaEditor(mediaEditor);
-            };
 
             function setUpdatedMediaNodes(item) {
                 // add udi to list of updated media items so we easily can update them in other editors
