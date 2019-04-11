@@ -171,7 +171,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,
 
-                allowMediaEdit: false,
                 submit: function(model) {
 
                     editorService.close();
