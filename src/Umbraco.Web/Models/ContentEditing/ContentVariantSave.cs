@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
@@ -16,6 +17,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "name", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
+        [MaxLength(256)]
         public string Name { get; set; }
 
         [DataMember(Name = "properties")]
