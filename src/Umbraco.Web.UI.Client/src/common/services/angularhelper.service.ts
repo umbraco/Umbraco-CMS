@@ -1,6 +1,6 @@
 /// <reference path="../definitions/global.d.ts" />
 
-module umbraco.services {
+namespace umbraco.services {
 
     export class angularHelper {
 
