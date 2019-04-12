@@ -299,23 +299,6 @@ namespace Umbraco.Web
         #region IsSomething: misc.
 
         /// <summary>
-        /// Gets a value indicating whether the content is visible.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>A value indicating whether the content is visible.</returns>
-        /// <remarks>A content is not visible if it has an umbracoNaviHide property with a value of "1". Otherwise,
-        /// the content is visible.</remarks>
-        public static bool IsVisible(this IPublishedContent content)
-        {
-            // note: would be better to ensure we have an IPropertyEditorValueConverter for booleans
-            // and then treat the umbracoNaviHide property as a boolean - vs. the hard-coded "1".
-
-            // rely on the property converter - will return default bool value, ie false, if property
-            // is not defined, or has no value, else will return its value.
-            return content.Value<bool>(Constants.Conventions.Content.NaviHide) == false;
-        }
-
-        /// <summary>
         /// Determines whether the specified content is a specified content type.
         /// </summary>
         /// <param name="content">The content to determine content type of.</param>

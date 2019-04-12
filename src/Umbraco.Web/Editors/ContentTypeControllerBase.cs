@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -15,7 +14,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -502,13 +500,13 @@ namespace Umbraco.Web.Editors
             where TPropertyType : PropertyTypeBasic
         {
             InvalidCompositionException invalidCompositionException = null;
-            if (ex is AutoMapperMappingException && ex.InnerException is InvalidCompositionException)
+            if (ex is InvalidCompositionException)
             {
-                invalidCompositionException = (InvalidCompositionException)ex.InnerException;
+                invalidCompositionException = (InvalidCompositionException)ex;
             }
             else if (ex.InnerException is InvalidCompositionException)
             {
-                invalidCompositionException = (InvalidCompositionException)ex;
+                invalidCompositionException = (InvalidCompositionException)ex.InnerException;
             }
             if (invalidCompositionException != null)
             {

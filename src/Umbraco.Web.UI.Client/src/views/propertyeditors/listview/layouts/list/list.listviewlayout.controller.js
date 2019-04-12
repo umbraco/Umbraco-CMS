@@ -40,8 +40,8 @@
             }
         }
 
-        function selectAll($event) {
-            listViewHelper.selectAllItems($scope.items, $scope.selection, $event);
+        function selectAll() {
+            listViewHelper.selectAllItemsToggle($scope.items, $scope.selection);
         }
 
         function isSelectedAll() {

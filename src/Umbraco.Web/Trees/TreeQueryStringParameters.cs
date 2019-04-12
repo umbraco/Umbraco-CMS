@@ -5,7 +5,7 @@
     /// </summary>
     internal struct TreeQueryStringParameters
     {
-        public const string IsDialog = "isDialog";
+        public const string Use = "use";
         public const string Application = "application";
         public const string StartNodeId = "startNodeId";
         //public const string OnNodeClick = "OnNodeClick";

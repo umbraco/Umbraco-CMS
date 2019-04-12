@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using AutoMapper;
 using Examine;
 using Moq;
 using NUnit.Framework;
@@ -37,6 +36,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Mapping;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
@@ -108,6 +108,8 @@ namespace Umbraco.Tests.Testing
 
         protected IMapperCollection Mappers => Factory.GetInstance<IMapperCollection>();
 
+        protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
+
         #endregion
 
         #region Setup
@@ -148,7 +150,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void Compose()
         {
-            ComposeAutoMapper(Options.AutoMapper);
+            ComposeMapper(Options.Mapper);
             ComposeDatabase(Options.Database);
             ComposeApplication(Options.WithApplication);
 
@@ -165,7 +167,6 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void Initialize()
         {
-            InitializeAutoMapper(Options.AutoMapper);
             InitializeApplication(Options.WithApplication);
         }
 
@@ -249,7 +250,7 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
         }
 
-        protected virtual void ComposeAutoMapper(bool configure)
+        protected virtual void ComposeMapper(bool configure)
         {
             if (configure == false) return;
 
@@ -371,18 +372,6 @@ namespace Umbraco.Tests.Testing
 
         #region Initialize
 
-        protected virtual void InitializeAutoMapper(bool configure)
-        {
-            if (configure == false) return;
-
-            Mapper.Initialize(configuration =>
-            {
-                var profiles = Factory.GetAllInstances<Profile>();
-                foreach (var profile in profiles)
-                    configuration.AddProfile(profile);
-            });
-        }
-
         protected virtual void InitializeApplication(bool withApplication)
         {
             if (withApplication == false) return;
@@ -429,8 +418,6 @@ namespace Umbraco.Tests.Testing
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath();
             SettingsForTests.Reset(); // FIXME: should it be optional?
-
-            Mapper.Reset();
 
             // clear static events
             DocumentRepository.ClearScopeEvents();

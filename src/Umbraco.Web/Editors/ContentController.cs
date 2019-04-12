@@ -9,7 +9,6 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -191,7 +190,7 @@ namespace Umbraco.Web.Editors
             //get all user groups and map their default permissions to the AssignedUserGroupPermissions model.
             //we do this because not all groups will have true assigned permissions for this node so if they don't have assigned permissions, we need to show the defaults.
 
-            var defaultPermissionsByGroup = Mapper.Map<IEnumerable<AssignedUserGroupPermissions>>(allUserGroups).ToArray();
+            var defaultPermissionsByGroup = Mapper.MapEnumerable<IUserGroup, AssignedUserGroupPermissions>(allUserGroups);
 
             var defaultPermissionsAsDictionary = defaultPermissionsByGroup
                 .ToDictionary(x => Convert.ToInt32(x.Id), x => x);
@@ -505,14 +504,14 @@ namespace Umbraco.Web.Editors
             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize);
             pagedResult.Items = children.Select(content =>
                 Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content,
-                    opts =>
+                    context =>
                     {
 
-                        opts.SetCulture(cultureName);
+                        context.SetCulture(cultureName);
 
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
                         if (!includeProperties.IsNullOrWhiteSpace())
-                            opts.SetIncludedProperties(includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries));
+                            context.SetIncludedProperties(includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries));
                     }))
                 .ToList(); // evaluate now
 
@@ -666,7 +665,7 @@ namespace Umbraco.Web.Editors
 
             //The default validation language will be either: The default languauge, else if the content is brand new and the default culture is
             // not marked to be saved, it will be the first culture in the list marked for saving.
-            var defaultCulture = _allLangs.Value.First(x => x.Value.IsDefault).Key;
+            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.CultureName;
             var cultureForInvariantErrors = CultureImpact.GetCultureForInvariantErrors(
                 contentItem.PersistedContent,
                 contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),

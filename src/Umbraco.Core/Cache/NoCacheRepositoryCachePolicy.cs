@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
@@ -12,11 +11,6 @@ namespace Umbraco.Core.Cache
         private NoCacheRepositoryCachePolicy() { }
 
         public static NoCacheRepositoryCachePolicy<TEntity, TId> Instance { get; } = new NoCacheRepositoryCachePolicy<TEntity, TId>();
-
-        public IRepositoryCachePolicy<TEntity, TId> Scoped(IAppPolicyCache runtimeCache, IScope scope)
-        {
-            throw new NotImplementedException();
-        }
 
         public TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
