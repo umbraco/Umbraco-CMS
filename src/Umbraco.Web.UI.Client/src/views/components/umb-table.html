@@ -22,7 +22,7 @@
                     <localize key="general_status">Status</localize>
                 </div>
                 <div class="umb-table-cell" ng-repeat="column in vm.itemProperties track by column.alias">
-                    <a class="umb-table-head__link" title="Sort by {{ column.header }}" href="#"
+                    <a class="umb-table-head__link" href="#"
                        ng-click="vm.sort(column.alias, column.allowSorting, column.isSystem)"
                        ng-class="{'sortable':column.allowSorting}" prevent-default>
                         <span ng-bind="column.header"></span>
