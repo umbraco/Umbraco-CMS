@@ -18,7 +18,16 @@
 
 	&-push {
 		float:right;
-	}
+    }
+
+    &--list{
+        float: left;
+    }
+
+    &__item{
+        line-height: 1;
+        margin: 0 0 5px;
+    }
 }
 
 .umb-property-editor-tiny {
@@ -68,6 +77,11 @@
 		}
 	}
 }
+
+.umb-property .alert {
+	border-radius: 3px;
+}
+
 
 
 //
@@ -213,7 +227,7 @@
         margin: 24px 0 0;
         display: flex;
     }
-    
+
     &__input {
         width: 100%;
         &-wrap{
@@ -255,8 +269,8 @@
     transition: all 150ms ease-in-out;
 
     &:hover {
-        color: @ui-action-disgrete-type-hover;
-        border-color: @ui-action-disgrete-type-hover;
+        color: @ui-action-discreet-type-hover;
+        border-color: @ui-action-discreet-type-hover;
     }
 }
 
@@ -905,13 +919,6 @@
 	height: 100%;
     min-height:200px;
 }
-
-//
-// Nested boolean (e.g. list view bulk action permissions)
-// -------------------------------------------------------
-.umb-nested-boolean label {margin-bottom: 8px; float: left; width: 320px;}
-.umb-nested-boolean label span {float: left; width: 80%;}
-.umb-nested-boolean label input[type='checkbox'] {margin-right: 10px; float: left;}
 
 //
 // Custom styles of property editors in property preview in document type editor

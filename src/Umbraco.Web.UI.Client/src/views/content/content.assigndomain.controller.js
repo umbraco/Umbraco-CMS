@@ -46,8 +46,7 @@
 
                     if (data.language !== "undefined") {
                         var lang = vm.languages.filter(function (l) {
-                            return matchLanguageById(l, data.language.Id);
-
+                            return matchLanguageById(l, data.language);
                         });
                         if (lang.length > 0) {
                             vm.language = lang[0];
@@ -117,6 +116,7 @@
                     if(response.valid) {
 
                         vm.submitButtonState = "success";
+                        closeDialog();
 
                     // show validation messages for each domain
                     } else {

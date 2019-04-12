@@ -19,9 +19,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.RadioButtonsContro
 
                 $scope.configItems = configItems;
             }
-
-            $scope.htmlId = "radiobuttons-" + $scope.model.alias + String.CreateGuid();
-
+            
         }
 
         init();

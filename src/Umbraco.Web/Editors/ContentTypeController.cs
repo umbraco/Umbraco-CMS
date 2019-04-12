@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -323,6 +322,23 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        public TemplateDisplay PostCreateDefaultTemplate(int id)
+        {
+            var contentType = Services.ContentTypeService.Get(id);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound, "No content type found with id " + id));
+            }
+
+            var template = CreateTemplateForContentType(contentType.Alias, contentType.Name);
+            if (template == null)
+            {
+                throw new InvalidOperationException("Could not create default template for content type with id " + id);
+            }
+
+            return Mapper.Map<TemplateDisplay>(template);
+        }
+
         private ITemplate CreateTemplateForContentType(string contentTypeAlias, string contentTypeName)
         {
             var template = Services.FileService.GetTemplate(contentTypeAlias);
@@ -552,9 +568,15 @@ namespace Umbraco.Web.Editors
             var file = result.FileData[0];
             var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
+
+            // renaming the file because MultipartFormDataStreamProvider has created a random fileName instead of using the name from the
+            // content-disposition for more than 6 years now. Creating a CustomMultipartDataStreamProvider deriving from MultipartFormDataStreamProvider
+            // seems like a cleaner option, but I'm not sure where to put it and renaming only takes one line of code.
+            System.IO.File.Move(result.FileData[0].LocalFileName, root + "\\" + fileName);
+
             if (ext.InvariantEquals("udt"))
             {
-                model.TempFileName = Path.Combine(root, model.TempFileName);
+                model.TempFileName = Path.Combine(root, fileName);
 
                 model.UploadedFiles.Add(new ContentPropertyFile
                 {

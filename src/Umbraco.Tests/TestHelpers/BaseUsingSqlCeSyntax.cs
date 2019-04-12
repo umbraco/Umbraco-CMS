@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -33,8 +34,6 @@ namespace Umbraco.Tests.TestHelpers
         {
             Current.Reset();
 
-            var sqlSyntax = new SqlCeSyntaxProvider();
-
             var container = RegisterFactory.Create();
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
@@ -51,15 +50,17 @@ namespace Umbraco.Tests.TestHelpers
             composition.RegisterUnique(typeLoader);
 
             composition.WithCollectionBuilder<MapperCollectionBuilder>()
-                .Add(() => composition.TypeLoader.GetAssignedMapperTypes());
+                .AddCoreMappers();
+
+            composition.RegisterUnique<ISqlContext>(_ => SqlContext);
 
             var factory = Current.Factory = composition.CreateFactory();
 
-            Mappers = factory.GetInstance<IMapperCollection>();
-
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
-            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SQLCe, pocoDataFactory, Mappers);
+            var sqlSyntax = new SqlCeSyntaxProvider();
+            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SQLCe, pocoDataFactory, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
+            Mappers = factory.GetInstance<IMapperCollection>();
 
             SetUp();
         }
