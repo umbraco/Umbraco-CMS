@@ -106,10 +106,18 @@ namespace Umbraco.Web.PublishedCache
         {
             var guidUdi = contentId as GuidUdi;
             if (guidUdi == null)
-                throw new InvalidOperationException("UDIs for content items must be " + typeof(GuidUdi));
+                throw new ArgumentException($"Udi must be of type {typeof(GuidUdi).Name}.", nameof(contentId));
+
+            if (guidUdi.EntityType != UdiEntityType)
+                throw new ArgumentException($"Udi entity type must be \"{UdiEntityType}\".", nameof(contentId));
 
             return GetById(preview, guidUdi.Guid);
         }
+
+        /// <summary>
+        /// Gets the entity type.
+        /// </summary>
+        protected abstract string UdiEntityType { get; }
 
         /// <summary>
         /// Gets content at root.
