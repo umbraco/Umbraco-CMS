@@ -36,6 +36,7 @@ using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -1651,6 +1652,19 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public DomainSave PostSaveLanguageAndDomains(DomainSave model)
         {
+            foreach(var domain in model.Domains)
+            {
+                try
+                {
+                    var uri = DomainHelper.ParseUriFromDomainName(domain.Name, Request.RequestUri);
+                }
+                catch (UriFormatException)
+                {                    
+                    var response = Request.CreateValidationErrorResponse(Services.TextService.Localize("assignDomain/invalidDomain"));
+                    throw new HttpResponseException(response);
+                }
+            }
+
             var node = Services.ContentService.GetById(model.NodeId);
 
             if (node == null)
