@@ -5,7 +5,6 @@ using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
@@ -55,6 +54,181 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static string GetCropUrl(
+            this IPublishedContent mediaItem,
+            string propertyAlias,
+            string culture,
+            string cropAlias)
+        {
+            return mediaItem.GetCropUrl(
+                propertyAlias: propertyAlias,
+                culture: culture,
+                cropAlias: cropAlias,
+                useCropDimensions: true);
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="fallback">
+        /// The property's optional fallback strategy.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static string GetCropUrl(
+            this IPublishedContent mediaItem,
+            string propertyAlias,
+            Fallback fallback,
+            string cropAlias)
+        {
+            return mediaItem.GetCropUrl(
+                propertyAlias: propertyAlias,
+                fallback: fallback,
+                cropAlias: cropAlias,
+                useCropDimensions: true);
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="segment">
+        /// The property's variation segment.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static string GetCropUrl(
+            this IPublishedContent mediaItem,
+            string propertyAlias,
+            string culture,
+            string segment,
+            string cropAlias)
+        {
+            return mediaItem.GetCropUrl(
+                propertyAlias: propertyAlias,
+                culture: culture,
+                segment: segment,
+                cropAlias: cropAlias,
+                useCropDimensions: true);
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="fallback">
+        /// The property's optional fallback strategy.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static string GetCropUrl(
+            this IPublishedContent mediaItem,
+            string propertyAlias,
+            string culture,
+            Fallback fallback,
+            string cropAlias)
+        {
+            return mediaItem.GetCropUrl(
+                propertyAlias: propertyAlias,
+                culture: culture,
+                fallback: fallback,
+                cropAlias: cropAlias,
+                useCropDimensions: true);
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="segment">
+        /// The property's variation segment.
+        /// </param>
+        /// <param name="fallback">
+        /// The property's optional fallback strategy.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static string GetCropUrl(
+            this IPublishedContent mediaItem,
+            string propertyAlias,
+            string culture,
+            string segment,
+            Fallback fallback,
+            string cropAlias)
+        {
+            return mediaItem.GetCropUrl(
+                propertyAlias: propertyAlias,
+                culture: culture,
+                segment: segment,
+                fallback: fallback,
+                cropAlias: cropAlias,
+                useCropDimensions: true);
+        }
+
+        /// <summary>
         /// Gets the ImageProcessor Url from the IPublishedContent item.
         /// </summary>
         /// <param name="mediaItem">
@@ -68,6 +242,15 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="propertyAlias">
         /// Property alias of the property containing the Json data.
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="segment">
+        /// The property's variation segment.
+        /// </param>
+        /// <param name="fallback">
+        /// The property's optional fallback strategy.
         /// </param>
         /// <param name="cropAlias">
         /// The crop alias.
@@ -112,6 +295,9 @@ namespace Umbraco.Web
              int? width = null,
              int? height = null,
              string propertyAlias = Constants.Conventions.Media.File,
+             string culture = null,
+             string segment = null,
+             Fallback fallback = default,
              string cropAlias = null,
              int? quality = null,
              ImageCropMode? imageCropMode = null,
@@ -127,11 +313,17 @@ namespace Umbraco.Web
 
             var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
 
-            if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
+            if (mediaItem.HasProperty(propertyAlias) == false)
+            {
                 return string.Empty;
+            }
 
             //get the default obj from the value converter
-            var cropperValue = mediaItem.Value(propertyAlias);
+            var cropperValue = mediaItem.Value(propertyAlias, culture, segment, fallback);
+            if (cropperValue == null)
+            {
+                return string.Empty;
+            }
 
             //is it strongly typed?
             var stronglyTyped = cropperValue as ImageCropperValue;
