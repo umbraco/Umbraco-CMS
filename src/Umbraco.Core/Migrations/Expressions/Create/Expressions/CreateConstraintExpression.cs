@@ -18,7 +18,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Expressions
         {
             var constraintType = (Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
 
-            if (Constraint.IsPrimaryKeyConstraint && SqlSyntax.SupportsClustered())
+            if (Constraint.IsPrimaryKeyConstraint && Constraint.IsPrimaryKeyClustered && SqlSyntax.SupportsClustered())
                 constraintType += " CLUSTERED";
 
             if (Constraint.IsNonUniqueConstraint)
