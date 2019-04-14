@@ -236,18 +236,18 @@ body.touch .umb-tree {
     }
 }
 
-.has-unpublished-version > .umb-tree-item__inner > .umb-tree-item__annotation::before {
-    content: "\e25a";
-    color: @green;
-    font-size: 20px;
-    margin-left: -25px;
-}
-
 .is-container > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e04e";
     color: @blue;
     font-size: 9px;
     margin-left: -20px;
+}
+
+.has-unpublished-version > .umb-tree-item__inner > .umb-tree-item__annotation::before {
+    content: "\e25a";
+    color: @green;
+    font-size: 20px;
+    margin-left: -25px;
 }
 
 .protected > .umb-tree-item__inner > .umb-tree-item__annotation::before {
