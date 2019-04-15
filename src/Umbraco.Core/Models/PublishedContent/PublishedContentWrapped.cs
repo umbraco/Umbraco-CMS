@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models.PublishedContent
         #region ContentType
 
         /// <inheritdoc />
-        public virtual PublishedContentType ContentType => _content.ContentType;
+        public virtual IPublishedContentType ContentType => _content.ContentType;
 
         #endregion
 

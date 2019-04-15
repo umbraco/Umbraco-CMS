@@ -221,6 +221,7 @@
     <Compile Include="Mapping\UmbracoMapper.cs" />
     <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />

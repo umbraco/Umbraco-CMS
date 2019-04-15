@@ -156,12 +156,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Content types
 
-        public override PublishedContentType GetContentType(int id)
+        public override IPublishedContentType GetContentType(int id)
         {
             return _snapshot.GetContentType(id);
         }
 
-        public override PublishedContentType GetContentType(string alias)
+        public override IPublishedContentType GetContentType(string alias)
         {
             return _snapshot.GetContentType(alias);
         }

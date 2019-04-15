@@ -26,31 +26,31 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public PublishedContentType CreateContentType(IContentTypeComposition contentType)
+        public IPublishedContentType CreateContentType(IContentTypeComposition contentType)
         {
             return new PublishedContentType(contentType, this);
         }
 
         // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
+        internal IPublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
             return new PublishedContentType(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations, isElement);
         }
 
         // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
+        internal IPublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
             return new PublishedContentType(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations, isElement);
         }
 
         /// <inheritdoc />
-        public PublishedPropertyType CreatePropertyType(PublishedContentType contentType, PropertyType propertyType)
+        public PublishedPropertyType CreatePropertyType(IPublishedContentType contentType, PropertyType propertyType)
         {
             return new PublishedPropertyType(contentType, propertyType, _propertyValueConverters, _publishedModelFactory, this);
         }
 
         /// <inheritdoc />
-        public PublishedPropertyType CreatePropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations = ContentVariation.Nothing)
+        public PublishedPropertyType CreatePropertyType(IPublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations = ContentVariation.Nothing)
         {
             return new PublishedPropertyType(contentType, propertyTypeAlias, dataTypeId, true, variations, _propertyValueConverters, _publishedModelFactory, this);
         }

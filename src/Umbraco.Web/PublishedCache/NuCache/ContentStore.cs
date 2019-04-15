@@ -24,8 +24,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ConcurrentDictionary<int, LinkedNode<ContentNode>> _contentNodes;
         private readonly ConcurrentDictionary<int, LinkedNode<object>> _contentRootNodes;
-        private readonly ConcurrentDictionary<int, LinkedNode<PublishedContentType>> _contentTypesById;
-        private readonly ConcurrentDictionary<string, LinkedNode<PublishedContentType>> _contentTypesByAlias;
+        private readonly ConcurrentDictionary<int, LinkedNode<IPublishedContentType>> _contentTypesById;
+        private readonly ConcurrentDictionary<string, LinkedNode<IPublishedContentType>> _contentTypesByAlias;
         private readonly ConcurrentDictionary<Guid, int> _xmap;
 
         private readonly ILogger _logger;
@@ -61,8 +61,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _contentNodes = new ConcurrentDictionary<int, LinkedNode<ContentNode>>();
             _contentRootNodes = new ConcurrentDictionary<int, LinkedNode<object>>();
-            _contentTypesById = new ConcurrentDictionary<int, LinkedNode<PublishedContentType>>();
-            _contentTypesByAlias = new ConcurrentDictionary<string, LinkedNode<PublishedContentType>>(StringComparer.InvariantCultureIgnoreCase);
+            _contentTypesById = new ConcurrentDictionary<int, LinkedNode<IPublishedContentType>>();
+            _contentTypesByAlias = new ConcurrentDictionary<string, LinkedNode<IPublishedContentType>>(StringComparer.InvariantCultureIgnoreCase);
             _xmap = new ConcurrentDictionary<Guid, int>();
 
             _genObjs = new ConcurrentQueue<GenObj>();
@@ -249,7 +249,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Content types
 
-        public void NewContentTypes(IEnumerable<PublishedContentType> types)
+        public void NewContentTypes(IEnumerable<IPublishedContentType> types)
         {
             var lockInfo = new WriteLockInfo();
             try
@@ -268,7 +268,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public void UpdateContentTypes(IEnumerable<PublishedContentType> types)
+        public void UpdateContentTypes(IEnumerable<IPublishedContentType> types)
         {
             var lockInfo = new WriteLockInfo();
             try
@@ -288,7 +288,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     var node = link.Value;
                     if (node == null) continue;
                     var contentTypeId = node.ContentType.Id;
-                    if (index.TryGetValue(contentTypeId, out PublishedContentType contentType) == false) continue;
+                    if (index.TryGetValue(contentTypeId, out var contentType) == false) continue;
                     SetValueLocked(_contentNodes, node.Id, new ContentNode(node, contentType, _publishedSnapshotAccessor, _variationContextAccessor, _umbracoContextAccessor));
                 }
             }
@@ -298,10 +298,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public void UpdateContentTypes(IEnumerable<int> removedIds, IEnumerable<PublishedContentType> refreshedTypes, IEnumerable<ContentNodeKit> kits)
+        public void UpdateContentTypes(IEnumerable<int> removedIds, IEnumerable<IPublishedContentType> refreshedTypes, IEnumerable<ContentNodeKit> kits)
         {
             var removedIdsA = removedIds?.ToArray() ?? Array.Empty<int>();
-            var refreshedTypesA = refreshedTypes?.ToArray() ?? Array.Empty<PublishedContentType>();
+            var refreshedTypesA = refreshedTypes?.ToArray() ?? Array.Empty<IPublishedContentType>();
             var refreshedIdsA = refreshedTypesA.Select(x => x.Id).ToArray();
             kits = kits ?? Array.Empty<ContentNodeKit>();
 
@@ -377,7 +377,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public void UpdateDataTypes(IEnumerable<int> dataTypeIds, Func<int, PublishedContentType> getContentType)
+        public void UpdateDataTypes(IEnumerable<int> dataTypeIds, Func<int, IPublishedContentType> getContentType)
         {
             var lockInfo = new WriteLockInfo();
             try
@@ -434,7 +434,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return false;
 
             // unknown = bad
-            if (_contentTypesById.TryGetValue(kit.ContentTypeId, out LinkedNode<PublishedContentType> link) == false || link.Value == null)
+            if (_contentTypesById.TryGetValue(kit.ContentTypeId, out var link) == false || link.Value == null)
                 return false;
 
             // check whether parent is published
@@ -830,12 +830,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return has == false;
         }
 
-        public PublishedContentType GetContentType(int id, long gen)
+        public IPublishedContentType GetContentType(int id, long gen)
         {
             return GetValue(_contentTypesById, id, gen);
         }
 
-        public PublishedContentType GetContentType(string alias, long gen)
+        public IPublishedContentType GetContentType(string alias, long gen)
         {
             return GetValue(_contentTypesByAlias, alias, gen);
         }
@@ -1151,14 +1151,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return _store.GetAll(_gen);
             }
 
-            public PublishedContentType GetContentType(int id)
+            public IPublishedContentType GetContentType(int id)
             {
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
                 return _store.GetContentType(id, _gen);
             }
 
-            public PublishedContentType GetContentType(string alias)
+            public IPublishedContentType GetContentType(string alias)
             {
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);

@@ -30,7 +30,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public static IPublishedContent Create(
             IMember member,
-            PublishedContentType contentType,
+            IPublishedContentType contentType,
             bool previewing,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
@@ -53,7 +53,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor).CreateModel();
         }
 
-        private static Dictionary<string, PropertyData[]> GetPropertyValues(PublishedContentType contentType, IMember member)
+        private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
         {
             // see node in PublishedSnapshotService
             // we do not (want to) support ConvertDbToXml/String
@@ -91,7 +91,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return properties;
         }
 
-        private static void AddIf(PublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object value)
+        private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object value)
         {
             var propertyType = contentType.GetPropertyType(alias);
             if (propertyType == null || propertyType.IsUserProperty) return;

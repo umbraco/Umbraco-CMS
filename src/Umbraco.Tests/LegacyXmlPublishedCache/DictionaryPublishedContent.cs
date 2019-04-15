@@ -194,7 +194,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _getProperty(this, alias);
         }
 
-        public override PublishedContentType ContentType => _contentType;
+        public override IPublishedContentType ContentType => _contentType;
 
         private readonly List<string> _keysAdded = new List<string>();
         private int _id;
@@ -215,7 +215,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         //private Guid _version;
         private int _level;
         private readonly ICollection<IPublishedProperty> _properties;
-        private readonly PublishedContentType _contentType;
+        private readonly IPublishedContentType _contentType;
 
         private void ValidateAndSetProperty(IReadOnlyDictionary<string, string> valueDictionary, Action<string> setProperty, params string[] potentialKeys)
         {

@@ -243,7 +243,7 @@ namespace Umbraco.Tests.PublishedContent
                 return property;
             }
 
-            public PublishedContentType ContentType { get; set; }
+            public IPublishedContentType ContentType { get; set; }
         }
     }
 }

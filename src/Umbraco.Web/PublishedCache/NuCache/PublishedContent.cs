@@ -166,7 +166,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Content Type
 
         /// <inheritdoc />
-        public override PublishedContentType ContentType => _contentNode.ContentType;
+        public override IPublishedContentType ContentType => _contentNode.ContentType;
 
         #endregion
 

@@ -138,12 +138,12 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #region Content types
 
-        public PublishedContentType GetContentType(int id)
+        public IPublishedContentType GetContentType(int id)
         {
             return _contentTypeCache.Get(PublishedItemType.Member, id);
         }
 
-        public PublishedContentType GetContentType(string alias)
+        public IPublishedContentType GetContentType(string alias)
         {
             return _contentTypeCache.Get(PublishedItemType.Member, alias);
         }

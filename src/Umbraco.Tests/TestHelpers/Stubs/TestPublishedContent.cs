@@ -7,7 +7,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     internal class TestPublishedContent : PublishedElement, IPublishedContent
     {
-        public TestPublishedContent(PublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfo> cultures = null)
+        public TestPublishedContent(IPublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfo> cultures = null)
             : base(contentType, key, values, previewing)
         {
             Id = id;

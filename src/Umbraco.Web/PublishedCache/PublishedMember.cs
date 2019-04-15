@@ -17,11 +17,11 @@ namespace Umbraco.Web.PublishedCache
         private readonly IMember _member;
         private readonly IMembershipUser _membershipUser;
         private readonly IPublishedProperty[] _properties;
-        private readonly PublishedContentType _publishedMemberType;
+        private readonly IPublishedContentType _publishedMemberType;
 
         public PublishedMember(
             IMember member,
-            PublishedContentType publishedMemberType,
+            IPublishedContentType publishedMemberType,
             IUmbracoContextAccessor umbracoContextAccessor)
             :base(umbracoContextAccessor)
         {
@@ -126,7 +126,7 @@ namespace Umbraco.Web.PublishedCache
             properties.Add(property);
         }
 
-        public override PublishedContentType ContentType => _publishedMemberType;
+        public override IPublishedContentType ContentType => _publishedMemberType;
 
         public override int Id => _member.Id;
 

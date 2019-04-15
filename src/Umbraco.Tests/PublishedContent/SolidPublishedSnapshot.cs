@@ -137,17 +137,17 @@ namespace Umbraco.Tests.PublishedContent
             return _content.Count > 0;
         }
 
-        public override PublishedContentType GetContentType(int id)
+        public override IPublishedContentType GetContentType(int id)
         {
             throw new NotImplementedException();
         }
 
-        public override PublishedContentType GetContentType(string alias)
+        public override IPublishedContentType GetContentType(string alias)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
+        public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {
             throw new NotImplementedException();
         }
@@ -157,7 +157,7 @@ namespace Umbraco.Tests.PublishedContent
     {
         #region Constructor
 
-        public SolidPublishedContent(PublishedContentType contentType)
+        public SolidPublishedContent(IPublishedContentType contentType)
         {
             // initialize boring stuff
             TemplateId = 0;
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.PublishedContent
 
         #region ContentType
 
-        public PublishedContentType ContentType { get; private set; }
+        public IPublishedContentType ContentType { get; private set; }
 
         #endregion
 

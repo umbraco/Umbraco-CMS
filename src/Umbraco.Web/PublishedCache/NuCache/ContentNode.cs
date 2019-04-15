@@ -10,7 +10,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class ContentNode
     {
         // special ctor with no content data - for members
-        public ContentNode(int id, Guid uid, PublishedContentType contentType,
+        public ContentNode(int id, Guid uid, IPublishedContentType contentType,
             int level, string path, int sortOrder,
             int parentContentId,
             DateTime createDate, int creatorId)
@@ -28,7 +28,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ChildContentIds = new List<int>();
         }
 
-        public ContentNode(int id, Guid uid, PublishedContentType contentType,
+        public ContentNode(int id, Guid uid, IPublishedContentType contentType,
             int level, string path, int sortOrder,
             int parentContentId,
             DateTime createDate, int creatorId,
@@ -60,7 +60,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // two-phase ctor, phase 2
-        public void SetContentTypeAndData(PublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor)
+        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor)
         {
             ContentType = contentType;
 
@@ -109,7 +109,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // clone with new content type
-        public ContentNode(ContentNode origin, PublishedContentType contentType, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor)
+        public ContentNode(ContentNode origin, IPublishedContentType contentType, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor)
         {
             Id = origin.Id;
             Uid = origin.Uid;
@@ -136,7 +136,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // keep this as small as possible
         public readonly int Id;
         public readonly Guid Uid;
-        public PublishedContentType ContentType;
+        public IPublishedContentType ContentType;
         public readonly int Level;
         public readonly string Path;
         public readonly int SortOrder;

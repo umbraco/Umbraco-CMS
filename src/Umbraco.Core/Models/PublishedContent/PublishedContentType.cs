@@ -5,11 +5,11 @@ using System.Linq;
 namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// Represents an <see cref="IPublishedContent"/> type.
+    /// Represents an <see cref="IPublishedElement"/> type.
     /// </summary>
     /// <remarks>Instances of the <see cref="PublishedContentType"/> class are immutable, ie
     /// if the content type changes, then a new class needs to be created.</remarks>
-    public class PublishedContentType
+    public class PublishedContentType : IPublishedContentType
     {
         private readonly PublishedPropertyType[] _propertyTypes;
 
@@ -103,44 +103,29 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Content type
 
-        /// <summary>
-        /// Gets the content type identifier.
-        /// </summary>
+        /// <inheritdoc />
         public int Id { get; }
 
-        /// <summary>
-        /// Gets the content type alias.
-        /// </summary>
+        /// <inheritdoc />
         public string Alias { get; }
 
-        /// <summary>
-        /// Gets the content item type.
-        /// </summary>
+        /// <inheritdoc />
         public PublishedItemType ItemType { get; }
 
-        /// <summary>
-        /// Gets the aliases of the content types participating in the composition.
-        /// </summary>
+        /// <inheritdoc />
         public HashSet<string> CompositionAliases { get; }
 
-        /// <summary>
-        /// Gets the content variations of the content type.
-        /// </summary>
+        /// <inheritdoc />
         public ContentVariation Variations { get; }
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Gets the content type properties.
-        /// </summary>
+        /// <inheritdoc />
         public IEnumerable<PublishedPropertyType> PropertyTypes => _propertyTypes;
 
-        /// <summary>
-        /// Gets a property type index.
-        /// </summary>
-        /// <remarks>The alias is case-insensitive. This is the only place where alias strings are compared.</remarks>
+        /// <inheritdoc />
         public int GetPropertyIndex(string alias)
         {
             if (_indexes.TryGetValue(alias, out var index)) return index; // fastest
@@ -150,9 +135,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         // virtual for unit tests
         // TODO: explain why
-        /// <summary>
-        /// Gets a property type.
-        /// </summary>
+        /// <inheritdoc />
         public virtual PublishedPropertyType GetPropertyType(string alias)
         {
             var index = GetPropertyIndex(alias);
@@ -161,17 +144,13 @@ namespace Umbraco.Core.Models.PublishedContent
 
         // virtual for unit tests
         // TODO: explain why
-        /// <summary>
-        /// Gets a property type.
-        /// </summary>
+        /// <inheritdoc />
         public virtual PublishedPropertyType GetPropertyType(int index)
         {
             return index >= 0 && index < _propertyTypes.Length ? _propertyTypes[index] : null;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this content type is for an element.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsElement { get; }
 
         #endregion

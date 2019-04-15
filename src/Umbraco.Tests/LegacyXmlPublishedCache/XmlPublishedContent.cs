@@ -53,7 +53,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private IEnumerable<IPublishedContent> _children = Enumerable.Empty<IPublishedContent>();
         private IPublishedContent _parent;
 
-        private PublishedContentType _contentType;
+        private IPublishedContentType _contentType;
         private Dictionary<string, IPublishedProperty> _properties;
 
         private int _id;
@@ -254,7 +254,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
-        public override PublishedContentType ContentType
+        public override IPublishedContentType ContentType
         {
             get
             {
@@ -308,8 +308,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
             out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
             out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,
-            out PublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties,
-            Func<PublishedItemType, string, PublishedContentType> getPublishedContentType)
+            out IPublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties,
+            Func<PublishedItemType, string, IPublishedContentType> getPublishedContentType)
         {
             //initialize the out params with defaults:
             writerName = null;

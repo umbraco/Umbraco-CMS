@@ -218,7 +218,7 @@ namespace Umbraco.Web.Macros
                 Parent = new PagePublishedContent(_inner.ParentId);
             }
 
-            public PublishedContentType ContentType { get; }
+            public IPublishedContentType ContentType { get; }
 
             public int Id { get; }
 

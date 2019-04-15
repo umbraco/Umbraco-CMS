@@ -930,7 +930,7 @@ namespace Umbraco.Tests.PublishedContent
 
         class ImageWithLegendModel : PublishedElement
         {
-            public ImageWithLegendModel(PublishedContentType contentType, Guid fragmentKey, Dictionary<string, object> values, bool previewing)
+            public ImageWithLegendModel(IPublishedContentType contentType, Guid fragmentKey, Dictionary<string, object> values, bool previewing)
                 : base(contentType, fragmentKey, values, previewing)
             { }
 

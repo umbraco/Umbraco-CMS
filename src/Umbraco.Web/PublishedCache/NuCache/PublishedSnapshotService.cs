@@ -898,11 +898,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Content Types
 
-        private IEnumerable<PublishedContentType> CreateContentTypes(PublishedItemType itemType, int[] ids)
+        private IEnumerable<IPublishedContentType> CreateContentTypes(PublishedItemType itemType, int[] ids)
         {
             // XxxTypeService.GetAll(empty) returns everything!
             if (ids.Length == 0)
-                return Enumerable.Empty<PublishedContentType>();
+                return Enumerable.Empty<IPublishedContentType>();
 
             IEnumerable<IContentTypeComposition> contentTypes;
             switch (itemType)
@@ -925,7 +925,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x));
         }
 
-        private PublishedContentType CreateContentType(PublishedItemType itemType, int id)
+        private IPublishedContentType CreateContentType(PublishedItemType itemType, int id)
         {
             IContentTypeComposition contentType;
             switch (itemType)

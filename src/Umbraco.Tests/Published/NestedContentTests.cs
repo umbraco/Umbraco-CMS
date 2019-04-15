@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Published
     [TestFixture]
     public class NestedContentTests
     {
-        private (PublishedContentType, PublishedContentType) CreateContentTypes()
+        private (IPublishedContentType, IPublishedContentType) CreateContentTypes()
         {
             Current.Reset();
 
@@ -250,7 +250,7 @@ namespace Umbraco.Tests.Published
 
         class TestPublishedContent : PublishedContentBase
         {
-            public TestPublishedContent(PublishedContentType contentType, Guid key, IEnumerable<TestPublishedProperty> properties, IUmbracoContextAccessor umbracoContextAccessor): base(umbracoContextAccessor)
+            public TestPublishedContent(IPublishedContentType contentType, Guid key, IEnumerable<TestPublishedProperty> properties, IUmbracoContextAccessor umbracoContextAccessor): base(umbracoContextAccessor)
             {
                 ContentType = contentType;
                 Key = key;
@@ -266,7 +266,7 @@ namespace Umbraco.Tests.Published
             public override bool IsPublished(string culture = null) => true;
             public override IPublishedContent Parent { get; }
             public override IEnumerable<IPublishedContent> Children { get; }
-            public override PublishedContentType ContentType { get; }
+            public override IPublishedContentType ContentType { get; }
             // ReSharper restore UnassignedGetOnlyAutoProperty
 
             // ReSharper disable UnassignedGetOnlyAutoProperty

@@ -88,11 +88,11 @@ namespace Umbraco.Web.PublishedCache
             return HasContent(PreviewDefault);
         }
 
-        public abstract PublishedContentType GetContentType(int id);
+        public abstract IPublishedContentType GetContentType(int id);
 
-        public abstract PublishedContentType GetContentType(string alias);
+        public abstract IPublishedContentType GetContentType(string alias);
 
-        public virtual IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
+        public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {
             // this is probably not super-efficient, but works
             // some cache implementation may want to override it, though

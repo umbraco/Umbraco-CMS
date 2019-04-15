@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models
 
         #region ContentType
 
-        public abstract PublishedContentType ContentType { get; }
+        public abstract IPublishedContentType ContentType { get; }
 
         #endregion
 

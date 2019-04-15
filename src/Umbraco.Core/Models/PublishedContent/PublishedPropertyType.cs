@@ -32,7 +32,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <remarks>
         /// <para>The new published property type belongs to the published content type.</para>
         /// </remarks>
-        public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+        public PublishedPropertyType(IPublishedContentType contentType, PropertyType propertyType, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
             : this(propertyType.Alias, propertyType.DataTypeId, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory)
         {
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>Values are assumed to be consisted and are not checked.</para>
         /// <para>The new published property type belongs to the published content type.</para>
         /// </remarks>
-        public PublishedPropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+        public PublishedPropertyType(IPublishedContentType contentType, string propertyTypeAlias, int dataTypeId, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
             : this(propertyTypeAlias, dataTypeId, isUserProperty, variations, propertyValueConverters, publishedModelFactory, factory)
         {
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the published content type containing the property type.
         /// </summary>
-        public PublishedContentType ContentType { get; internal set; } // internally set by PublishedContentType constructor
+        public IPublishedContentType ContentType { get; internal set; } // internally set by PublishedContentType constructor
 
         /// <summary>
         /// Gets the data type.
