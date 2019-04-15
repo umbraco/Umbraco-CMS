@@ -48,8 +48,8 @@ namespace Umbraco.Web.Compose
             ContentService.Unpublished += (sender, args) => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
 
             //Send notifications for the move/move to recycle bin and restore actions
-            ContentService.Moved += (sender, args)  => ContentServiceMoved(_notifier, sender, args, _actions);
-            ContentService.Trashed += (sender, args)  => ContentServiceMoved(_notifier, sender, args, _actions);
+            ContentService.Moved += (sender, args) => ContentServiceMoved(_notifier, sender, args, _actions);
+            ContentService.Trashed += (sender, args) => ContentServiceMoved(_notifier, sender, args, _actions);
             
             //Send notifications for the copy action
             ContentService.Copied += (sender, args) => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
@@ -109,7 +109,7 @@ namespace Umbraco.Web.Compose
                 .ToArray();
             if(restoredEntities.Any())
             {
-                _notifier.Notify(_actions.GetAction<ActionRestore>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
+                _notifier.Notify(_actions.GetAction<ActionRestore>(), restoredEntities);
             }
         }
 
