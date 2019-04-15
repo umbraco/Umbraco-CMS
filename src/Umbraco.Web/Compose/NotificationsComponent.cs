@@ -41,15 +41,14 @@ namespace Umbraco.Web.Compose
             //Send notifications for the update and created actions
             ContentService.Saved += (sender, args) => ContentServiceSaved(_notifier, sender, args, _actions);
 
-            //Send notifications for the delete action
-            ContentService.Deleted += (sender, args) => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.DeletedEntities.ToArray());
-
             //Send notifications for the unpublish action
             ContentService.Unpublished += (sender, args) => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
 
             //Send notifications for the move/move to recycle bin and restore actions
             ContentService.Moved += (sender, args) => ContentServiceMoved(_notifier, sender, args, _actions);
-            ContentService.Trashed += (sender, args) => ContentServiceMoved(_notifier, sender, args, _actions);
+
+            //Send notifications for the delete action when content is moved to the recycle bin
+            ContentService.Trashed += (sender, args) => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
             
             //Send notifications for the copy action
             ContentService.Copied += (sender, args) => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
