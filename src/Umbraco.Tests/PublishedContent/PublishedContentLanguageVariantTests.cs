@@ -65,17 +65,22 @@ namespace Umbraco.Tests.PublishedContent
             var welcome2Type = factory.CreatePropertyType("welcomeText2", 1, variations: ContentVariation.Culture);
             var nopropType = factory.CreatePropertyType("noprop", 1, variations: ContentVariation.Culture);
 
-            var props = new[]
-                {
-                    prop1Type,
-                    welcomeType,
-                    welcome2Type,
-                    nopropType
-                };
-            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes1(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "prop1", 1, variations: ContentVariation.Culture);
+                yield return factory.CreatePropertyType(contentType, "welcomeText", 1, variations: ContentVariation.Culture);
+                yield return factory.CreatePropertyType(contentType, "welcomeText2", 1, variations: ContentVariation.Culture);
+                yield return factory.CreatePropertyType(contentType, "noprop", 1, variations: ContentVariation.Culture);
+            }
 
-            var prop3Type = factory.CreatePropertyType("prop3", 1, variations: ContentVariation.Culture);
-            var contentType2 = factory.CreateContentType(2, "contentType2", Enumerable.Empty<string>(), new[] { prop3Type });
+            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes1);
+
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes2(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "prop3", 1, variations: ContentVariation.Culture);
+            }
+
+            var contentType2 = factory.CreateContentType(2, "contentType2", Enumerable.Empty<string>(), CreatePropertyTypes2);
 
             var prop1 = new SolidPublishedPropertyWithLanguageVariants
             {
@@ -150,7 +155,7 @@ namespace Umbraco.Tests.PublishedContent
             var prop4 = new SolidPublishedPropertyWithLanguageVariants
             {
                 Alias = "prop3",
-                PropertyType = prop3Type
+                PropertyType = contentType2.GetPropertyType("prop3")
             };
             prop4.SetSourceValue("en-US", "Oxxo", true);
             prop4.SetValue("en-US", "Oxxo", true);

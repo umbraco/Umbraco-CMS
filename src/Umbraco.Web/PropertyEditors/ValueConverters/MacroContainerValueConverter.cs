@@ -28,13 +28,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             _macroRenderer = macroRenderer ?? throw new ArgumentNullException(nameof(macroRenderer));
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.MacroContainer;
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof (IHtmlString);
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
         // NOT thread-safe over a request because it modifies the
@@ -63,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
          }
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();

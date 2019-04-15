@@ -18,7 +18,7 @@
         /// <param name="contentType">The published content type owning the property.</param>
         /// <param name="propertyType">A property type.</param>
         /// <remarks>Is used by <see cref="PublishedContentType"/> constructor to create property types.</remarks>
-        PublishedPropertyType CreatePropertyType(IPublishedContentType contentType, PropertyType propertyType);
+        IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, PropertyType propertyType);
 
         /// <summary>
         /// Creates a published property type.
@@ -28,7 +28,7 @@
         /// <param name="dataTypeId">The datatype identifier.</param>
         /// <param name="variations">The variations.</param>
         /// <remarks>Is used by <see cref="PublishedContentType"/> constructor to create special property types.</remarks>
-        PublishedPropertyType CreatePropertyType(IPublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations);
+        IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations);
 
         /// <summary>
         /// Gets a published datatype.

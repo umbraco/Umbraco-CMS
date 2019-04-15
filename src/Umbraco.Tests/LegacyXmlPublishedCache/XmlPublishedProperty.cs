@@ -50,7 +50,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override object GetXPathValue(string culture = null, string segment = null) { throw new NotImplementedException(); }
 
-        public XmlPublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing, XmlNode propertyXmlData)
+        public XmlPublishedProperty(IPublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing, XmlNode propertyXmlData)
             : this(propertyType, content, isPreviewing)
         {
             if (propertyXmlData == null)
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _sourceValue = XmlHelper.GetNodeValue(propertyXmlData);
         }
 
-        public XmlPublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing, string propertyData)
+        public XmlPublishedProperty(IPublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing, string propertyData)
             : this(propertyType, content, isPreviewing)
         {
             if (propertyData == null)
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _sourceValue = propertyData;
         }
 
-        public XmlPublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing)
+        public XmlPublishedProperty(IPublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing)
             : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
         {
             _sourceValue = string.Empty;

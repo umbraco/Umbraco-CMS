@@ -19,8 +19,8 @@ namespace Umbraco.Web.Models
         /// and taking values from the collection of Property.</returns>
         /// <remarks>Ensures that all conversions took place correctly.</remarks>
         internal static IEnumerable<IPublishedProperty> MapProperties(
-            IEnumerable<PublishedPropertyType> propertyTypes, IEnumerable<Property> properties,
-            Func<PublishedPropertyType, object, IPublishedProperty> map)
+            IEnumerable<IPublishedPropertyType> propertyTypes, IEnumerable<Property> properties,
+            Func<IPublishedPropertyType, object, IPublishedProperty> map)
         {
             var propertyEditors = Current.PropertyEditors;
             var dataTypeService = Current.Services.DataTypeService;

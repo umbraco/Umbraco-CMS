@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -62,18 +63,19 @@ namespace Umbraco.Tests.PublishedContent
             // when they are requested, but we must declare those that we
             // explicitely want to be here...
 
-            var propertyTypes = new[]
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
                 // AutoPublishedContentType will auto-generate other properties
-                factory.CreatePropertyType("umbracoNaviHide", 1001),
-                factory.CreatePropertyType("selectedNodes", 1),
-                factory.CreatePropertyType("umbracoUrlAlias", 1),
-                factory.CreatePropertyType("content", 1002),
-                factory.CreatePropertyType("testRecursive", 1),
-            };
+                yield return factory.CreatePropertyType(contentType, "umbracoNaviHide", 1001);
+                yield return factory.CreatePropertyType(contentType, "selectedNodes", 1);
+                yield return factory.CreatePropertyType(contentType, "umbracoUrlAlias", 1);
+                yield return factory.CreatePropertyType(contentType, "content", 1002);
+                yield return factory.CreatePropertyType(contentType, "testRecursive", 1);
+            }
+
             var compositionAliases = new[] { "MyCompositionAlias" };
-            var anythingType = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
-            var homeType = new AutoPublishedContentType(0, "home", compositionAliases, propertyTypes);
+            var anythingType = new AutoPublishedContentType(0, "anything", compositionAliases, CreatePropertyTypes);
+            var homeType = new AutoPublishedContentType(0, "home", compositionAliases, CreatePropertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => alias.InvariantEquals("home") ? homeType : anythingType;
         }
 
@@ -887,8 +889,13 @@ namespace Umbraco.Tests.PublishedContent
         {
             var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
-            var pt = factory.CreatePropertyType("detached", 1003);
-            var ct = factory.CreateContentType(0, "alias", new[] { pt });
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "detached", 1003);
+            }
+
+            var ct = factory.CreateContentType(0, "alias", CreatePropertyTypes);
+            var pt = ct.GetPropertyType("detached");
             var prop = new PublishedElementPropertyBase(pt, null, false, PropertyCacheLevel.None, 5548);
             Assert.IsInstanceOf<int>(prop.GetValue());
             Assert.AreEqual(5548, prop.GetValue());
@@ -906,16 +913,20 @@ namespace Umbraco.Tests.PublishedContent
         {
             var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
-            var pt1 = factory.CreatePropertyType("legend", 1004);
-            var pt2 = factory.CreatePropertyType("image", 1005);
-            var pt3 = factory.CreatePropertyType("size", 1003);
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "legend", 1004);
+                yield return factory.CreatePropertyType(contentType, "image", 1005);
+                yield return factory.CreatePropertyType(contentType, "size", 1003);
+            }
+
             const string val1 = "boom bam";
             const int val2 = 0;
             const int val3 = 666;
 
             var guid = Guid.NewGuid();
 
-            var ct = factory.CreateContentType(0, "alias", new[] { pt1, pt2, pt3 });
+            var ct = factory.CreateContentType(0, "alias", CreatePropertyTypes);
 
             var c = new ImageWithLegendModel(ct, guid, new Dictionary<string, object>
             {

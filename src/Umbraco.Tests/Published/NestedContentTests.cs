@@ -125,13 +125,24 @@ namespace Umbraco.Tests.Published
 
             var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, dataTypeService);
 
-            var propertyType1 = factory.CreatePropertyType("property1", 1);
-            var propertyType2 = factory.CreatePropertyType("property2", 2);
-            var propertyTypeN1 = factory.CreatePropertyType("propertyN1", 3);
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes1(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "property1", 1);
+            }
 
-            var contentType1 = factory.CreateContentType(1, "content1", new[] { propertyType1 });
-            var contentType2 = factory.CreateContentType(2, "content2", new[] { propertyType2 });
-            var contentTypeN1 = factory.CreateContentType(2, "contentN1", new[] { propertyTypeN1 }, isElement: true);
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes2(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "property2", 2);
+            }
+
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypesN1(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "propertyN1", 3);
+            }
+
+            var contentType1 = factory.CreateContentType(1, "content1", CreatePropertyTypes1);
+            var contentType2 = factory.CreateContentType(2, "content2", CreatePropertyTypes2);
+            var contentTypeN1 = factory.CreateContentType(2, "contentN1", CreatePropertyTypesN1, isElement: true);
 
             // mocked content cache returns content types
             contentCache
@@ -219,14 +230,14 @@ namespace Umbraco.Tests.Published
             private readonly bool _hasValue;
             private IPublishedElement _owner;
 
-            public TestPublishedProperty(PublishedPropertyType propertyType, object source)
+            public TestPublishedProperty(IPublishedPropertyType propertyType, object source)
                 : base(propertyType, PropertyCacheLevel.Element) // initial reference cache level always is .Content
             {
                 _sourceValue = source;
                 _hasValue = source != null && (!(source is string ssource) || !string.IsNullOrWhiteSpace(ssource));
             }
 
-            public TestPublishedProperty(PublishedPropertyType propertyType, IPublishedElement element, bool preview, PropertyCacheLevel referenceCacheLevel, object source)
+            public TestPublishedProperty(IPublishedPropertyType propertyType, IPublishedElement element, bool preview, PropertyCacheLevel referenceCacheLevel, object source)
                 : base(propertyType, referenceCacheLevel)
             {
                 _sourceValue = source;

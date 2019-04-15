@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models.PublishedContent;
@@ -15,13 +16,14 @@ namespace Umbraco.Tests.PublishedContent
     {
         internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
         {
-            var props = new[]
-                {
-                    factory.CreatePropertyType("prop1", 1),
-                };
-            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
-            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
-            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "prop1", 1);
+            }
+
+            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes);
+            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), CreatePropertyTypes);
+            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), CreatePropertyTypes);
 
             cache.Add(new SolidPublishedContent(contentType1)
             {

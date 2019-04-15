@@ -23,20 +23,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType) => Constants.PropertyEditors.Aliases.MultiUrlPicker.Equals(propertyType.EditorAlias);
+        public override bool IsConverter(IPublishedPropertyType propertyType) => Constants.PropertyEditors.Aliases.MultiUrlPicker.Equals(propertyType.EditorAlias);
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType) =>
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType) =>
             propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().MaxNumber == 1 ?
                 typeof(Link) :
                 typeof(IEnumerable<Link>);
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
         public override bool? IsValue(object value, PropertyValueLevel level) => value?.ToString() != "[]";
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview) => source?.ToString();
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview) => source?.ToString();
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             using (_proflog.DebugDuration<MultiUrlPickerValueConverter>($"ConvertPropertyToLinks ({propertyType.DataType.Id})"))
             {

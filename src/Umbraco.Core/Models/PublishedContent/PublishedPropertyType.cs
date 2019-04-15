@@ -10,10 +10,8 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     /// <remarks>Instances of the <see cref="PublishedPropertyType"/> class are immutable, ie
     /// if the property type changes, then a new class needs to be created.</remarks>
-    public class PublishedPropertyType
+    public class PublishedPropertyType : IPublishedPropertyType
     {
-        // TODO: API design review, should this be an interface?
-
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly PropertyValueConverterCollection _propertyValueConverters;
         private readonly object _locker = new object();
@@ -38,6 +36,7 @@ namespace Umbraco.Core.Models.PublishedContent
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
+        // fixme should be internal?
         /// <summary>
         /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
@@ -51,6 +50,7 @@ namespace Umbraco.Core.Models.PublishedContent
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
+        // fixme should be internal?
         /// <summary>
         /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
@@ -75,37 +75,22 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Property type
 
-        /// <summary>
-        /// Gets the published content type containing the property type.
-        /// </summary>
+        /// <inheritdoc />
         public IPublishedContentType ContentType { get; internal set; } // internally set by PublishedContentType constructor
 
-        /// <summary>
-        /// Gets the data type.
-        /// </summary>
+        /// <inheritdoc />
         public PublishedDataType DataType { get; }
 
-        /// <summary>
-        /// Gets property type alias.
-        /// </summary>
+        /// <inheritdoc />
         public string Alias { get; }
 
-        /// <summary>
-        /// Gets the property editor alias.
-        /// </summary>
+        /// <inheritdoc />
         public string EditorAlias => DataType.EditorAlias;
 
-        /// <summary>
-        /// Gets a value indicating whether the property is a user content property.
-        /// </summary>
-        /// <remarks>A non-user content property is a property that has been added to a
-        /// published content type by Umbraco but does not corresponds to a user-defined
-        /// published property.</remarks>
+        /// <inheritdoc />
         public bool IsUserProperty { get; }
 
-        /// <summary>
-        /// Gets the content variations of the property type.
-        /// </summary>
+        /// <inheritdoc />
         public ContentVariation Variations { get; }
 
         #endregion
@@ -193,10 +178,7 @@ namespace Umbraco.Core.Models.PublishedContent
             _modelClrType = _converter == null ? typeof (object) : _converter.GetPropertyValueType(this);
         }
 
-        /// <summary>
-        /// Determines whether a value is an actual value, or not a value.
-        /// </summary>
-        /// <remarks>Used by property.HasValue and, for instance, in fallback scenarios.</remarks>
+        /// <inheritdoc />
         public bool? IsValue(object value, PropertyValueLevel level)
         {
             if (!_initialized) Initialize();
@@ -209,9 +191,7 @@ namespace Umbraco.Core.Models.PublishedContent
             return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
         }
 
-        /// <summary>
-        /// Gets the property cache level.
-        /// </summary>
+        /// <inheritdoc />
         public PropertyCacheLevel CacheLevel
         {
             get
@@ -221,13 +201,7 @@ namespace Umbraco.Core.Models.PublishedContent
             }
         }
 
-        /// <summary>
-        /// Converts the source value into the intermediate value.
-        /// </summary>
-        /// <param name="owner">The published element owning the property.</param>
-        /// <param name="source">The source value.</param>
-        /// <param name="preview">A value indicating whether content should be considered draft.</param>
-        /// <returns>The intermediate value.</returns>
+        /// <inheritdoc />
         public object ConvertSourceToInter(IPublishedElement owner, object source, bool preview)
         {
             if (!_initialized) Initialize();
@@ -238,14 +212,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 : source;
         }
 
-        /// <summary>
-        /// Converts the intermediate value into the object value.
-        /// </summary>
-        /// <param name="owner">The published element owning the property.</param>
-        /// <param name="referenceCacheLevel">The reference cache level.</param>
-        /// <param name="inter">The intermediate value.</param>
-        /// <param name="preview">A value indicating whether content should be considered draft.</param>
-        /// <returns>The object value.</returns>
+        /// <inheritdoc />
         public object ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             if (!_initialized) Initialize();
@@ -256,17 +223,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 : inter;
         }
 
-        /// <summary>
-        /// Converts the intermediate value into the XPath value.
-        /// </summary>
-        /// <param name="owner">The published element owning the property.</param>
-        /// <param name="referenceCacheLevel">The reference cache level.</param>
-        /// <param name="inter">The intermediate value.</param>
-        /// <param name="preview">A value indicating whether content should be considered draft.</param>
-        /// <returns>The XPath value.</returns>
-        /// <remarks>
-        /// <para>The XPath value can be either a string or an XPathNavigator.</para>
-        /// </remarks>
+        /// <inheritdoc />
         public object ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             if (!_initialized) Initialize();
@@ -282,13 +239,7 @@ namespace Umbraco.Core.Models.PublishedContent
             return inter.ToString().Trim();
         }
 
-        /// <summary>
-        /// Gets the property model CLR type.
-        /// </summary>
-        /// <remarks>
-        /// <para>The model CLR type may be a <see cref="ModelType"/> type, or may contain <see cref="ModelType"/> types.</para>
-        /// <para>For the actual CLR type, see <see cref="ClrType"/>.</para>
-        /// </remarks>
+        /// <inheritdoc />
         public Type ModelClrType
         {
             get
@@ -298,14 +249,7 @@ namespace Umbraco.Core.Models.PublishedContent
             }
         }
 
-        /// <summary>
-        /// Gets the property CLR type.
-        /// </summary>
-        /// <remarks>
-        /// <para>Returns the actual CLR type which does not contain <see cref="ModelType"/> types.</para>
-        /// <para>Mapping from <see cref="ModelClrType"/> may throw if some <see cref="ModelType"/> instances
-        /// could not be mapped to actual CLR types.</para>
-        /// </remarks>
+        /// <inheritdoc />
         public Type ClrType
         {
             get

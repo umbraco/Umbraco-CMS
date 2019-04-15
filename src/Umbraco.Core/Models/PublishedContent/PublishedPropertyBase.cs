@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedPropertyBase"/> class.
         /// </summary>
-        protected PublishedPropertyBase(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel)
+        protected PublishedPropertyBase(IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel)
         {
             PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
             ReferenceCacheLevel = referenceCacheLevel;
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the property type.
         /// </summary>
-        public PublishedPropertyType PropertyType { get; }
+        public IPublishedPropertyType PropertyType { get; }
 
         /// <summary>
         /// Gets the property reference cache level.

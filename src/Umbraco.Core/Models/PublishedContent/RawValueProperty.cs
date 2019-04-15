@@ -38,7 +38,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public override object GetXPathValue(string culture = null, string segment = null)
             => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _xpathValue.Value : null;
 
-        public RawValueProperty(PublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)
+        public RawValueProperty(IPublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)
             : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
         {
             if (propertyType.Variations != ContentVariation.Nothing)

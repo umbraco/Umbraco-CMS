@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// if the content type changes, then a new class needs to be created.</remarks>
     public class PublishedContentType : IPublishedContentType
     {
-        private readonly PublishedPropertyType[] _propertyTypes;
+        private readonly IPublishedPropertyType[] _propertyTypes;
 
         // fast alias-to-index xref containing both the raw alias and its lowercase version
         private readonly Dictionary<string, int> _indexes = new Dictionary<string, int>();
@@ -34,11 +34,11 @@ namespace Umbraco.Core.Models.PublishedContent
             InitializeIndexes();
         }
 
+        // fixme should be internal?
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedContentType"/> with specific values.
+        /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
         /// <remarks>
-        /// <para>This constructor is for tests and is not intended to be used directly from application code.</para>
         /// <para>Values are assumed to be consisted and are not checked.</para>
         /// </remarks>
         public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations, bool isElement = false)
@@ -48,6 +48,15 @@ namespace Umbraco.Core.Models.PublishedContent
             foreach (var propertyType in propertyTypesA)
                 propertyType.ContentType = this;
             _propertyTypes = propertyTypesA;
+
+            InitializeIndexes();
+        }
+
+        // fixme
+        public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations, bool isElement = false)
+            : this(id, alias, itemType, compositionAliases, variations, isElement)
+        {
+            _propertyTypes = propertyTypes(this).ToArray();
 
             InitializeIndexes();
         }
@@ -75,7 +84,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // Members have properties such as IMember LastLoginDate which are plain C# properties and not content
         // properties; they are exposed as pseudo content properties, as long as a content property with the
         // same alias does not exist already.
-        private void EnsureMemberProperties(List<PublishedPropertyType> propertyTypes, IPublishedContentTypeFactory factory)
+        private void EnsureMemberProperties(List<IPublishedPropertyType> propertyTypes, IPublishedContentTypeFactory factory)
         {
             var aliases = new HashSet<string>(propertyTypes.Select(x => x.Alias), StringComparer.OrdinalIgnoreCase);
 
@@ -123,7 +132,7 @@ namespace Umbraco.Core.Models.PublishedContent
         #region Properties
 
         /// <inheritdoc />
-        public IEnumerable<PublishedPropertyType> PropertyTypes => _propertyTypes;
+        public IEnumerable<IPublishedPropertyType> PropertyTypes => _propertyTypes;
 
         /// <inheritdoc />
         public int GetPropertyIndex(string alias)
@@ -136,7 +145,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // virtual for unit tests
         // TODO: explain why
         /// <inheritdoc />
-        public virtual PublishedPropertyType GetPropertyType(string alias)
+        public virtual IPublishedPropertyType GetPropertyType(string alias)
         {
             var index = GetPropertyIndex(alias);
             return GetPropertyType(index);
@@ -145,7 +154,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // virtual for unit tests
         // TODO: explain why
         /// <inheritdoc />
-        public virtual PublishedPropertyType GetPropertyType(int index)
+        public virtual IPublishedPropertyType GetPropertyType(int index)
         {
             return index >= 0 && index < _propertyTypes.Length ? _propertyTypes[index] : null;
         }

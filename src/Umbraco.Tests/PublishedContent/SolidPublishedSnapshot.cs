@@ -253,7 +253,7 @@ namespace Umbraco.Tests.PublishedContent
 
     internal class SolidPublishedProperty : IPublishedProperty
     {
-        public PublishedPropertyType PropertyType { get; set; }
+        public IPublishedPropertyType PropertyType { get; set; }
         public string Alias { get; set; }
         public object SolidSourceValue { get; set; }
         public object SolidValue { get; set; }
@@ -397,7 +397,7 @@ namespace Umbraco.Tests.PublishedContent
 
     class AutoPublishedContentType : PublishedContentType
     {
-        private static readonly PublishedPropertyType Default;
+        private static readonly IPublishedPropertyType Default;
 
         static AutoPublishedContentType()
         {
@@ -412,11 +412,19 @@ namespace Umbraco.Tests.PublishedContent
             : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
         { }
 
+        public AutoPublishedContentType(int id, string alias, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
+            : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
+        { }
+
         public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
             : base(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
         { }
 
-        public override PublishedPropertyType GetPropertyType(string alias)
+        public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
+            : base(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
+        { }
+
+        public override IPublishedPropertyType GetPropertyType(string alias)
         {
             var propertyType = base.GetPropertyType(alias);
             return propertyType ?? Default;
