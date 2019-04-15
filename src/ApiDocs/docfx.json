@@ -2,7 +2,8 @@
   "metadata": [
     {
       "src": [
-        {
+        { 
+          "src": "../",
           "files": [
             "Umbraco.Core/Umbraco.Core.csproj",
             "Umbraco.Web/Umbraco.Web.csproj"
@@ -11,12 +12,11 @@
             "**/obj/**",
             "**/bin/**",
             "_site/**"
-          ],
-          "cwd": "../src"
+          ]
         }
       ],
-      "dest": "../apidocs/api",
-      "filter": "../apidocs/docfx.filter.yml"
+      "dest": "api",
+      "filter": "docfx.filter.yml"
     }
   ],
   "build": {
