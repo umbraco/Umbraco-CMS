@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Routing
 {
@@ -23,13 +24,15 @@ namespace Umbraco.Web.Routing
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="routingSettings">Routing settings.</param>
         /// <param name="urlProviders">The list of url providers.</param>
+        /// <param name="mediaUrlProviders">The list of media url providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders, IVariationContextAccessor variationContextAccessor)
+        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
         {
             if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
 
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
+            _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             var provider = UrlProviderMode.Auto;
             Mode = provider;
@@ -45,12 +48,14 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="urlProviders">The list of url providers.</param>
+        /// <param name="mediaUrlProviders">The list of media url providers</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
         /// <param name="mode">An optional provider mode.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, IVariationContextAccessor variationContextAccessor, UrlProviderMode mode = UrlProviderMode.Auto)
+        public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor, UrlProviderMode mode = UrlProviderMode.Auto)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
+            _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor;
 
             Mode = mode;
@@ -58,6 +63,7 @@ namespace Umbraco.Web.Routing
 
         private readonly UmbracoContext _umbracoContext;
         private readonly IEnumerable<IUrlProvider> _urlProviders;
+        private readonly IEnumerable<IMediaUrlProvider> _mediaUrlProviders;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
@@ -247,6 +253,87 @@ namespace Umbraco.Web.Routing
         public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
             return _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current) ?? Enumerable.Empty<UrlInfo>());
+        }
+
+        #endregion
+
+        #region GetMediaUrl
+
+        /// <summary>
+        /// Gets the url of a media item.
+        /// </summary>
+        /// <param name="content">The published content.</param>
+        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="current">The current absolute url.</param>
+        /// <returns>The url for the media.</returns>
+        /// <remarks>
+        /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
+        /// <para>If the media is multi-lingual, gets the url for the specified culture or,
+        /// when no culture is specified, the current culture.</para>
+        /// <para>If the provider is unable to provide a url, it returns <see cref="String.Empty"/>.</para>
+        /// </remarks>
+        public string GetMediaUrl(IPublishedContent content, string propertyAlias, string culture = null, Uri current = null)
+            => GetMediaUrl(content, propertyAlias, Mode, culture, current);
+
+        /// <summary>
+        /// Gets the url of a media item.
+        /// </summary>
+        /// <param name="content">The published content.</param>
+        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
+        /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="current">The current absolute url.</param>
+        /// <returns>The url for the media.</returns>
+        /// <remarks>
+        /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
+        /// <para>If the media is multi-lingual, gets the url for the specified culture or,
+        /// when no culture is specified, the current culture.</para>
+        /// <para>If the provider is unable to provide a url, it returns <see cref="String.Empty"/>.</para>
+        /// </remarks>
+        public string GetMediaUrl(IPublishedContent content, string propertyAlias, bool absolute, string culture = null, Uri current = null)
+            => GetMediaUrl(content, propertyAlias, GetMode(absolute), culture, current);
+        /// <summary>
+        /// Gets the url of a media item.
+        /// </summary>
+        /// <param name="content">The published content.</param>
+        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
+        /// <param name="mode">The url mode.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="current">The current absolute url.</param>
+        /// <returns>The url for the media.</returns>
+        /// <remarks>
+        /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
+        /// <para>If the media is multi-lingual, gets the url for the specified culture or,
+        /// when no culture is specified, the current culture.</para>
+        /// <para>If the provider is unable to provide a url, it returns <see cref="String.Empty"/>.</para>
+        /// </remarks>
+        public string GetMediaUrl(IPublishedContent content,
+            string propertyAlias, UrlProviderMode mode,
+            string culture = null, Uri current = null)
+        {
+            if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
+
+            if (content == null)
+                return "";
+
+            // this the ONLY place where we deal with default culture - IMediaUrlProvider always receive a culture
+            // be nice with tests, assume things can be null, ultimately fall back to invariant
+            // (but only for variant content of course)
+            if (content.ContentType.VariesByCulture())
+            {
+                if (culture == null)
+                    culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+            }
+
+            if (current == null)
+                current = _umbracoContext.CleanedUmbracoUrl;
+
+            var url = _mediaUrlProviders.Select(provider =>
+                    provider.GetMediaUrl(_umbracoContext, content, propertyAlias, mode, culture, current))
+                .FirstOrDefault(u => u != null);
+
+            return url?.Text ?? "";
         }
 
         #endregion

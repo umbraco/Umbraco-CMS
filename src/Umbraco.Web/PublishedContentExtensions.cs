@@ -45,19 +45,56 @@ namespace Umbraco.Web
         public static string UrlAbsolute(this IPublishedContent content)
         {
             // adapted from PublishedContentBase.Url
+
+            if (Current.UmbracoContext == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
+            if (Current.UmbracoContext.UrlProvider == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
+
             switch (content.ItemType)
             {
                 case PublishedItemType.Content:
-                    if (Current.UmbracoContext == null)
-                        throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
-                    if (Current.UmbracoContext.UrlProvider == null)
-                        throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
                     return Current.UmbracoContext.UrlProvider.GetUrl(content.Id, true);
                 case PublishedItemType.Media:
-                    throw new NotSupportedException("AbsoluteUrl is not supported for media types.");
+                    return Current.UmbracoContext.UrlProvider.GetMediaUrl(content, Constants.Conventions.Media.File, true);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        /// <summary>
+        /// Gets the url for the media.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <returns>The url for the content.</returns>
+        /// <remarks>Better use the <c>GetMediaUrl</c> method but that method is here to complement <c>MediaUrlAbsolute()</c>.</remarks>
+        public static string MediaUrl(this IPublishedContent content, string propertyAlias, string culture = null)
+        {
+            if (Current.UmbracoContext == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
+            if (Current.UmbracoContext.UrlProvider == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
+
+            return Current.UmbracoContext.UrlProvider.GetMediaUrl(content, propertyAlias, culture);
+        }
+
+        /// <summary>
+        /// Gets the absolute url for the media.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <returns>The absolute url for the media.</returns>
+        public static string MediaUrlAbsolute(this IPublishedContent content, string propertyAlias, string culture = null)
+        {
+            if (Current.UmbracoContext == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
+            if (Current.UmbracoContext.UrlProvider == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
+
+            return Current.UmbracoContext.UrlProvider.GetMediaUrl(content, propertyAlias, true, culture);
         }
 
         /// <summary>

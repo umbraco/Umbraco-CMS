@@ -380,6 +380,7 @@ namespace Umbraco.Tests.TestHelpers
                     Factory.GetInstance<IGlobalSettings>()),
                 umbracoSettings ?? Factory.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
                 new TestVariationContextAccessor());
 
