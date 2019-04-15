@@ -76,7 +76,6 @@ namespace Umbraco.Core.Composing
 
             // only for debugging, this is verbose
             //_logger.Debug<Composers>(GetComposersReport(requirements));
-            Console.WriteLine(GetComposersReport(requirements));
 
             var sortedComposerTypes = SortComposers(requirements);
 
