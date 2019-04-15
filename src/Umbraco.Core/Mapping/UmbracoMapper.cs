@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,11 +30,16 @@ namespace Umbraco.Core.Mapping
     /// </remarks>
     public class UmbracoMapper
     {
-        private readonly Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors
-            = new Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>>();
+        // note
+        //
+        // the outer dictionary *can* be modified, see GetCtor and GetMap, hence have to be ConcurrentDictionary
+        // the inner dictionaries are never modified and therefore can be simple Dictionary
 
-        private readonly Dictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
-            = new Dictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
+        private readonly ConcurrentDictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors
+            = new ConcurrentDictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>>();
+
+        private readonly ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
+            = new ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoMapper"/> class.
