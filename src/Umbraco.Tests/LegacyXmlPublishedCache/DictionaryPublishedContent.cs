@@ -139,11 +139,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly Func<DictionaryPublishedContent, string, IPublishedProperty> _getProperty;
         private readonly IAppCache _appCache;
 
-        /// <summary>
-        /// Returns 'Media' as the item type
-        /// </summary>
-        public override PublishedItemType ItemType => PublishedItemType.Media;
-
         public override IPublishedContent Parent => _getParent.Value;
 
         public int ParentId { get; private set; }

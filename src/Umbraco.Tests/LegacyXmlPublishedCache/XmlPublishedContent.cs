@@ -91,8 +91,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _properties.TryGetValue(alias, out property) ? property : null;
         }
 
-        public override PublishedItemType ItemType => PublishedItemType.Content;
-
         public override IPublishedContent Parent
         {
             get

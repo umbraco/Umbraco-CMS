@@ -188,8 +188,6 @@ namespace Umbraco.Tests.PublishedContent
 
             public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => default;
 
-            public PublishedItemType ItemType { get; set; }
-
             IPublishedContent IPublishedContent.Parent
             {
                 get { return Parent; }

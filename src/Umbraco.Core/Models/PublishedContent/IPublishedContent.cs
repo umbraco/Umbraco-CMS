@@ -119,11 +119,6 @@ namespace Umbraco.Core.Models.PublishedContent
         IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
 
         /// <summary>
-        /// Gets the type of the content item (document, media...).
-        /// </summary>
-        PublishedItemType ItemType { get; }
-
-        /// <summary>
         /// Gets a value indicating whether the content is draft.
         /// </summary>
         /// <remarks>

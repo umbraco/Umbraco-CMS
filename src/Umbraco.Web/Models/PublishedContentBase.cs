@@ -83,7 +83,7 @@ namespace Umbraco.Web.Models
         /// </remarks>
         public virtual string Url(string culture = null, UrlMode mode = UrlMode.Auto)
         {
-            switch (ItemType)
+            switch (ContentType.ItemType)
             {
                 case PublishedItemType.Content:
                     var umbracoContext = UmbracoContextAccessor.UmbracoContext;
@@ -139,9 +139,6 @@ namespace Umbraco.Web.Models
 
         /// <inheritdoc />
         public abstract IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
-
-        /// <inheritdoc />
-        public abstract PublishedItemType ItemType { get; }
 
         /// <inheritdoc />
         public abstract bool IsDraft(string culture = null);

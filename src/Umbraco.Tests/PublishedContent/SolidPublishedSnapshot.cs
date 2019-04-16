@@ -199,7 +199,6 @@ namespace Umbraco.Tests.PublishedContent
         public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => _urls.TryGetValue(culture ?? "", out var url) ? url : null;
         public void SetUrl(string url, string culture = null) => _urls[culture ?? ""] = url;
 
-        public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
         public bool IsDraft(string culture = null) => false;
         public bool IsPublished(string culture = null) => true;
 

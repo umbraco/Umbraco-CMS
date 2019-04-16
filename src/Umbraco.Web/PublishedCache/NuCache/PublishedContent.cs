@@ -281,9 +281,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <inheritdoc />
-        public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
-
-        /// <inheritdoc />
         public override bool IsDraft(string culture = null)
         {
             // if this is the 'published' published content, nothing can be draft
@@ -421,7 +418,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
             var cache = publishedSnapshot == null
                 ? null
-                : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ItemType != PublishedItemType.Member)
+                : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ContentType.ItemType != PublishedItemType.Member)
                     ? publishedSnapshot.ElementsCache
                     : publishedSnapshot.SnapshotCache);
             return cache;

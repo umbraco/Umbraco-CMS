@@ -103,9 +103,6 @@ namespace Umbraco.Core.Models.PublishedContent
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
 
         /// <inheritdoc />
-        public virtual PublishedItemType ItemType => _content.ItemType;
-
-        /// <inheritdoc />
         public virtual bool IsDraft(string culture = null) => _content.IsDraft(culture);
 
         /// <inheritdoc />

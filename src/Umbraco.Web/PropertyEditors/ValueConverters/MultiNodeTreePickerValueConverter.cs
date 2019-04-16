@@ -99,7 +99,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                     break;
                             }
 
-                            if (multiNodeTreePickerItem != null && multiNodeTreePickerItem.ItemType != PublishedItemType.Element)
+                            if (multiNodeTreePickerItem != null && multiNodeTreePickerItem.ContentType.ItemType != PublishedItemType.Element)
                             {
                                 multiNodeTreePicker.Add(multiNodeTreePickerItem);
                             }

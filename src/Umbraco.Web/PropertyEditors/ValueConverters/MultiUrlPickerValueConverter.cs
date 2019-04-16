@@ -65,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                              _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(preview, dto.Udi.Guid) :
                              _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(preview, dto.Udi.Guid);
 
-                        if (content == null || content.ItemType == PublishedItemType.Element)
+                        if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
                         {
                             continue;
                         }

@@ -279,8 +279,6 @@ namespace Umbraco.Web.Macros
 
             public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => throw new NotSupportedException();
 
-            public PublishedItemType ItemType => PublishedItemType.Content;
-
             public bool IsDraft(string culture = null)
             {
                 throw new NotImplementedException();
