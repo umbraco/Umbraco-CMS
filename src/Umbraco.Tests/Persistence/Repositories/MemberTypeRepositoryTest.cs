@@ -232,6 +232,32 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        /// <summary>
+        /// This demonstates an issue found: https://github.com/umbraco/Umbraco-CMS/issues/4963#issuecomment-483516698
+        /// </summary>
+        [Test]
+        public void Bug_Changing_Built_In_Member_Type_Property_Type_Aliases_Results_In_Exception()
+        {
+            //TODO: Fix this bug and then change this test
+
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+                repository.Save(memberType);
+
+                foreach(var stub in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
+                {
+                    var prop = memberType.PropertyTypes.First(x => x.Alias == stub.Key);
+                    prop.Alias = prop.Alias + "__0000";
+                }
+
+                Assert.Throws<ArgumentException>(() => repository.Save(memberType));
+            }
+        }
+
         [Test]
         public void Built_In_Member_Type_Properties_Are_Automatically_Added_When_Creating()
         {
