@@ -208,8 +208,6 @@ namespace Umbraco.Web
 
         #region Urls
 
-        // fixme do something with these
-
         /// <summary>
         /// Gets the url of a content identified by its identifier.
         /// </summary>
@@ -239,7 +237,7 @@ namespace Umbraco.Web
         /// <param name="mode">The mode.</param>
         /// <param name="culture"></param>
         /// <returns>The url for the content.</returns>
-        public string Url(int contentId, UrlProviderMode mode, string culture = null)
+        public string Url(int contentId, UrlMode mode, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, mode, culture);
         }
@@ -251,7 +249,7 @@ namespace Umbraco.Web
         /// <param name="mode">The mode.</param>
         /// <param name="culture"></param>
         /// <returns>The url for the content.</returns>
-        public string Url(Guid contentId, UrlProviderMode mode, string culture = null)
+        public string Url(Guid contentId, UrlMode mode, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, mode, culture);
         }
@@ -262,6 +260,7 @@ namespace Umbraco.Web
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
         /// <returns>The absolute url for the content.</returns>
+        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(int contentId, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, true, culture);
@@ -273,6 +272,7 @@ namespace Umbraco.Web
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
         /// <returns>The absolute url for the content.</returns>
+        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(Guid contentId, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, true, culture);

@@ -45,7 +45,7 @@ namespace Umbraco.Web.Routing
             }
 
             var content = frequest.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
-            var url = content == null ? "#" : content.GetUrl(redirectUrl.Culture);
+            var url = content == null ? "#" : content.Url(redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
                 _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);

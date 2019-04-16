@@ -124,7 +124,6 @@ namespace Umbraco.Tests.PublishedContent
                 SortOrder = 0,
                 Path = "/1",
                 Level = 1,
-                Url = "/content-1",
                 ParentId = -1,
                 ChildIds = new[] { 2 },
                 Properties = new Collection<IPublishedProperty>
@@ -134,6 +133,7 @@ namespace Umbraco.Tests.PublishedContent
             };
             item1.SetName("Content 1");
             item1.SetUrlSegment("content-1");
+            item1.SetUrl("/content-1");
 
             var item2 = new SolidPublishedContent(contentType1)
             {
@@ -141,7 +141,6 @@ namespace Umbraco.Tests.PublishedContent
                 SortOrder = 0,
                 Path = "/1/2",
                 Level = 2,
-                Url = "/content-1/content-2",
                 ParentId = 1,
                 ChildIds = new int[] { 3 },
                 Properties = new Collection<IPublishedProperty>
@@ -151,6 +150,7 @@ namespace Umbraco.Tests.PublishedContent
             };
             item2.SetName("Content 2");
             item2.SetUrlSegment("content-2");
+            item2.SetUrl("/content-1/content-2");
 
             var prop4 = new SolidPublishedPropertyWithLanguageVariants
             {
@@ -166,7 +166,6 @@ namespace Umbraco.Tests.PublishedContent
                 SortOrder = 0,
                 Path = "/1/2/3",
                 Level = 3,
-                Url = "/content-1/content-2/content-3",
                 ParentId = 2,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -176,6 +175,7 @@ namespace Umbraco.Tests.PublishedContent
             };
             item3.SetName("Content 3");
             item3.SetUrlSegment("content-3");
+            item3.SetUrl("/content-1/content-2/content-3");
 
             item1.Children = new List<IPublishedContent> { item2 };
             item2.Parent = item1;

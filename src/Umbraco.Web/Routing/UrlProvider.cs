@@ -31,10 +31,10 @@ namespace Umbraco.Web.Routing
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            var provider = UrlProviderMode.Auto;
+            var provider = UrlMode.Auto;
             Mode = provider;
 
-            if (Enum<UrlProviderMode>.TryParse(routingSettings.UrlProviderMode, out provider))
+            if (Enum<UrlMode>.TryParse(routingSettings.UrlProviderMode, out provider))
             {
                 Mode = provider;
             }
@@ -47,7 +47,7 @@ namespace Umbraco.Web.Routing
         /// <param name="urlProviders">The list of url providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
         /// <param name="mode">An optional provider mode.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, IVariationContextAccessor variationContextAccessor, UrlProviderMode mode = UrlProviderMode.Auto)
+        public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, IVariationContextAccessor variationContextAccessor, UrlMode mode = UrlMode.Auto)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
@@ -63,13 +63,13 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets or sets the provider url mode.
         /// </summary>
-        public UrlProviderMode Mode { get; set; }
+        public UrlMode Mode { get; set; }
 
         #endregion
 
         #region GetUrl
 
-        private UrlProviderMode GetMode(bool absolute) => absolute ? UrlProviderMode.Absolute : Mode;
+        private UrlMode GetMode(bool absolute) => absolute ? UrlMode.Absolute : Mode;
         private IPublishedContent GetDocument(int id) => _umbracoContext.ContentCache.GetById(id);
         private IPublishedContent GetDocument(Guid id) => _umbracoContext.ContentCache.GetById(id);
 
@@ -131,7 +131,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        public string GetUrl(Guid id, UrlProviderMode mode, string culture = null, Uri current = null)
+        public string GetUrl(Guid id, UrlMode mode, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        public string GetUrl(int id, UrlProviderMode mode, string culture = null, Uri current = null)
+        public string GetUrl(int id, UrlMode mode, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Umbraco.Web.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(IPublishedContent content, UrlProviderMode mode, string culture = null, Uri current = null)
+        public string GetUrl(IPublishedContent content, UrlMode mode, string culture = null, Uri current = null)
         {
             if (content == null || content.ItemType == PublishedItemType.Element)
                 return "#";

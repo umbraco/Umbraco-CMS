@@ -146,7 +146,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             umbracoContextAccessor.UmbracoContext = umbCtx;
 
             var urlHelper = new Mock<IUrlProvider>();
-            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
+            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/hello/world/1234"));
 
             var membershipHelper = new MembershipHelper(umbCtx.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>());

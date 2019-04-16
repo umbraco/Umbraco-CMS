@@ -31,7 +31,6 @@ namespace Umbraco.Tests.PublishedContent
                 SortOrder = 0,
                 Path = "/1",
                 Level = 1,
-                Url = "/content-1",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -47,6 +46,7 @@ namespace Umbraco.Tests.PublishedContent
             };
             content.SetName("Content 1");
             content.SetUrlSegment("content-1");
+            content.SetUrl("/content-1");
             cache.Add(content);
 
             content = new SolidPublishedContent(contentType2)
@@ -55,7 +55,6 @@ namespace Umbraco.Tests.PublishedContent
                 SortOrder = 1,
                 Path = "/2",
                 Level = 1,
-                Url = "/content-2",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -71,6 +70,7 @@ namespace Umbraco.Tests.PublishedContent
             };
             content.SetName("Content 2");
             content.SetUrlSegment("content-2");
+            content.SetUrl("/content-2");
             cache.Add(content);
 
             content = new SolidPublishedContent(contentType2Sub)
@@ -79,7 +79,6 @@ namespace Umbraco.Tests.PublishedContent
                 SortOrder = 2,
                 Path = "/3",
                 Level = 1,
-                Url = "/content-2sub",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -95,6 +94,7 @@ namespace Umbraco.Tests.PublishedContent
             };
             content.SetName("Content 2Sub");
             content.SetUrlSegment("content-2sub");
+            content.SetUrl("/content-2sub");
             cache.Add(content);
         }
 

@@ -69,7 +69,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         {
                             continue;
                         }
-                        url = content.Url;
+                        url = content.Url();
                     }
 
                     links.Add(

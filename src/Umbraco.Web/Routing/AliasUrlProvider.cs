@@ -31,7 +31,7 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
+        public UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             return null; // we have nothing to say
         }

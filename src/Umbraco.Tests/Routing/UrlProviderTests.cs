@@ -314,7 +314,7 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual("/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
 
-            umbracoContext.UrlProvider.Mode = UrlProviderMode.Absolute;
+            umbracoContext.UrlProvider.Mode = UrlMode.Absolute;
             Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
         }
 
@@ -335,7 +335,7 @@ namespace Umbraco.Tests.Routing
             
             Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
 
-            umbracoContext.UrlProvider.Mode = UrlProviderMode.Absolute;
+            umbracoContext.UrlProvider.Mode = UrlMode.Absolute;
 
             Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
         }

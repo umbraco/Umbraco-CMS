@@ -29,7 +29,7 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public virtual UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
+        public virtual UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
 
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
             return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
         }
 
-        internal UrlInfo GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture)
+        internal UrlInfo GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlMode mode, string culture)
         {
             if (string.IsNullOrWhiteSpace(route))
             {
@@ -121,7 +121,7 @@ namespace Umbraco.Web.Routing
 
         #region Utilities
 
-        Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, UrlProviderMode mode)
+        Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, UrlMode mode)
         {
             Uri uri;
 
@@ -130,15 +130,15 @@ namespace Umbraco.Web.Routing
             if (domainUri == null) // no domain was found
             {
                 if (current == null)
-                    mode = UrlProviderMode.Relative; // best we can do
+                    mode = UrlMode.Relative; // best we can do
 
                 switch (mode)
                 {
-                    case UrlProviderMode.Absolute:
+                    case UrlMode.Absolute:
                         uri = new Uri(current.GetLeftPart(UriPartial.Authority) + path);
                         break;
-                    case UrlProviderMode.Relative:
-                    case UrlProviderMode.Auto:
+                    case UrlMode.Relative:
+                    case UrlMode.Auto:
                         uri = new Uri(path, UriKind.Relative);
                         break;
                     default:
@@ -147,21 +147,21 @@ namespace Umbraco.Web.Routing
             }
             else // a domain was found
             {
-                if (mode == UrlProviderMode.Auto)
+                if (mode == UrlMode.Auto)
                 {
                     //this check is a little tricky, we can't just compare domains
                     if (current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
-                        mode = UrlProviderMode.Relative;
+                        mode = UrlMode.Relative;
                     else
-                        mode = UrlProviderMode.Absolute;
+                        mode = UrlMode.Absolute;
                 }
 
                 switch (mode)
                 {
-                    case UrlProviderMode.Absolute:
+                    case UrlMode.Absolute:
                         uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
                         break;
-                    case UrlProviderMode.Relative:
+                    case UrlMode.Relative:
                         uri = new Uri(CombinePaths(domainUri.Uri.AbsolutePath, path), UriKind.Relative);
                         break;
                     default:

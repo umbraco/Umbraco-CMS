@@ -49,8 +49,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public DateTime UpdateDate { get; set; }
         public Guid Version { get; set; }
         public int Level { get; set; }
-        public string Url { get; set; }
-        public string GetUrl(string culture = null) => throw new NotSupportedException();
+        public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => throw new NotSupportedException();
         public PublishedItemType ItemType => ContentType.ItemType;
         public bool IsDraft(string culture = null) => false;
         public bool IsPublished(string culture = null) => true;

@@ -77,14 +77,11 @@ namespace Umbraco.Web.Models
         public abstract DateTime UpdateDate { get; }
 
         /// <inheritdoc />
-        public virtual string Url => GetUrl();
-
-        /// <inheritdoc />
         /// <remarks>
         /// The url of documents are computed by the document url providers. The url of medias are, at the moment,
         /// computed here from the 'umbracoFile' property -- but we should move to media url providers at some point.
         /// </remarks>
-        public virtual string GetUrl(string culture = null) // TODO: consider .GetCulture("fr-FR").Url
+        public virtual string Url(string culture = null, UrlMode mode = UrlMode.Auto)
         {
             switch (ItemType)
             {
@@ -96,9 +93,12 @@ namespace Umbraco.Web.Models
                     if (umbracoContext.UrlProvider == null)
                         throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.UrlProvider is null.");
 
-                    return umbracoContext.UrlProvider.GetUrl(this, culture);
+                    return umbracoContext.UrlProvider.GetUrl(this, mode, culture);
 
                 case PublishedItemType.Media:
+                    if (mode == UrlMode.Absolute)
+                        throw new NotSupportedException("Absolute urls are not supported for media items.");
+
                     var prop = GetProperty(Constants.Conventions.Media.File);
                     if (prop?.GetValue() == null)
                     {

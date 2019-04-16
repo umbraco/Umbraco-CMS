@@ -24,65 +24,6 @@ namespace Umbraco.Web
         private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
         private static IPublishedSnapshot PublishedSnapshot => Current.PublishedSnapshot;
 
-        #region Urls
-
-        /// <summary>
-        /// Gets the url for the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The url for the content.</returns>
-        /// <remarks>Better use the <c>Url</c> property but that method is here to complement <c>UrlAbsolute()</c>.</remarks>
-        public static string Url(this IPublishedContent content)
-        {
-            return content.Url;
-        }
-
-        /// <summary>
-        /// Gets the absolute url for the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The absolute url for the content.</returns>
-        public static string UrlAbsolute(this IPublishedContent content)
-        {
-            // adapted from PublishedContentBase.Url
-            switch (content.ItemType)
-            {
-                case PublishedItemType.Content:
-                    if (Current.UmbracoContext == null)
-                        throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
-                    if (Current.UmbracoContext.UrlProvider == null)
-                        throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
-                    return Current.UmbracoContext.UrlProvider.GetUrl(content.Id, true);
-                case PublishedItemType.Media:
-                    throw new NotSupportedException("AbsoluteUrl is not supported for media types.");
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
-        {
-            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates)
-                return content.TemplateId == templateId;
-
-            if (content.TemplateId == templateId || !Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates)
-                return true;
-
-            var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
-            if (publishedContentContentType == null)
-                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
-
-            return publishedContentContentType.IsAllowedTemplate(templateId);
-
-        }
-        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
-        {
-            var template = Current.Services.FileService.GetTemplate(templateAlias);
-            return template != null && content.IsAllowedTemplate(template.Id);
-        }
-
-        #endregion
-
         #region IsComposedOf
 
         /// <summary>
@@ -114,6 +55,27 @@ namespace Umbraco.Web
 
             var template = Current.Services.FileService.GetTemplate(content.TemplateId.Value);
             return template == null ? string.Empty : template.Alias;
+        }
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
+        {
+            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates)
+                return content.TemplateId == templateId;
+
+            if (content.TemplateId == templateId || !Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates)
+                return true;
+
+            var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
+            if (publishedContentContentType == null)
+                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+            return publishedContentContentType.IsAllowedTemplate(templateId);
+
+        }
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
+        {
+            var template = Current.Services.FileService.GetTemplate(templateAlias);
+            return template != null && content.IsAllowedTemplate(template.Id);
         }
 
         #endregion
@@ -1059,7 +1021,7 @@ namespace Umbraco.Web
                                     { "UpdateDate", n.UpdateDate },
                                     { "CreatorName", n.CreatorName },
                                     { "WriterName", n.WriterName },
-                                    { "Url", n.Url }
+                                    { "Url", n.Url() }
                                 };
 
                         var userVals = new Dictionary<string, object>();

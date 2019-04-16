@@ -1,13 +1,9 @@
-﻿namespace Umbraco.Web.Routing
+﻿namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// Specifies the type of urls that the url provider should produce, Auto is the default
+    /// Specifies the type of urls that the url provider should produce, Auto is the default.
     /// </summary>
-    /// <remarks>
-    /// <para>The <c>Relative</c> option can lead to invalid results when combined with hostnames, but it is the only way to reproduce
-    /// the true, pre-4.10, always-relative behavior of Umbraco.</para>
-    /// </remarks>
-    public enum UrlProviderMode
+    public enum UrlMode
     {
 
         /// <summary>

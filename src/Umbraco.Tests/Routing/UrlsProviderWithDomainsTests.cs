@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
@@ -359,7 +360,7 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual("/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111));
             Assert.AreEqual("http://domain3.com/en/1003-1-1/", umbracoContext.UrlProvider.GetUrl(100311));
 
-            umbracoContext.UrlProvider.Mode = UrlProviderMode.Absolute;
+            umbracoContext.UrlProvider.Mode = UrlMode.Absolute;
 
             Assert.AreEqual("http://domain1.com/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111));
             Assert.AreEqual("http://domain3.com/en/1003-1-1/", umbracoContext.UrlProvider.GetUrl(100311));

@@ -158,7 +158,7 @@ namespace Umbraco.Web.Templates
                     return match.Value;
                 }
 
-                var url = media.Url;
+                var url = media.Url();
                 return $"{match.Groups[1].Value}{url}{match.Groups[3].Value}{udi}{match.Groups[5].Value}";
             });
         }

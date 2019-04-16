@@ -277,9 +277,7 @@ namespace Umbraco.Web.Macros
 
             public int Level => _inner.Level;
 
-            public string Url => throw new NotImplementedException();
-
-            public string GetUrl(string culture = null) => throw new NotSupportedException();
+            public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => throw new NotSupportedException();
 
             public PublishedItemType ItemType => PublishedItemType.Content;
 

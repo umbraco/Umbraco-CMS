@@ -157,6 +157,7 @@ namespace Umbraco.Tests.PublishedContent
     {
         private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _urlSegments = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _urls = new Dictionary<string, string>();
 
         #region Constructor
 
@@ -195,8 +196,8 @@ namespace Umbraco.Tests.PublishedContent
         public DateTime UpdateDate { get; set; }
         public Guid Version { get; set; }
         public int Level { get; set; }
-        public string Url { get; set; }
-        public string GetUrl(string culture = null) => throw new NotSupportedException();
+        public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => _urls.TryGetValue(culture ?? "", out var url) ? url : null;
+        public void SetUrl(string url, string culture = null) => _urls[culture ?? ""] = url;
 
         public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
         public bool IsDraft(string culture = null) => false;

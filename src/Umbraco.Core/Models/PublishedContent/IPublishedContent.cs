@@ -99,19 +99,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <remarks>
         /// <para>The value of this property is contextual. It depends on the 'current' request uri,
         /// if any. In addition, when the content type is multi-lingual, this is the url for the
-        /// 'current' culture. Otherwise, it is the invariant url.</para>
-        /// </remarks>
-        string Url { get; }
-
-        /// <summary>
-        /// Gets the url of the content item.
-        /// </summary>
-        /// <remarks>
-        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
-        /// if any. In addition, when the content type is multi-lingual, this is the url for the
         /// specified culture. Otherwise, it is the invariant url.</para>
         /// </remarks>
-        string GetUrl(string culture = null);
+        string Url(string culture = null, UrlMode mode = UrlMode.Auto);
 
         /// <summary>
         /// Gets culture infos for a culture.

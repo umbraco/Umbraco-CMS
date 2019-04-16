@@ -186,8 +186,7 @@ namespace Umbraco.Tests.PublishedContent
             private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
             private readonly Dictionary<string, string> _urlSegments = new Dictionary<string, string>();
 
-            public string Url { get; set; }
-            public string GetUrl(string culture = null) => throw new NotSupportedException();
+            public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => default;
 
             public PublishedItemType ItemType { get; set; }
 
