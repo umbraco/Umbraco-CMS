@@ -1,11 +1,11 @@
-describe("udiHelper tests", function () {
+describe("udiParser tests", function () {
 
-    var udiHelper;
+    var udiParser;
 
     beforeEach(module('umbraco.services'));
 
     beforeEach(inject(function ($injector) {
-        udiHelper = $injector.get('udiHelper');        
+        udiParser = $injector.get('udiParser');
     }));
 
     describe("Parse UDI", function () {
@@ -14,7 +14,7 @@ describe("udiHelper tests", function () {
             var key = "c0a62ced-6402-4025-8d46-a234a34f6a56";
             var value = "umb://" + entityType + "/" + key;
 
-            var udi = udiHelper.parse(value);
+            var udi = udiParser.parse(value);
 
             expect(udi.entityType).toBe(entityType);
             expect(udi.value).toBe(key);
@@ -25,7 +25,7 @@ describe("udiHelper tests", function () {
             var key = "f82f3313-f8e9-42b0-a67f-80a7f452dd21";
             var value = "umb://" + entityType + "/" + key;
 
-            var udi = udiHelper.parse(value);
+            var udi = udiParser.parse(value);
 
             expect(udi.entityType).toBe(entityType);
             expect(udi.value).toBe(key);
@@ -34,7 +34,7 @@ describe("udiHelper tests", function () {
         it("returns the full UDI when calling toString() on the returned value", function() {
             var value = "umb://document/c0a62ced-6402-4025-8d46-a234a34f6a56";
 
-            var udi = udiHelper.parse(value);
+            var udi = udiParser.parse(value);
 
             expect(udi.toString()).toBe(value);
         });
@@ -43,7 +43,7 @@ describe("udiHelper tests", function () {
             var entityType = "media";
             var value = "umb://" + entityType;
 
-            var udi = udiHelper.parse(value);
+            var udi = udiParser.parse(value);
 
             expect(udi.entityType).toBe(entityType);
             expect(udi.value).toBeNull();
@@ -53,7 +53,7 @@ describe("udiHelper tests", function () {
         it("returns null if the input is invalid", function() {
             var value = "not an UDI";
 
-            var udi = udiHelper.parse(value);
+            var udi = udiParser.parse(value);
 
             expect(udi).toBeNull();
         });

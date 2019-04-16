@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
-    function ($scope, eventsService, entityResource, contentResource, mediaResource, mediaHelper, udiHelper, userService, localizationService, tinyMceService, editorService) {
+    function ($scope, eventsService, entityResource, contentResource, mediaResource, mediaHelper, udiParser, userService, localizationService, tinyMceService, editorService) {
         
         var vm = this;
         var dialogOptions = $scope.model;
@@ -66,9 +66,9 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
                 if ($scope.model.target.udi) {
                     // extract the entity type from the udi and set target.isMedia accordingly
-                    var udi = udiHelper.parse(id);
+                    var udi = udiParser.parse(id);
 
-                    if (udi && udi.entityType === 'media') {
+                    if (udi && udi.entityType === "media") {
                         $scope.model.target.isMedia = true;
                     } else {
                         delete $scope.model.target.isMedia;

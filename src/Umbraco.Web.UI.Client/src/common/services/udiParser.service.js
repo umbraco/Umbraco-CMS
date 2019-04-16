@@ -3,16 +3,16 @@
 
     /**
     * @ngdoc service
-    * @name umbraco.services.udiHelper
-    * @description A helper object used to work with UDIs
+    * @name umbraco.services.udiParser
+    * @description A object used to parse UDIs
     **/
-    function udiHelper() {
+    function udiParser() {
         return {
-            
+
             /**
              * @ngdoc method
-             * @name umbraco.services.udiHelper#parse
-             * @methodOf umbraco.services.udiHelper
+             * @name umbraco.services.udiParser#parse
+             * @methodOf umbraco.services.udiParser
              * @function
              *
              * @description
@@ -42,6 +42,6 @@
         }
     }
 
-    angular.module("umbraco.services").factory("udiHelper", udiHelper);
+    angular.module("umbraco.services").factory("udiParser", udiParser);
 
 })();
