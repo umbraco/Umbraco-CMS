@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Published
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
-            var cntType1 = contentTypeFactory.CreateContentType(1001, "cnt1", Array.Empty<PublishedPropertyType>());
+            var cntType1 = contentTypeFactory.CreateContentType(1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
             var cnt1 = new TestPublishedContent(cntType1, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
             cacheContent[cnt1.Id] = cnt1;
 

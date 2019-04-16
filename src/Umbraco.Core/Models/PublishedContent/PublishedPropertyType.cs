@@ -36,7 +36,6 @@ namespace Umbraco.Core.Models.PublishedContent
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
-        // fixme should be internal?
         /// <summary>
         /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
@@ -50,7 +49,6 @@ namespace Umbraco.Core.Models.PublishedContent
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
-        // fixme should be internal?
         /// <summary>
         /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>

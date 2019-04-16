@@ -34,12 +34,11 @@ namespace Umbraco.Core.Models.PublishedContent
             InitializeIndexes();
         }
 
-        // fixme should be internal?
         /// <summary>
         /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
         /// <remarks>
-        /// <para>Values are assumed to be consisted and are not checked.</para>
+        /// <para>Values are assumed to be consistent and are not checked.</para>
         /// </remarks>
         public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations, bool isElement = false)
             : this (id, alias, itemType, compositionAliases, variations, isElement)
@@ -52,7 +51,12 @@ namespace Umbraco.Core.Models.PublishedContent
             InitializeIndexes();
         }
 
-        // fixme
+        /// <summary>
+        /// This constructor is for tests and is not intended to be used directly from application code.
+        /// </summary>
+        /// <remarks>
+        /// <para>Values are assumed to be consistent and are not checked.</para>
+        /// </remarks>
         public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations, bool isElement = false)
             : this(id, alias, itemType, compositionAliases, variations, isElement)
         {
