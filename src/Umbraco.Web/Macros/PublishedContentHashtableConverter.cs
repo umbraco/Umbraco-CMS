@@ -35,7 +35,7 @@ namespace Umbraco.Web.Macros
                 throw new ArgumentException("Document request has no node.", nameof(frequest));
 
             PopulatePageData(frequest.PublishedContent.Id,
-                frequest.PublishedContent.Name, frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
+                frequest.PublishedContent.Name(), frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
                 frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
                 frequest.PublishedContent.Path, frequest.PublishedContent.Parent?.Id ?? -1);
 
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Macros
             if (doc == null) throw new ArgumentNullException(nameof(doc));
 
             PopulatePageData(doc.Id,
-                doc.Name, doc.ContentType.Id, doc.ContentType.Alias,
+                doc.Name(), doc.ContentType.Id, doc.ContentType.Alias,
                 doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
                 doc.Path, doc.Parent?.Id ?? -1);
 
@@ -228,7 +228,7 @@ namespace Umbraco.Web.Macros
 
             public int SortOrder => _inner.SortOrder;
 
-            public string Name => _inner.Name;
+            public string Name(string culture = null) => _inner.GetCultureName(culture);
 
             public PublishedCultureInfo GetCulture(string culture = null)
             {

@@ -29,11 +29,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the name of the content item.
         /// </summary>
-        /// <remarks>
-        /// <para>The value of this property is contextual. When the content type is multi-lingual,
-        /// this is the name for the 'current' culture. Otherwise, it is the invariant name.</para>
-        /// </remarks>
-        string Name { get; }
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
+        /// <returns>The name of the content.</returns>
+        string Name(string culture = null);
 
         /// <summary>
         /// Gets the url segment of the content item.

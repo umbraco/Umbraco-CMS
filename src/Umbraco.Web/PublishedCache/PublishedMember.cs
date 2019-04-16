@@ -136,7 +136,11 @@ namespace Umbraco.Web.PublishedCache
 
         public override int SortOrder => 0;
 
-        public override string Name => _member.Name;
+        public override string Name(string culture = null)
+        {
+            // member name does not vary, ignore culture
+            return _member.Name;
+        }
 
         public override PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
 

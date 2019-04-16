@@ -58,7 +58,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual int Id => _content.Id;
 
         /// <inheritdoc />
-        public virtual string Name => _content.Name;
+        public virtual string Name(string culture = null) => _content.Name(culture);
 
         /// <inheritdoc />
         public virtual string UrlSegment => _content.UrlSegment;

@@ -25,11 +25,10 @@ namespace Umbraco.Tests.PublishedContent
             var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), CreatePropertyTypes);
             var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), CreatePropertyTypes);
 
-            cache.Add(new SolidPublishedContent(contentType1)
+            var content = new SolidPublishedContent(contentType1)
             {
                 Id = 1,
                 SortOrder = 0,
-                Name = "Content 1",
                 UrlSegment = "content-1",
                 Path = "/1",
                 Level = 1,
@@ -37,22 +36,23 @@ namespace Umbraco.Tests.PublishedContent
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
+                {
+                    new SolidPublishedProperty
                     {
-                        new SolidPublishedProperty
-                        {
-                            Alias = "prop1",
-                            SolidHasValue = true,
-                            SolidValue = 1234,
-                            SolidSourceValue = "1234"
-                        }
+                        Alias = "prop1",
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
                     }
-            });
+                }
+            };
+            content.SetName("Content 1");
+            cache.Add(content);
 
-            cache.Add(new SolidPublishedContent(contentType2)
+            content = new SolidPublishedContent(contentType2)
             {
                 Id = 2,
                 SortOrder = 1,
-                Name = "Content 2",
                 UrlSegment = "content-2",
                 Path = "/2",
                 Level = 1,
@@ -60,22 +60,23 @@ namespace Umbraco.Tests.PublishedContent
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
+                {
+                    new SolidPublishedProperty
                     {
-                        new SolidPublishedProperty
-                        {
-                            Alias = "prop1",
-                            SolidHasValue = true,
-                            SolidValue = 1234,
-                            SolidSourceValue = "1234"
-                        }
+                        Alias = "prop1",
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
                     }
-            });
+                }
+            };
+            content.SetName("Content 2");
+            cache.Add(content);
 
-            cache.Add(new SolidPublishedContent(contentType2Sub)
+            content = new SolidPublishedContent(contentType2Sub)
             {
                 Id = 3,
                 SortOrder = 2,
-                Name = "Content 2Sub",
                 UrlSegment = "content-2sub",
                 Path = "/3",
                 Level = 1,
@@ -92,14 +93,16 @@ namespace Umbraco.Tests.PublishedContent
                         SolidSourceValue = "1234"
                     }
                 }
-            });
+            };
+            content.SetName("Content 2Sub");
+            cache.Add(content);
         }
 
         [Test]
         public void First()
         {
             var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
-            Assert.AreEqual("Content 1", content.Name);
+            Assert.AreEqual("Content 1", content.Name());
         }
 
         [Test]
@@ -111,17 +114,17 @@ namespace Umbraco.Tests.PublishedContent
                 .ToIndexedArray();
 
             var item = items[0];
-            Assert.AreEqual("Content 1", item.Content.Name);
+            Assert.AreEqual("Content 1", item.Content.Name());
             Assert.IsTrue(item.IsFirst());
             Assert.IsFalse(item.IsLast());
 
             item = items[1];
-            Assert.AreEqual("Content 2", item.Content.Name);
+            Assert.AreEqual("Content 2", item.Content.Name());
             Assert.IsFalse(item.IsFirst());
             Assert.IsFalse(item.IsLast());
 
             item = items[2];
-            Assert.AreEqual("Content 2Sub", item.Content.Name);
+            Assert.AreEqual("Content 2Sub", item.Content.Name());
             Assert.IsFalse(item.IsFirst());
             Assert.IsTrue(item.IsLast());
         }
@@ -154,7 +157,7 @@ namespace Umbraco.Tests.PublishedContent
             var content = Current.UmbracoContext.ContentCache.GetAtRoot()
                 .OfType<ContentType2>()
                 .First(x => x.Prop1 == 1234);
-            Assert.AreEqual("Content 2", content.Name);
+            Assert.AreEqual("Content 2", content.Name());
             Assert.AreEqual(1234, content.Prop1);
         }
 

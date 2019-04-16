@@ -187,7 +187,7 @@ namespace Umbraco.Web.Routing
                 var l = new List<string>();
                 while (o != null)
                 {
-                    l.Add(o.Name);
+                    l.Add(o.Name());
                     o = o.Parent;
                 }
                 l.Reverse();

@@ -156,7 +156,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override int SortOrder => _sortOrder;
 
-        public override string Name => _name;
+        public override string Name(string culture = null) => _name;
 
         public override PublishedCultureInfo GetCulture(string culture = null) => null;
 

@@ -138,13 +138,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
-        public override string Name
+        public override string Name(string culture = null)
         {
-            get
-            {
-				EnsureNodeInitialized();
-                return _name;
-            }
+			EnsureNodeInitialized();
+            return _name;
         }
 
         public override PublishedCultureInfo GetCulture(string culture = null) => null;

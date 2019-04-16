@@ -7,6 +7,8 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     internal class TestPublishedContent : PublishedElement, IPublishedContent
     {
+        private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
+
         public TestPublishedContent(IPublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfo> cultures = null)
             : base(contentType, key, values, previewing)
         {
@@ -17,7 +19,8 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public int Id { get; }
         public int? TemplateId { get; set; }
         public int SortOrder { get; set; }
-        public string Name { get; set; }
+        public string Name(string culture = null) => _names.TryGetValue(culture ?? "", out var name) ? name : null;
+        public void SetName(string name, string culture = null) => _names[culture ?? ""] = name;
         public IVariationContextAccessor VariationContextAccessor { get; set; }
         public PublishedCultureInfo GetCulture(string culture = null)
         {

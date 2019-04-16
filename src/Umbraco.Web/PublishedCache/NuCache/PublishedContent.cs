@@ -185,19 +185,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int Id => _contentNode.Id;
 
         /// <inheritdoc />
-        public override string Name
+        public override string Name(string culture = null)
         {
-            get
-            {
-                if (!ContentType.VariesByCulture())
-                    return ContentData.Name;
+            // handle context culture
+            if (culture == null)
+                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
 
-                var culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-                if (culture == "")
-                    return ContentData.Name;
+            // invariant culture
+            if (culture == "")
+                return ContentType.VariesByCulture() ? null : ContentData.Name;
 
-                return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.Name : null;
-            }
+            // explicit culture
+            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.Name : null;
         }
 
         /// <inheritdoc />

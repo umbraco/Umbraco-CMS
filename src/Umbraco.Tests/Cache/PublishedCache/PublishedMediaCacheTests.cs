@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             Assert.AreEqual(mRoot.ContentType.Alias, publishedMedia.ContentType.Alias);
             Assert.AreEqual(mRoot.ContentType.Id, publishedMedia.ContentType.Id);
             Assert.AreEqual(mRoot.Level, publishedMedia.Level);
-            Assert.AreEqual(mRoot.Name, publishedMedia.Name);
+            Assert.AreEqual(mRoot.Name, publishedMedia.Name());
             Assert.AreEqual(mRoot.Path, publishedMedia.Path);
             Assert.AreEqual(mRoot.SortOrder, publishedMedia.SortOrder);
             Assert.IsNull(publishedMedia.Parent);

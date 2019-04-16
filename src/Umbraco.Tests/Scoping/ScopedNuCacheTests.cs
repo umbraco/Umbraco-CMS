@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Scoping
 
                 // during events, due to LiveSnapshot, we see the changes
                 Assert.IsNotNull(e);
-                Assert.AreEqual("changed", e.Name);
+                Assert.AreEqual("changed", e.Name());
             };
 
             using (var scope = ScopeProvider.CreateScope())
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Scoping
             // been created
             var x = umbracoContext.ContentCache.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual("name", x.Name);
+            Assert.AreEqual("name", x.Name());
 
             ContentService.Published += OnPublishedAssert;
 
@@ -186,7 +186,7 @@ namespace Umbraco.Tests.Scoping
             // else changes have been rolled back
             x = umbracoContext.ContentCache.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual(complete ? "changed" : "name", x.Name);
+            Assert.AreEqual(complete ? "changed" : "name", x.Name());
         }
     }
 }

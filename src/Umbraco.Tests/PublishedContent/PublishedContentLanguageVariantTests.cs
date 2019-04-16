@@ -122,7 +122,6 @@ namespace Umbraco.Tests.PublishedContent
             {
                 Id = 1,
                 SortOrder = 0,
-                Name = "Content 1",
                 UrlSegment = "content-1",
                 Path = "/1",
                 Level = 1,
@@ -134,12 +133,12 @@ namespace Umbraco.Tests.PublishedContent
                         prop1, prop2, noprop
                     }
             };
+            item1.SetName("Content 1");
 
             var item2 = new SolidPublishedContent(contentType1)
             {
                 Id = 2,
                 SortOrder = 0,
-                Name = "Content 2",
                 UrlSegment = "content-2",
                 Path = "/1/2",
                 Level = 2,
@@ -151,6 +150,7 @@ namespace Umbraco.Tests.PublishedContent
                         prop3
                     }
             };
+            item2.SetName("Content 2");
 
             var prop4 = new SolidPublishedPropertyWithLanguageVariants
             {
@@ -164,7 +164,6 @@ namespace Umbraco.Tests.PublishedContent
             {
                 Id = 3,
                 SortOrder = 0,
-                Name = "Content 3",
                 UrlSegment = "content-3",
                 Path = "/1/2/3",
                 Level = 3,
@@ -176,6 +175,7 @@ namespace Umbraco.Tests.PublishedContent
                     prop4
                 }
             };
+            item3.SetName("Content 3");
 
             item1.Children = new List<IPublishedContent> { item2 };
             item2.Parent = item1;

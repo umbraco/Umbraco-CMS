@@ -1077,7 +1077,7 @@ namespace Umbraco.Web
                         var standardVals = new Dictionary<string, object>
                             {
                                     { "Id", n.Id },
-                                    { "NodeName", n.Name },
+                                    { "NodeName", n.Name() },
                                     { "NodeTypeAlias", n.ContentType.Alias },
                                     { "CreateDate", n.CreateDate },
                                     { "UpdateDate", n.UpdateDate },

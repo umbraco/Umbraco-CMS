@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
                 QueryExpression = queryExpression.ToString(),
                 ResultCount = results.Count,
                 ExecutionTime = timer.ElapsedMilliseconds,
-                SampleResults = results.Take(20).Select(x => new TemplateQueryResult { Icon = "icon-file", Name = x.Name })
+                SampleResults = results.Take(20).Select(x => new TemplateQueryResult { Icon = "icon-file", Name = x.Name() })
             };
         }
 
@@ -186,12 +186,12 @@ namespace Umbraco.Web.Editors
                         : contents.OrderByDescending(x => x.UpdateDate);
                 case "name":
                     return sortExpression.Direction == "ascending"
-                        ? contents.OrderBy(x => x.Name)
-                        : contents.OrderByDescending(x => x.Name);
+                        ? contents.OrderBy(x => x.Name())
+                        : contents.OrderByDescending(x => x.Name());
                 default:
                     return sortExpression.Direction == "ascending"
-                        ? contents.OrderBy(x => x.Name)
-                        : contents.OrderByDescending(x => x.Name);
+                        ? contents.OrderBy(x => x.Name())
+                        : contents.OrderByDescending(x => x.Name());
             }
         }
 

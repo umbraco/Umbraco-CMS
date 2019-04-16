@@ -495,7 +495,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(nodeId, converted.Id);
             Assert.AreEqual(3, converted.Level);
             Assert.AreEqual(1, converted.SortOrder);
-            Assert.AreEqual("Sam's Umbraco Image", converted.Name);
+            Assert.AreEqual("Sam's Umbraco Image", converted.Name());
             Assert.AreEqual("-1,1111,2222,2112", converted.Path);
         }
 

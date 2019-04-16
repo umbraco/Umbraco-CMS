@@ -153,8 +153,10 @@ namespace Umbraco.Tests.PublishedContent
         }
     }
 
-    class SolidPublishedContent : IPublishedContent
+    internal class SolidPublishedContent : IPublishedContent
     {
+        private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
+
         #region Constructor
 
         public SolidPublishedContent(IPublishedContentType contentType)
@@ -177,7 +179,8 @@ namespace Umbraco.Tests.PublishedContent
         public Guid Key { get; set; }
         public int? TemplateId { get; set; }
         public int SortOrder { get; set; }
-        public string Name { get; set; }
+        public string Name(string culture = null) => _names.TryGetValue(culture ?? "", out var name) ? name : null;
+        public void SetName(string name, string culture = null) => _names[culture ?? ""] = name;
         public PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
         public string UrlSegment { get; set; }

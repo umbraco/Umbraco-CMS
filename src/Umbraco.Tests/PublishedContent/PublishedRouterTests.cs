@@ -58,7 +58,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var pc = new Mock<IPublishedContent>();
             pc.Setup(content => content.Id).Returns(1);
-            pc.Setup(content => content.Name).Returns("test");
+            pc.Setup(content => content.Name(It.IsAny<string>())).Returns("test");
             pc.Setup(content => content.WriterName).Returns("admin");
             pc.Setup(content => content.CreatorName).Returns("admin");
             pc.Setup(content => content.CreateDate).Returns(DateTime.Now);
