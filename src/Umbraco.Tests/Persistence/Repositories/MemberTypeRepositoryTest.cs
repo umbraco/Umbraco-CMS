@@ -248,7 +248,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.Save(memberType);
 
-                foreach(var stub in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
+                foreach (var stub in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
                 {
                     var prop = memberType.PropertyTypes.First(x => x.Alias == stub.Key);
                     prop.Alias = prop.Alias + "__0000";
