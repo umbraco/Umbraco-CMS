@@ -20,11 +20,13 @@ namespace Umbraco.Web.Compose
     {
         private readonly Notifier _notifier;
         private readonly ActionCollection _actions;
+        private readonly IContentService _contentService;
 
-        public NotificationsComponent(Notifier notifier, ActionCollection actions)
+        public NotificationsComponent(Notifier notifier, ActionCollection actions, IContentService contentService)
         {
             _notifier = notifier;
             _actions = actions;
+            _contentService = contentService;
         }
 
         public void Initialize()
@@ -46,6 +48,9 @@ namespace Umbraco.Web.Compose
 
             //Send notifications for the unpublish action
             ContentService.Unpublished += (sender, args) => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
+
+            //Send notifications for the permissions action
+            UserService.UserGroupPermissionsAssigned += (sender, args) => UserServiceUserGroupPermissionsAssigned(_notifier, sender, args, _contentService, _actions);
         }
 
         public void Terminate()
@@ -88,6 +93,16 @@ namespace Umbraco.Web.Compose
             }
             notifier.Notify(actions.GetAction<ActionNew>(), newEntities.ToArray());
             notifier.Notify(actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
+        }
+
+        private void UserServiceUserGroupPermissionsAssigned(Notifier notifier, IUserService sender, Core.Events.SaveEventArgs<EntityPermission> args, IContentService contentService, ActionCollection actions)
+        {
+            var entities = contentService.GetByIds(args.SavedEntities.Select(e => e.EntityId)).ToArray();
+            if(entities.Any() == false)
+            {
+                return;
+            }
+            notifier.Notify(actions.GetAction<ActionRights>(), entities);
         }
 
         /// <summary>
