@@ -61,7 +61,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual string Name(string culture = null) => _content.Name(culture);
 
         /// <inheritdoc />
-        public virtual string UrlSegment => _content.UrlSegment;
+        public virtual string UrlSegment(string culture = null) => _content.UrlSegment(culture);
 
         /// <inheritdoc />
         public virtual int SortOrder => _content.SortOrder;

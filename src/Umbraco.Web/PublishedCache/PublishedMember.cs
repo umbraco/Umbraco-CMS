@@ -146,7 +146,7 @@ namespace Umbraco.Web.PublishedCache
 
         public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
 
-        public override string UrlSegment => throw new NotSupportedException();
+        public override string UrlSegment(string culture = null) => throw new NotSupportedException();
 
         // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
         public override string WriterName => _member.GetCreatorProfile().Name;

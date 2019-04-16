@@ -397,7 +397,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             Assert.AreEqual(keyVal, doc.Key);
             Assert.AreEqual(templateIdVal, doc.TemplateId);
             Assert.AreEqual(sortOrderVal, doc.SortOrder);
-            Assert.AreEqual(urlNameVal, doc.UrlSegment);
+            Assert.AreEqual(urlNameVal, doc.UrlSegment());
             Assert.AreEqual(nodeTypeAliasVal, doc.ContentType.Alias);
             Assert.AreEqual(nodeTypeIdVal, doc.ContentType.Id);
             Assert.AreEqual(writerNameVal, doc.WriterName);

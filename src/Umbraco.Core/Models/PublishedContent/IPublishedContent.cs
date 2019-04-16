@@ -29,18 +29,14 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the name of the content item.
         /// </summary>
-        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
-        /// <returns>The name of the content.</returns>
+        /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
         string Name(string culture = null);
 
         /// <summary>
         /// Gets the url segment of the content item.
         /// </summary>
-        /// <remarks>
-        /// <para>The value of this property is contextual. When the content type is multi-lingual,
-        /// this is the name for the 'current' culture. Otherwise, it is the invariant url segment.</para>
-        /// </remarks>
-        string UrlSegment { get; }
+        /// <param name="culture">The specific culture to get the url segment for. If null is used the current culture is used (Default is null).</param>
+        string UrlSegment(string culture = null);
 
         /// <summary>
         /// Gets the sort order of the content item.

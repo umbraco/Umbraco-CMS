@@ -44,7 +44,7 @@ namespace Umbraco.Web.Models
         public abstract string Name(string culture = null);
 
         /// <inheritdoc />
-        public abstract string UrlSegment { get; }
+        public abstract string UrlSegment(string culture = null);
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }

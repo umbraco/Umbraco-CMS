@@ -163,7 +163,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
         public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
 
-        public override string UrlSegment => _urlName;
+        public override string UrlSegment(string culture = null) => _urlName;
 
         public override string WriterName => _creatorName;
 

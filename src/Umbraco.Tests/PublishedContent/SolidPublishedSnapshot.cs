@@ -156,6 +156,7 @@ namespace Umbraco.Tests.PublishedContent
     internal class SolidPublishedContent : IPublishedContent
     {
         private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _urlSegments = new Dictionary<string, string>();
 
         #region Constructor
 
@@ -183,7 +184,8 @@ namespace Umbraco.Tests.PublishedContent
         public void SetName(string name, string culture = null) => _names[culture ?? ""] = name;
         public PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
-        public string UrlSegment { get; set; }
+        public string UrlSegment(string culture = null) => _urlSegments.TryGetValue(culture ?? "", out var urlSegment) ? urlSegment : null;
+        public void SetUrlSegment(string urlSegment, string culture = null) => _urlSegments[culture ?? ""] = urlSegment;
         public string WriterName { get; set; }
         public string CreatorName { get; set; }
         public int WriterId { get; set; }

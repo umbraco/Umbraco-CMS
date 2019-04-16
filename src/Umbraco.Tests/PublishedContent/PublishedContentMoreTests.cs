@@ -29,7 +29,6 @@ namespace Umbraco.Tests.PublishedContent
             {
                 Id = 1,
                 SortOrder = 0,
-                UrlSegment = "content-1",
                 Path = "/1",
                 Level = 1,
                 Url = "/content-1",
@@ -47,13 +46,13 @@ namespace Umbraco.Tests.PublishedContent
                 }
             };
             content.SetName("Content 1");
+            content.SetUrlSegment("content-1");
             cache.Add(content);
 
             content = new SolidPublishedContent(contentType2)
             {
                 Id = 2,
                 SortOrder = 1,
-                UrlSegment = "content-2",
                 Path = "/2",
                 Level = 1,
                 Url = "/content-2",
@@ -71,13 +70,13 @@ namespace Umbraco.Tests.PublishedContent
                 }
             };
             content.SetName("Content 2");
+            content.SetUrlSegment("content-2");
             cache.Add(content);
 
             content = new SolidPublishedContent(contentType2Sub)
             {
                 Id = 3,
                 SortOrder = 2,
-                UrlSegment = "content-2sub",
                 Path = "/3",
                 Level = 1,
                 Url = "/content-2sub",
@@ -95,6 +94,7 @@ namespace Umbraco.Tests.PublishedContent
                 }
             };
             content.SetName("Content 2Sub");
+            content.SetUrlSegment("content-2sub");
             cache.Add(content);
         }
 

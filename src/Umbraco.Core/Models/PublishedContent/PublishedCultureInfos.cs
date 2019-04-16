@@ -35,7 +35,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the url segment of the item.
         /// </summary>
-        public string UrlSegment { get; }
+        internal string UrlSegment { get; }
 
         /// <summary>
         /// Gets the date associated with the culture.

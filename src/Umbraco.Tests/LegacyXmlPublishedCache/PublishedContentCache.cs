@@ -271,7 +271,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             while (hasDomains == false && n != null) // n is null at root
             {
                 // get the url
-                var urlName = n.UrlSegment;
+                var urlName = n.UrlSegment();
                 pathParts.Add(urlName);
 
                 // move to parent node

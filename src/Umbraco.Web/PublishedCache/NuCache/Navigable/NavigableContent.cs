@@ -28,7 +28,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
                     XmlString(i++, _content.TemplateId),
                     XmlString(i++, _content.WriterId),
                     XmlString(i++, _content.CreatorId),
-                    XmlString(i++, _content.UrlSegment),
+                    XmlString(i++, _content.UrlSegment()),
                     XmlString(i, _content.IsDraft())
                 };
         }

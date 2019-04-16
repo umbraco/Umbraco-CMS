@@ -259,7 +259,7 @@ namespace Umbraco.Web.Macros
                 }
             }
 
-            public string UrlSegment => throw new NotImplementedException();
+            public string UrlSegment(string culture = null) => throw new NotImplementedException();
 
             public string WriterName { get; }
 

@@ -139,7 +139,6 @@ namespace Umbraco.Tests.PublishedContent
                     TemplateId = 5,
                     UpdateDate = DateTime.Now,
                     Path = "-1,3",
-                    UrlSegment = "home-page",
                     Version = Guid.NewGuid(),
                     WriterId = 1,
                     WriterName = "Shannon",
@@ -148,6 +147,7 @@ namespace Umbraco.Tests.PublishedContent
                     Children = new List<IPublishedContent>()
                 };
             d.SetName("Page" + Guid.NewGuid());
+            d.SetUrlSegment("home-page");
             d.Properties = new Collection<IPublishedProperty>(new List<IPublishedProperty>
             {
                 new RawValueProperty(factory.CreatePropertyType("property1", 1), d, "value" + indexVals),
@@ -184,6 +184,7 @@ namespace Umbraco.Tests.PublishedContent
         private class TestPublishedContent : IPublishedContent
         {
             private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
+            private readonly Dictionary<string, string> _urlSegments = new Dictionary<string, string>();
 
             public string Url { get; set; }
             public string GetUrl(string culture = null) => throw new NotSupportedException();
@@ -209,7 +210,8 @@ namespace Umbraco.Tests.PublishedContent
             public void SetName(string name, string culture = null) => _names[culture ?? ""] = name;
             public PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
             public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
-            public string UrlSegment { get; set; }
+            public string UrlSegment(string culture = null) => _urlSegments.TryGetValue(culture ?? "", out var urlSegment) ? urlSegment : null;
+            public void SetUrlSegment(string urlSegment, string culture = null) => _urlSegments[culture ?? ""] = urlSegment;
             public string WriterName { get; set; }
             public string CreatorName { get; set; }
             public int WriterId { get; set; }

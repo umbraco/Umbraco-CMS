@@ -212,13 +212,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
-        public override string UrlSegment
+        public override string UrlSegment(string culture = null)
         {
-            get
-            {
-                EnsureNodeInitialized();
-                return _urlName;
-            }
+            EnsureNodeInitialized();
+            return _urlName;
         }
 
         public override int Level

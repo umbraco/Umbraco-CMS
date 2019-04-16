@@ -60,30 +60,6 @@ namespace Umbraco.Web
             }
         }
 
-        /// <summary>
-        /// Gets the Url segment.
-        /// </summary>
-        /// <remarks>
-        /// <para>Gets the url segment for the document, taking its content type and a specified
-        /// culture in account. For invariant content types, the culture is ignored, else it is
-        /// used to try and find the segment corresponding to the culture. May return null.</para>
-        /// </remarks>
-        public static string GetUrlSegment(this IPublishedContent content, string culture = null)
-        {
-            // for invariant content, return the invariant url segment
-            if (!content.ContentType.VariesByCulture())
-                return content.UrlSegment;
-
-            // content.GetCulture(culture) will use the 'current' culture (via accessor) in case 'culture'
-            // is null (meaning, 'current') - and can return 'null' if that culture is not published - and
-            // will return 'null' if the content is variant and culture is invariant
-
-            // else try and get the culture info
-            // return the corresponding url segment, or null if none
-            var cultureInfo = content.GetCulture(culture);
-            return cultureInfo?.UrlSegment;
-		}
-
         public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         {
             if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates)

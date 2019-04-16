@@ -200,19 +200,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <inheritdoc />
-        public override string UrlSegment
+        public override string UrlSegment(string culture = null)
         {
-            get
-            {
-                if (!ContentType.VariesByCulture())
-                    return _urlSegment;
+            // handle context culture
+            if (culture == null)
+                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
 
-                var culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-                if (culture == "")
-                    return _urlSegment;
+            // invariant culture
+            if (culture == "")
+                return ContentType.VariesByCulture() ? null : _urlSegment;
 
-                return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.UrlSegment : null;
-            }
+            // explicit culture
+            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.UrlSegment : null;
         }
 
         /// <inheritdoc />

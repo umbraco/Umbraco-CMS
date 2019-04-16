@@ -8,6 +8,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
     internal class TestPublishedContent : PublishedElement, IPublishedContent
     {
         private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _urlSegments = new Dictionary<string, string>();
 
         public TestPublishedContent(IPublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfo> cultures = null)
             : base(contentType, key, values, previewing)
@@ -35,7 +36,8 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
         }
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; set; }
-        public string UrlSegment { get; set; }
+        public string UrlSegment(string culture = null) => _urlSegments.TryGetValue(culture ?? "", out var urlSegment) ? urlSegment : null;
+        public void SetUrlSegment(string urlSegment, string culture = null) => _urlSegments[culture ?? ""] = urlSegment;
         public string DocumentTypeAlias => ContentType.Alias;
         public int DocumentTypeId { get; set; }
         public string WriterName { get; set; }
