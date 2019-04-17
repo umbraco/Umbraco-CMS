@@ -70,6 +70,8 @@
 
     &__check {
         display: flex;
+        align-items: center;
+        justify-content: center;
         position: relative;
         background: @white;
         border: 1px solid @inputBorder;
@@ -110,6 +112,7 @@
     }
 
     &__icon {
+        position: relative;
         color: @white;
         text-align: center;
         font-size: 12px;
@@ -126,6 +129,10 @@
             left: 0;
             bottom: 0;
             margin: auto;
+        }
+
+        svg {
+            display: block;
         }
     }
 
