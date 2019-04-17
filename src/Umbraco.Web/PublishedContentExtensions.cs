@@ -11,6 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
@@ -20,9 +21,12 @@ namespace Umbraco.Web
     public static class PublishedContentExtensions
     {
         // see notes in PublishedElementExtensions
+        // (yes, this is not pretty, but works for now)
         //
         private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
         private static IPublishedSnapshot PublishedSnapshot => Current.PublishedSnapshot;
+        private static UmbracoContext UmbracoContext => Current.UmbracoContext;
+        private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
 
         #region IsComposedOf
 
@@ -184,6 +188,27 @@ namespace Umbraco.Web
 
             // either does not vary by culture, or has the specified culture
             return contents.Where(x => !x.ContentType.VariesByCulture() || x.HasCulture(culture));
+        }
+
+        /// <summary>
+        /// Gets the culture assigned to a document by domains, in the context of a current Uri.
+        /// </summary>
+        /// <param name="content">The document.</param>
+        /// <param name="current">An optional current Uri.</param>
+        /// <returns>The culture assigned to the document by domains.</returns>
+        /// <remarks>
+        /// <para>In 1:1 multilingual setup, a document contains several cultures (there is not
+        /// one document per culture), and domains, withing the context of a current Uri, assign
+        /// a culture to that document.</para>
+        /// </remarks>
+        public static string GetCultureFromDomains(this IPublishedContent content, Uri current = null)
+        {
+            var umbracoContext = UmbracoContext;
+
+            if (umbracoContext == null)
+                throw new InvalidOperationException("A current UmbracoContext is required.");
+
+            return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, SiteDomainHelper);
         }
 
         #endregion

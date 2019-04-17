@@ -123,23 +123,17 @@ namespace Umbraco.Web.Editors
             // Since a Macro might contain thing thats related to the culture of the "IPublishedContent" (ie Dictionary keys) we want
             // to set the current culture to the culture related to the content item. This is hacky but it works.
 
-            // fixme I don't even know how this ever worked?!
+            // fixme
+            // in a 1:1 situation we do not handle the language being edited
+            // so the macro renders in the wrong language
 
-            // assume this was some sort of "the culture of the item"
-            // but... with multilingual it does not make any sense?!
-            //var culture = publishedContent.GetCulture();
-
-            string culture = ""; // needs to be eg fr-FR
+            var culture = publishedContent.GetCultureFromDomains();
 
             if (culture != null)
-            {
                 Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(culture);
-                _variationContextAccessor.VariationContext = new VariationContext(culture);
-            }
-            else
-            {
-                _variationContextAccessor.VariationContext = new VariationContext(); //must have an active variation context!
-            }
+
+            // must have an active variation context!
+            _variationContextAccessor.VariationContext = new VariationContext(culture);
 
             var result = Request.CreateResponse();
             //need to create a specific content result formatted as HTML since this controller has been configured

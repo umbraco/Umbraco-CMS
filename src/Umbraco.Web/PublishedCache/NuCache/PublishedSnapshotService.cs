@@ -4,13 +4,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Web;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -1074,11 +1072,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var defaultCulture = _defaultCultureAccessor.DefaultCulture;
             var domainCache = new DomainCache(domainSnap, defaultCulture);
-            var domainHelper = new DomainHelper(domainCache, _siteDomainHelper);
 
             return new PublishedSnapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainHelper, _globalSettings, _serviceContext.LocalizationService),
+                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, _globalSettings),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
                 MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _umbracoContextAccessor, _entitySerializer),
                 DomainCache = domainCache,

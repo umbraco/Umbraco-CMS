@@ -28,7 +28,7 @@ namespace Umbraco.Web.Routing
         {
             string route;
             if (frequest.HasDomain)
-                route = frequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
+                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
             else
                 route = frequest.Uri.GetAbsolutePathDecoded();
 

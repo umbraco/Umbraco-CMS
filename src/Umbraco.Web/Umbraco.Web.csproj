@@ -1137,7 +1137,7 @@
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Routing\DomainHelper.cs" />
+    <Compile Include="Routing\DomainUtilities.cs" />
     <Compile Include="Routing\PublishedRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

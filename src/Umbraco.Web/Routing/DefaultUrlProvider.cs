@@ -47,15 +47,13 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
-            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
-
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
             var domainUri = pos == 0
                 ? null
-                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current, culture);
+                : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, int.Parse(route.Substring(0, pos)), current, culture);
 
             // assemble the url from domainUri (maybe null) and path
             var url = AssembleUrl(domainUri, path, current, mode).ToString();
@@ -84,15 +82,13 @@ namespace Umbraco.Web.Routing
             if (node == null)
                 yield break;
 
-            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
-
             // look for domains, walking up the tree
             var n = node;
-            var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
+            var domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 n = n.Parent; // move to parent node
-                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, excludeDefault: true);
+                domainUris = n == null ? null : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, excludeDefault: true);
             }
 
             // no domains = exit

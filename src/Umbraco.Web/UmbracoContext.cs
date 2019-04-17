@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Runtime;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
@@ -20,7 +18,6 @@ namespace Umbraco.Web
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
-        private DomainHelper _domainHelper;
         private string _previewToken;
         private bool? _previewing;
 
@@ -107,9 +104,6 @@ namespace Umbraco.Web
         /// </summary>
         public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
 
-        // for unit tests
-        internal bool HasPublishedSnapshot => _publishedSnapshot.IsValueCreated;
-
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
@@ -161,20 +155,6 @@ namespace Umbraco.Web
         /// Gets the variation context accessor.
         /// </summary>
         public IVariationContextAccessor VariationContextAccessor { get; }
-
-        /// <summary>
-        /// Creates and caches an instance of a DomainHelper
-        /// </summary>
-        /// <remarks>
-        /// We keep creating new instances of DomainHelper, it would be better if we didn't have to do that so instead we can
-        /// have one attached to the UmbracoContext. This method accepts an external ISiteDomainHelper otherwise the UmbracoContext
-        /// ctor will have to have another parameter added only for this one method which is annoying and doesn't make a ton of sense
-        /// since the UmbracoContext itself doesn't use this.
-        ///
-        /// TODO: The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
-        /// </remarks>
-        internal DomainHelper GetDomainHelper(ISiteDomainHelper siteDomainHelper)
-            => _domainHelper ?? (_domainHelper = new DomainHelper(PublishedSnapshot.Domains, siteDomainHelper));
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled

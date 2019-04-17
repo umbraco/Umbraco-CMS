@@ -23,9 +23,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ContentStore.Snapshot _snapshot;
         private readonly IAppCache _snapshotCache;
         private readonly IAppCache _elementsCache;
-        private readonly DomainHelper _domainHelper;
+        private readonly IDomainCache _domainCache;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ILocalizationService _localizationService;
 
         #region Constructor
 
@@ -34,15 +33,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // it's too late for UmbracoContext which has captured previewDefault and stuff into these ctor vars
         // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
 
-        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings, ILocalizationService localizationService)
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, IDomainCache domainCache, IGlobalSettings globalSettings)
             : base(previewDefault)
         {
             _snapshot = snapshot;
             _snapshotCache = snapshotCache;
             _elementsCache = elementsCache;
-            _domainHelper = domainHelper;
+            _domainCache = domainCache;
             _globalSettings = globalSettings;
-            _localizationService = localizationService;
         }
 
         private bool HideTopLevelNodeFromPath => _globalSettings.HideTopLevelNodeFromPath;
@@ -150,7 +148,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var pathParts = new List<string>();
             var n = node;
             var urlSegment = n.UrlSegment(culture);
-            var hasDomains = _domainHelper.NodeHasDomains(n.Id);
+            var hasDomains = _domainCache.HasAssigned(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
                 // no segment indicates this is not published when this is a variant
@@ -163,7 +161,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (n != null)
                     urlSegment = n.UrlSegment(culture);
 
-                hasDomains = n != null && _domainHelper.NodeHasDomains(n.Id);
+                hasDomains = n != null && _domainCache.HasAssigned(n.Id);
             }
 
             // at this point this will be the urlSegment of the root, no segment indicates this is not published when this is a variant

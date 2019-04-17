@@ -284,7 +284,7 @@ namespace Umbraco.Web.Routing
             var defaultCulture = domainsCache.DefaultCulture;
 
             // try to find a domain matching the current request
-            var domainAndUri = DomainHelper.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
+            var domainAndUri = DomainUtilities.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
 
             // handle domain - always has a contentId and a culture
             if (domainAndUri != null)
@@ -328,7 +328,7 @@ namespace Umbraco.Web.Routing
             var nodePath = request.PublishedContent.Path;
             _logger.Debug<PublishedRouter>("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
             var rootNodeId = request.HasDomain ? request.Domain.ContentId : (int?)null;
-            var domain = DomainHelper.FindWildcardDomainInPath(request.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
+            var domain = DomainUtilities.FindWildcardDomainInPath(request.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
 
             // always has a contentId and a culture
             if (domain != null)

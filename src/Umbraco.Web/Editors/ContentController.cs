@@ -1656,7 +1656,7 @@ namespace Umbraco.Web.Editors
             {
                 try
                 {
-                    var uri = DomainHelper.ParseUriFromDomainName(domain.Name, Request.RequestUri);
+                    var uri = DomainUtilities.ParseUriFromDomainName(domain.Name, Request.RequestUri);
                 }
                 catch (UriFormatException)
                 {                    

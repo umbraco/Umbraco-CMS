@@ -22,7 +22,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly RoutesCache _routesCache;
         private readonly IDomainCache _domainCache;
-        private readonly DomainHelper _domainHelper;
         private readonly PublishedContentTypeCache _contentTypeCache;
 
         // initialize a PublishedContentCache instance with
@@ -48,7 +47,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _routesCache = routesCache; // may be null for unit-testing
             _contentTypeCache = contentTypeCache;
             _domainCache = domainCache;
-            _domainHelper = new DomainHelper(_domainCache, siteDomainHelper);
 
             _xmlStore = xmlStore;
             _xml = _xmlStore.Xml; // capture - because the cache has to remain consistent
@@ -107,7 +105,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             // that would be returned - the "deepest" route - and that is the route we want to cache, *not* the
             // longer one - so make sure we don't cache the wrong route
 
-            var deepest = DomainHelper.ExistsDomainInPath(_domainCache.GetAll(false), content.Path, domainRootNodeId) == false;
+            var deepest = DomainUtilities.ExistsDomainInPath(_domainCache.GetAll(false), content.Path, domainRootNodeId) == false;
 
             if (deepest)
                 _routesCache.Store(content.Id, route, true); // trusted route
@@ -267,7 +265,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             // or we reach the content root, collecting urls in the way
             var pathParts = new List<string>();
             var n = node;
-            var hasDomains = _domainHelper.NodeHasDomains(n.Id);
+            var hasDomains = _domainCache.HasAssigned(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
                 // get the url
@@ -276,7 +274,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
                 // move to parent node
                 n = n.Parent;
-                hasDomains = n != null && _domainHelper.NodeHasDomains(n.Id);
+                hasDomains = n != null && _domainCache.HasAssigned(n.Id);
             }
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
