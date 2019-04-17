@@ -19,7 +19,7 @@
 
                     <a href="" class="umb-help-list-item umb-help-list-item__content flex items-center justify-between" ng-click="tourGroup.open = !tourGroup.open">
                         <h5 class="umb-help-list-item__group-title">
-                            <umb-icon icon-name="{'icon-navigation-right': !tourGroup.open, 'icon-navigation-down': tourGroup.open}" ng-class="{'icon-navigation-right': !tourGroup.open, 'icon-navigation-down': tourGroup.open}"></umb-icon>
+                            <umb-icon icon-name="{{tourGroup.open ? 'icon-navigation-down' : 'icon-navigation-right'}}" ng-class="{'icon-navigation-right': !tourGroup.open, 'icon-navigation-down': tourGroup.open}"></umb-icon>
                             <span ng-if="tourGroup.group !== 'undefined'">{{tourGroup.group}}</span>
                             <span ng-if="tourGroup.group === 'undefined'">Other</span>
                         </h5>
@@ -34,7 +34,9 @@
                             <div class="umb-help-list-item__content justify-between">
                                 <div class="flex items-center">
                                     <div ng-if="!tour.completed" class="umb-number-badge umb-number-badge--xs umb-help-list-item__icon">{{ $index + 1 }}</div>
-                                    <umb-checkmark ng-if="tour.completed" size="xs" checked="tour.completed" class="umb-help-list-item__icon"></umb-checkmark>
+                                    <span ng-if="tour.completed" class="umb-help-list-item__icon umb-checkmark umb-checkmark--xs" ng-class="{'umb-checkmark--checked': tour.completed}">
+                                        <umb-icon  icon-name="icon-check" class="icon-check"></umb-icon>
+                                    </span>
                                     <span ng-class="{'strike': tour.completed}" class="umb-help-list-item__title">{{ tour.name }}</span>
                                 </div>
                                 <div>
