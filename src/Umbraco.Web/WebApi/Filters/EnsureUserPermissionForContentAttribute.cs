@@ -118,7 +118,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
 
             var queryStringCollection = HttpUtility.ParseQueryString(actionContext.Request.RequestUri.Query);
-            var ignoreUserStartNodes = bool.Parse(queryStringCollection["ignoreUserStartNodes"]);
+            bool.TryParse(queryStringCollection["ignoreUserStartNodes"], out var ignoreUserStartNodes);
             if (ignoreUserStartNodes == false)
             {
                 var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
