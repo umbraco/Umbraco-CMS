@@ -34,9 +34,7 @@
                             <div class="umb-help-list-item__content justify-between">
                                 <div class="flex items-center">
                                     <div ng-if="!tour.completed" class="umb-number-badge umb-number-badge--xs umb-help-list-item__icon">{{ $index + 1 }}</div>
-                                    <span ng-if="tour.completed" class="umb-help-list-item__icon umb-checkmark umb-checkmark--xs" ng-class="{'umb-checkmark--checked': tour.completed}">
-                                        <umb-icon  icon-name="icon-check" class="icon-check"></umb-icon>
-                                    </span>
+                                    <umb-checkmark ng-if="tour.completed" size="xs" checked="tour.completed" class="umb-help-list-item__icon"></umb-checkmark>
                                     <span ng-class="{'strike': tour.completed}" class="umb-help-list-item__title">{{ tour.name }}</span>
                                 </div>
                                 <div>
