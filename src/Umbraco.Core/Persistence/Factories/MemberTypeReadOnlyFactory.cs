@@ -54,6 +54,12 @@ namespace Umbraco.Core.Persistence.Factories
                     // no id, no dataTypeDefinitionId - ouch! - better notify caller of the situation
                     needsSaving = true;
 
+                    //fixme - this is wrong, this will add the standard prop without a group, yet by default it is attempted to be added to the
+                    // group with the `Membership` alias just like we do in the MemberTypeRepository.PersistNewItem:
+                    //      //By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
+                    //      entity.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
+                    // that's exactly how it would need to be done here too, but... need to decide where/how this is done properly.
+
                     //Add the standard PropertyType to the current list
                     propertyTypes.Add(standardPropertyType.Value);
                     
@@ -154,6 +160,7 @@ namespace Umbraco.Core.Persistence.Factories
             foreach (var typeDto in dto.PropertyTypes.Where(x => (x.PropertyTypeGroupId.HasValue == false || x.PropertyTypeGroupId.Value == 0) && x.Id.HasValue))
             {
                 //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
+
                 memberType.MemberTypePropertyTypes.Add(typeDto.Alias,
                     new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit, typeDto.IsSensitive));
 
