@@ -86,7 +86,7 @@
     <key alias="addNew">Tilføj nyt domæne</key>
     <key alias="remove">fjern</key>
     <key alias="invalidNode">Ugyldig node.</key>
-    <key alias="invalidDomain">Ugyldigt domæne-format.</key>
+    <key alias="invalidDomain">Et eller flere domæner har et ugyldigt format.</key>
     <key alias="duplicateDomain">Domæne er allerede blevet tildelt.</key>
     <key alias="language">Sprog</key>
     <key alias="domain">Domæne</key>

@@ -87,7 +87,7 @@
     <key alias="addNew">Add new Domain</key>
     <key alias="remove">remove</key>
     <key alias="invalidNode">Invalid node.</key>
-    <key alias="invalidDomain">Invalid domain format.</key>
+    <key alias="invalidDomain">One or more domains have an invalid format.</key>
     <key alias="duplicateDomain">Domain has already been assigned.</key>
     <key alias="language">Language</key>
     <key alias="domain">Domain</key>
@@ -96,7 +96,8 @@
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
-    <key alias="domainHelpWithVariants"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
+    <key alias="domainHelpWithVariants">
+    	<![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
      Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
@@ -282,7 +283,7 @@
     <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
     <key alias="languagesToPublish">What languages would you like to publish?</key>
     <key alias="languagesToSave">What languages would you like to save?</key>
-    <key alias="languagesToSaveForFirstTime">What languages would you like to save?</key>
+    <key alias="languagesToSaveForFirstTime">All languages with content are saved on creation!</key>
     <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
     <key alias="languagesToSchedule">What languages would you like to schedule?</key>
     <key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key>
@@ -2123,7 +2124,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="mediaFolderBrowser">Content</key>
     <key alias="settingsWelcome">Welcome</key>
     <key alias="settingsExamine">Examine Management</key>
-    <key alias="settingsPublishedStatus">Published Cache</key>
+    <key alias="settingsPublishedStatus">Published Status</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
     <key alias="memberIntro">Getting Started</key>

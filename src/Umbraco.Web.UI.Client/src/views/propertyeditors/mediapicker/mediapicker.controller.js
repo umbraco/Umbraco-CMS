@@ -7,8 +7,11 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
+        var ignoreUserStartNodes = Object.toBoolean($scope.model.config.ignoreUserStartNodes);
         $scope.allowEditMedia = false;
         $scope.allowAddMedia = false;
+
+
 
         function setupViewModel() {
             $scope.mediaItems = [];
@@ -90,26 +93,31 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             // reload. We only reload the images that is already picked but has been updated.
             // We have to get the entities from the server because the media 
             // can be edited without being selected
-            _.each($scope.images, function (image, i) {
-                if (updatedMediaNodes.indexOf(image.udi) !== -1) {
-                    image.loading = true;
-                    entityResource.getById(image.udi, "media")
-                        .then(function (mediaEntity) {
-                            angular.extend(image, mediaEntity);
-                            image.thumbnail = mediaHelper.resolveFileFromEntity(image, true);
-                            image.loading = false;
-                        });
-                }
-            })
+            _.each($scope.images,
+                function (image, i) {
+                    if (updatedMediaNodes.indexOf(image.udi) !== -1) {
+                        image.loading = true;
+                        entityResource.getById(image.udi, "media")
+                            .then(function (mediaEntity) {
+                                angular.extend(image, mediaEntity);
+                                image.thumbnail = mediaHelper.resolveFileFromEntity(image, true);
+                                image.loading = false;
+                            });
+                    }
+                });
         }
 
         function init() {
-
             userService.getCurrentUser().then(function (userData) {
                 if (!$scope.model.config.startNodeId) {
                     $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
                     $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
                 }
+                if (ignoreUserStartNodes === true) {
+                    $scope.model.config.startNodeId = -1;
+                    $scope.model.config.startNodeIsVirtual = true;
+                }
+
                 // only allow users to add and edit media if they have access to the media section
                 var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;
                 $scope.allowEditMedia = hasAccessToMedia;
@@ -167,11 +175,13 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             var mediaPicker = {
                 startNodeId: $scope.model.config.startNodeId,
                 startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
+                ignoreUserStartNodes: ignoreUserStartNodes,
                 multiPicker: multiPicker,
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,
 
-                submit: function(model) {
+                allowMediaEdit: true,
+                submit: function (model) {
 
                     editorService.close();
 
@@ -181,7 +191,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                         }
 
-                       $scope.mediaItems.push(media);
+                        $scope.mediaItems.push(media);
 
                         if ($scope.model.config.idType === "udi") {
                             $scope.ids.push(media.udi);
@@ -204,7 +214,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         };
 
-        
+
 
         $scope.sortableOptions = {
             disabled: !$scope.isMultiPicker,
@@ -216,7 +226,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
                 // watch do all the rest.
                 $timeout(function () {
-                    angular.forEach($scope.mediaItems, function(value, key) {
+                    angular.forEach($scope.mediaItems, function (value, key) {
                         r.push($scope.model.config.idType === "udi" ? value.udi : value.id);
                     });
                     $scope.ids = r;
@@ -235,5 +245,5 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         };
 
         init();
-        
+
     });
