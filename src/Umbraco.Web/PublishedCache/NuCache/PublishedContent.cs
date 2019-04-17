@@ -187,31 +187,31 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override string Name(string culture = null)
         {
-            // handle context culture
+            // invariant has invariant value (whatever the requested culture)
+            if (!ContentType.VariesByCulture())
+                return ContentData.Name;
+
+            // handle context culture for variant
             if (culture == null)
                 culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
 
-            // invariant culture
-            if (culture == "")
-                return ContentType.VariesByCulture() ? null : ContentData.Name;
-
-            // explicit culture
-            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.Name : null;
+            // get
+            return culture != "" && Cultures.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
 
         /// <inheritdoc />
         public override string UrlSegment(string culture = null)
         {
-            // handle context culture
+            // invariant has invariant value (whatever the requested culture)
+            if (!ContentType.VariesByCulture())
+                return _urlSegment;
+
+            // handle context culture fpr variant
             if (culture == null)
                 culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
 
-            // invariant culture
-            if (culture == "")
-                return ContentType.VariesByCulture() ? null : _urlSegment;
-
-            // explicit culture
-            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.UrlSegment : null;
+            // get
+            return culture != "" && Cultures.TryGetValue(culture, out var infos) ? infos.UrlSegment : null;
         }
 
         /// <inheritdoc />

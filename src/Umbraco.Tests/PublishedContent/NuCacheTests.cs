@@ -249,7 +249,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(ContentVariation.Nothing, againContent.ContentType.GetPropertyType("prop").Variations);
 
             // now, "no culture" means "invariant"
-            Assert.IsNull(againContent.Name()); // no invariant name for varying content
+            Assert.AreEqual("It Works1!", againContent.Name());
             Assert.AreEqual("val1", againContent.Value<string>("prop"));
         }
 
