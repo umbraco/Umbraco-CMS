@@ -223,13 +223,13 @@ namespace Umbraco.Tests.PublishedContent
             _variationAccesor.VariationContext = new VariationContext("fr-FR");
             Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop"));
             Assert.AreEqual("name-fr1", publishedContent.Name());
-            Assert.AreEqual(new DateTime(2018, 01, 01, 01, 00, 00), publishedContent.GetCulture().Date);
+            Assert.AreEqual(new DateTime(2018, 01, 01, 01, 00, 00), publishedContent.CultureDate());
 
             // now uk is default
             _variationAccesor.VariationContext = new VariationContext("en-UK");
             Assert.AreEqual("val-uk1", publishedContent.Value<string>("prop"));
             Assert.AreEqual("name-uk1", publishedContent.Name());
-            Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.GetCulture().Date);
+            Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.CultureDate());
 
             // invariant needs to be retrieved explicitly, when it's not default
             Assert.AreEqual("val1", publishedContent.Value<string>("prop", culture: ""));

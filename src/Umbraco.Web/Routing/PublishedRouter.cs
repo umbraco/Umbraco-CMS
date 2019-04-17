@@ -276,7 +276,7 @@ namespace Umbraco.Web.Routing
                     return true;
 
                 // variant, ensure that the culture corresponding to the domain's language is published
-                return domainDocument.Cultures.ContainsKey(domain.Culture.Name);
+                return domainDocument.Cultures.Contains(domain.Culture.Name);
             }
 
             domains = domains.Where(IsPublishedContentDomain).ToList();

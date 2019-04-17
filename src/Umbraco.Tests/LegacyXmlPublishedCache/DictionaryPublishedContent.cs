@@ -153,10 +153,11 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override string Name(string culture = null) => _name;
 
-        public override PublishedCultureInfo GetCulture(string culture = null) => null;
+        public override DateTime CultureDate(string culture = null) => UpdateDate;
 
-        private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
-        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
+        // ReSharper disable once CollectionNeverUpdated.Local
+        private static readonly List<string> EmptyListOfString = new List<string>();
+        public override IReadOnlyList<string> Cultures => EmptyListOfString;
 
         public override string UrlSegment(string culture = null) => _urlName;
 

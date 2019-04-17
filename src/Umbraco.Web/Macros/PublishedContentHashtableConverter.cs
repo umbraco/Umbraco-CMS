@@ -230,32 +230,31 @@ namespace Umbraco.Web.Macros
 
             public string Name(string culture = null) => _inner.GetCultureName(culture);
 
-            public PublishedCultureInfo GetCulture(string culture = null)
+            public DateTime CultureDate(string culture = null)
             {
-                // handle context culture
+                // invariant has invariant value (whatever the requested culture)
+                if (!ContentType.VariesByCulture())
+                    return UpdateDate;
+
+                // handle context culture for variant
                 if (culture == null)
                     culture = _variationContextAccessor.VariationContext.Culture;
 
-                // no invariant culture infos
-                if (culture == "") return null;
-
                 // get
-                return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
+                return culture != "" && _inner.PublishCultureInfos.TryGetValue(culture, out var infos) ? infos.Date : DateTime.MinValue;
             }
 
-            public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
+            // ReSharper disable once CollectionNeverUpdated.Local
+            private static readonly List<string> EmptyListOfString = new List<string>();
+            private IReadOnlyList<string> _cultures;
+
+            public IReadOnlyList<string> Cultures
             {
                 get
                 {
                     if (!_inner.ContentType.VariesByCulture())
-                        return NoCultureInfos;
-
-                    if (_cultureInfos != null)
-                        return _cultureInfos;
-
-                    var urlSegmentProviders = Current.UrlSegmentProviders; // TODO inject
-                    return _cultureInfos = _inner.PublishCultureInfos.Values
-                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(urlSegmentProviders, x.Culture), x.Date));
+                        return EmptyListOfString;
+                    return _cultures ?? (_cultures = _inner.PublishCultureInfos.Values.Select(x => x.Culture).ToList());
                 }
             }
 

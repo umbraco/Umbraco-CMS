@@ -140,9 +140,9 @@ namespace Umbraco.Web.PublishedCache
             return _member.Name;
         }
 
-        public override PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
+        public override DateTime CultureDate(string culture = null) => throw new NotSupportedException();
 
-        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+        public override IReadOnlyList<string> Cultures => throw new NotSupportedException();
 
         public override string UrlSegment(string culture = null) => throw new NotSupportedException();
 

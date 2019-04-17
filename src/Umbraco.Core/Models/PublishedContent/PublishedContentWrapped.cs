@@ -97,10 +97,10 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual string Url(string culture = null, UrlMode mode = UrlMode.Auto) => _content.Url(culture, mode);
 
         /// <inheritdoc />
-        public PublishedCultureInfo GetCulture(string culture = null) => _content.GetCulture(culture);
+        public DateTime CultureDate(string culture = null) => _content.CultureDate(culture);
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
+        public IReadOnlyList<string> Cultures => _content.Cultures;
 
         /// <inheritdoc />
         public virtual bool IsDraft(string culture = null) => _content.IsDraft(culture);

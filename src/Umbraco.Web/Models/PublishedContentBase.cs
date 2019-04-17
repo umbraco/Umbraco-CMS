@@ -135,10 +135,10 @@ namespace Umbraco.Web.Models
         }
 
         /// <inheritdoc />
-        public abstract PublishedCultureInfo GetCulture(string culture = null);
+        public abstract DateTime CultureDate(string culture = null);
 
         /// <inheritdoc />
-        public abstract IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
+        public abstract IReadOnlyList<string> Cultures { get; }
 
         /// <inheritdoc />
         public abstract bool IsDraft(string culture = null);

@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         /// <remarks>
         /// <para>For published content items, this is also the date the item was published.</para>
-        /// <para>This date is always global to the content item, see GetCulture().Date for the
+        /// <para>This date is always global to the content item, see CultureDate() for the
         /// date each culture was published.</para>
         /// </remarks>
         DateTime UpdateDate { get; }
@@ -104,19 +104,20 @@ namespace Umbraco.Core.Models.PublishedContent
         string Url(string culture = null, UrlMode mode = UrlMode.Auto);
 
         /// <summary>
-        /// Gets culture infos for a culture.
+        /// Gets the culture date of the content item.
         /// </summary>
-        PublishedCultureInfo GetCulture(string culture = null);
+        /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
+        DateTime CultureDate(string culture = null);
 
         /// <summary>
-        /// Gets culture infos.
+        /// Gets all available cultures.
         /// </summary>
         /// <remarks>
         /// <para>Contains only those culture that are available. For a published content, these are
         /// the cultures that are published. For a draft content, those that are 'available' ie
         /// have a non-empty content name.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
+        IReadOnlyList<string> Cultures { get; }
 
         /// <summary>
         /// Gets a value indicating whether the content is draft.

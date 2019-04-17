@@ -9,12 +9,13 @@ namespace Umbraco.Tests.TestHelpers.Stubs
     {
         private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _urlSegments = new Dictionary<string, string>();
+        private readonly Dictionary<string, DateTime> _cultures;
 
-        public TestPublishedContent(IPublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfo> cultures = null)
+        public TestPublishedContent(IPublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, DateTime> cultures = null)
             : base(contentType, key, values, previewing)
         {
             Id = id;
-            Cultures = cultures;
+            _cultures = cultures ??  new Dictionary<string, DateTime>();
         }
 
         public int Id { get; }
@@ -23,19 +24,19 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public string Name(string culture = null) => _names.TryGetValue(culture ?? "", out var name) ? name : null;
         public void SetName(string name, string culture = null) => _names[culture ?? ""] = name;
         public IVariationContextAccessor VariationContextAccessor { get; set; }
-        public PublishedCultureInfo GetCulture(string culture = null)
+        public DateTime CultureDate(string culture = null)
         {
             // handle context culture
             if (culture == null)
                 culture = VariationContextAccessor?.VariationContext?.Culture;
 
             // no invariant culture infos
-            if (culture == "" || Cultures == null) return null;
+            if (culture == "" || Cultures == null) return UpdateDate;
 
             // get
-            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
+            return _cultures.TryGetValue(culture, out var date) ? date : DateTime.MinValue;
         }
-        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; set; }
+        public IReadOnlyList<string> Cultures { get; set; }
         public string UrlSegment(string culture = null) => _urlSegments.TryGetValue(culture ?? "", out var urlSegment) ? urlSegment : null;
         public void SetUrlSegment(string urlSegment, string culture = null) => _urlSegments[culture ?? ""] = urlSegment;
         public string DocumentTypeAlias => ContentType.Alias;

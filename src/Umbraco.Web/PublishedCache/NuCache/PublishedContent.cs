@@ -196,7 +196,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
 
             // get
-            return culture != "" && Cultures.TryGetValue(culture, out var infos) ? infos.Name : null;
+            return culture != "" && ContentData.CultureInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
 
         /// <inheritdoc />
@@ -206,12 +206,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (!ContentType.VariesByCulture())
                 return _urlSegment;
 
-            // handle context culture fpr variant
+            // handle context culture for variant
             if (culture == null)
                 culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
 
             // get
-            return culture != "" && Cultures.TryGetValue(culture, out var infos) ? infos.UrlSegment : null;
+            return ContentData.CultureInfos.TryGetValue(culture, out var infos) ? infos.UrlSegment : null;
         }
 
         /// <inheritdoc />
@@ -244,39 +244,34 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override DateTime UpdateDate => ContentData.VersionDate;
 
-        private IReadOnlyDictionary<string, PublishedCultureInfo> _cultureInfos;
-
-        private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> NoCultureInfos = new Dictionary<string, PublishedCultureInfo>();
-
         /// <inheritdoc />
-        public override PublishedCultureInfo GetCulture(string culture = null)
+        public override DateTime CultureDate(string culture = null)
         {
-            // handle context culture
+            // invariant has invariant value (whatever the requested culture)
+            if (!ContentType.VariesByCulture())
+                return UpdateDate;
+
+            // handle context culture for variant
             if (culture == null)
                 culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
 
-            // no invariant culture infos
-            if (culture == "") return null;
-
             // get
-            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
+            return culture != "" && ContentData.CultureInfos.TryGetValue(culture, out var infos) ? infos.Date : DateTime.MinValue;
         }
 
+        // ReSharper disable once CollectionNeverUpdated.Local
+        private static readonly List<string> EmptyListOfString = new List<string>();
+        private IReadOnlyList<string> _cultures;
+
         /// <inheritdoc />
-        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
+        public override IReadOnlyList<string> Cultures
         {
             get
             {
                 if (!ContentType.VariesByCulture())
-                    return NoCultureInfos;
+                    return EmptyListOfString;
 
-                if (_cultureInfos != null) return _cultureInfos;
-
-                if (ContentData.CultureInfos == null)
-                    throw new Exception("oops: _contentDate.CultureInfos is null.");
-
-                return _cultureInfos = ContentData.CultureInfos
-                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date), StringComparer.OrdinalIgnoreCase);
+                return _cultures ?? (_cultures = ContentData.CultureInfos.Keys.ToList());
             }
         }
 
