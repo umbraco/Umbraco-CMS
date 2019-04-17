@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -12,7 +11,6 @@ using System.Net.Http;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Services;
 using System;
-using System.ComponentModel;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;

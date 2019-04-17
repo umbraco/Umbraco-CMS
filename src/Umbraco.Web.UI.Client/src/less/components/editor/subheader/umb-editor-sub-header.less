@@ -1,7 +1,11 @@
 .umb-editor-sub-header {
    padding: 10px 0;
    margin-bottom: 10px;
-   background: @gray-10;
+   background: @brownGrayLight;
+   border-left: 5px solid @brownGrayLight;
+   border-right: 5px solid @brownGrayLight;
+   margin-left: -5px;
+   margin-right: -5px;
    display: flex;
    justify-content: space-between;
    margin-top: -10px;
@@ -12,8 +16,12 @@
     &.nested {
         margin-top: 0;
         margin-bottom: 0;
-        background: @gray-10;
+        background: @brownGrayLight;
     }
+}
+.umb-editor-sub-header--white {
+    background-color: white;
+    border-color: white;
 }
 
 .umb-editor-sub-header.--state-selection {
@@ -25,10 +33,14 @@
 
 .umb-editor-sub-header.-umb-sticky-bar {
     box-shadow: 0 6px 3px -3px rgba(0,0,0,.16);
-    transition: box-shadow 1s;
-    top: calc(@appHeaderHeight + @editorHeaderHeight);
+    transition: box-shadow 240ms;
     margin-top: 0;
     margin-bottom: 0;
+    top: calc(@appHeaderHeight + @editorHeaderHeight);
+    
+    .umb-editor--infinityMode & {
+        top: calc(@editorHeaderHeight);
+    }
 }
 
 .umb-group-builder__property-preview .umb-editor-sub-header {

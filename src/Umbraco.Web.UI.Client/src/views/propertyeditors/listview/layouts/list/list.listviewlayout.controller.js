@@ -19,7 +19,7 @@
         vm.activeDrag = false;
         vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
         vm.acceptedMediatypes = [];
-
+        
         vm.selectItem = selectItem;
         vm.clickItem = clickItem;
         vm.selectAll = selectAll;
@@ -40,8 +40,8 @@
             }
         }
 
-        function selectAll($event) {
-            listViewHelper.selectAllItems($scope.items, $scope.selection, $event);
+        function selectAll() {
+            listViewHelper.selectAllItemsToggle($scope.items, $scope.selection);
         }
 
         function isSelectedAll() {
@@ -55,7 +55,7 @@
         function clickItem(item) {
             // if item.id is 2147483647 (int.MaxValue) use item.key
             $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id));
-                }
+        }
 
         function isSortDirection(col, direction) {
             return listViewHelper.setSortingDirection(col, direction, $scope.options);

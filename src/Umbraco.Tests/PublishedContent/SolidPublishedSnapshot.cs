@@ -92,6 +92,9 @@ namespace Umbraco.Tests.PublishedContent
             throw new NotImplementedException();
         }
 
+        public override IPublishedContent GetById(bool preview, Udi nodeId)
+            => throw new NotSupportedException();
+
         public override bool HasById(bool preview, int contentId)
         {
             return _content.ContainsKey(contentId);

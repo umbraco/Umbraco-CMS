@@ -1,0 +1,42 @@
+/* PACKAGE DETAILS */
+
+.umb-logviewer {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+@sidebarwidth: 350px; // Width of sidebar. Ugly hack because of old version of Less
+
+.umb-logviewer__main-content {
+    flex: 1 1 auto;
+    margin-right: 20px;
+    width: calc(~'100%' - ~'@{sidebarwidth}' - ~'20px'); // Make sure that the main content area doesn't gets affected by inline styling
+    min-width: 500px;
+
+    .btn-link {
+        text-align: left;
+    }
+}
+
+.umb-logviewer__sidebar {
+    flex: 0 0 @sidebarwidth;
+}
+
+@media (max-width: 768px) {
+
+    .umb-logviewer {
+        flex-direction: column;
+    }
+
+    .umb-logviewer__main-content {
+        flex: 1 1 auto;
+        width: 100%;
+        margin-bottom: 30px;
+        margin-right: 0;        
+    }
+
+    .umb-logviewer__sidebar {
+        flex: 1 1 auto;
+        width: 100%;
+    }
+}

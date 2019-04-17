@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <metadata minClientVersion="4.6.0">
+    <metadata minClientVersion="4.1.0">
         <id>UmbracoCms.Web</id>
         <version>8.0.0</version>
         <title>Umbraco Cms Core Binaries</title>

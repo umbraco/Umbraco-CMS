@@ -9,7 +9,7 @@
 (function () {
     'use strict';
 
-    function TemplatesController($scope, entityResource, contentTypeHelper, templateResource, $routeParams) {
+    function TemplatesController($scope, entityResource, contentTypeHelper, templateResource, contentTypeResource, $routeParams) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -48,34 +48,25 @@
 
             vm.createTemplateButtonState = "busy";
 
-            templateResource.getScaffold(-1).then(function (template) {
-
-                template.alias = $scope.model.alias;
-                template.name = $scope.model.name;
-
-                templateResource.save(template).then(function (savedTemplate) {
-
-                    // add icon
-                    savedTemplate.icon = "icon-layout";
+            contentTypeResource.createDefaultTemplate($scope.model.id).then(function (savedTemplate) {
+                // add icon
+                savedTemplate.icon = "icon-layout";
                     
-                    vm.availableTemplates.push(savedTemplate);
-                    vm.canCreateTemplate = false;
+                vm.availableTemplates.push(savedTemplate);
+                vm.canCreateTemplate = false;
 
-                    $scope.model.allowedTemplates.push(savedTemplate);
+                $scope.model.allowedTemplates.push(savedTemplate);
 
-                    if ($scope.model.defaultTemplate === null) {
-                        $scope.model.defaultTemplate = savedTemplate;
-                    }
+                if ($scope.model.defaultTemplate === null) {
+                    $scope.model.defaultTemplate = savedTemplate;
+                }
 
-                    vm.createTemplateButtonState = "success";
-
-                }, function() {
-                    vm.createTemplateButtonState = "error";
-                });
+                vm.createTemplateButtonState = "success";
 
             }, function() {
                 vm.createTemplateButtonState = "error";
             });
+
         };
 
         function checkIfTemplateExists() {

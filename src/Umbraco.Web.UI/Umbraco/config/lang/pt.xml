@@ -40,7 +40,6 @@
     <key alias="domainCreated">Novo domínio '%0%' foi criado</key>
     <key alias="domainDeleted">Domínio '%0%' foi removido</key>
     <key alias="domainExists">Domínio '%0%' já foi designado</key>
-    <key alias="domainHelp">ou seja: seudominio.com, www.seudominio.com</key>
     <key alias="domainUpdated">Domínio '%0%' foi atualizado</key>
     <key alias="orEdit">Editar Domínios Atuais</key>
   </area>

@@ -12,14 +12,15 @@
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.modifiedVariantFilter">
             <ng-form name="publishVariantSelectorForm">
-                <div class="flex">
-                    <input id="{{variant.htmlId}}"
-                           name="publishVariantSelector"
-                           type="checkbox"
-                           ng-model="variant.save"
-                           ng-change="vm.changeSelection(variant)"
-                           style="margin-right: 8px;"
-                           val-server-field="{{variant.htmlId}}" />
+                <div class="flex" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
+
+                    <umb-checkbox
+                        input-id="{{variant.htmlId}}"
+                        name="publishVariantSelector"
+                        model="variant.save"
+                        on-change="vm.changeSelection(variant)"
+                        server-validation-field="{{variant.htmlId}}"/>
+
                     <div>
                         <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                             <span>{{ variant.language.name }}</span>
@@ -33,9 +34,8 @@
                                 <span class="db umb-permission__description text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
                             </span>
 
-                            <span class="db" ng-repeat="notification in variant.notifications">
-                                <span class="db umb-permission__description text-success">{{notification.message}}</span>
-                            </span>
+                            <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
+
                         </label>
                     </div>
                 </div>

@@ -93,7 +93,6 @@ namespace Umbraco.Core
             /// </summary>
             public const string DisableElectionForSingleServer = "Umbraco.Core.DisableElectionForSingleServer";
 
-            
             /// <summary>
             /// Debug specific web.config AppSetting keys for Umbraco
             /// </summary>

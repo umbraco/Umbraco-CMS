@@ -60,7 +60,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="Examine" Version="1.0.0" />
@@ -86,6 +85,9 @@
     <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
+    <PackageReference Include="Umbraco.Code">
+      <Version>1.0.5</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
@@ -134,6 +136,8 @@
     <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
     <Compile Include="Dashboards\SettingsDashboards.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
+    <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
@@ -202,9 +206,14 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
+    <Compile Include="Models\Mapping\CommonMapper.cs" />
+    <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
+    <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
+    <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
+    <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
@@ -213,6 +222,8 @@
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="UmbracoContextReference.cs" />
+    <Compile Include="ViewDataExtensions.cs" />
+    <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />
@@ -241,12 +252,10 @@
     <Compile Include="Models\ContentEditing\SearchResult.cs" />
     <Compile Include="Models\ContentEditing\SearchResults.cs" />
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
-    <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
     <Compile Include="ContentApps\ContentAppFactoryCollection.cs" />
     <Compile Include="ContentApps\ContentAppFactoryCollectionBuilder.cs" />
     <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
     <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
-    <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
     <Compile Include="Services\ITreeService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Sections\SectionCollection.cs" />
@@ -278,7 +287,7 @@
     <Compile Include="Models\ContentEditing\ContentDomainsAndCulture.cs" />
     <Compile Include="Models\ContentEditing\ContentSavedState.cs" />
     <Compile Include="Trees\LogViewerTreeController.cs" />
-    <Compile Include="Models\Mapping\ContentSavedStateResolver.cs" />
+    <Compile Include="Models\Mapping\ContentSavedStateMapper.cs" />
     <Compile Include="Mvc\ContainerControllerFactory.cs" />
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
@@ -302,7 +311,7 @@
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
     <Compile Include="Editors\EditorValidatorOfT.cs" />
-    <Compile Include="Editors\Filters\MemberValidationHelper.cs" />
+    <Compile Include="Editors\Filters\MemberSaveModelValidator.cs" />
     <Compile Include="Editors\ExamineManagementController.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\HelpController.cs" />
@@ -417,34 +426,14 @@
     <Compile Include="Models\ContentEditing\UserSave.cs" />
     <Compile Include="Models\ContentEditing\Language.cs" />
     <Compile Include="Models\ContentTypeImportModel.cs" />
-    <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
-    <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
-    <Compile Include="Models\Mapping\ContentAppResolver.cs" />
-    <Compile Include="Models\Mapping\ContentTypeVariationsResolver.cs" />
-    <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
-    <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
-    <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />
-    <Compile Include="Models\Mapping\DictionaryMapperProfile.cs" />
-    <Compile Include="Models\Mapping\LanguageMapperProfile.cs" />
-    <Compile Include="Models\Mapping\MediaAppResolver.cs" />
-    <Compile Include="Models\Mapping\MediaChildOfListViewResolver.cs" />
-    <Compile Include="Models\Mapping\CodeFileMapperProfile.cs" />
-    <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
-    <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
-    <Compile Include="Models\Mapping\EntityProfileExtensions.cs" />
-    <Compile Include="Models\Mapping\ContentTypeBasicResolver.cs" />
-    <Compile Include="Models\Mapping\MemberBasicPropertiesResolver.cs" />
-    <Compile Include="Models\Mapping\MemberDtoPropertiesResolver.cs" />
-    <Compile Include="Models\Mapping\MemberProviderFieldResolver.cs" />
-    <Compile Include="Models\Mapping\MembershipScenarioResolver.cs" />
-    <Compile Include="Models\Mapping\MembershipUserTypeConverter.cs" />
-    <Compile Include="Models\Mapping\MemberTabsAndPropertiesResolver.cs" />
-    <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
-    <Compile Include="Models\Mapping\PropertyTypeVariationsResolver.cs" />
-    <Compile Include="Models\Mapping\RedirectUrlMapperProfile.cs" />
-    <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
-    <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
-    <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
+    <Compile Include="Models\Mapping\AuditMapDefinition.cs" />
+    <Compile Include="Models\Mapping\DictionaryMapDefinition.cs" />
+    <Compile Include="Models\Mapping\LanguageMapDefinition.cs" />
+    <Compile Include="Models\Mapping\CodeFileMapDefinition.cs" />
+    <Compile Include="Models\Mapping\MemberTabsAndPropertiesMapper.cs" />
+    <Compile Include="Models\Mapping\RedirectUrlMapDefinition.cs" />
+    <Compile Include="Models\Mapping\TemplateMapDefinition.cs" />
+    <Compile Include="Models\Mapping\ContentVariantMapper.cs" />
     <Compile Include="Models\PublishedContent\HttpContextVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />
     <Compile Include="Models\SendCodeViewModel.cs" />
@@ -651,9 +640,6 @@
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
-    <Compile Include="Models\Mapping\ContentTypeProfileExtensions.cs" />
-    <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
-    <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\PackageInstallResult.cs" />
     <Compile Include="Models\SetPasswordModel.cs" />
     <Compile Include="Models\RequestPasswordResetModel.cs" />
@@ -683,7 +669,7 @@
     <Compile Include="Models\ContentEditing\PropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupDisplay.cs" />
     <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
-    <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
+    <Compile Include="Models\Mapping\PropertyTypeGroupMapper.cs" />
     <Compile Include="Services\TreeService.cs" />
     <Compile Include="Security\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
@@ -697,7 +683,7 @@
     <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="ITagQuery.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
-    <Compile Include="Models\Mapping\RelationMapperProfile.cs" />
+    <Compile Include="Models\Mapping\RelationMapDefinition.cs" />
     <Compile Include="Models\UnLinkLoginModel.cs" />
     <Compile Include="Mvc\MvcVersionCheck.cs" />
     <Compile Include="Scheduling\ThreadingTaskImmutable.cs" />
@@ -824,9 +810,9 @@
     <Compile Include="Models\ContentEditing\RichTextEditorPlugin.cs" />
     <Compile Include="Models\ContentEditing\StylesheetRule.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
-    <Compile Include="Models\Mapping\MacroMapperProfile.cs" />
-    <Compile Include="Models\Mapping\MemberMapperProfile.cs" />
-    <Compile Include="Models\Mapping\TagMapperProfile.cs" />
+    <Compile Include="Models\Mapping\MacroMapDefinition.cs" />
+    <Compile Include="Models\Mapping\MemberMapDefinition.cs" />
+    <Compile Include="Models\Mapping\TagMapDefinition.cs" />
     <Compile Include="Models\TagModel.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
@@ -854,11 +840,8 @@
     <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
-    <Compile Include="Models\Mapping\AvailablePropertyEditorsResolver.cs" />
-    <Compile Include="Models\Mapping\DatabaseTypeResolver.cs" />
-    <Compile Include="Models\Mapping\DataTypeMapperProfile.cs" />
-    <Compile Include="Models\Mapping\EntityMapperProfile.cs" />
-    <Compile Include="Models\Mapping\DataTypeConfigurationFieldDisplayResolver.cs" />
+    <Compile Include="Models\Mapping\DataTypeMapDefinition.cs" />
+    <Compile Include="Models\Mapping\EntityMapDefinition.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
@@ -877,7 +860,6 @@
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
-    <Compile Include="Routing\CustomRouteUrlProvider.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerOptions.cs" />
     <Compile Include="Scheduling\IBackgroundTaskRunner.cs" />
@@ -967,18 +949,16 @@
     <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\ContentEditing\UserDetail.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
-    <Compile Include="Models\Mapping\ContentPropertyBasicConverter.cs" />
-    <Compile Include="Models\Mapping\ContentPropertyDisplayConverter.cs" />
-    <Compile Include="Models\Mapping\ContentPropertyDtoConverter.cs" />
-    <Compile Include="Models\Mapping\ContentPropertyMapperProfile.cs" />
-    <Compile Include="Models\Mapping\CreatorResolver.cs" />
-    <Compile Include="Models\Mapping\MediaMapperProfile.cs" />
-    <Compile Include="Models\Mapping\ContentTypeMapperProfile.cs" />
-    <Compile Include="Models\Mapping\ContentMapperProfile.cs" />
-    <Compile Include="Models\Mapping\OwnerResolver.cs" />
-    <Compile Include="Models\Mapping\SectionMapperProfile.cs" />
-    <Compile Include="Models\Mapping\TabsAndPropertiesResolver.cs" />
-    <Compile Include="Models\Mapping\UserMapperProfile.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyBasicMapper.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyDisplayMapper.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyDtoMapper.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyMapDefinition.cs" />
+    <Compile Include="Models\Mapping\MediaMapDefinition.cs" />
+    <Compile Include="Models\Mapping\ContentTypeMapDefinition.cs" />
+    <Compile Include="Models\Mapping\ContentMapDefinition.cs" />
+    <Compile Include="Models\Mapping\SectionMapDefinition.cs" />
+    <Compile Include="Models\Mapping\TabsAndPropertiesMapper.cs" />
+    <Compile Include="Models\Mapping\UserMapDefinition.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPropertyEditor.cs" />
@@ -1058,7 +1038,7 @@
     <Compile Include="Editors\Binders\ContentItemBinder.cs" />
     <Compile Include="Editors\Binders\MediaItemBinder.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForContentAttribute.cs" />
-    <Compile Include="Editors\Filters\ContentItemValidationHelper.cs" />
+    <Compile Include="Editors\Filters\ContentModelValidator.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForMediaAttribute.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterAllowedOutgoingContentAttribute.cs" />
