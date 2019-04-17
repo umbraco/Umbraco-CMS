@@ -250,7 +250,7 @@
                     <umb-box>
                         <umb-box-content>
                             <div class="umb-package-details__section-title"><localize key="packager_packageCompatibility">Compatibility</localize></div>
-                            <div class="umb-package-details__section-description"><localize key="packager_packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</localize></div>
+                            <div class="umb-package-details__section-description"><localize key="packager_packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be guaranteed for versions reported below 100%</localize></div>
                             <div class="umb-package-details__compatability" ng-repeat="compatibility in vm.package.compatibility | filter:percentage > 0">
                                 <div class="umb-package-details__compatability-label">
                                     <span class="umb-package-details__information-item-label">{{compatibility.version}}</span>

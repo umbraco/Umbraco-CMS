@@ -22,7 +22,9 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private MemberTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new MemberTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
+            var templateRepository = Mock.Of<ITemplateRepository>();
+            var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches);
+            return new MemberTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), commonRepository);
         }
 
         [Test]
@@ -35,7 +37,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = (IMemberType) MockedContentTypes.CreateSimpleMemberType();
                 repository.Save(memberType);
-                
 
                 var sut = repository.Get(memberType.Id);
 
@@ -88,7 +89,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberType.Alias = null;
-                
+
 
                 Assert.Throws<InvalidOperationException>(() => repository.Save(memberType));
             }
@@ -104,13 +105,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 repository.Save(memberType1);
-                
+
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
                 repository.Save(memberType2);
-                
+
 
                 var result = repository.GetMany();
 
@@ -129,13 +130,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 repository.Save(memberType1);
-                
+
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
                 repository.Save(memberType2);
-                
+
 
                 var result = ((IReadRepository<Guid, IMemberType>)repository).GetMany(memberType1.Key, memberType2.Key);
 
@@ -154,13 +155,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 repository.Save(memberType1);
-                
+
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
                 repository.Save(memberType2);
-                
+
 
                 var result = repository.Get(memberType1.Key);
 
@@ -183,14 +184,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 memberType1.PropertyTypeCollection.Clear();
                 repository.Save(memberType1);
-                
+
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.PropertyTypeCollection.Clear();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
                 repository.Save(memberType2);
-                
+
 
                 var result = repository.GetMany();
 
@@ -210,7 +211,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.Save(memberType);
-                
+
                 memberType = repository.Get(memberType.Id);
                 Assert.That(memberType, Is.Not.Null);
             }
@@ -226,7 +227,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.Save(memberType);
-                
+
                 memberType = repository.Get(memberType.Key);
                 Assert.That(memberType, Is.Not.Null);
             }
@@ -242,7 +243,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.Save(memberType);
-                
+
 
                 memberType = repository.Get(memberType.Id);
 
@@ -265,7 +266,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 IMemberType memberType2 = MockedContentTypes.CreateSimpleMemberType("test2");
                 repository.Save(memberType1);
                 repository.Save(memberType2);
-                
+
 
                 var m1Ids = memberType1.PropertyTypes.Select(x => x.Id).ToArray();
                 var m2Ids = memberType2.PropertyTypes.Select(x => x.Id).ToArray();
@@ -286,11 +287,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.Save(memberType);
-                
+
 
                 var contentType2 = repository.Get(memberType.Id);
                 repository.Delete(contentType2);
-                
+
 
                 var exists = repository.Exists(memberType.Id);
 

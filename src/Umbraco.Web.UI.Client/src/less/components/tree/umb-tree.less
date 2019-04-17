@@ -164,7 +164,9 @@ body.touch .umb-tree {
 }
 
 .umb-tree .umb-tree-node-checked > .umb-tree-item__inner > i[class^="icon-"],
-.umb-tree .umb-tree-node-checked > .umb-tree-item__inner > i[class*=" icon-"] {
+.umb-tree .umb-tree-node-checked > .umb-tree-item__inner > i[class*=" icon-"],
+.umb-tree .umb-tree-node-checked .umb-search-group-item-name > i[class^="icon-"],
+.umb-tree .umb-tree-node-checked .umb-search-group-item-name > i[class*=" icon-"] {
     font-family: 'icomoon' !important;
     color: @green !important;
 
@@ -224,40 +226,64 @@ body.touch .umb-tree {
     }
 }
 
-.umb-tree-item__annotation {
-    &::before {
-        font-family: 'icomoon';
-        position: absolute;
-        bottom: 0;
-    }
-}
+.has-unpublished-version, .is-container, .protected {
+    > .umb-tree-item__inner {
+        > .umb-tree-item__annotation {
+            background-color: @white;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            position: absolute;
+            margin-left: 12px;
+            top: 17px;
 
-.has-unpublished-version > .umb-tree-item__inner > .umb-tree-item__annotation::before {
-    content: "\e25a";
-    color: @green;
-    font-size: 20px;
-    margin-left: -25px;
+            &::before {
+                font-family: 'icomoon';
+                position: absolute;
+                top: -4px;
+            }
+        }
+
+        &:hover > .umb-tree-item__annotation {
+            background-color: @ui-option-hover;
+        }
+    }
+
+    &.current > .umb-tree-item__inner > .umb-tree-item__annotation {
+        background-color: @pinkLight;
+    }
 }
 
 .is-container > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e04e";
     color: @blue;
     font-size: 9px;
-    margin-left: -20px;
+    margin-left: 2px;
+    left: 0px;
+}
+
+.has-unpublished-version > .umb-tree-item__inner > .umb-tree-item__annotation::before {
+    content: "\e25a";
+    color: @green;
+    font-size: 23px;
+    margin-left: 16px;
+    left: -21px;
 }
 
 .protected > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e256";
     color: @red;
-    font-size: 20px;
-    margin-left: -25px;
+    font-size: 23px;
+    margin-left: -3px;
+    left: -2px;
 }
 
 .locked > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e0a7";
     color: @red;
     font-size: 9px;
-    margin-left: -20px;
+    margin-left: 2px;
+    left: 0px;
 }
 
 .no-access {

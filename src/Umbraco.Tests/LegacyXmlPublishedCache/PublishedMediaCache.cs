@@ -97,6 +97,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             throw new NotImplementedException();
         }
 
+        public override IPublishedContent GetById(bool preview, Udi nodeId)
+            => throw new NotSupportedException();
+
         public override bool HasById(bool preview, int contentId)
         {
             return GetUmbracoMedia(contentId) != null;

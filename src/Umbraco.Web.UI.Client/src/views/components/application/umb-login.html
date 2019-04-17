@@ -2,10 +2,10 @@
 
     <div id="login" class="umb-modalcolumn umb-dialog" ng-class="{'show-validation': vm.loginForm.$invalid}" ng-cloak>
 
-        <div class="login-overlay__background-image" ng-if="vm.backgroundImage" ng-style="{'background-image':'url(' + vm.backgroundImage + ')'}"></div>
+        <div class="login-overlay__background-image" ng-style="{'background-image': 'url('+vm.backgroundImage+')'}"></div>
 
         <div class="login-overlay__logo">
-            <img ng-src="assets/img/application/logo.png" ng-srcset="assets/img/application/logo@2x.png 2x, assets/img/application/logo@3x.png 3x">
+            <img src="assets/img/application/umbraco_logo_white.svg">
         </div>
 
         <div ng-show="vm.invitedUser != null" class="umb-login-container">

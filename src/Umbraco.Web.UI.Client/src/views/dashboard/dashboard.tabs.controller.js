@@ -22,7 +22,7 @@ function startUpVideosDashboardController($scope, dashboardResource) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function startUpDynamicContentController($timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
+function startUpDynamicContentController($q, $timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
     var vm = this;
     var evts = [];
 
@@ -167,7 +167,7 @@ function FormsController($scope, $cookies, packageResource, localizationService)
                     return packageResource.installData(pack);
                 }, vm.error)
             .then(function(pack) {
-                vm.state = installStateComplete;
+                vm.state = labels.installStateComplete;
                     return packageResource.cleanUp(pack);
                 }, vm.error)
             .then(vm.complete, vm.error);

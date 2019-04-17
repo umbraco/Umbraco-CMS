@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Configuration;
 using System.Web;
 using System.Web.Configuration;
+using System.Web.Hosting;
 using System.Xml.Linq;
 using Umbraco.Core.IO;
 
@@ -17,16 +18,15 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     public class GlobalSettings : IGlobalSettings
     {
+        private string _localTempPath;
 
-        #region Private static fields
-
-        
+        // TODO these should not be static
         private static string _reservedPaths;
         private static string _reservedUrls;
+
         //ensure the built on (non-changeable) reserved paths are there at all times
         internal const string StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
         internal const string StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known,"; //must end with a comma!
-        #endregion
 
         /// <summary>
         /// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Configuration
                     : "~/App_Data/umbraco.config";
             }
         }
-        
+
         /// <summary>
         /// Gets the path to umbraco's root directory (/umbraco by default).
         /// </summary>
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Configuration
                 SaveSetting(Constants.AppSettings.ConfigurationStatus, value);
             }
         }
-        
+
         /// <summary>
         /// Saves a setting into the configuration file.
         /// </summary>
@@ -220,7 +220,7 @@ namespace Umbraco.Core.Configuration
                 ConfigurationManager.RefreshSection("appSettings");
             }
         }
-              
+
         /// <summary>
         /// Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>
@@ -264,7 +264,7 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
-        
+
         /// <summary>
         /// Returns the number of days that should take place between version checks.
         /// </summary>
@@ -283,7 +283,7 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
-        
+
         /// <inheritdoc />
         public LocalTempStorage LocalTempStorageLocation
         {
@@ -302,24 +302,42 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
+                if (_localTempPath != null)
+                    return _localTempPath;
+
                 switch (LocalTempStorageLocation)
                 {
                     case LocalTempStorage.AspNetTemp:
-                        return System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
+                        return _localTempPath = System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
+
                     case LocalTempStorage.EnvironmentTemp:
-                        // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-                        // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
-                        var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
-                        return System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash);
+
+                        // environment temp is unique, we need a folder per site
+
+                        // use a hash
+                        // combine site name and application id
+                        //  site name is a Guid on Cloud
+                        //  application id is eg /LM/W3SVC/123456/ROOT
+                        // the combination is unique on one server
+                        // and, if a site moves from worker A to B and then back to A...
+                        //  hopefully it gets a new Guid or new application id?
+
+                        var siteName = HostingEnvironment.SiteName;
+                        var applicationId = HostingEnvironment.ApplicationID; // ie HttpRuntime.AppDomainAppId
+
+                        var hashString = siteName + "::" + applicationId;
+                        var hash = hashString.GenerateHash();
+                        var siteTemp = System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", hash);
+
+                        return _localTempPath = siteTemp;
+
                     //case LocalTempStorage.Default:
                     //case LocalTempStorage.Unknown:
                     default:
-                        return IOHelper.MapPath("~/App_Data/TEMP");
+                        return _localTempPath = IOHelper.MapPath("~/App_Data/TEMP");
                 }
             }
         }
-
 
         /// <summary>
         /// Gets the default UI language.

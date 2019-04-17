@@ -75,7 +75,7 @@
   display: flex;
   align-items: center;
   border-bottom: 1px solid @gray-9;
-  padding: 10px 15px;
+  padding: 10px 15px 10px 10px;
 }
 
 .umb-group-builder__group-title {
@@ -112,7 +112,7 @@ input.umb-group-builder__group-title-input {
 }
 
 input.umb-group-builder__group-title-input:disabled:hover {
-  border: none;
+    border-color: transparent;
 }
 
 .umb-group-builder__group-title-input:hover {
@@ -135,12 +135,35 @@ input.umb-group-builder__group-title-input:disabled:hover {
     margin-left: auto;
 }
 
+.umb-group-builder__group-add-property {
+    min-height: 46px;
+    margin-right: 30px;
+    margin-left: 270px;
+    border-radius: 3px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px dashed @gray-7;
+    background-color: transparent;
+    color: @ui-action-type;
+    font-weight: bold;
+    position: relative;
+    &:hover {
+        color:@ui-action-type-hover;
+        text-decoration: none;
+        border-color: @ui-active-type-hover;
+    }
+}
+
 /* ---------- PROPERTIES ---------- */
 
 .umb-group-builder__properties {
   list-style: none;
   margin: 0;
   padding: 15px;
+  padding-right: 5px;
   min-height: 35px; // the height of a sortable property
 }
 
@@ -228,6 +251,9 @@ input.umb-group-builder__group-title-input:disabled:hover {
   overflow: hidden;
   border-color: transparent;
   background: transparent;
+    &:focus {
+        border-color: @inputBorderFocus;
+    }
 }
 
 .umb-group-builder__property-meta-label textarea.ng-invalid {
@@ -247,6 +273,9 @@ input.umb-group-builder__group-title-input:disabled:hover {
   overflow: hidden;
   border-color: transparent;
   background: transparent;
+    &:focus {
+        border-color: @inputBorderFocus;
+    }
 }
 
 .umb-group-builder__property-preview {
@@ -265,19 +294,15 @@ input.umb-group-builder__group-title-input:disabled:hover {
         bottom: 0;
         left: 0;
         right: 0;
-        background: rgba(0,0,0,0.1);
+        background: rgba(225,225,225,.5);
         transition: opacity 120ms;
     }
 }
 
-.umb-group-builder__property-preview:hover {
+.umb-group-builder__property-preview:not(.-not-clickable):hover {
     &::after {
-        opacity: .8;
+        opacity: .66;
     }
-}
-
-.umb-group-builder__property-preview:focus {
-    outline: none;
 }
 
 .umb-group-builder__property-preview.-not-clickable {
@@ -301,24 +326,54 @@ input.umb-group-builder__group-title-input:disabled:hover {
   opacity: 0.8
 }
 
+
+.umb-group-builder__open-settings {
+    position: absolute;
+    z-index:1;
+    top: 0;
+    bottom:0;
+    left: 0;
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    &:focus {
+        outline:0;
+        border: 1px solid @inputBorderFocus;
+    }
+}
+
 .umb-group-builder__property-actions {
-  flex: 0 0 40px;
-  margin: 15px 0 0 15px;
+    flex: 0 0 44px;
+    text-align: right;
+    margin-top: 7px;
 }
 
 .umb-group-builder__property-action {
-  margin: 0 0 15px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  position: relative;
-  cursor: pointer;
-  color: @ui-icon;
-}
-
-.umb-group-builder__property-action:hover {
-    color: @ui-icon-hover;
+    
+    position: relative;
+    margin: 5px 0;
+    
+    > button {
+        border: none;
+        
+        font-size: 18px;
+        position: relative;
+        cursor: pointer;
+        color: @ui-icon;
+        
+        margin: 0;
+        padding: 5px 10px;
+        width: auto;
+        overflow: visible;
+        background: transparent;
+        line-height: normal;
+        outline: 0;
+        -webkit-appearance: none;
+        
+        &:hover, &:focus  {
+            color: @ui-icon-hover;
+        }
+    }
 }
 
 .umb-group-builder__property-tags {
@@ -440,7 +495,7 @@ input.umb-group-builder__group-sort-value {
         font-size: 14px;
         color: @ui-action-type;
         
-        &:hover {
+        &:hover{
             text-decoration: none;
             color:@ui-action-type-hover;
             border-color:@ui-action-border-hover;

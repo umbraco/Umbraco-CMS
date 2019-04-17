@@ -427,8 +427,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     data["rel"] = img.id;
                     data["data-id"] = img.id;
                 }
-
-                editor.insertContent(editor.dom.createHTML('img', data));
+                
+                editor.selection.setContent(editor.dom.createHTML('img', data));
 
                 $timeout(function () {
                     var imgElm = editor.dom.get('__mcenew');
@@ -1143,11 +1143,25 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             let self = this;
 
+            function getIgnoreUserStartNodes(args) {
+                var ignoreUserStartNodes = false;
+                // Most property editors have a "config" property with ignoreUserStartNodes on then
+                if (args.model.config) {
+                    ignoreUserStartNodes = Object.toBoolean(args.model.config.ignoreUserStartNodes);
+                }
+                // EXCEPT for the grid's TinyMCE editor, that one wants to be special and the config is called "configuration" instead
+                else if (args.model.configuration) {
+                    ignoreUserStartNodes = Object.toBoolean(args.model.configuration.ignoreUserStartNodes);
+                }
+                return ignoreUserStartNodes;
+            }
+
             //create link picker
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
                 var linkPicker = {
                     currentTarget: currentTarget,
                     anchors: editorState.current ? self.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
+                    ignoreUserStartNodes: getIgnoreUserStartNodes(args),
                     submit: function (model) {
                         self.insertLinkInEditor(args.editor, model.target, anchorElement);
                         editorService.close();
@@ -1161,13 +1175,25 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             //Create the insert media plugin
             self.createMediaPicker(args.editor, function (currentTarget, userData) {
+
+                var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                var startNodeIsVirtual = userData.startMediaIds.length !== 1;
+
+                var ignoreUserStartNodes = getIgnoreUserStartNodes(args);
+                if (ignoreUserStartNodes) {
+                    ignoreUserStartNodes = true;
+                    startNodeId = -1;
+                    startNodeIsVirtual = true;
+                }
+
                 var mediaPicker = {
                     currentTarget: currentTarget,
                     onlyImages: true,
                     showDetails: true,
                     disableFolderSelect: true,
-                    startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                    startNodeId: startNodeId,
+                    startNodeIsVirtual: startNodeIsVirtual,
+                    ignoreUserStartNodes: ignoreUserStartNodes,
                     submit: function (model) {
                         self.insertMediaInEditor(args.editor, model.selection[0]);
                         editorService.close();
