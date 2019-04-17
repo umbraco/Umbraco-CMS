@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
+            var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
             var mapped = Mapper.Map<MediaItemDisplay>(emptyContent);
 
             //remove the listview app if it exists
@@ -447,7 +447,7 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundMedia.Trashed == false)
             {
-                var moveResult = Services.MediaService.MoveToRecycleBin(foundMedia, (int)Security.CurrentUser.Id);
+                var moveResult = Services.MediaService.MoveToRecycleBin(foundMedia, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
                 if (moveResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -457,7 +457,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = Services.MediaService.Delete(foundMedia, (int)Security.CurrentUser.Id);
+                var deleteResult = Services.MediaService.Delete(foundMedia, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
                 if (deleteResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -481,7 +481,7 @@ namespace Umbraco.Web.Editors
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
 
-            var moveResult = Services.MediaService.Move(toMove, move.ParentId);
+            var moveResult = Services.MediaService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             if (sourceParentID == destinationParentID)
             {
@@ -557,7 +557,7 @@ namespace Umbraco.Web.Editors
             }
 
             //save the item
-            var saveStatus = Services.MediaService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
+            var saveStatus = Services.MediaService.Save(contentItem.PersistedContent, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             //return the updated model
             var display = Mapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
@@ -603,7 +603,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage EmptyRecycleBin()
         {
-            Services.MediaService.EmptyRecycleBin();
+            Services.MediaService.EmptyRecycleBin(Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
