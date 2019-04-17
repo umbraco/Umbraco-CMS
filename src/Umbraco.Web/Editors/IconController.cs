@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Models;
 using System.IO;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrWhiteSpace(iconName) == false)
             {
-                return _GetIcon(iconName.StripFileExtension(), HttpContext.Current.Server.MapPath($"{GlobalSettings.Path}/assets/icons/{iconName}.svg"));
+                return _GetIcon(iconName.StripFileExtension(), IOHelper.MapPath($"{GlobalSettings.Path}/assets/icons/{iconName}.svg"));
             }
 
             return null;
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Editors
         public List<IconModel> GetAllIcons()
         {
             var icons = new List<IconModel>();
-            var directory = new DirectoryInfo(HttpContext.Current.Server.MapPath($"{GlobalSettings.Path}/assets/icons"));
+            var directory = new DirectoryInfo(IOHelper.MapPath($"{GlobalSettings.Path}/assets/icons"));
             var iconNames = directory.GetFiles("*.svg");
             
             iconNames.ToList().ForEach(iconInfo =>
