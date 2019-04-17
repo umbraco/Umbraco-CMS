@@ -16,6 +16,7 @@ namespace Umbraco.Tests.Models
     public class ContentTypeTests : UmbracoTestBase
     {
         [Test]
+        [Ignore("Ignoring this test until we actually enforce this, see comments in ContentTypeBase.PropertyTypesChanged")]
         public void Cannot_Add_Duplicate_Property_Aliases()
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
@@ -32,6 +33,7 @@ namespace Umbraco.Tests.Models
         }
 
         [Test]
+        [Ignore("Ignoring this test until we actually enforce this, see comments in ContentTypeBase.PropertyTypesChanged")]
         public void Cannot_Update_Duplicate_Property_Aliases()
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
