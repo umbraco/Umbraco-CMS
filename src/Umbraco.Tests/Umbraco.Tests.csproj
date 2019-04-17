@@ -193,6 +193,7 @@
     <Compile Include="PublishedContent\StronglyTypedModels\Home.cs" />
     <Compile Include="Services\AuditServiceTests.cs" />
     <Compile Include="Services\ConsentServiceTests.cs" />
+    <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingMiddleware.cs" />
     <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />

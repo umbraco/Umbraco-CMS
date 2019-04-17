@@ -262,10 +262,11 @@ namespace Umbraco.Web.Editors
         /// Gets the content json for the content id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(int id)
+        public ContentItemDisplay GetById(int id, [FromUri]bool ignoreUserStartNodes = false)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
             if (foundContent == null)
@@ -349,7 +350,9 @@ namespace Umbraco.Web.Editors
             var mapped = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(emptyContent, UmbracoContext);
             // translate the content type name if applicable
             mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
-            mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
+            // if your user type doesn't have access to the Settings section it would not get this property mapped
+            if(mapped.DocumentType != null)
+                mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
@@ -845,10 +848,10 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
+        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, 'D')]
         public HttpResponseMessage EmptyRecycleBin()
         {
-            Services.ContentService.EmptyRecycleBin();
+            Services.ContentService.EmptyRecycleBin(Security.CurrentUser.Id);
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
@@ -1114,6 +1117,7 @@ namespace Umbraco.Web.Editors
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
         /// <param name="permissionsToCheck"></param>
         /// <param name="contentItem">Specifies the already resolved content item to check against</param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         internal static bool CheckPermissions(
                 IDictionary<string, object> storage,
@@ -1123,7 +1127,8 @@ namespace Umbraco.Web.Editors
                 IEntityService entityService,
                 int nodeId,
                 char[] permissionsToCheck = null,
-                IContent contentItem = null)
+                IContent contentItem = null,
+                bool ignoreUserStartNodes = false)
         {
             if (storage == null) throw new ArgumentNullException("storage");
             if (user == null) throw new ArgumentNullException("user");
@@ -1142,6 +1147,11 @@ namespace Umbraco.Web.Editors
             if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if(ignoreUserStartNodes)
+            {
+                return true;
             }
 
             var hasPathAccess = (nodeId == Constants.System.Root)
@@ -1177,7 +1187,7 @@ namespace Umbraco.Web.Editors
             return allowed;
         }
 
-        [EnsureUserPermissionForContent("contentId", 'R')]
+        [EnsureUserPermissionForContent("contentId", 'F')]
         public IEnumerable<NotifySetting> GetNotificationOptions(int contentId)
         {
             var notifications = new List<NotifySetting>();

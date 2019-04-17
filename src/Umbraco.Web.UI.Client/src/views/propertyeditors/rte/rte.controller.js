@@ -11,20 +11,15 @@ angular.module("umbraco")
         var n = d.getTime();
         $scope.textAreaHtmlId = $scope.model.alias + "_" + n + "_rte";
 
-        var alreadyDirty = false;
         function syncContent(editor){
             editor.save();
             angularHelper.safeApply($scope, function () {
                 $scope.model.value = editor.getContent();
             });
 
-            if (!alreadyDirty) {
-                //make the form dirty manually so that the track changes works, setting our model doesn't trigger
-                // the angular bits because tinymce replaces the textarea.
-                var currForm = angularHelper.getCurrentForm($scope);
-                currForm.$setDirty();
-                alreadyDirty = true;
-            }
+            //make the form dirty manually so that the track changes works, setting our model doesn't trigger
+            // the angular bits because tinymce replaces the textarea.
+            angularHelper.getCurrentForm($scope).$setDirty();
         }
 
         tinyMceService.configuration().then(function (tinyMceConfig) {
@@ -278,7 +273,8 @@ angular.module("umbraco")
                         $scope.linkPickerOverlay = {
                             view: "linkpicker",
                             currentTarget: currentTarget,
-							anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
+							              anchors: editorState.current ? tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
+                            ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === "1",
                             show: true,
                             submit: function(model) {
                                 tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
@@ -290,14 +286,24 @@ angular.module("umbraco")
 
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
+                        var ignoreUserStartNodes = false;
+                        var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                        var startNodeIsVirtual = userData.startMediaIds.length !== 1;
+
+                        if ($scope.model.config.ignoreUserStartNodes === "1") {
+                            ignoreUserStartNodes = true;
+                            startNodeId = -1;
+                            startNodeIsVirtual = true;
+                        }
 
                         $scope.mediaPickerOverlay = {
                             currentTarget: currentTarget,
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
-                            startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-                            startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                            startNodeId: startNodeId,
+                            startNodeIsVirtual: startNodeIsVirtual,
+                            ignoreUserStartNodes: ignoreUserStartNodes,
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {
@@ -388,8 +394,8 @@ angular.module("umbraco")
                 $scope.$on('$destroy', function () {
                     unsubscribe();
 					if (tinyMceEditor !== undefined && tinyMceEditor != null) {
-						tinyMceEditor.destroy()
-					}
+                        tinyMceEditor.destroy();
+                    }
                 });
             });
         });

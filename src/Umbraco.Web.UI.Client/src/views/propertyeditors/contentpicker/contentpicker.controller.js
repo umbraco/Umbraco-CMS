@@ -35,7 +35,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 return $scope.model.config.idType === "udi" ? i.udi : i.id;                
             });
             $scope.model.value = trim(currIds.join(), ",");
-            angularHelper.getCurrentForm($scope).$setDirty();
 
             //Validate!
             if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
@@ -67,6 +66,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
+        ignoreUserStartNodes: false,
         maxNumber: 1,
         minNumber : 0,
         startNode: {
@@ -84,7 +84,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
-        zIndex: 6000
+        zIndex: 6000,
+        update: function (e, ui) {
+            angularHelper.getCurrentForm($scope).$setDirty();
+        }
     };
 
     if ($scope.model.config) {
@@ -97,7 +100,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = ($scope.model.config.showOpenButton === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
     $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
-    
+    $scope.model.config.ignoreUserStartNodes = ($scope.model.config.ignoreUserStartNodes === "1" ? true : false);
+  
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"

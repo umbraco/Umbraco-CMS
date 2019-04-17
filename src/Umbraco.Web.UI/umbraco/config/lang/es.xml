@@ -1856,6 +1856,9 @@
         <key alias="notificationEmailsCheckErrorMessage"><![CDATA[El email de notificación está todavía configurado en tuvalor por defecto: <strong>%0%</strong>.]]></key>
         <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Los resultados de los Chequeos de Salud de Umbraco programados para ejecutarse el %0% a las %1% son:</p>%2%</body></html>]]></key>
         <key alias="scheduledHealthCheckEmailSubject">Status de los Chequeos de Salud de Umbraco: %0%</key>
+
+        <key alias="tlsHealthCheckSuccess">Su sitio web está configurado para usar TLS 1.2 o superior para las conexiones salientes.</key>
+        <key alias="tlsHealthCheckWarn">Las conexiones salientes de su sitio web están siendo servidas a través de un protocolo antiguo. Deberías considerar actualizarlo para usar TLS 1.2 o superior.</key>
     </area>
     <area alias="redirectUrls">
         <key alias="disableUrlTracker">Desactivar URL tracker</key>

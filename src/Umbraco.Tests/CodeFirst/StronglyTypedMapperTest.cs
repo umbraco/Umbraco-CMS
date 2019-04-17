@@ -83,7 +83,7 @@ namespace Umbraco.Tests.CodeFirst
                     new PublishedPropertyType("articleDate", 0, "?"), 
                     new PublishedPropertyType("pageTitle", 0, "?"), 
                 };
-            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            var type = new AutoPublishedContentType(0, "anything", "anything", "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
             Debug.Print("INIT STRONG {0}",
                 PublishedContentType.Get(PublishedItemType.Content, "anything")

@@ -382,6 +382,7 @@ ORDER BY colName";
                 "DELETE FROM cmsTask WHERE parentUserId = @Id",
                 "DELETE FROM umbracoUser2UserGroup WHERE userId = @Id",
                 "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
+                "DELETE FROM umbracoUserStartNode WHERE userId = @Id",
                 "DELETE FROM umbracoUser WHERE id = @Id",
                 "DELETE FROM umbracoExternalLogin WHERE id = @Id"
             };
