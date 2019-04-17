@@ -409,15 +409,16 @@ namespace Umbraco.Core.Models
             var group = PropertyGroups[propertyGroupName];
             if (group == null) return;
 
-            // re-assign the group's properties to no group
+            // first remove the group
+            PropertyGroups.RemoveItem(propertyGroupName);
+
+            // Then re-assign the group's properties to no group
             foreach (var property in group.PropertyTypes)
             {
                 property.PropertyGroupId = null;
                 _noGroupPropertyTypes.Add(property);
             }
 
-            // actually remove the group
-            PropertyGroups.RemoveItem(propertyGroupName);
             OnPropertyChanged(nameof(PropertyGroups));
         }
 
