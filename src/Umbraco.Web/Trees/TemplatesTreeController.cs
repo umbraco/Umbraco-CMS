@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -44,7 +43,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            var found = id == Constants.System.Root.ToInvariantString()
+            var found = id == Constants.System.RootString
                 ? Services.FileService.GetTemplates(-1)
                 : Services.FileService.GetTemplates(int.Parse(id));
 
@@ -77,7 +76,7 @@ namespace Umbraco.Web.Trees
             var item = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
             item.NavigateToRoute($"{queryStrings.GetRequiredValue<string>("application")}/templates/edit/{id}?create=true");
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 //refresh action
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -123,7 +122,7 @@ namespace Umbraco.Web.Trees
         {
             var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.Template, pageIndex, pageSize, out totalFound,
                 filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
-            return Mapper.Map<IEnumerable<SearchResultEntity>>(results);
+            return Mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
     }
 }

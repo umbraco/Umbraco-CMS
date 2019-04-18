@@ -16,9 +16,10 @@
 
         <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
+            <div class="umb-list-item"
+                 ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
                 <ng-form name="saveVariantSelectorForm">
-                    <div class="flex">
+                    <div class="flex" ng-class="{'umb-list-item--error': saveVariantSelectorForm.saveVariantSelector.$invalid}">
 
                         <umb-checkbox
                             input-id="{{variant.htmlId}}"
@@ -40,9 +41,8 @@
                                     <span class="db umb-permission__description text-error" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
                                 </span>
 
-                                <span class="db" ng-repeat="notification in variant.notifications">
-                                    <span class="db umb-permission__description text-success">{{notification.message}}</span>
-                                </span>
+                                <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
+
                             </label>
                         </div>
                     </div>

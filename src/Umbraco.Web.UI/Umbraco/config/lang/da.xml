@@ -86,7 +86,7 @@
     <key alias="addNew">Tilføj nyt domæne</key>
     <key alias="remove">fjern</key>
     <key alias="invalidNode">Ugyldig node.</key>
-    <key alias="invalidDomain">Ugyldigt domæne-format.</key>
+    <key alias="invalidDomain">Et eller flere domæner har et ugyldigt format.</key>
     <key alias="duplicateDomain">Domæne er allerede blevet tildelt.</key>
     <key alias="language">Sprog</key>
     <key alias="domain">Domæne</key>
@@ -503,13 +503,6 @@
     <key alias="generatingAlias">Genererer alias...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Tilladte typer</key>
-    <key alias="create">Opret</key>
-    <key alias="deletetab">Slet fane</key>
-    <key alias="description">Beskrivelse</key>
-    <key alias="newtab">Ny fane</key>
-    <key alias="tab">Fane</key>
-    <key alias="thumbnail">Thumbnail</key>
     <key alias="createListView" version="7.2">Opret brugerdefineret listevisning</key>
     <key alias="removeListView" version="7.2">Fjern brugerdefineret listevisning</key>
   </area>
@@ -609,6 +602,7 @@
     <key alias="first">Første</key>
     <key alias="general">Generelt</key>
     <key alias="groups">Grupper</key>
+    <key alias="group">Gruppe</key>
     <key alias="height">Højde</key>
     <key alias="help">Hjælp</key>
     <key alias="hide">Skjul</key>
@@ -1338,6 +1332,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="enterMacroName">Indtast makronavn</key>
     <key alias="parameters">Parametre</key>
     <key alias="parametersDescription">Definer de parametre, der skal være tilgængelige, når du bruger denne makro.</key>
+    <key alias="selectViewFile">Vælg partial view makrofil</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>
@@ -1569,7 +1564,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="emptyDictionaryTree">Ingen ordbog elementer at vælge imellem</key>
   </area>
   <area alias="textbox">
-    <key alias="characters_left">Karakterer tilbage</key>
+    <key alias="characters_left"><![CDATA[<strong>%0%</strong> tegn tilbage.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maksimum %0% tegn, <strong>%1%</strong> for mange.]]></key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
@@ -1599,7 +1595,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="mediaFolderBrowser">Indhold</key>
     <key alias="settingsWelcome">Velkommen</key>
     <key alias="settingsExamine">Examine Management</key>
-    <key alias="settingsPublishedStatus">Published Status</key>
+    <key alias="settingsPublishedStatus">Published Cache</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
     <key alias="memberIntro">Kom godt i gang</key>

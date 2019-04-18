@@ -42,7 +42,15 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns>The absolute url for the content.</returns>
-        public static string UrlAbsolute(this IPublishedContent content)
+        public static string UrlAbsolute(this IPublishedContent content) => content.UrlAbsolute(null);
+
+        /// <summary>
+        /// Gets the absolute url for the content.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="culture">The culture to get the url for</param>
+        /// <returns>The absolute url for the content.</returns>
+        public static string UrlAbsolute(this IPublishedContent content, string culture)
         {
             // adapted from PublishedContentBase.Url
             switch (content.ItemType)
@@ -52,7 +60,7 @@ namespace Umbraco.Web
                         throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
                     if (Current.UmbracoContext.UrlProvider == null)
                         throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
-                    return Current.UmbracoContext.UrlProvider.GetUrl(content.Id, true);
+                    return Current.UmbracoContext.UrlProvider.GetUrl(content.Id, true, culture);
                 case PublishedItemType.Media:
                     throw new NotSupportedException("AbsoluteUrl is not supported for media types.");
                 default:
@@ -297,23 +305,6 @@ namespace Umbraco.Web
         #endregion
 
         #region IsSomething: misc.
-
-        /// <summary>
-        /// Gets a value indicating whether the content is visible.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>A value indicating whether the content is visible.</returns>
-        /// <remarks>A content is not visible if it has an umbracoNaviHide property with a value of "1". Otherwise,
-        /// the content is visible.</remarks>
-        public static bool IsVisible(this IPublishedContent content)
-        {
-            // note: would be better to ensure we have an IPropertyEditorValueConverter for booleans
-            // and then treat the umbracoNaviHide property as a boolean - vs. the hard-coded "1".
-
-            // rely on the property converter - will return default bool value, ie false, if property
-            // is not defined, or has no value, else will return its value.
-            return content.Value<bool>(Constants.Conventions.Content.NaviHide) == false;
-        }
 
         /// <summary>
         /// Determines whether the specified content is a specified content type.

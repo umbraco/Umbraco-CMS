@@ -1,27 +1,32 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
     function ($scope, $timeout, userService, editorService) {
-
+        var ignoreUserStartNodes = Object.toBoolean($scope.model.config.ignoreUserStartNodes);
+        
+        
+        $scope.thumbnailUrl = getThumbnailUrl();
+        
+        
         if (!$scope.model.config.startNodeId) {
-            userService.getCurrentUser().then(function (userData) {
-                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-            });
-        }
+            if (ignoreUserStartNodes === true) {
+                $scope.model.config.startNodeId = -1;
+                $scope.model.config.startNodeIsVirtual = true;
 
-        function onInit() {
-            if($scope.control.value){
-                $scope.setUrl();
+            } else {
+                userService.getCurrentUser().then(function (userData) {
+                    $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                    $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                });
             }
         }
-
+        
         $scope.setImage = function(){
             var startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
             var startNodeIsVirtual = startNodeId ? $scope.model.config.startNodeIsVirtual : undefined;
-
             var mediaPicker = {
                 startNodeId: startNodeId,
                 startNodeIsVirtual: startNodeIsVirtual,
+                ignoreUserStartNodes: ignoreUserStartNodes,
                 cropSize: $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined,
                 showDetails: true,
                 disableFolderSelect: true,
@@ -34,10 +39,8 @@ angular.module("umbraco")
                         id: selectedImage.id,
                         udi: selectedImage.udi,
                         image: selectedImage.image,
-                        altText: selectedImage.altText
-                    };   
-
-                    $scope.setUrl();
+                        caption: selectedImage.altText
+                    };
                     
                     editorService.close();
                 },
@@ -48,10 +51,18 @@ angular.module("umbraco")
             
             editorService.mediaPicker(mediaPicker);
         };
+        
+        $scope.$watch('control.value', function(newValue, oldValue) {
+            if(angular.equals(newValue, oldValue)){
+                return; // simply skip that
+            }
+            
+            $scope.thumbnailUrl = getThumbnailUrl();
+        }, true);
+        
+        function getThumbnailUrl() {
 
-        $scope.setUrl = function(){
-
-            if($scope.control.value.image){
+            if($scope.control.value && $scope.control.value.image) {
                 var url = $scope.control.value.image;
 
                 if($scope.control.editor.config && $scope.control.editor.config.size){
@@ -70,10 +81,10 @@ angular.module("umbraco")
                 {
                     url += "?width=800&upscale=false&animationprocessmode=false"
                 }
-                $scope.url = url;
+                return url;
             }
+            
+            return null;
         };
-
-        onInit();
 
 });

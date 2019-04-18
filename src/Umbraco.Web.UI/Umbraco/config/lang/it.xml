@@ -205,13 +205,6 @@
     <key alias="displayName"><![CDATA[Identificativo Cultura]]></key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Possibili nodetypes figli</key>
-    <key alias="create">Crea</key>
-    <key alias="deletetab">Cancella tab</key>
-    <key alias="description">Descrizione</key>
-    <key alias="newtab">Nuova tab</key>
-    <key alias="tab">Tab</key>
-    <key alias="thumbnail">Miniatura</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue"><![CDATA[Aggiungi valore predefinito]]></key>
