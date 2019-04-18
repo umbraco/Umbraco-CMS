@@ -756,6 +756,11 @@ namespace Umbraco.Core.Services.Implement
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException("Cannot save (un)publishing content, use the dedicated SavePublished method.");
 
+            if (content.Name.Length > 255)
+            {
+                throw new Exception("The name should be less than 255 characters.");
+            }
+
             var evtMsgs = EventMessagesFactory.Get();
 
             using (var scope = ScopeProvider.CreateScope())
@@ -870,7 +875,7 @@ namespace Umbraco.Core.Services.Implement
             }
             if (content.Name.Length > 255)
             {
-                return new PublishResult(PublishResultType.FailedPublishTooLongName, evtMsgs, content);
+                throw new Exception("The name should be less than 255 characters.");
             }
 
             using (var scope = ScopeProvider.CreateScope())

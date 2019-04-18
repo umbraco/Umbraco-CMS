@@ -1440,7 +1440,6 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="editContentSavedHeader">Content saved</key>
         <key alias="editContentSavedText">Remember to publish to make changes visible</key>
         <key alias="editContentNotSaved">Content could not be saved</key>
-        <key alias="editContentNotSavedTooLongName">Make sure content name is less than 255 characters</key>
         <key alias="editContentScheduledSavedText">A schedule for publishing has been updated</key>
         <key alias="editVariantSavedText">%0% saved</key>
         <key alias="editContentSendToPublish">Sent For Approval</key>

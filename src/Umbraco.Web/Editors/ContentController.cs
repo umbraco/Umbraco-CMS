@@ -816,10 +816,7 @@ namespace Umbraco.Web.Editors
 
             if (wasCancelled)
             {
-                if (contentItem.Action != ContentSaveAction.Save && contentItem.Action != ContentSaveAction.SaveNew)
-                {
-                    AddCancelMessage(display);
-                }
+                AddCancelMessage(display);
                 if (IsCreatingAction(contentItem.Action))
                 {
                     //If the item is new and the operation was cancelled, we need to return a different
@@ -853,37 +850,29 @@ namespace Umbraco.Web.Editors
             string invariantSavedLocalizationKey, string variantSavedLocalizationKey,
             out bool wasCancelled)
         {
-            if (contentItem.PersistedContent.Name.Length > 255)
+
+            var saveResult = saveMethod(contentItem.PersistedContent);
+            wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
+            if (saveResult.Success)
             {
-                wasCancelled = true;
-                globalNotifications.AddErrorNotification(
-                      Services.TextService.Localize("speechBubbles/editContentNotSaved"),
-                      Services.TextService.Localize("speechBubbles/editContentNotSavedTooLongName"));
-            }
-            else
-            {
-                var saveResult = saveMethod(contentItem.PersistedContent);
-                wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
-                if (saveResult.Success)
+                if (variantCount > 1)
                 {
-                    if (variantCount > 1)
+                    var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+                    foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
                     {
-                        var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
-                        foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
-                        {
-                            AddSuccessNotification(notifications, c,
-                        Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                        Services.TextService.Localize(variantSavedLocalizationKey, new[] { _allLangs.Value[c].CultureName }));
-                        }
-                    }
-                    else if (ModelState.IsValid)
-                    {
-                        globalNotifications.AddSuccessNotification(
-         Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-         Services.TextService.Localize(invariantSavedLocalizationKey));
+                        AddSuccessNotification(notifications, c,
+                    Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+                    Services.TextService.Localize(variantSavedLocalizationKey, new[] { _allLangs.Value[c].CultureName }));
                     }
                 }
+                else if (ModelState.IsValid)
+                {
+                    globalNotifications.AddSuccessNotification(
+     Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+     Services.TextService.Localize(invariantSavedLocalizationKey));
+                }
             }
+
         }
 
         /// <summary>
@@ -1933,8 +1922,6 @@ namespace Umbraco.Web.Editors
                     case PublishResultType.FailedPublishMandatoryCultureMissing:
                         //the rest that we are looking for each belong in their own group
                         return x.Result;
-                    case PublishResultType.FailedPublishTooLongName:
-                        return x.Result;
                     default:
                         throw new IndexOutOfRangeException($"{x.Result}\" was not expected.");
                 }
@@ -2058,15 +2045,6 @@ namespace Umbraco.Web.Editors
                         display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             "publish/contentPublishedFailedByCulture");
-                        break;
-                    case PublishResultType.FailedPublishTooLongName:
-                        {
-                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
-                            display.AddErrorNotification(
-                               Services.TextService.Localize("publish"),
-                               Services.TextService.Localize("publish/contentPublishedFailedByContentTitle",
-                                   new[] { names }).Trim());
-                        }
                         break;
                     default:
                         throw new IndexOutOfRangeException($"PublishedResultType \"{status.Key}\" was not expected.");

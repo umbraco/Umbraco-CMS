@@ -127,12 +127,7 @@
         /// </summary>
         FailedPublishConcurrencyViolation = FailedPublish | 11,
 
-        /// <summary>
-        /// The document could not be published because the name is longer than 255 characters.
-        /// </summary>
-        FailedPublishTooLongName = FailedPublish | 12,
-
-        #endregion
+             #endregion
 
         #region Failed - Unpublish
 
