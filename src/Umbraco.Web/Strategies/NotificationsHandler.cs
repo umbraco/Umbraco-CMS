@@ -73,6 +73,10 @@ namespace Umbraco.Web.Strategies
                                               applicationContext.Services.NotificationService.SendNotification(
                                                   content, ActionUnPublish.Instance, applicationContext));
 
+            //Send notifications for the copy action
+            ContentService.Copied += (sender, args) => applicationContext.Services.NotificationService.SendNotification(
+                args.Original, ActionCopy.Instance, applicationContext
+            );
         }
 
     }
