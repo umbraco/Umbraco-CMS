@@ -73,6 +73,25 @@ namespace Umbraco.Web.Strategies
                                               applicationContext.Services.NotificationService.SendNotification(
                                                   content, ActionUnPublish.Instance, applicationContext));
 
+            //Send notifications for the move and restore actions
+            ContentService.Moved += (sender, args) =>
+            {
+                // notify about the move for all moved items
+                foreach(var moveInfo in args.MoveInfoCollection)
+                {
+                    applicationContext.Services.NotificationService.SendNotification(
+                        moveInfo.Entity, ActionMove.Instance, applicationContext
+                    );
+                }
+
+                // for any items being moved from the recycle bin (restored), explicitly notify about that too
+                foreach(var moveInfo in args.MoveInfoCollection.Where(m => m.OriginalPath.Contains(Constants.System.RecycleBinContentString)))
+                {
+                    applicationContext.Services.NotificationService.SendNotification(
+                        moveInfo.Entity, ActionRestore.Instance, applicationContext
+                    );
+                }
+            };
         }
 
     }
