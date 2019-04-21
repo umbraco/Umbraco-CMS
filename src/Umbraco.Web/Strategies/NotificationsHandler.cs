@@ -73,6 +73,18 @@ namespace Umbraco.Web.Strategies
                                               applicationContext.Services.NotificationService.SendNotification(
                                                   content, ActionUnPublish.Instance, applicationContext));
 
+            //Send notifications for the permissions action
+            UserService.UserGroupPermissionsAssigned += (sender, args) =>
+            {
+                var entities = applicationContext.Services.ContentService.GetByIds(args.SavedEntities.Select(e => e.EntityId));
+
+                foreach(var entity in entities)
+                {
+                    applicationContext.Services.NotificationService.SendNotification(
+                        entity, ActionRights.Instance, applicationContext
+                    );
+                }
+            };
         }
 
     }
