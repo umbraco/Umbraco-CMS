@@ -67,12 +67,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return user?.Name;
         }
 
-        // (see ContentNode.CloneParent)
-        public PublishedContent(
-            ContentNode contentNode,
-            PublishedContent origin,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            : base(umbracoContextAccessor)
+        // used when cloning in ContentNode
+        public PublishedContent(ContentNode contentNode, PublishedContent origin)
+            : base(origin.UmbracoContextAccessor)
         {
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
@@ -124,41 +121,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return GetContentByIdFunc(_publishedSnapshotAccessor.PublishedSnapshot, previewing, id);
         }
 
-        private IEnumerable<IPublishedContent> GetContentByIds(bool previewing, IEnumerable<int> ids)
-        {
-            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
-
-            // beware! the loop below CANNOT be converted to query such as:
-            //return ids.Select(x => _getContentByIdFunc(publishedSnapshot, previewing, x)).Where(x => x != null);
-            // because it would capture the published snapshot and cause all sorts of issues
-            //
-            // we WANT to get the actual current published snapshot each time we run
-
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var id in ids)
-            {
-                var content = GetContentByIdFunc(publishedSnapshot, previewing, id);
-                if (content != null) yield return content;
-            }
-        }
-
         private IPublishedContent GetMediaById(bool previewing, int id)
         {
             return GetMediaByIdFunc(_publishedSnapshotAccessor.PublishedSnapshot, previewing, id);
-        }
-
-        private IEnumerable<IPublishedContent> GetMediaByIds(bool previewing, IEnumerable<int> ids)
-        {
-            var publishedShapshot = _publishedSnapshotAccessor.PublishedSnapshot;
-
-            // see note above for content
-
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var id in ids)
-            {
-                var content = GetMediaByIdFunc(publishedShapshot, previewing, id);
-                if (content != null) yield return content;
-            }
         }
 
         #endregion
@@ -343,43 +308,34 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override IEnumerable<IPublishedContent> Children(string culture = null)
         {
-            // FIXME THIS CANNOT WORK
-            // we cannot cache children this way, they should be a linked list!
-            throw new NotImplementedException();
+            Func<IPublishedSnapshot, bool, int, IPublishedContent> getById;
 
-            var cache = GetAppropriateCache();
-            if (cache == null || PublishedSnapshotService.CachePublishedContentChildren == false)
-                return GetChildren();
-
-            // note: ToArray is important here, we want to cache the result, not the function!
-            return (IEnumerable<IPublishedContent>)cache.Get(ChildrenCacheKey, () => GetChildren().ToArray());
-        }
-
-        private string _childrenCacheKey;
-
-        private string ChildrenCacheKey => _childrenCacheKey ?? (_childrenCacheKey = CacheKeys.PublishedContentChildren(Key, IsPreviewing));
-
-        private IEnumerable<IPublishedContent> GetChildren()
-        {
-            IEnumerable<IPublishedContent> c;
-            switch (_contentNode.ContentType.ItemType)
+            switch (ContentType.ItemType)
             {
                 case PublishedItemType.Content:
-                    c = GetContentByIds(IsPreviewing, _contentNode.ChildContentIds);
+                    getById = GetContentByIdFunc;
                     break;
                 case PublishedItemType.Media:
-                    c = GetMediaByIds(IsPreviewing, _contentNode.ChildContentIds);
+                    getById = GetMediaByIdFunc;
                     break;
                 default:
-                    throw new Exception("oops");
+                    throw new Exception("panic: invalid item type");
             }
 
-            return c.OrderBy(x => x.SortOrder);
+            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+            var id = _contentNode.FirstChildContentId;
 
-            // notes:
-            // _contentNode.ChildContentIds is an unordered int[]
-            // needs to fetch & sort - do it only once, lazily, though
-            // Q: perfs-wise, is it better than having the store managed an ordered list
+            while (id > 0)
+            {
+                var content = (PublishedContent) getById(publishedSnapshot, IsPreviewing, id);
+                if (content == null)
+                    throw new Exception("panic: failed to get content");
+
+                if (content.IsInvariantOrHasCulture(culture))
+                    yield return content;
+
+                id = content._contentNode.NextSiblingContentId;
+            }
         }
 
         #endregion
@@ -439,7 +395,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // used by navigable content
         // includes all children, published or unpublished
         // NavigableNavigator takes care of selecting those it wants
-        internal IList<int> ChildIds => _contentNode.ChildContentIds;
+        // note: this is not efficient - we do not try to be (would require a double-linked list)
+        internal IList<int> ChildIds => Children().Select(x => x.Id).ToList();
 
         // used by Property
         // gets a value indicating whether the content or media exists in

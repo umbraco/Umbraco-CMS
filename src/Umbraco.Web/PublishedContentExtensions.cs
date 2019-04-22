@@ -172,7 +172,11 @@ namespace Umbraco.Web
         /// </summary>
         /// <remarks>Culture is case-insensitive.</remarks>
         public static bool HasCulture(this IPublishedContent content, string culture)
-            => content.Cultures.Contains(culture ?? string.Empty);
+            => content.Cultures.Contains(culture ?? string.Empty); // fixme oops?!
+
+        // fixme
+        public static bool IsInvariantOrHasCulture(this IPublishedContent content, string culture)
+            => !content.ContentType.VariesByCulture() || content.Cultures.Contains(culture ?? "");
 
         /// <summary>
         /// Filters a sequence of <see cref="IPublishedContent"/> to return invariant items, and items that are published for the specified culture.
