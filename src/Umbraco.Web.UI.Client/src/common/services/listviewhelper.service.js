@@ -581,7 +581,7 @@
 
             $location.path(path);
             for (var p in params) {
-                $location.search(p, params[p])
+                $location.search(p, params[p]);
             }
         }
         
