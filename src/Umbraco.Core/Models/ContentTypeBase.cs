@@ -210,9 +210,7 @@ namespace Umbraco.Core.Models
             return Variations.ValidateVariation(culture, segment, false, true, false);
         }
 
-        /// <summary>
-        /// List of PropertyGroups available on this ContentType
-        /// </summary>
+        /// <inheritdoc />
         /// <remarks>
         /// <para>A PropertyGroup corresponds to a Tab in the UI</para>
         /// <para>Marked DoNotClone because we will manually deal with cloning and the event handlers</para>
@@ -230,9 +228,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets all property types, across all property groups.
-        /// </summary>
+        /// <inheritdoc />
         [IgnoreDataMember]
         [DoNotClone]
         public IEnumerable<PropertyType> PropertyTypes
@@ -243,12 +239,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets or sets the property types that are not in a group.
-        /// </summary>
-        /// <remarks>
-        /// Marked DoNotClone because we will manually deal with cloning and the event handlers
-        /// </remarks>
+        /// <inheritdoc />
         [DoNotClone]
         public IEnumerable<PropertyType> NoGroupPropertyTypes
         {

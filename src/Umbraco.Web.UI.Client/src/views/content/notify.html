@@ -21,12 +21,7 @@
                     <div class="block-form" ng-show="!vm.loading">
                         <span ng-bind-html="vm.labels.headline"></span>
                         <umb-control-group>
-                            <umb-permission ng-repeat="option in vm.notifyOptions"
-                                            name="option.name"
-                                            description="option.description"
-                                            selected="option.checked"
-                                            on-change="vm.notificationChanged()">
-                            </umb-permission>
+                            <umb-toggle-group items="vm.notifyOptions"></umb-toggle-group>
                         </umb-control-group>
                     </div>
                 </div>

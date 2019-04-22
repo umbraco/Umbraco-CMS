@@ -27,7 +27,10 @@ function valPropertyMsg(serverValidationManager) {
             var umbPropCtrl = ctrl[2];
             
             scope.currentProperty = umbPropCtrl.property;
-            var currentCulture = scope.currentProperty.culture;
+
+            //if the property is invariant (no culture), then we will explicitly set it to the string 'invariant'
+            //since this matches the value that the server will return for an invariant property.
+            var currentCulture = scope.currentProperty.culture || "invariant";
 
             var watcher = null;
 

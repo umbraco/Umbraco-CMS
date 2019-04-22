@@ -87,7 +87,7 @@
     <key alias="addNew">Add new Domain</key>
     <key alias="remove">remove</key>
     <key alias="invalidNode">Invalid node.</key>
-    <key alias="invalidDomain">Invalid domain format.</key>
+    <key alias="invalidDomain">One or more domains have an invalid format.</key>
     <key alias="duplicateDomain">Domain has already been assigned.</key>
     <key alias="language">Language</key>
     <key alias="domain">Domain</key>
@@ -96,7 +96,8 @@
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
-      <key alias="domainHelpWithVariants"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
+    <key alias="domainHelpWithVariants">
+    	<![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
      Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
@@ -280,7 +281,7 @@
     <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
     <key alias="languagesToPublish">What languages would you like to publish?</key>
     <key alias="languagesToSave">What languages would you like to save?</key>
-    <key alias="languagesToSaveForFirstTime">What languages would you like to save?</key>
+    <key alias="languagesToSaveForFirstTime">All languages with content are saved on creation!</key>
     <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
     <key alias="languagesToSchedule">What languages would you like to schedule?</key>
     <key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key>
@@ -520,13 +521,6 @@
         <key alias="generatingAlias">Generating alias...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Allowed child node types</key>
-    <key alias="create">Create</key>
-    <key alias="deletetab">Delete tab</key>
-    <key alias="description">Description</key>
-    <key alias="newtab">New tab</key>
-    <key alias="tab">Tab</key>
-    <key alias="thumbnail">Thumbnail</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
     <key alias="aliasAlreadyExists">A content type, media type or member type with this alias already exists</key>
@@ -631,6 +625,7 @@
     <key alias="first">First</key>
     <key alias="general">General</key>
     <key alias="groups">Groups</key>
+    <key alias="group">Group</key>
     <key alias="height">Height</key>
     <key alias="help">Help</key>
     <key alias="hide">Hide</key>
@@ -1127,7 +1122,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
-
+    
     <key alias="pathToFile">Path to file</key>
     <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
@@ -1614,6 +1609,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="enterMacroName">Enter macro name</key>
     <key alias="parameters">Parameters</key>
     <key alias="parametersDescription">Define the parameters that should be available when using this macro.</key>
+    <key alias="selectViewFile">Select partial view macro file</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>
@@ -2079,7 +2075,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
   </area>
   <area alias="textbox">
-    <key alias="characters_left">characters left</key>
+    <key alias="characters_left"><![CDATA[<strong>%0%</strong> characters left.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maximum %0% characters, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>

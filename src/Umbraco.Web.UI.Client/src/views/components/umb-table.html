@@ -4,15 +4,15 @@
         <div class="umb-table-head">
             <div class="umb-table-row">
                 <div class="umb-table-cell">
-                    <input class="umb-table__input" type="checkbox"
-                           ng-show="vm.allowSelectAll"
-                           ng-click="vm.selectAll($event)"
-                           ng-checked="vm.isSelectedAll()">
+
+                    <a href="" style="text-decoration: none;" ng-show="vm.allowSelectAll" ng-click="vm.selectAll()">
+                        <umb-checkmark checked="vm.isSelectedAll()" size="xs"></umb-checkmark>
+                    </a>
+
                 </div>
                 <div class="umb-table-cell umb-table__name">
-                        <localize key="general_name">Name</localize>
-                        <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': vm.isSortDirection('Name', 'asc'), 'icon-navigation-down': vm.isSortDirection('Name', 'desc')}"></i>
-                    </a>
+                    <localize key="general_name">Name</localize>
+                    <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': vm.isSortDirection('Name', 'asc'), 'icon-navigation-down': vm.isSortDirection('Name', 'desc')}"></i>
                 </div>
                 <div class="umb-table-cell" ng-show="vm.items[0].state">
                     <localize key="general_status">Status</localize>

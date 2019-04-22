@@ -381,6 +381,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
+        public override IPublishedContent GetById(bool preview, Udi nodeId)
+            => throw new NotSupportedException();
+
         public override bool HasById(bool preview, int contentId)
         {
             return GetXml(preview).CreateNavigator().MoveToId(contentId.ToString(CultureInfo.InvariantCulture));

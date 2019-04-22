@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Security;
-using AutoMapper;
 using Microsoft.AspNet.Identity;
-using Microsoft.Owin;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
@@ -19,7 +17,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeUserStore : DisposableObjectSlim, 
+    public class BackOfficeUserStore : DisposableObjectSlim,
         IUserStore<BackOfficeIdentityUser, int>,
         IUserPasswordStore<BackOfficeIdentityUser, int>,
         IUserEmailStore<BackOfficeIdentityUser, int>,
@@ -40,9 +38,10 @@ namespace Umbraco.Core.Security
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
         private readonly IGlobalSettings _globalSettings;
+        private readonly UmbracoMapper _mapper;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider)
+        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider, UmbracoMapper mapper)
         {
             _userService = userService;
             _memberTypeService = memberTypeService;
@@ -52,6 +51,7 @@ namespace Umbraco.Core.Security
             if (userService == null) throw new ArgumentNullException("userService");
             if (usersMembershipProvider == null) throw new ArgumentNullException("usersMembershipProvider");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
+            _mapper = mapper;
 
             _userService = userService;
             _externalLoginService = externalLoginService;
@@ -185,7 +185,8 @@ namespace Umbraco.Core.Security
             {
                 return null;
             }
-            return await Task.FromResult(AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user)));
+
+            return await Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)));
         }
 
         /// <summary>
@@ -202,7 +203,7 @@ namespace Umbraco.Core.Security
                 return null;
             }
 
-            var result = AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user));
+            var result = AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user));
 
             return await Task.FromResult(result);
         }
@@ -314,7 +315,7 @@ namespace Umbraco.Core.Security
             var user = _userService.GetByEmail(email);
             var result = user == null
                 ? null
-                : Mapper.Map<BackOfficeIdentityUser>(user);
+                : _mapper.Map<BackOfficeIdentityUser>(user);
 
             return Task.FromResult(AssignLoginsCallback(result));
         }
@@ -391,7 +392,7 @@ namespace Umbraco.Core.Security
                     var user = _userService.GetUserById(l.UserId);
                     if (user != null)
                     {
-                        output = Mapper.Map<BackOfficeIdentityUser>(user);
+                        output = _mapper.Map<BackOfficeIdentityUser>(user);
                         break;
                     }
                 }
