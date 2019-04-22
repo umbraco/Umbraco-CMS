@@ -775,7 +775,6 @@
     <Compile Include="Models\IContentModel.cs" />
     <Compile Include="Models\PartialViewMacroModelExtensions.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
-    <Compile Include="Models\PublishedProperty.cs" />
     <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
     <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />

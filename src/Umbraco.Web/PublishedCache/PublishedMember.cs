@@ -35,16 +35,13 @@ namespace Umbraco.Web.PublishedCache
             //   if they are not part of the member type properties - in which case they are created as
             //   simple raw properties - which are completely invariant
 
-            var _properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
-                (t, v) => new RawValueProperty(t, this, v ?? string.Empty));
-
             var properties = new List<IPublishedProperty>();
             foreach (var propertyType in _publishedMemberType.PropertyTypes)
             {
                 var property = _member.Properties[propertyType.Alias];
                 if (property == null) continue;
 
-                //properties.Add(new FooProperty(propertyType, this, property.Values));
+                properties.Add(new RawValueProperty(propertyType, this, property.GetValue()));
             }
             EnsureMemberProperties(properties);
             _properties = properties.ToArray();
