@@ -100,7 +100,19 @@ namespace Umbraco.Web.Strategies
             //Send notifications for the copy action
             ContentService.Copied += (sender, args) => applicationContext.Services.NotificationService.SendNotification(
                 args.Original, ActionCopy.Instance, applicationContext);
-        }
 
+            //Send notifications for the permissions action
+            UserService.UserGroupPermissionsAssigned += (sender, args) =>
+            {
+                var entities = applicationContext.Services.ContentService.GetByIds(args.SavedEntities.Select(e => e.EntityId));
+
+                foreach(var entity in entities)
+                {
+                    applicationContext.Services.NotificationService.SendNotification(
+                        entity, ActionRights.Instance, applicationContext
+                    );
+                }
+            };
+        }
     }
 }
