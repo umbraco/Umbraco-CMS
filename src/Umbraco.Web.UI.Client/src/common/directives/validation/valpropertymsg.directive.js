@@ -27,7 +27,10 @@ function valPropertyMsg(serverValidationManager) {
             var umbPropCtrl = ctrl[2];
             
             scope.currentProperty = umbPropCtrl.property;
-            var currentCulture = scope.currentProperty.culture;
+
+            //if the property is invariant (no culture), then we will explicitly set it to the string 'invariant'
+            //since this matches the value that the server will return for an invariant property.
+            var currentCulture = scope.currentProperty.culture || "invariant";
 
             var watcher = null;
 
@@ -62,8 +65,8 @@ function valPropertyMsg(serverValidationManager) {
                 if (!watcher) {
                     watcher = scope.$watch("currentProperty.value",
                         function (newValue, oldValue) {
-
-                            if (!newValue || angular.equals(newValue, oldValue)) {
+                            
+                            if (angular.equals(newValue, oldValue)) {
                                 return;
                             }
 
@@ -78,10 +81,12 @@ function valPropertyMsg(serverValidationManager) {
                             // based on other errors. We'll also check if there's no other validation errors apart from valPropertyMsg, if valPropertyMsg
                             // is the only one, then we'll clear.
 
-                            if ((errCount === 1 && angular.isArray(formCtrl.$error.valPropertyMsg)) || (formCtrl.$invalid && angular.isArray(formCtrl.$error.valServer))) {
+                            if (errCount === 0 || (errCount === 1 && angular.isArray(formCtrl.$error.valPropertyMsg)) || (formCtrl.$invalid && angular.isArray(formCtrl.$error.valServer))) {
                                 scope.errorMsg = "";
                                 formCtrl.$setValidity('valPropertyMsg', true);
-                                stopWatch();
+                            } else if (showValidation && scope.errorMsg === "") {
+                                formCtrl.$setValidity('valPropertyMsg', false);
+                                scope.errorMsg = getErrorMsg();
                             }
                         }, true);
                 }
@@ -152,6 +157,7 @@ function valPropertyMsg(serverValidationManager) {
                 showValidation = true;
                 if (hasError && scope.errorMsg === "") {
                     scope.errorMsg = getErrorMsg();
+                    startWatch();
                 }
                 else if (!hasError) {
                     scope.errorMsg = "";

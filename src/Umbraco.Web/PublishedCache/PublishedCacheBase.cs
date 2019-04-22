@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 
@@ -19,23 +20,22 @@ namespace Umbraco.Web.PublishedCache
         public abstract IPublishedContent GetById(bool preview, int contentId);
 
         public IPublishedContent GetById(int contentId)
-        {
-            return GetById(PreviewDefault, contentId);
-        }
+            => GetById(PreviewDefault, contentId);
 
         public abstract IPublishedContent GetById(bool preview, Guid contentId);
 
         public IPublishedContent GetById(Guid contentId)
-        {
-            return GetById(PreviewDefault, contentId);
-        }
+            => GetById(PreviewDefault, contentId);
+
+        public abstract IPublishedContent GetById(bool preview, Udi contentId);
+
+        public IPublishedContent GetById(Udi contentId)
+            => GetById(PreviewDefault, contentId);
 
         public abstract bool HasById(bool preview, int contentId);
 
         public bool HasById(int contentId)
-        {
-            return HasById(PreviewDefault, contentId);
-        }
+            => HasById(PreviewDefault, contentId);
 
         public abstract IEnumerable<IPublishedContent> GetAtRoot(bool preview);
 

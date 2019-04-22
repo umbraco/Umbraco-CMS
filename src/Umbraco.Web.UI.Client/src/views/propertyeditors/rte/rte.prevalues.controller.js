@@ -40,10 +40,21 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
 
-            _.each($scope.stylesheets, function(stylesheet) {
+            _.each($scope.stylesheets, function (stylesheet) {
                 stylesheet.selected = $scope.model.value.stylesheets.indexOf(stylesheet.name) >= 0;
             });
         });
+
+        $scope.commandSelected = function(cmd) {
+            cmd.selected = $scope.model.value.toolbar.indexOf(cmd.alias) >= 0;
+            return cmd.selected;
+        };
+
+        $scope.cssSelected = function (css) {
+            // support both current format (full stylesheet path) and legacy format (stylesheet name only) 
+            css.selected = $scope.model.value.stylesheets.indexOf(css.path) >= 0 ||$scope.model.value.stylesheets.indexOf(css.name) >= 0;
+            return css.selected;
+        }
 
         $scope.selectCommand = function(command){
             var index = $scope.model.value.toolbar.indexOf(command.alias);
@@ -57,11 +68,16 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
         $scope.selectStylesheet = function (css) {
 
-            var index = $scope.model.value.stylesheets.indexOf(css.name);
+            // find out if the stylesheet is already selected; first look for the full stylesheet path (current format)
+            var index = $scope.model.value.stylesheets.indexOf(css.path);
+            if (index === -1) {
+                // ... then look for the stylesheet name (legacy format)
+                index = $scope.model.value.stylesheets.indexOf(css.name);
+            }
 
-            if(css.selected && index === -1){
-                $scope.model.value.stylesheets.push(css.name);
-            }else if(index >= 0){
+            if(index === -1){
+                $scope.model.value.stylesheets.push(css.path);
+            }else{
                 $scope.model.value.stylesheets.splice(index, 1);
             }
         };

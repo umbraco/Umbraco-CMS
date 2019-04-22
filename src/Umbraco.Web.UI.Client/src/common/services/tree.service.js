@@ -165,8 +165,9 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 Umbraco.Sys.ServerVariables.umbracoPlugins.trees &&
                 angular.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
 
-                var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function(item) {
-                    return item.alias === treeAlias;
+                var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function (item) {
+                    // localeCompare returns 0 when strings are equal, so return false if there's no match
+                    return item.alias.localeCompare(treeAlias, undefined, { ignorePunctuation: true }) !== 0;
                 });
 
                 return found ? found.packageFolder : undefined;
