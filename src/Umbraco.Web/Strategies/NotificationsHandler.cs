@@ -96,6 +96,10 @@ namespace Umbraco.Web.Strategies
                     );
                 }
             };
+			
+            //Send notifications for the copy action
+            ContentService.Copied += (sender, args) => applicationContext.Services.NotificationService.SendNotification(
+                args.Original, ActionCopy.Instance, applicationContext);
         }
 
     }
