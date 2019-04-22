@@ -45,7 +45,7 @@
 (function () {
     'use strict';
 
-    function listViewHelper(localStorageService) {
+    function listViewHelper($location, localStorageService, urlHelper) {
 
         var firstSelectedIndex = 0;
         var localStorageKey = "umblistViewLayout";
@@ -559,6 +559,32 @@
         }
 
         
+        /**
+        * @ngdoc method
+        * @name umbraco.services.listViewHelper#editItem
+        * @methodOf umbraco.services.listViewHelper
+        *
+        * @description
+        * Method for opening an item in a list view for editing.
+        *
+        * @param {Object} item The item to edit
+        */
+        function editItem(item) {
+            if (!item.editPath) {
+                return;
+            }
+            var parts = item.editPath.split("?");
+            var path = parts[0];
+            var params = parts[1]
+                ? urlHelper.getQueryStringParams("?" + parts[1])
+                : {};
+
+            $location.path(path);
+            for (var p in params) {
+                $location.search(p, params[p])
+            }
+        }
+        
         function isMatchingLayout(id, layout) {
             // legacy format uses "nodeId", be sure to look for both
             return layout.id === id || layout.nodeId === id;
@@ -579,7 +605,8 @@
           isSelectedAll: isSelectedAll,
           setSortingDirection: setSortingDirection,
           setSorting: setSorting,
-          getButtonPermissions: getButtonPermissions
+          getButtonPermissions: getButtonPermissions,
+          editItem: editItem
 
         };
 
