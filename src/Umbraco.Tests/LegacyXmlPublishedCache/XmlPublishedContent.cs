@@ -75,13 +75,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private bool _isDraft;
 
 
-        public override IEnumerable<IPublishedContent> Children
+        public override IEnumerable<IPublishedContent> Children(string culture = null)
         {
-            get
-            {
-                EnsureNodeInitialized(andChildren: true);
-                return _children;
-            }
+            EnsureNodeInitialized(andChildren: true);
+            return _children;
         }
 
         public override IPublishedProperty GetProperty(string alias)

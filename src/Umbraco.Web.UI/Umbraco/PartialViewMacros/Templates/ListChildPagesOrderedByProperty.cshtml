@@ -17,7 +17,7 @@
 
 @if (propertyAlias != null)
 {
-    var selection = Model.Content.Children.Where(x => x.IsVisible()).OrderBy(x => x.Value(propertyAlias.ToString())).ToArray();
+    var selection = Model.Content.Children().Where(x => x.IsVisible()).OrderBy(x => x.Value(propertyAlias.ToString())).ToArray();
 
     if (selection.Length > 0)
     {

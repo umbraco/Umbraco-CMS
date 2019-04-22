@@ -23,7 +23,7 @@
     const int maxLevelForSitemap = 4;
 
     @* Select visible children *@
-    var selection = node.Children.Where(x => x.IsVisible() && x.Level <= maxLevelForSitemap).ToArray();
+    var selection = node.Children().Where(x => x.IsVisible() && x.Level <= maxLevelForSitemap).ToArray();
 
     @* If any items are returned, render a list *@
     if (selection.Length > 0)

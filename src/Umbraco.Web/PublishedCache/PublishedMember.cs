@@ -84,7 +84,7 @@ namespace Umbraco.Web.PublishedCache
 
         public override IPublishedContent Parent() => null;
 
-        public override IEnumerable<IPublishedContent> Children => Enumerable.Empty<IPublishedContent>();
+        public override IEnumerable<IPublishedContent> Children(string culture = null) => Enumerable.Empty<IPublishedContent>();
 
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 

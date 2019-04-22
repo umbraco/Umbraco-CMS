@@ -7,7 +7,7 @@
     the page currently being viewed by the website visitor, displayed as nested unordered HTML lists.
 *@
 
-@{ var selection = Model.Content.Children.Where(x => x.IsVisible()).ToArray(); }
+@{ var selection = Model.Content.Children().Where(x => x.IsVisible()).ToArray(); }
 
 @* Ensure that the Current Page has children *@
 @if (selection.Length > 0)
@@ -25,7 +25,7 @@
 
                 @* if this child page has any children, where the property umbracoNaviHide is not True *@
                 @{
-                    var children = item.Children.Where(x => x.IsVisible()).ToArray();
+                    var children = item.Children().Where(x => x.IsVisible()).ToArray();
                     if (children.Length > 0)
                     {
                         @* Call our helper to display the children *@
@@ -54,7 +54,7 @@
 
                     @* if the page has any children, where the property umbracoNaviHide is not True *@
                     @{
-                        var children = item.Children.Where(x => x.IsVisible()).ToArray();
+                        var children = item.Children().Where(x => x.IsVisible()).ToArray();
                         if (children.Length > 0)
                         {
                             @* Recurse and call our helper to display the children *@

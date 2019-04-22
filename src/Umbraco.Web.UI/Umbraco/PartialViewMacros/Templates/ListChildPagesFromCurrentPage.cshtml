@@ -9,7 +9,7 @@
     - It then generates links so the visitor can go to each page
 *@
 
-@{ var selection = Model.Content.Children.Where(x => x.IsVisible()).ToArray(); }
+@{ var selection = Model.Content.Children().Where(x => x.IsVisible()).ToArray(); }
 
 @if (selection.Length > 0)
 {

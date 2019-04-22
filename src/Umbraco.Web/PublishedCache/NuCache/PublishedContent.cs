@@ -341,17 +341,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <inheritdoc />
-        public override IEnumerable<IPublishedContent> Children
+        public override IEnumerable<IPublishedContent> Children(string culture = null)
         {
-            get
-            {
-                var cache = GetAppropriateCache();
-                if (cache == null || PublishedSnapshotService.CachePublishedContentChildren == false)
-                    return GetChildren();
+            // FIXME THIS CANNOT WORK
+            // we cannot cache children this way, they should be a linked list!
+            throw new NotImplementedException();
 
-                // note: ToArray is important here, we want to cache the result, not the function!
-                return (IEnumerable<IPublishedContent>)cache.Get(ChildrenCacheKey, () => GetChildren().ToArray());
-            }
+            var cache = GetAppropriateCache();
+            if (cache == null || PublishedSnapshotService.CachePublishedContentChildren == false)
+                return GetChildren();
+
+            // note: ToArray is important here, we want to cache the result, not the function!
+            return (IEnumerable<IPublishedContent>)cache.Get(ChildrenCacheKey, () => GetChildren().ToArray());
         }
 
         private string _childrenCacheKey;

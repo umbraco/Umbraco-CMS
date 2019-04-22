@@ -154,7 +154,7 @@ namespace Umbraco.Web.Models
         public abstract IPublishedContent Parent();
 
         /// <inheritdoc />
-        public abstract IEnumerable<IPublishedContent> Children { get; }
+        public abstract IEnumerable<IPublishedContent> Children(string culture = null);
 
         #endregion
 

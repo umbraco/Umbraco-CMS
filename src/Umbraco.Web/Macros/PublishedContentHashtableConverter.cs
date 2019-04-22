@@ -290,7 +290,7 @@ namespace Umbraco.Web.Macros
 
             public IPublishedContent Parent() => _parent;
 
-            public IEnumerable<IPublishedContent> Children => throw new NotImplementedException();
+            public IEnumerable<IPublishedContent> Children(string culture = null) => throw new NotImplementedException();
 
             public IEnumerable<IPublishedProperty> Properties => _properties;
 

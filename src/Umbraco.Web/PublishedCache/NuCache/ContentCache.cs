@@ -107,7 +107,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.UrlSegment(culture) == parts[0])
+                    ? GetAtRoot(preview).SelectMany(x => x.Children(culture)).FirstOrDefault(x => x.UrlSegment(culture) == parts[0])
                     : GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
                 content = FollowRoute(content, parts, 1, culture);
             }
@@ -187,7 +187,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (content != null && i < parts.Count)
             {
                 var part = parts[i++];
-                content = content.Children.FirstOrDefault(x =>
+                content = content.Children(culture).FirstOrDefault(x =>
                 {
                     var urlSegment = x.UrlSegment(culture);
                     return urlSegment == part;

@@ -160,8 +160,13 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the children of the content item.
         /// </summary>
-        /// <remarks>Children are sorted by their sortOrder.</remarks>
-        IEnumerable<IPublishedContent> Children { get; }
+        /// <param name="culture">The specific culture to get the url children for. If null is used the current culture is used (Default is null).</param>
+        /// <remarks>
+        /// <para>Gets children that are available for the specified culture.</para>
+        /// <para>Children are sorted by their sortOrder.</para>
+        /// </remarks>
+        // FIXME: can culture be '*'?
+        IEnumerable<IPublishedContent> Children(string culture = null);
 
         #endregion
     }

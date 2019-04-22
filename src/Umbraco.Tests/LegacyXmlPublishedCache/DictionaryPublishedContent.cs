@@ -183,7 +183,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 
-        public override IEnumerable<IPublishedContent> Children => _getChildren.Value;
+        public override IEnumerable<IPublishedContent> Children(string culture = null) => _getChildren.Value;
 
         public override IPublishedProperty GetProperty(string alias)
         {

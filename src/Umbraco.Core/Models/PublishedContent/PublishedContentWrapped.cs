@@ -116,7 +116,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual IPublishedContent Parent() => _content.Parent();
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children => _content.Children;
+        public virtual IEnumerable<IPublishedContent> Children(string culture = null) => _content.Children(culture);
 
         #endregion
 

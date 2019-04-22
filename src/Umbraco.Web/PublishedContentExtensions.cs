@@ -891,6 +891,7 @@ namespace Umbraco.Web
 
         #region Axes: children
 
+        // FIXME: kill that one
         /// <summary>
         /// Gets the children of the content.
         /// </summary>
@@ -905,7 +906,7 @@ namespace Umbraco.Web
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 
-            return content.Children.WhereIsInvariantOrHasCulture(culture);
+            return content.Children(culture); //.WhereIsInvariantOrHasCulture(culture);
         }
 
         /// <summary>
@@ -1029,7 +1030,7 @@ namespace Umbraco.Web
                     //create all row data
                     var tableData = Core.DataTableExtensions.CreateTableData();
                     //loop through each child and create row data for it
-                    foreach (var n in content.Children.OrderBy(x => x.SortOrder))
+                    foreach (var n in content.Children().OrderBy(x => x.SortOrder))
                     {
                         if (contentTypeAliasFilter.IsNullOrWhiteSpace() == false)
                         {

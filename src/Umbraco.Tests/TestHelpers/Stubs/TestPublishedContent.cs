@@ -56,7 +56,9 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         private IPublishedContent _parent;
         public IPublishedContent Parent() => _parent;
         public void SetParent(IPublishedContent parent) => _parent = parent;
-        public IEnumerable<IPublishedContent> Children { get; set; }
+        private IEnumerable<IPublishedContent> _children;
+        public IEnumerable<IPublishedContent> Children(string culture = null) => _children;
+        public void SetChildren(IEnumerable<IPublishedContent> children) => _children = children;
 
         // copied from PublishedContentBase
         public IPublishedProperty GetProperty(string alias, bool recurse)

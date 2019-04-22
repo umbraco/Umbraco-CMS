@@ -18,7 +18,7 @@
 {
     @* Get the media item associated with the id passed in *@
     var media = Umbraco.Media(mediaId);
-    var selection = media.Children.ToArray();
+    var selection = media.Children().ToArray();
 
     if (selection.Length > 0)
     {

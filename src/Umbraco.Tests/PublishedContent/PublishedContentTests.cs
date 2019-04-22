@@ -169,7 +169,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children.Where(x => x.IsVisible()).ToIndexedArray();
+            var items = doc.Children().Where(x => x.IsVisible()).ToIndexedArray();
 
             foreach (var item in items)
             {
@@ -190,7 +190,7 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetNode(1173);
 
             var items = doc
-                .Children
+                .Children()
                 .Where(x => x.IsVisible())
                 .ToIndexedArray();
 
@@ -245,7 +245,7 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetNode(1173);
             var ct = doc.ContentType;
 
-            var items = doc.Children
+            var items = doc.Children()
                 .Select(x => x.CreateModel()) // linq, returns IEnumerable<IPublishedContent>
 
                 // only way around this is to make sure every IEnumerable<T> extension
@@ -277,7 +277,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children.Take(4).ToIndexedArray();
+            var items = doc.Children().Take(4).ToIndexedArray();
 
             foreach (var item in items)
             {
@@ -297,7 +297,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            foreach (var d in doc.Children.Skip(1).ToIndexedArray())
+            foreach (var d in doc.Children().Skip(1).ToIndexedArray())
             {
                 if (d.Content.Id != 1176)
                 {
@@ -315,7 +315,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children
+            var items = doc.Children()
                 .Concat(new[] { GetNode(1175), GetNode(4444) })
                 .ToIndexedArray();
 
@@ -400,7 +400,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var doc = GetNode(1046);
 
-            var found1 = doc.Children.GroupBy(x => x.ContentType.Alias).ToArray();
+            var found1 = doc.Children().GroupBy(x => x.ContentType.Alias).ToArray();
 
             Assert.AreEqual(2, found1.Length);
             Assert.AreEqual(2, found1.Single(x => x.Key.ToString() == "Home").Count());
@@ -421,8 +421,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var doc = GetNode(1046);
 
-            var found1 = doc.Children.Where(x => x.ContentType.Alias == "CustomDocument");
-            var found2 = doc.Children.Where(x => x.ContentType.Alias == "Home");
+            var found1 = doc.Children().Where(x => x.ContentType.Alias == "CustomDocument");
+            var found2 = doc.Children().Where(x => x.ContentType.Alias == "Home");
 
             Assert.AreEqual(1, found1.Count());
             Assert.AreEqual(2, found2.Count());
@@ -433,7 +433,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var ordered = doc.Children.OrderBy(x => x.UpdateDate);
+            var ordered = doc.Children().OrderBy(x => x.UpdateDate);
 
             var correctOrder = new[] { 1178, 1177, 1174, 1176 };
             for (var i = 0; i < correctOrder.Length; i++)
