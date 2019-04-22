@@ -200,7 +200,7 @@ namespace Umbraco.Tests.PublishedContent
             public string Name(string culture = null) => _names.TryGetValue(culture ?? "", out var name) ? name : null;
             public void SetName(string name, string culture = null) => _names[culture ?? ""] = name;
             public DateTime CultureDate(string culture = null) => throw new NotSupportedException();
-            public IReadOnlyList<string> Cultures => throw new NotSupportedException();
+            public IReadOnlyCollection<string> Cultures => throw new NotSupportedException();
             public string UrlSegment(string culture = null) => _urlSegments.TryGetValue(culture ?? "", out var urlSegment) ? urlSegment : null;
             public void SetUrlSegment(string urlSegment, string culture = null) => _urlSegments[culture ?? ""] = urlSegment;
             public string WriterName { get; set; }

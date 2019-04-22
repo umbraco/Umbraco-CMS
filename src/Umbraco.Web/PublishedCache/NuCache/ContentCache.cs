@@ -246,28 +246,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
         {
-            if (PublishedSnapshotService.CacheContentCacheRoots == false)
-                return GetAtRootNoCache(preview);
-
-            var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
-                ? _elementsCache
-                : _snapshotCache;
-
-            if (cache == null)
-                return GetAtRootNoCache(preview);
-
-            // note: ToArray is important here, we want to cache the result, not the function!
-            return (IEnumerable<IPublishedContent>)cache.Get(
-                CacheKeys.ContentCacheRoots(preview),
-                () => GetAtRootNoCache(preview).ToArray());
-        }
-
-        private IEnumerable<IPublishedContent> GetAtRootNoCache(bool preview)
-        {
-            var c = _snapshot.GetAtRoot();
-
             // both .Draft and .Published cannot be null at the same time
-            return c.Select(n => GetNodePublishedContent(n, preview)).WhereNotNull().OrderBy(x => x.SortOrder);
+            // root is already sorted by sortOrder, and does not contain nulls
+            return _snapshot.GetAtRoot().Select(n => GetNodePublishedContent(n, preview));
         }
 
         private static IPublishedContent GetNodePublishedContent(ContentNode node, bool preview)

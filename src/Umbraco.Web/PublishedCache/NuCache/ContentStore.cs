@@ -508,7 +508,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // new, add to parent
                     AddNodeLocked(kit.Node);
                 }
-                else if (moving)
+                else if (moving || existing.SortOrder != kit.Node.SortOrder)
                 {
                     // moved, remove existing from its parent, add content to its parent
                     RemoveNodeLocked(existing);
@@ -562,7 +562,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        // IMPORTANT kits must be sorted out by LEVEL
+        // IMPORTANT kits must be sorted out by LEVEL and by SORT ORDER
         public void SetBranch(int rootContentId, IEnumerable<ContentNodeKit> kits)
         {
             var lockInfo = new WriteLockInfo();

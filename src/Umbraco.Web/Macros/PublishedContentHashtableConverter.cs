@@ -248,7 +248,7 @@ namespace Umbraco.Web.Macros
             private static readonly List<string> EmptyListOfString = new List<string>();
             private IReadOnlyList<string> _cultures;
 
-            public IReadOnlyList<string> Cultures
+            public IReadOnlyCollection<string> Cultures
             {
                 get
                 {

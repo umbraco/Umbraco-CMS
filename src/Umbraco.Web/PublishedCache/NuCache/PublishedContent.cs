@@ -116,14 +116,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         internal static Func<IPublishedSnapshot, bool, int, IPublishedContent> GetMediaByIdFunc { get; set; }
             = (publishedShapshot, previewing, id) => publishedShapshot.Media.GetById(previewing, id);
 
-        private IPublishedContent GetContentById(bool previewing, int id)
+        private Func<IPublishedSnapshot, bool, int, IPublishedContent> GetGetterById(PublishedItemType itemType)
         {
-            return GetContentByIdFunc(_publishedSnapshotAccessor.PublishedSnapshot, previewing, id);
-        }
+            switch (ContentType.ItemType)
+            {
+                case PublishedItemType.Content:
+                    return GetContentByIdFunc;
+                case PublishedItemType.Media:
+                    return GetMediaByIdFunc;
+                default:
+                    throw new Exception("panic: invalid item type");
+            }
 
-        private IPublishedContent GetMediaById(bool previewing, int id)
-        {
-            return GetMediaByIdFunc(_publishedSnapshotAccessor.PublishedSnapshot, previewing, id);
         }
 
         #endregion
@@ -226,17 +230,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         // ReSharper disable once CollectionNeverUpdated.Local
         private static readonly List<string> EmptyListOfString = new List<string>();
-        private IReadOnlyList<string> _cultures;
+        private IReadOnlyCollection<string> _cultures;
 
         /// <inheritdoc />
-        public override IReadOnlyList<string> Cultures
+        public override IReadOnlyCollection<string> Cultures
         {
             get
             {
                 if (!ContentType.VariesByCulture())
                     return EmptyListOfString;
 
-                return _cultures ?? (_cultures = ContentData.CultureInfos.Keys.ToList());
+                return _cultures ?? (_cultures = new HashSet<string>(ContentData.CultureInfos.Keys, StringComparer.OrdinalIgnoreCase));
             }
         }
 
@@ -292,49 +296,36 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override IPublishedContent Parent()
         {
-            // have to use the "current" cache because a PublishedContent can be shared
-            // amongst many snapshots and other content depend on the snapshots
-            switch (_contentNode.ContentType.ItemType)
-            {
-                case PublishedItemType.Content:
-                    return GetContentById(IsPreviewing, _contentNode.ParentContentId);
-                case PublishedItemType.Media:
-                    return GetMediaById(IsPreviewing, _contentNode.ParentContentId);
-                default:
-                    throw new Exception($"Panic: unsupported item type \"{_contentNode.ContentType.ItemType}\".");
-            }
+            var getById = GetGetterById(ContentType.ItemType);
+            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+            return getById(publishedSnapshot, IsPreviewing, ParentId);
         }
 
         /// <inheritdoc />
         public override IEnumerable<IPublishedContent> Children(string culture = null)
         {
-            Func<IPublishedSnapshot, bool, int, IPublishedContent> getById;
+            // invariant has invariant value (whatever the requested culture)
+            if (!ContentType.VariesByCulture() && culture != "*")
+                culture = "";
 
-            switch (ContentType.ItemType)
-            {
-                case PublishedItemType.Content:
-                    getById = GetContentByIdFunc;
-                    break;
-                case PublishedItemType.Media:
-                    getById = GetMediaByIdFunc;
-                    break;
-                default:
-                    throw new Exception("panic: invalid item type");
-            }
+            // handle context culture for variant
+            if (culture == null)
+                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
 
+            var getById = GetGetterById(ContentType.ItemType);
             var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
             var id = _contentNode.FirstChildContentId;
 
             while (id > 0)
             {
-                var content = (PublishedContent) getById(publishedSnapshot, IsPreviewing, id);
+                var content = getById(publishedSnapshot, IsPreviewing, id);
                 if (content == null)
                     throw new Exception("panic: failed to get content");
 
-                if (content.IsInvariantOrHasCulture(culture))
+                if (culture == "*" || content.IsInvariantOrHasCulture(culture))
                     yield return content;
 
-                id = content._contentNode.NextSiblingContentId;
+                id = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
             }
         }
 
@@ -422,11 +413,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // used by Navigable.Source,...
         internal static PublishedContent UnwrapIPublishedContent(IPublishedContent content)
         {
-            PublishedContentWrapped wrapped;
-            while ((wrapped = content as PublishedContentWrapped) != null)
+            while (content is PublishedContentWrapped wrapped)
                 content = wrapped.Unwrap();
-            var inner = content as PublishedContent;
-            if (inner == null)
+            if (!(content is PublishedContent inner))
                 throw new InvalidOperationException("Innermost content is not PublishedContent.");
             return inner;
         }

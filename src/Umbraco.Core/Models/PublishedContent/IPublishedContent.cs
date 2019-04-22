@@ -117,7 +117,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// the cultures that are published. For a draft content, those that are 'available' ie
         /// have a non-empty content name.</para>
         /// </remarks>
-        IReadOnlyList<string> Cultures { get; }
+        IReadOnlyCollection<string> Cultures { get; }
 
         /// <summary>
         /// Gets a value indicating whether the content is draft.
@@ -164,8 +164,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <remarks>
         /// <para>Gets children that are available for the specified culture.</para>
         /// <para>Children are sorted by their sortOrder.</para>
+        /// <para>The '*' culture and supported and returns everything.</para>
         /// </remarks>
-        // FIXME: can culture be '*'?
         IEnumerable<IPublishedContent> Children(string culture = null);
 
         #endregion

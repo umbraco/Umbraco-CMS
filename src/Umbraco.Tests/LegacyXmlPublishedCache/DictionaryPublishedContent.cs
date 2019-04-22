@@ -157,7 +157,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         // ReSharper disable once CollectionNeverUpdated.Local
         private static readonly List<string> EmptyListOfString = new List<string>();
-        public override IReadOnlyList<string> Cultures => EmptyListOfString;
+        public override IReadOnlyCollection<string> Cultures => EmptyListOfString;
 
         public override string UrlSegment(string culture = null) => _urlName;
 

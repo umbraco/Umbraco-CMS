@@ -172,9 +172,12 @@ namespace Umbraco.Web
         /// </summary>
         /// <remarks>Culture is case-insensitive.</remarks>
         public static bool HasCulture(this IPublishedContent content, string culture)
-            => content.Cultures.Contains(culture ?? string.Empty); // fixme oops?!
+            => content.Cultures.Contains(culture ?? string.Empty);
 
-        // fixme
+        /// <summary>
+        /// Determines whether the content is invariant, or has a culture.
+        /// </summary>
+        /// <remarks>Culture is case-insensitive.</remarks>
         public static bool IsInvariantOrHasCulture(this IPublishedContent content, string culture)
             => !content.ContentType.VariesByCulture() || content.Cultures.Contains(culture ?? "");
 
@@ -894,24 +897,6 @@ namespace Umbraco.Web
         #endregion
 
         #region Axes: children
-
-        // FIXME: kill that one
-        /// <summary>
-        /// Gets the children of the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
-        /// <returns>The children of the content.</returns>
-        /// <remarks>
-        /// <para>Children are sorted by their sortOrder.</para>
-        /// <para>This method exists for consistency, it is the same as calling content.Children as a property.</para>
-        /// </remarks>
-        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
-        {
-            if (content == null) throw new ArgumentNullException(nameof(content));
-
-            return content.Children(culture); //.WhereIsInvariantOrHasCulture(culture);
-        }
 
         /// <summary>
         /// Gets the children of the content, filtered by a predicate.

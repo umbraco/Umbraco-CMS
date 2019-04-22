@@ -36,7 +36,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             // get
             return _cultures.TryGetValue(culture, out var date) ? date : DateTime.MinValue;
         }
-        public IReadOnlyList<string> Cultures { get; set; }
+        public IReadOnlyCollection<string> Cultures { get; set; }
         public string UrlSegment(string culture = null) => _urlSegments.TryGetValue(culture ?? "", out var urlSegment) ? urlSegment : null;
         public void SetUrlSegment(string urlSegment, string culture = null) => _urlSegments[culture ?? ""] = urlSegment;
         public string DocumentTypeAlias => ContentType.Alias;

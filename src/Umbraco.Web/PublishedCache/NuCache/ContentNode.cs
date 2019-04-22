@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -10,13 +11,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
     {
         // special ctor for root pseudo node
         public ContentNode()
-        { }
+        {
+            FirstChildContentId = -1;
+            NextSiblingContentId = -1;
+        }
 
         // special ctor with no content data - for members
         public ContentNode(int id, Guid uid, IPublishedContentType contentType,
             int level, string path, int sortOrder,
             int parentContentId,
             DateTime createDate, int creatorId)
+            : this()
         {
             Id = id;
             Uid = uid;
@@ -25,8 +30,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Path = path;
             SortOrder = sortOrder;
             ParentContentId = parentContentId;
-            FirstChildContentId = -1;
-            NextSiblingContentId = -1;
             CreateDate = createDate;
             CreatorId = creatorId;
         }

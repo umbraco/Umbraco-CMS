@@ -12,7 +12,7 @@ namespace Umbraco.Web.Models
     /// </summary>
     /// <remarks>This base class does which (a) consistently resolves and caches the Url, (b) provides an implementation
     /// for this[alias], and (c) provides basic content set management.</remarks>
-    [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
+    [DebuggerDisplay("Content Id: {Id}}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
         protected PublishedContentBase(IUmbracoContextAccessor umbracoContextAccessor)
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Models
         public abstract DateTime CultureDate(string culture = null);
 
         /// <inheritdoc />
-        public abstract IReadOnlyList<string> Cultures { get; }
+        public abstract IReadOnlyCollection<string> Cultures { get; }
 
         /// <inheritdoc />
         public abstract bool IsDraft(string culture = null);

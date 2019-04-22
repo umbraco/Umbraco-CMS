@@ -649,7 +649,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (capture.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                     {
                         // ?? should we do some RV check here?
-                        // IMPORTANT GetbranchContentSources sorts kits by level
+                        // IMPORTANT GetbranchContentSources sorts kits by level and by sort order
                         var kits = _dataSource.GetBranchContentSources(scope, capture.Id);
                         _contentStore.SetBranch(capture.Id, kits);
                     }
@@ -741,7 +741,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (capture.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                     {
                         // ?? should we do some RV check here?
-                        // IMPORTANT GetbranchContentSources sorts kits by level
+                        // IMPORTANT GetbranchContentSources sorts kits by level and by sort order
                         var kits = _dataSource.GetBranchMediaSources(scope, capture.Id);
                         _mediaStore.SetBranch(capture.Id, kits);
                     }

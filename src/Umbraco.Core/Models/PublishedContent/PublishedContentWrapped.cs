@@ -100,7 +100,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public DateTime CultureDate(string culture = null) => _content.CultureDate(culture);
 
         /// <inheritdoc />
-        public IReadOnlyList<string> Cultures => _content.Cultures;
+        public IReadOnlyCollection<string> Cultures => _content.Cultures;
 
         /// <inheritdoc />
         public virtual bool IsDraft(string culture = null) => _content.IsDraft(culture);
