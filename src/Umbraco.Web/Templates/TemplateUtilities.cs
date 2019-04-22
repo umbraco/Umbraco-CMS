@@ -131,7 +131,7 @@ namespace Umbraco.Web.Templates
         public static string ResolveMediaFromTextString(string text)
         {
             // don't attempt to proceed without a context
-            if (Current.UmbracoContext == null || Current.UmbracoContext.MediaCache == null)
+            if (Current.UmbracoContext == null || Current.UmbracoContext.Media == null)
             {
                 return text;
             }
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Templates
                 {
                     return match.Value;
                 }
-                var media = Current.UmbracoContext.MediaCache.GetById(guidUdi.Guid);
+                var media = Current.UmbracoContext.Media.GetById(guidUdi.Guid);
                 if(media == null)
                 {
                     // image does not exist - we could choose to remove the image entirely here (return empty string),

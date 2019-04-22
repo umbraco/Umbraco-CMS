@@ -142,7 +142,7 @@ namespace Umbraco.Tests.PublishedContent
         internal IPublishedContent GetNode(int id)
         {
             var ctx = GetUmbracoContext("/test");
-            var doc = ctx.ContentCache.GetById(id);
+            var doc = ctx.Content.GetById(id);
             Assert.IsNotNull(doc);
             return doc;
         }
@@ -151,16 +151,16 @@ namespace Umbraco.Tests.PublishedContent
         public void GetNodeByIds()
         {
             var ctx = GetUmbracoContext("/test");
-            var contentById = ctx.ContentCache.GetById(1173);
+            var contentById = ctx.Content.GetById(1173);
             Assert.IsNotNull(contentById);
-            var contentByGuid = ctx.ContentCache.GetById(_node1173Guid);
+            var contentByGuid = ctx.Content.GetById(_node1173Guid);
             Assert.IsNotNull(contentByGuid);
             Assert.AreEqual(contentById.Id, contentByGuid.Id);
             Assert.AreEqual(contentById.Key, contentByGuid.Key);
 
-            contentById = ctx.ContentCache.GetById(666);
+            contentById = ctx.Content.GetById(666);
             Assert.IsNull(contentById);
-            contentByGuid = ctx.ContentCache.GetById(Guid.NewGuid());
+            contentByGuid = ctx.Content.GetById(Guid.NewGuid());
             Assert.IsNull(contentByGuid);
         }
 

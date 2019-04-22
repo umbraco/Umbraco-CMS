@@ -10,7 +10,7 @@ namespace Umbraco.Web.UI.Config.Splashes
         {
             base.OnInit(e);
 
-            var store = Current.UmbracoContext.ContentCache;
+            var store = Current.UmbracoContext.Content;
             if (store.HasContent())
             {
                 //if there is actually content, go to the root

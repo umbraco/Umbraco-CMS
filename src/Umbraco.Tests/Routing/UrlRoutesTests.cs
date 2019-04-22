@@ -200,7 +200,7 @@ DetermineRouteById(id):
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
 
             var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings.Object);
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
             var route = cache.GetRouteById(false, id);
@@ -224,7 +224,7 @@ DetermineRouteById(id):
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
 
             var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings.Object);
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
             var route = cache.GetRouteById(false, id);
@@ -238,7 +238,7 @@ DetermineRouteById(id):
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
             var route = cache.GetRouteById(false, 1000);
@@ -269,7 +269,7 @@ DetermineRouteById(id):
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
 
             var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
             const bool preview = false; // make sure we don't cache - but HOW? should be some sort of switch?!
@@ -300,7 +300,7 @@ DetermineRouteById(id):
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
 
             var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
             const bool preview = false; // make sure we don't cache - but HOW? should be some sort of switch?!
@@ -323,7 +323,7 @@ DetermineRouteById(id):
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
             var content = cache.GetByRoute(false, "/a/b/c");

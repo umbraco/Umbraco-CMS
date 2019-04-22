@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Scoping
             {
                 evented++;
 
-                var e = umbracoContext.ContentCache.GetById(item.Id);
+                var e = umbracoContext.Content.GetById(item.Id);
 
                 // during events, due to LiveSnapshot, we see the changes
                 Assert.IsNotNull(e);
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Scoping
             }
 
             // been created
-            var x = umbracoContext.ContentCache.GetById(item.Id);
+            var x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
             Assert.AreEqual("name", x.Name());
 
@@ -184,7 +184,7 @@ namespace Umbraco.Tests.Scoping
             // after the scope,
             // if completed, we see the changes
             // else changes have been rolled back
-            x = umbracoContext.ContentCache.GetById(item.Id);
+            x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
             Assert.AreEqual(complete ? "changed" : "name", x.Name());
         }

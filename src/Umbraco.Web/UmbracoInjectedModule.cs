@@ -300,7 +300,7 @@ namespace Umbraco.Web
         // if yes, return true
         private bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
         {
-            if (context.ContentCache.HasContent())
+            if (context.Content.HasContent())
                 return true;
 
             _logger.Warn<UmbracoModule>("Umbraco has no content");

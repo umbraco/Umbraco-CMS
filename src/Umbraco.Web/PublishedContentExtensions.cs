@@ -237,7 +237,7 @@ namespace Umbraco.Web
                 .And()
                 .ManagedQuery(term);
 
-            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.ContentCache);
+            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.Content);
         }
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, string indexName = null)
@@ -258,7 +258,7 @@ namespace Umbraco.Web
                 .And()
                 .ManagedQuery(term);
 
-            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.ContentCache);
+            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.Content);
         }
 
         #endregion

@@ -104,7 +104,7 @@ namespace Umbraco.Web.Editors
             if (m == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var publishedContent = UmbracoContext.ContentCache.GetById(true, pageId);
+            var publishedContent = UmbracoContext.Content.GetById(true, pageId);
 
             //if it isn't supposed to be rendered in the editor then return an empty string
             //currently we cannot render a macro if the page doesn't yet exist

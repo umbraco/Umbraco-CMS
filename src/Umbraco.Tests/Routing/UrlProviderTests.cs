@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Routing
                 Assert.AreEqual(randomSample.Value, result);
             }
 
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
             Assert.AreEqual(8, cachedRoutes.Count);

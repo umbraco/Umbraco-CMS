@@ -34,7 +34,7 @@ namespace Umbraco.Web.Routing
             if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
 
             // will not use cache if previewing
-            var route = umbracoContext.ContentCache.GetRouteById(content.Id, culture);
+            var route = umbracoContext.Content.GetRouteById(content.Id, culture);
 
             return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
         }
@@ -78,7 +78,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            var node = umbracoContext.ContentCache.GetById(id);
+            var node = umbracoContext.Content.GetById(id);
             if (node == null)
                 yield break;
 
@@ -100,7 +100,7 @@ namespace Umbraco.Web.Routing
                 var culture = d?.Culture?.Name;
 
                 //although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
-                var route = umbracoContext.ContentCache.GetRouteById(id, culture);
+                var route = umbracoContext.Content.GetRouteById(id, culture);
                 if (route == null) continue;
 
                 //need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)

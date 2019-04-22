@@ -101,14 +101,14 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void First()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
             Assert.AreEqual("Content 1", content.Name());
         }
 
         [Test]
         public void Distinct()
         {
-            var items = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var items = Current.UmbracoContext.Content.GetAtRoot()
                 .Distinct()
                 .Distinct()
                 .ToIndexedArray();
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void OfType1()
         {
-            var items = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var items = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .Distinct()
                 .ToIndexedArray();
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void OfType2()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2Sub>()
                 .Distinct()
                 .ToIndexedArray();
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void OfType()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First(x => x.Prop1 == 1234);
             Assert.AreEqual("Content 2", content.Name());
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Position()
         {
-            var items = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var items = Current.UmbracoContext.Content.GetAtRoot()
                 .Where(x => x.Value<int>("prop1") == 1234)
                 .ToIndexedArray();
 
@@ -179,7 +179,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Issue()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content = Current.UmbracoContext.Content.GetAtRoot()
                 .Distinct()
                 .OfType<ContentType2>();
 
@@ -187,12 +187,12 @@ namespace Umbraco.Tests.PublishedContent
             var first = where.First();
             Assert.AreEqual(1234, first.Prop1);
 
-            var content2 = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content2 = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First(x => x.Prop1 == 1234);
             Assert.AreEqual(1234, content2.Prop1);
 
-            var content3 = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content3 = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First();
             Assert.AreEqual(1234, content3.Prop1);

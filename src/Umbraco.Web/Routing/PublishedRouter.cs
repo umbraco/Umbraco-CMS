@@ -517,7 +517,7 @@ namespace Umbraco.Web.Routing
             {
                 // try and get the redirect node from a legacy integer ID
                 valid = true;
-                internalRedirectNode = request.UmbracoContext.ContentCache.GetById(internalRedirectId);
+                internalRedirectNode = request.UmbracoContext.Content.GetById(internalRedirectId);
             }
             else
             {
@@ -526,7 +526,7 @@ namespace Umbraco.Web.Routing
                 {
                     // try and get the redirect node from a UDI Guid
                     valid = true;
-                    internalRedirectNode = request.UmbracoContext.ContentCache.GetById(udiInternalRedirectId.Guid);
+                    internalRedirectNode = request.UmbracoContext.Content.GetById(udiInternalRedirectId.Guid);
                 }
             }
 

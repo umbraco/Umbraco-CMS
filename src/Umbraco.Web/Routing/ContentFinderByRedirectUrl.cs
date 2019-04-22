@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
                 return false;
             }
 
-            var content = frequest.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
+            var content = frequest.UmbracoContext.Content.GetById(redirectUrl.ContentId);
             var url = content == null ? "#" : content.Url(redirectUrl.Culture);
             if (url.StartsWith("#"))
             {

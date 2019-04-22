@@ -191,7 +191,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_For_Populated_Requested_Language()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
             var value = content.Value("welcomeText", "en-US");
             Assert.AreEqual("Welcome", value);
         }
@@ -199,7 +199,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_For_Populated_Requested_Non_Default_Language()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
             var value = content.Value("welcomeText", "de");
             Assert.AreEqual("Willkommen", value);
         }
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Do_Not_Get_Content_For_Unpopulated_Requested_Language_Without_Fallback()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
             var value = content.Value("welcomeText", "fr");
             Assert.IsNull(value);
         }
@@ -215,7 +215,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Do_Not_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_Unless_Requested()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
             var value = content.Value("welcomeText", "es");
             Assert.IsNull(value);
         }
@@ -223,7 +223,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
             var value = content.Value("welcomeText", "es", fallback: Fallback.ToLanguage);
             Assert.AreEqual("Welcome", value);
         }
@@ -231,7 +231,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_Over_Two_Levels()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
             var value = content.Value("welcomeText", "it", fallback: Fallback.To(Fallback.Language, Fallback.Ancestors));
             Assert.AreEqual("Welcome", value);
         }
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Do_Not_GetContent_For_Unpopulated_Requested_Language_With_Fallback_Over_That_Loops()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
             var value = content.Value("welcomeText", "no", fallback: Fallback.ToLanguage);
             Assert.IsNull(value);
         }
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Do_Not_Get_Content_Recursively_Unless_Requested()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
             var value = content.Value("welcomeText2");
             Assert.IsNull(value);
         }
@@ -255,7 +255,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_Recursively()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
             var value = content.Value("welcomeText2", fallback: Fallback.ToAncestors);
             Assert.AreEqual("Welcome", value);
         }
@@ -263,7 +263,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Do_Not_Get_Content_Recursively_Unless_Requested2()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First().Children().First();
             Assert.IsNull(content.GetProperty("welcomeText2"));
             var value = content.Value("welcomeText2");
             Assert.IsNull(value);
@@ -272,7 +272,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_Recursively2()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First().Children().First();
             Assert.IsNull(content.GetProperty("welcomeText2"));
             var value = content.Value("welcomeText2", fallback: Fallback.ToAncestors);
             Assert.AreEqual("Welcome", value);
@@ -281,7 +281,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_Recursively3()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First().Children().First();
             Assert.IsNull(content.GetProperty("noprop"));
             var value = content.Value("noprop", fallback: Fallback.ToAncestors);
             // property has no value but we still get the value (ie, the converter would do something)
@@ -292,7 +292,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_With_Recursive_Priority()
         {
             Current.VariationContextAccessor.VariationContext = new VariationContext("nl");
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
 
             var value = content.Value("welcomeText", "nl", fallback: Fallback.To(Fallback.Ancestors, Fallback.Language));
 
@@ -303,7 +303,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_With_Fallback_Language_Priority()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
             var value = content.Value("welcomeText", "nl", fallback: Fallback.ToLanguage);
 
             // No Dutch value is directly assigned.  Check has fallen back to English value from language variant.
@@ -313,14 +313,14 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Throws_For_Non_Supported_Fallback()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
             Assert.Throws<NotSupportedException>(() => content.Value("welcomeText", "nl", fallback: Fallback.To(999)));
         }
 
         [Test]
         public void Can_Fallback_To_Default_Value()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
 
             // no Dutch value is assigned, so getting null
             var value = content.Value("welcomeText", "nl");
@@ -338,7 +338,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Have_Custom_Default_Value()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
 
             // HACK: the value, pretend the converter would return something
             var prop = content.GetProperty("welcomeText") as SolidPublishedPropertyWithLanguageVariants;

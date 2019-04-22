@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Routing
             ignore = umbracoContext.UrlProvider.GetUrl(100111, false, current: new Uri("http://domain2.com"));
             ignore = umbracoContext.UrlProvider.GetUrl(1002, false, current: new Uri("http://domain2.com"));
 
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
             Assert.AreEqual(7, cachedRoutes.Count);

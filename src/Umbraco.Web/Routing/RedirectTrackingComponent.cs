@@ -164,7 +164,7 @@ namespace Umbraco.Web.Routing
         {
             if (LockedEvents) return;
 
-            var contentCache = Current.UmbracoContext.ContentCache;
+            var contentCache = Current.UmbracoContext.Content;
             foreach (var entity in args.PublishedEntities)
             {
                 var entityContent = contentCache.GetById(entity.Id);
@@ -210,7 +210,7 @@ namespace Umbraco.Web.Routing
 
         private static void CreateRedirect(int contentId, string culture, Guid contentKey, string oldRoute)
         {
-            var contentCache = Current.UmbracoContext.ContentCache;
+            var contentCache = Current.UmbracoContext.Content;
             var newRoute = contentCache.GetRouteById(contentId, culture);
             if (IsNotRoute(newRoute) || oldRoute == newRoute) return;
             var redirectUrlService = Current.Services.RedirectUrlService;

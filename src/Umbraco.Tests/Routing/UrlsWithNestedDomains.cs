@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, true));
 
             // check that the proper route has been cached
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
             Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);

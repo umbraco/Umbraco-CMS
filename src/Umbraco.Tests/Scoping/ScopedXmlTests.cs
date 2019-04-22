@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Scoping
 
         private static XmlStore XmlStore => (Current.Factory.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService).XmlStore;
         private static XmlDocument XmlMaster => XmlStore.Xml;
-        private static XmlDocument XmlInContext => ((PublishedContentCache) Umbraco.Web.Composing.Current.UmbracoContext.ContentCache).GetXml(false);
+        private static XmlDocument XmlInContext => ((PublishedContentCache) Umbraco.Web.Composing.Current.UmbracoContext.Content).GetXml(false);
 
         [TestCase(true)]
         [TestCase(false)]
@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Scoping
 
             // sanity checks
             Assert.AreSame(umbracoContext, Umbraco.Web.Composing.Current.UmbracoContext);
-            Assert.AreSame(XmlStore, ((PublishedContentCache) umbracoContext.ContentCache).XmlStore);
+            Assert.AreSame(XmlStore, ((PublishedContentCache) umbracoContext.Content).XmlStore);
 
             // create document type, document
             var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Scoping
 
             // sanity checks
             Assert.AreSame(umbracoContext, Umbraco.Web.Composing.Current.UmbracoContext);
-            Assert.AreSame(XmlStore, ((PublishedContentCache)umbracoContext.ContentCache).XmlStore);
+            Assert.AreSame(XmlStore, ((PublishedContentCache)umbracoContext.Content).XmlStore);
 
             // create document type
             var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };

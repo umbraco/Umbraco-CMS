@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 globalSettings,
                 new TestVariationContextAccessor());
 
-            _cache = _umbracoContext.ContentCache;
+            _cache = _umbracoContext.Content;
         }
 
         [Test]
