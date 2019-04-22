@@ -113,12 +113,29 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
+        [Obsolete("Use the Content property.")]
         public IPublishedContentCache ContentCache => PublishedSnapshot.Content;
+
+        /// <summary>
+        /// Gets the published content cache.
+        /// </summary>
+        public IPublishedContentCache Content => PublishedSnapshot.Content;
 
         /// <summary>
         /// Gets the published media cache.
         /// </summary>
+        [Obsolete("Use the Media property.")]
         public IPublishedMediaCache MediaCache => PublishedSnapshot.Media;
+
+        /// <summary>
+        /// Gets the published media cache.
+        /// </summary>
+        public IPublishedMediaCache Media => PublishedSnapshot.Media;
+
+        /// <summary>
+        /// Gets the domains cache.
+        /// </summary>
+        public IDomainCache Domains => PublishedSnapshot.Domains;
 
         /// <summary>
         /// Boolean value indicating whether the current request is a front-end umbraco request
@@ -190,6 +207,8 @@ namespace Umbraco.Web
         }
 
         #region Urls
+
+        // fixme do something with these
 
         /// <summary>
         /// Gets the url of a content identified by its identifier.
