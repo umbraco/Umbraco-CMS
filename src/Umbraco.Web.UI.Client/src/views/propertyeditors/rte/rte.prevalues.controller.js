@@ -41,20 +41,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             $scope.stylesheets = stylesheets;
 
             _.each($scope.stylesheets, function (stylesheet) {
-                stylesheet.selected = $scope.model.value.stylesheets.indexOf(stylesheet.name) >= 0;
+                // support both current format (full stylesheet path) and legacy format (stylesheet name only) 
+                stylesheet.selected = $scope.model.value.stylesheets.indexOf(stylesheet.path) >= 0 ||$scope.model.value.stylesheets.indexOf(stylesheet.name) >= 0;
             });
         });
-
-        $scope.commandSelected = function(cmd) {
-            cmd.selected = $scope.model.value.toolbar.indexOf(cmd.alias) >= 0;
-            return cmd.selected;
-        };
-
-        $scope.cssSelected = function (css) {
-            // support both current format (full stylesheet path) and legacy format (stylesheet name only) 
-            css.selected = $scope.model.value.stylesheets.indexOf(css.path) >= 0 ||$scope.model.value.stylesheets.indexOf(css.name) >= 0;
-            return css.selected;
-        }
 
         $scope.selectCommand = function(command){
             var index = $scope.model.value.toolbar.indexOf(command.alias);
