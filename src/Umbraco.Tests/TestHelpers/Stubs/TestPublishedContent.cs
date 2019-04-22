@@ -53,7 +53,9 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => throw new NotSupportedException();
         public bool IsDraft(string culture = null) => false;
         public bool IsPublished(string culture = null) => true;
-        public IPublishedContent Parent { get; set; }
+        private IPublishedContent _parent;
+        public IPublishedContent Parent() => _parent;
+        public void SetParent(IPublishedContent parent) => _parent = parent;
         public IEnumerable<IPublishedContent> Children { get; set; }
 
         // copied from PublishedContentBase
@@ -66,7 +68,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             var firstNonNullProperty = property;
             while (content != null && (property == null || property.HasValue() == false))
             {
-                content = content.Parent;
+                content = content.Parent();
                 property = content?.GetProperty(alias);
                 if (firstNonNullProperty == null && property != null) firstNonNullProperty = property;
             }

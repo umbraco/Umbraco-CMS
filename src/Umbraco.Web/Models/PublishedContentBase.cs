@@ -151,7 +151,7 @@ namespace Umbraco.Web.Models
         #region Tree
 
         /// <inheritdoc />
-        public abstract IPublishedContent Parent { get; }
+        public abstract IPublishedContent Parent();
 
         /// <inheritdoc />
         public abstract IEnumerable<IPublishedContent> Children { get; }

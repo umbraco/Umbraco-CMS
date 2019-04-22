@@ -188,10 +188,7 @@ namespace Umbraco.Tests.PublishedContent
 
             public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => default;
 
-            IPublishedContent IPublishedContent.Parent
-            {
-                get { return Parent; }
-            }
+            IPublishedContent IPublishedContent.Parent() => Parent;
 
             IEnumerable<IPublishedContent> IPublishedContent.Children
             {
@@ -238,7 +235,7 @@ namespace Umbraco.Tests.PublishedContent
                 IPublishedContent content = this;
                 while (content != null && (property == null || property.HasValue() == false))
                 {
-                    content = content.Parent;
+                    content = content.Parent();
                     property = content == null ? null : content.GetProperty(alias);
                 }
 

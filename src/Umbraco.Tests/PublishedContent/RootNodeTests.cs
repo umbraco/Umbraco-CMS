@@ -20,7 +20,7 @@ namespace Umbraco.Tests.PublishedContent
             content = ctx.ContentCache.GetById(1046);
             Assert.IsNotNull(content);
             Assert.AreEqual(1, content.Level);
-            Assert.IsNull(content.Parent);
+            Assert.IsNull(content.Parent());
 
             // non-existing content is null
             content = ctx.ContentCache.GetById(666);

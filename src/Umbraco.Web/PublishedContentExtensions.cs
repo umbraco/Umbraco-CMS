@@ -548,7 +548,7 @@ namespace Umbraco.Web
         /// <remarks>This method is here for consistency purposes but does not make much sense.</remarks>
         public static IPublishedContent Ancestor(this IPublishedContent content)
         {
-            return content.Parent;
+            return content.Parent();
         }
 
         /// <summary>
@@ -680,7 +680,7 @@ namespace Umbraco.Web
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
-            while ((content = content.Parent) != null)
+            while ((content = content.Parent()) != null)
                 yield return content;
         }
 
@@ -884,7 +884,7 @@ namespace Umbraco.Web
             where T : class, IPublishedContent
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            return content.Parent as T;
+            return content.Parent() as T;
         }
 
         #endregion
@@ -1121,8 +1121,8 @@ namespace Umbraco.Web
         /// <returns>The siblings of the content including the node itself.</returns>
         public static IEnumerable<IPublishedContent> SiblingsAndSelf(this IPublishedContent content, string culture = null)
         {
-            return content.Parent != null
-                ? content.Parent.Children(culture)
+            return content.Parent() != null
+                ? content.Parent().Children(culture)
                 : PublishedSnapshot.Content.GetAtRoot().WhereIsInvariantOrHasCulture(culture);
         }
 
@@ -1135,8 +1135,8 @@ namespace Umbraco.Web
         /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
         public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.Parent != null
-                ? content.Parent.ChildrenOfType(contentTypeAlias, culture)
+            return content.Parent() != null
+                ? content.Parent().ChildrenOfType(contentTypeAlias, culture)
                 : PublishedSnapshot.Content.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(culture);
         }
 
@@ -1150,8 +1150,8 @@ namespace Umbraco.Web
         public static IEnumerable<T> SiblingsAndSelf<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.Parent != null
-                ? content.Parent.Children<T>(culture)
+            return content.Parent() != null
+                ? content.Parent().Children<T>(culture)
                 : PublishedSnapshot.Content.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(culture);
         }
 

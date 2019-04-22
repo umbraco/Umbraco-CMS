@@ -139,7 +139,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly Func<DictionaryPublishedContent, string, IPublishedProperty> _getProperty;
         private readonly IAppCache _appCache;
 
-        public override IPublishedContent Parent => _getParent.Value;
+        public override IPublishedContent Parent() => _getParent.Value;
 
         public int ParentId { get; private set; }
 

@@ -274,7 +274,7 @@ namespace Umbraco.Tests.Published
             // ReSharper disable UnassignedGetOnlyAutoProperty
             public override bool IsDraft(string culture = null) => false;
             public override bool IsPublished(string culture = null) => true;
-            public override IPublishedContent Parent { get; }
+            public override IPublishedContent Parent() => null;
             public override IEnumerable<IPublishedContent> Children { get; }
             public override IPublishedContentType ContentType { get; }
             // ReSharper restore UnassignedGetOnlyAutoProperty

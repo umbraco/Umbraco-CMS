@@ -91,13 +91,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _properties.TryGetValue(alias, out property) ? property : null;
         }
 
-        public override IPublishedContent Parent
+        public override IPublishedContent Parent()
         {
-            get
-            {
-                EnsureNodeInitialized(andParent: true);
-                return _parent;
-            }
+            EnsureNodeInitialized(andParent: true);
+            return _parent;
         }
 
         public override int Id

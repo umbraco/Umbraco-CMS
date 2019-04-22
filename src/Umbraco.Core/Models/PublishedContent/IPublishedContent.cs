@@ -155,7 +155,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// Gets the parent of the content item.
         /// </summary>
         /// <remarks>The parent of root content is <c>null</c>.</remarks>
-        IPublishedContent Parent { get; }
+        IPublishedContent Parent();
 
         /// <summary>
         /// Gets the children of the content item.

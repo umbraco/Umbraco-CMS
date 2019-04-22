@@ -37,7 +37,7 @@ namespace Umbraco.Web.Macros
             PopulatePageData(frequest.PublishedContent.Id,
                 frequest.PublishedContent.Name(), frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
                 frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
-                frequest.PublishedContent.Path, frequest.PublishedContent.Parent?.Id ?? -1);
+                frequest.PublishedContent.Path, frequest.PublishedContent.Parent()?.Id ?? -1);
 
             if (frequest.HasTemplate)
             {
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Macros
             PopulatePageData(doc.Id,
                 doc.Name(), doc.ContentType.Id, doc.ContentType.Alias,
                 doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
-                doc.Path, doc.Parent?.Id ?? -1);
+                doc.Path, doc.Parent()?.Id ?? -1);
 
             if (doc.TemplateId.HasValue)
             {
@@ -182,8 +182,8 @@ namespace Umbraco.Web.Macros
         {
             private readonly IContent _inner;
             private readonly IPublishedProperty[] _properties;
-            private IReadOnlyDictionary<string, PublishedCultureInfo> _cultureInfos;
             private readonly IVariationContextAccessor _variationContextAccessor;
+            private readonly IPublishedContent _parent;
 
             private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> NoCultureInfos = new Dictionary<string, PublishedCultureInfo>();
 
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Macros
                     .Cast<IPublishedProperty>()
                     .ToArray();
 
-                Parent = new PagePublishedContent(_inner.ParentId);
+                _parent = new PagePublishedContent(_inner.ParentId);
             }
 
             public IPublishedContentType ContentType { get; }
@@ -288,7 +288,7 @@ namespace Umbraco.Web.Macros
                 throw new NotImplementedException();
             }
 
-            public IPublishedContent Parent { get; }
+            public IPublishedContent Parent() => _parent;
 
             public IEnumerable<IPublishedContent> Children => throw new NotImplementedException();
 

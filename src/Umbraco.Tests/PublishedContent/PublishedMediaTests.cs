@@ -416,13 +416,13 @@ namespace Umbraco.Tests.PublishedContent
             var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedRoot = GetNode(mRoot.Id);
-            Assert.AreEqual(null, publishedRoot.Parent);
+            Assert.AreEqual(null, publishedRoot.Parent());
 
             var publishedChild1 = GetNode(mChild1.Id);
-            Assert.AreEqual(mRoot.Id, publishedChild1.Parent.Id);
+            Assert.AreEqual(mRoot.Id, publishedChild1.Parent().Id);
 
             var publishedSubChild1 = GetNode(mSubChild1.Id);
-            Assert.AreEqual(mChild1.Id, publishedSubChild1.Parent.Id);
+            Assert.AreEqual(mChild1.Id, publishedSubChild1.Parent().Id);
         }
 
         [Test]

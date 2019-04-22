@@ -82,7 +82,7 @@ namespace Umbraco.Web.PublishedCache
 
         public override bool IsPublished(string culture = null) => true;
 
-        public override IPublishedContent Parent => null;
+        public override IPublishedContent Parent() => null;
 
         public override IEnumerable<IPublishedContent> Children => Enumerable.Empty<IPublishedContent>();
 

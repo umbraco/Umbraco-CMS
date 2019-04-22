@@ -178,10 +178,10 @@ namespace Umbraco.Tests.PublishedContent
             item3.SetUrl("/content-1/content-2/content-3");
 
             item1.Children = new List<IPublishedContent> { item2 };
-            item2.Parent = item1;
+            item2.SetParent(item1);
 
             item2.Children = new List<IPublishedContent> { item3 };
-            item3.Parent = item2;
+            item3.SetParent(item2);
 
             cache.Add(item1);
             cache.Add(item2);

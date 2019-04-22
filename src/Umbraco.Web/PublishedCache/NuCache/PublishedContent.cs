@@ -325,21 +325,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Tree
 
         /// <inheritdoc />
-        public override IPublishedContent Parent
+        public override IPublishedContent Parent()
         {
-            get
+            // have to use the "current" cache because a PublishedContent can be shared
+            // amongst many snapshots and other content depend on the snapshots
+            switch (_contentNode.ContentType.ItemType)
             {
-                // have to use the "current" cache because a PublishedContent can be shared
-                // amongst many snapshots and other content depend on the snapshots
-                switch (_contentNode.ContentType.ItemType)
-                {
-                    case PublishedItemType.Content:
-                        return GetContentById(IsPreviewing, _contentNode.ParentContentId);
-                    case PublishedItemType.Media:
-                        return GetMediaById(IsPreviewing, _contentNode.ParentContentId);
-                    default:
-                        throw new Exception($"Panic: unsupported item type \"{_contentNode.ContentType.ItemType}\".");
-                }
+                case PublishedItemType.Content:
+                    return GetContentById(IsPreviewing, _contentNode.ParentContentId);
+                case PublishedItemType.Media:
+                    return GetMediaById(IsPreviewing, _contentNode.ParentContentId);
+                default:
+                    throw new Exception($"Panic: unsupported item type \"{_contentNode.ContentType.ItemType}\".");
             }
         }
 

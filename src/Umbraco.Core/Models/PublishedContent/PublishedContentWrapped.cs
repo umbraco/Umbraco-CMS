@@ -113,7 +113,7 @@ namespace Umbraco.Core.Models.PublishedContent
         #region Tree
 
         /// <inheritdoc />
-        public virtual IPublishedContent Parent => _content.Parent;
+        public virtual IPublishedContent Parent() => _content.Parent();
 
         /// <inheritdoc />
         public virtual IEnumerable<IPublishedContent> Children => _content.Children;
