@@ -72,6 +72,10 @@ namespace Umbraco.Web.Strategies
                                               content =>
                                               applicationContext.Services.NotificationService.SendNotification(
                                                   content, ActionUnPublish.Instance, applicationContext));
+												  
+            //Send notifications for the rollback action
+            ContentService.RolledBack += (sender, args) => applicationContext.Services.NotificationService.SendNotification(
+                                                               args.Entity, ActionRollback.Instance, applicationContext);
 
             //Send notifications for the move and restore actions
             ContentService.Moved += (sender, args) =>
