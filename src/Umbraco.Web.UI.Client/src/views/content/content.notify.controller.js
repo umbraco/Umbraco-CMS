@@ -45,7 +45,7 @@
                 vm.saveError = error;
             });
         }
-        function notificationChanged() {
+        function notificationChanged(item) {
             vm.canSave = true;
         }
         onInit();

@@ -21,7 +21,7 @@
                     <div class="block-form" ng-show="!vm.loading">
                         <span ng-bind-html="vm.labels.headline"></span>
                         <umb-control-group>
-                            <umb-toggle-group items="vm.notifyOptions"></umb-toggle-group>
+                            <umb-toggle-group items="vm.notifyOptions" on-click="vm.notificationChanged(item)"></umb-toggle-group>
                         </umb-control-group>
                     </div>
                 </div>
