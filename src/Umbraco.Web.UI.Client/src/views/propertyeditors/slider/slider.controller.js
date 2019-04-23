@@ -33,11 +33,11 @@
         configureDefaults();
 
         // format config to fit slider plugin
-        const start = $scope.model.config.enableRange ? [$scope.model.config.initVal1, $scope.model.config.initVal2] : [$scope.model.config.initVal1];
         const step = $scope.model.config.step;
         const tooltips = $scope.model.config.enableRange ? [true, true] : [true];
         const min = $scope.model.config.minVal ? [$scope.model.config.minVal] : [$scope.model.config.minVal];
         const max = $scope.model.config.maxVal ? [$scope.model.config.maxVal] : [$scope.model.config.maxVal];
+        const start = $scope.model.config.enableRange ? [$scope.model.config.initVal2, max] : [$scope.model.config.initVal1];
 
         // setup default
         $scope.sliderOptions = {
