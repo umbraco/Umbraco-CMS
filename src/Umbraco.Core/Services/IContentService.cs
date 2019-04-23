@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -315,7 +316,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the recycle bin.
         /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
         OperationResult EmptyRecycleBin();
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
+        /// </summary>
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Sorts documents.

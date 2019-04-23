@@ -11,14 +11,18 @@
 
                 </div>
                 <div class="umb-table-cell umb-table__name">
-                    <localize key="general_name">Name</localize>
-                    <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': vm.isSortDirection('Name', 'asc'), 'icon-navigation-down': vm.isSortDirection('Name', 'desc')}"></i>
+                    <a class="umb-table-head__link sortable" href="#"
+                        ng-click="vm.sort('Name', true, true)"
+                        prevent-default>
+                        <localize key="general_name">Name</localize>
+                        <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': vm.isSortDirection('Name', 'asc'), 'icon-navigation-down': vm.isSortDirection('Name', 'desc')}"></i>
+                    </a>
                 </div>
                 <div class="umb-table-cell" ng-show="vm.items[0].state">
                     <localize key="general_status">Status</localize>
                 </div>
                 <div class="umb-table-cell" ng-repeat="column in vm.itemProperties track by column.alias">
-                    <a class="umb-table-head__link" title="Sort by {{ column.header }}" href="#"
+                    <a class="umb-table-head__link" href="#"
                        ng-click="vm.sort(column.alias, column.allowSorting, column.isSystem)"
                        ng-class="{'sortable':column.allowSorting}" prevent-default>
                         <span ng-bind="column.header"></span>

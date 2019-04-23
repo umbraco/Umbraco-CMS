@@ -427,15 +427,8 @@
     <key alias="overviewTitle">Обзор словаря</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Допустимые типы дочерних узлов</key>
-    <key alias="create">Создать</key>
     <key alias="createListView" version="7.2">Создать пользовательский список</key>
-    <key alias="deletetab">Удалить вкладку</key>
-    <key alias="description">Описание</key>
-    <key alias="newtab">Новая вкладка</key>
     <key alias="removeListView" version="7.2">Удалить пользовательский список</key>
-    <key alias="tab">Вкладка</key>
-    <key alias="thumbnail">Миниатюра</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Добавить предустановленное значение</key>
