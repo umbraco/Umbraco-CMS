@@ -19,9 +19,6 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
 
-        // TODO: This doesn't seem to be used
-        [IgnoreDataMember]
-        internal Action OnAdd;
 
         internal PropertyTypeCollection(bool supportsPublishing)
         {
@@ -43,36 +40,44 @@ namespace Umbraco.Core.Models
         /// <remarks></remarks>
         internal void Reset(IEnumerable<PropertyType> properties)
         {
+            //collection events will be raised in each of these calls
             Clear();
+
+            //collection events will be raised in each of these calls
             foreach (var property in properties)
-                Add(property);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                Add(property);            
         }
 
         protected override void SetItem(int index, PropertyType item)
         {
             item.SupportsPublishing = SupportsPublishing;
-            base.SetItem(index, item);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+            var oldItem = index >= 0 ? this[index] : item;
+            base.SetItem(index, item);            
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem));
+            item.PropertyChanged += Item_PropertyChanged;
         }
 
         protected override void RemoveItem(int index)
         {
             var removed = this[index];
             base.RemoveItem(index);
+            removed.PropertyChanged -= Item_PropertyChanged;
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
         }
 
         protected override void InsertItem(int index, PropertyType item)
         {
             item.SupportsPublishing = SupportsPublishing;
-            base.InsertItem(index, item);
+            base.InsertItem(index, item);            
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            item.PropertyChanged += Item_PropertyChanged;
         }
 
         protected override void ClearItems()
         {
             base.ClearItems();
+            foreach (var item in this)
+                item.PropertyChanged -= Item_PropertyChanged;
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
@@ -91,6 +96,7 @@ namespace Umbraco.Core.Models
                     var exists = Contains(key);
                     if (exists)
                     {
+                        //collection events will be raised in SetItem
                         SetItem(IndexOfKey(key), item);
                         return;
                     }
@@ -103,16 +109,25 @@ namespace Umbraco.Core.Models
                     item.SortOrder = this.Max(x => x.SortOrder) + 1;
                 }
 
+                //collection events will be raised in InsertItem
                 base.Add(item);
-                OnAdd?.Invoke();
-
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
             }
             finally
             {
                 if (_addLocker.IsWriteLockHeld)
                     _addLocker.ExitWriteLock();
             }
+        }
+
+        /// <summary>
+        /// Occurs when a property changes on a PropertyType that exists in this collection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Item_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var propType = (PropertyType)sender;
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, propType, propType));
         }
 
         /// <summary>

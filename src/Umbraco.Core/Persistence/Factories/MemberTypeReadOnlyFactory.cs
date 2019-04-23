@@ -9,11 +9,10 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class MemberTypeReadOnlyFactory
     {
-        public static IMemberType BuildEntity(MemberTypeReadOnlyDto dto, out bool needsSaving)
+        public static IMemberType BuildEntity(MemberTypeReadOnlyDto dto)
         {
             var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
-            needsSaving = false;
-
+            
             var memberType = new MemberType(dto.ParentId);
 
             try
@@ -41,27 +40,29 @@ namespace Umbraco.Core.Persistence.Factories
                 var propertyTypeGroupCollection = GetPropertyTypeGroupCollection(dto, memberType, standardPropertyTypes);
                 memberType.PropertyGroups = propertyTypeGroupCollection;
 
-                var propertyTypes = GetPropertyTypes(dto, memberType, standardPropertyTypes);
+                memberType.NoGroupPropertyTypes = GetNoGroupPropertyTypes(dto, memberType, standardPropertyTypes);
 
-                //By Convention we add 9 standard PropertyTypes - This is only here to support loading of types that didn't have these conventions before.
+                // By Convention we add 9 standard PropertyTypes - This is only here to support loading of types that didn't have these conventions before.
+                // In theory this should not happen! The only reason this did happen was because:
+                // A) we didn't install all of the default membership properties by default
+                // B) the existing data is super old when we didn't store membership properties at all (very very old)
+                // So what to do? We absolutely do not want to update the database when only a read was requested, this will cause problems
+                // so we should just add these virtual properties, they will have no ids but they will have aliases and this should be perfectly
+                // fine for any membership provider logic to work since neither membership providers or asp.net identity care about whether a property
+                // has an ID or not.
+                // When the member type is saved, all the properties will correctly be added.
+
+                //This will add this group if it doesn't exist, no need to error check here
+                memberType.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
                 foreach (var standardPropertyType in standardPropertyTypes)
                 {
-                    if (dto.PropertyTypes.Any(x => x.Alias.Equals(standardPropertyType.Key))) continue;
+                    //This will add the property if it doesn't exist, no need to error check here
+                    memberType.AddPropertyType(standardPropertyType.Value, Constants.Conventions.Member.StandardPropertiesGroupName);
 
-                    // beware!
-                    // means that we can return a memberType "from database" that has some property types
-                    // that do *not* come from the database and therefore are incomplete eg have no key,
-                    // no id, no dataTypeDefinitionId - ouch! - better notify caller of the situation
-                    needsSaving = true;
-
-                    //Add the standard PropertyType to the current list
-                    propertyTypes.Add(standardPropertyType.Value);
-                    
                     //Internal dictionary for adding "MemberCanEdit", "VisibleOnProfile", "IsSensitive" properties to each PropertyType
-                    memberType.MemberTypePropertyTypes.Add(standardPropertyType.Key,
-                        new MemberTypePropertyProfileAccess(false, false, false));
+                    if (!memberType.MemberTypePropertyTypes.TryGetValue(standardPropertyType.Key, out var memberTypePropertyProfile))
+                        memberType.MemberTypePropertyTypes[standardPropertyType.Key] = new MemberTypePropertyProfileAccess(false, false, false);
                 }
-                memberType.NoGroupPropertyTypes = propertyTypes;
 
                 return memberType;
             }
@@ -147,13 +148,14 @@ namespace Umbraco.Core.Persistence.Factories
             return propertyGroups;
         }
 
-        private static List<PropertyType> GetPropertyTypes(MemberTypeReadOnlyDto dto, MemberType memberType, Dictionary<string, PropertyType> standardProps)
+        private static List<PropertyType> GetNoGroupPropertyTypes(MemberTypeReadOnlyDto dto, MemberType memberType, Dictionary<string, PropertyType> standardProps)
         {
             //Find PropertyTypes that does not belong to a PropertyTypeGroup
             var propertyTypes = new List<PropertyType>();
             foreach (var typeDto in dto.PropertyTypes.Where(x => (x.PropertyTypeGroupId.HasValue == false || x.PropertyTypeGroupId.Value == 0) && x.Id.HasValue))
             {
                 //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
+
                 memberType.MemberTypePropertyTypes.Add(typeDto.Alias,
                     new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit, typeDto.IsSensitive));
 
