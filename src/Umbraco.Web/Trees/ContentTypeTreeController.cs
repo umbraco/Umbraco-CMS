@@ -1,10 +1,8 @@
-﻿using AutoMapper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Actions;
@@ -140,7 +138,7 @@ namespace Umbraco.Web.Trees
         {
             var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound,
                 filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
-            return Mapper.Map<IEnumerable<SearchResultEntity>>(results);
+            return Mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
     }
 }

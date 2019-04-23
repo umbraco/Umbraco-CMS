@@ -90,6 +90,9 @@
 
 .umb-editor-header__name-and-description {
     margin-right: 20px;
+    .umb-panel-header-description {
+    	padding: 0 10px;
+    }
 }
 
 .-split-view-active .umb-editor-header__name-and-description {
@@ -166,9 +169,15 @@ a.umb-editor-header__close-split-view:hover {
     height: 30px;
 	text-decoration: none !important;
 	font-size: 13px;
-	//color: @gray-4;
     color: @ui-action-discreet-type;
-	//background-color: @white;
+    
+    max-width: 50%;
+    white-space: nowrap;
+    
+    span {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 }
 
 a.umb-variant-switcher__toggle {

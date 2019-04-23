@@ -9,18 +9,18 @@
         public bool EnableRange { get; set; }
 
         [ConfigurationField("initVal1", "Initial value", "number")]
-        public int InitialValue { get; set; }
+        public decimal InitialValue { get; set; }
 
         [ConfigurationField("initVal2", "Initial value 2", "number", Description = "Used when range is enabled")]
-        public int InitialValue2 { get; set; }
+        public decimal InitialValue2 { get; set; }
 
         [ConfigurationField("minVal", "Minimum value", "number")]
-        public int MinimumValue { get; set; }
+        public decimal MinimumValue { get; set; }
 
         [ConfigurationField("maxVal", "Maximum value", "number")]
-        public int MaximumValue { get; set; }
+        public decimal MaximumValue { get; set; }
 
         [ConfigurationField("step", "Step increments", "number")]
-        public int StepIncrements { get; set; }
+        public decimal StepIncrements { get; set; }
     }
 }
