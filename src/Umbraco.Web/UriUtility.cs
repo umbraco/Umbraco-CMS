@@ -72,6 +72,15 @@ namespace Umbraco.Web
             return uri.Rewrite(path);
         }
 
+        // maps a media umbraco uri to a public uri
+        // ie with virtual directory - that is all for media
+        public static Uri MediaUriFromUmbraco(Uri uri)
+        {
+            var path = uri.GetSafeAbsolutePath();
+            path = ToAbsolute(path);
+            return uri.Rewrite(path);
+        }
+
         // maps a public uri to an internal umbraco uri
         // ie no virtual directory, no .aspx, lowercase...
         public static Uri UriToUmbraco(Uri uri)
