@@ -1381,19 +1381,24 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
+                // the tree is locked, counting and comparing to total is safe
                 var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 var items = new List<ContentNuDto>();
+                var count = 0;
                 foreach (var c in descendants)
                 {
                     // always the edited version
                     items.Add(GetDto(c, false));
+
                     // and also the published version if it makes any sense
                     if (c.Published)
                         items.Add(GetDto(c, true));
+
+                    count++;
                 }
 
                 db.BulkInsertRecords(items);
-                processed += items.Count;
+                processed += count;
             } while (processed < total);
         }
 
@@ -1448,10 +1453,11 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
+                // the tree is locked, counting and comparing to total is safe
                 var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => GetDto(m, false)).ToArray();
+                var items = descendants.Select(m => GetDto(m, false)).ToList();
                 db.BulkInsertRecords(items);
-                processed += items.Length;
+                processed += items.Count;
             } while (processed < total);
         }
 
