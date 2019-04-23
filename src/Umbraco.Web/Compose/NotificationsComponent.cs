@@ -52,6 +52,9 @@ namespace Umbraco.Web.Compose
             
             //Send notifications for the copy action
             ContentService.Copied += (sender, args) => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
+			
+            //Send notifications for the rollback action
+            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);			
         }
 
         public void Terminate()
