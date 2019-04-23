@@ -21,6 +21,7 @@ function PartialViewMacrosDeleteController($scope, codefileResource, treeService
                 // TODO: Need to sync tree, etc...
                 treeService.removeNode($scope.currentNode);
                 navigationService.hideMenu();
+
             });
     };
 

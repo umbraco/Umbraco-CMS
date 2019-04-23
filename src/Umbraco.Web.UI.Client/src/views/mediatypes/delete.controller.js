@@ -6,7 +6,7 @@
  * @description
  * The controller for the media type delete dialog
  */
-function MediaTypesDeleteController($scope, dataTypeResource, mediaTypeResource, treeService, navigationService) {
+function MediaTypesDeleteController($scope, mediaTypeResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 

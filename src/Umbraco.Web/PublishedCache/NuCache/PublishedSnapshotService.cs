@@ -1620,14 +1620,14 @@ AND cmsContentNu.nodeId IS NULL
             var ce = _contentStore.Count;
             var me = _mediaStore.Count;
 
-            return "I'm feeling good, really." +
+            return
                 " Database cache is " + (dbCacheIsOk ? "ok" : "NOT ok (rebuild?)") + "." +
-                " ContentStore has " + cg + " generation" + (cg > 1 ? "s" : "") +
-                ", " + cs + " snapshot" + (cs > 1 ? "s" : "") +
-                " and " + ce + " entr" + (ce > 1 ? "ies" : "y") + "." +
-                " MediaStore has " + mg + " generation" + (mg > 1 ? "s" : "") +
-                ", " + ms + " snapshot" + (ms > 1 ? "s" : "") +
-                " and " + me + " entr" + (me > 1 ? "ies" : "y") + ".";
+                " ContentStore contains " + ce + " item" + (ce > 1 ? "s" : "") +
+                " and has " + cg + " generation" + (cg > 1 ? "s" : "") +
+                " and " + cs + " snapshot" + (cs > 1 ? "s" : "") + "." +
+                " MediaStore contains " + me + " item" + (ce > 1 ? "s" : "") +
+                " and has " + mg + " generation" + (mg > 1 ? "s" : "") +
+                " and " + ms + " snapshot" + (ms > 1 ? "s" : "") + ".";
         }
 
         public void Collect()

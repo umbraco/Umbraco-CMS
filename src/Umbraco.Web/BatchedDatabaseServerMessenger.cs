@@ -32,8 +32,7 @@ namespace Umbraco.Web
         public BatchedDatabaseServerMessenger(
             IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings, bool enableDistCalls, DatabaseServerMessengerOptions options)
             : this(runtime, databaseFactory, scopeProvider, sqlContext, proflog, globalSettings, options)
-        {
-        }
+        { }
 
         public BatchedDatabaseServerMessenger(
             IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings, DatabaseServerMessengerOptions options)

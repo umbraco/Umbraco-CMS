@@ -83,7 +83,6 @@
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
@@ -340,9 +339,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8010</DevelopmentServerPort>
+          <DevelopmentServerPort>8100</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8010</IISUrl>
+          <IISUrl>http://localhost:8100</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

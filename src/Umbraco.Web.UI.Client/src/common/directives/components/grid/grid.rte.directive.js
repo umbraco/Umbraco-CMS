@@ -13,25 +13,36 @@ angular.module("umbraco.directives")
                 // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
                 var promises = [];
-
+                
+                //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
+                // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
+                // we have this mini content editor panel that can be launched with MNTP.
+                scope.textAreaHtmlId = scope.uniqueId + "_" + String.CreateGuid();
+                
                 //queue file loading
                 if (typeof (tinymce) === "undefined") {
                     promises.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
                 }
 
-                var toolbar = ["code", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "link", "umbmediapicker", "umbembeddialog"];
-                if (scope.configuration && scope.configuration.toolbar) {
-                    toolbar = scope.configuration.toolbar;
+                var editorConfig = scope.configuration ? scope.configuration : null;
+                if (!editorConfig || angular.isString(editorConfig)) {
+                    editorConfig = tinyMceService.defaultPrevalues();
+                    //for the grid by default, we don't want to include the macro toolbar
+                    editorConfig.toolbar = _.without(editorConfig, "umbmacro");
+                }
+                //make sure there's a max image size
+                if (!scope.configuration.maxImageSize && scope.configuration.maxImageSize !== 0) {
+                    editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
                 }
 
                 //stores a reference to the editor
                 var tinyMceEditor = null;
 
                 promises.push(tinyMceService.getTinyMceEditorConfig({
-                    htmlId: scope.uniqueId,
-                    stylesheets: scope.configuration ? scope.configuration.stylesheets : null,
-                    toolbar: toolbar,
-                    mode: scope.configuration.mode
+                    htmlId: scope.textAreaHtmlId,
+                    stylesheets: editorConfig.stylesheets,
+                    toolbar: editorConfig.toolbar,
+                    mode: editorConfig.mode
                 }));
 
                 // pin toolbar to top of screen if we have focus and it scrolls off the screen
@@ -46,9 +57,16 @@ angular.module("umbraco.directives")
 
                 $q.all(promises).then(function (result) {
 
-                    var tinyMceEditorConfig = result[promises.length - 1];
+                    var standardConfig = result[promises.length - 1];
 
-                    tinyMceEditorConfig.setup = function (editor) {
+                    //create a baseline Config to extend upon
+                    var baseLineConfigObj = {
+                        maxImageSize: editorConfig.maxImageSize
+                    };
+
+                    angular.extend(baseLineConfigObj, standardConfig);
+
+                    baseLineConfigObj.setup = function (editor) {
 
                         //set the reference
                         tinyMceEditor = editor;
@@ -111,7 +129,7 @@ angular.module("umbraco.directives")
                         //the elements needed
                         $timeout(function () {
                             tinymce.DOM.events.domLoaded = true;
-                            tinymce.init(tinyMceEditorConfig);
+                            tinymce.init(baseLineConfigObj);
                         }, 150, false);
                     }
 
@@ -132,17 +150,11 @@ angular.module("umbraco.directives")
                         }
 
                     });
-
-                    //listen for formSubmitting event (the result is callback used to remove the event subscription)
-                    var formSubmittingListener = scope.$on("formSubmitting", function () {
-                        scope.value = tinyMceEditor ? tinyMceEditor.getContent() : null;
-                    });
-
+                    
                     //when the element is disposed we need to unsubscribe!
                     // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                     // element might still be there even after the modal has been hidden.
                     scope.$on('$destroy', function () {
-                        formSubmittingListener();
                         eventsService.unsubscribe(tabShownListener);
                         //ensure we unbind this in case the blur doesn't fire above
                         $('.umb-panel-body').off('scroll', pinToolbar);

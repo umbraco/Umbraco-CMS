@@ -40,7 +40,6 @@
     <key alias="domainCreated">Novo domínio '%0%' foi criado</key>
     <key alias="domainDeleted">Domínio '%0%' foi removido</key>
     <key alias="domainExists">Domínio '%0%' já foi designado</key>
-    <key alias="domainHelp">ou seja: seudominio.com, www.seudominio.com</key>
     <key alias="domainUpdated">Domínio '%0%' foi atualizado</key>
     <key alias="orEdit">Editar Domínios Atuais</key>
   </area>
@@ -200,13 +199,6 @@
     <key alias="displayName">Nome da Cultura</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Tipos de nós filhos permitidos</key>
-    <key alias="create">Criar</key>
-    <key alias="deletetab">Remover guia</key>
-    <key alias="description">Descrição</key>
-    <key alias="newtab">Nova guia</key>
-    <key alias="tab">Guia</key>
-    <key alias="thumbnail">Miniatura</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Adicionar valor prévio</key>

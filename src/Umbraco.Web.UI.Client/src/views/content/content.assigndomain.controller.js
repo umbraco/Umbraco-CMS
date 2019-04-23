@@ -88,6 +88,7 @@
 
         function save() {
 
+            vm.error = null;
             vm.submitButtonState = "busy";
 
             if (vm.domainForm.$valid) {
@@ -115,6 +116,7 @@
                     if(response.valid) {
 
                         vm.submitButtonState = "success";
+                        closeDialog();
 
                     // show validation messages for each domain
                     } else {
@@ -130,6 +132,7 @@
                     }
 
                 }, function (e) {
+                    vm.error = e;
                     vm.submitButtonState = "error";
                 });
             }

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Collections;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -170,23 +166,23 @@ namespace Umbraco.Core.Models
         /// Sets the publishing values for names and properties.
         /// </summary>
         /// <param name="content"></param>
-        /// <param name="culture"></param>
+        /// <param name="impact"></param>
         /// <returns>A value indicating whether it was possible to publish the names and values for the specified
         /// culture(s). The method may fail if required names are not set, but it does NOT validate property data</returns>
-        public static bool PublishCulture(this IContent content, string culture = "*")
+        public static bool PublishCulture(this IContent content, CultureImpact impact)
         {
-            culture = culture.NullOrWhiteSpaceAsNull();
+            if (impact == null) throw new ArgumentNullException(nameof(impact));
 
             // the variation should be supported by the content type properties
             //  if the content type is invariant, only '*' and 'null' is ok
             //  if the content type varies, everything is ok because some properties may be invariant
-            if (!content.ContentType.SupportsPropertyVariation(culture, "*", true))
-                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
+            if (!content.ContentType.SupportsPropertyVariation(impact.Culture, "*", true))
+                throw new NotSupportedException($"Culture \"{impact.Culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
 
-            var alsoInvariant = false;
-            if (culture == "*") // all cultures
+            // set names
+            if (impact.ImpactsAllCultures)
             {
-                foreach (var c in content.AvailableCultures)
+                foreach (var c in content.AvailableCultures) // does NOT contain the invariant culture
                 {
                     var name = content.GetCultureName(c);
                     if (string.IsNullOrWhiteSpace(name))
@@ -194,26 +190,31 @@ namespace Umbraco.Core.Models
                     content.SetPublishInfo(c, name, DateTime.Now);
                 }
             }
-            else if (culture == null) // invariant culture
+            else if (impact.ImpactsOnlyInvariantCulture)
             {
                 if (string.IsNullOrWhiteSpace(content.Name))
                     return false;
                 // PublishName set by repository - nothing to do here
             }
-            else // one single culture
+            else if (impact.ImpactsExplicitCulture)
             {
-                var name = content.GetCultureName(culture);
+                var name = content.GetCultureName(impact.Culture);
                 if (string.IsNullOrWhiteSpace(name))
                     return false;
-                content.SetPublishInfo(culture, name, DateTime.Now);
-                alsoInvariant = true; // we also want to publish invariant values
+                content.SetPublishInfo(impact.Culture, name, DateTime.Now);
             }
 
-            // property.PublishValues only publishes what is valid, variation-wise
+            // set values
+            // property.PublishValues only publishes what is valid, variation-wise,
+            // but accepts any culture arg: null, all, specific
             foreach (var property in content.Properties)
             {
-                property.PublishValues(culture);
-                if (alsoInvariant)
+                // for the specified culture (null or all or specific)
+                property.PublishValues(impact.Culture);
+
+                // maybe the specified culture did not impact the invariant culture, so PublishValues
+                // above would skip it, yet it *also* impacts invariant properties
+                if (impact.ImpactsAlsoInvariantProperties)
                     property.PublishValues(null);
             }
 

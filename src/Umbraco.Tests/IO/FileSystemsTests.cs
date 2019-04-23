@@ -112,9 +112,19 @@ namespace Umbraco.Tests.IO
             fs.DeleteMediaFiles(new[] { virtPath });
             Assert.IsFalse(File.Exists(physPath));
 
-            // ~/media/1234 is gone
-            physPath = Path.GetDirectoryName(physPath);
-            Assert.IsFalse(Directory.Exists(physPath));
+            var scheme = Current.Factory.GetInstance<IMediaPathScheme>();
+            if (scheme is UniqueMediaPathScheme)
+            {
+                // ~/media/1234 is *not* gone
+                physPath = Path.GetDirectoryName(physPath);
+                Assert.IsTrue(Directory.Exists(physPath));
+            }
+            else
+            {
+                // ~/media/1234 is gone
+                physPath = Path.GetDirectoryName(physPath);
+                Assert.IsFalse(Directory.Exists(physPath));
+            }
 
             // ~/media exists
             physPath = Path.GetDirectoryName(physPath);
