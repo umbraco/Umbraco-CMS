@@ -4,6 +4,7 @@ using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web;
@@ -28,6 +29,7 @@ namespace Umbraco.Web
         protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
+        protected UmbracoMapper Mapper => Current.Mapper;
 
         /// <summary>
         /// Main startup method
@@ -80,6 +82,7 @@ namespace Umbraco.Web
             // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
             app.ConfigureUserManagerForUmbracoBackOffice(
                 Services,
+                Mapper,
                 UmbracoSettings.Content,
                 GlobalSettings,
                 Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());

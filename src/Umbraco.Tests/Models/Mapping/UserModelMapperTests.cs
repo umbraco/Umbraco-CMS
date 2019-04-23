@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using AutoMapper;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models.Membership;
@@ -10,7 +9,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class UserModelMapperTests : TestWithDatabaseBase
     {
         [Test]

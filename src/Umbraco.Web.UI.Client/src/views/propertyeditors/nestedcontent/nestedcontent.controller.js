@@ -127,6 +127,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 show: false,
                 style: {},
                 filter: $scope.scaffolds.length > 15 ? true : false,
+                orderBy: "$index",
                 view: "itempicker",
                 event: $event,
                 submit: function(model) {                    

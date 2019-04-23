@@ -47,7 +47,6 @@
                 <umb-editor-sub-header-section>
                     <umb-button
                         type="button"
-                        size="xs"
                         button-style="white"
                         label-key="buttons_clearSelection"
                         action="vm.clearSelection()"
@@ -129,15 +128,10 @@
                     </a>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showStatusFilter" on-close="vm.page.showStatusFilter = false;">
                         <umb-dropdown-item ng-repeat="userState in vm.userStatesFilter | filter:{ count: '!0', key: '!All'}" style="padding: 8px 20px 8px 16px;">
-                            <div class="flex items-center">
-                                <input
-                                    id="state-{{$index}}"
-                                    type="checkbox"
-                                    ng-model="userState.selected"
-                                    ng-change="vm.setUserStatesFilter(userState)"
-                                    style="margin-right: 10px; margin-top: -3px;" />
-                                <label for="state-{{$index}}">{{ userState.name }} ({{userState.count}})</label>
-                            </div>
+                            <umb-checkbox model="userState.selected"
+                                          on-change="vm.setUserStatesFilter(userState)"
+                                          text="{{ userState.name }} ({{userState.count}})">
+                            </umb-checkbox>
                         </umb-dropdown-item>
                     </umb-dropdown>
                 </div>
@@ -151,15 +145,10 @@
                     </a>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showGroupFilter" on-close="vm.page.showGroupFilter = false;">
                         <umb-dropdown-item ng-repeat="userGroup in vm.userGroups" style="padding: 8px 20px 8px 16px;">
-                            <div class="flex items-center">
-                                <input
-                                    id="group-{{$index}}"
-                                    type="checkbox"
-                                    ng-model="userGroup.selected"
-                                    ng-change="vm.setUserGroupFilter(userGroup)"
-                                    style="margin-right: 10px; margin-top: -3px;" />
-                                <label for="group-{{$index}}">{{ userGroup.name }}</label>
-                            </div>
+                            <umb-checkbox model="userGroup.selected"
+                                          on-change="vm.setUserGroupFilter(userGroup)"
+                                          text="{{ userGroup.name }}">
+                            </umb-checkbox>
                         </umb-dropdown-item>
                     </umb-dropdown>
                 </div>
