@@ -96,10 +96,11 @@ angular.module("umbraco")
                 view: "views/propertyEditors/grid/dialogs/layoutconfig.html",
                 size: "small",
                 submit: function (model) {
-                    if (index === -1)
+                    if (index === -1) {
                         $scope.model.value.templates.push(model);
-                    else
+                    } else {
                         $scope.model.value.templates[index] = model;
+                    }
                     editorService.close();
                 },
                 close: function(model) {
@@ -140,10 +141,11 @@ angular.module("umbraco")
                view: "views/propertyEditors/grid/dialogs/rowconfig.html",
                size: "small",
                submit: function (model) {
-                   if (index === -1)
+                   if (index === -1) {
                        $scope.model.value.layouts.push(model);
-                   else
-                    $scope.model.value.layouts[index] = model;
+                   } else {
+                       $scope.model.value.layouts[index] = model;
+                   }
                    editorService.close();
                },
                close: function(model) {
