@@ -15,13 +15,8 @@ namespace Umbraco.Core
             var hs = new HashSet<T>();
             foreach (var item in items)
             {
-                if (item != null || includeNull)
-                {
-                    if (!hs.Add(item))
-                    {
-                        return true;
-                    }
-                }
+                if ((item != null || includeNull) && !hs.Add(item))
+                    return true;
             }
             return false;
         }
@@ -117,7 +112,7 @@ namespace Umbraco.Core
             }
         }
 
-        
+
         /// <summary>
         /// Returns true if all items in the other collection exist in this collection
         /// </summary>
