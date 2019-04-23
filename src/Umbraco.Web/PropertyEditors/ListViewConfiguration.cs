@@ -63,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("tabName", "Content app name", "textstring", Description = "The name of the listview content app (default if empty: 'Child Items')")]
         public string TabName { get; set; }
 
-        [ConfigurationField("showContentFirst", "Show Content First", "boolean", Description = "Enable this to show the page content app before the list view content app")]
+        [ConfigurationField("showContentFirst", "Show Content App First", "boolean", Description = "Enable this to show the content app by default instead of the list view app")]
         public bool ShowContentFirst { get; set; }
 
         public class Property
