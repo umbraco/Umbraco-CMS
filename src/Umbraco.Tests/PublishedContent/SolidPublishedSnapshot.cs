@@ -44,7 +44,10 @@ namespace Umbraco.Tests.PublishedContent
         { }
     }
 
-    class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache
+    /// <summary>
+    /// For unit testing. Routing is not implemented and will throw. PR welcome. :)
+    /// </summary>
+    public class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache
     {
         private readonly Dictionary<int, IPublishedContent> _content = new Dictionary<int, IPublishedContent>();
 
@@ -156,7 +159,7 @@ namespace Umbraco.Tests.PublishedContent
         }
     }
 
-    class SolidPublishedContent : IPublishedContent
+    public class SolidPublishedContent : IPublishedContent
     {
         #region Constructor
 
@@ -254,7 +257,7 @@ namespace Umbraco.Tests.PublishedContent
         #endregion
     }
 
-    internal class SolidPublishedProperty : IPublishedProperty
+    public class SolidPublishedProperty : IPublishedProperty
     {
         public PublishedPropertyType PropertyType { get; set; }
         public string Alias { get; set; }

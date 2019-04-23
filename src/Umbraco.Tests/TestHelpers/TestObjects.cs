@@ -30,7 +30,7 @@ namespace Umbraco.Tests.TestHelpers
     /// <summary>
     /// Provides objects for tests.
     /// </summary>
-    internal partial class TestObjects
+    public partial class TestObjects
     {
         private readonly IRegister _register;
 

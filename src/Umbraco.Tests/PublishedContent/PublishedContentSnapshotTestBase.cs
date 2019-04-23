@@ -97,6 +97,6 @@ namespace Umbraco.Tests.PublishedContent
             return caches;
         }
 
-        internal abstract void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache);
+        protected abstract void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache);
     }
 }

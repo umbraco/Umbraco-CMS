@@ -58,7 +58,7 @@ namespace Umbraco.Tests.PublishedContent
                 .Returns((string c) => languages.SingleOrDefault(y => y.IsoCode == c));
         }
 
-        internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
+        protected override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
         {
             var prop1Type = factory.CreatePropertyType("prop1", 1, variations: ContentVariation.Culture);
             var welcomeType = factory.CreatePropertyType("welcomeText", 1, variations: ContentVariation.Culture);

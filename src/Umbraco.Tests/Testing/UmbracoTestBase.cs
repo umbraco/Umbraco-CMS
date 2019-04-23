@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Testing
 
         protected bool FirstTestInFixture = true;
 
-        internal TestObjects TestObjects { get; private set; }
+        public TestObjects TestObjects { get; private set; }
 
         private static TypeLoader _commonTypeLoader;
 

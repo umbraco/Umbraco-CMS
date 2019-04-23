@@ -13,7 +13,7 @@ namespace Umbraco.Tests.PublishedContent
     [UmbracoTest(TypeLoader = UmbracoTestOptions.TypeLoader.PerFixture)]
     public class PublishedContentMoreTests : PublishedContentSnapshotTestBase
     {
-        internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
+        protected override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
         {
             var props = new[]
                 {

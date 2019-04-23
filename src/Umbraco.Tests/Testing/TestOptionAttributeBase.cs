@@ -27,9 +27,13 @@ namespace Umbraco.Tests.Testing
             var test = TestContext.CurrentContext.Test;
             var typeName = test.ClassName;
             var methodName = test.MethodName;
-            var type = Type.GetType(typeName, true);
+            var type = Type.GetType(typeName, false);
             if (type == null)
-                throw new Exception("panic"); // makes no sense
+            {
+//                throw new Exception("panic"); // makes no sense
+                // REVIEW: But happens anyway since we can't discover tests in assemblies referencing this for some reason. However, might be able to figure something out. (AKA. Blew up, quickfix)
+                return new TOptions();
+            }
             var methodInfo = type.GetMethod(methodName); // what about overloads?
             var options = GetTestOptions<TOptions>(methodInfo);
             return options;

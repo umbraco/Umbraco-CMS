@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// <summary>
     /// Provides a default implementation for <see cref="IPublishedContentTypeFactory"/>.
     /// </summary>
-    internal class PublishedContentTypeFactory : IPublishedContentTypeFactory
+    public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     {
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly PropertyValueConverterCollection _propertyValueConverters;
@@ -32,13 +32,33 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
+        /// <summary>
+        /// Only for unit tests
+        /// REVIEW: Make protected?
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="alias"></param>
+        /// <param name="propertyTypes"></param>
+        /// <param name="variations"></param>
+        /// <param name="isElement"></param>
+        /// <returns></returns>
+        public PublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
             return new PublishedContentType(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations, isElement);
         }
 
         // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
+        /// <summary>
+        /// Only for unit tests
+        /// REVIEW: Make protected?
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="alias"></param>
+        /// <param name="propertyTypes"></param>
+        /// <param name="variations"></param>
+        /// <param name="isElement"></param>
+        /// <returns></returns>
+        public PublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
             return new PublishedContentType(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations, isElement);
         }
@@ -55,8 +75,17 @@ namespace Umbraco.Core.Models.PublishedContent
             return new PublishedPropertyType(contentType, propertyTypeAlias, dataTypeId, true, variations, _propertyValueConverters, _publishedModelFactory, this);
         }
 
-        // for tests
-        internal PublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, bool umbraco = false, ContentVariation variations = ContentVariation.Nothing)
+        /// <summary>
+        /// For unit testing only
+        /// REVIEW: Make protected? - AKA Should this possibly be made public in "adapter class" or from class in test lib? (or should tests just pass the content type?)
+        /// TODO: Property type alias
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="dataTypeId"></param>
+        /// <param name="umbraco"></param>
+        /// <param name="variations"></param>
+        /// <returns></returns>
+        public PublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, bool umbraco = false, ContentVariation variations = ContentVariation.Nothing)
         {
             return new PublishedPropertyType(propertyTypeAlias, dataTypeId, umbraco, variations, _propertyValueConverters, _publishedModelFactory, this);
         }
