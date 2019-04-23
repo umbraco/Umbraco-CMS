@@ -171,7 +171,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-
         //NOTE: This tests for left join logic (rev 7b14e8eacc65f82d4f184ef46c23340c09569052)
         [Test]
         public void Can_Get_All_Members_When_No_Properties_Assigned()
@@ -199,7 +198,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(3, result.Count());
             }
         }
-
 
         [Test]
         public void Can_Get_Member_Type_By_Id()
@@ -233,51 +231,114 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        /// <summary>
-        /// This demonstates an issue found: https://github.com/umbraco/Umbraco-CMS/issues/4963#issuecomment-483516698
-        /// </summary>
+        // See: https://github.com/umbraco/Umbraco-CMS/issues/4963#issuecomment-483516698
         [Test]
-        [Ignore("Still testing")]
         public void Bug_Changing_Built_In_Member_Type_Property_Type_Aliases_Results_In_Exception()
         {
-            //TODO: Fix this bug and then change this test
+            var stubs = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
 
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
-                IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+                IMemberType memberType = MockedContentTypes.CreateSimpleMemberType("mtype");
+
+                // created without the stub properties
+                Assert.AreEqual(1, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3, memberType.PropertyTypes.Count());
+
+                // saving *new* member type adds the stub properties
                 repository.Save(memberType);
 
-                foreach (var stub in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
+                // saving has added (and saved) the stub properties
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
+
+                foreach (var stub in stubs)
                 {
                     var prop = memberType.PropertyTypes.First(x => x.Alias == stub.Key);
                     prop.Alias = prop.Alias + "__0000";
                 }
 
+                // saving *existing* member type does *not* ensure stub properties
                 repository.Save(memberType);
 
-                //Assert.Throws<ArgumentException>(() => );
+                // therefore, nothing has changed
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
+
+                // fetching ensures that the stub properties are there
+                memberType = repository.Get("mtype");
+                Assert.IsNotNull(memberType);
+
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count * 2, memberType.PropertyTypes.Count());
             }
         }
 
         [Test]
         public void Built_In_Member_Type_Properties_Are_Automatically_Added_When_Creating()
         {
+            var stubs = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+
+                // created without the stub properties
+                Assert.AreEqual(1, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3, memberType.PropertyTypes.Count());
+
+                // saving *new* member type adds the stub properties
                 repository.Save(memberType);
 
+                // saving has added (and saved) the stub properties
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
 
+                // getting with stub properties
                 memberType = repository.Get(memberType.Id);
 
-                Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
-                Assert.That(memberType.PropertyGroups.Count(), Is.EqualTo(2));
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
+            }
+        }
+
+        [Test]
+        public void Built_In_Member_Type_Properties_Missing_Are_Automatically_Added_When_Creating()
+        {
+            var stubs = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+
+                // created without the stub properties
+                Assert.AreEqual(1, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3, memberType.PropertyTypes.Count());
+
+                // add one stub property, others are still missing
+                memberType.AddPropertyType(stubs.First().Value, Constants.Conventions.Member.StandardPropertiesGroupName);
+
+                // saving *new* member type adds the (missing) stub properties
+                repository.Save(memberType);
+
+                // saving has added (and saved) the (missing) stub properties
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
+
+                // getting with stub properties
+                memberType = repository.Get(memberType.Id);
+
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
             }
         }
 
