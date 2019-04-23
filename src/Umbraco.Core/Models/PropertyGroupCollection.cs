@@ -19,9 +19,6 @@ namespace Umbraco.Core.Models
     {
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
 
-        // TODO: this doesn't seem to be used anywhere
-        internal Action OnAdd;
-
         internal PropertyGroupCollection()
         { }
 
@@ -37,16 +34,19 @@ namespace Umbraco.Core.Models
         /// <remarks></remarks>
         internal void Reset(IEnumerable<PropertyGroup> groups)
         {
+            //collection events will be raised in each of these calls
             Clear();
+
+            //collection events will be raised in each of these calls
             foreach (var group in groups)
                 Add(group);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         protected override void SetItem(int index, PropertyGroup item)
         {
+            var oldItem = index >= 0 ? this[index] : item;
             base.SetItem(index, item);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem));
         }
 
         protected override void RemoveItem(int index)
@@ -84,6 +84,7 @@ namespace Umbraco.Core.Models
                         if (keyExists)
                             throw new Exception($"Naming conflict: Changing the name of PropertyGroup '{item.Name}' would result in duplicates");
 
+                        //collection events will be raised in SetItem
                         SetItem(IndexOfKey(item.Id), item);
                         return;
                     }
@@ -96,16 +97,14 @@ namespace Umbraco.Core.Models
                         var exists = Contains(key);
                         if (exists)
                         {
+                            //collection events will be raised in SetItem
                             SetItem(IndexOfKey(key), item);
                             return;
                         }
                     }
                 }
-
+                //collection events will be raised in InsertItem
                 base.Add(item);
-                OnAdd?.Invoke();
-
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
             }
             finally
             {

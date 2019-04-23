@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using AutoMapper;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors.Binders
 {
@@ -46,7 +42,7 @@ namespace Umbraco.Web.Editors.Binders
             //create the dto from the persisted model
             if (model.PersistedContent != null)
             {
-                model.PropertyCollectionDto = Mapper.Map<IMedia, ContentPropertyCollectionDto>(model.PersistedContent);
+                model.PropertyCollectionDto = Current.Mapper.Map<IMedia, ContentPropertyCollectionDto>(model.PersistedContent);
                 //now map all of the saved values to the dto
                 _modelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
             }

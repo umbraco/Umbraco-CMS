@@ -313,6 +313,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var removedContentTypeNodes = new List<int>();
                 var refreshedContentTypeNodes = new List<int>();
 
+                // find all the nodes that are either refreshed or removed,
+                // because of their content type being either refreshed or removed
                 foreach (var link in _contentNodes.Values)
                 {
                     var node = link.Value;
@@ -322,39 +324,49 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (refreshedIdsA.Contains(contentTypeId)) refreshedContentTypeNodes.Add(node.Id);
                 }
 
-                // all content should have been deleted - but
+                // perform deletion of content with removed content type
+                // removing content types should have removed their content already
+                // but just to be 100% sure, clear again here
                 foreach (var node in removedContentTypeNodes)
                     ClearBranchLocked(node);
 
+                // perform deletion of removed content types
                 foreach (var id in removedIdsA)
                 {
-                    if (_contentTypesById.TryGetValue(id, out LinkedNode<PublishedContentType> link) == false || link.Value == null)
+                    if (_contentTypesById.TryGetValue(id, out var link) == false || link.Value == null)
                         continue;
                     SetValueLocked(_contentTypesById, id, null);
                     SetValueLocked(_contentTypesByAlias, link.Value.Alias, null);
                 }
 
+                // perform update of refreshed content types
                 foreach (var type in refreshedTypesA)
                 {
                     SetValueLocked(_contentTypesById, type.Id, type);
                     SetValueLocked(_contentTypesByAlias, type.Alias, type);
                 }
 
-                // skip missing type
-                // skip missing parents & unbuildable kits - what else could we do?
+                // perform update of content with refreshed content type - from the kits
+                // skip missing type, skip missing parents & unbuildable kits - what else could we do?
+                // kits are ordered by level, so ParentExits is ok here
                 var visited = new List<int>();
                 foreach (var kit in kits.Where(x =>
                     refreshedIdsA.Contains(x.ContentTypeId) &&
                     ParentExistsLocked(x) &&
                     BuildKit(x)))
                 {
+                    // replacing the node: must preserve the parents
+                    var node = GetHead(_contentNodes, kit.Node.Id)?.Value;
+                    if (node != null)
+                        kit.Node.ChildContentIds = node.ChildContentIds;
+
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
+
                     visited.Add(kit.Node.Id);
                     if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                 }
 
                 // all content should have been refreshed - but...
-
                 var orphans = refreshedContentTypeNodes.Except(visited);
                 foreach (var id in orphans)
                     ClearBranchLocked(id);
@@ -503,6 +515,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        // IMPORTANT kits must be sorted out by LEVEL
         public void SetAll(IEnumerable<ContentNodeKit> kits)
         {
             var lockInfo = new WriteLockInfo();
@@ -533,6 +546,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        // IMPORTANT kits must be sorted out by LEVEL
         public void SetBranch(int rootContentId, IEnumerable<ContentNodeKit> kits)
         {
             var lockInfo = new WriteLockInfo();

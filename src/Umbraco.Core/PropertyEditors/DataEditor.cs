@@ -173,7 +173,13 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         protected virtual IConfigurationEditor CreateConfigurationEditor()
         {
-            return new ConfigurationEditor();
+            var editor = new ConfigurationEditor();
+            // pass the default configuration if this is not a property value editor
+            if((Type & EditorType.PropertyValue) == 0)
+            {
+                editor.DefaultConfiguration = _defaultConfiguration;
+            }
+            return editor;
         }
 
         /// <summary>

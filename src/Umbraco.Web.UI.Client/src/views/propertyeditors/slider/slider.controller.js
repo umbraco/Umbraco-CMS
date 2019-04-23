@@ -38,7 +38,10 @@
         const tooltips = $scope.model.config.enableRange ? [true, true] : [true];
         const min = $scope.model.config.minVal ? [$scope.model.config.minVal] : [$scope.model.config.minVal];
         const max = $scope.model.config.maxVal ? [$scope.model.config.maxVal] : [$scope.model.config.maxVal];
-
+        // don't render values with decimal places if the step increment in a whole number
+        var stepDecimalPlaces = $scope.model.config.step % 1 == 0
+            ? 0
+            : _.last($scope.model.config.step.toString().replace(",", ".").split(".")).length;
         // setup default
         $scope.sliderOptions = {
             "start": start,
@@ -46,10 +49,10 @@
             "tooltips": tooltips,
             "format": {
                 to: function (value) {
-                    return Math.round(value);
+                    return value.toFixed(stepDecimalPlaces);
                 },
                 from: function (value) {
-                    return Math.round(value);
+                    return value;
                 }
             },
             "range": {

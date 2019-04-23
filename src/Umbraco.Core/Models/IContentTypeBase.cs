@@ -96,17 +96,17 @@ namespace Umbraco.Core.Models
         IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; }
 
         /// <summary>
-        /// Gets or Sets a collection of Property Groups
+        /// Gets or sets the local property groups.
         /// </summary>
         PropertyGroupCollection PropertyGroups { get; set; }
 
         /// <summary>
-        /// Gets all property types, across all property groups.
+        /// Gets all local property types belonging to a group, across all local property groups.
         /// </summary>
         IEnumerable<PropertyType> PropertyTypes { get; }
 
         /// <summary>
-        /// Gets or sets the property types that are not in a group.
+        /// Gets or sets the local property types that do not belong to a group.
         /// </summary>
         IEnumerable<PropertyType> NoGroupPropertyTypes { get; set; }
 

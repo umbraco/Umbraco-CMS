@@ -391,13 +391,6 @@
     <key alias="usernameHint">Tu nombre de usuario normalmente es tu e-mail</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Tipos de nodos hijos permitidos</key>
-    <key alias="create">Crear</key>
-    <key alias="deletetab">Borrar pestaña</key>
-    <key alias="description">Descripción</key>
-    <key alias="newtab">Nueva pestaña</key>
-    <key alias="tab">Pestaña</key>
-    <key alias="thumbnail">Miniatura</key>
     <key alias="createListView" version="7.2">Crear un tipo de listado personalizado</key>
     <key alias="removeListView" version="7.2">Quitar el tipo de listado personalizado</key>
   </area>
