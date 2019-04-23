@@ -9,7 +9,7 @@ namespace Umbraco.Web.Routing
     public interface IMediaUrlProvider
     {
         /// <summary>
-        /// Gets the nice url of a media item.
+        /// Gets the url of a media item.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="content">The published content.</param>

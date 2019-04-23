@@ -7,7 +7,6 @@ namespace Umbraco.Web.Routing
     {
         public MediaUrlProviderCollection(IEnumerable<IMediaUrlProvider> items)
             : base(items)
-        {
-        }
+        { }
     }
 }

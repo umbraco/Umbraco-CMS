@@ -22,8 +22,7 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
-            var propType = content.ContentType.GetPropertyType(propertyAlias);
-
+            var propType = prop.PropertyType;
             string path = null;
 
             switch (propType.EditorAlias)
@@ -33,18 +32,12 @@ namespace Umbraco.Web.Routing
                     break;
                 case Constants.PropertyEditors.Aliases.ImageCropper:
                     //get the url from the json format
-
-                    var stronglyTyped = value as ImageCropperValue;
-                    if (stronglyTyped != null)
-                    {
-                        path = stronglyTyped.Src;
-                        break;
-                    }
-                    path = value.ToString();
+                    path = value is ImageCropperValue stronglyTyped ? stronglyTyped.Src : value.ToString();
                     break;
             }
 
-            return path == null ? null : UrlInfo.Url(AssembleUrl(path, current, mode).ToString(), culture);
+            var url = AssembleUrl(path, current, mode);
+            return url == null ? null : UrlInfo.Url(url.ToString(), culture);
         }
 
         private Uri AssembleUrl(string path, Uri current, UrlProviderMode mode)
@@ -70,7 +63,7 @@ namespace Umbraco.Web.Routing
                     throw new ArgumentOutOfRangeException(nameof(mode));
             }
 
-            return uri.Rewrite(UriUtility.ToAbsolute(uri.GetSafeAbsolutePath()));
+            return UriUtility.MediaUriFromUmbraco(uri);
         }
     }
 }

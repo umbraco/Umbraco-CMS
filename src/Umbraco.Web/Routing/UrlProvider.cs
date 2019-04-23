@@ -90,7 +90,7 @@ namespace Umbraco.Web.Routing
             => GetUrl(content, Mode, culture, current);
 
         /// <summary>
-        /// Gets the nice url of a published content.
+        /// Gets the url of a published content.
         /// </summary>
         /// <param name="content">The published content.</param>
         /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Routing
             => GetUrl(GetDocument(id), Mode, culture, current);
 
         /// <summary>
-        /// Gets the nice url of a published content.
+        /// Gets the url of a published content.
         /// </summary>
         /// <param name="id">The published content identifier.</param>
         /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
@@ -130,7 +130,7 @@ namespace Umbraco.Web.Routing
             => GetUrl(GetDocument(id), GetMode(absolute), culture, current);
 
         /// <summary>
-        /// Gets the nice url of a published content.
+        /// Gets the url of a published content.
         /// </summary>
         /// <param name="id">The published content identifier.</param>
         /// <param name="mode">The url mode.</param>
@@ -151,7 +151,7 @@ namespace Umbraco.Web.Routing
             => GetUrl(GetDocument(id), Mode, culture, current);
 
         /// <summary>
-        /// Gets the nice url of a published content.
+        /// Gets the url of a published content.
         /// </summary>
         /// <param name="id">The published content identifier.</param>
         /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Routing
             => GetUrl(GetDocument(id), GetMode(absolute), culture, current);
 
         /// <summary>
-        /// Gets the nice url of a published content.
+        /// Gets the url of a published content.
         /// </summary>
         /// <param name="id">The published content identifier.</param>
         /// <param name="mode">The url mode.</param>
@@ -177,7 +177,7 @@ namespace Umbraco.Web.Routing
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
-        /// Gets the nice url of a published content.
+        /// Gets the url of a published content.
         /// </summary>
         /// <param name="content">The published content.</param>
         /// <param name="mode">The url mode.</param>
