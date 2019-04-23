@@ -46,6 +46,9 @@ namespace Umbraco.Web.Compose
 
             //Send notifications for the unpublish action
             ContentService.Unpublished += (sender, args) => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
+
+            //Send notifications for the rollback action
+            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);
         }
 
         public void Terminate()

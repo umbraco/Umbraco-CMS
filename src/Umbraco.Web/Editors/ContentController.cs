@@ -1483,7 +1483,7 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
         public HttpResponseMessage EmptyRecycleBin()
         {
-            Services.ContentService.EmptyRecycleBin();
+            Services.ContentService.EmptyRecycleBin(Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }

@@ -42,7 +42,15 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns>The absolute url for the content.</returns>
-        public static string UrlAbsolute(this IPublishedContent content)
+        public static string UrlAbsolute(this IPublishedContent content) => content.UrlAbsolute(null);
+
+        /// <summary>
+        /// Gets the absolute url for the content.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="culture">The culture to get the url for</param>
+        /// <returns>The absolute url for the content.</returns>
+        public static string UrlAbsolute(this IPublishedContent content, string culture)
         {
             // adapted from PublishedContentBase.Url
 
@@ -54,7 +62,7 @@ namespace Umbraco.Web
             switch (content.ItemType)
             {
                 case PublishedItemType.Content:
-                    return Current.UmbracoContext.UrlProvider.GetUrl(content.Id, true);
+                    return Current.UmbracoContext.UrlProvider.GetUrl(content.Id, true, culture);
                 case PublishedItemType.Media:
                     return Current.UmbracoContext.UrlProvider.GetMediaUrl(content, Constants.Conventions.Media.File, true);
                 default:

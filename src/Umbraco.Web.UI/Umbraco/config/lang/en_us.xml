@@ -523,13 +523,6 @@
     <key alias="generatingAlias">Generating alias...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Allowed child node types</key>
-    <key alias="create">Create</key>
-    <key alias="deletetab">Delete tab</key>
-    <key alias="description">Description</key>
-    <key alias="newtab">New tab</key>
-    <key alias="tab">Tab</key>
-    <key alias="thumbnail">Thumbnail</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
     <key alias="aliasAlreadyExists">A content type, media type or member type with this alias already exists</key>
@@ -635,6 +628,7 @@
     <key alias="first">First</key>
     <key alias="general">General</key>
     <key alias="groups">Groups</key>
+    <key alias="group">Group</key>
     <key alias="height">Height</key>
     <key alias="help">Help</key>
     <key alias="hide">Hide</key>
@@ -1625,6 +1619,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="enterMacroName">Enter macro name</key>
     <key alias="parameters">Parameters</key>
     <key alias="parametersDescription">Define the parameters that should be available when using this macro.</key>
+    <key alias="selectViewFile">Select partial view macro file</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>
