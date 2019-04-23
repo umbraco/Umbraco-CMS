@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Testing.TestingTests
                 .Returns(UrlInfo.Url("/hello/world/1234"));
             var urlProvider = urlProviderMock.Object;
 
-            var theUrlProvider = new UrlProvider(umbracoContext, new [] { urlProvider }, umbracoContext.VariationContextAccessor);
+            var theUrlProvider = new UrlProvider(umbracoContext, new [] { urlProvider }, Enumerable.Empty<IMediaUrlProvider>(), umbracoContext.VariationContextAccessor);
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = Mock.Of<IPublishedContent>();

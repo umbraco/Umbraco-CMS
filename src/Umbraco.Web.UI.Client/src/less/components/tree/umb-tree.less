@@ -256,20 +256,20 @@ body.touch .umb-tree {
     }
 }
 
-.has-unpublished-version > .umb-tree-item__inner > .umb-tree-item__annotation::before {
-    content: "\e25a";
-    color: @green;
-    font-size: 23px;
-    margin-left: 16px;
-    left: -21px;
-}
-
 .is-container > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e04e";
     color: @blue;
     font-size: 9px;
     margin-left: 2px;
     left: 0px;
+}
+
+.has-unpublished-version > .umb-tree-item__inner > .umb-tree-item__annotation::before {
+    content: "\e25a";
+    color: @green;
+    font-size: 23px;
+    margin-left: 16px;
+    left: -21px;
 }
 
 .protected > .umb-tree-item__inner > .umb-tree-item__annotation::before {

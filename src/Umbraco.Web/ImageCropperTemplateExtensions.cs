@@ -130,15 +130,15 @@ namespace Umbraco.Web
             if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
                 return string.Empty;
 
+            var mediaItemUrl = mediaItem.MediaUrl(propertyAlias);
+
             //get the default obj from the value converter
             var cropperValue = mediaItem.Value(propertyAlias);
 
             //is it strongly typed?
             var stronglyTyped = cropperValue as ImageCropperValue;
-            string mediaItemUrl;
             if (stronglyTyped != null)
             {
-                mediaItemUrl = stronglyTyped.Src;
                 return GetCropUrl(
                     mediaItemUrl, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
                     cacheBusterValue, furtherOptions, ratioMode, upScale);
@@ -149,14 +149,12 @@ namespace Umbraco.Web
             if (jobj != null)
             {
                 stronglyTyped = jobj.ToObject<ImageCropperValue>();
-                mediaItemUrl = stronglyTyped.Src;
                 return GetCropUrl(
                     mediaItemUrl, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
                     cacheBusterValue, furtherOptions, ratioMode, upScale);
             }
 
             //it's a single string
-            mediaItemUrl = cropperValue.ToString();
             return GetCropUrl(
                 mediaItemUrl, width, height, mediaItemUrl, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
                 cacheBusterValue, furtherOptions, ratioMode, upScale);
@@ -322,7 +320,7 @@ namespace Umbraco.Web
                     if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))
                         return null;
 
-                    imageProcessorUrl.Append(cropDataSet.Src);
+                    imageProcessorUrl.Append(imageUrl);
                     cropDataSet.AppendCropBaseUrl(imageProcessorUrl, crop, string.IsNullOrWhiteSpace(cropAlias), preferFocalPoint);
 
                     if (crop != null & useCropDimensions)

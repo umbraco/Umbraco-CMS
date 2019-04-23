@@ -186,15 +186,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     //update all of the system includeProperties to enable sorting
     _.each($scope.options.includeProperties, function (e, i) {
+        e.allowSorting = true;
 
-        //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
-        // to do that, we'd need to update the base query for content to include the content type alias column
-        // which requires another join and would be slower. BUT We are doing this for members so not sure it makes a diff?
-        if (e.alias != "contentTypeAlias") {
-            e.allowSorting = true;
-        }
-
-        // Another special case for members, only fields on the base table (cmsMember) can be used for sorting
+        // Special case for members, only fields on the base table (cmsMember) can be used for sorting
         if (e.isSystem && $scope.entityType == "member") {
             e.allowSorting = e.alias == 'username' || e.alias == 'email';
         }
