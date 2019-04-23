@@ -406,13 +406,6 @@
     <key alias="usernameHint">Votre nom d'utilisateur est généralement votre adresse email</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Types de noeuds enfants autorisés</key>
-    <key alias="create">Créer</key>
-    <key alias="deletetab">Supprimer l'onglet</key>
-    <key alias="description">Description</key>
-    <key alias="newtab">Nouvel onglet</key>
-    <key alias="tab">Onglet</key>
-    <key alias="thumbnail">Miniature</key>
     <key alias="createListView" version="7.2">Créer une liste personnalisée</key>
     <key alias="removeListView" version="7.2">Supprimer la liste personnalisée</key>
   </area>

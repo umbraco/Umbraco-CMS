@@ -236,6 +236,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return GetNodePublishedContent(node, preview);
         }
 
+        public override IPublishedContent GetById(bool preview, Udi contentId)
+        {
+            var guidUdi = contentId as GuidUdi;
+            if (guidUdi == null)
+                throw new ArgumentException($"Udi must be of type {typeof(GuidUdi).Name}.", nameof(contentId));
+            
+            if (guidUdi.EntityType != Constants.UdiEntityType.Document)
+                throw new ArgumentException($"Udi entity type must be \"{Constants.UdiEntityType.Document}\".", nameof(contentId));
+
+            return GetById(preview, guidUdi.Guid);
+        }
+
         public override bool HasById(bool preview, int contentId)
         {
             var n = _snapshot.Get(contentId);

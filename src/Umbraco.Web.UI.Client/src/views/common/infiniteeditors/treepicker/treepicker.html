@@ -27,7 +27,7 @@
                                         <a ng-click="vm.selectLanguage(language)" ng-repeat="language in vm.languages" href="">{{language.name}}</a>
                                     </div>
                                 </div>
-                        
+
                                 <div class="umb-control-group">
                                     <umb-tree-search-box
                                         ng-if="vm.enableSearh"
@@ -36,6 +36,7 @@
                                         search-from-id="{{vm.searchInfo.searchFromId}}"
                                         search-from-name="{{vm.searchInfo.searchFromName}}"
                                         show-search="{{vm.searchInfo.showSearch}}"
+                                        ignore-user-start-nodes="{{vm.ignoreUserStartNodes}}"
                                         section="{{vm.section}}">
                                     </umb-tree-search-box>
                                 </div>

@@ -268,13 +268,6 @@
     <key alias="enterTags">Skriv inn nøkkelord (trykk på Enter etter hvert nøkkelord)...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Tillatte underordnede noder</key>
-    <key alias="create">Opprett</key>
-    <key alias="deletetab">Slett arkfane</key>
-    <key alias="description">Beskrivelse</key>
-    <key alias="newtab">Ny arkfane</key>
-    <key alias="tab">Arkfane</key>
-    <key alias="thumbnail">Miniatyrbilde</key>
     <key alias="createListView" version="7.2">Opprett brukerdefinert listevisning</key>
     <key alias="removeListView" version="7.2">Fjern brukerdefinert listevisning</key>
   </area>

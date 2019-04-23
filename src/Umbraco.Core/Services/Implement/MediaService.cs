@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -1024,7 +1025,15 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
-        public OperationResult EmptyRecycleBin()
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
+        public OperationResult EmptyRecycleBin() => EmptyRecycleBin(Constants.Security.SuperUserId);
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
+        /// </summary>
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        public OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId)
         {
             var nodeObjectType = Constants.ObjectTypes.Media;
             var deleted = new List<IMedia>();
@@ -1063,7 +1072,7 @@ namespace Umbraco.Core.Services.Implement
                 args.CanCancel = false;
                 scope.Events.Dispatch(EmptiedRecycleBin, this, args);
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.Remove)).ToEventArgs());
-                Audit(AuditType.Delete, 0, Constants.System.RecycleBinMedia, "Empty Media recycle bin");
+                Audit(AuditType.Delete, userId, Constants.System.RecycleBinMedia, "Empty Media recycle bin");
                 scope.Complete();
             }
 

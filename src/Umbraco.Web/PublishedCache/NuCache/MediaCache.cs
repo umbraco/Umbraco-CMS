@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
@@ -41,6 +42,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             // ignore preview, there's only draft for media
             var n = _snapshot.Get(contentId);
+            return n?.PublishedModel;
+        }
+
+        public override IPublishedContent GetById(bool preview, Udi contentId)
+        {
+            var guidUdi = contentId as GuidUdi;
+            if (guidUdi == null)
+                throw new ArgumentException($"Udi must be of type {typeof(GuidUdi).Name}.", nameof(contentId));
+
+            if (guidUdi.EntityType != Constants.UdiEntityType.Media)
+                throw new ArgumentException($"Udi entity type must be \"{Constants.UdiEntityType.Media}\".", nameof(contentId));
+
+            // ignore preview, there's only draft for media
+            var n = _snapshot.Get(guidUdi.Guid);
             return n?.PublishedModel;
         }
 

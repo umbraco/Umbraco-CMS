@@ -311,13 +311,6 @@
     <key alias="email">輸入您的電子郵件</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">允許子項節點類型</key>
-    <key alias="create">創建</key>
-    <key alias="deletetab">刪除選項卡</key>
-    <key alias="description">描述</key>
-    <key alias="newtab">新建選項卡</key>
-    <key alias="tab">選項卡</key>
-    <key alias="thumbnail">縮略圖</key>
     <key alias="createListView" version="7.2">新增自訂清單檢視</key>
     <key alias="removeListView" version="7.2">移除自訂清單檢視</key>
   </area>
