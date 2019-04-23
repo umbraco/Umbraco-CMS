@@ -59,12 +59,10 @@ namespace Umbraco.Web.Strategies
                     applicationContext.Services.NotificationService.SendNotification(updatedEntities, ActionUpdate.Instance, applicationContext);
                 };
 
-            //Send notifications for the delete action
-            ContentService.Deleted += (sender, args) =>
-                                      args.DeletedEntities.ForEach(
-                                          content =>
-                                          applicationContext.Services.NotificationService.SendNotification(
-                                              content, ActionDelete.Instance, applicationContext));
+            //Send notifications for the delete (send to recycle bin) action
+            ContentService.Trashed += (sender, args) => applicationContext.Services.NotificationService.SendNotification(
+                                                            args.MoveInfoCollection.Select(mi => mi.Entity), ActionDelete.Instance, applicationContext
+                                                        );
            
             //Send notifications for the unpublish action
             ContentService.UnPublished += (sender, args) =>
