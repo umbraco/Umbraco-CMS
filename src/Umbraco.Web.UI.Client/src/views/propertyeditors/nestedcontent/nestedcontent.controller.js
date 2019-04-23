@@ -93,8 +93,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.maxItems = 1000;
 
         $scope.singleMode = $scope.minItems == 1 && $scope.maxItems == 1;
-        $scope.showIcons = $scope.model.config.showIcons || true;
-        $scope.wideMode = $scope.model.config.hideLabel == "1";
+        $scope.showIcons = $scope.model.config.showIcons;
+        $scope.wideMode = $scope.model.config.hideLabel;
 
         $scope.labels = {};
         localizationService.localizeMany(["grid_insertControl"]).then(function(data) {
