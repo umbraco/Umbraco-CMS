@@ -43,14 +43,23 @@ namespace Umbraco.Web.Compose
             //Send notifications for the update and created actions
             ContentService.Saved += (sender, args) => ContentServiceSaved(_notifier, sender, args, _actions);
 
-            //Send notifications for the delete action
-            ContentService.Deleted += (sender, args) => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.DeletedEntities.ToArray());
-
             //Send notifications for the unpublish action
             ContentService.Unpublished += (sender, args) => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
 
+            //Send notifications for the move/move to recycle bin and restore actions
+            ContentService.Moved += (sender, args) => ContentServiceMoved(_notifier, sender, args, _actions);
+
+            //Send notifications for the delete action when content is moved to the recycle bin
+            ContentService.Trashed += (sender, args) => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
+            
+            //Send notifications for the copy action
+            ContentService.Copied += (sender, args) => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
+			
+            //Send notifications for the rollback action
+            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);	
+			
             //Send notifications for the public access changed action
-            PublicAccessService.Saved += (sender, args) => PublicAccessServiceSaved(_notifier, sender, args, _contentService, _actions);
+            PublicAccessService.Saved += (sender, args) => PublicAccessServiceSaved(_notifier, sender, args, _contentService, _actions);					
         }
 
         public void Terminate()
@@ -94,6 +103,22 @@ namespace Umbraco.Web.Compose
             notifier.Notify(actions.GetAction<ActionNew>(), newEntities.ToArray());
             notifier.Notify(actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
         }
+                
+        private void ContentServiceMoved(Notifier notifier, IContentService sender, Core.Events.MoveEventArgs<IContent> args, ActionCollection actions)
+        {
+            // notify about the move for all moved items
+            _notifier.Notify(_actions.GetAction<ActionMove>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
+
+            // for any items being moved from the recycle bin (restored), explicitly notify about that too
+            var restoredEntities = args.MoveInfoCollection
+                .Where(m => m.OriginalPath.Contains(Constants.System.RecycleBinContentString))
+                .Select(m => m.Entity)
+                .ToArray();
+            if(restoredEntities.Any())
+            {
+                _notifier.Notify(_actions.GetAction<ActionRestore>(), restoredEntities);
+            }
+        }
 
         private void PublicAccessServiceSaved(Notifier notifier, IPublicAccessService sender, Core.Events.SaveEventArgs<PublicAccessEntry> args, IContentService contentService, ActionCollection actions)
         {
@@ -104,7 +129,7 @@ namespace Umbraco.Web.Compose
             }
             notifier.Notify(actions.GetAction<ActionProtect>(), entities);
         }
-
+		
         /// <summary>
         /// This class is used to send the notifications
         /// </summary>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -31,6 +32,7 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor());
             var r1 = new RouteData();
@@ -49,6 +51,7 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor());
 
@@ -77,6 +80,7 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor());
 

@@ -240,6 +240,25 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     propertyIx++;
                 }
                 contentType.NoGroupPropertyTypes = noGroupPropertyTypes;
+
+                // ensure builtin properties
+                if (contentType is MemberType memberType)
+                {
+                    // ensure that the group exists (ok if it already exists)
+                    memberType.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
+
+                    // ensure that property types exist (ok if they already exist)
+                    foreach (var (alias, propertyType) in builtinProperties)
+                    {
+                        var added = memberType.AddPropertyType(propertyType, Constants.Conventions.Member.StandardPropertiesGroupName);
+
+                        if (added)
+                        {
+                            var access = new MemberTypePropertyProfileAccess(false, false, false);
+                            memberType.MemberTypePropertyTypes[alias] = access;
+                        }
+                    }
+                }
             }
         }
 
@@ -264,7 +283,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (contentType is MemberType memberType)
             {
                 var access = new MemberTypePropertyProfileAccess(dto.ViewOnProfile, dto.CanEdit, dto.IsSensitive);
-                memberType.MemberTypePropertyTypes.Add(dto.Alias, access);
+                memberType.MemberTypePropertyTypes[dto.Alias] = access;
             }
 
             return new PropertyType(dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType, dto.Alias)

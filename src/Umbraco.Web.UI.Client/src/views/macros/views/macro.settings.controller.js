@@ -15,9 +15,15 @@ function MacrosSettingsController($scope, editorService, localizationService) {
     $scope.model.openViewPicker = openViewPicker;
     $scope.model.removeMacroView = removeMacroView;
 
+    var labels = {};
+
+    localizationService.localizeMany(["macro_selectViewFile"]).then(function(data) {
+        labels.selectViewFile = data[0];
+    });
+
     function openViewPicker() {
         const controlPicker = {
-            title: "Select view",
+            title: labels.selectViewFile,
             section: "settings",
             treeAlias: "partialViewMacros",
             entityType: "partialView",
