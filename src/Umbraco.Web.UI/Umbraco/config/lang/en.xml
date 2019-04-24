@@ -1159,7 +1159,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageDownloads">Downloads</key>
     <key alias="packageLikes">Likes</key>
     <key alias="packageCompatibility">Compatibility</key>
-    <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</key>
+    <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be guaranteed for versions reported below 100%</key>
     <key alias="packageExternalSources">External sources</key>
     <key alias="packageAuthor">Author</key>
     <key alias="packageDocumentation">Documentation</key>

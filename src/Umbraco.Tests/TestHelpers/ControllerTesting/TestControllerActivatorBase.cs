@@ -139,6 +139,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 webSecurity.Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor());
 

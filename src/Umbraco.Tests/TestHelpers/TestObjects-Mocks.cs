@@ -123,6 +123,7 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoSettings = GetUmbracoSettings();
             var globalSettings = GetGlobalSettings();
             var urlProviders = new UrlProviderCollection(Enumerable.Empty<IUrlProvider>());
+            var mediaUrlProviders = new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>());
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
 
@@ -134,6 +135,7 @@ namespace Umbraco.Tests.TestHelpers
                 umbracoSettings,
                 globalSettings,
                 urlProviders,
+                mediaUrlProviders,
                 Mock.Of<IUserService>());
 
             return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
