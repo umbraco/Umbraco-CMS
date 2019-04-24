@@ -50,7 +50,7 @@
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.dll" target="lib\net472\Umbraco.Core.dll" />
 
         <!-- docs -->
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
+        <!--<file src="$BuildTmp$\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />-->
 
         <!-- symbols -->
         <file src="$BuildTmp$\bin\Umbraco.Core.pdb" target="lib" />
