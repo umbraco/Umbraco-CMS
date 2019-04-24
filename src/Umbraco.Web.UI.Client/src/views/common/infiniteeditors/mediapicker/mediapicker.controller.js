@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function($scope, mediaResource, entityResource, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
+    function ($scope, mediaResource, entityResource, mediaHelper, mediaTypeHelper, eventsService, userService, treeService, localStorageService, localizationService, editorService) {
 
             if (!$scope.model.title) {
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
@@ -67,15 +67,19 @@ angular.module("umbraco")
             }
 
             function onInit() {
-                if ($scope.startNodeId !== -1) {
-                    entityResource.getById($scope.startNodeId, "media")
-                        .then(function(ent) {
-                            $scope.startNodeId = ent.id;
-                            run();
-                        });
-                } else {
-                    run();
-                }
+                userService.getCurrentUser().then(function(userData) {
+                    userStartNodes = userData.startMediaIds;
+
+                    if ($scope.startNodeId !== -1) {
+                        entityResource.getById($scope.startNodeId, "media")
+                            .then(function(ent) {
+                                $scope.startNodeId = ent.id;
+                                run();
+                            });
+                    } else {
+                        run();
+                    }
+                });
             }
 
             function run() {
@@ -90,7 +94,7 @@ angular.module("umbraco")
                 } else {
                     //if a target is specified, go look it up - generally this target will just contain ids not the actual full
                     //media object so we need to look it up
-                    var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
+                    var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
                     mediaResource.getById(id)
                         .then(function (node) {
@@ -120,7 +124,7 @@ angular.module("umbraco")
 
             $scope.submitFolder = function() {
                 if ($scope.model.newFolderName) {
-                    $scope.creatingFolder = true;
+                    $scope.model.creatingFolder = true;
                     mediaResource
                         .addFolder($scope.model.newFolderName, $scope.currentFolder.id)
                         .then(function(data) {
@@ -129,13 +133,13 @@ angular.module("umbraco")
                                 cacheKey: "__media", //this is the main media tree cache key
                                 childrenOf: data.parentId //clear the children of the parent
                             });
-                            $scope.creatingFolder = false;
+                            $scope.model.creatingFolder = false;
                             $scope.gotoFolder(data);
-                            $scope.showFolderInput = false;
+                            $scope.model.showFolderInput = false;
                             $scope.model.newFolderName = "";
                         });
                 } else {
-                    $scope.showFolderInput = false;
+                    $scope.model.showFolderInput = false;
                 }
             };
 
