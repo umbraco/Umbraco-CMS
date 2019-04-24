@@ -387,13 +387,13 @@
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
-        -Symbols -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
+        -Symbols -SymbolPackageFormat snupkg -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Core." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Web.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
-        -Symbols -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
+        -Symbols -SymbolPackageFormat snupkg -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Web." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `

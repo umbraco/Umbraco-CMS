@@ -54,6 +54,5 @@
 
         <!-- symbols -->
         <file src="$BuildTmp$\bin\Umbraco.Core.pdb" target="lib" />
-        <file src="$BuildTmp$\..\src\Umbraco.Core\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Core" />
     </files>
 </package>
