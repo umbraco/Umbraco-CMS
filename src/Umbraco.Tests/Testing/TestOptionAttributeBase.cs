@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
@@ -8,6 +9,8 @@ namespace Umbraco.Tests.Testing
 {
     public abstract class TestOptionAttributeBase : Attribute
     {
+        public static readonly List<string> ScanAssemblies = new List<string>();
+
         public static TOptions GetTestOptions<TOptions>(MethodInfo method)
             where TOptions : TestOptionAttributeBase, new()
         {
@@ -30,7 +33,15 @@ namespace Umbraco.Tests.Testing
             var methodName = test.MethodName;
             var type = Type.GetType(typeName, true);
             if (type == null)
-                throw new PanicException($"Could not resolve the type from type name {typeName}"); // makes no sense
+            {
+                type = ScanAssemblies
+                    .Select(x => Type.GetType(typeName + ", " + x, false))
+                    .FirstOrDefault(x => x != null);
+                if (type == null)
+                { 
+                    throw new PanicException($"Could not resolve the type from type name {typeName}"); // makes no sense
+                }
+            }
             var methodInfo = type.GetMethod(methodName); // what about overloads?
             var options = GetTestOptions<TOptions>(methodInfo);
             return options;
