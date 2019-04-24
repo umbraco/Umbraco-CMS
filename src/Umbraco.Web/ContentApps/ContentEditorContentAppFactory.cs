@@ -9,7 +9,7 @@ namespace Umbraco.Web.ContentApps
     internal class ContentEditorContentAppFactory : IContentAppFactory
     {
         // see note on ContentApp
-        private const int Weight = -100;
+        internal const int Weight = -100;
 
         private ContentApp _contentApp;
         private ContentApp _mediaApp;
