@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
@@ -7,6 +8,8 @@ namespace Umbraco.Tests.Testing
 {
     public abstract class TestOptionAttributeBase : Attribute
     {
+        public static readonly List<string> ScanAssemblies = new List<string>();
+
         public static TOptions GetTestOptions<TOptions>(MethodInfo method)
             where TOptions : TestOptionAttributeBase, new()
         {
@@ -30,9 +33,14 @@ namespace Umbraco.Tests.Testing
             var type = Type.GetType(typeName, false);
             if (type == null)
             {
-//                throw new Exception("panic"); // makes no sense
+                type = ScanAssemblies
+                    .Select(x => Type.GetType(typeName + ", " + x, false))
+                    .FirstOrDefault(x => x != null);
+
+                //                throw new Exception("panic"); // makes no sense
                 // REVIEW: But happens anyway since we can't discover tests in assemblies referencing this for some reason. However, might be able to figure something out. (AKA. Blew up, quickfix)
-                return new TOptions();
+                if (type == null) // TODO: Panic or return default?
+                    return new TOptions();
             }
             var methodInfo = type.GetMethod(methodName); // what about overloads?
             var options = GetTestOptions<TOptions>(methodInfo);
