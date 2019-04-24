@@ -65,11 +65,9 @@ ul.sections>li>a:focus .section__name {
 }
 
 ul.sections>li>a:focus .section__name {
-    box-shadow: 0 0 2px @pinkLight, inset 0 0 2px 1px @pinkLight;
-}
-ul.sections>li>a:hover .section__name,
-ul.sections>li.current>a:focus .section__name {
-    box-shadow: none;
+    .tabbing-active & {
+        box-shadow: 0 0 2px @pinkLight, inset 0 0 2px 1px @pinkLight;
+    }
 }
 
 
