@@ -3,6 +3,15 @@
         <TargetFramework>net472</TargetFramework>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
+
+    <!-- Duplicate Assembly Attribute Error issue -->
+    <!-- https://johnkoerner.com/csharp/dealing-with-duplicate-attribute-errors-in-net-core/ -->
+    <PropertyGroup>
+        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+        <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    </PropertyGroup>
     
     <ItemGroup>
         <Reference Include="Microsoft.CSharp" />
