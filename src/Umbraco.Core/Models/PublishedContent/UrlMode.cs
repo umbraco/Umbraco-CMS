@@ -5,6 +5,10 @@
     /// </summary>
     public enum UrlMode
     {
+        /// <summary>
+        /// Indicates that the url provider should do what it has been configured to do.
+        /// </summary>
+        Default = 0,
 
         /// <summary>
         /// Indicates that the url provider should produce relative urls exclusively.

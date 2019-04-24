@@ -97,6 +97,10 @@ namespace Umbraco.Core.Models.PublishedContent
         /// Gets the url of the content item.
         /// </summary>
         /// <remarks>
+        /// <para>If the content item is a document, then this method returns the url of the
+        /// document. If it is a media, then this methods return the media url for the
+        /// 'umbracoFile' property. Use the MediaUrl() method to get the media url for other
+        /// properties.</para>
         /// <para>The value of this property is contextual. It depends on the 'current' request uri,
         /// if any. In addition, when the content type is multi-lingual, this is the url for the
         /// specified culture. Otherwise, it is the invariant url.</para>

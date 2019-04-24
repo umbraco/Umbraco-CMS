@@ -198,7 +198,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
         public string Url(int contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, culture);
+            return UrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
         public string Url(Guid contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, culture);
+            return UrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
