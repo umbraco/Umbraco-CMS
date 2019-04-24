@@ -91,12 +91,39 @@ input.umb-table__input {
 .umb-table-body .umb-table-row {
     color: @gray-5;
     border-top: 1px solid @gray-9;
-    cursor: pointer;
     font-size: 14px;
     position: relative;
     min-height: 52px;
+}
+.umb-table-body .umb-table-row.-selectable {
+    cursor: pointer;
+}
+.umb-table-row.-selected, 
+.umb-table-body .umb-table-row.-selectable:hover {
+    &::before {
+        content: "";
+        position: absolute;
+        z-index:1;
+        top: 1px;
+        left: 1px;
+        right: 1px;
+        bottom: 1px;
+        border: 2px solid @ui-selected-border;
+        pointer-events: none;
+    }
+}
+.umb-table-body .umb-table-row.-selectable {
     &:hover {
-        background-color: @ui-option-hover;
+        &::before {
+            opacity:.33;
+        }
+    }
+}
+.umb-table-body .umb-table-row.-selected.-selectable {
+    &:hover {
+        &::before {
+            opacity:.66;
+        }
     }
 }
 
@@ -109,9 +136,14 @@ input.umb-table__input {
 }
 
 .umb-table-body__link {
+    
+    color: @ui-option-type;
+    font-size: 14px;
+    font-weight: bold;
     text-decoration: none;
-
-    &:hover {
+    
+    &:hover, &:focus {
+        color: @ui-option-type-hover;
         text-decoration: underline;
     }
 }
@@ -122,7 +154,7 @@ input.umb-table__input {
     margin: 0 auto;
     font-size: 20px;
     line-height: 20px;
-    color: @gray-7;
+    color: @ui-option-type;
 }
 
 .umb-table-body__checkicon,
@@ -135,9 +167,30 @@ input.umb-table__input {
 }
 
 .umb-table-body .umb-table__name {
-    color: @black;
+    color: @ui-option-type;
     font-size: 14px;
     font-weight: bold;
+    a {
+        color: @ui-option-type;
+        &:hover, &:focus {
+            color: @ui-option-type-hover;
+            text-decoration: underline;
+        }
+    }
+}
+.umb-table-body .umb-table-row.-light {
+    .umb-table-body__icon {
+        color: @ui-option-disabled-type;
+    }
+    .umb-table__name {
+        color: @ui-option-disabled-type;
+        a {
+            color: @ui-option-disabled-type;
+            &:hover, &:focus {
+                color: @ui-option-disabled-type-hover;
+            }
+        }
+    }
 }
 
 // Styles of no items in the listview
@@ -150,27 +203,15 @@ input.umb-table__input {
 }
 
 // Show checkmark when checked, hide file icon
-.umb-table-row--selected {
-    /*
+.umb-table-row.-selected {
+    
     .umb-table-body__fileicon {
         display: none;
     }
     .umb-table-body__checkicon {
         display: inline-block;
     }
-    */
-    &::before {
-        content: "";
-        position: absolute;
-        z-index:1;
-        top: 1px;
-        left: 1px;
-        right: 1px;
-        bottom: 1px;
-        border: 2px solid @ui-selected-border;
-        box-shadow: 0 0 2px 0 fade(@ui-selected-border, 80%);
-        pointer-events: none;
-    }
+    
 }
 
 // Table Row Styles
@@ -221,6 +262,15 @@ input.umb-table__input {
 
 .umb-table-cell--auto-width {
     flex: 0 0 auto !important;
+}
+
+.umb-table-cell--small {
+    flex: .5 .5 1%;
+    max-width: 12.5%;
+}
+.umb-table-cell--large {
+    flex: 1 1 25%;
+    max-width: 25%;
 }
 
 .umb-table-cell--faded {

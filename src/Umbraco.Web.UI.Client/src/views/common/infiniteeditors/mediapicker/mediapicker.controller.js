@@ -20,11 +20,13 @@ angular.module("umbraco")
             $scope.showDetails = dialogOptions.showDetails;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
+            $scope.ignoreUserStartNodes = Object.toBoolean(dialogOptions.ignoreUserStartNodes);
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
             $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
 
+            var userStartNodes = []; 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
             if ($scope.onlyImages) {
@@ -54,7 +56,8 @@ angular.module("umbraco")
                 pageSize: 100,
                 totalItems: 0,
                 totalPages: 0,
-                filter: ''
+                filter: "",
+                ignoreUserStartNodes: $scope.model.ignoreUserStartNodes
             };
 
             //preload selected item
@@ -66,7 +69,7 @@ angular.module("umbraco")
             function onInit() {
                 if ($scope.startNodeId !== -1) {
                     entityResource.getById($scope.startNodeId, "media")
-                        .then(function (ent) {
+                        .then(function(ent) {
                             $scope.startNodeId = ent.id;
                             run();
                         });
@@ -143,7 +146,7 @@ angular.module("umbraco")
                 }
             };
 
-            $scope.gotoFolder = function(folder) {
+            $scope.gotoFolder = function (folder) {
                 if (!$scope.multiPicker) {
                     deselectAllImages($scope.model.selection);
                 }
@@ -152,8 +155,10 @@ angular.module("umbraco")
                     folder = { id: -1, name: "Media", icon: "icon-folder" };
                 }
 
+                var options = {};
                 if (folder.id > 0) {
-                    entityResource.getAncestors(folder.id, "media")
+                    options.ignoreUserStartNodes = $scope.model.ignoreUserStartNodes;
+                    entityResource.getAncestors(folder.id, "media", options)
                         .then(function(anc) {
                             $scope.path = _.filter(anc,
                                 function(f) {
@@ -169,12 +174,25 @@ angular.module("umbraco")
                     $scope.path = [];
                 }
 
-                $scope.lockedFolder = folder.id === -1 && $scope.model.startNodeIsVirtual;
+                $scope.lockedFolder = (folder.id === -1 && $scope.model.startNodeIsVirtual) || hasFolderAccess(folder) === false;
+                
 
                 $scope.currentFolder = folder;
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
-                return getChildren(folder.id);
+                options.ignoreUserStartNodes = $scope.ignoreUserStartNodes;
+                return getChildren(folder.id, options);
             };
+
+            function hasFolderAccess(node) {
+                var nodePath = node.path ? node.path.split(',') : [node.id];
+
+                for (var i = 0; i < nodePath.length; i++) {
+                    if (userStartNodes.indexOf(parseInt(nodePath[i])) !== -1)
+                        return true;
+                }
+
+                return false;
+            }
 
             $scope.clickHandler = function(image, event, index) {
                 if (image.isFolder) {
@@ -299,7 +317,8 @@ angular.module("umbraco")
                                 pageSize: 100,
                                 totalItems: 0,
                                 totalPages: 0,
-                                filter: ''
+                                filter: "",
+                                ignoreUserStartNodes: $scope.model.ignoreUserStartNodes
                             };
                             getChildren($scope.currentFolder.id);
                         }
@@ -367,9 +386,9 @@ angular.module("umbraco")
                 }
             }
 
-            function getChildren(id) {
+            function getChildren(id, options) {
                 $scope.loading = true;
-                return mediaResource.getChildren(id)
+                return mediaResource.getChildren(id, options)
                     .then(function(data) {
                         $scope.searchOptions.filter = "";
                         $scope.images = data.items ? data.items : [];

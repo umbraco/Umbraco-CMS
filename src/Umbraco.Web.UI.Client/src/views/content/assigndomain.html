@@ -5,7 +5,7 @@
     <form name="vm.domainForm" ng-submit="vm.save()" novalidate>
 
         <div ng-hide="vm.loading" class="umb-dialog-body">
-            
+
             <umb-pane ng-if="!currentNode.metaData.variesByCulture">
                 <h5 class="umb-pane-title"><localize key="assignDomain_setLanguage">Culture</localize></h5>
                 <label for="assignDomain_language" class="control-label"><localize key="general_language"></localize></label>
@@ -16,16 +16,23 @@
 
             <umb-pane>
 
+                <div ng-show="vm.error">
+                    <div class="alert alert-error">
+                        <div><strong>{{vm.error.errorMsg}}</strong></div>
+                        <div>{{vm.error.data.Message}}</div>
+                    </div>
+                </div>
+
                 <h5 class="umb-pane-title"><localize key="assignDomain_setDomains">Domains</localize></h5>
                 <small class="db" style="margin-bottom: 10px;">
-                    <localize key="assignDomain_domainHelp"></localize>
+                    <localize key="assignDomain_domainHelpWithVariants"></localize>
                 </small>
                 <div class="umb-el-wrap  hidelabel">
                     <table class="table table-condensed table-bordered domains" style="margin-bottom: 10px;" ng-if="vm.domains.length > 0">
                         <thead>
                             <tr>
                                 <th>
-                                    <localize key="assignDomain_domain"></localize>                    
+                                    <localize key="assignDomain_domain"></localize>
                                     <span class="umb-control-required">*</span>
                                 </th>
                                 <th>
@@ -45,17 +52,17 @@
                                     <span ng-show="domain.duplicate" class="help-inline"><localize key="assignDomain_duplicateDomain"></localize><span ng-show="domain.other">({{domain.other}})</span></span>
                                 </td>
                                 <td>
-                                    <select 
-                                        style="width: 100%; margin-bottom: 0;" 
-                                        name="domain_language_{{$index}}" 
-                                        class="language" 
-                                        ng-model="domain.lang" 
+                                    <select
+                                        style="width: 100%; margin-bottom: 0;"
+                                        name="domain_language_{{$index}}"
+                                        class="language"
+                                        ng-model="domain.lang"
                                         ng-options="lang.name for lang in vm.languages"
                                         required>
                                     </select>
                                 </td>
                                 <td>
-                                    <umb-button 
+                                    <umb-button
                                         icon="icon-trash"
                                         action="vm.removeDomain($index)"
                                         type="button"
@@ -66,8 +73,8 @@
                         </tbody>
                     </table>
                 </div>
-                
-                <umb-button 
+
+                <umb-button
                     label-key="assignDomain_addNew"
                     action="vm.addDomain()"
                     type="button"
@@ -80,14 +87,14 @@
 
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
 
-            <umb-button 
+            <umb-button
                 label-key="general_close"
                 action="vm.closeDialog()"
                 type="button"
                 button-style="link">
             </umb-button>
 
-            <umb-button 
+            <umb-button
                 label-key="buttons_save"
                 type="submit"
                 button-style="success"
@@ -97,5 +104,5 @@
         </div>
 
     </form>
-    
+
 </div>

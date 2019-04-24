@@ -145,11 +145,11 @@
 
             public const string PartialViewMacros = "partialViewMacros";
 
-			public const string LogViewer = "logViewer";
+            public const string LogViewer = "logViewer";
 
             public static class Groups
             {
-				public const string Settings = "settingsGroup";
+                public const string Settings = "settingsGroup";
 
                 public const string Templating = "templatingGroup";
 

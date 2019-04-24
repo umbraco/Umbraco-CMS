@@ -183,7 +183,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private HealthCheckStatus FixHttpsSetting()
         {
             var configFile = IOHelper.MapPath("~/Web.config");
-            const string xPath = "/configuration/appSettings/add[@key='umbracoUseSSL']/@value";
+            const string xPath = "/configuration/appSettings/add[@key='Umbraco.Core.UseHttps']/@value";
             var configurationService = new ConfigurationService(configFile, xPath, _textService);
             var updateConfigFile = configurationService.UpdateConfigFile("true");
 

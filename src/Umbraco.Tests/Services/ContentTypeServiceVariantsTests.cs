@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -72,7 +73,8 @@ namespace Umbraco.Tests.Services
                 new DatabaseDataSource(),
                 Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>());
+                Mock.Of<IPublishedModelFactory>(),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
         }
 
         public class LocalServerMessenger : ServerMessengerBase

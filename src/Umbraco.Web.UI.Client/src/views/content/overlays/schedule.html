@@ -27,7 +27,7 @@
                                 {{vm.variants[0].releaseDateFormatted}}
                             </button>
 
-                            <a ng-hide="vm.variants[0].releaseDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                            <a ng-hide="vm.variants[0].releaseDate" href="">
                                 <localize key="content_setDate">Set date</localize>
                             </a>
                         </div>
@@ -59,7 +59,7 @@
                                 {{vm.variants[0].expireDateFormatted}}
                             </button>
 
-                            <a ng-hide="vm.variants[0].expireDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                            <a ng-hide="vm.variants[0].expireDate" href="">
                                 <localize key="content_setDate">Set date</localize>
                             </a>
                         </div>
@@ -84,30 +84,31 @@
 
         <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter">
-                <ng-form name="scheduleSelectorForm">
-                    <div class="flex">
-                        <input id="{{'saveVariantSelector_' + variant.language.culture}}"
-                               name="saveVariantSelector"
-                               type="checkbox"
-                               ng-model="variant.save"
-                               ng-change="vm.changeSelection(variant)"
-                               style="margin-right: 8px;" />
+            <div class="umb-list-item" ng-repeat="variant in vm.variants">
+                <ng-form name="scheduleSelectorForm" style="width:100%;">
+                    <div class="flex" ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid}">
+
+                        <umb-checkbox
+                            input-id="{{'saveVariantSelector_' + variant.language.culture}}"
+                            name="saveVariantSelector"
+                            model="variant.save"
+                            on-change="vm.changeSelection(variant)"/>
+
                         <div>
 
                             <label for="{{'saveVariantSelector_' + variant.language.culture}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
+
+                                <span class="db umb-list-item__description"
+                                      ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                    <umb-variant-state variant="variant"></umb-variant-state>
+                                    <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                                </span>
                             </label>
 
-                            <div class="umb-permission__description"
-                                 ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                                <umb-variant-state variant="variant"></umb-variant-state>
-                                <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                            </div>
+                            <div class="date-wrapper-mini">
+                                <div class="date-wrapper-mini__date" ng-if="vm.dirtyVariantFilter(variant) && (variant.releaseDate || variant.save)">
 
-                            <div class="flex items-center" style="margin-top: 10px; margin-bottom: 10px;">
-
-                                <div class="flex items-center" ng-if="variant.releaseDate || variant.save">
                                     <div style="font-size: 13px; margin-right: 5px;">Publish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.releaseDateFormatted}}</em></div>
 
                                     <div class="btn-group flex" style="font-size: 14px; margin-right: 10px;" ng-if="variant.save">
@@ -122,7 +123,7 @@
                                                     {{variant.releaseDateFormatted}}
                                                 </button>
 
-                                                <a ng-hide="variant.releaseDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                                                <a ng-hide="variant.releaseDate" href="">
                                                     <localize key="content_setDate">Set date</localize>
                                                 </a>
                                             </div>
@@ -133,7 +134,7 @@
                                     </div>
                                 </div>
 
-                                <div class="flex items-center" ng-if="variant.expireDate || variant.save">
+                                <div class="date-wrapper-mini__date" ng-if="variant.expireDate || variant.save">
                                     <div style="font-size: 13px; margin-right: 5px;">Unpublish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.expireDateFormatted}}</em></div>
 
                                     <div class="btn-group flex" style="font-size: 14px;" ng-if="variant.save">
@@ -148,7 +149,7 @@
                                                     {{variant.expireDateFormatted}}
                                                 </button>
 
-                                                <a ng-hide="variant.expireDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                                                <a ng-hide="variant.expireDate" href="">
                                                     <localize key="content_setDate">Set date</localize>
                                                 </a>
                                             </div>
@@ -166,12 +167,10 @@
                                    val-server-field="{{variant.htmlId}}" />
 
                             <div ng-messages="scheduleSelectorForm.saveVariantReleaseDate.$error" show-validation-on-submit>
-                                <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
+                                <div class="umb-list-item__description text-error" ng-message="valServerField">{{scheduleSelectorForm.saveVariantReleaseDate.errorMsg}}</div>
                             </div>
 
-                            <div ng-repeat="notification in variant.notifications">
-                                <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
-                            </div>
+                            <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
 
                         </div>
                     </div>
@@ -179,24 +178,6 @@
                 </ng-form>
             </div>
             <br />
-        </div>
-
-        <div class="umb-list umb-list--condensed" ng-if="vm.hasPristineVariants">
-            <div style="margin-bottom: 15px; font-weight: bold;">
-                <p><localize key="content_publishedLanguages"></localize></p>
-            </div>
-
-            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter track by variant.language.culture">
-                <div>
-                    <div style="margin-bottom: 2px;">
-                        <span>{{ variant.language.name }}</span>
-                    </div>
-                    <div class="umb-permission__description">
-                        <umb-variant-state variant="variant"></umb-variant-state>
-                        <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>

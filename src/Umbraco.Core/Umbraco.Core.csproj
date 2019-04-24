@@ -55,7 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="Umbraco.Code">
+      <Version>1.0.5</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Web" Version="2.0.0" />
@@ -161,6 +165,7 @@
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
+    <Compile Include="Composing\SetCollectionBuilderBase.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\DisableAttribute.cs" />
     <Compile Include="Composing\DisableComposerAttribute.cs" />
@@ -168,7 +173,6 @@
     <Compile Include="Composing\EnableComposerAttribute.cs" />
     <Compile Include="Composing\IComposer.cs" />
     <Compile Include="Composing\ICoreComposer.cs" />
-    <Compile Include="Composing\IRuntimeComposer.cs" />
     <Compile Include="Composing\IComponent.cs" />
     <Compile Include="Composing\IUserComposer.cs" />
     <Compile Include="Compose\ManifestWatcherComposer.cs" />
@@ -208,12 +212,24 @@
     <Compile Include="Composing\TypeHelper.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
     <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
+    <Compile Include="Mapping\MapperContext.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
+    <Compile Include="Mapping\MapDefinitionCollection.cs" />
+    <Compile Include="Mapping\MapDefinitionCollectionBuilder.cs" />
+    <Compile Include="Mapping\IMapDefinition.cs" />
+    <Compile Include="Mapping\UmbracoMapper.cs" />
+    <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
+    <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
+    <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
+    <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />
+    <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedModelFactoryExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
+    <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Composing\WeightAttribute.cs" />
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
@@ -437,7 +453,7 @@
     <Compile Include="Models\IAuditItem.cs" />
     <Compile Include="Models\IConsent.cs" />
     <Compile Include="Models\ISimpleContentType.cs" />
-    <Compile Include="Models\Identity\IdentityMapperProfile.cs" />
+    <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
     <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\NotificationEmailBodyParams.cs" />
@@ -530,7 +546,7 @@
     <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
-    <Compile Include="Runtime\CoreRuntimeComponent.cs" />
+    <Compile Include="Runtime\CoreInitialComponent.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
     <Compile Include="Migrations\Expressions\Common\ExecutableBuilder.cs" />
     <Compile Include="Migrations\Expressions\Common\IExecutableBuilder.cs" />
@@ -851,8 +867,7 @@
     <Compile Include="Persistence\Dtos\MacroPropertyDto.cs" />
     <Compile Include="Persistence\Dtos\Member2MemberGroupDto.cs" />
     <Compile Include="Persistence\Dtos\MemberDto.cs" />
-    <Compile Include="Persistence\Dtos\MemberTypeDto.cs" />
-    <Compile Include="Persistence\Dtos\MemberTypeReadOnlyDto.cs" />
+    <Compile Include="Persistence\Dtos\MemberPropertyTypeDto.cs" />
     <Compile Include="Persistence\Dtos\NodeDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyDataDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeDto.cs" />
@@ -947,7 +962,6 @@
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Factories\ContentBaseFactory.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
-    <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
@@ -983,7 +997,6 @@
     <Compile Include="Persistence\Mappers\DictionaryMapper.cs" />
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
-    <Compile Include="Persistence\Mappers\DtoMapModel.cs" />
     <Compile Include="Persistence\Mappers\ExternalLoginMapper.cs" />
     <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
@@ -1311,7 +1324,7 @@
     <Compile Include="ReflectionUtilities.cs" />
     <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
-    <Compile Include="Runtime\CoreRuntimeComposer.cs" />
+    <Compile Include="Runtime\CoreInitialComposer.cs" />
     <Compile Include="SafeCallContext.cs" />
     <Compile Include="Scoping\IInstanceIdentifiable.cs" />
     <Compile Include="Scoping\IScope.cs" />

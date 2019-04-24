@@ -10,7 +10,7 @@ namespace Umbraco.Web.Routing
     public interface IUrlProvider
     {
         /// <summary>
-        /// Gets the nice url of a published content.
+        /// Gets the url of a published content.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="content">The published content.</param>

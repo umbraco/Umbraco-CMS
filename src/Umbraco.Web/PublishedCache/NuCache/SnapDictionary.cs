@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core.Scoping;
+using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -20,9 +21,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // This class is optimized for many readers, few writers
         // Readers are lock-free
 
-        private readonly ConcurrentDictionary<TKey, LinkedNode> _items;
-        private readonly ConcurrentQueue<GenerationObject> _generationObjects;
-        private GenerationObject _generationObject;
+        private readonly ConcurrentDictionary<TKey, LinkedNode<TValue>> _items;
+        private readonly ConcurrentQueue<GenObj> _genObjs;
+        private GenObj _genObj;
         private readonly object _wlocko = new object();
         private readonly object _rlocko = new object();
         private long _liveGen, _floorGen;
@@ -40,9 +41,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public SnapDictionary()
         {
-            _items = new ConcurrentDictionary<TKey, LinkedNode>();
-            _generationObjects = new ConcurrentQueue<GenerationObject>();
-            _generationObject = null; // no initial gen exists
+            _items = new ConcurrentDictionary<TKey, LinkedNode<TValue>>();
+            _genObjs = new ConcurrentQueue<GenObj>();
+            _genObj = null; // no initial gen exists
             _liveGen = _floorGen = 0;
             _nextGen = false; // first time, must create a snapshot
             _collectAuto = true; // collect automatically by default
@@ -86,12 +87,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // a scope contextual that represents a locked writer to the dictionary
-        private class SnapDictionaryWriter : ScopeContextualBase
+        private class ScopedWriteLock : ScopeContextualBase
         {
             private readonly WriteLockInfo _lockinfo = new WriteLockInfo();
-            private SnapDictionary<TKey, TValue> _dictionary;
+            private readonly SnapDictionary<TKey, TValue> _dictionary;
+            private int _released;
 
-            public SnapDictionaryWriter(SnapDictionary<TKey, TValue> dictionary, bool scoped)
+            public ScopedWriteLock(SnapDictionary<TKey, TValue> dictionary, bool scoped)
             {
                 _dictionary = dictionary;
                 dictionary.Lock(_lockinfo, scoped);
@@ -99,17 +101,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             public override void Release(bool completed)
             {
-                if (_dictionary == null) return;
+                if (Interlocked.CompareExchange(ref _released, 1, 0) != 0)
+                    return;
                 _dictionary.Release(_lockinfo, completed);
-                _dictionary = null;
             }
         }
 
         // gets a scope contextual representing a locked writer to the dictionary
-        // GetScopedWriter? should the dict have a ref onto the scope provider?
-        public IDisposable GetWriter(IScopeProvider scopeProvider)
+        // the dict is write-locked until the write-lock is released
+        //  which happens when it is disposed (non-scoped)
+        //  or when the scope context exits (scoped)
+        public IDisposable GetScopedWriteLock(IScopeProvider scopeProvider)
         {
-            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new SnapDictionaryWriter(this, scoped));
+            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }
 
         private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
@@ -129,14 +133,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //RuntimeHelpers.PrepareConstrainedRegions();
                 try { } finally
                 {
+                    // increment the lock count, and register that this lock is counting
                     _wlocked++;
                     lockInfo.Count = true;
-                    if (_nextGen == false || (forceGen && _wlocked == 1)) // if true already... ok to have "holes" in generation objects
+
+                    if (_nextGen == false || (forceGen && _wlocked == 1))
                     {
                         // because we are changing things, a new generation
                         // is created, which will trigger a new snapshot
-                        _nextGen = true;
+                        if (_nextGen)
+                            _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
                         _liveGen += 1;
+                        _nextGen = true; // this is the ONLY place where _nextGen becomes true
                     }
                 }
             }
@@ -153,6 +161,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void Release(WriteLockInfo lockInfo, bool commit = true)
         {
+            // if the lock wasn't taken in the first place, do nothing
+            if (!lockInfo.Taken)
+                return;
+
             if (commit == false)
             {
                 var rtaken = false;
@@ -161,6 +173,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     Monitor.Enter(_rlocko, ref rtaken);
                     try { } finally
                     {
+                        // forget about the temp. liveGen
                         _nextGen = false;
                         _liveGen -= 1;
                     }
@@ -183,8 +196,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
+            // decrement the lock count, if counting, then exit the lock
             if (lockInfo.Count) _wlocked--;
-            if (lockInfo.Taken) Monitor.Exit(_wlocko);
+            Monitor.Exit(_wlocko);
         }
 
         private void Release(ReadLockInfo lockInfo)
@@ -198,9 +212,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public int Count => _items.Count;
 
-        private LinkedNode GetHead(TKey key)
+        private LinkedNode<TValue> GetHead(TKey key)
         {
-            _items.TryGetValue(key, out LinkedNode link); // else null
+            _items.TryGetValue(key, out var link); // else null
             return link;
         }
 
@@ -221,7 +235,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         // for an older gen - if value is different then insert a new
                         // link for the new gen, with the new value
                         if (link.Value != value)
-                            _items.TryUpdate(key, new LinkedNode(value, _liveGen, link), link);
+                            _items.TryUpdate(key, new LinkedNode<TValue>(value, _liveGen, link), link);
                     }
                     else
                     {
@@ -235,7 +249,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
                 else
                 {
-                    _items.TryAdd(key, new LinkedNode(value, _liveGen));
+                    _items.TryAdd(key, new LinkedNode<TValue>(value, _liveGen));
                 }
             }
             finally
@@ -261,7 +275,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     if (kvp.Value.Gen < _liveGen)
                     {
-                        var link = new LinkedNode(null, _liveGen, kvp.Value);
+                        var link = new LinkedNode<TValue>(null, _liveGen, kvp.Value);
                         _items.TryUpdate(kvp.Key, link, kvp.Value);
                     }
                     else
@@ -337,12 +351,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 Lock(lockInfo);
 
-                // if no next generation is required, and we already have one,
-                // use it and create a new snapshot
-                if (_nextGen == false && _generationObject != null)
-                    return new Snapshot(this, _generationObject.GetReference());
+                // if no next generation is required, and we already have a gen object,
+                // use it to create a new snapshot
+                if (_nextGen == false && _genObj != null)
+                    return new Snapshot(this, _genObj.GetGenRef());
 
-                // else we need to try to create a new gen ref
+                // else we need to try to create a new gen object
                 // whether we are wlocked or not, noone can rlock while we do,
                 // so _liveGen and _nextGen are safe
                 if (_wlocked > 0) // volatile, cannot ++ but could --
@@ -350,29 +364,32 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // write-locked, cannot use latest gen (at least 1) so use previous
                     var snapGen = _nextGen ? _liveGen - 1 : _liveGen;
 
-                    // create a new gen ref unless we already have it
-                    if (_generationObject == null)
-                        _generationObjects.Enqueue(_generationObject = new GenerationObject(snapGen));
-                    else if (_generationObject.Gen != snapGen)
+                    // create a new gen object if we don't already have one
+                    // (happens the first time a snapshot is created)
+                    if (_genObj == null)
+                        _genObjs.Enqueue(_genObj = new GenObj(snapGen));
+
+                    // if we have one already, ensure it's consistent
+                    else if (_genObj.Gen != snapGen)
                         throw new Exception("panic");
                 }
                 else
                 {
-                    // not write-locked, can use latest gen, create a new gen ref
-                    _generationObjects.Enqueue(_generationObject = new GenerationObject(_liveGen));
+                    // not write-locked, can use latest gen (_liveGen), create a corresponding new gen object
+                    _genObjs.Enqueue(_genObj = new GenObj(_liveGen));
                     _nextGen = false; // this is the ONLY thing that triggers a _liveGen++
                 }
 
                 // so...
-                // the genRefRef has a weak ref to the genRef, and is queued
-                // the snapshot has a ref to the genRef, which has a ref to the genRefRef
-                // when the snapshot is disposed, it decreases genRefRef counter
+                // the genObj has a weak ref to the genRef, and is queued
+                // the snapshot has a ref to the genRef, which has a ref to the genObj
+                // when the snapshot is disposed, it decreases genObj counter
                 // so after a while, one of these conditions is going to be true:
-                // - the genRefRef counter is zero because all snapshots have properly been disposed
-                // - the genRefRef weak ref is dead because all snapshots have been collected
+                // - genObj.Count is zero because all snapshots have properly been disposed
+                // - genObj.WeakGenRef is dead because all snapshots have been collected
                 // in both cases, we will dequeue and collect
 
-                var snapshot = new Snapshot(this, _generationObject.GetReference());
+                var snapshot = new Snapshot(this, _genObj.GetGenRef());
 
                 // reading _floorGen is safe if _collectTask is null
                 if (_collectTask == null && _collectAuto && _liveGen - _floorGen > CollectMinGenDelta)
@@ -416,16 +433,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void Collect()
         {
             // see notes in CreateSnapshot
-            while (_generationObjects.TryPeek(out GenerationObject generationObject) && (generationObject.Count == 0 || generationObject.WeakReference.IsAlive == false))
+            while (_genObjs.TryPeek(out var genObj) && (genObj.Count == 0 || genObj.WeakGenRef.IsAlive == false))
             {
-                _generationObjects.TryDequeue(out generationObject); // cannot fail since TryPeek has succeeded
-                _floorGen = generationObject.Gen;
+                _genObjs.TryDequeue(out genObj); // cannot fail since TryPeek has succeeded
+                _floorGen = genObj.Gen;
             }
 
             Collect(_items);
         }
 
-        private void Collect(ConcurrentDictionary<TKey, LinkedNode> dict)
+        private void Collect(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict)
         {
             // it is OK to enumerate a concurrent dictionary and it does not lock
             // it - and here it's not an issue if we skip some items, they will be
@@ -460,7 +477,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // not live, null value, no next link = remove that one -- but only if
                     // the dict has not been updated, have to do it via ICollection<> (thanks
                     // Mr Toub) -- and if the dict has been updated there is nothing to collect
-                    var idict = dict as ICollection<KeyValuePair<TKey, LinkedNode>>;
+                    var idict = dict as ICollection<KeyValuePair<TKey, LinkedNode<TValue>>>;
                     /*var removed =*/ idict.Remove(kvp);
                     //Console.WriteLine("remove (" + (removed ? "true" : "false") + ")");
                     continue;
@@ -485,14 +502,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 task = _collectTask;
             }
-            return task ?? Task.FromResult(0);
+            return task ?? Task.CompletedTask;
             //if (task != null)
             //    await task;
         }
 
-        public long GenCount => _generationObjects.Count;
+        public long GenCount => _genObjs.Count;
 
-        public long SnapCount => _generationObjects.Sum(x => x.Count);
+        public long SnapCount => _genObjs.Sum(x => x.Count);
 
         #endregion
 
@@ -513,6 +530,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             public long LiveGen => _dict._liveGen;
             public long FloorGen => _dict._floorGen;
             public bool NextGen => _dict._nextGen;
+            public int WLocked => _dict._wlocked;
 
             public bool CollectAuto
             {
@@ -520,13 +538,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 set => _dict._collectAuto = value;
             }
 
-            public ConcurrentQueue<GenerationObject> GenerationObjects => _dict._generationObjects;
+            public GenObj GenObj => _dict._genObj;
+
+            public ConcurrentQueue<GenObj> GenObjs => _dict._genObjs;
 
             public Snapshot LiveSnapshot => new Snapshot(_dict, _dict._liveGen);
 
             public GenVal[] GetValues(TKey key)
             {
-                _dict._items.TryGetValue(key, out LinkedNode link); // else null
+                _dict._items.TryGetValue(key, out var link); // else null
 
                 if (link == null)
                     return new GenVal[0];
@@ -559,35 +579,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Classes
 
-        private class LinkedNode
-        {
-            public LinkedNode(TValue value, long gen, LinkedNode next = null)
-            {
-                Value = value;
-                Gen = gen;
-                Next = next;
-            }
-
-            internal readonly long Gen;
-
-            // reading & writing references is thread-safe on all .NET platforms
-            // mark as volatile to ensure we always read the correct value
-            internal volatile TValue Value;
-            internal volatile LinkedNode Next;
-        }
-
         public class Snapshot : IDisposable
         {
             private readonly SnapDictionary<TKey, TValue> _store;
-            private readonly GenerationReference _generationReference;
-            private long _gen; // copied for perfs
+            private readonly GenRef _genRef;
+            private readonly long _gen; // copied for perfs
+            private int _disposed;
 
-            internal Snapshot(SnapDictionary<TKey, TValue> store, GenerationReference generationReference)
+            //private static int _count;
+            //private readonly int _thisCount;
+
+            internal Snapshot(SnapDictionary<TKey, TValue> store, GenRef genRef)
             {
                 _store = store;
-                _generationReference = generationReference;
-                _gen = generationReference.GenerationObject.Gen;
-                _generationReference.GenerationObject.Reference();
+                _genRef = genRef;
+                _gen = genRef.GenObj.Gen;
+                _genRef.GenObj.Reference();
+                //_thisCount = _count++;
             }
 
             internal Snapshot(SnapDictionary<TKey, TValue> store, long gen)
@@ -596,17 +604,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _gen = gen;
             }
 
+            private void EnsureNotDisposed()
+            {
+                if (_disposed > 0)
+                    throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
+            }
+
             public TValue Get(TKey key)
             {
-                if (_gen < 0)
-                    throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
+                EnsureNotDisposed();
                 return _store.Get(key, _gen);
             }
 
             public IEnumerable<TValue> GetAll()
             {
-                if (_gen < 0)
-                    throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
+                EnsureNotDisposed();
                 return _store.GetAll(_gen);
             }
 
@@ -614,8 +626,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 get
                 {
-                    if (_gen < 0)
-                        throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
+                    EnsureNotDisposed();
                     return _store.IsEmpty(_gen);
                 }
             }
@@ -624,61 +635,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 get
                 {
-                    if (_gen < 0)
-                        throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
+                    EnsureNotDisposed();
                     return _gen;
                 }
             }
 
             public void Dispose()
             {
-                if (_gen < 0) return;
-                _gen = -1;
-                _generationReference?.GenerationObject.Release();
+                if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
+                    return;
+                _genRef?.GenObj.Release();
                 GC.SuppressFinalize(this);
             }
-        }
-
-        internal class GenerationObject
-        {
-            public GenerationObject(long gen)
-            {
-                Gen = gen;
-                WeakReference = new WeakReference(null);
-            }
-
-            public GenerationReference GetReference()
-            {
-                // not thread-safe but always invoked from within a lock
-                var generationReference = (GenerationReference) WeakReference.Target;
-                if (generationReference == null)
-                    WeakReference.Target = generationReference = new GenerationReference(this);
-                return generationReference;
-            }
-
-            public readonly long Gen;
-            public readonly WeakReference WeakReference;
-            public int Count;
-
-            public void Reference()
-            {
-                Interlocked.Increment(ref Count);
-            }
-
-            public void Release()
-            {
-                Interlocked.Decrement(ref Count);
-            }
-        }
-
-        internal class GenerationReference
-        {
-            public GenerationReference(GenerationObject generationObject)
-            {
-                GenerationObject = generationObject;
-            }
-
-            public readonly GenerationObject GenerationObject;
         }
 
         #endregion
