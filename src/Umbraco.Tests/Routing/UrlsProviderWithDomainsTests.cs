@@ -189,7 +189,8 @@ namespace Umbraco.Tests.Routing
             SetDomains1();
 
             var currentUri = new Uri(currentUrl);
-            var result = umbracoContext.UrlProvider.GetUrl(nodeId, absolute, current: currentUri);
+            var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
+            var result = umbracoContext.UrlProvider.GetUrl(nodeId, mode, current: currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -221,7 +222,8 @@ namespace Umbraco.Tests.Routing
             SetDomains2();
 
             var currentUri = new Uri(currentUrl);
-            var result = umbracoContext.UrlProvider.GetUrl(nodeId, absolute, current : currentUri);
+            var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
+            var result = umbracoContext.UrlProvider.GetUrl(nodeId, mode, current : currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -245,7 +247,8 @@ namespace Umbraco.Tests.Routing
             SetDomains3();
 
             var currentUri = new Uri(currentUrl);
-            var result = umbracoContext.UrlProvider.GetUrl(nodeId, absolute, current : currentUri);
+            var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
+            var result = umbracoContext.UrlProvider.GetUrl(nodeId, mode, current : currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -275,7 +278,8 @@ namespace Umbraco.Tests.Routing
             SetDomains4();
 
             var currentUri = new Uri(currentUrl);
-            var result = umbracoContext.UrlProvider.GetUrl(nodeId, absolute, current : currentUri);
+            var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
+            var result = umbracoContext.UrlProvider.GetUrl(nodeId, mode, current : currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -295,17 +299,17 @@ namespace Umbraco.Tests.Routing
             SetDomains4();
 
             string ignore;
-            ignore = umbracoContext.UrlProvider.GetUrl(1001, false, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(10011, false, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(100111, false, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(10012, false, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(100121, false, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(10013, false, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(1002, false, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(1001, false, current: new Uri("http://domain2.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(10011, false, current: new Uri("http://domain2.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(100111, false, current: new Uri("http://domain2.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(1002, false, current: new Uri("http://domain2.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = umbracoContext.UrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain2.com"));
 
             var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
@@ -324,15 +328,15 @@ namespace Umbraco.Tests.Routing
             CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
 
             // use the cache
-            Assert.AreEqual("/", umbracoContext.UrlProvider.GetUrl(1001, false, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/en/", umbracoContext.UrlProvider.GetUrl(10011, false, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, false, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/fr/", umbracoContext.UrlProvider.GetUrl(10012, false, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/fr/1001-2-1/", umbracoContext.UrlProvider.GetUrl(100121, false, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/1001-3/", umbracoContext.UrlProvider.GetUrl(10013, false, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/1002/", umbracoContext.UrlProvider.GetUrl(1002, false, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/", umbracoContext.UrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/en/", umbracoContext.UrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/fr/", umbracoContext.UrlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/fr/1001-2-1/", umbracoContext.UrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/1001-3/", umbracoContext.UrlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/1002/", umbracoContext.UrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com")));
 
-            Assert.AreEqual("http://domain1.com/fr/1001-2-1/", umbracoContext.UrlProvider.GetUrl(100121, false, current: new Uri("http://domain2.com")));
+            Assert.AreEqual("http://domain1.com/fr/1001-2-1/", umbracoContext.UrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain2.com")));
         }
 
         private static void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
@@ -381,7 +385,7 @@ namespace Umbraco.Tests.Routing
 
             SetDomains5();
 
-            var url = umbracoContext.UrlProvider.GetUrl(100111, true);
+            var url = umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Absolute);
             Assert.AreEqual("http://domain1.com/en/1001-1-1/", url);
 
             var result = umbracoContext.UrlProvider.GetOtherUrls(100111).ToArray();

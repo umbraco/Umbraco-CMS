@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Services;
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.Routing
             {
                 new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
-            Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, true));
+            Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Absolute));
 
             // check that the proper route has been cached
             var cache = umbracoContext.Content as PublishedContentCache;

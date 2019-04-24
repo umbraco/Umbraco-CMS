@@ -82,52 +82,12 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the url of a published content.
         /// </summary>
-        /// <param name="content">The published content.</param>
-        /// <param name="culture">A culture.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The url for the published content.</returns>
-        public string GetUrl(IPublishedContent content, string culture = null, Uri current = null)
-            => GetUrl(content, Mode, culture, current);
-
-        /// <summary>
-        /// Gets the url of a published content.
-        /// </summary>
-        /// <param name="content">The published content.</param>
-        /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
-        /// <param name="culture">A culture.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The url for the published content.</returns>
-        /// <remarks>
-        /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
-        /// <c>absolute</c> is true, in which case the url is always absolute.</para>
-        /// </remarks>
-        public string GetUrl(IPublishedContent content, bool absolute, string culture = null, Uri current = null)
-            => GetUrl(content, GetMode(absolute), culture, current);
-
-        /// <summary>
-        /// Gets the url of a published content.
-        /// </summary>
         /// <param name="id">The published content identifier.</param>
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
         public string GetUrl(Guid id, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), Mode, culture, current);
-
-        /// <summary>
-        /// Gets the url of a published content.
-        /// </summary>
-        /// <param name="id">The published content identifier.</param>
-        /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
-        /// <param name="culture">A culture.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The url for the published content.</returns>
-        /// <remarks>
-        /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
-        /// <c>absolute</c> is true, in which case the url is always absolute.</para>
-        /// </remarks>
-        public string GetUrl(Guid id, bool absolute, string culture = null, Uri current = null)
-            => GetUrl(GetDocument(id), GetMode(absolute), culture, current);
 
         /// <summary>
         /// Gets the url of a published content.
@@ -154,27 +114,22 @@ namespace Umbraco.Web.Routing
         /// Gets the url of a published content.
         /// </summary>
         /// <param name="id">The published content identifier.</param>
-        /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
-        /// <param name="culture">A culture.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The url for the published content.</returns>
-        /// <remarks>
-        /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
-        /// <c>absolute</c> is true, in which case the url is always absolute.</para>
-        /// </remarks>
-        public string GetUrl(int id, bool absolute, string culture = null, Uri current = null)
-            => GetUrl(GetDocument(id), GetMode(absolute), culture, current);
-
-        /// <summary>
-        /// Gets the url of a published content.
-        /// </summary>
-        /// <param name="id">The published content identifier.</param>
         /// <param name="mode">The url mode.</param>
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
         public string GetUrl(int id, UrlMode mode, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
+
+        /// <summary>
+        /// Gets the url of a published content.
+        /// </summary>
+        /// <param name="content">The published content.</param>
+        /// <param name="culture">A culture.</param>
+        /// <param name="current">The current absolute url.</param>
+        /// <returns>The url for the published content.</returns>
+        public string GetUrl(IPublishedContent content, string culture = null, Uri current = null)
+            => GetUrl(content, Mode, culture, current);
 
         /// <summary>
         /// Gets the url of a published content.
@@ -273,26 +228,9 @@ namespace Umbraco.Web.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a url, it returns <see cref="String.Empty"/>.</para>
         /// </remarks>
-        public string GetMediaUrl(IPublishedContent content, string propertyAlias, UrlMode mode = UrlMode.Wtf, string culture = null, Uri current = null)
+        public string GetMediaUrl(IPublishedContent content, string propertyAlias, string culture = null, Uri current = null)
             => GetMediaUrl(content, propertyAlias, Mode, culture, current);
 
-        /// <summary>
-        /// Gets the url of a media item.
-        /// </summary>
-        /// <param name="content">The published content.</param>
-        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
-        /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
-        /// <param name="culture">The variation language.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The url for the media.</returns>
-        /// <remarks>
-        /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
-        /// <para>If the media is multi-lingual, gets the url for the specified culture or,
-        /// when no culture is specified, the current culture.</para>
-        /// <para>If the provider is unable to provide a url, it returns <see cref="String.Empty"/>.</para>
-        /// </remarks>
-        public string GetMediaUrl(IPublishedContent content, string propertyAlias, boolx absolute, string culture = null, Uri current = null)
-            => GetMediaUrl(content, propertyAlias, GetMode(absolute), culture, current);
         /// <summary>
         /// Gets the url of a media item.
         /// </summary>
@@ -308,9 +246,7 @@ namespace Umbraco.Web.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a url, it returns <see cref="String.Empty"/>.</para>
         /// </remarks>
-        public string GetMediaUrl(IPublishedContent content,
-            string propertyAlias, UrlMode mode = UrlMode.Wtf,
-            string culture = null, Uri current = null)
+        public string GetMediaUrl(IPublishedContent content, string propertyAlias, UrlMode mode, string culture = null, Uri current = null)
         {
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
 

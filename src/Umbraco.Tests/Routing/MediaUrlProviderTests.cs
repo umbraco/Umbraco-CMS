@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("/", mediaUrlProviders: new[] { _mediaUrlProvider });
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.UploadField, expected, null);
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "umbracoFile", UrlProviderMode.Auto, null, null);
+            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "umbracoFile", UrlMode.Auto, null, null);
 
             Assert.AreEqual(expected, resolvedUrl);
         }
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("/", mediaUrlProviders: new[] { _mediaUrlProvider });
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.ImageCropper, imageCropperValue, configuration);
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "umbracoFile", UrlProviderMode.Auto, null, null);
+            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "umbracoFile", UrlMode.Auto, null, null);
 
             Assert.AreEqual(expected, resolvedUrl);
         }
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("http://localhost", mediaUrlProviders: new[] { _mediaUrlProvider });
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.UploadField, mediaUrl, null);
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "umbracoFile", UrlProviderMode.Absolute, null, null);
+            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "umbracoFile", UrlMode.Absolute, null, null);
 
             Assert.AreEqual(expected, resolvedUrl);
         }
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("/", mediaUrlProviders: new[] { _mediaUrlProvider });
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.Boolean, "0", null);
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "test", UrlProviderMode.Absolute, null, null);
+            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "test", UrlMode.Absolute, null, null);
 
             Assert.AreEqual(string.Empty, resolvedUrl);
         }
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Routing
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), new [] { umbracoFilePropertyType }, ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) {Properties = new[] {property}};
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "umbracoFile", UrlProviderMode.Auto, "da", null);
+            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, "umbracoFile", UrlMode.Auto, "da", null);
             Assert.AreEqual(daMediaUrl, resolvedUrl);
         }
 

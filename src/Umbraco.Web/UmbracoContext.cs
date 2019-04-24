@@ -245,7 +245,7 @@ namespace Umbraco.Web
         [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(int contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, true, culture);
+            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace Umbraco.Web
         [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(Guid contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, true, culture);
+            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
         }
 
         #endregion

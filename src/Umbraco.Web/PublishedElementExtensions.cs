@@ -188,5 +188,49 @@ namespace Umbraco.Web
         }
 
         #endregion
+
+        #region MediaUrl
+
+        /// <summary>
+        /// Gets the url for the media.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <returns>The url for the content.</returns>
+        /// <remarks>Better use the <c>GetMediaUrl</c> method but that method is here to complement <c>MediaUrlAbsolute()</c>.</remarks>
+        public static string MediaUrl(this IPublishedContent content, string propertyAlias, string culture = null)
+        {
+            var umbracoContext = Composing.Current.UmbracoContext;
+
+            if (umbracoContext == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
+            if (umbracoContext.UrlProvider == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
+
+            return umbracoContext.UrlProvider.GetMediaUrl(content, propertyAlias, culture);
+        }
+
+        /// <summary>
+        /// Gets the absolute url for the media.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
+        /// <param name="mode">The url mode.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <returns>The absolute url for the media.</returns>
+        public static string MediaUrl(this IPublishedContent content, string propertyAlias, UrlMode mode, string culture = null)
+        {
+            var umbracoContext = Composing.Current.UmbracoContext;
+
+            if (umbracoContext == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
+            if (umbracoContext.UrlProvider == null)
+                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
+
+            return umbracoContext.UrlProvider.GetMediaUrl(content, propertyAlias, mode, culture);
+        }
+
+        #endregion
     }
 }
