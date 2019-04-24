@@ -15,13 +15,6 @@ namespace Umbraco.Web.Models
     [DebuggerDisplay("Content Id: {Id}}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        protected PublishedContentBase(IUmbracoContextAccessor umbracoContextAccessor)
-        {
-            UmbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-        }
-
-        protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
-
         #region ContentType
 
         public abstract IPublishedContentType ContentType { get; }
@@ -75,32 +68,6 @@ namespace Umbraco.Web.Models
 
         /// <inheritdoc />
         public abstract DateTime UpdateDate { get; }
-
-        /// <inheritdoc />
-        /// <remarks>
-        /// The url of documents are computed by the document url providers. The url of medias are computed by the media url providers.
-        /// </remarks>
-        public virtual string Url(string culture = null, UrlMode mode = UrlMode.Auto)
-        {
-            var umbracoContext = UmbracoContextAccessor.UmbracoContext;
-
-            if (umbracoContext == null)
-                throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext is null.");
-            if (umbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.UrlProvider is null.");
-
-            switch (ContentType.ItemType)
-            {
-                case PublishedItemType.Content:
-                    return umbracoContext.UrlProvider.GetUrl(this, mode, culture);
-
-                case PublishedItemType.Media:
-                    return umbracoContext.UrlProvider.GetMediaUrl(this, mode, culture, Constants.Conventions.Media.File);
-
-                default:
-                    throw new NotSupportedException();
-            }
-        }
 
         /// <inheritdoc />
         public abstract DateTime CultureDate(string culture = null);

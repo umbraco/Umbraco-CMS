@@ -21,9 +21,7 @@ namespace Umbraco.Web.PublishedCache
 
         public PublishedMember(
             IMember member,
-            IPublishedContentType publishedMemberType,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            :base(umbracoContextAccessor)
+            IPublishedContentType publishedMemberType)
         {
             _member = member ?? throw new ArgumentNullException(nameof(member));
             _membershipUser = member;

@@ -323,8 +323,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 // no xpath
                 null,
                 // not from examine
-                false,
-                _umbracoContextAccessor),
+                false),
             //callback to get the children
             (dd, n) => children,
             // callback to get a property
@@ -334,8 +333,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             // no xpath
             null,
             // not from examine
-            false,
-            _umbracoContextAccessor);
+            false);
             return dicDoc;
         }
 

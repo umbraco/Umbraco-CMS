@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Routing
                 snapshotService: snapshotService.Object);
 
             //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative url.
-            var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
+            var url = umbracoContext.UrlProvider.GetUrl(1234, culture: "fr-FR");
 
             Assert.AreEqual("/home/test-fr/", url);
         }
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Routing
                 snapshotService: snapshotService.Object);
 
 
-            var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
+            var url = umbracoContext.UrlProvider.GetUrl(1234, culture: "fr-FR");
 
             Assert.AreEqual("/home/test-fr/", url);
         }
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.Routing
                 snapshotService: snapshotService.Object);
 
 
-            var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
+            var url = umbracoContext.UrlProvider.GetUrl(1234, culture: "fr-FR");
 
             //the current uri is not the culture specific domain we want, so the result is an absolute path to the culture specific domain
             Assert.AreEqual("http://example.fr/home/test-fr/", url);

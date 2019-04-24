@@ -22,9 +22,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentNode contentNode,
             ContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            : base(umbracoContextAccessor)
+            IVariationContextAccessor variationContextAccessor)
         {
             _contentNode = contentNode ?? throw new ArgumentNullException(nameof(contentNode));
             ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
@@ -69,7 +67,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         // used when cloning in ContentNode
         public PublishedContent(ContentNode contentNode, PublishedContent origin)
-            : base(origin.UmbracoContextAccessor)
         {
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
@@ -86,10 +83,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // clone for previewing as draft a published content that is published and has no draft
-        private PublishedContent(
-            PublishedContent origin,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            : base(umbracoContextAccessor)
+        private PublishedContent(PublishedContent origin)
         {
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             VariationContextAccessor = origin.VariationContextAccessor;
@@ -406,8 +400,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return this;
 
             var cache = GetAppropriateCache();
-            if (cache == null) return new PublishedContent(this, UmbracoContextAccessor).CreateModel();
-            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this, UmbracoContextAccessor).CreateModel());
+            if (cache == null) return new PublishedContent(this).CreateModel();
+            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel());
         }
 
         // used by Navigable.Source,...

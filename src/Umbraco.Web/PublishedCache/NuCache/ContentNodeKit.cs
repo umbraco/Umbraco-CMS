@@ -21,8 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IPublishedContentType contentType,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
-            bool canBePublished,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            bool canBePublished)
         {
             var draftData = DraftData;
 
@@ -35,7 +34,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (draftData == null && !canBePublished)
                 draftData = PublishedData;
 
-            Node.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor,umbracoContextAccessor);
+            Node.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor);
         }
     }
 }

@@ -209,9 +209,9 @@ namespace Umbraco.Web
             var umbracoContext = Composing.Current.UmbracoContext;
 
             if (umbracoContext == null)
-                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
+                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
             if (umbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
+                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
 
             return umbracoContext.UrlProvider.GetMediaUrl(content, mode, culture, propertyAlias);
         }

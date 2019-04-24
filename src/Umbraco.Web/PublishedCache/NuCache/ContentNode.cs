@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -40,11 +39,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             DateTime createDate, int creatorId,
             ContentData draftData, ContentData publishedData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IVariationContextAccessor variationContextAccessor)
             : this(id, uid, level, path, sortOrder, parentContentId, createDate, creatorId)
         {
-            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor);
         }
 
         // 2-phases ctor, phase 1
@@ -66,7 +64,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // two-phase ctor, phase 2
-        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor)
+        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
         {
             ContentType = contentType;
 
@@ -75,13 +73,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (draftData != null)
             {
-                DraftContent = new PublishedContent(this, draftData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+                DraftContent = new PublishedContent(this, draftData, publishedSnapshotAccessor, variationContextAccessor);
                 DraftModel = DraftContent.CreateModel();
             }
 
             if (publishedData != null)
             {
-                PublishedContent = new PublishedContent(this, publishedData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+                PublishedContent = new PublishedContent(this, publishedData, publishedSnapshotAccessor, variationContextAccessor);
                 PublishedModel = PublishedContent.CreateModel();
             }
         }

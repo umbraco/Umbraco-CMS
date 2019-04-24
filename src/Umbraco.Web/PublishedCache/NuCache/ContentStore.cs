@@ -21,7 +21,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ConcurrentDictionary<int, LinkedNode<ContentNode>> _contentNodes;
         private LinkedNode<ContentNode> _root;
         private readonly ConcurrentDictionary<int, LinkedNode<IPublishedContentType>> _contentTypesById;
@@ -49,13 +48,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public ContentStore(
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor,
             ILogger logger,
             BPlusTree<int, ContentNodeKit> localDb = null)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor;
-            _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
             _localDb = localDb;
 
@@ -449,7 +446,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var canBePublished = ParentPublishedLocked(kit);
 
             // and use
-            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, canBePublished, _umbracoContextAccessor);
+            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, canBePublished);
 
             return true;
         }

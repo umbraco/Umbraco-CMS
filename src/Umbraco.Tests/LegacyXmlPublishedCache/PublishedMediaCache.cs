@@ -674,8 +674,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 _appCache,
                 _contentTypeCache,
                 cacheValues.XPath, // though, outside of tests, that should be null
-                cacheValues.FromExamine,
-                _umbracoContextAccessor
+                cacheValues.FromExamine
             );
             return content.CreateModel();
         }

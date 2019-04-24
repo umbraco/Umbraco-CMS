@@ -6,7 +6,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 
@@ -18,16 +17,13 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IAppCache _requestCache;
         private readonly XmlStore _xmlStore;
         private readonly PublishedContentTypeCache _contentTypeCache;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public PublishedMemberCache(XmlStore xmlStore, IAppCache requestCache, IMemberService memberService,
-            PublishedContentTypeCache contentTypeCache, IUmbracoContextAccessor umbracoContextAccessor)
+        public PublishedMemberCache(XmlStore xmlStore, IAppCache requestCache, IMemberService memberService, PublishedContentTypeCache contentTypeCache)
         {
             _requestCache = requestCache;
             _memberService = memberService;
             _xmlStore = xmlStore;
             _contentTypeCache = contentTypeCache;
-            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         public IPublishedContent GetByProviderKey(object key)
@@ -44,7 +40,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     var result = _memberService.GetByProviderKey(key);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
-                    return new PublishedMember(result, type, _umbracoContextAccessor).CreateModel();
+                    return new PublishedMember(result, type).CreateModel();
                 });
         }
 
@@ -62,7 +58,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     var result = _memberService.GetById(memberId);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
-                    return new PublishedMember(result, type, _umbracoContextAccessor).CreateModel();
+                    return new PublishedMember(result, type).CreateModel();
                 });
         }
 
@@ -80,7 +76,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     var result = _memberService.GetByUsername(username);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
-                    return new PublishedMember(result, type, _umbracoContextAccessor).CreateModel();
+                    return new PublishedMember(result, type).CreateModel();
                 });
         }
 
@@ -98,14 +94,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     var result = _memberService.GetByEmail(email);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
-                    return new PublishedMember(result, type, _umbracoContextAccessor).CreateModel();
+                    return new PublishedMember(result, type).CreateModel();
                 });
         }
 
         public IPublishedContent GetByMember(IMember member)
         {
             var type = _contentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
-            return new PublishedMember(member, type, _umbracoContextAccessor).CreateModel();
+            return new PublishedMember(member, type).CreateModel();
         }
 
         public XPathNavigator CreateNavigator()

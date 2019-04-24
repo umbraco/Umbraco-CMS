@@ -24,7 +24,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -171,7 +170,6 @@ namespace Umbraco.Tests.PublishedContent
                 null,
                 new TestPublishedSnapshotAccessor(),
                 _variationAccesor,
-                Mock.Of<IUmbracoContextAccessor>(),
                 Mock.Of<ILogger>(),
                 scopeProvider,
                 Mock.Of<IDocumentRepository>(),
@@ -180,7 +178,6 @@ namespace Umbraco.Tests.PublishedContent
                 new TestDefaultCultureAccessor(),
                 dataSource,
                 globalSettings,
-                new SiteDomainHelper(),
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));

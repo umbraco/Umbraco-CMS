@@ -109,7 +109,7 @@ namespace Umbraco.Web.Routing
                 string url;
                 try
                 {
-                    url = umbracoContext.UrlProvider.GetUrl(content.Id, culture);
+                    url = umbracoContext.UrlProvider.GetUrl(content.Id, culture: culture);
                 }
                 catch (Exception ex)
                 {

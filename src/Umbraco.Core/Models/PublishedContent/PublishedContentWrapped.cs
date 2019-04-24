@@ -94,9 +94,6 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual DateTime UpdateDate => _content.UpdateDate;
 
         /// <inheritdoc />
-        public virtual string Url(string culture = null, UrlMode mode = UrlMode.Auto) => _content.Url(culture, mode);
-
-        /// <inheritdoc />
         public DateTime CultureDate(string culture = null) => _content.CultureDate(culture);
 
         /// <inheritdoc />

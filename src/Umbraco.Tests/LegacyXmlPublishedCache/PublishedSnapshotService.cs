@@ -145,9 +145,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var domainCache = new DomainCache(_domainService, _defaultCultureAccessor);
 
             return new PublishedSnapshot(
-                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _siteDomainHelper,_umbracoContextAccessor, _contentTypeCache, _routesCache, previewToken),
+                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache, _entitySerializer, _umbracoContextAccessor),
-                new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _umbracoContextAccessor),
+                new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache),
                 domainCache);
         }
 

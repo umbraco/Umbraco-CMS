@@ -26,23 +26,19 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             XmlNode xmlNode,
             bool isPreviewing,
             IAppCache appCache,
-            PublishedContentTypeCache contentTypeCache,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            :base(umbracoContextAccessor)
+            PublishedContentTypeCache contentTypeCache)
         {
             _xmlNode = xmlNode;
             _isPreviewing = isPreviewing;
 
             _appCache = appCache;
             _contentTypeCache = contentTypeCache;
-            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
         private readonly IAppCache _appCache; // at snapshot/request level (see PublishedContentCache)
         private readonly PublishedContentTypeCache _contentTypeCache;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         private readonly object _initializeLock = new object();
 
@@ -256,7 +252,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             if (parent == null) return;
 
             if (parent.Attributes?.GetNamedItem("isDoc") != null)
-                _parent = Get(parent, _isPreviewing, _appCache, _contentTypeCache, _umbracoContextAccessor);
+                _parent = Get(parent, _isPreviewing, _appCache, _contentTypeCache);
 
             _parentInitialized = true;
         }
@@ -413,7 +409,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var iterator = nav.Select(expr);
 
             _children = iterator.Cast<XPathNavigator>()
-                .Select(n => Get(((IHasXmlNode) n).GetNode(), _isPreviewing, _appCache, _contentTypeCache, _umbracoContextAccessor))
+                .Select(n => Get(((IHasXmlNode) n).GetNode(), _isPreviewing, _appCache, _contentTypeCache))
                 .OrderBy(x => x.SortOrder)
                 .ToList();
 
@@ -433,7 +429,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         /// sure that we create only one instance of each for the duration of a request. The
         /// returned IPublishedContent is a model, if models are enabled.</remarks>
         public static IPublishedContent Get(XmlNode node, bool isPreviewing, IAppCache appCache,
-            PublishedContentTypeCache contentTypeCache, IUmbracoContextAccessor umbracoContextAccessor)
+            PublishedContentTypeCache contentTypeCache)
         {
             // only 1 per request
 
@@ -441,7 +437,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var id = attrs?.GetNamedItem("id").Value;
             if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
             var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in Xml cache
-            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache, umbracoContextAccessor)).CreateModel());
+            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache)).CreateModel());
         }
 
         public static void ClearRequest()

@@ -94,20 +94,6 @@ namespace Umbraco.Core.Models.PublishedContent
         DateTime UpdateDate { get; }
 
         /// <summary>
-        /// Gets the url of the content item.
-        /// </summary>
-        /// <remarks>
-        /// <para>If the content item is a document, then this method returns the url of the
-        /// document. If it is a media, then this methods return the media url for the
-        /// 'umbracoFile' property. Use the MediaUrl() method to get the media url for other
-        /// properties.</para>
-        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
-        /// if any. In addition, when the content type is multi-lingual, this is the url for the
-        /// specified culture. Otherwise, it is the invariant url.</para>
-        /// </remarks>
-        string Url(string culture = null, UrlMode mode = UrlMode.Auto);
-
-        /// <summary>
         /// Gets the culture date of the content item.
         /// </summary>
         /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>

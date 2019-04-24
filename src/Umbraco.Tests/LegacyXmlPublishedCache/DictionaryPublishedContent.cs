@@ -8,7 +8,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
@@ -40,9 +39,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IAppCache appCache,
             PublishedContentTypeCache contentTypeCache,
             XPathNavigator nav,
-            bool fromExamine,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            :base(umbracoContextAccessor)
+            bool fromExamine)
         {
             if (valueDictionary == null) throw new ArgumentNullException(nameof(valueDictionary));
             if (getParent == null) throw new ArgumentNullException(nameof(getParent));
