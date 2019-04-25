@@ -1,6 +1,10 @@
 ﻿<div>
     <ng-form name="tabbedContentForm">
-        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.label">
+        <div class="umb-group-panel"
+            retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)"
+            data-app-anchor="{{group.id}}"
+            data-element="group-{{group.alias}}"
+            ng-repeat="group in content.tabs track by group.label">
 
             <div class="umb-group-panel__header">
                 <div>{{ group.label }}</div>
@@ -12,9 +16,11 @@
                     ng-repeat="property in group.properties track by property.alias"
                     property="property"
                     show-inherit="content.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
-                    inherits-from="defaultVariant.language.name">
+                    inherits-from="defaultVariant.language.name"
+                    ng-class="{'--disabled': content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}"
+                    >
 
-                    <div ng-class="{'o-40 cursor-not-allowed': content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
+                    <div>
                         <umb-property-editor
                             model="property"
                             preview="content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
