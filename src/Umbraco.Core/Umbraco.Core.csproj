@@ -12,6 +12,12 @@
         <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
         <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\SolutionInfo.cs">
+            <Link>Properties\SolutionInfo.cs</Link>
+        </Compile>
+    </ItemGroup>
     
     <!-- .NET Framework References -->
     <ItemGroup>
