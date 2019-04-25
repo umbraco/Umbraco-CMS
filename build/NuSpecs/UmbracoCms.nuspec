@@ -11,6 +11,7 @@
         <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Installs Umbraco Cms in your Visual Studio ASP.NET project</description>
+        <repository type="git" url="https://github.com/umbraco/Umbraco-CMS" />
         <summary>Installs Umbraco Cms in your Visual Studio ASP.NET project</summary>
         <language>en-US</language>
         <tags>umbraco</tags>

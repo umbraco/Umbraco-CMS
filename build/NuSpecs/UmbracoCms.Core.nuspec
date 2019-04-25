@@ -11,6 +11,7 @@
         <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Contains the core assemblies needed to run Umbraco Cms. This package only contains assemblies and can be used for package development. Use the UmbracoCms package to setup Umbraco in Visual Studio as an ASP.NET project.</description>
+        <repository type="git" url="https://github.com/umbraco/Umbraco-CMS" />
         <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
         <language>en-US</language>
         <tags>umbraco</tags>
@@ -53,6 +54,6 @@
         <!--<file src="$BuildTmp$\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />-->
 
         <!-- symbols -->
-        <file src="$BuildTmp$\bin\Umbraco.Core.pdb" target="lib" />
+        <file src="$BuildTmp$\bin\Umbraco.Core.pdb" target="lib\net472\Umbraco.Core.pdb" />
     </files>
 </package>
