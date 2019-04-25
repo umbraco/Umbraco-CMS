@@ -28,13 +28,14 @@ namespace Umbraco.Web
 
         private readonly IUmbracoSettingsSection _umbracoSettings;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IEnumerable<IUrlProvider> _urlProviders;
+        private readonly UrlProviderCollection _urlProviders;
+        private readonly MediaUrlProviderCollection _mediaUrlProviders;
         private readonly IUserService _userService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextFactory"/> class.
         /// </summary>
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, IEnumerable<IUrlProvider> urlProviders, IUserService userService)
+        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IUserService userService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -44,6 +45,7 @@ namespace Umbraco.Web
             _umbracoSettings = umbracoSettings ?? throw new ArgumentNullException(nameof(umbracoSettings));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _urlProviders = urlProviders ?? throw new ArgumentNullException(nameof(urlProviders));
+            _mediaUrlProviders = mediaUrlProviders ?? throw new ArgumentNullException(nameof(mediaUrlProviders));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
@@ -55,7 +57,7 @@ namespace Umbraco.Web
 
             var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings);
 
-            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _globalSettings, _variationContextAccessor);
+            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor);
         }
 
         /// <inheritdoc />
@@ -65,7 +67,7 @@ namespace Umbraco.Web
             if (currentUmbracoContext != null)
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
 
-            
+
             httpContext = httpContext ?? new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
 
             var umbracoContext = CreateUmbracoContext(httpContext);

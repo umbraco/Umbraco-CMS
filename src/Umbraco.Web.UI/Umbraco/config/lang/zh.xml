@@ -55,9 +55,6 @@
     <key alias="domainExists">域名 '%0%' 已使用</key>
     <key alias="domainUpdated">域名 '%0%' 已更新</key>
     <key alias="orEdit">编辑当前域名</key>
-    <key alias="domainHelp"><![CDATA[例如：example.com、www.example.com、example.com:8080、<br/>
-        https://www.example.com/、example.com/en、……使用 * 代表任意域名，<br/>
-        只需要设置语言部分即可。]]></key>
     <key alias="inherit">继承</key>
     <key alias="setLanguage">语言</key>
     <key alias="setLanguageHelp"><![CDATA[为当前节点及子节点设置语言，<br />
@@ -321,13 +318,6 @@
     <key alias="email">输入您的电子邮件</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">允许子项节点类型</key>
-    <key alias="create">创建</key>
-    <key alias="deletetab">删除选项卡</key>
-    <key alias="description">描述</key>
-    <key alias="newtab">新建选项卡</key>
-    <key alias="tab">选项卡</key>
-    <key alias="thumbnail">缩略图</key>
     <key alias="createListView" version="7.2">创建自定义列表视图</key>
     <key alias="removeListView" version="7.2">删除自定义列表视图</key>
   </area>

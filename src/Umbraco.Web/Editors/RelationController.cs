@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -35,11 +34,11 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrWhiteSpace(relationTypeAlias) == false)
             {
                 return
-                    Mapper.Map<IEnumerable<IRelation>, IEnumerable<RelationDisplay>>(
+                    Mapper.MapEnumerable<IRelation, RelationDisplay>(
                         relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)));
             }
 
-            return Mapper.Map<IEnumerable<IRelation>, IEnumerable<RelationDisplay>>(relations);
+            return Mapper.MapEnumerable<IRelation, RelationDisplay>(relations);
         }
 
         [HttpDelete]

@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -12,16 +13,16 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IDictionaryItem))]
     public sealed class DictionaryMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public DictionaryMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        protected override void DefineMaps()
         {
-            CacheMap<DictionaryItem, DictionaryDto>(src => src.Id, dto => dto.PrimaryKey);
-            CacheMap<DictionaryItem, DictionaryDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<DictionaryItem, DictionaryDto>(src => src.ItemKey, dto => dto.Key);
-            CacheMap<DictionaryItem, DictionaryDto>(src => src.ParentId, dto => dto.Parent);
+            DefineMap<DictionaryItem, DictionaryDto>(nameof(DictionaryItem.Id), nameof(DictionaryDto.PrimaryKey));
+            DefineMap<DictionaryItem, DictionaryDto>(nameof(DictionaryItem.Key), nameof(DictionaryDto.UniqueId));
+            DefineMap<DictionaryItem, DictionaryDto>(nameof(DictionaryItem.ItemKey), nameof(DictionaryDto.Key));
+            DefineMap<DictionaryItem, DictionaryDto>(nameof(DictionaryItem.ParentId), nameof(DictionaryDto.Parent));
         }
     }
 }

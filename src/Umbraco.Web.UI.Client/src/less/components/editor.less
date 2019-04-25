@@ -90,6 +90,9 @@
 
 .umb-editor-header__name-and-description {
     margin-right: 20px;
+    .umb-panel-header-description {
+    	padding: 0 10px;
+    }
 }
 
 .-split-view-active .umb-editor-header__name-and-description {
@@ -166,24 +169,30 @@ a.umb-editor-header__close-split-view:hover {
     height: 30px;
 	text-decoration: none !important;
 	font-size: 13px;
-	//color: @gray-4;
-    color: @ui-action-disgrete-type;
-	//background-color: @white;
+    color: @ui-action-discreet-type;
+    
+    max-width: 50%;
+    white-space: nowrap;
+    
+    span {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 }
 
 a.umb-variant-switcher__toggle {
 	transition: color 0.2s ease-in-out;
 	&:hover {
 		//background-color: @gray-10;
-        color: @ui-action-disgrete-type-hover;
+        color: @ui-action-discreet-type-hover;
         .umb-variant-switcher__expand {
-            color: @ui-action-disgrete-type-hover;
+            color: @ui-action-discreet-type-hover;
         }
 	}
 }
 
 .umb-variant-switcher__expand {
-    color: @ui-action-disgrete-type;
+    color: @ui-action-discreet-type;
 	margin-top: 3px;
 	margin-left: 5px;
 	margin-right: -5px;
@@ -195,6 +204,7 @@ a.umb-variant-switcher__toggle {
     justify-content: space-between;
 	align-items: center;
 	border-bottom: 1px solid @gray-9;
+    position: relative;
     &:hover .umb-variant-switcher__name-wrapper {
         
     }
@@ -246,10 +256,15 @@ a.umb-variant-switcher__toggle {
 }
 
 .umb-variant-switcher__split-view {
-	font-size: 13px;
-	display: none;
-	padding: 16px 20px;
-    
+    font-size: 13px;
+    display: none;
+    padding: 16px 20px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: @white;
+
     &:hover {
         background-color: @ui-option-hover;
         color: @ui-option-type-hover;

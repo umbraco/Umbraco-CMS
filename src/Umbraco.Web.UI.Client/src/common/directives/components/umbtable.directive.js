@@ -117,10 +117,11 @@
         var vm = this;
 
         vm.clickItem = function (item, $event) {
-            if (vm.onClick) {
+            if (vm.onClick && !($event.metaKey || $event.ctrlKey)) {
                 vm.onClick({ item: item});
-                $event.stopPropagation();
+                $event.preventDefault();
             }
+            $event.stopPropagation();
         };
 
         vm.selectItem = function (item, $index, $event) {

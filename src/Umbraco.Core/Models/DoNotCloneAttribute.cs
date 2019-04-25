@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models
     /// * when the setter performs additional required logic other than just setting the underlying field
     ///
     /// </remarks>
-    internal class DoNotCloneAttribute : Attribute
+    public class DoNotCloneAttribute : Attribute
     {
 
     }
