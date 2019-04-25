@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
             mapper.Define<ITemplate, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<EntityBasic, ContentTypeSort>((source, context) => new ContentTypeSort(), Map);
             mapper.Define<IContentTypeComposition, EntityBasic>((source, context) => new EntityBasic(), Map);
-            mapper.Define<EntitySlim, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
+            mapper.Define<IEntitySlim, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
             mapper.Define<ISearchResult, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
             mapper.Define<ISearchResults, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source));
             mapper.Define<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source));
