@@ -8,17 +8,20 @@ angular.module("umbraco")
         umbRequestHelper,
         angularHelper,
         $element,
-        eventsService
+            eventsService,
+            editorService
     ) {
 
         // Grid status variables
         var placeHolder = "";
         var currentForm = angularHelper.getCurrentForm($scope);
 
+        
         $scope.currentRow = null;
         $scope.currentCell = null;
         $scope.currentToolsControl = null;
         $scope.currentControl = null;
+        
         $scope.openRTEToolbarId = null;
         $scope.hasSettings = false;
         $scope.showRowConfigurations = true;
@@ -238,8 +241,10 @@ angular.module("umbraco")
                 $scope.$apply(function () {
 
                     var cell = event.target.getScope_HackForSortable().area;
+                    
                     cell.hasActiveChild = hasActiveChild(cell, cell.controls);
                     cell.active = false;
+                    
                 });
             }
 
@@ -273,7 +278,7 @@ angular.module("umbraco")
             localizationService.localize("grid_insertControl").then(function(value){
                 title = value;
                 $scope.editorOverlay = {
-                    view: "itempicker",
+                        view: "itempicker",
                     filter: area.$allowedEditors.length > 15,
                     title: title,
                     availableItems: area.$allowedEditors,
@@ -314,6 +319,7 @@ angular.module("umbraco")
 
         $scope.clickOutsideRow = function(index, rows) {
             rows[index].active = false;
+            
         };
 
         function getAllowedLayouts(section) {
@@ -431,44 +437,46 @@ angular.module("umbraco")
                 });
             }
 
-            $scope.gridItemSettingsDialog = {};
-            $scope.gridItemSettingsDialog.view = "views/propertyeditors/grid/dialogs/config.html";
-            $scope.gridItemSettingsDialog.title = "Settings";
-            $scope.gridItemSettingsDialog.styles = styles;
-            $scope.gridItemSettingsDialog.config = config;
+                var dialogOptions = {
+                    view: "views/propertyeditors/grid/dialogs/config.html",
+                    size: "small",
+                    styles: styles,
+                    config: config,
+                    submit: function (model) {
+                    var styleObject = {};
+                    var configObject = {};
 
-            $scope.gridItemSettingsDialog.show = true;
+                    _.each(model.styles, function (style) {
+                        if (style.value) {
+                            styleObject[style.key] = addModifier(style.value, style.modifier);
+                        }
+                    });
+                    _.each(model.config, function (cfg) {
+                            cfg.alias = cfg.key;
+                            cfg.label = cfg.value;
 
-            $scope.gridItemSettingsDialog.submit = function(model) {
+                        if (cfg.value) {
+                            configObject[cfg.key] = addModifier(cfg.value, cfg.modifier);
+                        }
+                    });
 
-                var styleObject = {};
-                var configObject = {};
+                    gridItem.styles = styleObject;
+                    gridItem.config = configObject;
+                    gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
 
-                _.each(model.styles, function(style){
-                    if(style.value){
-                        styleObject[style.key] = addModifier(style.value, style.modifier);
+                    currentForm.$setDirty();
+
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
                     }
-                });
-                _.each(model.config, function (cfg) {
-                    if (cfg.value) {
-                        configObject[cfg.key] = addModifier(cfg.value, cfg.modifier);
-                    }
-                });
-
-                gridItem.styles = styleObject;
-                gridItem.config = configObject;
-                gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
-
-                currentForm.$setDirty();
-
-                $scope.gridItemSettingsDialog.show = false;
-                $scope.gridItemSettingsDialog = null;
             };
 
-            $scope.gridItemSettingsDialog.close = function(oldModel) {
-                $scope.gridItemSettingsDialog.show = false;
-                $scope.gridItemSettingsDialog = null;
-            };
+                localizationService.localize("general_settings").then(value => {
+                    dialogOptions.title = value;
+                    editorService.open(dialogOptions);
+                });
 
         };
 
@@ -538,6 +546,7 @@ angular.module("umbraco")
         // Control management functions
         // *********************************************
         $scope.clickControl = function (index, controls, cell) {
+            
             controls[index].active = true;
             cell.hasActiveChild = true;
         };

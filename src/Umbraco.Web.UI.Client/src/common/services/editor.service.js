@@ -112,6 +112,7 @@ When building a custom infinite editor view you can use the same components as a
                         type="button"
                         button-style="link"
                         label-key="general_close"
+                        shortcut="esc"
                         action="vm.close()">
                     </umb-button>
                     <umb-button
