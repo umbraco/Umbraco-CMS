@@ -4,6 +4,11 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/umbraco/Umbraco-CMS.git</RepositoryUrl>
+    </PropertyGroup>
+
     <!-- Duplicate Assembly Attribute Error issue -->
     <!-- https://johnkoerner.com/csharp/dealing-with-duplicate-attribute-errors-in-net-core/ -->
     <PropertyGroup>
@@ -38,6 +43,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+
         <PackageReference Include="Examine" Version="1.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
         <PackageReference Include="NPoco" Version="3.9.4" />
