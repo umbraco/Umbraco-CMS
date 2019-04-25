@@ -173,7 +173,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            var rootNodeAsString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+            var rootNodeAsString = Constants.System.RootString;
             var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
 
             var node = new TreeNode(
@@ -366,7 +366,17 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected bool IsDialog(FormDataCollection queryStrings)
         {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IsDialog);
+            return queryStrings.GetValue<string>(TreeQueryStringParameters.Use) == "dialog";
+        }
+
+        /// <summary>
+        /// If the request should allows a user to choose nodes that they normally don't have access to
+        /// </summary>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected bool IgnoreUserStartNodes(FormDataCollection queryStrings)
+        {
+            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IgnoreUserStartNodes);
         }
 
         /// <summary>

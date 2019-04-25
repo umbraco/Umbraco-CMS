@@ -69,7 +69,7 @@ namespace Umbraco.Web.Trees
         {
             var node = base.CreateRootNode(queryStrings);
 
-            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false)
+            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false && IgnoreUserStartNodes(queryStrings) == false)
             {
                 node.AdditionalData["noAccess"] = true;
             }
@@ -90,11 +90,11 @@ namespace Umbraco.Web.Trees
         internal TreeNode GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormDataCollection queryStrings)
         {
             var entityIsAncestorOfStartNodes = Security.CurrentUser.IsInBranchOfStartNode(e, Services.EntityService, RecycleBinId, out var hasPathAccess);
-            if (entityIsAncestorOfStartNodes == false)
+            if (IgnoreUserStartNodes(queryStrings) == false && entityIsAncestorOfStartNodes == false)
                 return null;
 
             var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
-            if (hasPathAccess == false)
+            if (IgnoreUserStartNodes(queryStrings) == false && hasPathAccess == false)
             {
                 treeNode.AdditionalData["noAccess"] = true;
             }
@@ -120,7 +120,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            var rootIdString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+            var rootIdString = Constants.System.RootString;
             var hasAccessToRoot = UserStartNodes.Contains(Constants.System.Root);
 
             var startNodeId = queryStrings.HasKey(TreeQueryStringParameters.StartNodeId)
@@ -134,7 +134,7 @@ namespace Umbraco.Web.Trees
 
                 // ensure that the user has access to that node, otherwise return the empty tree nodes collection
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
-                if (HasPathAccess(id, queryStrings) == false)
+                if (IgnoreUserStartNodes(queryStrings) == false && HasPathAccess(id, queryStrings) == false)
                 {
                     Logger.Warn<ContentTreeControllerBase>("User {Username} does not have access to node with id {Id}", Security.CurrentUser.Username, id);
                     return nodes;
@@ -255,8 +255,9 @@ namespace Umbraco.Web.Trees
         /// </remarks>
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
+            var ignoreUserStartNodes = queryStrings.GetValue<bool>(TreeQueryStringParameters.IgnoreUserStartNodes);
             //check if we're rendering the root
-            if (id == Constants.System.Root.ToInvariantString() && UserStartNodes.Contains(Constants.System.Root))
+            if (id == Constants.System.RootString && UserStartNodes.Contains(Constants.System.Root) || ignoreUserStartNodes)
             {
                 var altStartId = string.Empty;
 
@@ -264,7 +265,7 @@ namespace Umbraco.Web.Trees
                     altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
                 //check if a request has been made to render from a specific start node
-                if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
+                if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.RootString)
                 {
                     id = altStartId;
                 }
@@ -272,7 +273,7 @@ namespace Umbraco.Web.Trees
                 var nodes = GetTreeNodesInternal(id, queryStrings);
 
                 //only render the recycle bin if we are not in dialog and the start id id still the root
-                if (IsDialog(queryStrings) == false && id == Constants.System.Root.ToInvariantString())
+                if (IsDialog(queryStrings) == false && id == Constants.System.RootString)
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),

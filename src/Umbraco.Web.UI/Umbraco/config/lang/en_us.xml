@@ -87,7 +87,7 @@
     <key alias="addNew">Add new Domain</key>
     <key alias="remove">remove</key>
     <key alias="invalidNode">Invalid node.</key>
-    <key alias="invalidDomain">Invalid domain format.</key>
+    <key alias="invalidDomain">One or more domains have an invalid format.</key>
     <key alias="duplicateDomain">Domain has already been assigned.</key>
     <key alias="language">Language</key>
     <key alias="domain">Domain</key>
@@ -96,9 +96,9 @@
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
-    <key alias="domainHelp"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
-        "https://www.example.com/". One-level paths in domains are supported, eg. "example.com/en". However, they
-        should be avoided. Better use the culture setting above.]]></key>
+    <key alias="domainHelpWithVariants">
+    	<![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
+     Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
     <key alias="setLanguageHelp"><![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
@@ -283,7 +283,7 @@
     <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
     <key alias="languagesToPublish">What languages would you like to publish?</key>
     <key alias="languagesToSave">What languages would you like to save?</key>
-    <key alias="languagesToSaveForFirstTime">What languages would you like to save?</key>
+    <key alias="languagesToSaveForFirstTime">All languages with content are saved on creation!</key>
     <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
     <key alias="languagesToSchedule">What languages would you like to schedule?</key>
     <key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key>
@@ -523,13 +523,6 @@
     <key alias="generatingAlias">Generating alias...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Allowed child node types</key>
-    <key alias="create">Create</key>
-    <key alias="deletetab">Delete tab</key>
-    <key alias="description">Description</key>
-    <key alias="newtab">New tab</key>
-    <key alias="tab">Tab</key>
-    <key alias="thumbnail">Thumbnail</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
     <key alias="aliasAlreadyExists">A content type, media type or member type with this alias already exists</key>
@@ -635,6 +628,7 @@
     <key alias="first">First</key>
     <key alias="general">General</key>
     <key alias="groups">Groups</key>
+    <key alias="group">Group</key>
     <key alias="height">Height</key>
     <key alias="help">Help</key>
     <key alias="hide">Hide</key>
@@ -1164,7 +1158,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageDownloads">Downloads</key>
     <key alias="packageLikes">Likes</key>
     <key alias="packageCompatibility">Compatibility</key>
-    <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</key>
+    <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be guaranteed for versions reported below 100%</key>
     <key alias="packageExternalSources">External sources</key>
     <key alias="packageAuthor">Author</key>
     <key alias="packageDocumentation">Documentation</key>
@@ -1242,6 +1236,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       %0% can not be published, because a parent page is not published.
     ]]></key>
     <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% can not be published, because its missing a name.]]></key>
+    <key alias="contentPublishedFailedReqCultureValidationError">Validation failed for required language '%0%'. This language was saved but not published.</key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
     <key alias="nodePublish">%0% has been published</key>
@@ -1409,7 +1404,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="deleteUserSuccess">User %0% was deleted</key>
     <key alias="resendInviteHeader">Invite user</key>
     <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
-    <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>
+    <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>    
     <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
     <key alias="documentTypeExportedSuccess">Document type was exported to file</key>
     <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
@@ -1624,6 +1619,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="enterMacroName">Enter macro name</key>
     <key alias="parameters">Parameters</key>
     <key alias="parametersDescription">Define the parameters that should be available when using this macro.</key>
+    <key alias="selectViewFile">Select partial view macro file</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>
@@ -2092,7 +2088,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
   </area>
   <area alias="textbox">
-    <key alias="characters_left">characters left</key>
+    <key alias="characters_left"><![CDATA[<strong>%0%</strong> characters left.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maximum %0% characters, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>

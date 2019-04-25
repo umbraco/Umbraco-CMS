@@ -292,7 +292,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     if (psql.Arguments[i] is string s && s == "[[[ISOCODE]]]")
                     {
                         psql.Arguments[i] = ordering.Culture;
-                        break;
                     }
                 }
             }
@@ -378,6 +377,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // previously, we inserted the join+select *here* so we were sure to have it,
                 // but now that's not the case anymore!
                 return "variantName";
+            }
+
+            // content type alias is invariant
+            if(ordering.OrderBy.InvariantEquals("contentTypeAlias"))
+            {
+                var joins = Sql()
+                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype");
+
+                // see notes in ApplyOrdering: the field MUST be selected + aliased
+                sql = Sql(InsertBefore(sql, "FROM", ", " + SqlSyntax.GetFieldName<ContentTypeDto>(x => x.Alias, "ctype") + " AS ordering "), sql.Arguments);
+
+                sql = InsertJoins(sql, joins);
+
+                return "ordering";
             }
 
             // previously, we'd accept anything and just sanitize it - not anymore
