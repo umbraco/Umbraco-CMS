@@ -30,10 +30,10 @@
 
         ncResources.getContentTypes().then(function (docTypes) {
             $scope.model.docTypes = docTypes;
-
+            
             // Populate document type tab dictionary
             docTypes.forEach(function (value) {
-                $scope.docTypeTabs[value.alias] = value.tabs;
+                $scope.docTypeTabs[value.alias] = value.variants[0].tabs;
             });
         });
 
@@ -46,7 +46,6 @@
                     return docType.alias === c.ncAlias;
                 });
             });
-
         }
 
         if (!$scope.model.value) {
@@ -65,10 +64,17 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "contentResource",
     "localizationService",
     "iconHelper",
-
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
+    "copyService",
+    "eventsService",
+    
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, copyService, eventsService) {
 
         var inited = false;
+        
+        var contentTypeAliases = [];
+        _.each($scope.model.config.contentTypes, function (contentType) {
+            contentTypeAliases.push(contentType.ncAlias);
+        });
 
         _.each($scope.model.config.contentTypes, function (contentType) {
             contentType.nameExp = !!contentType.nameTemplate
@@ -222,7 +228,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
             return name;
         };
-
+        
         $scope.getIcon = function (idx) {
             var scaffold = $scope.getScaffold($scope.model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
@@ -269,7 +275,38 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return contentType.ncAlias === alias;
             });
         }
-
+        
+        $scope.showCopy = copyService.supportsCopy();
+        
+        $scope.showPaste = false;
+        
+        $scope.clickCopy = function($event, node) {
+            copyService.copy("elementType", node);
+            $event.stopPropagation();
+        }
+        
+        $scope.clickPaste = function($event) {
+            
+            var newNode = copyService.retriveDataOfType("elementType", contentTypeAliases).pop();
+            
+            if (newNode === undefined) {
+                return;
+            }
+            
+            console.log(newNode);
+            
+            $scope.nodes.push(newNode);
+            updatemodel();
+            
+            $scope.currentNode = newNode;
+        }
+        
+        function checkAbilityToPasteContent() {
+            $scope.showPaste = copyService.hasDataOfType("elementType", contentTypeAliases);
+        }
+        
+        eventsService.on("copyService.storageUpdate", checkAbilityToPasteContent);
+        
         var notSupported = [
           "Umbraco.Tags",
           "Umbraco.UploadField",
@@ -288,9 +325,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     var tab = _.find(tabs, function (tab) {
                         return tab.id !== 0 && (tab.alias.toLowerCase() === contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias === "");
                     });
-                    scaffold.tabs = [];
+                    scaffold.variants[0].tabs = [];
                     if (tab) {
-                        scaffold.tabs.push(tab);
+                        scaffold.variants[0].tabs.push(tab);
 
                         angular.forEach(tab.properties,
                             function (property) {
@@ -319,7 +356,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             if ($scope.model.config.contentTypes.length === scaffoldsLoaded) {
                 // Because we're loading the scaffolds async one at a time, we need to
                 // sort them explicitly according to the sort order defined by the data type.
-                var contentTypeAliases = [];
+                contentTypeAliases = [];
                 _.each($scope.model.config.contentTypes, function (contentType) {
                     contentTypeAliases.push(contentType.ncAlias);
                 });
@@ -353,64 +390,85 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 }
 
                 inited = true;
+                
+                checkAbilityToPasteContent();
             }
         }
 
         var initNode = function (scaffold, item) {
             var node = angular.copy(scaffold);
-
-            node.key = item && item.key ? item.key : UUID.generate();
-            node.ncContentTypeAlias = scaffold.contentTypeAlias;
-
-            for (var t = 0; t < node.tabs.length; t++) {
-                var tab = node.tabs[t];
-                for (var p = 0; p < tab.properties.length; p++) {
-                    var prop = tab.properties[p];
-                    prop.propertyAlias = prop.alias;
-                    prop.alias = $scope.model.alias + "___" + prop.alias;
-                    // Force validation to occur server side as this is the
-                    // only way we can have consistency between mandatory and
-                    // regex validation messages. Not ideal, but it works.
-                    prop.validation = {
-                        mandatory: false,
-                        pattern: ""
-                    };
-                    if (item) {
-                        if (item[prop.propertyAlias]) {
+            
+            node.key = item && item.key ? item.key : String.CreateGuid();
+            //node.ncContentTypeAlias = scaffold.contentTypeAlias;
+            
+            for (var v = 0; v < node.variants.length; v++) {
+                var variant = node.variants[v];
+                
+                console.log("- variant:", variant);
+                
+                for (var t = 0; t < variant.tabs.length; t++) {
+                    var tab = variant.tabs[t];
+                    
+                    console.log("-- tab:", tab);
+                    
+                    for (var p = 0; p < tab.properties.length; p++) {
+                        var prop = tab.properties[p];
+                        
+                        console.log("--- prop:", prop.alias, prop.value);
+                        
+                        prop.propertyAlias = prop.alias;
+                        prop.alias = $scope.model.alias + "___" + prop.alias;
+                        // Force validation to occur server side as this is the
+                        // only way we can have consistency between mandatory and
+                        // regex validation messages. Not ideal, but it works.
+                        prop.validation = {
+                            mandatory: false,
+                            pattern: ""
+                        };
+                        
+                        if (item && item[prop.propertyAlias]) {
+                            
+                            console.log("setting property: ", prop.propertyAlias, item[prop.propertyAlias]);
                             prop.value = item[prop.propertyAlias];
                         }
                     }
                 }
             }
-
+            
+            console.log("initNode node:", node);
+            
             $scope.nodes.push(node);
 
             return node;
         }
+        
+        function convertNodeIntoNCEntry(node) {
+            var obj = {
+                key: node.key,
+                name: node.name,
+                ncContentTypeAlias: node.contentTypeAlias
+            };
+            for (var t = 0; t < node.variants[0].tabs.length; t++) {
+                var tab = node.variants[0].tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+                    if (typeof prop.value !== "function") {
+                        obj[prop.propertyAlias] = prop.value;
+                    }
+                }
+            }
+            console.log(obj);
+            return obj;
+        }
 
-        var updateModel = function () {
+        function updateModel() {
             if ($scope.realCurrentNode) {
                 $scope.$broadcast("ncSyncVal", { key: $scope.realCurrentNode.key });
             }
             if (inited) {
                 var newValues = [];
                 for (var i = 0; i < $scope.nodes.length; i++) {
-                    var node = $scope.nodes[i];
-                    var newValue = {
-                        key: node.key,
-                        name: node.name,
-                        ncContentTypeAlias: node.ncContentTypeAlias
-                    };
-                    for (var t = 0; t < node.tabs.length; t++) {
-                        var tab = node.tabs[t];
-                        for (var p = 0; p < tab.properties.length; p++) {
-                            var prop = tab.properties[p];
-                            if (typeof prop.value !== "function") {
-                                newValue[prop.propertyAlias] = prop.value;
-                            }
-                        }
-                    }
-                    newValues.push(newValue);
+                    newValues.push(convertNodeIntoNCEntry($scope.nodes[i]));
                 }
                 $scope.model.value = newValues;
             }
@@ -428,23 +486,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.$on("$destroy", function () {
             unsubscribe();
         });
-
-        // TODO: Move this into a shared location?
-        var UUID = (function () {
-            var self = {};
-            var lut = []; for (var i = 0; i < 256; i++) { lut[i] = (i < 16 ? "0" : "") + (i).toString(16); }
-            self.generate = function () {
-                var d0 = Math.random() * 0xffffffff | 0;
-                var d1 = Math.random() * 0xffffffff | 0;
-                var d2 = Math.random() * 0xffffffff | 0;
-                var d3 = Math.random() * 0xffffffff | 0;
-                return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + "-" +
-                  lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + "-" + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + "-" +
-                  lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + "-" + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
-                  lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
-            }
-            return self;
-        })();
+        
     }
 
 ]);

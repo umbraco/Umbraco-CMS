@@ -12,10 +12,10 @@
             $scope.nodeContext = $scope.model;
 
             // Find the selected tab
-            var selectedTab = $scope.model.tabs[0];
+            var selectedTab = $scope.model.variants[0].tabs[0];
 
             if ($scope.tabAlias) {
-                angular.forEach($scope.model.tabs, function (tab) {
+                angular.forEach($scope.model.variants[0].tabs, function (tab) {
                     if (tab.alias.toLowerCase() === $scope.tabAlias.toLowerCase()) {
                         selectedTab = tab;
                         return;
@@ -32,8 +32,10 @@
                     // Tell inner controls we are submitting
                     $scope.$broadcast("formSubmitting", { scope: $scope });
 
+                    console.log("Form Submitting:: ", $scope.ngModel);
+                    
                     // Sync the values back
-                    angular.forEach($scope.ngModel.tabs, function (tab) {
+                    angular.forEach($scope.ngModel.variants[0].tabs, function (tab) {
                         if (tab.alias.toLowerCase() === selectedTab.alias.toLowerCase()) {
 
                             var localPropsMap = selectedTab.properties.reduce(function (map, obj) {
