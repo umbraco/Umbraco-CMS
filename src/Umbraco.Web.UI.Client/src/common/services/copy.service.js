@@ -64,52 +64,38 @@ function copyService(notificationsService, eventsService) {
             storage = new Object();
         }
         
-        
-        if(nodeType === "content" || nodeType === "element") {
-            if(data.contentTypeAlias === undefined) {
-                // missing contentTypeAlias... then we cant copy jet.
-                success = false;
-            }
-        }
-        
-        /**
-        Will need to store things differently...
-        
-        Can we copy real IpublishedContent...
-        
-        And should I wrap data into a entry-object knowing about the data type..
-        
-        */
-        
-        delete data.key;
-        delete data.$$hashKey;
-        
         if(storage.items === undefined) {
             storage.items = [];
         }
         
-        storage.items.push({nodeType:nodeType, data:data});
+        var shallowCloneData = Object.assign({}, data);// Notice only a shallow copy, since we dont need to deep copy. (that will happen when storing the data)
+        
+        delete shallowCloneData.key;
+        delete shallowCloneData.$$hashKey;
+        
+        var entry = {nodeType:nodeType, data:shallowCloneData};
+        storage.items.push(entry);
         
         if (saveStorage(storage) === true) {
-            notificationsService.success("", "Copied to clipboard.");
+            notificationsService.success("Clipboard", "Copied to clipboard.");
         } else {
-            notificationsService.success("", "Couldnt copy this data to clipboard.");
+            notificationsService.success("Clipboard", "Couldnt copy this data to clipboard.");
         }
         
     };
     
     service.supportsCopy = supportsLocalStorage;
     
-    service.hasDataOfType = function(nodeType, nodeTypeAliases) {
+    service.hasEntriesOfType = function(nodeType, nodeTypeAliases) {
         
-        if(service.retriveDataOfType(nodeType, nodeTypeAliases).length > 0) {
+        if(service.retriveEntriesOfType(nodeType, nodeTypeAliases).length > 0) {
             return true;
         }
         
         return false;
     };
     
-    service.retriveDataOfType = function(nodeType, nodeTypeAliases) {
+    service.retriveEntriesOfType = function(nodeType, nodeTypeAliases) {
         
         var storage = retriveStorage();
         
@@ -117,19 +103,22 @@ function copyService(notificationsService, eventsService) {
             return [];
         }
         
-        var itemsOfType = storage.items.filter(
+        var filteretEntries = storage.items.filter(
             (item) => item.nodeType === nodeType
         );
         if (nodeTypeAliases) {
-            return itemsOfType.filter(
+            filteretEntries = filteretEntries.filter(
                 (item) => {
                     return nodeTypeAliases.filter(alias => alias === item.data.contentTypeAlias).length > 0;
                 }
             );
-        } else {
-            return itemsOfType;
         }
-        
+        return filteretEntries;
+    };
+    
+    
+    service.retriveDataOfType = function(nodeType, nodeTypeAliases) {
+        return service.retriveEntriesOfType(nodeType, nodeTypeAliases).map((x) => x.data);
     };
     
     

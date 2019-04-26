@@ -113,7 +113,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.addNode = function (alias) {
             var scaffold = $scope.getScaffold(alias);
 
-            var newNode = initNode(scaffold, null);
+            var newNode = createNode(scaffold, null);
 
             $scope.currentNode = newNode;
             $scope.setDirty();
@@ -224,8 +224,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             if ($scope.nodes[idx].name !== name) {
                 $scope.nodes[idx].name = name;
             }
-
-
+            
             return name;
         };
         
@@ -281,6 +280,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.showPaste = false;
         
         $scope.clickCopy = function($event, node) {
+            
+            syncCurrentNode();
+            
             copyService.copy("elementType", node);
             $event.stopPropagation();
         }
@@ -293,16 +295,17 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return;
             }
             
-            console.log(newNode);
+            // generate a new key.
+            newNode.key = String.CreateGuid();
             
             $scope.nodes.push(newNode);
-            updatemodel();
+            //updateModel();// done by setting current node...
             
             $scope.currentNode = newNode;
         }
         
         function checkAbilityToPasteContent() {
-            $scope.showPaste = copyService.hasDataOfType("elementType", contentTypeAliases);
+            $scope.showPaste = copyService.hasEntriesOfType("elementType", contentTypeAliases);
         }
         
         eventsService.on("copyService.storageUpdate", checkAbilityToPasteContent);
@@ -373,7 +376,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                             // No such scaffold - the content type might have been deleted. We need to skip it.
                             continue;
                         }
-                        initNode(scaffold, item);
+                        createNode(scaffold, item);
                     }
                 }
 
@@ -394,27 +397,20 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 checkAbilityToPasteContent();
             }
         }
-
-        var initNode = function (scaffold, item) {
+        
+        function createNode(scaffold, fromNcEntry) {
             var node = angular.copy(scaffold);
             
-            node.key = item && item.key ? item.key : String.CreateGuid();
-            //node.ncContentTypeAlias = scaffold.contentTypeAlias;
+            node.key = fromNcEntry && fromNcEntry.key ? fromNcEntry.key : String.CreateGuid();
             
             for (var v = 0; v < node.variants.length; v++) {
                 var variant = node.variants[v];
                 
-                console.log("- variant:", variant);
-                
                 for (var t = 0; t < variant.tabs.length; t++) {
                     var tab = variant.tabs[t];
                     
-                    console.log("-- tab:", tab);
-                    
                     for (var p = 0; p < tab.properties.length; p++) {
                         var prop = tab.properties[p];
-                        
-                        console.log("--- prop:", prop.alias, prop.value);
                         
                         prop.propertyAlias = prop.alias;
                         prop.alias = $scope.model.alias + "___" + prop.alias;
@@ -426,16 +422,12 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                             pattern: ""
                         };
                         
-                        if (item && item[prop.propertyAlias]) {
-                            
-                            console.log("setting property: ", prop.propertyAlias, item[prop.propertyAlias]);
-                            prop.value = item[prop.propertyAlias];
+                        if (fromNcEntry && fromNcEntry[prop.propertyAlias]) {
+                            prop.value = fromNcEntry[prop.propertyAlias];
                         }
                     }
                 }
             }
-            
-            console.log("initNode node:", node);
             
             $scope.nodes.push(node);
 
@@ -457,14 +449,18 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     }
                 }
             }
-            console.log(obj);
             return obj;
         }
-
-        function updateModel() {
+        
+        function syncCurrentNode() {
             if ($scope.realCurrentNode) {
                 $scope.$broadcast("ncSyncVal", { key: $scope.realCurrentNode.key });
             }
+        }
+        
+        function updateModel() {
+            syncCurrentNode();
+            
             if (inited) {
                 var newValues = [];
                 for (var i = 0; i < $scope.nodes.length; i++) {

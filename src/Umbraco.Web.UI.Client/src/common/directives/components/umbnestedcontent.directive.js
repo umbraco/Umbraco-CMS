@@ -3,7 +3,7 @@
     function () {
 
         var link = function ($scope) {
-
+            
             // Clone the model because some property editors
             // do weird things like updating and config values
             // so we want to ensure we start from a fresh every
@@ -31,8 +31,6 @@
 
                     // Tell inner controls we are submitting
                     $scope.$broadcast("formSubmitting", { scope: $scope });
-
-                    console.log("Form Submitting:: ", $scope.ngModel);
                     
                     // Sync the values back
                     angular.forEach($scope.ngModel.variants[0].tabs, function (tab) {
