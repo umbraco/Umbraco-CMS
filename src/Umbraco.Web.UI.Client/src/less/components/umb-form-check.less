@@ -16,6 +16,7 @@
         margin: 0 0 0 26px;
         position: relative;
         top: 0;
+        user-select: none;
     }
 
     &__input {
@@ -23,14 +24,26 @@
         top: 0;
         left: 0;
         opacity: 0;
-
+        
+        &:hover ~ .umb-form-check__state .umb-form-check__check {
+            border-color: @inputBorderFocus;
+        }
         &:checked ~ .umb-form-check__state .umb-form-check__check {
             border-color: @ui-option-type;
+        }
+        &:checked:hover ~ .umb-form-check__state .umb-form-check__check {
+            &::before {
+                background: @ui-option-type-hover;
+            }
         }
 
         &:focus:checked ~ .umb-form-check .umb-form-check__check,
         &:focus ~ .umb-form-check__state .umb-form-check__check {
             border-color: @inputBorderFocus;
+            
+            .tabbing-active & {
+                outline: 2px solid @inputBorderTabFocus;
+            }
         }
 
         &:checked ~ .umb-form-check__state {
