@@ -13,6 +13,7 @@ using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -36,6 +37,7 @@ namespace Umbraco.Web.Security
         /// <param name="userMembershipProvider"></param>
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             ServiceContext services,
+            UmbracoMapper mapper,
             IContentSection contentSettings,
             IGlobalSettings globalSettings,
             MembershipProviderBase userMembershipProvider)
@@ -52,6 +54,7 @@ namespace Umbraco.Web.Security
                     services.EntityService,
                     services.ExternalLoginService,
                     userMembershipProvider,
+                    mapper,
                     contentSettings,
                     globalSettings));
 

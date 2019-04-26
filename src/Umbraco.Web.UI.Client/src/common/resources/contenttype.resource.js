@@ -344,6 +344,12 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "Import", { file: file })),
                 "Failed to import document type " + file
             );
+        },
+
+        createDefaultTemplate: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateDefaultTemplate", { id: id })),
+                'Failed to create default template for content type with id ' + id);
         }
     };
 }

@@ -329,7 +329,8 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 filter: '',
                 orderDirection: "Ascending",
                 orderBy: "SortOrder",
-                orderBySystemField: true
+                orderBySystemField: true,
+                ignoreUserStartNodes: false
             };
             if (options === undefined) {
                 options = {};
@@ -367,6 +368,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                               "GetChildren",
                               [
                                     { id: parentId },
+                                    { ignoreUserStartNodes: options.ignoreUserStartNodes },
                                     { pageNumber: options.pageNumber },
                                     { pageSize: options.pageSize },
                                     { orderBy: options.orderBy },

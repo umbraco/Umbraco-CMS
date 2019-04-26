@@ -33,7 +33,7 @@ angular.module("umbraco.directives")
 						viewport:{},
 						margin: 20,
 						scale: {
-							min: 0, //0.3,
+							min: 0,
 							max: 3,
 							current: 1
 						}
@@ -180,20 +180,6 @@ angular.module("umbraco.directives")
 						// Update min and max based on original width/height
 						scope.dimensions.scale.min = ratioCalculation.ratio;
                         scope.dimensions.scale.max = 2;
-                        
-                        //if (sliderRef) {
-
-                        //    // Set slider handle position
-                        //    sliderRef.noUiSlider.set(scope.dimensions.scale.current);
-                            
-                        //    // Update slider range min/max
-                        //    sliderRef.noUiSlider.updateOptions({
-                        //        "range": {
-                        //            "min": scope.dimensions.scale.min,
-                        //            "max": scope.dimensions.scale.max
-                        //        }
-                        //    });
-                        //}
 					};
 
 					var validatePosition = function(left, top){
