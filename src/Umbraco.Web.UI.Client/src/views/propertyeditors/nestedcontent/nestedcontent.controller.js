@@ -173,7 +173,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.deleteNode = function (idx) {
             if ($scope.nodes.length > $scope.model.config.minItems) {
-                if ($scope.model.config.confirmDeletes) {
+                if (Object.toBoolean($scope.model.config.confirmDeletes)) {
                     localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
                         const overlay = {
                             title: data[1],
