@@ -65,8 +65,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "contentResource",
     "localizationService",
     "iconHelper",
+    "overlayService",
 
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, overlayService) {
 
         var inited = false;
 
@@ -172,13 +173,26 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.deleteNode = function (idx) {
             if ($scope.nodes.length > $scope.model.config.minItems) {
-                if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes === 1) {
-                    localizationService.localize("content_nestedContentDeleteItem").then(function (value) {
-                        if (confirm(value)) {
-                            $scope.nodes.splice(idx, 1);
-                            $scope.setDirty();
-                            updateModel();
-                        }
+                if ($scope.model.config.confirmDeletes) {
+                    localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
+                        const overlay = {
+                            title: data[1],
+                            content: data[0],
+                            closeButtonLabel: data[2],
+                            submitButtonLabel: data[3],
+                            submitButtonStyle: "danger",
+                            close: function () {
+                                overlayService.close();
+                            },
+                            submit: function () {
+                                $scope.nodes.splice(idx, 1);
+                                $scope.setDirty();
+                                updateModel();
+                                overlayService.close();
+                            }
+                        };
+
+                        overlayService.open(overlay);
                     });
                 } else {
                     $scope.nodes.splice(idx, 1);
