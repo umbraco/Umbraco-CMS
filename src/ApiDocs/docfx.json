@@ -11,7 +11,7 @@
           "exclude": [
             "**/obj/**",
             "**/bin/**",
-            "_site/**"
+            "../../build.tmp/_site/**"
           ]
         }
       ],
@@ -36,7 +36,7 @@
         ],
         "exclude": [
           "obj/**",
-          "_site/**"
+          "../../build.tmp/_site/**"
         ]
       }
     ],
@@ -47,7 +47,7 @@
         ],
         "exclude": [
           "obj/**",
-          "_site/**"
+          "../../build.tmp/_site/**"
         ]
       }
     ],
@@ -58,7 +58,7 @@
         ],
         "exclude": [
           "obj/**",
-          "_site/**"
+          "../../build.tmp/_site/**"
         ]
       }
     ],
@@ -67,7 +67,7 @@
       "_enableSearch": true,
       "_disableContribution": false
     },
-    "dest": "_site",
+    "dest": "../../build.tmp/_site",
     "template": [
       "default", "umbracotemplate"
     ]
