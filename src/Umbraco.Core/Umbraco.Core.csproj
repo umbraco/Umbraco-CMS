@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
-        <TargetFramework>net472</TargetFramework>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
-    <PropertyGroup>
+    <PropertyGroup>        
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/umbraco/Umbraco-CMS.git</RepositoryUrl>
     </PropertyGroup>
@@ -54,10 +55,7 @@
     <!-- Nuget Packages-->
     <!-- note: NuGet deals with transitive references now -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
 
         <PackageReference Include="Umbraco.Code">
             <Version>1.0.5</Version>
