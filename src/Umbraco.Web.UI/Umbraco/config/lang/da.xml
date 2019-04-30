@@ -996,6 +996,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="noColors">Du har ikke konfigureret nogen godkendte farver</key>
   </area>
   <area alias="contentPicker">
+    <key alias="allowedItemTypes">Du kan kun vælge følgende type(r) dokumenter: %0%</key>
     <key alias="pickedTrashedItem">Du har valgt et dokument som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
   </area>

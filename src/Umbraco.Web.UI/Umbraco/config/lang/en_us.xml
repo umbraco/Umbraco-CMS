@@ -1253,6 +1253,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noColors">You have not configured any approved colors</key>
   </area>
   <area alias="contentPicker">
+    <key alias="allowedItemTypes">You can only select items of type(s): %0%</key>
     <key alias="pickedTrashedItem">You have picked a content item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
   </area>
