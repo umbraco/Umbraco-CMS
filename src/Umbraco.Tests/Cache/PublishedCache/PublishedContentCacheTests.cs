@@ -81,6 +81,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 new WebSecurity(_httpContextFactory.HttpContext, Current.Services.UserService, globalSettings),
                 umbracoSettings,
                 Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor());
 

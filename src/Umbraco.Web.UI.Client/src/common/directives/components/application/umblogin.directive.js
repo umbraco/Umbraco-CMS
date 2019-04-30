@@ -126,6 +126,7 @@
         function togglePassword() {
             var elem = $("form[name='vm.loginForm'] input[name='password']");
             elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
+            elem.focus();
             $(".password-text.show, .password-text.hide").toggle();
         }
 

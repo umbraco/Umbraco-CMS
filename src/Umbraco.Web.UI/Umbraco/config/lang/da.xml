@@ -86,7 +86,7 @@
     <key alias="addNew">Tilføj nyt domæne</key>
     <key alias="remove">fjern</key>
     <key alias="invalidNode">Ugyldig node.</key>
-    <key alias="invalidDomain">Ugyldigt domæne-format.</key>
+    <key alias="invalidDomain">Et eller flere domæner har et ugyldigt format.</key>
     <key alias="duplicateDomain">Domæne er allerede blevet tildelt.</key>
     <key alias="language">Sprog</key>
     <key alias="domain">Domæne</key>
@@ -95,7 +95,8 @@
     <key alias="domainExists">Domænet '%0%' er oprettet</key>
     <key alias="domainUpdated">Domænet '%0%' er nu opdateret</key>
     <key alias="orEdit">eller rediger nuværende domæner</key>
-    <key alias="domainHelp">f.eks. ditdomaene.com, www.ditdomaene.com</key>
+    <key alias="domainHelpWithVariants"><![CDATA[Gyldige domænenavne er: "example.com", "www.example.com", "example.com:8080" eller "https://www.example.com/".
+     Yderlgiere understøttes også første niveau af stien efter domænet, f.eks. "Example.com/en" eller "/en". ]]></key>
     <key alias="inherit">Nedarv</key>
     <key alias="setLanguage">Sprog</key>
     <key alias="setLanguageHelp"><![CDATA[Indstil sproget for noder under den aktuelle node,<br /> eller nedarv sprog fra forældre noder. Gælder også<br />
@@ -262,6 +263,7 @@
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Hvad betyder det?</a>]]></key>
     <key alias="nestedContentDeleteItem">Er du sikker på, at du vil slette dette element?</key>
     <key alias="nestedContentEditorNotSupported">Egenskaben %0% anvender editoren %1% som ikke er understøttet af Nested Content.</key>
+    <key alias="nestedContentNoContentTypes">Der er ikke konfigureret nogen indholdstyper for denne egenskab.</key>
     <key alias="addTextBox">Tilføj en ny tekstboks</key>
     <key alias="removeTextBox">Fjern denne tekstboks</key>
     <key alias="contentRoot">Indholdsrod</key>
@@ -502,13 +504,6 @@
     <key alias="generatingAlias">Genererer alias...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Tilladte typer</key>
-    <key alias="create">Opret</key>
-    <key alias="deletetab">Slet fane</key>
-    <key alias="description">Beskrivelse</key>
-    <key alias="newtab">Ny fane</key>
-    <key alias="tab">Fane</key>
-    <key alias="thumbnail">Thumbnail</key>
     <key alias="createListView" version="7.2">Opret brugerdefineret listevisning</key>
     <key alias="removeListView" version="7.2">Fjern brugerdefineret listevisning</key>
   </area>
@@ -608,6 +603,7 @@
     <key alias="first">Første</key>
     <key alias="general">Generelt</key>
     <key alias="groups">Grupper</key>
+    <key alias="group">Gruppe</key>
     <key alias="height">Højde</key>
     <key alias="help">Hjælp</key>
     <key alias="hide">Skjul</key>
@@ -1000,6 +996,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="noColors">Du har ikke konfigureret nogen godkendte farver</key>
   </area>
   <area alias="contentPicker">
+    <key alias="allowedItemTypes">Du kan kun vælge følgende type(r) dokumenter: %0%</key>
     <key alias="pickedTrashedItem">Du har valgt et dokument som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
   </area>
@@ -1278,6 +1275,7 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompositioner</key>
+    <key alias="group">Gruppe</key>
     <key alias="noGroups">Du har ikke tilføjet nogle grupper</key>
     <key alias="addGroup">Tilføj gruppe</key>
     <key alias="inheritedFrom">Nedarvet fra</key>
@@ -1315,6 +1313,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberCanEdit">Medlem kan redigere</key>
     <key alias="showOnMemberProfile">Vis på medlemsprofil</key>
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
+    <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
     <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet</key>
     <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>
@@ -1337,6 +1336,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="enterMacroName">Indtast makronavn</key>
     <key alias="parameters">Parametre</key>
     <key alias="parametersDescription">Definer de parametre, der skal være tilgængelige, når du bruger denne makro.</key>
+    <key alias="selectViewFile">Vælg partial view makrofil</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>
@@ -1568,7 +1568,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="emptyDictionaryTree">Ingen ordbog elementer at vælge imellem</key>
   </area>
   <area alias="textbox">
-    <key alias="characters_left">Karakterer tilbage</key>
+    <key alias="characters_left"><![CDATA[<strong>%0%</strong> tegn tilbage.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maksimum %0% tegn, <strong>%1%</strong> for mange.]]></key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
@@ -1598,7 +1599,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="mediaFolderBrowser">Indhold</key>
     <key alias="settingsWelcome">Velkommen</key>
     <key alias="settingsExamine">Examine Management</key>
-    <key alias="settingsPublishedStatus">Published Status</key>
+    <key alias="settingsPublishedStatus">Published Cache</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
     <key alias="memberIntro">Kom godt i gang</key>
