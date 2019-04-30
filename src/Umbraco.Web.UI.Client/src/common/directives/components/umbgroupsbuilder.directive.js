@@ -1,13 +1,17 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService, editorService) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, 
+      dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, 
+      localizationService, editorService, eventsService) {
     
     function link(scope, el, attr, ctrl) {
-
+        
+        var eventBindings = [];
         var validationTranslated = "";
         var tabNoSortOrderTranslated = "";
 
+      scope.dataTypeHasChanged = false;
       scope.sortingMode = false;
       scope.toolbar = [];
       scope.sortableOptionsGroup = {};
@@ -613,18 +617,44 @@
           });
         });
       }
-
-
-      var unbindModelWatcher = scope.$watch('model', function(newValue, oldValue) {
-        if (newValue !== undefined && newValue.groups !== undefined) {
-          activate();
+      
+        function hasPropertyOfDataTypeId(dataTypeId) {
+            
+            // look at each property
+            var result = _.filter(scope.model.groups, function(group) {
+                return _.filter(group.properties, function(property) {
+                    return (property.dataTypeId === dataTypeId);
+                });
+            });
+            
+            return (result.length > 0);
         }
-      });
 
-      // clean up
-      scope.$on('$destroy', function(){
-        unbindModelWatcher();
-      });
+
+        eventBindings.push(scope.$watch('model', function(newValue, oldValue) {
+            if (newValue !== undefined && newValue.groups !== undefined) {
+                activate();
+            }
+        }));
+        
+        // clean up
+        eventBindings.push(eventsService.on("editors.dataTypeSettings.saved", function (name, args) {
+            if(hasPropertyOfDataTypeId(args.dataType.id)) {
+                scope.dataTypeHasChanged = true;
+            }
+        }));
+        
+        // clean up
+        eventBindings.push(scope.$on('$destroy', function() {
+            for(var e in eventBindings) {
+                eventBindings[e]();
+            }
+            // if a dataType has changed, we want to notify which properties that are affected by this dataTypeSettings change
+            if(scope.dataTypeHasChanged === true) {
+                var args = {documentType: scope.model};
+                eventsService.emit("editors.documentType.saved", args);
+            }
+        }));
 
     }
 

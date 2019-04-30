@@ -38,7 +38,7 @@
                         <span>{{vm.currentVariant.language.name}}</span>
                     </span>
 
-                    <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                    <umb-dropdown ng-if="vm.dropdownOpen" style="min-width: 100%; max-height: 250px; overflow-y: auto; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                         <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active, 'umb-variant-switcher_item--not-allowed': variantIsOpen(variant.language.culture)}" ng-repeat="variant in content.variants">
                             <a href="" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
                                 <span class="umb-variant-switcher__name" ng-class="{'bold': variant.language.isDefault}">{{variant.language.name}}</span>

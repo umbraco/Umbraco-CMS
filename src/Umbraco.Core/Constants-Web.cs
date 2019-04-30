@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace Umbraco.Core
+﻿namespace Umbraco.Core
 {
     public static partial class Constants
     {
@@ -22,7 +19,6 @@ namespace Umbraco.Core
             public const string PreviewCookieName = "UMB_PREVIEW";
 
             public const string InstallerCookieName = "umb_installId";
-
         }
     }
 }

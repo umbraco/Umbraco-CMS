@@ -7,6 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
@@ -56,6 +57,9 @@ namespace Umbraco.Web.WebApi
             Logger = logger;
             RuntimeState = runtimeState;
             Umbraco = umbracoHelper;
+
+            // fixme - can we break all ctors?
+            Mapper = Current.Mapper;
         }
 
         /// <summary>
@@ -119,6 +123,11 @@ namespace Umbraco.Web.WebApi
         /// Gets the Umbraco helper.
         /// </summary>
         public UmbracoHelper Umbraco { get; }
+
+        /// <summary>
+        /// Gets the mapper.
+        /// </summary>
+        public UmbracoMapper Mapper { get; }
 
         /// <summary>
         /// Gets the web security helper.

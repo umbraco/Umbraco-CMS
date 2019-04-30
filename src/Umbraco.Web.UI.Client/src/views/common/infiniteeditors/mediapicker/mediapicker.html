@@ -64,15 +64,15 @@
                         </li>
 
                         <li class="umb-breadcrumbs__ancestor" ng-show="!lockedFolder">
-                            <a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
+                            <a href ng-hide="model.showFolderInput" ng-click="model.showFolderInput = true">
                                 <i class="icon icon-add small"></i>
                             </a>
 
-                            <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="showFolderInput" ng-model="model.newFolderName" ng-keydown="enterSubmitFolder($event)"
-                                ng-blur="submitFolder()" focus-when="{{showFolderInput}}" />
+                            <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="model.showFolderInput" ng-model="model.newFolderName" ng-keydown="enterSubmitFolder($event)"
+                                ng-blur="submitFolder()" focus-when="{{model.showFolderInput}}" />
                         </li>
                     </ul>
-                    <div class="umb-loader" ng-if="creatingFolder"></div>
+                    <div class="umb-loader" ng-if="model.creatingFolder"></div>
                 </div>
 
                 <umb-file-dropzone

@@ -440,6 +440,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new WebSecurity(http, Current.Services.UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor());
 

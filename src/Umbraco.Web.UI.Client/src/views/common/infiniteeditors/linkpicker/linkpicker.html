@@ -49,13 +49,11 @@
                     </umb-control-group>
                 
                     <umb-control-group ng-if="showTarget" label="@content_target">
-                        <label class="checkbox no-indent">
-                            <input type="checkbox"
-                                    ng-model="model.target.target"
-                                    ng-true-value="'_blank'"
-                                    ng-false-value="" /> 
-                            <localize key="defaultdialogs_openInNewWindow">Opens the linked document in a new window or tab</localize>
-                        </label>
+                        <umb-checkbox
+                                      model="vm.openInNewWindow"
+                                      on-change="vm.toggleOpenInNewWindow(model, value)"
+                                      text="{{vm.labels.openInNewWindow}}">
+                        </umb-checkbox>
                     </umb-control-group>
 
                     <div class="umb-control-group">
@@ -68,6 +66,7 @@
                                 search-from-id="{{searchInfo.searchFromId}}"
                                 search-from-name="{{searchInfo.searchFromName}}"
                                 show-search="{{searchInfo.showSearch}}"
+                                ignore-user-start-nodes="{{searchInfo.ignoreUserStartNodes}}"
                                 section="{{section}}">
                             </umb-tree-search-box>
                 
@@ -84,6 +83,7 @@
                                     section="content"
                                     hideheader="true"
                                     hideoptions="true"
+                                    customtreeparams="{{customTreeParams}}"
                                     api="dialogTreeApi"
                                     on-init="onTreeInit()"
                                     enablelistviewexpand="true"

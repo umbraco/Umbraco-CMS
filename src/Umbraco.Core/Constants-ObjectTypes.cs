@@ -123,7 +123,6 @@ namespace Umbraco.Core
             public static readonly Guid Template = new Guid(Strings.Template);
 
             public static readonly Guid ContentItem = new Guid(Strings.ContentItem);
-
         }
     }
 }

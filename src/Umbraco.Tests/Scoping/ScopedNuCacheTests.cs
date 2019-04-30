@@ -118,6 +118,7 @@ namespace Umbraco.Tests.Scoping
                 new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
                 umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor());
 
