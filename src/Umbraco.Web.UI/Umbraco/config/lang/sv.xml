@@ -43,7 +43,6 @@
     <key alias="domainCreated">Har skapat domännamnet %0%</key>
     <key alias="domainDeleted">Har tagit bort domännamnet %0%</key>
     <key alias="domainExists">Domänen %0% är redan tillagd</key>
-    <key alias="domainHelp">t.ex.: dittdomannamn.se, www.dittdomannamn.se</key>
     <key alias="domainUpdated">Domännamnet %0% har uppdaterats</key>
     <key alias="duplicateDomain">Domänen är redan tilldelad</key>
     <key alias="inherit">Ärv</key>
@@ -258,15 +257,8 @@
     <key alias="displayName">Språknamn</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Tillåtna typer för underliggande noder</key>
-    <key alias="create">Skapa</key>
     <key alias="createListView">Skapa en anpassad listvy</key>
-    <key alias="deletetab">Ta bort flik</key>
-    <key alias="description">Beskrivning</key>
-    <key alias="newtab">Ny flik</key>
     <key alias="removeListView">Radera anpassad listvy</key>
-    <key alias="tab">Flik</key>
-    <key alias="thumbnail">Miniatyrbild</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Lägg till värde</key>

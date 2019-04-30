@@ -20,7 +20,7 @@ namespace Umbraco.Core
 
             internal static Dictionary<string, UdiType> GetTypes()
             {
-                return new Dictionary<string,UdiType>
+                return new Dictionary<string, UdiType>
                 {
                     { Unknown, UdiType.Unknown },
 

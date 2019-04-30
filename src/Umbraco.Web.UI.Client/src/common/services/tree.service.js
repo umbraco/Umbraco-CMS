@@ -29,6 +29,15 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
         return cacheKey;
     }
 
+    // Adapted from: https://stackoverflow.com/a/2140723
+    // Please note, we can NOT test this functionality correctly in Phantom because it implements
+    // the localeCompare method incorrectly: https://github.com/ariya/phantomjs/issues/11063
+    function invariantEquals(a, b) {
+        return typeof a === "string" && typeof b === "string"
+            ? a.localeCompare(b, undefined, { sensitivity: "base" }) === 0
+            : a === b;
+    }
+
     return {
 
         /** Internal method to return the tree cache */
@@ -165,8 +174,8 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 Umbraco.Sys.ServerVariables.umbracoPlugins.trees &&
                 angular.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
 
-                var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function(item) {
-                    return item.alias === treeAlias;
+                var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function (item) {
+                    return invariantEquals(item.alias, treeAlias);
                 });
 
                 return found ? found.packageFolder : undefined;

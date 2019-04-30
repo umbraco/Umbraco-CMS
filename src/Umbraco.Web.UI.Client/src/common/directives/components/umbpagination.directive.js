@@ -91,6 +91,10 @@ Use this directive to generate a pagination.
       function link(scope, el, attr, ctrl) {
 
          function activate() {
+            // page number is sometimes a string - let's make sure it's an int before we do anything with it
+            if (scope.pageNumber) {
+                scope.pageNumber = parseInt(scope.pageNumber);
+            }
 
             scope.pagination = [];
              

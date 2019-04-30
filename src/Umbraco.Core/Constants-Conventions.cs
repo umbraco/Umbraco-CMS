@@ -92,10 +92,10 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string Extension = "umbracoExtension";
 
-				/// <summary>
-				/// The default height/width of an image file if the size can't be determined from the metadata
-				/// </summary>
-				public const int DefaultSize = 200;
+                /// <summary>
+                /// The default height/width of an image file if the size can't be determined from the metadata
+                /// </summary>
+                public const int DefaultSize = 200;
             }
 
             /// <summary>
@@ -209,71 +209,71 @@ namespace Umbraco.Core
                 public static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
                 {
                     return new Dictionary<string, PropertyType>
+                    {
                         {
+                            Comments,
+                            new PropertyType(PropertyEditors.Aliases.TextArea, ValueStorageType.Ntext, true, Comments)
                             {
-                                Comments,
-                                new PropertyType(PropertyEditors.Aliases.TextArea, ValueStorageType.Ntext, true, Comments)
-                                    {
-                                        Name = CommentsLabel
-                                    }
-                            },
-                            {
-                                FailedPasswordAttempts,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Integer, true, FailedPasswordAttempts)
-                                    {
-                                        Name = FailedPasswordAttemptsLabel
-                                    }
-                            },
-                            {
-                                IsApproved,
-                                new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsApproved)
-                                    {
-                                        Name = IsApprovedLabel
-                                    }
-                            },
-                            {
-                                IsLockedOut,
-                                new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsLockedOut)
-                                    {
-                                        Name = IsLockedOutLabel
-                                    }
-                            },
-                            {
-                                LastLockoutDate,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLockoutDate)
-                                    {
-                                        Name = LastLockoutDateLabel
-                                    }
-                            },
-                            {
-                                LastLoginDate,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLoginDate)
-                                    {
-                                        Name = LastLoginDateLabel
-                                    }
-                            },
-                            {
-                                LastPasswordChangeDate,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastPasswordChangeDate)
-                                    {
-                                        Name = LastPasswordChangeDateLabel
-                                    }
-                            },
-                            {
-                                PasswordAnswer,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordAnswer)
-                                    {
-                                        Name = PasswordAnswerLabel
-                                    }
-                            },
-                            {
-                                PasswordQuestion,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordQuestion)
-                                    {
-                                        Name = PasswordQuestionLabel
-                                    }
+                                Name = CommentsLabel
                             }
-                        };
+                        },
+                        {
+                            FailedPasswordAttempts,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Integer, true, FailedPasswordAttempts)
+                            {
+                                Name = FailedPasswordAttemptsLabel
+                            }
+                        },
+                        {
+                            IsApproved,
+                            new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsApproved)
+                            {
+                                Name = IsApprovedLabel
+                            }
+                        },
+                        {
+                            IsLockedOut,
+                            new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsLockedOut)
+                            {
+                                Name = IsLockedOutLabel
+                            }
+                        },
+                        {
+                            LastLockoutDate,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLockoutDate)
+                            {
+                                Name = LastLockoutDateLabel
+                            }
+                        },
+                        {
+                            LastLoginDate,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLoginDate)
+                            {
+                                Name = LastLoginDateLabel
+                            }
+                        },
+                        {
+                            LastPasswordChangeDate,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastPasswordChangeDate)
+                            {
+                                Name = LastPasswordChangeDateLabel
+                            }
+                        },
+                        {
+                            PasswordAnswer,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordAnswer)
+                            {
+                                Name = PasswordAnswerLabel
+                            }
+                        },
+                        {
+                            PasswordQuestion,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordQuestion)
+                            {
+                                Name = PasswordQuestionLabel
+                            }
+                        }
+                    };
                 }
             }
 

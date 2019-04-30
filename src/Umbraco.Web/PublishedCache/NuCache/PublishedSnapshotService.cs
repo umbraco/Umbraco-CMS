@@ -330,14 +330,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadContent(Action<IScope> action)
         {
-            using (_contentStore.GetWriter(_scopeProvider))
+            // first get a writer, then a scope
+            // if there already is a scope, the writer will attach to it
+            // otherwise, it will only exist here - cheap
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.ContentTree);
-                    action(scope);
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.ContentTree);
+                action(scope);
+                scope.Complete();
             }
         }
 
@@ -355,6 +356,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _logger.Debug<PublishedSnapshotService>("Loading content from database...");
             var sw = Stopwatch.StartNew();
+            // IMPORTANT GetAllContentSources sorts kits by level
             var kits = _dataSource.GetAllContentSources(scope);
             _contentStore.SetAll(kits);
             sw.Stop();
@@ -369,7 +371,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _logger.Debug<PublishedSnapshotService>("Loading content from local db...");
             var sw = Stopwatch.StartNew();
-            var kits = _localContentDb.Select(x => x.Value).OrderBy(x => x.Node.Level);
+            var kits = _localContentDb.Select(x => x.Value)
+                .OrderBy(x => x.Node.Level); // IMPORTANT sort by level
             _contentStore.SetAll(kits);
             sw.Stop();
             _logger.Debug<PublishedSnapshotService>("Loaded content from local db ({Duration}ms)", sw.ElapsedMilliseconds);
@@ -399,14 +402,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadMedia(Action<IScope> action)
         {
-            using (_mediaStore.GetWriter(_scopeProvider))
+            // see note in LockAndLoadContent
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.MediaTree);
-                    action(scope);
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.MediaTree);
+                action(scope);
+                scope.Complete();
             }
         }
 
@@ -422,6 +424,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _logger.Debug<PublishedSnapshotService>("Loading media from database...");
             var sw = Stopwatch.StartNew();
+            // IMPORTANT GetAllMediaSources sorts kits by level
             var kits = _dataSource.GetAllMediaSources(scope);
             _mediaStore.SetAll(kits);
             sw.Stop();
@@ -436,7 +439,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _logger.Debug<PublishedSnapshotService>("Loading media from local db...");
             var sw = Stopwatch.StartNew();
-            var kits = _localMediaDb.Select(x => x.Value);
+            var kits = _localMediaDb.Select(x => x.Value)
+                .OrderBy(x => x.Node.Level); // IMPORTANT sort by level
             _mediaStore.SetAll(kits);
             sw.Stop();
             _logger.Debug<PublishedSnapshotService>("Loaded media from local db ({Duration}ms)", sw.ElapsedMilliseconds);
@@ -528,14 +532,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadDomains()
         {
-            using (_domainStore.GetWriter(_scopeProvider))
+            // see note in LockAndLoadContent
+            using (_domainStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
             {
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    scope.ReadLock(Constants.Locks.Domains);
-                    LoadDomainsLocked();
-                    scope.Complete();
-                }
+                scope.ReadLock(Constants.Locks.Domains);
+                LoadDomainsLocked();
+                scope.Complete();
             }
         }
 
@@ -587,7 +590,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
             }
 
-            using (_contentStore.GetWriter(_scopeProvider))
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
             {
                 NotifyLocked(payloads, out bool draftChanged2, out bool publishedChanged2);
                 draftChanged = draftChanged2;
@@ -648,6 +651,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (capture.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                     {
                         // ?? should we do some RV check here?
+                        // IMPORTANT GetbranchContentSources sorts kits by level
                         var kits = _dataSource.GetBranchContentSources(scope, capture.Id);
                         _contentStore.SetBranch(capture.Id, kits);
                     }
@@ -683,7 +687,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
             }
 
-            using (_mediaStore.GetWriter(_scopeProvider))
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
                 NotifyLocked(payloads, out bool anythingChanged2);
                 anythingChanged = anythingChanged2;
@@ -739,6 +743,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (capture.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                     {
                         // ?? should we do some RV check here?
+                        // IMPORTANT GetbranchContentSources sorts kits by level
                         var kits = _dataSource.GetBranchMediaSources(scope, capture.Id);
                         _mediaStore.SetBranch(capture.Id, kits);
                     }
@@ -804,7 +809,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (removedIds.Count == 0 && refreshedIds.Count == 0 && otherIds.Count == 0 && newIds.Count == 0) return;
 
-            using (store.GetWriter(_scopeProvider))
+            using (store.GetScopedWriteLock(_scopeProvider))
             {
                 // ReSharper disable AccessToModifiedClosure
                 action(removedIds, refreshedIds, otherIds, newIds);
@@ -825,8 +830,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     payload.Removed ? "Removed" : "Refreshed",
                     payload.Id);
 
-            using (_contentStore.GetWriter(_scopeProvider))
-            using (_mediaStore.GetWriter(_scopeProvider))
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
                 // TODO: need to add a datatype lock
                 // this is triggering datatypes reload in the factory, and right after we create some
@@ -858,7 +863,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_isReady == false)
                 return;
 
-            using (_domainStore.GetWriter(_scopeProvider))
+            // see note in LockAndLoadContent
+            using (_domainStore.GetScopedWriteLock(_scopeProvider))
             {
                 foreach (var payload in payloads)
                 {
@@ -1375,19 +1381,24 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
+                // the tree is locked, counting and comparing to total is safe
                 var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 var items = new List<ContentNuDto>();
+                var count = 0;
                 foreach (var c in descendants)
                 {
                     // always the edited version
                     items.Add(GetDto(c, false));
+
                     // and also the published version if it makes any sense
                     if (c.Published)
                         items.Add(GetDto(c, true));
+
+                    count++;
                 }
 
                 db.BulkInsertRecords(items);
-                processed += items.Count;
+                processed += count;
             } while (processed < total);
         }
 
@@ -1442,10 +1453,11 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
+                // the tree is locked, counting and comparing to total is safe
                 var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => GetDto(m, false)).ToArray();
+                var items = descendants.Select(m => GetDto(m, false)).ToList();
                 db.BulkInsertRecords(items);
-                processed += items.Length;
+                processed += items.Count;
             } while (processed < total);
         }
 
@@ -1614,14 +1626,14 @@ AND cmsContentNu.nodeId IS NULL
             var ce = _contentStore.Count;
             var me = _mediaStore.Count;
 
-            return "I'm feeling good, really." +
+            return
                 " Database cache is " + (dbCacheIsOk ? "ok" : "NOT ok (rebuild?)") + "." +
-                " ContentStore has " + cg + " generation" + (cg > 1 ? "s" : "") +
-                ", " + cs + " snapshot" + (cs > 1 ? "s" : "") +
-                " and " + ce + " entr" + (ce > 1 ? "ies" : "y") + "." +
-                " MediaStore has " + mg + " generation" + (mg > 1 ? "s" : "") +
-                ", " + ms + " snapshot" + (ms > 1 ? "s" : "") +
-                " and " + me + " entr" + (me > 1 ? "ies" : "y") + ".";
+                " ContentStore contains " + ce + " item" + (ce > 1 ? "s" : "") +
+                " and has " + cg + " generation" + (cg > 1 ? "s" : "") +
+                " and " + cs + " snapshot" + (cs > 1 ? "s" : "") + "." +
+                " MediaStore contains " + me + " item" + (ce > 1 ? "s" : "") +
+                " and has " + mg + " generation" + (mg > 1 ? "s" : "") +
+                " and " + ms + " snapshot" + (ms > 1 ? "s" : "") + ".";
         }
 
         public void Collect()

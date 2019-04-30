@@ -41,7 +41,11 @@
         }
         // convert to array
         $scope.sliderValue = $scope.model.value ? $scope.model.value.split(',') : null;
-
+        
+        // don't render values with decimal places if the step increment in a whole number
+        var stepDecimalPlaces = $scope.model.config.step % 1 == 0
+            ? 0
+            : _.last($scope.model.config.step.toString().replace(",", ".").split(".")).length;
         // setup default
         $scope.sliderOptions = {
             "start": start,
@@ -49,10 +53,10 @@
             "tooltips": tooltips,
             "format": {
                 to: function (value) {
-                    return Math.round(value);
+                    return value.toFixed(stepDecimalPlaces);
                 },
                 from: function (value) {
-                    return Math.round(value);
+                    return value;
                 }
             },
             "range": {

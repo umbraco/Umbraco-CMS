@@ -25,12 +25,27 @@
     height: @appHeaderHeight;
 }
 
-.umb-app-header__action a:hover,
-.umb-app-header__action a:focus {
+.umb-app-header__action a {
     outline: none;
+    &:focus {
+        .tabbing-active & {
+            .umb-app-header__action-icon::after {
+                content: '';
+                position: absolute;
+                z-index:10000;
+                top: -7px;
+                left: -7px;
+                width: 36px;
+                height: 35px;
+                border-radius: 3px;
+                box-shadow: 0 0 2px @pinkLight, inset 0 0 2px 1px @pinkLight;
+            }
+        }
+    }
 }
 
 .umb-app-header__action-icon {
+    position: relative;
     opacity: 0.8;
     color: @white;
     font-size: 22px;
