@@ -50,6 +50,8 @@
     <key alias="unlock">Unlock</key>
     <key alias="createblueprint">Create Content Template</key>
     <key alias="resendInvite">Resend Invitation</key>
+    <key alias="createEmpty">Create new</key>
+    <key alias="createFromClipboard">Paste from clipboard</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>

@@ -6,8 +6,10 @@
         ng-click="select(mediatype)"
         class="-three-in-row">
         <a class="umb-card-grid-item" href="" title="{{mediatype.name}}">
-            <i class="{{ mediatype.icon }}"></i>
-            {{ mediatype.name }}
+            <span>
+                <i class="{{ mediatype.icon }}"></i>
+                {{ mediatype.name }}
+            </span>
         </a>
       </li>
     </ul>

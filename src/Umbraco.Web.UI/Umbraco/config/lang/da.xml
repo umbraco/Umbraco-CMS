@@ -284,6 +284,8 @@
     <key alias="readyToSave">Klar til at gemme?</key>
     <key alias="sendForApproval">Send til godkendelse</key>
     <key alias="schedulePublishHelp">Vælg dato og klokkeslæt for at udgive og/eller afpublicere indholdet.</key>
+    <key alias="createEmpty">Opret ny</key>
+    <key alias="createFromClipboard">Indsæt fra udklipsmappen</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Opret en ny indholdsskabelon fra '%0%'</key>
