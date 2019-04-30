@@ -1275,6 +1275,7 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompositioner</key>
+    <key alias="group">Gruppe</key>
     <key alias="noGroups">Du har ikke tilføjet nogle grupper</key>
     <key alias="addGroup">Tilføj gruppe</key>
     <key alias="inheritedFrom">Nedarvet fra</key>
@@ -1312,6 +1313,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberCanEdit">Medlem kan redigere</key>
     <key alias="showOnMemberProfile">Vis på medlemsprofil</key>
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
+    <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
     <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet</key>
     <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>

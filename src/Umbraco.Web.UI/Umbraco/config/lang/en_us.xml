@@ -1553,6 +1553,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
+    <key alias="group">Group</key>
     <key alias="noGroups">You have not added any groups</key>
     <key alias="addGroup">Add group</key>
     <key alias="inheritedFrom">Inherited from</key>
@@ -1601,6 +1602,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="variantsHeading">Allow varying by culture</key>
     <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
+    <key alias="elementType">Element type</key>
     <key alias="elementHeading">Is an Element type</key>
     <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
     <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
