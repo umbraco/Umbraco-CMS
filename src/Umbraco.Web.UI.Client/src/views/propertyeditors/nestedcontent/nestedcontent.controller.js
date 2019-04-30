@@ -99,7 +99,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.wideMode = Object.toBoolean($scope.model.config.hideLabel);
 
         $scope.labels = {};
-        localizationService.localizeMany(["grid_insertControl"]).then(function(data) {
+        localizationService.localizeMany(["grid_addElement"]).then(function(data) {
             $scope.labels.docTypePickerTitle = data[0];
         });
 
