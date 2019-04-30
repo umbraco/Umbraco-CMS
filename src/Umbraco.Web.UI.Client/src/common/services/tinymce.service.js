@@ -453,6 +453,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
                     }
 				    editor.dom.setAttrib(imgElm, 'id', null);
+                    
+                    editor.fire('Change');
+                    
                 }, 500);
             }
         },
@@ -1257,6 +1260,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     view: 'views/propertyeditors/rte/codeeditor.html',
                     submit: function (model) {
                         args.editor.setContent(model.content);
+                        args.editor.fire('Change');
                         editorService.close();
                     },
                     close: function () {

@@ -9,7 +9,7 @@
 
                 <div class="umb-nested-content__header-bar" ng-click="$parent.editNode($index)" ng-hide="$parent.singleMode">
 
-                    <div class="umb-nested-content__heading" ng-class="{'-with-icon': showIcons}"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-bind="$parent.getName($index)"></span></div>
+                    <div class="umb-nested-content__heading"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-bind="$parent.getName($index)"></span></div>
 
                     <div class="umb-nested-content__icons">
                         <a class="umb-nested-content__icon umb-nested-content__icon--edit" localize="title" title="general_edit" ng-class="{ 'umb-nested-content__icon--active' : $parent.realCurrentNode.id == node.id }" ng-click="$parent.editNode($index); $event.stopPropagation();" ng-show="$parent.maxItems > 1" prevent-default>
@@ -37,17 +37,11 @@
                 <localize key="content_nestedContentNoContentTypes"></localize>
             </div>
         </div>
-
-        <div ng-show="hasContentTypes">
-            <div class="umb-nested-content__help-text" ng-show="nodes.length == 0">
+		
+        <div class="umb-nested-content__footer-bar" ng-hide="nodes.length >= maxItems">
+            <a href class="umb-nested-content__add-content" ng-class="{ '--disabled': !scaffolds.length }" ng-click="openNodeTypePicker($event)" prevent-default>
                 <localize key="grid_addElement"></localize>
-            </div>
-
-            <div class="umb-nested-content__footer-bar" ng-hide="nodes.length >= maxItems">
-                <a href class="umb-nested-content__icon" ng-click="openNodeTypePicker($event)" prevent-default>
-                    <i class="icon icon-add"></i>
-                </a>
-            </div>
+            </a>
         </div>
 
     </ng-form>
