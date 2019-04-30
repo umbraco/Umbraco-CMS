@@ -33,9 +33,9 @@
                     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
                     <!-- TABS -->
                     <div ng-if="vm.showTabs">
-                        <umb-tabs-nav 
-                            ng-if="vm.tabs" 
-                            tabs="vm.tabs" 
+                        <umb-tabs-nav
+                            ng-if="vm.tabs"
+                            tabs="vm.tabs"
                             on-tab-change="vm.onTabChange(tab)">
                         </umb-tabs-nav>
                         <umb-tab-content ng-repeat="tab in vm.tabs" tab="tab" ng-if="tab.active">
@@ -49,8 +49,10 @@
                                             ng-click="vm.pickEditor(systemDataType)"
                                             class="-four-in-row">
                                             <a class="umb-card-grid-item" href="" title="{{ systemDataType.name }}">
-                                                <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
-                                                {{ systemDataType.name }}
+                                                <span>
+                                                    <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
+                                                    {{ systemDataType.name }}
+                                                </span>
                                             </a>
                                         </li>
                                     </ul>
@@ -69,8 +71,10 @@
                                                 <div class="umb-button__progress"></div>
                                             </div>
                                             <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
-                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
-                                                {{ dataType.name }}
+                                                <span>
+                                                    <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+                                                    {{ dataType.name }}
+                                                </span>
                                             </a>
                                         </li>
                                     </ul>
@@ -93,8 +97,10 @@
                                             <div class="umb-button__progress"></div>
                                         </div>
                                         <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
-                                            <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
-                                            {{ dataType.name }}
+                                            <span>
+                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+                                                {{ dataType.name }}
+                                            </span>
                                         </a>
                                     </li>
                                 </ul>
@@ -110,8 +116,10 @@
                                         ng-click="vm.pickEditor(systemDataType)"
                                         class="-four-in-row">
                                         <a class="umb-card-grid-item" href="" title="{{ systemDataType.name }}">
-                                            <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
-                                            {{ systemDataType.name }}
+                                            <span>
+                                                <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
+                                                {{ systemDataType.name }}
+                                            </span>
                                         </a>
                                     </li>
                                 </ul>

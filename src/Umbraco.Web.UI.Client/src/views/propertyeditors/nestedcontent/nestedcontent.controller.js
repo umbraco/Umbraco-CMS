@@ -12,8 +12,7 @@
                 ncAlias: "",
                 ncTabAlias: "",
                 nameTemplate: ""
-            }
-            );
+            });
         }
 
         $scope.remove = function (index) {
@@ -33,7 +32,7 @@
             
             // Populate document type tab dictionary
             docTypes.forEach(function (value) {
-                $scope.docTypeTabs[value.alias] = value.variants[0].tabs;
+                $scope.docTypeTabs[value.alias] = value.tabs;
             });
         });
 
