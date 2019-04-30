@@ -50,8 +50,6 @@
     <key alias="unlock">Unlock</key>
     <key alias="createblueprint">Create Content Template</key>
     <key alias="resendInvite">Resend Invitation</key>
-    <key alias="createEmpty">Create new</key>
-    <key alias="createFromClipboard">Paste from clipboard</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>
@@ -297,6 +295,8 @@
     <key alias="readyToSave">Ready to Save?</key>
     <key alias="sendForApproval">Send for approval</key>
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
+    <key alias="createEmpty">Create new</key>
+    <key alias="createFromClipboard">Paste from clipboard</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -1406,7 +1406,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="deleteUserSuccess">User %0% was deleted</key>
     <key alias="resendInviteHeader">Invite user</key>
     <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
-    <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>    
+    <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>
     <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
     <key alias="documentTypeExportedSuccess">Document type was exported to file</key>
     <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
