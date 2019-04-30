@@ -248,11 +248,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             var scaffold = $scope.getScaffold($scope.model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
         }
-
         $scope.sortableOptions = {
             axis: "y",
             cursor: "move",
-            handle: ".umb-nested-content__icon--move",
+            handle:'.umb-nested-content__header-bar',
+            distance: 10,
+            opacity: 0.7,
+            tolerance: "pointer",
+            scroll: true,
             start: function (ev, ui) {
                 updateModel();
                 // Yea, yea, we shouldn't modify the dom, sue me

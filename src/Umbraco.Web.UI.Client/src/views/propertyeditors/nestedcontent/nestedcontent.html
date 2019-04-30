@@ -3,18 +3,15 @@
      ng-class="{'umb-nested-content--narrow':!wideMode, 'umb-nested-content--wide':wideMode}">
     <ng-form>
 
-        <div class="umb-nested-content__items" ng-hide="nodes.length == 0" ui-sortable="sortableOptions" ng-model="nodes">
+        <div class="umb-nested-content__items" ng-hide="nodes.length === 0" ui-sortable="sortableOptions" ng-model="nodes">
 
-            <div class="umb-nested-content__item" ng-repeat="node in nodes" ng-class="{ 'umb-nested-content__item--active' : $parent.realCurrentNode.key == node.key, 'umb-nested-content__item--single' : $parent.singleMode }">
+            <div class="umb-nested-content__item" ng-repeat="node in nodes" ng-class="{ 'umb-nested-content__item--active' : $parent.realCurrentNode.key === node.key, 'umb-nested-content__item--single' : $parent.singleMode }">
 
                 <div class="umb-nested-content__header-bar" ng-click="$parent.editNode($index)" ng-hide="$parent.singleMode">
 
                     <div class="umb-nested-content__heading"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-bind="$parent.getName($index)"></span></div>
 
                     <div class="umb-nested-content__icons">
-                        <a class="umb-nested-content__icon umb-nested-content__icon--move" localize="title" title="actions_move" ng-click="$event.stopPropagation();" ng-show="$parent.nodes.length > 1" prevent-default>
-                            <i class="icon icon-navigation"></i>
-                        </a>
                         <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
                             <i class="icon icon-trash"></i>
                         </a>
@@ -25,7 +22,7 @@
 
                 </div>
 
-                <div class="umb-nested-content__content" ng-if="$parent.realCurrentNode.key == node.key && !$parent.sorting">
+                <div class="umb-nested-content__content" ng-if="$parent.realCurrentNode.key === node.key && !$parent.sorting">
                     <umb-nested-content-editor ng-model="node" tab-alias="ncTabAlias" />
                 </div>
             </div>
