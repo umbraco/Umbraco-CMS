@@ -158,6 +158,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return;
             }
             
+            $scope.overlayMenu.size = $scope.overlayMenu.availableItems.length > 6 ? "medium" : "small";
+            
             $scope.overlayMenu.pasteItems = [];
             var availableNodesForPaste = copyService.retriveDataOfType("elementType", contentTypeAliases);
             _.each(availableNodesForPaste, function (node) {

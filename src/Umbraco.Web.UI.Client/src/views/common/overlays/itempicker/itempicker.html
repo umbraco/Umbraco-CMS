@@ -18,10 +18,9 @@
         </button>
     </div>
 
-    <ul class="umb-card-grid">
+    <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
         <li ng-repeat="pasteItem in model.pasteItems | filter:searchTerm"
-            ng-click="pasteItem(pasteItem)"
-            class="-three-in-row">
+            ng-click="pasteItem(pasteItem)">
             <a class="umb-card-grid-item" href="" title="{{ pasteItem.name }}">
                 <span>
                     <i class="{{ pasteItem.icon }}"></i>
@@ -35,10 +34,9 @@
         <h5><localize key="content_createEmpty">Create new</localize></h5>
     </div>
 
-    <ul class="umb-card-grid">
+    <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
         <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:searchTerm"
-            ng-click="selectItem(availableItem)"
-            ng-class="{'-three-in-row': model.availableItems < 7, '-four-in-row': model.availableItems >= 7}">
+            ng-click="selectItem(availableItem)">
             <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
                 <span>
                     <i class="{{ availableItem.icon }}"></i>

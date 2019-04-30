@@ -42,12 +42,11 @@
                             <div ng-if="tab.alias==='Default'">
                                 <div ng-repeat="(key,value) in tab.typesAndEditors">
                                     <h5>{{key}}</h5>
-                                    <ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+                                    <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
                                         <li ng-repeat="systemDataType in value | orderBy:'name'"
                                             data-element="editor-{{systemDataType.name}}"
                                             ng-mouseover="vm.showDetailsOverlay(systemDataType)"
-                                            ng-click="vm.pickEditor(systemDataType)"
-                                            class="-four-in-row">
+                                            ng-click="vm.pickEditor(systemDataType)">
                                             <a class="umb-card-grid-item" href="" title="{{ systemDataType.name }}">
                                                 <span>
                                                     <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
@@ -61,12 +60,11 @@
                             <div ng-if="tab.alias==='Reuse'">
                                 <div ng-repeat="(key,value) in tab.userConfigured">
                                     <h5>{{key}}</h5>
-                                    <ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+                                    <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
                                         <li ng-repeat="dataType in value | orderBy:'name'"
                                             data-element="editor-{{dataType.name}}"
                                             ng-mouseover="vm.showDetailsOverlay(dataType)"
-                                            ng-click="vm.pickDataType(dataType)"
-                                            class="-four-in-row">
+                                            ng-click="vm.pickDataType(dataType)">
                                             <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
                                                 <div class="umb-button__progress"></div>
                                             </div>
@@ -88,11 +86,10 @@
                         <div ng-repeat="result in vm.filterResult.userConfigured">
                             <div ng-if="result.dataTypes.length > 0">
                                 <h5>{{result.group}}</h5>
-                                <ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+                                <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
                                     <li ng-repeat="dataType in result.dataTypes | orderBy:'name'"
                                         ng-mouseover="vm.showDetailsOverlay(dataType)"
-                                        ng-click="vm.pickDataType(dataType)"
-                                        class="-four-in-row">
+                                        ng-click="vm.pickDataType(dataType)">
                                         <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
                                             <div class="umb-button__progress"></div>
                                         </div>
@@ -110,11 +107,10 @@
                         <div ng-repeat="result in vm.filterResult.typesAndEditors">
                             <div ng-if="result.dataTypes.length > 0">
                                 <h5>{{result.group}}</h5>
-                                <ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+                                <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
                                     <li ng-repeat="systemDataType in result.dataTypes | orderBy:'name'"
                                         ng-mouseover="vm.showDetailsOverlay(systemDataType)"
-                                        ng-click="vm.pickEditor(systemDataType)"
-                                        class="-four-in-row">
+                                        ng-click="vm.pickEditor(systemDataType)">
                                         <a class="umb-card-grid-item" href="" title="{{ systemDataType.name }}">
                                             <span>
                                                 <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
