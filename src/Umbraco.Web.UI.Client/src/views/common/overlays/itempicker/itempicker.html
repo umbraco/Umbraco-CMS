@@ -38,7 +38,7 @@
     <ul class="umb-card-grid">
         <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:searchTerm"
             ng-click="selectItem(availableItem)"
-            class="-three-in-row">
+            ng-class="{'-three-in-row': model.availableItems < 7, '-four-in-row': model.availableItems >= 7}">
             <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
                 <span>
                     <i class="{{ availableItem.icon }}"></i>
