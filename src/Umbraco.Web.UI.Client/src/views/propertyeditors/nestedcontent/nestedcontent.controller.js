@@ -158,13 +158,29 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             if ($scope.overlayMenu.availableItems.length === 0) {
                 return;
             }
-
-            if ($scope.overlayMenu.availableItems.length === 1) {
+            
+            $scope.overlayMenu.pasteItems = [];
+            var availableNodesForPaste = copyService.retriveDataOfType("elementType", contentTypeAliases);
+            _.each(availableNodesForPaste, function (node) {
+                $scope.overlayMenu.pasteItems.push({
+                    alias: node.contentTypeAlias,
+                    name: node.name, //contentTypeName
+                    icon: iconHelper.convertFromLegacyIcon(node.icon)
+                });
+            });
+            $scope.overlayMenu.clickClearPaste = function($event) {
+                $event.stopPropagation();
+                $event.preventDefault();
+                copyService.clearEntriesOfType("elementType", contentTypeAliases);
+                $scope.overlayMenu.pasteItems = [];// This dialog is not connected via the copyService events, so we need to update manually.
+            };
+            
+            if ($scope.overlayMenu.availableItems.length === 1 && $scope.overlayMenu.pasteItems.length === 0) {
                 // only one scaffold type - no need to display the picker
                 $scope.addNode($scope.scaffolds[0].contentTypeAlias);
                 return;
             }
-
+            
             $scope.overlayMenu.show = true;
         };
 
@@ -290,6 +306,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.clickPaste = function($event) {
             
             var newNode = copyService.retriveDataOfType("elementType", contentTypeAliases).pop();
+            $scope.pasteFromClipboard(newNode);
+            
+        }
+        
+        $scope.pasteFromClipboard = function(newNode) {
             
             if (newNode === undefined) {
                 return;

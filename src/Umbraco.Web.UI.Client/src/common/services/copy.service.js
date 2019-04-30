@@ -21,11 +21,23 @@ function copyService(notificationsService, eventsService) {
         if (supportsLocalStorage === false) {
             return null;
         }
+        
+        
+        var dataJSON;
         var dataString = window.localStorage.getItem(STORAGE_KEY);
-        if (dataString == null) {
-            return null;
+        if (dataString != null) {
+            dataJSON = JSON.parse(dataString);
         }
-        return JSON.parse(dataString);
+        
+        if(dataJSON == null) {
+            dataJSON = new Object();
+        }
+        
+        if(dataJSON.entries === undefined) {
+            dataJSON.entries = [];
+        }
+        
+        return dataJSON;
     }
     
     var saveStorage = function(storage) {
@@ -54,27 +66,28 @@ function copyService(notificationsService, eventsService) {
     * @methodOf umbraco.services.copyService
     *
     * @description
-    * Saves a JS-object to the LocalStage of copied items.
+    * Saves a JS-object to the LocalStage of copied entries.
     *
     */
     service.copy = function(nodeType, data) {
         
         var storage = retriveStorage();
-        if(storage === null) {
-            storage = new Object();
-        }
-        
-        if(storage.items === undefined) {
-            storage.items = [];
-        }
         
         var shallowCloneData = Object.assign({}, data);// Notice only a shallow copy, since we dont need to deep copy. (that will happen when storing the data)
-        
         delete shallowCloneData.key;
         delete shallowCloneData.$$hashKey;
         
-        var entry = {nodeType:nodeType, data:shallowCloneData};
-        storage.items.push(entry);
+        var key = data.key || data.$$hashKey || console.error("missing unique key for this content");
+        
+        // remove previous copies of this entry:
+        storage.entries = storage.entries.filter(
+            (entry) => {
+                return entry.unique !== key;
+            }
+        );
+        
+        var entry = {unique:key, nodeType:nodeType, data:shallowCloneData};
+        storage.entries.push(entry);
         
         if (saveStorage(storage) === true) {
             notificationsService.success("Clipboard", "Copied to clipboard.");
@@ -99,26 +112,34 @@ function copyService(notificationsService, eventsService) {
         
         var storage = retriveStorage();
         
-        if (storage === null) {
-            return [];
-        }
-        
-        var filteretEntries = storage.items.filter(
-            (item) => item.nodeType === nodeType
+        // Find entries that are furfilling the criterias for this nodeTYpe and nodeTypesAliases.
+        var filteretEntries = storage.entries.filter(
+            (entry) => {
+                return (entry.nodeType === nodeType && nodeTypeAliases.filter(alias => alias === entry.data.contentTypeAlias).length > 0);
+            }
         );
-        if (nodeTypeAliases) {
-            filteretEntries = filteretEntries.filter(
-                (item) => {
-                    return nodeTypeAliases.filter(alias => alias === item.data.contentTypeAlias).length > 0;
-                }
-            );
-        }
+        
         return filteretEntries;
     };
     
-    
     service.retriveDataOfType = function(nodeType, nodeTypeAliases) {
         return service.retriveEntriesOfType(nodeType, nodeTypeAliases).map((x) => x.data);
+    };
+    
+    service.clearEntriesOfType = function(nodeType, nodeTypeAliases) {
+        
+        var storage = retriveStorage();
+        
+        // Find entries that are NOT furfilling the criterias for this nodeTYpe and nodeTypesAliases.
+        var filteretEntries = storage.entries.filter(
+            (entry) => {
+                return !(entry.nodeType === nodeType && nodeTypeAliases.filter(alias => alias === entry.data.contentTypeAlias).length > 0);
+            }
+        );
+        
+        storage.entries = filteretEntries;
+        
+        saveStorage(storage);
     };
     
     
