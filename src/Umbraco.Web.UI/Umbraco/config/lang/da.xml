@@ -263,6 +263,7 @@
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Hvad betyder det?</a>]]></key>
     <key alias="nestedContentDeleteItem">Er du sikker på, at du vil slette dette element?</key>
     <key alias="nestedContentEditorNotSupported">Egenskaben %0% anvender editoren %1% som ikke er understøttet af Nested Content.</key>
+    <key alias="nestedContentNoContentTypes">Der er ikke konfigureret nogen indholdstyper for denne egenskab.</key>
     <key alias="addTextBox">Tilføj en ny tekstboks</key>
     <key alias="removeTextBox">Fjern denne tekstboks</key>
     <key alias="contentRoot">Indholdsrod</key>
