@@ -98,8 +98,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.wideMode = Object.toBoolean($scope.model.config.hideLabel);
 
         $scope.labels = {};
-        localizationService.localizeMany(["grid_addElement"]).then(function(data) {
-            $scope.labels.docTypePickerTitle = data[0];
+        localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function(data) {
+            $scope.labels.grid_addElement = data[0];
+            $scope.labels.content_createEmpty = data[1];
         });
 
         // helper to force the current form into the dirty state
@@ -124,7 +125,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             }
 
             $scope.overlayMenu = {
-                title: $scope.labels.docTypePickerTitle,
                 show: false,
                 style: {},
                 filter: $scope.scaffolds.length > 15 ? true : false,
@@ -169,6 +169,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     icon: iconHelper.convertFromLegacyIcon(node.icon)
                 });
             });
+            
+            $scope.overlayMenu.title = $scope.overlayMenu.pasteItems.length > 0 ? $scope.labels.grid_addElement : $scope.labels.content_createEmpty;
+            
             $scope.overlayMenu.clickClearPaste = function($event) {
                 $event.stopPropagation();
                 $event.preventDefault();
