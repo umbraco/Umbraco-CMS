@@ -511,7 +511,7 @@ Opens an overlay to show a custom YSOD. </br>
             model: "=",
             view: "=",
             position: "@",
-            size: "@?",
+            size: "=?",
             parentScope: "=?"
          },
          link: link
