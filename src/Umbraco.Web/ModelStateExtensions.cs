@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web
 {
@@ -51,15 +53,36 @@ namespace Umbraco.Web
         {
             if (culture == null)
                 culture = "";
-            modelState.AddValidationError(result, "_Properties", propertyAlias, culture);
+            modelState.AddValidationError(result, "_Properties", propertyAlias,
+                //if the culture is null, we'll add the term 'invariant' as part of the key
+                culture.IsNullOrWhiteSpace() ? "invariant" : culture);
         }
 
         /// <summary>
-        /// Returns a list of cultures that have property errors
+        /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
         /// </summary>
         /// <param name="modelState"></param>
-        /// <returns></returns>
-        internal static IReadOnlyList<string> GetCulturesWithPropertyErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)
+        /// <param name="culture"></param>
+        /// <param name="errMsg"></param>
+        internal static void AddCultureValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            string culture, string errMsg)
+        {
+            var key = "_content_variant_" + culture + "_";
+            if (modelState.ContainsKey(key)) return;
+            modelState.AddModelError(key, errMsg);
+        }
+
+        /// <summary>
+        /// Returns a list of cultures that have property validation errors errors
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="cultureForInvariantErrors">The culture to affiliate invariant errors with</param>
+        /// <returns>
+        /// A list of cultures that have property validation errors. The default culture will be returned for any invariant property errors.
+        /// </returns>
+        internal static IReadOnlyList<string> GetCulturesWithPropertyErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            ILocalizationService localizationService, string cultureForInvariantErrors)
         {
             //Add any culture specific errors here
             var cultureErrors = modelState.Keys
@@ -67,12 +90,44 @@ namespace Umbraco.Web
                 .Where(x => x.Length >= 3 && x[0] == "_Properties") //only choose _Properties errors
                 .Select(x => x[2]) //select the culture part
                 .Where(x => !x.IsNullOrWhiteSpace()) //if it has a value
+                //if it's marked "invariant" than return the default language, this is because we can only edit invariant properties on the default language
+                //so errors for those must show up under the default lang.
+                .Select(x => x == "invariant" ? cultureForInvariantErrors : x)
+                .WhereNotNull()
                 .Distinct()
                 .ToList();
 
             return cultureErrors;
         }
 
+        /// <summary>
+        /// Returns a list of cultures that have any validation errors
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="cultureForInvariantErrors">The culture to affiliate invariant errors with</param>
+        /// <returns>
+        /// A list of cultures that have validation errors. The default culture will be returned for any invariant errors.
+        /// </returns>
+        internal static IReadOnlyList<string> GetCulturesWithErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            ILocalizationService localizationService, string cultureForInvariantErrors)
+        {
+            var propertyCultureErrors = modelState.GetCulturesWithPropertyErrors(localizationService, cultureForInvariantErrors);
+
+            //now check the other special culture errors that are
+            var genericCultureErrors = modelState.Keys
+                .Where(x => x.StartsWith("_content_variant_") && x.EndsWith("_"))
+                .Select(x => x.TrimStart("_content_variant_").TrimEnd("_"))
+                .Where(x => !x.IsNullOrWhiteSpace())
+                //if it's marked "invariant" than return the default language, this is because we can only edit invariant properties on the default language
+                //so errors for those must show up under the default lang.
+                .Select(x => x == "invariant" ? cultureForInvariantErrors : x)
+                .WhereNotNull()
+                .Distinct();
+
+            return propertyCultureErrors.Union(genericCultureErrors).ToList();
+        }
+        
         /// <summary>
         /// Adds the error to model state correctly for a property so we can use it on the client side.
         /// </summary>

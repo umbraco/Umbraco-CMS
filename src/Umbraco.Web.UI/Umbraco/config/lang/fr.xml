@@ -88,9 +88,6 @@
     <key alias="domainExists">Domaine '%0%' déjà assigné</key>
     <key alias="domainUpdated">Domaine '%0%' mis à jour</key>
     <key alias="orEdit">Editer les domaines actuels</key>
-    <key alias="domainHelp"><![CDATA[Les formats de domaines suivants sont autorisés : "example.com", "www.example.com", "example.com:8080" ou
-        "https://www.example.com/".<br /><br />Les domaines contenant un chemin d'un niveau sont autorisés, ex : "example.com/en". Pour autant, cela
-        devrait être évité. Utilisez plutôt la gestion de la culture et des noms d'hôte.]]></key>
     <key alias="inherit">Hériter</key>
     <key alias="setLanguage">Culture</key>
     <key alias="setLanguageHelp"><![CDATA[Définir la culture pour les noeuds enfants du noeud courant,<br /> ou hériter de la culture des noeuds parents. S'appliquera aussi<br />
@@ -409,13 +406,6 @@
     <key alias="usernameHint">Votre nom d'utilisateur est généralement votre adresse email</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Types de noeuds enfants autorisés</key>
-    <key alias="create">Créer</key>
-    <key alias="deletetab">Supprimer l'onglet</key>
-    <key alias="description">Description</key>
-    <key alias="newtab">Nouvel onglet</key>
-    <key alias="tab">Onglet</key>
-    <key alias="thumbnail">Miniature</key>
     <key alias="createListView" version="7.2">Créer une liste personnalisée</key>
     <key alias="removeListView" version="7.2">Supprimer la liste personnalisée</key>
   </area>

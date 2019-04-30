@@ -303,7 +303,7 @@ describe('tree service tests', function () {
         });
 
         it('returns undefined for a not found tree', function () {
-            //we know this exists in the mock umbraco server vars
+            //we know this does not exist in the mock umbraco server vars
             var found = treeService.getTreePackageFolder("asdfasdf");
             expect(found).not.toBeDefined();
         });
@@ -315,8 +315,8 @@ describe('tree service tests', function () {
         it('hasChildren has to be updated on parent', function () {
             var tree = getContentTree();
 
-            while (tree.children.length > 0){
-                treeService.removeNode(tree.children[0])
+            while (tree.children.length > 0) {
+                treeService.removeNode(tree.children[0]);
             }
 
             expect(tree.hasChildren).toBe(false);

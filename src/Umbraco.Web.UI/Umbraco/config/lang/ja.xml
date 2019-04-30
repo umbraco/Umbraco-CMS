@@ -52,7 +52,6 @@
     <key alias="domainExists">ドメイン '%0%' は既に割り当てられています</key>
     <key alias="domainUpdated">ドメイン '%0%' は更新されました</key>
     <key alias="orEdit">ドメインの編集</key>
-    <key alias="domainHelp"><![CDATA[有効なドメイン名は、"example.com"、"www.example.com"、"example.com:8080"、"https://www.example.com/" などです。ドメインで 1 レベル パスがサポートされます。ただし、それらは回避する必要があります。代わりに上記のカルチャ設定を使用してください。]]></key>
     <key alias="inherit">継承</key>
     <key alias="setLanguage">カルチャの割り当て</key>
     <key alias="setLanguageHelp"><![CDATA[現在のノードの下のノードのカルチャを設定または親ノードからカルチャを継承。以下のドメインが適用されない場合、現在のノードにも適用します。]]></key>
@@ -301,13 +300,6 @@
     <key alias="enterTags">入力してタグを追加 (各タグの後に Enter を押してください)...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">子ノードとして許可するタイプ</key>
-    <key alias="create">新規作成</key>
-    <key alias="deletetab">タブの削除</key>
-    <key alias="description">説明</key>
-    <key alias="newtab">新しいタブ</key>
-    <key alias="tab">タブ</key>
-    <key alias="thumbnail">サムネイル</key>
     <key alias="createListView" version="7.2">カスタムリストビューを作成する</key>
     <key alias="removeListView" version="7.2">カスタムリストビューを削除する</key>
   </area>

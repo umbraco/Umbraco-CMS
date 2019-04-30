@@ -6,14 +6,20 @@
 		</div>
 	</div>
 
-	<div class="crop-slider" ng-if="loaded">
-		<i class="icon-picture"></i>
-			<input
-				type="range" 
-				min="{{dimensions.scale.min}}" 
-				max="{{dimensions.scale.max}}" 
-				step="0.001" 
-				ng-model="dimensions.scale.current" />			
-				<i class="icon-picture" style="font-size: 22px"></i>	
-	</div>		
+	<div class="crop-slider-wrapper" ng-if="loaded">
+        <i class="icon-picture"></i>
+
+        <div class="crop-slider">
+            <umb-range-slider
+                ng-model="sliderValue"
+                options="sliderOptions"
+                on-setup="setup(slider)"
+                on-slide="slide(values)"
+                on-change="change(values)">
+            </umb-range-slider>
+        </div>
+
+        <i class="icon-picture" style="font-size: 22px"></i>
+    </div>
+    
 </div>
