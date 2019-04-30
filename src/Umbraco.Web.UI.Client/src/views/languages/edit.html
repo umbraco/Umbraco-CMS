@@ -34,28 +34,28 @@
                             </span>                            
                         </umb-control-group>
 
-                        <umb-control-group label="@general_settings">
+                        <umb-control-group label="@general_settings" class="umb-toggle-group">
 
-                            <div class="umb-permission" ng-click="vm.toggleDefault()" ng-class="{'umb-permission--disabled': vm.initIsDefault}">
+                            <div class="umb-toggle-group-item" ng-click="vm.toggleDefault()" ng-class="{'umb-toggle-group-item--disabled': vm.initIsDefault}">
                                 <umb-toggle
-                                    class="umb-permission__toggle"
+                                    class="umb-toggle-group-item__toggle"
                                     checked="vm.language.isDefault"
                                     disabled="vm.initIsDefault">
                                 </umb-toggle>
-                                <div class="umb-permission__content" >
+                                <div class="umb-toggle-group-item__content" >
                                     <div>{{vm.labels.defaultLanguage}}</div>
-                                    <div class="umb-permission__description">{{vm.labels.defaultLanguageHelp}}</div>
+                                    <div class="umb-toggle-group-item__description">{{vm.labels.defaultLanguageHelp}}</div>
                                 </div>
                             </div>
 
-                            <div class="umb-permission" ng-click="vm.toggleMandatory()">
+                            <div class="umb-toggle-group-item" ng-click="vm.toggleMandatory()">
                                 <umb-toggle
-                                    class="umb-permission__toggle"
+                                    class="umb-toggle-group-item__toggle"
                                     checked="vm.language.isMandatory">
                                 </umb-toggle>
-                                <div class="umb-permission__content">
+                                <div class="umb-toggle-group-item__content">
                                     <div>{{vm.labels.mandatoryLanguage}}</div>
-                                    <div class="umb-permission__description">{{vm.labels.mandatoryLanguageHelp}}</div>
+                                    <div class="umb-toggle-group-item__description">{{vm.labels.mandatoryLanguageHelp}}</div>
                                 </div>
                             </div>
 

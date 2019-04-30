@@ -48,7 +48,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         if (configuredStylesheets) {
             angular.forEach(configuredStylesheets, function (val, key) {
 
-                stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css");
+                if (val.indexOf(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/") === 0) {
+                    // current format (full path to stylesheet)
+                    stylesheets.push(val);
+                }
+                else {
+                    // legacy format (stylesheet name only) - must prefix with stylesheet folder and postfix with ".css"
+                    stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css");
+                }
 
                 promises.push(stylesheetResource.getRulesByName(val).then(function (rules) {
                     angular.forEach(rules, function (rule) {
@@ -427,8 +434,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     data["rel"] = img.id;
                     data["data-id"] = img.id;
                 }
-
-                editor.insertContent(editor.dom.createHTML('img', data));
+                
+                editor.selection.setContent(editor.dom.createHTML('img', data));
 
                 $timeout(function () {
                     var imgElm = editor.dom.get('__mcenew');
@@ -446,6 +453,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
                     }
 				    editor.dom.setAttrib(imgElm, 'id', null);
+                    
+                    editor.fire('Change');
+                    
                 }, 500);
             }
         },
@@ -995,9 +1005,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 return;
             }
 
-            // Is email and not //user@domain.com
-            if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf('mailto:') === -1) {
-                href = 'mailto:' + href;
+		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
+		    if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
+		        // assume it's a mailto link
+				href = 'mailto:' + href;
                 insertLink();
                 return;
             }
@@ -1143,11 +1154,25 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             let self = this;
 
+            function getIgnoreUserStartNodes(args) {
+                var ignoreUserStartNodes = false;
+                // Most property editors have a "config" property with ignoreUserStartNodes on then
+                if (args.model.config) {
+                    ignoreUserStartNodes = Object.toBoolean(args.model.config.ignoreUserStartNodes);
+                }
+                // EXCEPT for the grid's TinyMCE editor, that one wants to be special and the config is called "configuration" instead
+                else if (args.model.configuration) {
+                    ignoreUserStartNodes = Object.toBoolean(args.model.configuration.ignoreUserStartNodes);
+                }
+                return ignoreUserStartNodes;
+            }
+
             //create link picker
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
                 var linkPicker = {
                     currentTarget: currentTarget,
                     anchors: editorState.current ? self.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
+                    ignoreUserStartNodes: getIgnoreUserStartNodes(args),
                     submit: function (model) {
                         self.insertLinkInEditor(args.editor, model.target, anchorElement);
                         editorService.close();
@@ -1161,13 +1186,25 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             //Create the insert media plugin
             self.createMediaPicker(args.editor, function (currentTarget, userData) {
+
+                var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                var startNodeIsVirtual = userData.startMediaIds.length !== 1;
+
+                var ignoreUserStartNodes = getIgnoreUserStartNodes(args);
+                if (ignoreUserStartNodes) {
+                    ignoreUserStartNodes = true;
+                    startNodeId = -1;
+                    startNodeIsVirtual = true;
+                }
+
                 var mediaPicker = {
                     currentTarget: currentTarget,
                     onlyImages: true,
                     showDetails: true,
                     disableFolderSelect: true,
-                    startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                    startNodeId: startNodeId,
+                    startNodeIsVirtual: startNodeIsVirtual,
+                    ignoreUserStartNodes: ignoreUserStartNodes,
                     submit: function (model) {
                         self.insertMediaInEditor(args.editor, model.selection[0]);
                         editorService.close();
@@ -1224,6 +1261,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     view: 'views/propertyeditors/rte/codeeditor.html',
                     submit: function (model) {
                         args.editor.setContent(model.content);
+                        args.editor.fire('Change');
                         editorService.close();
                     },
                     close: function () {

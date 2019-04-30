@@ -11,7 +11,6 @@ ul.sections>li {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	padding: 0 20px;
 	position: relative;
 }
 
@@ -22,27 +21,33 @@ ul.sections>li>a {
 	align-items: center;
 	justify-content: center;
 	position: relative;
+	padding: 0 10px;
 	text-decoration: none;
 	outline: none;
 	cursor: pointer;
 }
 
 ul.sections>li>a .section__name {
+    border-radius: 3px;
+    margin-top:1px;
+    padding: 3px 10px 4px 10px;
 	opacity: 0.8;
-	transition: opacity .1s linear;
+	transition: opacity .1s linear, box-shadow .1s;
 }
 
 ul.sections>li>a::after {
 	content: "";
+    left: 10px;
+    right: 10px;
 	height: 4px;
-	width: 100%;
+	bottom: 0;
+    transform: translateY(4px);
 	background-color: @pinkLight;
-	position: absolute;
-	bottom: -4px;
+    position: absolute;
 	border-radius: 3px 3px 0 0;
 	opacity: 0;
 	padding: 0 2px;
-	transition: all .2s linear;
+	transition: transform 240ms ease-in-out;
 }
 
 ul.sections>li.current>a {
@@ -50,14 +55,19 @@ ul.sections>li.current>a {
 }
 ul.sections>li.current>a::after {
 	opacity: 1;
-	bottom: 0;
+    transform: translateY(0px);
 }
-
 ul.sections>li.current>a .section__name,
-ul.sections>li>a:hover .section__name,
+ul.sections>li>a:hover .section__name, 
 ul.sections>li>a:focus .section__name {
 	opacity: 1;
     -webkit-font-smoothing: subpixel-antialiased;
+}
+
+ul.sections>li>a:focus .section__name {
+    .tabbing-active & {
+        box-shadow: 0 0 2px @pinkLight, inset 0 0 2px 1px @pinkLight;
+    }
 }
 
 

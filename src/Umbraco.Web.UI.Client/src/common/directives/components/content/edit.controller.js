@@ -55,9 +55,9 @@
                 }
                 
             }
-            
+
             // if we still dont have a app, lets show the first one:
-            if (isAppPresent === false) {
+            if (isAppPresent === false && content.apps.length) {
                 content.apps[0].active = true;
                 $scope.appChanged(content.apps[0]);
             }
@@ -116,6 +116,13 @@
         function isContentCultureVariant() {
             return $scope.content.variants.length > 1;
         }
+        
+        function reload() {
+            $scope.page.loading = true;
+            loadContent().then(function() {
+                $scope.page.loading = false;
+            });
+        }
 
         function bindEvents() {
             //bindEvents can be called more than once and we don't want to have multiple bound events
@@ -123,13 +130,10 @@
                 eventsService.unsubscribe(evts[e]);
             }
 
-            evts.push(eventsService.on("editors.content.reload", function (name, args) {
+            evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
                 // if this content item uses the updated doc type we need to reload the content item
-                if(args && args.node && args.node.key === $scope.content.key) {
-                    $scope.page.loading = true;
-                    loadContent().then(function() {
-                        $scope.page.loading = false;
-                    });
+                if(args && args.documentType && $scope.content.documentType.id === args.documentType.id) {
+                    reload();
                 }
             }));
 
@@ -331,8 +335,7 @@
 
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
-
-
+            
             //Used to check validility of nested form - coming from Content Apps mostly
             //Set them all to be invalid
             var fieldsToRollback = checkValidility();

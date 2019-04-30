@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <metadata minClientVersion="3.4.4">
+    <metadata minClientVersion="4.1.0">
         <id>UmbracoCms.Web</id>
         <version>8.0.0</version>
         <title>Umbraco Cms Core Binaries</title>
@@ -59,8 +59,6 @@
 
         <!-- symbols -->
         <file src="$BuildTmp$\bin\Umbraco.Web.pdb" target="lib" />
-        <file src="$BuildTmp$\..\src\Umbraco.Web\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Web" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.pdb" target="lib" />
-        <file src="$BuildTmp$\..\src\Umbraco.Examine\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Examine" />
     </files>
 </package>

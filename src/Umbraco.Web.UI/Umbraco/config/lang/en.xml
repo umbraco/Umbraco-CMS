@@ -87,7 +87,7 @@
     <key alias="addNew">Add new Domain</key>
     <key alias="remove">remove</key>
     <key alias="invalidNode">Invalid node.</key>
-    <key alias="invalidDomain">Invalid domain format.</key>
+    <key alias="invalidDomain">One or more domains have an invalid format.</key>
     <key alias="duplicateDomain">Domain has already been assigned.</key>
     <key alias="language">Language</key>
     <key alias="domain">Domain</key>
@@ -96,9 +96,9 @@
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
-    <key alias="domainHelp"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
-        "https://www.example.com/". One-level paths in domains are supported, eg. "example.com/en". However, they
-        should be avoided. Better use the culture setting above.]]></key>
+    <key alias="domainHelpWithVariants">
+    	<![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
+     Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
         <key alias="setLanguageHelp">
@@ -272,6 +272,7 @@
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
+    <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -288,6 +289,7 @@
     <key alias="publishedLanguages">Published Languages</key>
     <key alias="unpublishedLanguages">Unpublished Languages</key>
     <key alias="unmodifiedLanguages">Unmodified Languages</key>
+    <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
     <key alias="readyToPublish">Ready to Publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
     <key alias="sendForApproval">Send for approval</key>
@@ -520,13 +522,6 @@
         <key alias="generatingAlias">Generating alias...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Allowed child node types</key>
-    <key alias="create">Create</key>
-    <key alias="deletetab">Delete tab</key>
-    <key alias="description">Description</key>
-    <key alias="newtab">New tab</key>
-    <key alias="tab">Tab</key>
-    <key alias="thumbnail">Thumbnail</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
     <key alias="aliasAlreadyExists">A content type, media type or member type with this alias already exists</key>
@@ -631,6 +626,7 @@
     <key alias="first">First</key>
     <key alias="general">General</key>
     <key alias="groups">Groups</key>
+    <key alias="group">Group</key>
     <key alias="height">Height</key>
     <key alias="help">Help</key>
     <key alias="hide">Hide</key>
@@ -1127,7 +1123,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
-
+    
     <key alias="pathToFile">Path to file</key>
     <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
@@ -1164,7 +1160,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageDownloads">Downloads</key>
     <key alias="packageLikes">Likes</key>
     <key alias="packageCompatibility">Compatibility</key>
-    <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</key>
+    <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be guaranteed for versions reported below 100%</key>
     <key alias="packageExternalSources">External sources</key>
     <key alias="packageAuthor">Author</key>
     <key alias="packageDocumentation">Documentation</key>
@@ -1236,6 +1232,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% can not be published, because a parent page is not published.
     ]]></key>
+    <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% can not be published, because its missing a name.]]></key>
     <key alias="includeUnpublished">Include unpublished subpages</key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
@@ -1250,6 +1247,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noColors">You have not configured any approved colours</key>
   </area>
   <area alias="contentPicker">
+    <key alias="allowedItemTypes">You can only select items of type(s): %0%</key>
     <key alias="pickedTrashedItem">You have picked a content item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
   </area>
@@ -1542,6 +1540,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
+    <key alias="group">Group</key>
     <key alias="noGroups">You have not added any groups</key>
     <key alias="addGroup">Add group</key>
     <key alias="inheritedFrom">Inherited from</key>
@@ -1590,6 +1589,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="variantsHeading">Allow varying by culture</key>
     <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
+    <key alias="elementType">Element type</key>
     <key alias="elementHeading">Is an Element type</key>
     <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
     <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
@@ -1613,6 +1613,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="enterMacroName">Enter macro name</key>
     <key alias="parameters">Parameters</key>
     <key alias="parametersDescription">Define the parameters that should be available when using this macro.</key>
+    <key alias="selectViewFile">Select partial view macro file</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>
@@ -2078,7 +2079,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
   </area>
   <area alias="textbox">
-    <key alias="characters_left">characters left</key>
+    <key alias="characters_left"><![CDATA[<strong>%0%</strong> characters left.]]></key>
+    <key alias="characters_exceed"><![CDATA[Maximum %0% characters, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="recycleBin">
     <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>

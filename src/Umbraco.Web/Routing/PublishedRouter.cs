@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Routing
             // trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
             //
-            // also, OnPrepared() will make the PublishedContentRequest readonly, so nothing can change
+            // also, OnPrepared() will make the PublishedRequest readonly, so nothing can change
             //
             request.OnPrepared();
 
@@ -244,7 +244,7 @@ namespace Umbraco.Web.Routing
         #region Domain
 
         /// <summary>
-        /// Finds the site root (if any) matching the http request, and updates the PublishedContentRequest accordingly.
+        /// Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
         /// </summary>
         /// <returns>A value indicating whether a domain was found.</returns>
         internal bool FindDomain(PublishedRequest request)
@@ -375,7 +375,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Finds the Umbraco document (if any) matching the request, and updates the PublishedContentRequest accordingly.
+        /// Finds the Umbraco document (if any) matching the request, and updates the PublishedRequest accordingly.
         /// </summary>
         /// <returns>A value indicating whether a document and template were found.</returns>
         private void FindPublishedContentAndTemplate(PublishedRequest request)

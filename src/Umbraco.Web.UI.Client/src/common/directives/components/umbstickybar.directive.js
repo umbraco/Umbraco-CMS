@@ -56,7 +56,7 @@ Use this directive make an element sticky and follow the page when scrolling.
                 }
 
                 if (attr.scrollableContainer) {
-                    scrollableContainer = $(attr.scrollableContainer);
+                    scrollableContainer = bar.closest(attr.scrollableContainer);
                 } else {
                     scrollableContainer = $(window);
                 }
@@ -121,7 +121,7 @@ Use this directive make an element sticky and follow the page when scrolling.
             function calculateSize() {
                 var width = bar.innerWidth();
                 clonedBar.css({
-                    width: width
+                    width: width + 10 // + 10 (5*2) because we need to add border to avoid seeing the shadow beneath. Look at the CSS.
                 });
             }
 

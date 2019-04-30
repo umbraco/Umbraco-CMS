@@ -54,6 +54,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public byte Variations { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
         public NodeDto NodeDto { get; set; }
     }
 }

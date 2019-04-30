@@ -11,6 +11,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
@@ -100,6 +101,9 @@ namespace Umbraco.Web.Composing
         public static UrlProviderCollection UrlProviders
             => Factory.GetInstance<UrlProviderCollection>();
 
+        public static MediaUrlProviderCollection MediaUrlProviders
+            => Factory.GetInstance<MediaUrlProviderCollection>();
+
         public static HealthCheckCollectionBuilder HealthCheckCollectionBuilder
             => Factory.GetInstance<HealthCheckCollectionBuilder>();
 
@@ -163,6 +167,8 @@ namespace Umbraco.Web.Composing
         #region Core Getters
 
         // proxy Core for convenience
+
+        public static UmbracoMapper Mapper => CoreCurrent.Mapper;
 
         public static IRuntimeState RuntimeState => CoreCurrent.RuntimeState;
 

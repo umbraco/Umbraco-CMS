@@ -5,13 +5,13 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         var vm = this;
         var dialogOptions = $scope.model;
 
-        var searchText = "Search...";
-
         vm.submit = submit;
         vm.close = close;
+        vm.toggleOpenInNewWindow = toggleOpenInNewWindow;
 
-        localizationService.localize("general_search").then(function (value) {
-            searchText = value + "...";
+        vm.labels = {};
+        localizationService.localizeMany(["defaultdialogs_openInNewWindow"]).then(function (data) {
+            vm.labels.openInNewWindow = data[0];
         });
 
         if (!$scope.model.title) {
@@ -28,9 +28,11 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
             searchFromName: null,
             showSearch: false,
             results: [],
-            selectedSearchResults: []
+            selectedSearchResults: [],
+            ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes
         };
 
+        $scope.customTreeParams = dialogOptions.ignoreUserStartNodes ? "ignoreUserStartNodes=" + dialogOptions.ignoreUserStartNodes : "";
         $scope.showTarget = $scope.model.hideTarget !== true;
 
         // this ensures that we only sync the tree once and only when it's ready
@@ -73,7 +75,11 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     });
 
                     // get the content properties to build the anchor name list
-                    contentResource.getById(id).then(function (resp) {
+
+                    var options = {};
+                    options.ignoreUserStartNodes = dialogOptions.ignoreUserStartNodes;
+
+                    contentResource.getById(id, options).then(function (resp) {
                         $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
                         $scope.model.target.url = resp.urls[0].text;
                     });
@@ -87,8 +93,13 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     $scope.model.target.anchor = $scope.model.target.url.substring(indexOfAnchor);
                     // then rewrite the model and populate the link
                     $scope.model.target.url = $scope.model.target.url.substring(0, indexOfAnchor);
-                }            }
-        } else if (dialogOptions.anchors) {
+                }
+            }
+
+            // need to translate the link target ("_blank" or "") into a boolean value for umb-checkbox 
+            vm.openInNewWindow = $scope.model.target.target === "_blank";
+        } 
+        else if (dialogOptions.anchors) {
             $scope.anchorValues = dialogOptions.anchors;
         }
 
@@ -119,7 +130,10 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
             if (args.node.id < 0) {
                 $scope.model.target.url = "/";
             } else {
-                contentResource.getById(args.node.id).then(function (resp) {
+                var options = {};
+                options.ignoreUserStartNodes = dialogOptions.ignoreUserStartNodes;
+
+                contentResource.getById(args.node.id, options).then(function (resp) {
                     $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
                     $scope.model.target.url = resp.urls[0].text;
                 });
@@ -139,9 +153,17 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
         $scope.switchToMediaPicker = function () {
             userService.getCurrentUser().then(function (userData) {
+                var startNodeId =  userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                var startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                if (dialogOptions.ignoreUserStartNodes) {
+                    startNodeId = -1;
+                    startNodeIsVirtual = true;
+                }
+
                 var mediaPicker = {
-                    startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                    startNodeId: startNodeId,
+                    startNodeIsVirtual: startNodeIsVirtual,
+                    ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes,
                     submit: function (model) {
                         var media = model.selection[0];
 
@@ -209,6 +231,10 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
         function openMiniListView(node) {
             $scope.miniListView = node;
+        }
+
+        function toggleOpenInNewWindow(model, value) {
+            $scope.model.target.target = model ? "_blank" : "";
         }
 
         function close() {

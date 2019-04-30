@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
@@ -24,8 +25,8 @@ namespace Umbraco.Web.Macros
         /// </summary>
         /// <param name="frequest">The <see cref="PublishedRequest"/> pointing to the document.</param>
         /// <remarks>
-        /// The difference between creating the page with PublishedContentRequest vs an IPublishedContent item is
-        /// that the PublishedContentRequest takes into account how a template is assigned during the routing process whereas
+        /// The difference between creating the page with PublishedRequest vs an IPublishedContent item is
+        /// that the PublishedRequest takes into account how a template is assigned during the routing process whereas
         /// with an IPublishedContent item, the template id is assigned purely based on the default.
         /// </remarks>
         internal PublishedContentHashtableConverter(PublishedRequest frequest)
@@ -198,10 +199,10 @@ namespace Umbraco.Web.Macros
                 Id = _inner.Id;
                 Key = _inner.Key;
 
-                // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
                 CreatorName = _inner.GetCreatorProfile()?.Name;
                 WriterName = _inner.GetWriterProfile()?.Name;
 
+                // TODO: inject
                 var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(_inner);
                 ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentType);
 
@@ -252,8 +253,9 @@ namespace Umbraco.Web.Macros
                     if (_cultureInfos != null)
                         return _cultureInfos;
 
+                    var urlSegmentProviders = Current.UrlSegmentProviders; // TODO inject
                     return _cultureInfos = _inner.PublishCultureInfos.Values
-                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, x.Date));
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(urlSegmentProviders, x.Culture), x.Date));
                 }
             }
 

@@ -6,75 +6,76 @@
 		<option value="member">Members</option>
 	</select>
 
-	<ul class="unstyled list-icons" ng-if="node" style="margin-top: 30px">
-		<li>
-			<a href="" class="hover-show pull-right" ng-click="clear()">
-				<i class="icon icon-delete red"></i>
-			</a>
-			<i class="icon {{node.icon}} hover-hide"></i>
-			
-			<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
-		</li>
-	</ul>
 
-	<div ng-if="!node && model.value.type !== 'member'" style="margin-top: 30px">	
-		<span ng-hide="showSearch || model.value.query">
-			<ul class="unstyled list-icons">	
-				<li>	
-					<i class="icon icon-add turquoise"></i>
-					<a href ng-click="openContentPicker()" prevent-default>
-						<localize key="general_choose">Choose a root node</localize>...
-					</a>
-				</li>
-				<li ng-show="model.value.type == 'content'">
-					<i class="icon icon-search"></i>
-					<a href ng-click="showSearch = true">Query for root node with xpath</a>
-				</li>
-			</ul>
-		</span>
+    <umb-node-preview
+		ng-show="node"
+        class="mt1"
+		icon="node.icon"
+		name="node.name"
+		published="node.published"
+		description="node.path"
+		allow-remove="true"
+		allow-edit="true"
+		on-remove="clear()"
+		on-edit="openContentPicker()">
+	</umb-node-preview>
 
-		<span ng-show="showSearch || model.value.query">
-			
-			<input type="text" 
-				ng-model="model.value.query" 
-				class="umb-property-editor umb-textstring" 
-				placeholder="Enter xpath query">
+    <div ng-if="!node && model.value.type !== 'member'" class="mt2">
+        <span ng-hide="showSearch || model.value.query">
+            <a class="umb-node-preview-add"
+               href=""
+               ng-click="openContentPicker()"
+               prevent-default>
+                <localize key="general_choose">Choose a root node</localize>
+            </a>
+            <div class="mt2" ng-show="model.value.type == 'content'">
+                <i class="icon icon-search"></i>
+                <a href ng-click="showSearch = true">Query for root node with xpath</a>
+            </div>
+        </span>
 
-				<ul class="unstyled list-icons" style="margin-top: 15px">	
-					<li style="max-width: 600px">	
-						<i class="icon icon-help-alt"></i>
-						<a href ng-click="showHelp = 1" prevent-default>
-							Show xpath query help
-						</a>
+        <span ng-show="showSearch || model.value.query">
 
-						<small ng-if="showHelp">
-							<p>
-								Use Xpath query to set a root node on the tree, either based on a search from the root of the content tree, or by using a context-aware placeholder.
-							</p>
+            <input type="text"
+                   ng-model="model.value.query"
+                   class="umb-property-editor umb-textstring"
+                   placeholder="Enter xpath query">
 
-							<p>
-								Placeholders finds the nearest published ID and runs its query from there. so for instance: 
+            <ul class="unstyled list-icons" style="margin-top: 15px">
+                <li style="max-width: 600px">
+                    <i class="icon icon-help-alt"></i>
+                    <a href ng-click="showHelp = 1" prevent-default>
+                        Show xpath query help
+                    </a>
 
-								<pre>$parent/newsArticle</pre>
+                    <small ng-if="showHelp">
+                        <p>
+                            Use Xpath query to set a root node on the tree, either based on a search from the root of the content tree, or by using a context-aware placeholder.
+                        </p>
 
-								Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news articles there.
-							</p>
+                        <p>
+                            Placeholders finds the nearest published ID and runs its query from there. so for instance:
 
-							<p>
-								Available placeholders: <br/>
-								<code>$current</code>: current page or closest found ancestor<br/>
-								<code>$parent</code>: parent page or closest found ancestor<br/>
-								<code>$root</code>: root of the content tree<br/>
-								<code>$site</code>: Ancestor node at level 1 <br/>
-							</p>
-						</small>
-					</li>
-					<li>
-						<i class="icon icon-delete red"></i>
-						<a href ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</a>
-					</li>
-				</ul>
-		</span>
-	</div>
+                            <pre>$parent/newsArticle</pre>
+
+                            Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news articles there.
+                        </p>
+
+                        <p>
+                            Available placeholders: <br/>
+                            <code>$current</code>: current page or closest found ancestor<br/>
+                            <code>$parent</code>: parent page or closest found ancestor<br/>
+                            <code>$root</code>: root of the content tree<br/>
+                            <code>$site</code>: Ancestor node at level 1 <br/>
+                        </p>
+                    </small>
+                </li>
+                <li>
+                    <i class="icon icon-delete red"></i>
+                    <a href ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</a>
+                </li>
+            </ul>
+        </span>
+    </div>
 
 </div>
