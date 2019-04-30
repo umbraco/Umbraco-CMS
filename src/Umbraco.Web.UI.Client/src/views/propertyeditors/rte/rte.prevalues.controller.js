@@ -31,22 +31,20 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 var icon = getFontIcon(obj.alias);
                 return angular.extend(obj, {
                     fontIcon: icon.name,
-                    isCustom: icon.isCustom
+                    isCustom: icon.isCustom,
+                    selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0
                 });
             });
         });
 
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
-        });
 
-        $scope.selected = function(cmd, alias, lookup){
-            if (lookup && angular.isArray(lookup)) {
-                cmd.selected = lookup.indexOf(alias) >= 0;
-                return cmd.selected;
-            }
-            return false;
-        };
+            _.each($scope.stylesheets, function (stylesheet) {
+                // support both current format (full stylesheet path) and legacy format (stylesheet name only) 
+                stylesheet.selected = $scope.model.value.stylesheets.indexOf(stylesheet.path) >= 0 ||$scope.model.value.stylesheets.indexOf(stylesheet.name) >= 0;
+            });
+        });
 
         $scope.selectCommand = function(command){
             var index = $scope.model.value.toolbar.indexOf(command.alias);
@@ -60,11 +58,16 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
         $scope.selectStylesheet = function (css) {
 
-            var index = $scope.model.value.stylesheets.indexOf(css.name);
+            // find out if the stylesheet is already selected; first look for the full stylesheet path (current format)
+            var index = $scope.model.value.stylesheets.indexOf(css.path);
+            if (index === -1) {
+                // ... then look for the stylesheet name (legacy format)
+                index = $scope.model.value.stylesheets.indexOf(css.name);
+            }
 
-            if(css.selected && index === -1){
-                $scope.model.value.stylesheets.push(css.name);
-            }else if(index >= 0){
+            if(index === -1){
+                $scope.model.value.stylesheets.push(css.path);
+            }else{
                 $scope.model.value.stylesheets.splice(index, 1);
             }
         };

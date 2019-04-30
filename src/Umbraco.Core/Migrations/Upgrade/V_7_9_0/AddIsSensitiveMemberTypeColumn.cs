@@ -13,8 +13,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_9_0
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
 
-            if (columns.Any(x => x.TableName.InvariantEquals(Constants.DatabaseSchema.Tables.MemberType) && x.ColumnName.InvariantEquals("isSensitive")) == false)
-                AddColumn<MemberTypeDto>("isSensitive");
+            if (columns.Any(x => x.TableName.InvariantEquals(Constants.DatabaseSchema.Tables.MemberPropertyType) && x.ColumnName.InvariantEquals("isSensitive")) == false)
+                AddColumn<MemberPropertyTypeDto>("isSensitive");
         }
     }
 }

@@ -3,9 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
@@ -48,7 +46,7 @@ namespace Umbraco.Web.Editors
         {
             var allLanguages = Services.LocalizationService.GetAllLanguages();
 
-            return Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages);
+            return Mapper.MapEnumerable<ILanguage, Language>(allLanguages);
         }
 
         [HttpGet]
@@ -102,6 +100,13 @@ namespace Umbraco.Web.Editors
 
             // this is prone to race conditions but the service will not let us proceed anyways
             var existing = Services.LocalizationService.GetLanguageByIsoCode(language.IsoCode);
+
+            // the localization service might return the generic language even when queried for specific ones (e.g. "da" when queried for "da-DK")
+            // - we need to handle that explicitly
+            if (existing?.IsoCode != language.IsoCode)
+            {
+                existing = null;
+            }
 
             if (existing != null && language.Id != existing.Id)
             {

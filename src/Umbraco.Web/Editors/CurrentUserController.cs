@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using AutoMapper;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -15,7 +12,6 @@ using Umbraco.Web.WebApi;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 

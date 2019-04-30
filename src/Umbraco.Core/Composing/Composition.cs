@@ -133,7 +133,11 @@ namespace Umbraco.Core.Composing
 
             Configs.RegisterWith(_register);
 
-            return _register.CreateFactory();
+            IFactory factory = null;
+            // ReSharper disable once AccessToModifiedClosure -- on purpose
+            _register.Register(_ => factory, Lifetime.Singleton);
+            factory = _register.CreateFactory();
+            return factory;
         }
 
         /// <summary>

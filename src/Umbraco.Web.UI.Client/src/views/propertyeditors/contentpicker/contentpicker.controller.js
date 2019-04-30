@@ -33,7 +33,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     /** Performs validation based on the renderModel data */
     function validate() {
         if ($scope.contentPickerForm) {
-            angularHelper.getCurrentForm($scope).$setDirty();
             //Validate!
             if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", false);
@@ -65,7 +64,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         //model if it changes (i.e. based on server updates, or if used in split view, etc...)
         $scope.$watch("model.value", function (newVal, oldVal) {
             if (newVal !== oldVal) {
-                syncRenderModel();
+                syncRenderModel(true);
             }
         });
     }
@@ -81,6 +80,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
+        ignoreUserStartNodes: false,
         maxNumber: 1,
         minNumber: 0,
         startNode: {
@@ -118,7 +118,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = Object.toBoolean($scope.model.config.showOpenButton);
     $scope.model.config.showEditButton = Object.toBoolean($scope.model.config.showEditButton);
     $scope.model.config.showPathOnHover = Object.toBoolean($scope.model.config.showPathOnHover);
-
+    $scope.model.config.ignoreUserStartNodes = Object.toBoolean($scope.model.config.ignoreUserStartNodes);    
+    
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
@@ -134,6 +135,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
         startNodeId: null,
+        ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes,
         currentNode: editorState ? editorState.current : null,
         callback: function (data) {
             if (angular.isArray(data)) {
@@ -383,7 +385,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
         else {
             $scope.renderModel = [];
-            if (validate) {
+            if (doValidation) {
                 validate();
             }
             setSortingState($scope.renderModel);
@@ -463,6 +465,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             //everything is loaded, start the watch on the model
             startWatch();
             subscribe();
+            validate();
         });
     }
 
