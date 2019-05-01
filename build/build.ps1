@@ -424,6 +424,56 @@
     Write-Host "Prepare Azure Gallery"
     $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
   })
+  
+  $ubuild.DefineMethod("PrepareCSharpDocs",
+  {
+    Write-Host "Prepare C# Documentation"
+	
+	$src = "$($this.SolutionRoot)\src"
+    $tmp = $this.BuildTemp
+    $out = $this.BuildOutput
+	$DocFxJson = Join-Path -Path $src "\ApiDocs\docfx.json"
+	$DocFxSiteOutput = Join-Path -Path $tmp "\_site\*.*"
+	
+	# Build the solution in debug mode
+	$SolutionPath = Join-Path -Path $src -ChildPath "umbraco.sln"
+
+	#restore nuget packages
+	$this.RestoreNuGet()
+
+	# run DocFx
+	$DocFx = $this.BuildEnv.DocFx
+	
+	& $DocFx metadata $DocFxJson
+	& $DocFx build $DocFxJson
+
+	# zip it
+	& $this.BuildEnv.Zip a -tzip -r "$out\csharp-docs.zip" $DocFxSiteOutput
+  })
+  
+  $ubuild.DefineMethod("PrepareAngularDocs",
+  {
+    Write-Host "Prepare Angular Documentation"
+	
+	$src = "$($this.SolutionRoot)\src"
+    $out = $this.BuildOutput
+	
+	$this.CompileBelle()
+
+	"Moving to Umbraco.Web.UI.Client folder"
+	cd .\src\Umbraco.Web.UI.Client
+
+	"Generating the docs and waiting before executing the next commands"
+	& gulp docs | Out-Null
+
+	# change baseUrl
+	$BaseUrl = "https://our.umbraco.org/apidocs/ui/"
+	$IndexPath = "./docs/api/index.html"
+	(Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
+
+	# zip it
+	& $this.BuildEnv.Zip a -tzip -r "$out\ui-docs.zip" "$src\Umbraco.Web.UI.Client\docs\api\*.*"
+  })
 
   $ubuild.DefineMethod("Build",
   {
