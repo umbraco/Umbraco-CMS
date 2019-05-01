@@ -233,27 +233,20 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.deleteNode = function (idx) {
             if ($scope.nodes.length > $scope.model.config.minItems) {
-                if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes === 1) {
-                    localizationService.localize("content_nestedContentDeleteItem").then(function (value) {
-                        if (confirm(value)) {
-                            $scope.nodes.splice(idx, 1);
-                            $scope.setDirty();
-                            updateModel();
-                        }
-                    });
-                } else {
-                    $scope.nodes.splice(idx, 1);
-                    $scope.setDirty();
-                    updateModel();
-                }
+                $scope.nodes.splice(idx, 1);
+                $scope.setDirty();
+                updateModel();
             }
         };
         $scope.requestDeleteNode = function (idx) {
-            console.log("$scope.model.config.confirmDeletes", $scope.model.config.confirmDeletes)
-            if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes === 1) {
-                
+            if ($scope.model.config.confirmDeletes === true) {
+                localizationService.localize("content_nestedContentDeleteItem").then(function (value) {
+                    if (confirm(value)) {
+                        $scope.deleteNode(idx);
+                    }
+                });
             } else {
-                
+                $scope.deleteNode(idx);
             }
         };
 
