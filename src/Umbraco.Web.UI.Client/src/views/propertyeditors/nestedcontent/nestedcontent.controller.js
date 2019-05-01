@@ -22,7 +22,35 @@
         $scope.sortableOptions = {
             axis: "y",
             cursor: "move",
-            handle: ".icon-navigation"
+            handle: ".handle",
+            placeholder: 'sortable-placeholder',
+            forcePlaceholderSize: true,
+            helper: function (e, ui) {
+                // When sorting table rows, the cells collapse. This helper fixes that: https://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
+                ui.children().each(function () {
+                    $(this).width($(this).width());
+                });
+                return ui;
+            },
+            start: function (e, ui) {
+
+                var cellHeight = ui.item.height();
+
+                // Build a placeholder cell that spans all the cells in the row: https://stackoverflow.com/questions/25845310/jquery-ui-sortable-and-table-cell-size
+                var cellCount = 0;
+                $('td, th', ui.helper).each(function () {
+                    // For each td or th try and get it's colspan attribute, and add that or 1 to the total
+                    var colspan = 1;
+                    var colspanAttr = $(this).attr('colspan');
+                    if (colspanAttr > 1) {
+                        colspan = colspanAttr;
+                    }
+                    cellCount += colspan;
+                });
+
+                // Add the placeholder UI - note that this is the item's content, so td rather than tr - and set height of tr
+                ui.placeholder.html('<td colspan="' + cellCount + '"></td>').height(cellHeight);
+            }
         };
 
         $scope.docTypeTabs = {};
@@ -96,6 +124,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.singleMode = $scope.minItems === 1 && $scope.maxItems === 1;
         $scope.showIcons = Object.toBoolean($scope.model.config.showIcons);
         $scope.wideMode = Object.toBoolean($scope.model.config.hideLabel);
+        $scope.hasContentTypes = $scope.model.config.contentTypes.length > 0;
 
         $scope.labels = {};
         localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function(data) {

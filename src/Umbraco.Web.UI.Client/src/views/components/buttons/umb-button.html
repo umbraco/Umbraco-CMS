@@ -1,9 +1,9 @@
 <div class="umb-button" ng-class="{'umb-button--block': vm.blockElement}" data-element="{{ vm.alias ? 'button-' + vm.alias : '' }}">
 
     <div ng-if="vm.innerState">
-        <div class="icon-check umb-button__success" ng-class="{'-hidden': vm.innerState !== 'success', '-white': vm.style}"></div>
-        <div class="icon-delete umb-button__error" ng-class="{'-hidden': vm.innerState !== 'error', '-white': vm.style}"></div>
-        <div class="umb-button__progress" ng-class="{'-hidden': vm.innerState !== 'busy', '-white': vm.style}"></div>
+        <div class="icon-check umb-button__success" ng-class="{'-hidden': vm.innerState !== 'success', '-white': vm.isPrimaryButtonStyle}"></div>
+        <div class="icon-delete umb-button__error" ng-class="{'-hidden': vm.innerState !== 'error', '-white': vm.isPrimaryButtonStyle}"></div>
+        <div class="umb-button__progress" ng-class="{'-hidden': vm.innerState !== 'busy', '-white': vm.isPrimaryButtonStyle}"></div>
         <div ng-if="vm.innerState !== 'init'" class="umb-button__overlay"></div>
     </div>
 

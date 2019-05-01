@@ -5,13 +5,13 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         var vm = this;
         var dialogOptions = $scope.model;
 
-        var searchText = "Search...";
-
         vm.submit = submit;
         vm.close = close;
+        vm.toggleOpenInNewWindow = toggleOpenInNewWindow;
 
-        localizationService.localize("general_search").then(function (value) {
-            searchText = value + "...";
+        vm.labels = {};
+        localizationService.localizeMany(["defaultdialogs_openInNewWindow"]).then(function (data) {
+            vm.labels.openInNewWindow = data[0];
         });
 
         if (!$scope.model.title) {
@@ -93,8 +93,13 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     $scope.model.target.anchor = $scope.model.target.url.substring(indexOfAnchor);
                     // then rewrite the model and populate the link
                     $scope.model.target.url = $scope.model.target.url.substring(0, indexOfAnchor);
-                }            }
-        } else if (dialogOptions.anchors) {
+                }
+            }
+
+            // need to translate the link target ("_blank" or "") into a boolean value for umb-checkbox 
+            vm.openInNewWindow = $scope.model.target.target === "_blank";
+        } 
+        else if (dialogOptions.anchors) {
             $scope.anchorValues = dialogOptions.anchors;
         }
 
@@ -226,6 +231,10 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
         function openMiniListView(node) {
             $scope.miniListView = node;
+        }
+
+        function toggleOpenInNewWindow(model, value) {
+            $scope.model.target.target = model ? "_blank" : "";
         }
 
         function close() {

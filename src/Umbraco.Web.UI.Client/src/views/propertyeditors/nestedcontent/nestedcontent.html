@@ -29,7 +29,13 @@
 
         </div>
 
-        <div class="umb-nested-content__footer-bar" ng-hide="nodes.length >= maxItems">
+        <div ng-hide="hasContentTypes">
+            <div class="umb-nested-content__help-text">
+                <localize key="content_nestedContentNoContentTypes"></localize>
+            </div>
+        </div>
+
+        <div class="umb-nested-content__footer-bar" ng-hide="hasContentTypes === false || nodes.length >= maxItems">
             <a href class="umb-nested-content__add-content" ng-class="{ '--disabled': !scaffolds.length }" ng-click="openNodeTypePicker($event)" prevent-default>
                 <localize key="grid_addElement"></localize>
             </a>

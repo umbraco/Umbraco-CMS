@@ -39,11 +39,6 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
                     editorState.set($scope.content);
 
-                    // set all groups to open
-                    angular.forEach($scope.content.tabs, function(group){
-                        group.open = true;
-                    });
-
                     $scope.page.loading = false;
 
                 });
@@ -57,11 +52,6 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
                     setHeaderNameState($scope.content);
 
                     editorState.set($scope.content);
-
-                    // set all groups to open
-                    angular.forEach($scope.content.tabs, function(group){
-                        group.open = true;
-                    });
 
                     $scope.page.loading = false;
 

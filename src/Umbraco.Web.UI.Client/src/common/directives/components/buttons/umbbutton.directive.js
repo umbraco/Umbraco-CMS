@@ -117,6 +117,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
             vm.innerState = "init";
 
             vm.buttonLabel = vm.label;
+            // is this a primary button style (i.e. anything but an 'info' button)?
+            vm.isPrimaryButtonStyle = vm.buttonStyle && vm.buttonStyle !== 'info';
 
             if (vm.buttonStyle) {
 
