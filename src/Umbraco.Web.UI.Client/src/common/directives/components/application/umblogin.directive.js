@@ -56,6 +56,7 @@
         vm.getStarted = getStarted;
         vm.inviteSavePassword = inviteSavePassword;
         vm.showLogin = showLogin;
+        vm.show2FALogin = show2FALogin;
         vm.showRequestPasswordReset = showRequestPasswordReset;
         vm.showSetPassword = showSetPassword;
         vm.loginSubmit = loginSubmit;
@@ -219,7 +220,7 @@
                     //is Two Factor required?
                     if (reason.status === 402) {
                         vm.errorMsg = "Additional authentication required";
-                        show2FALoginDialog(reason.data.twoFactorView, submit);
+                        show2FALogin();
                     }
                     else {
                         vm.loginStates.submitButton = "error";
@@ -403,8 +404,12 @@
             });
         }
 
-        function show2FALoginDialog(view, callback) {
-            // TODO: show 2FA window
+        function show2FALogin() {
+            
+            vm.errorMsg = '';
+            resetInputValidation();
+            vm.view = "2fa-login";
+            
         }
 
         function resetInputValidation() {
