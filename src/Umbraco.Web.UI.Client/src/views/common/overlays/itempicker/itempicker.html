@@ -20,7 +20,7 @@
 
     <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
         <li ng-repeat="pasteItem in model.pasteItems | filter:searchTerm"
-            ng-click="pasteItem(pasteItem)">
+            ng-click="model.clickPasteItem(pasteItem)">
             <a class="umb-card-grid-item" href="" title="{{ pasteItem.name }}">
                 <span>
                     <i class="{{ pasteItem.icon }}"></i>

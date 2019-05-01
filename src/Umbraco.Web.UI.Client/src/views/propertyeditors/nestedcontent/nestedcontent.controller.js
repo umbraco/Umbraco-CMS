@@ -127,11 +127,16 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.overlayMenu = {
                 show: false,
                 style: {},
-                filter: $scope.scaffolds.length > 15 ? true : false,
+                filter: $scope.scaffolds.length > 12 ? true : false,
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
-                submit: function(model) {                    
+                clickPasteItem: function(item) {
+                    $scope.pasteFromClipboard(item.data);
+                    $scope.overlayMenu.show = false;
+                    $scope.overlayMenu = null;
+                },
+                submit: function(model) {
                     if(model && model.selectedItem) {
                         $scope.addNode(model.selectedItem.alias);
                     }
@@ -166,6 +171,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 $scope.overlayMenu.pasteItems.push({
                     alias: node.contentTypeAlias,
                     name: node.name, //contentTypeName
+                    data: node,
                     icon: iconHelper.convertFromLegacyIcon(node.icon)
                 });
             });
@@ -308,13 +314,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             
             copyService.copy("elementType", node);
             $event.stopPropagation();
-        }
-        
-        $scope.clickPaste = function($event) {
-            
-            var newNode = copyService.retriveDataOfType("elementType", contentTypeAliases).pop();
-            $scope.pasteFromClipboard(newNode);
-            
         }
         
         $scope.pasteFromClipboard = function(newNode) {
