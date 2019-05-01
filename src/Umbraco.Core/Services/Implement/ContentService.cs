@@ -870,6 +870,11 @@ namespace Umbraco.Core.Services.Implement
                     throw new NotSupportedException($"Culture \"{culture}\" is not supported by invariant content types.");
             }
 
+            if(content.Name.Length > 256)
+            {
+                throw new Exception("Name cannot be more than 256 characters in length.");
+            }
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
