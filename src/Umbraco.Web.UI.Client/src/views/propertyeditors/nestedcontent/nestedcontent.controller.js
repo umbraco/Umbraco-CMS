@@ -219,6 +219,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 }
             }
         };
+        $scope.requestDeleteNode = function (idx) {
+            console.log("$scope.model.config.confirmDeletes", $scope.model.config.confirmDeletes)
+            if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes === 1) {
+                
+            } else {
+                
+            }
+        };
 
         $scope.getName = function (idx) {
 

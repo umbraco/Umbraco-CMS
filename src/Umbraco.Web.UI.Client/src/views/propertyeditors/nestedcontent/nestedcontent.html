@@ -15,7 +15,7 @@
                         <a class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{copyIconTitle}}" ng-click="clickCopy($event, node);" ng-if="showCopy" prevent-default>
                             <i class="icon icon-documents"></i>
                         </a>
-                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.requestDeleteNode($index); $event.stopPropagation();" prevent-default>
                             <i class="icon icon-trash"></i>
                         </a>
                     </div>
