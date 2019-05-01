@@ -17,7 +17,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "name", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
-        [MaxLength(256, ErrorMessage ="Name must be less than 256 characters")]
+        [MaxLength(255, ErrorMessage ="Name must be less than 255 characters")]
         public string Name { get; set; }
 
         [DataMember(Name = "properties")]
