@@ -467,7 +467,7 @@
 	& gulp docs | Out-Null
 
 	# change baseUrl
-	$BaseUrl = "https://our.umbraco.org/apidocs/ui/"
+	$BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
 	$IndexPath = "./docs/api/index.html"
 	(Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
 
