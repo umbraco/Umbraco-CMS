@@ -62,6 +62,9 @@ namespace Umbraco.Web.Templates
                             else if (guidUdi.EntityType == Constants.UdiEntityType.Media)
                                 newLink = mediaCache.GetById(guidUdi.Guid)?.Url;
 
+                            if (newLink == null)
+                                newLink = "#";
+
                             text = text.Replace(tag.Value, "href=\"" + newLink);
                         }
                     }
