@@ -1005,9 +1005,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 return;
             }
 
-            // Is email and not //user@domain.com
-            if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf('mailto:') === -1) {
-                href = 'mailto:' + href;
+		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
+		    if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
+		        // assume it's a mailto link
+				href = 'mailto:' + href;
                 insertLink();
                 return;
             }
