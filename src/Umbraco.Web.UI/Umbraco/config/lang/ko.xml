@@ -201,13 +201,6 @@
     <key alias="displayName">국가명</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">자식노드 타입 허용</key>
-    <key alias="create">생성</key>
-    <key alias="deletetab">색인 삭제</key>
-    <key alias="description">설명</key>
-    <key alias="newtab">새 색인</key>
-    <key alias="tab">색인</key>
-    <key alias="thumbnail">썸네일</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">이전값 더하기</key>

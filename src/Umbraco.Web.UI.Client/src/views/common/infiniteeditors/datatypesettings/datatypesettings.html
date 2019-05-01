@@ -1,7 +1,8 @@
 <div ng-controller="Umbraco.Editors.DataTypeSettingsController as vm">
-<umb-editor-view data-element="editor-data-type-settings">
 
-    <form novalidate name="dataTypeSettingsForm" val-form-manager>
+<form novalidate name="dataTypeSettingsForm" val-form-manager>
+
+    <umb-editor-view data-element="editor-data-type-settings">
 
         <umb-editor-header
             name="model.title"
@@ -11,7 +12,7 @@
             hide-description="true">
         </umb-editor-header>
 
-        <umb-editor-container>
+        <umb-editor-container class="form-horizontal">
 
             <umb-load-indicator
                 ng-if="vm.loadingDataType">
@@ -66,7 +67,8 @@
             </umb-editor-footer-content-right>
         </umb-editor-footer>
 
-    </form>
+    </umb-editor-view>
 
-</umb-editor-view>
+</form>
+
 </div>

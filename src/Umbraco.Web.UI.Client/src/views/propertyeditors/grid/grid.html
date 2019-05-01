@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.PropertyEditors.GridController" class="umb-grid umb-property-editor clearfix" id="umb-grid">
 
-    <umb-editor-sub-header ng-if="showReorderButton()" style="background-color: white;">
+    <umb-editor-sub-header ng-if="showReorderButton()" appearance="white">
 
         <umb-editor-sub-header-content-right>
             <umb-button
@@ -301,13 +301,6 @@
       model="editorOverlay"
       view="editorOverlay.view"
       position="target">
-    </umb-overlay>
-
-    <umb-overlay
-      ng-if="gridItemSettingsDialog.show"
-      model="gridItemSettingsDialog"
-      view="gridItemSettingsDialog.view"
-      position="right">
     </umb-overlay>
 
 </div>

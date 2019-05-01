@@ -330,13 +330,6 @@
     <key alias="usernameHint">Jouw gebruikersnaam is meestal jouw email</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Toegelaten subnodetypes</key>
-    <key alias="create">Nieuw</key>
-    <key alias="deletetab">Tab verwijderen</key>
-    <key alias="description">Omschrijving</key>
-    <key alias="newtab">Nieuwe tab</key>
-    <key alias="tab">Tab</key>
-    <key alias="thumbnail">Miniatuur</key>
     <key alias="createListView" version="7.2">Maak een aangepaste lijstweergave</key>
     <key alias="removeListView" version="7.2">Verwijder aangepaste lijstweergave</key>
   </area>

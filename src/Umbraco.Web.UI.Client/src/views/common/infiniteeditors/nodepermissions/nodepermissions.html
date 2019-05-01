@@ -17,12 +17,7 @@
                     <umb-control-group
                         ng-repeat="(category, permissions) in model.node.permissions"
                         label="{{category}}">
-                        <umb-permission
-                            ng-repeat="permission in permissions"
-                            name="permission.name"
-                            description="permission.description"
-                            selected="permission.checked">
-                        </umb-permission>
+                        <umb-toggle-group items="permissions"></umb-toggle-group>
                     </umb-control-group>
                 </umb-box-content>
             </umb-box>

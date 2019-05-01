@@ -91,6 +91,13 @@ namespace Umbraco.Web
             => composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
 
         /// <summary>
+        /// Gets the media url providers collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static MediaUrlProviderCollectionBuilder MediaUrlProviders(this Composition composition)
+            => composition.WithCollectionBuilder<MediaUrlProviderCollectionBuilder>();
+
+        /// <summary>
         /// Gets the backoffice sections/applications collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
