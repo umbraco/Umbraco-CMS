@@ -42,30 +42,22 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (source == null)
-                return null;
-
             var umbracoContext = UmbracoContext.Current;
             if (umbracoContext == null)
                 return source;
 
             var membershipHelper = new MembershipHelper(umbracoContext);
 
-            IPublishedContent member;
             if (source is int sourceInt)
             {
-                member = membershipHelper.GetById(sourceInt);
-                if (member != null)
-                    return member;
+                return membershipHelper.GetById(sourceInt);
             }
             else if (source is GuidUdi sourceUdi)
             {
-                member = membershipHelper.GetByProviderKey(sourceUdi.Guid);
-                if (member != null)
-                    return member;
+                return membershipHelper.GetByProviderKey(sourceUdi.Guid);
             }
 
-            return source;
+            return null;
         }
 
     }

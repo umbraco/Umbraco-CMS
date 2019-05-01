@@ -8,7 +8,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Globalization;
 
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -33,8 +32,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </summary>
         private static readonly List<string> PropertiesToExclude = new List<string>()
         {
-            Constants.Conventions.Content.InternalRedirectId.ToLower(CultureInfo.InvariantCulture),
-            Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
+            Constants.Conventions.Content.InternalRedirectId,
+            Constants.Conventions.Content.Redirect
         };
 
         /// <summary>
@@ -111,24 +110,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (umbracoContext == null)
                 return source;
 
-            if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
+            // Do not convert source for excluded properties
+            if (propertyType.PropertyTypeAlias == null || PropertiesToExclude.InvariantContains(propertyType.PropertyTypeAlias))
+                return source;
+
+            if (source is int sourceInt)
             {
-                IPublishedContent content;
-                if (source is int sourceInt)
-                {
-                    content = umbracoContext.ContentCache.GetById(sourceInt);
-                    if (content != null)
-                        return content;
-                }
-                else if (source is Udi sourceUdi)
-                {
-                    content = umbracoContext.ContentCache.GetById(sourceUdi);
-                    if (content != null)
-                        return content;
-                }
+                return umbracoContext.ContentCache.GetById(sourceInt);
+            }
+            else if (source is Udi sourceUdi)
+            {
+                return umbracoContext.ContentCache.GetById(sourceUdi);
             }
 
-            return source;
+            return null;
         }
 
         /// <summary>
