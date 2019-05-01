@@ -189,7 +189,7 @@
             vm.view = "set-password";
         }
 
-        function loginSubmit(login, password) {
+        function loginSubmit() {
             
             // make sure that we are returning to the login view.
             vm.view = "login";
@@ -200,7 +200,7 @@
             // validate them - this is because if there are validation errors on the server
             // then the user has to change both username & password to resubmit which isn't ideal,
             // so if they're not empty, we'll just make sure to set them to valid.
-            if (login && password && login.length > 0 && password.length > 0) {
+            if (vm.login && vm.password && vm.login.length > 0 && vm.password.length > 0) {
                 vm.loginForm.username.$setValidity('auth', true);
                 vm.loginForm.password.$setValidity('auth', true);
             }
@@ -211,7 +211,7 @@
 
             vm.loginStates.submitButton = "busy";
 
-            userService.authenticate(login, password)
+            userService.authenticate(vm.login, vm.password)
                 .then(function (data) {
                     vm.loginStates.submitButton = "success";
                     userService._retryRequestQueue(true);
@@ -225,7 +225,7 @@
                     if (reason.status === 402) {
                         vm.errorMsg = "Additional authentication required";
                         show2FALogin(reason.data.twoFactorView, $scope.loginSubmit);
-
+                        
                     }
                     else {
                         vm.loginStates.submitButton = "error";
