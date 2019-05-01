@@ -190,28 +190,43 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.getName = function (idx) {
 
-            var name = "Item " + (idx + 1);
+            var name = "";
 
             if ($scope.model.value[idx]) {
 
                 var contentType = $scope.getContentTypeConfig($scope.model.value[idx].ncContentTypeAlias);
 
-                if (contentType != null && contentType.nameExp) {
-                    // Run the expression against the stored dictionary value, NOT the node object
-                    var item = $scope.model.value[idx];
+                if (contentType != null) {
+                    // first try getting a name using the configured label template
+                    if (contentType.nameExp) {
+                        // Run the expression against the stored dictionary value, NOT the node object
+                        var item = $scope.model.value[idx];
 
-                    // Add a temporary index property
-                    item["$index"] = (idx + 1);
+                        // Add a temporary index property
+                        item["$index"] = (idx + 1);
 
-                    var newName = contentType.nameExp(item);
-                    if (newName && (newName = $.trim(newName))) {
-                        name = newName;
+                        var newName = contentType.nameExp(item);
+                        if (newName && (newName = $.trim(newName))) {
+                            name = newName;
+                        }
+
+                        // Delete the index property as we don't want to persist it
+                        delete item["$index"];
                     }
 
-                    // Delete the index property as we don't want to persist it
-                    delete item["$index"];
+                    // if we still do not have a name and we have multiple content types to choose from, use the content type name (same as is shown in the content type picker)
+                    if (!name && $scope.scaffolds.length > 1) {
+                        var scaffold = $scope.getScaffold(contentType.ncAlias);
+                        if (scaffold) {
+                            name = scaffold.contentTypeName;
+                        }
+                    }
                 }
 
+            }
+
+            if (!name) {
+                name = "Item " + (idx + 1);
             }
 
             // Update the nodes actual name value
