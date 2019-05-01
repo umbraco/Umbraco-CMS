@@ -20,11 +20,13 @@ namespace Umbraco.Web.Compose
     {
         private readonly Notifier _notifier;
         private readonly ActionCollection _actions;
+        private readonly IContentService _contentService;
 
-        public NotificationsComponent(Notifier notifier, ActionCollection actions)
+        public NotificationsComponent(Notifier notifier, ActionCollection actions, IContentService contentService)
         {
             _notifier = notifier;
             _actions = actions;
+            _contentService = contentService;
         }
 
         public void Initialize()
@@ -54,7 +56,12 @@ namespace Umbraco.Web.Compose
             ContentService.Copied += (sender, args) => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
 			
             //Send notifications for the rollback action
-            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);			
+            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);	
+			
+            //Send notifications for the public access changed action
+            PublicAccessService.Saved += (sender, args) => PublicAccessServiceSaved(_notifier, sender, args, _contentService, _actions);
+			
+            UserService.UserGroupPermissionsAssigned += (sender, args) => UserServiceUserGroupPermissionsAssigned(_notifier, sender, args, _contentService, _actions);
         }
 
         public void Terminate()
@@ -98,6 +105,16 @@ namespace Umbraco.Web.Compose
             notifier.Notify(actions.GetAction<ActionNew>(), newEntities.ToArray());
             notifier.Notify(actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
         }
+
+        private void UserServiceUserGroupPermissionsAssigned(Notifier notifier, IUserService sender, Core.Events.SaveEventArgs<EntityPermission> args, IContentService contentService, ActionCollection actions)
+        {
+            var entities = contentService.GetByIds(args.SavedEntities.Select(e => e.EntityId)).ToArray();
+            if(entities.Any() == false)
+            {
+                return;
+            }
+            notifier.Notify(actions.GetAction<ActionRights>(), entities);
+        }
                 
         private void ContentServiceMoved(Notifier notifier, IContentService sender, Core.Events.MoveEventArgs<IContent> args, ActionCollection actions)
         {
@@ -115,6 +132,16 @@ namespace Umbraco.Web.Compose
             }
         }
 
+        private void PublicAccessServiceSaved(Notifier notifier, IPublicAccessService sender, Core.Events.SaveEventArgs<PublicAccessEntry> args, IContentService contentService, ActionCollection actions)
+        {
+            var entities = contentService.GetByIds(args.SavedEntities.Select(e => e.ProtectedNodeId)).ToArray();
+            if(entities.Any() == false)
+            {
+                return;
+            }
+            notifier.Notify(actions.GetAction<ActionProtect>(), entities);
+        }
+		
         /// <summary>
         /// This class is used to send the notifications
         /// </summary>

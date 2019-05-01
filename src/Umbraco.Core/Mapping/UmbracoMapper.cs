@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,11 +30,16 @@ namespace Umbraco.Core.Mapping
     /// </remarks>
     public class UmbracoMapper
     {
-        private readonly Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors
-            = new Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>>();
+        // note
+        //
+        // the outer dictionary *can* be modified, see GetCtor and GetMap, hence have to be ConcurrentDictionary
+        // the inner dictionaries are never modified and therefore can be simple Dictionary
 
-        private readonly Dictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
-            = new Dictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
+        private readonly ConcurrentDictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors
+            = new ConcurrentDictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>>();
+
+        private readonly ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
+            = new ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoMapper"/> class.
@@ -101,16 +107,12 @@ namespace Umbraco.Core.Mapping
 
         private Dictionary<Type, Func<object, MapperContext, object>> DefineCtors(Type sourceType)
         {
-            if (!_ctors.TryGetValue(sourceType, out var sourceCtor))
-                sourceCtor = _ctors[sourceType] = new Dictionary<Type, Func<object, MapperContext, object>>();
-            return sourceCtor;
+            return _ctors.GetOrAdd(sourceType, _ => new Dictionary<Type, Func<object, MapperContext, object>>());
         }
 
         private Dictionary<Type, Action<object, object, MapperContext>> DefineMaps(Type sourceType)
         {
-            if (!_maps.TryGetValue(sourceType, out var sourceMap))
-                sourceMap = _maps[sourceType] = new Dictionary<Type, Action<object, object, MapperContext>>();
-            return sourceMap;
+            return _maps.GetOrAdd(sourceType, _ => new Dictionary<Type, Action<object, object, MapperContext>>());
         }
 
         #endregion
@@ -326,6 +328,8 @@ namespace Umbraco.Core.Mapping
             if (_ctors.TryGetValue(sourceType, out var sourceCtor) && sourceCtor.TryGetValue(targetType, out var ctor))
                 return ctor;
 
+            // we *may* run this more than once but it does not matter
+
             ctor = null;
             foreach (var (stype, sctors) in _ctors)
             {
@@ -346,6 +350,8 @@ namespace Umbraco.Core.Mapping
         {
             if (_maps.TryGetValue(sourceType, out var sourceMap) && sourceMap.TryGetValue(targetType, out var map))
                 return map;
+
+            // we *may* run this more than once but it does not matter
 
             map = null;
             foreach (var (stype, smap) in _maps)

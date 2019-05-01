@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -25,9 +25,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
         public bool TryFindContent(PublishedRequest frequest)

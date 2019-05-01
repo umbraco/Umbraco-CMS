@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,8 +25,8 @@ namespace Umbraco.Web.Macros
         /// </summary>
         /// <param name="frequest">The <see cref="PublishedRequest"/> pointing to the document.</param>
         /// <remarks>
-        /// The difference between creating the page with PublishedContentRequest vs an IPublishedContent item is
-        /// that the PublishedContentRequest takes into account how a template is assigned during the routing process whereas
+        /// The difference between creating the page with PublishedRequest vs an IPublishedContent item is
+        /// that the PublishedRequest takes into account how a template is assigned during the routing process whereas
         /// with an IPublishedContent item, the template id is assigned purely based on the default.
         /// </remarks>
         internal PublishedContentHashtableConverter(PublishedRequest frequest)

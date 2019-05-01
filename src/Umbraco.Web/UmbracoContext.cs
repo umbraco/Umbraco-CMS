@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
@@ -144,7 +144,7 @@ namespace Umbraco.Web
         public UrlProvider UrlProvider { get; }
 
         /// <summary>
-        /// Gets/sets the PublishedContentRequest object
+        /// Gets/sets the PublishedRequest object
         /// </summary>
         public PublishedRequest PublishedRequest { get; set; }
 
