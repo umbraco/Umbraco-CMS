@@ -56,7 +56,6 @@
         vm.getStarted = getStarted;
         vm.inviteSavePassword = inviteSavePassword;
         vm.showLogin = showLogin;
-        vm.show2FALogin = show2FALogin;
         vm.showRequestPasswordReset = showRequestPasswordReset;
         vm.showSetPassword = showSetPassword;
         vm.loginSubmit = loginSubmit;
@@ -70,7 +69,9 @@
         ).then(function (data) {
             vm.labels.usernameLabel = data[0];
             vm.labels.usernamePlaceholder = data[1];
-        })                        
+        })            
+        
+        vm.twoFactor = {};
 
         function onInit() {
 
@@ -220,7 +221,8 @@
                     //is Two Factor required?
                     if (reason.status === 402) {
                         vm.errorMsg = "Additional authentication required";
-                        show2FALogin();
+                        show2FALogin(reason.data.twoFactorView, $scope.loginSubmit);
+
                     }
                     else {
                         vm.loginStates.submitButton = "error";
@@ -404,10 +406,12 @@
             });
         }
 
-        function show2FALogin() {
+        function show2FALogin(viewPath, submitCallback) {
             
             vm.errorMsg = '';
             resetInputValidation();
+            vm.twoFactor.submitCallback = submitCallback;
+            vm.twoFactor.view = viewPath;
             vm.view = "2fa-login";
             
         }
