@@ -1,7 +1,7 @@
 function copyService(notificationsService, eventsService) {
     
     
-    var STORAGE_KEY = "uCopyService";
+    var STORAGE_KEY = "umbCopyService";
     
     var supportsLocalStorage = function () {
         var test = "test";
