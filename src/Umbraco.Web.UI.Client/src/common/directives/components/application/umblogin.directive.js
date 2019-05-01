@@ -190,7 +190,10 @@
         }
 
         function loginSubmit(login, password) {
-
+            
+            // make sure that we are returning to the login view.
+            vm.view = "login";
+            
             // TODO: Do validation properly like in the invite password update
 
             //if the login and password are not empty we need to automatically
