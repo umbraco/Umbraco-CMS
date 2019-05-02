@@ -16,7 +16,6 @@
     function UmbLoginController($scope, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, $q) {
 
         const vm = this;
-        let twoFactorloginDialog = null;
 
         vm.invitedUser = null;
 
@@ -69,7 +68,7 @@
         ).then(function (data) {
             vm.labels.usernameLabel = data[0];
             vm.labels.usernamePlaceholder = data[1];
-        })            
+        });
         
         vm.twoFactor = {};
 
@@ -224,8 +223,7 @@
                     //is Two Factor required?
                     if (reason.status === 402) {
                         vm.errorMsg = "Additional authentication required";
-                        show2FALogin(reason.data.twoFactorView, $scope.loginSubmit);
-                        
+                        show2FALoginDialog(reason.data.twoFactorView);
                     }
                     else {
                         vm.loginStates.submitButton = "error";
@@ -409,14 +407,12 @@
             });
         }
 
-        function show2FALogin(viewPath, submitCallback) {
-            
-            vm.errorMsg = '';
-            resetInputValidation();
-            vm.twoFactor.submitCallback = submitCallback;
+        function show2FALoginDialog(viewPath) {
+            vm.twoFactor.submitCallback = function submitCallback() {
+                vm.onLogin();
+            }
             vm.twoFactor.view = viewPath;
             vm.view = "2fa-login";
-            
         }
 
         function resetInputValidation() {
