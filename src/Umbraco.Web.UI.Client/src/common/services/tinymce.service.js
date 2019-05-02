@@ -453,6 +453,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
                     }
 				    editor.dom.setAttrib(imgElm, 'id', null);
+                    
+                    editor.fire('Change');
+                    
                 }, 500);
             }
         },
@@ -1002,9 +1005,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 return;
             }
 
-            // Is email and not //user@domain.com
-            if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf('mailto:') === -1) {
-                href = 'mailto:' + href;
+		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
+		    if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
+		        // assume it's a mailto link
+				href = 'mailto:' + href;
                 insertLink();
                 return;
             }
@@ -1257,6 +1261,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     view: 'views/propertyeditors/rte/codeeditor.html',
                     submit: function (model) {
                         args.editor.setContent(model.content);
+                        args.editor.fire('Change');
                         editorService.close();
                     },
                     close: function () {

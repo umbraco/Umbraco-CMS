@@ -1,4 +1,4 @@
-function EditConfigController($scope) {
+function ConfigController($scope) {
 
     var vm = this;
 
@@ -16,7 +16,7 @@ function EditConfigController($scope) {
             $scope.model.close();
         }
     }
-
+    
 }
 
-angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.EditConfigController", EditConfigController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.ConfigController", ConfigController);

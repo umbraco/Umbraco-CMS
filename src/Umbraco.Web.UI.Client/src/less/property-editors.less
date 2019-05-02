@@ -238,6 +238,7 @@
 
 
 .umb-mediapicker .add-link {
+    position: relative;
     display: flex;
     justify-content:center;
     align-items:center;
@@ -249,9 +250,25 @@
 
     transition: all 150ms ease-in-out;
 
+    &:focus,
     &:hover {
         color: @ui-action-discreet-type-hover;
         border-color: @ui-action-discreet-type-hover;
+    }
+    
+    &:focus {
+        outline: none;
+        .tabbing-active &:after {
+            content: '';
+            position: absolute;
+            z-index: 10000;
+            top: -6px;
+            bottom: -6px;
+            left: -6px;
+            right: -6px;
+            border-radius: 3px;
+            box-shadow: 0 0 2px @blueMid, inset 0 0 2px 1px @blueMid;
+        }
     }
 }
 
@@ -550,7 +567,7 @@
     text-align: center;
 }
 
-.umb-cropper .crop-slider {
+.umb-cropper .crop-slider-wrapper {
     padding: 10px;
     border-top: 1px solid @gray-10;
     margin-top: 10px;
@@ -558,25 +575,28 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
+
     @media (min-width: 769px) {
         padding: 10px 50px 10px 50px;
     }
+
+    i {
+        color: @gray-3;
+        flex: 0 0 25px;
+        padding: 0 5px;
+        box-sizing: border-box;
+
+        &:first-of-type {
+            text-align: right;
+        }
+    }
+
+    .crop-slider {
+        padding: 50px 15px 40px 15px;
+        width: 66.6%;
+    }
 }
 
-.umb-cropper .crop-slider i {
-    color: @gray-3;
-    flex: 0 0 25px;
-    padding: 0 5px;
-    box-sizing: border-box;
-}
-
-.umb-cropper .crop-slider i:first-of-type {
-    text-align: right;
-}
-
-.umb-cropper .crop-slider input {
-    flex: 0 1 auto;
-}
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
         max-width: 100%;
@@ -637,6 +657,7 @@
         display: flex;
         justify-content: flex-end;
         padding: 10px;
+        position: relative;
 
         button {
             margin-left: 4px;
@@ -762,8 +783,7 @@
 }
 
 .umb-fileupload .file-icon {
-  text-align: center;
-  display: block;
+  display: inline-block;
   position: relative;
   padding: 5px 0;
 
@@ -782,7 +802,7 @@
     line-height: 130%;
     position: absolute;
     top: 45px;
-    left: 110px;
+    left: 10px;
   }
 }
 
