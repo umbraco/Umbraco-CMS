@@ -1889,9 +1889,8 @@ namespace Umbraco.Core.Services.Implement
             content.ParentId = parentId;
 
             // get the level delta (old pos to new pos)
-            var levelDelta = parent == null
-                ? 1 - content.Level + (parentId == Constants.System.RecycleBinContent ? 1 : 0)
-                : parent.Level + 1 - content.Level;
+            // note that recycle bin (id:-20) level is 0!
+            var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
 
             var paths = new Dictionary<int, string>();
 
@@ -2886,24 +2885,15 @@ namespace Umbraco.Core.Services.Implement
             {
                 foreach (var property in blueprint.Properties)
                 {
-                    if (property.PropertyType.VariesByCulture())
-                    {
-                        content.SetValue(property.Alias, property.GetValue(culture), culture);
-                    }
-                    else
-                    {
-                        content.SetValue(property.Alias, property.GetValue());
-                    }
+					var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
+                    content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
                 }
 
-                content.Name = blueprint.Name;
                 if (!string.IsNullOrEmpty(culture))
                 {
                     content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
                 }
             }
-
-
 
             return content;
         }

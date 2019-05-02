@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Logging;
+using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -20,9 +20,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public virtual bool TryFindContent(PublishedRequest frequest)
         {
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find an Umbraco document for a <c>PublishedContentRequest</c> and a route.
+        /// Tries to find an Umbraco document for a <c>PublishedRequest</c> and a route.
         /// </summary>
         /// <param name="docreq">The document request.</param>
         /// <param name="route">The route.</param>

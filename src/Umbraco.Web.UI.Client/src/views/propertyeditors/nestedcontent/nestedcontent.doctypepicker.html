@@ -5,7 +5,7 @@
                 <tr>
                     <th/>
                     <th>
-                        <localize key="content_documentType">Document Type</localize>
+                        <localize key="contentTypeEditor_elementType">Element Type</localize>
                     </th>
                     <th>
                         <localize key="general_group">Group</localize>
@@ -18,7 +18,8 @@
             </thead>
             <tbody ui-sortable="sortableOptions" ng-model="model.value">
                 <tr ng-repeat="config in model.value">
-                    <td class="icon icon-navigation">
+                    <td>
+                        <i class="icon icon-navigation handle"></i>
                     </td>
                     <td>
                         <select id="{{model.alias}}_doctype_select"
@@ -52,7 +53,7 @@
     <div class="umb-nested-content__help-text" ng-show="showHelpText">
         <p>
             <b><localize key="general_group">Group</localize>:</b><br/>
-            Select the group whose properties should be displayed. If left blank, the first group on the document type will be used.
+            Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.
         </p>
         <p>
             <b><localize key="template_template">Template</localize>:</b><br/>

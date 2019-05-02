@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -108,6 +110,68 @@ namespace Umbraco.Tests.Mapping
             var target = mapper.Map<IEnumerable<ContentPropertyDto>>(source);
         }
 
+        [Test]
+        [Explicit]
+        public void ConcurrentMap()
+        {
+            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            {
+                new MapperDefinition1(),
+                new MapperDefinition3(),
+            });
+            var mapper = new UmbracoMapper(definitions);
+
+            // the mapper currently has a map from Thing1 to Thing2
+            // because Thing3 inherits from Thing1, it will map a Thing3 instance,
+            // and register a new map from Thing3 to Thing2,
+            // thus modifying its internal dictionaries
+
+            // if timing is good, and mapper does have non-concurrent dictionaries, it fails
+            // practically, to reproduce, one needs to add a 1s sleep in the mapper's loop
+            // hence, this test is explicit
+
+            var thing3 = new Thing3 { Value = "value" };
+            var thing4 = new Thing4();
+            Exception caught = null;
+
+            void ThreadLoop()
+            {
+                // keep failing at mapping - and looping through the maps
+                for (var i = 0; i < 10; i++)
+                {
+                    try
+                    {
+                        mapper.Map<Thing2>(thing4);
+                    }
+                    catch (Exception e)
+                    {
+                        caught = e;
+                        Console.WriteLine($"{e.GetType().Name} {e.Message}");
+                    }
+                }
+
+                Console.WriteLine("done");
+            }
+
+            var thread = new Thread(ThreadLoop);
+            thread.Start();
+            Thread.Sleep(1000);
+
+            try
+            {
+                Console.WriteLine($"{DateTime.Now:O} mapping");
+                var thing2 = mapper.Map<Thing2>(thing3);
+                Console.WriteLine($"{DateTime.Now:O} mapped");
+
+                Assert.IsNotNull(thing2);
+                Assert.AreEqual("value", thing2.Value);
+            }
+            finally
+            {
+                thread.Join();
+            }
+        }
+
         private class Thing1
         {
             public string Value { get; set; }
@@ -120,6 +184,9 @@ namespace Umbraco.Tests.Mapping
         {
             public string Value { get; set; }
         }
+
+        private class Thing4
+        { }
 
         private class MapperDefinition1 : IMapDefinition
         {
@@ -143,6 +210,19 @@ namespace Umbraco.Tests.Mapping
 
             private static void Map(Property source, ContentPropertyDto target, MapperContext context)
             { }
+        }
+
+        private class MapperDefinition3 : IMapDefinition
+        {
+            public void DefineMaps(UmbracoMapper mapper)
+            {
+                // just some random things so that the mapper contains things
+                mapper.Define<int, object>();
+                mapper.Define<string, object>();
+                mapper.Define<double, object>();
+                mapper.Define<UmbracoMapper, object>();
+                mapper.Define<Property, object>();
+            }
         }
     }
 }

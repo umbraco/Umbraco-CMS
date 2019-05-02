@@ -25,7 +25,11 @@ function ContentBlueprintEditController($scope, $routeParams, contentResource) {
             var contentApp = _.find(content.apps, function (app) {
                 return app.alias === "umbContent";
             });
-            content.apps = [contentApp];
+            if (contentApp) {
+                content.apps = [contentApp];
+            } else {
+                content.apps = [];
+            }
         }
         content.allowPreview = false;
         content.allowedActions = ["A", "S", "C"];
