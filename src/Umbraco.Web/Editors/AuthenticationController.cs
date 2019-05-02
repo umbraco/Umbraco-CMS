@@ -329,7 +329,7 @@ namespace Umbraco.Web.Editors
         public async Task<IEnumerable<string>> Get2FAProviders()
         {
             var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId < 0)
+            if (userId < Core.Constants.Security.SuperUserId)
             {
                 Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -345,7 +345,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId < 0)
+            if (userId < Core.Constants.Security.SuperUserId)
             {
                 Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -475,8 +475,7 @@ namespace Umbraco.Web.Editors
 
             if (UserManager != null)
             {
-                var userId = -1;
-                int.TryParse(User.Identity.GetUserId(), out userId);
+                int.TryParse(User.Identity.GetUserId(), out var userId);
                 UserManager.RaiseLogoutSuccessEvent(userId);
             }
 

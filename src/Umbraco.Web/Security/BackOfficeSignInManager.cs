@@ -227,7 +227,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Get the user id that has been verified already or -1.
+        /// Get the user id that has been verified already or the SuperUserId minus 1.
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -240,7 +240,7 @@ namespace Umbraco.Web.Security
             {
                 return ConvertIdFromString(result.Identity.GetUserId());
             }
-            return -1;
+            return Constants.Security.SuperUserId - 1;
         }
 
         /// <summary>
@@ -269,12 +269,12 @@ namespace Umbraco.Web.Security
         /// This is implemented because we cannot override GetVerifiedUserIdAsync and instead we have to shadow it
         /// so due to this and because we are using an INT as the TKey and not an object, it can never be null. Adding to that
         /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
-        /// all of this code to check for -1 instead.
+        /// all of this code to check for SuperUserId-1 instead.
         /// </remarks>
         public override async Task<SignInStatus> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberBrowser)
         {
             var userId = await GetVerifiedUserIdAsync();
-            if (userId == -1)
+            if (userId == Constants.Security.SuperUserId - 1)
             {
                 return SignInStatus.Failure;
             }
@@ -306,12 +306,12 @@ namespace Umbraco.Web.Security
         /// This is implemented because we cannot override GetVerifiedUserIdAsync and instead we have to shadow it
         /// so due to this and because we are using an INT as the TKey and not an object, it can never be null. Adding to that
         /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
-        /// all of this code to check for -1 instead.
+        /// all of this code to check for SuperUserId-1 instead.
         /// </remarks>
         public override async Task<bool> SendTwoFactorCodeAsync(string provider)
         {
             var userId = await GetVerifiedUserIdAsync();
-            if (userId == -1)
+            if (userId == Constants.Security.SuperUserId - 1)
                 return false;
 
             var token = await UserManager.GenerateTwoFactorTokenAsync(userId, provider);
