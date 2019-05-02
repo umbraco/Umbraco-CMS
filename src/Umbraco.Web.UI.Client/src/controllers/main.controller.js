@@ -24,7 +24,6 @@ function MainController($scope, $location, appState, treeService, notificationsS
     // For more information about this approach, see https://hackernoon.com/removing-that-ugly-focus-ring-and-keeping-it-too-6c8727fefcd2
     function handleFirstTab(evt) {
         if (evt.keyCode === 9) {
-            console.log("handleFirstTab")
             $scope.tabbingActive = true;
             $scope.$digest();
             window.removeEventListener('keydown', handleFirstTab);
@@ -35,7 +34,6 @@ function MainController($scope, $location, appState, treeService, notificationsS
     function disableTabbingActive(evt) {
         $scope.tabbingActive = false;
         $scope.$digest();
-            console.log("disableTabbingActive")
         window.removeEventListener('mousedown', disableTabbingActive);
         window.addEventListener("keydown", handleFirstTab);
     }
