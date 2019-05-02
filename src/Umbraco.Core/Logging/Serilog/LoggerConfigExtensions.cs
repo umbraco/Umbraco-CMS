@@ -13,6 +13,7 @@ namespace Umbraco.Core.Logging.Serilog
 {
     public static class LoggerConfigExtensions
     {
+        private const string AppDomainId = "AppDomainId";
         /// <summary>
         /// This configures Serilog with some defaults
         /// Such as adding ProcessID, Thread, AppDomain etc
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
                 .Enrich.WithThreadId()
-                .Enrich.WithProperty("AppDomainId", AppDomain.CurrentDomain.Id)
+                .Enrich.WithProperty(AppDomainId, AppDomain.CurrentDomain.Id)
                 .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
@@ -81,7 +82,8 @@ namespace Umbraco.Core.Logging.Serilog
             Encoding encoding = null,
             bool async = false,
             bool asyncBlockWhenFull = false,
-            int asyncBufferSize = 10000)
+            int asyncBufferSize = 10000,
+            bool asyncKeepFileOpen = true)
         {
             LoggerConfiguration GetFileSink(LoggerSinkConfiguration c)
             {
@@ -100,16 +102,35 @@ namespace Umbraco.Core.Logging.Serilog
                     encoding);
             }
 
-            if ( async )
+            if (!async && !asyncKeepFileOpen)
             {
+                throw new InvalidOperationException($"{nameof(asyncKeepFileOpen)} cannot be changed if async is false.");
+            }
+            if (!async && rollOnFileSizeLimit)
+            {
+                throw new InvalidOperationException($"{nameof(rollOnFileSizeLimit)} cannot be changed if async is false.");
+            }
 
-                return configuration.Async(c => GetFileSink(c), blockWhenFull: asyncBlockWhenFull, bufferSize: asyncBufferSize);
-            }
-            else
+            if (async)
             {
-                return GetFileSink(configuration);
+                Action<LoggerSinkConfiguration> configure;
+                if (asyncKeepFileOpen)
+                {
+                    configure = a => GetFileSink(a);
+                }
+                else
+                {
+                    // This is a way to force the file to be closed after each log event. Read more https://github.com/serilog/serilog-sinks-file/issues/99#issuecomment-488612711
+                    // We basically map all log events with a AppDomainId property (all events) into a file sink and forces the sink to be closed, due to the sinkMapCountLimit = 0.
+                    configure = a => a.Map(AppDomainId, (name,c) => GetFileSink(c), sinkMapCountLimit:0);
+                }
+
+                return configuration.Async(configure, blockWhenFull: asyncBlockWhenFull, bufferSize: asyncBufferSize);
+
             }
+            return GetFileSink(configuration);
         }
+
 
         /// <summary>
         /// Outputs a CLEF format JSON log at /App_Data/Logs/
