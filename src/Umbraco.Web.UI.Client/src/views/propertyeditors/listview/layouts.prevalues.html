@@ -29,7 +29,7 @@
          </div>
 
          <div>
-            <input ng-if="layout.isSystem === 1" type="checkbox" ng-model="layout.selected" />
+             <umb-checkbox model="layout.selected" class="mce-cmd" />
             <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
                 <i class="icon-trash" ng-click="vm.showPrompt(layout)"></i>
                 <umb-confirm-action

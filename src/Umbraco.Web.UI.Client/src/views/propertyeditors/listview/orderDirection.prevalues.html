@@ -1,15 +1,8 @@
 ﻿<div>
     <ng-form name="listViewOrderDirectionForm">
-        <label class="radio">
-            <input type="radio" name="orderDirection" value="asc" ng-model="model.value" />
-            Ascending <code>[a-z]</code>
-        </label>
-        <label class="radio">
-            <input type="radio" name="orderDirection" value="desc" ng-model="model.value" />
-            Descending <code>[z-a]</code>
-        </label>
-
-        <span ng-messages="listViewOrderDirectionForm.orderDirection.$error" show-validation-on-submit >
+        <umb-radiobutton name="orderDirection" value="asc" model="model.value" text="Ascending"></umb-radiobutton>
+        <umb-radiobutton name="orderDirection" value="desc" model="model.value" text="Descending"></umb-radiobutton>
+        <span ng-messages="listViewOrderDirectionForm.orderDirection.$error" show-validation-on-submit>
             <span class="help-inline" ng-message="required">Required</span>
         </span>
     </ng-form>
