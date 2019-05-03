@@ -22,16 +22,32 @@
             }
         };
 
+        let querystring = $location.search();
+        if(querystring.startDate){
+            vm.startDate = querystring.startDate;
+        }else{
+            vm.startDate = new Date(Date.now());
+            vm.startDate.setDate(vm.startDate.getDate()-1);
+            vm.startDate = vm.startDate.toIsoDateString();
+        }
+
+        if(querystring.endDate){
+            vm.endDate = querystring.endDate;
+        }else{
+            vm.endDate = new Date(Date.now()).toIsoDateString();
+        }
+        vm.period = [vm.startDate, vm.endDate];
+
+
         //functions
         vm.searchLogQuery = searchLogQuery;
         vm.findMessageTemplate = findMessageTemplate;
-
+        
         function preFlightCheck(){
             vm.loading = true;
-
             //Do our pre-flight check (to see if we can view logs)
             //IE the log file is NOT too big such as 1GB & crash the site
-            logViewerResource.canViewLogs().then(function(result){
+            logViewerResource.canViewLogs(vm.startDate, vm.endDate).then(function(result){
                 vm.loading = false;
                 vm.canLoadLogs = result;
 
@@ -46,7 +62,7 @@
         function init() {
 
             vm.loading = true;
-
+            
             var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
                 vm.searches = data;
             },
@@ -80,11 +96,11 @@
                 ]
             });
 
-            var numOfErrors = logViewerResource.getNumberOfErrors().then(function (data) {
+            var numOfErrors = logViewerResource.getNumberOfErrors(vm.startDate, vm.endDate).then(function (data) {
                 vm.numberOfErrors = data;
             });
 
-            var logCounts = logViewerResource.getLogLevelCounts().then(function (data) {
+            var logCounts = logViewerResource.getLogLevelCounts(vm.startDate, vm.endDate).then(function (data) {
                 vm.logTypeData = [];
                 vm.logTypeData.push(data.Information);
                 vm.logTypeData.push(data.Debug);
@@ -93,7 +109,7 @@
                 vm.logTypeData.push(data.Fatal);
             });
 
-            var commonMsgs = logViewerResource.getMessageTemplates().then(function(data){
+            var commonMsgs = logViewerResource.getMessageTemplates(vm.startDate, vm.endDate).then(function(data){
                 vm.commonLogMessages = data;
             });
 
@@ -108,7 +124,7 @@
         }
 
         function searchLogQuery(logQuery){
-            $location.path("/settings/logViewer/search").search({lq: logQuery});
+            $location.path("/settings/logViewer/search").search({lq: logQuery, startDate: vm.startDate, endDate: vm.endDate});
         }
 
         function findMessageTemplate(template){
@@ -116,8 +132,32 @@
             searchLogQuery(logQuery);
         }
 
+        
+        
         preFlightCheck();
 
+        
+        /////////////////////
+
+        vm.config = {
+            enableTime: false,
+            dateFormat: "Y-m-d",
+            time_24hr: false,
+            mode: "range",
+            maxDate: "today",
+            conjunction: " to "
+        };
+        
+        vm.dateRangeChange = function(selectedDates, dateStr, instance) {
+            
+            if(selectedDates.length > 0){
+                vm.startDate = selectedDates[0].toIsoDateString();
+                vm.endDate = selectedDates[selectedDates.length-1].toIsoDateString(); // Take the last date as end
+
+                init();  
+            }
+
+        }
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.LogViewer.OverviewController", LogViewerOverviewController);

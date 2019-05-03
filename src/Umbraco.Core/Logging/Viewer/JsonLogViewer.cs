@@ -26,7 +26,7 @@ namespace Umbraco.Core.Logging.Viewer
 
         public override bool CanHandleLargeLogs => false;
 
-        public override bool CheckCanOpenLogs(DateTimeOffset startDate, DateTimeOffset endDate)
+        public override bool CheckCanOpenLogs(LogTimePeriod logTimePeriod)
         {
             //Log Directory
             var logDirectory = _logsPath;
@@ -36,10 +36,10 @@ namespace Umbraco.Core.Logging.Viewer
 
             //foreach full day in the range - see if we can find one or more filenames that end with
             //yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
-            for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
+            for (var day = logTimePeriod.StartTime.Date; day.Date <= logTimePeriod.EndTime.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
-                var filesToFind = $"*{day:yyyyMMdd}.json";
+                var filesToFind = GetSearchPattern(day);
 
                 var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
 
@@ -52,7 +52,12 @@ namespace Umbraco.Core.Logging.Viewer
             return logSizeAsMegabytes <= FileSizeCap;
         }
 
-        protected override IReadOnlyList<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take)
+        private string GetSearchPattern(DateTime day)
+        {
+            return $"*{day:yyyyMMdd}*.json";
+        }
+
+        protected override IReadOnlyList<LogEvent> GetLogs(LogTimePeriod logTimePeriod, ILogFilter filter, int skip, int take)
         {
             var logs = new List<LogEvent>();
 
@@ -63,10 +68,10 @@ namespace Umbraco.Core.Logging.Viewer
 
             //foreach full day in the range - see if we can find one or more filenames that end with
             //yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
-            for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
+            for (var day = logTimePeriod.StartTime.Date; day.Date <= logTimePeriod.EndTime.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
-                var filesToFind = $"*{day:yyyyMMdd}.json";
+                var filesToFind = GetSearchPattern(day);
 
                 var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
 

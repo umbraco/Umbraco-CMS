@@ -69,6 +69,19 @@
                 </div>
 
                 <div class="umb-logviewer__sidebar">
+
+                    <!-- Time period -->
+                    <umb-box>
+                        <umb-box-header title="Time Period"></umb-box-header>
+
+                        <umb-flatpickr
+                            class="datepicker"
+                            ng-model="vm.period"
+                            options="vm.config"
+                            on-close="vm.dateRangeChange(selectedDates, dateStr, instance)">
+                        </umb-flatpickr>
+                    </umb-box>
+
                     <!-- No of Errors -->
                     <umb-box ng-click="vm.searchLogQuery('Has(@Exception)')" style="cursor:pointer;">
                         <umb-box-header title="Number of Errors"></umb-box-header>

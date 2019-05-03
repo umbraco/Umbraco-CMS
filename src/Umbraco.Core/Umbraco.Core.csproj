@@ -212,6 +212,7 @@
     <Compile Include="Composing\TypeHelper.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
     <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
+    <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
     <Compile Include="Mapping\MapperContext.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
