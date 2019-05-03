@@ -66,7 +66,7 @@
 (function () {
     'use strict';
 
-    function ToggleDirective(localizationService, eventsService) {
+    function ToggleDirective(localizationService, eventsService, $timeout) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -75,7 +75,11 @@
 
             function onInit() {
                 setLabelText();
-                eventsService.emit("toggleValue", { value: scope.checked });
+                // must wait until the current digest cycle is finished before we emit this event on init, 
+                // otherwise other property editors might not yet be ready to receive the event
+                $timeout(function () {
+                    eventsService.emit("toggleValue", { value: scope.checked });
+                });
             }
 
             function setLabelText() {
