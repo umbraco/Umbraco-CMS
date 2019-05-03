@@ -759,7 +759,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (content.Name.Length > 255)
             {
-                throw new Exception("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
             var evtMsgs = EventMessagesFactory.Get();
@@ -877,7 +877,7 @@ namespace Umbraco.Core.Services.Implement
 
             if(content.Name.Length > 255)
             {
-                throw new Exception("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
             using (var scope = ScopeProvider.CreateScope())
@@ -912,7 +912,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (content.Name.Length > 255)
             {
-                throw new Exception("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
             using (var scope = ScopeProvider.CreateScope())
