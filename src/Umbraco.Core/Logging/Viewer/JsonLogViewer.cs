@@ -39,7 +39,7 @@ namespace Umbraco.Core.Logging.Viewer
             for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
-                var filesToFind = $"*{day:yyyyMMdd}.json";
+                var filesToFind = GetSearchPattern(day);
 
                 var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
 
@@ -50,6 +50,11 @@ namespace Umbraco.Core.Logging.Viewer
             //Check if the log size is not greater than 100Mb (FileSizeCap)
             var logSizeAsMegabytes = fileSizeCount / 1024 / 1024;
             return logSizeAsMegabytes <= FileSizeCap;
+        }
+
+        private string GetSearchPattern(DateTime day)
+        {
+            return $"*{day:yyyyMMdd}*.json";
         }
 
         protected override IReadOnlyList<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take)
@@ -66,7 +71,7 @@ namespace Umbraco.Core.Logging.Viewer
             for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
-                var filesToFind = $"*{day:yyyyMMdd}.json";
+                var filesToFind = GetSearchPattern(day);
 
                 var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
 
