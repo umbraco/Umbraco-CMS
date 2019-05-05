@@ -29,12 +29,6 @@
       vm.removeLayout = removeLayout;
       vm.openIconPicker = openIconPicker;
 
-      function activate() {
-
-
-
-      }
-
       function addLayout() {
 
          vm.focusLayoutName = false;
@@ -83,8 +77,6 @@
             };
             editorService.iconPicker(iconPicker);
         }
-
-      activate();
 
    }
 
