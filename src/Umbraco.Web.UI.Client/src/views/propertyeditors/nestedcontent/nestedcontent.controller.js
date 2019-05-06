@@ -342,7 +342,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             
             syncCurrentNode();
             
-            clipboardService.copy("elementType", node);
+            clipboardService.copy("elementType", node.contentTypeAlias, node);
             $event.stopPropagation();
         }
         

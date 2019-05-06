@@ -81,7 +81,7 @@ function clipboardService(notificationsService, eventsService) {
     * Saves a JS-object to the LocalStage of copied entries.
     *
     */
-    service.copy = function(nodeType, data) {
+    service.copy = function(type, alias, data) {
         
         var storage = retriveStorage();
         
@@ -98,7 +98,7 @@ function clipboardService(notificationsService, eventsService) {
             }
         );
         
-        var entry = {unique:key, nodeType:nodeType, data:shallowCloneData};
+        var entry = {unique:key, type:type, alias:alias, data:shallowCloneData};
         storage.entries.push(entry);
         
         if (saveStorage(storage) === true) {
@@ -111,41 +111,41 @@ function clipboardService(notificationsService, eventsService) {
     
     service.supportsCopy = supportsLocalStorage;
     
-    service.hasEntriesOfType = function(nodeType, nodeTypeAliases) {
+    service.hasEntriesOfType = function(type, aliases) {
         
-        if(service.retriveEntriesOfType(nodeType, nodeTypeAliases).length > 0) {
+        if(service.retriveEntriesOfType(type, aliases).length > 0) {
             return true;
         }
         
         return false;
     };
     
-    service.retriveEntriesOfType = function(nodeType, nodeTypeAliases) {
+    service.retriveEntriesOfType = function(type, aliases) {
         
         var storage = retriveStorage();
         
         // Find entries that are furfilling the criterias for this nodeTYpe and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
-                return (entry.nodeType === nodeType && nodeTypeAliases.filter(alias => alias === entry.data.contentTypeAlias).length > 0);
+                return (entry.type === type && aliases.filter(alias => alias === entry.alias).length > 0);
             }
         );
         
         return filteretEntries;
     };
     
-    service.retriveDataOfType = function(nodeType, nodeTypeAliases) {
-        return service.retriveEntriesOfType(nodeType, nodeTypeAliases).map((x) => x.data);
+    service.retriveDataOfType = function(type, aliases) {
+        return service.retriveEntriesOfType(type, aliases).map((x) => x.data);
     };
     
-    service.clearEntriesOfType = function(nodeType, nodeTypeAliases) {
+    service.clearEntriesOfType = function(type, aliases) {
         
         var storage = retriveStorage();
         
         // Find entries that are NOT furfilling the criterias for this nodeTYpe and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
-                return !(entry.nodeType === nodeType && nodeTypeAliases.filter(alias => alias === entry.data.contentTypeAlias).length > 0);
+                return !(entry.type === type && aliases.filter(alias => alias === entry.alias).length > 0);
             }
         );
         
