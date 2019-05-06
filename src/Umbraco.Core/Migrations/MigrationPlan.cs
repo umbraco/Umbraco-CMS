@@ -265,6 +265,14 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
+        /// Throws an exception when the initial state is unknown.
+        /// </summary>
+        protected virtual void ThrowOnUnknownInitialState(string state)
+        {
+            throw new Exception($"Unknown state \"{state}\".");
+        }
+
+        /// <summary>
         /// Executes the plan.
         /// </summary>
         /// <param name="scope">A scope.</param>
@@ -287,7 +295,7 @@ namespace Umbraco.Core.Migrations
             logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
 
             if (!_transitions.TryGetValue(origState, out var transition))
-                throw new Exception($"Unknown state \"{origState}\".");
+                ThrowOnUnknownInitialState(origState);
 
             var context = new MigrationContext(scope.Database, logger);
             context.PostMigrations.AddRange(_postMigrationTypes);
