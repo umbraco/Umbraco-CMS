@@ -34,7 +34,6 @@ function clipboardService(notificationsService, eventsService) {
             return null;
         }
         
-        
         var dataJSON;
         var dataString = window.localStorage.getItem(STORAGE_KEY);
         if (dataString != null) {
@@ -121,11 +120,11 @@ function clipboardService(notificationsService, eventsService) {
     
     /**
     * @ngdoc method
-    * @name umbraco.services.supportsCopy#copy
+    * @name umbraco.services.supportsCopy#hasEntriesOfType
     * @methodOf umbraco.services.clipboardService
     *
     * @description
-    * Determins wether the current browser is able to performe a copy-action.
+    * Determins wether the current clipboard has entries that matches given type and a one of the aliases.
     */
     service.hasEntriesOfType = function(type, aliases) {
         
@@ -136,11 +135,19 @@ function clipboardService(notificationsService, eventsService) {
         return false;
     };
     
+    /**
+    * @ngdoc method
+    * @name umbraco.services.supportsCopy#retriveEntriesOfType
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @description
+    * Returns an array of entries matching the given type and one of the provided aliases.
+    */
     service.retriveEntriesOfType = function(type, aliases) {
         
         var storage = retriveStorage();
         
-        // Find entries that are furfilling the criterias for this nodeTYpe and nodeTypesAliases.
+        // Find entries that are furfilling the criterias for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
                 return (entry.type === type && aliases.filter(alias => alias === entry.alias).length > 0);
@@ -150,15 +157,31 @@ function clipboardService(notificationsService, eventsService) {
         return filteretEntries;
     };
     
+    /**
+    * @ngdoc method
+    * @name umbraco.services.supportsCopy#retriveEntriesOfType
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @description
+    * Returns an array of data of entries matching the given type and one of the provided aliases.
+    */
     service.retriveDataOfType = function(type, aliases) {
         return service.retriveEntriesOfType(type, aliases).map((x) => x.data);
     };
     
+    /**
+    * @ngdoc method
+    * @name umbraco.services.supportsCopy#retriveEntriesOfType
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @description
+    * Removes entries matching the given type and one of the provided aliases.
+    */
     service.clearEntriesOfType = function(type, aliases) {
         
         var storage = retriveStorage();
         
-        // Find entries that are NOT furfilling the criterias for this nodeTYpe and nodeTypesAliases.
+        // Find entries that are NOT furfilling the criterias for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
                 return !(entry.type === type && aliases.filter(alias => alias === entry.alias).length > 0);
