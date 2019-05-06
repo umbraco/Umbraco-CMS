@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">>
+    <appSettings>
+
+        <add key="serilog:using:File" value="Umbraco.Core" xdt:Transform="SetAttributes(value)" xdt:Locator="Match(key)"/>
+        <add key="serilog:write-to:File.shared" value="false" xdt:Transform="SetAttributes(value)" xdt:Locator="Match(key)"/>
+        <add key="serilog:write-to:File.buffered" value="true" xdt:Transform="InsertIfMissing" xdt:Locator="Match(key)"/>
+        <add key="serilog:write-to:File.async" value="true" xdt:Transform="InsertIfMissing" xdt:Locator="Match(key)"/>
+        <add key="serilog:write-to:File.asyncKeepFileOpen" value="false" xdt:Transform="InsertIfMissing" xdt:Locator="Match(key)"/>
+
+    </appSettings>
+</configuration>
