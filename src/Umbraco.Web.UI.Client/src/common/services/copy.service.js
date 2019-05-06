@@ -78,8 +78,7 @@ function clipboardService(notificationsService, eventsService) {
     * @methodOf umbraco.services.clipboardService
     *
     * @description
-    * Saves a JS-object to the LocalStage of copied entries.
-    *
+    * Saves a single JS-object with a type and alias to the clipboard.
     */
     service.copy = function(type, alias, data) {
         
@@ -109,8 +108,25 @@ function clipboardService(notificationsService, eventsService) {
         
     };
     
-    service.supportsCopy = supportsLocalStorage;
     
+    /**
+    * @ngdoc method
+    * @name umbraco.services.supportsCopy#supported
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @description
+    * Determins wether the current browser is able to performe its actions.
+    */
+    service.isSupported = supportsLocalStorage;
+    
+    /**
+    * @ngdoc method
+    * @name umbraco.services.supportsCopy#copy
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @description
+    * Determins wether the current browser is able to performe a copy-action.
+    */
     service.hasEntriesOfType = function(type, aliases) {
         
         if(service.retriveEntriesOfType(type, aliases).length > 0) {

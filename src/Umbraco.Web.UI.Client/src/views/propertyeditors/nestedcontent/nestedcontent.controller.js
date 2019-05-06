@@ -334,7 +334,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             });
         }
         
-        $scope.showCopy = clipboardService.supportsCopy();
+        $scope.showCopy = clipboardService.isSupported();
         
         $scope.showPaste = false;
         
