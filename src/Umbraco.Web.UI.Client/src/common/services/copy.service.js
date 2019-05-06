@@ -1,7 +1,19 @@
-function copyService(notificationsService, eventsService) {
+/**
+ * @ngdoc service
+ * @name umbraco.services.clipboardService
+ *
+ * @requires notificationsService
+ * @requires eventsService
+ *
+ * @description
+ * Service to handle clipboard in general across the application. Responsible for handling the data both storing and retrive.
+ * The service has a set way for defining a data-set by a entryType and alias, which later will be used to retrive the posible entries for a paste scenario.
+ *
+ */
+function clipboardService(notificationsService, eventsService) {
     
     
-    var STORAGE_KEY = "umbCopyService";
+    var STORAGE_KEY = "umbClipboardService";
     
     var supportsLocalStorage = function () {
         var test = "test";
@@ -47,7 +59,7 @@ function copyService(notificationsService, eventsService) {
             var storageJSON = JSON.parse(storageString);
             window.localStorage.setItem(STORAGE_KEY, storageString);
             
-            eventsService.emit("copyService.storageUpdate");
+            eventsService.emit("clipboardService.storageUpdate");
             
             return true;
         } catch(e) {
@@ -62,8 +74,8 @@ function copyService(notificationsService, eventsService) {
     
     /**
     * @ngdoc method
-    * @name umbraco.services.copyService#copy
-    * @methodOf umbraco.services.copyService
+    * @name umbraco.services.clipboardService#copy
+    * @methodOf umbraco.services.clipboardService
     *
     * @description
     * Saves a JS-object to the LocalStage of copied entries.
@@ -146,4 +158,4 @@ function copyService(notificationsService, eventsService) {
     
     return service;
 }
-angular.module("umbraco.services").factory("copyService", copyService);
+angular.module("umbraco.services").factory("clipboardService", clipboardService);

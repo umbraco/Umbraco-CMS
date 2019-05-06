@@ -91,10 +91,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "contentResource",
     "localizationService",
     "iconHelper",
-    "copyService",
+    "clipboardService",
     "eventsService",
     
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, copyService, eventsService) {
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService) {
 
         var inited = false;
         
@@ -195,7 +195,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.overlayMenu.size = $scope.overlayMenu.availableItems.length > 6 ? "medium" : "small";
             
             $scope.overlayMenu.pasteItems = [];
-            var availableNodesForPaste = copyService.retriveDataOfType("elementType", contentTypeAliases);
+            var availableNodesForPaste = clipboardService.retriveDataOfType("elementType", contentTypeAliases);
             _.each(availableNodesForPaste, function (node) {
                 $scope.overlayMenu.pasteItems.push({
                     alias: node.contentTypeAlias,
@@ -210,8 +210,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.overlayMenu.clickClearPaste = function($event) {
                 $event.stopPropagation();
                 $event.preventDefault();
-                copyService.clearEntriesOfType("elementType", contentTypeAliases);
-                $scope.overlayMenu.pasteItems = [];// This dialog is not connected via the copyService events, so we need to update manually.
+                clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
+                $scope.overlayMenu.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
             };
             
             if ($scope.overlayMenu.availableItems.length === 1 && $scope.overlayMenu.pasteItems.length === 0) {
@@ -334,7 +334,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             });
         }
         
-        $scope.showCopy = copyService.supportsCopy();
+        $scope.showCopy = clipboardService.supportsCopy();
         
         $scope.showPaste = false;
         
@@ -342,7 +342,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             
             syncCurrentNode();
             
-            copyService.copy("elementType", node);
+            clipboardService.copy("elementType", node);
             $event.stopPropagation();
         }
         
@@ -362,10 +362,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
         
         function checkAbilityToPasteContent() {
-            $scope.showPaste = copyService.hasEntriesOfType("elementType", contentTypeAliases);
+            $scope.showPaste = clipboardService.hasEntriesOfType("elementType", contentTypeAliases);
         }
         
-        eventsService.on("copyService.storageUpdate", checkAbilityToPasteContent);
+        eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
         
         var notSupported = [
           "Umbraco.Tags",
