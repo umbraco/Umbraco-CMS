@@ -88,9 +88,6 @@
     <key alias="domainExists">Domaine '%0%' déjà assigné</key>
     <key alias="domainUpdated">Domaine '%0%' mis à jour</key>
     <key alias="orEdit">Editer les domaines actuels</key>
-    <key alias="domainHelp"><![CDATA[Les formats de domaines suivants sont autorisés : "example.com", "www.example.com", "example.com:8080" ou
-        "https://www.example.com/".<br /><br />Les domaines contenant un chemin d'un niveau sont autorisés, ex : "example.com/en". Pour autant, cela
-        devrait être évité. Utilisez plutôt la gestion de la culture et des noms d'hôte.]]></key>
     <key alias="inherit">Hériter</key>
     <key alias="setLanguage">Culture</key>
     <key alias="setLanguageHelp"><![CDATA[Définir la culture pour les noeuds enfants du noeud courant,<br /> ou hériter de la culture des noeuds parents. S'appliquera aussi<br />
@@ -409,13 +406,6 @@
     <key alias="usernameHint">Votre nom d'utilisateur est généralement votre adresse email</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Types de noeuds enfants autorisés</key>
-    <key alias="create">Créer</key>
-    <key alias="deletetab">Supprimer l'onglet</key>
-    <key alias="description">Description</key>
-    <key alias="newtab">Nouvel onglet</key>
-    <key alias="tab">Onglet</key>
-    <key alias="thumbnail">Miniature</key>
     <key alias="createListView" version="7.2">Créer une liste personnalisée</key>
     <key alias="removeListView" version="7.2">Supprimer la liste personnalisée</key>
   </area>
@@ -612,7 +602,7 @@
     <key alias="blue">Bleu</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Ajouter un onglet</key>
+    <key alias="addGroup">Ajouter un onglet</key>
     <key alias="addProperty">Ajouter une propriété</key>
     <key alias="addEditor">Ajouter un éditeur</key>
     <key alias="addTemplate">Ajouter un modèle</key>
@@ -1374,7 +1364,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
-    <key alias="noTabs">Vous n'avez pas ajouté d'onglet</key>
+    <key alias="noGroups">Vous n'avez pas ajouté d'onglet</key>
     <key alias="inheritedFrom">Hérité de</key>
     <key alias="addProperty">Ajouter une propriété</key>
     <key alias="requiredLabel">Label requis</key>
@@ -1782,13 +1772,13 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="httpsCheckExpiringCertificate">Le certificat SSL de votre site web va expirer dans %0% jours.</key>
     <key alias="healthCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Vous êtes actuellement %0% à voir le site via le schéma HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">La valeur appSetting 'umbracoUseSSL' est fixée à 'false' dans votre fichier web.config. Une fois que vous donnerez accès à ce site en utilisant le schéma HTTPS, cette valeur devra être mise à 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">La valeur appSetting 'umbracoUseSSL' est fixée à '%0%' dans votre fichier web.config, vos cookies sont %1% marqués comme étant sécurisés.</key>
-    <key alias="httpsCheckEnableHttpsError">Impossible de mettre à jour la configuration 'umbracoUseSSL' dans votre fichier web.config. Erreur : %0%</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">La valeur appSetting 'Umbraco.Core.UseHttps' est fixée à 'false' dans votre fichier web.config. Une fois que vous donnerez accès à ce site en utilisant le schéma HTTPS, cette valeur devra être mise à 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">La valeur appSetting 'Umbraco.Core.UseHttps' est fixée à '%0%' dans votre fichier web.config, vos cookies sont %1% marqués comme étant sécurisés.</key>
+    <key alias="httpsCheckEnableHttpsError">Impossible de mettre à jour la configuration 'Umbraco.Core.UseHttps' dans votre fichier web.config. Erreur : %0%</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">Activer HTTPS</key>
     <key alias="httpsCheckEnableHttpsDescription">Fixe la configuration 'umbracoSSL' à 'true' dans la section appSettings du fichier web.config.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">La configuration appSetting 'umbracoUseSSL' est maintenant fixée à 'true' dans votre fichier web.config, vos cookies seront marqués comme étant sécurisés.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">La configuration appSetting 'Umbraco.Core.UseHttps' est maintenant fixée à 'true' dans votre fichier web.config, vos cookies seront marqués comme étant sécurisés.</key>
     <key alias="rectifyButton">Corriger</key>
     <key alias="cannotRectifyShouldNotEqual">Impossible de corriger une vérification avec un type de comparaison 'ShouldNotEqual'.</key>
     <key alias="cannotRectifyShouldEqualWithValue">Impossible de corriger une vérification avec un type de comparaison 'ShouldEqual' avec une valeur spécifiée.</key>

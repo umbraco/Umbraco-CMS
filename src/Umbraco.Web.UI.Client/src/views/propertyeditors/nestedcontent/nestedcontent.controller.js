@@ -21,9 +21,37 @@
         }
 
         $scope.sortableOptions = {
-            axis: 'y',
+            axis: "y",
             cursor: "move",
-            handle: ".icon-navigation"
+            handle: ".handle",
+            placeholder: 'sortable-placeholder',
+            forcePlaceholderSize: true,
+            helper: function (e, ui) {
+                // When sorting table rows, the cells collapse. This helper fixes that: https://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
+                ui.children().each(function () {
+                    $(this).width($(this).width());
+                });
+                return ui;
+            },
+            start: function (e, ui) {
+
+                var cellHeight = ui.item.height();
+
+                // Build a placeholder cell that spans all the cells in the row: https://stackoverflow.com/questions/25845310/jquery-ui-sortable-and-table-cell-size
+                var cellCount = 0;
+                $('td, th', ui.helper).each(function () {
+                    // For each td or th try and get it's colspan attribute, and add that or 1 to the total
+                    var colspan = 1;
+                    var colspanAttr = $(this).attr('colspan');
+                    if (colspanAttr > 1) {
+                        colspan = colspanAttr;
+                    }
+                    cellCount += colspan;
+                });
+
+                // Add the placeholder UI - note that this is the item's content, so td rather than tr - and set height of tr
+                ui.placeholder.html('<td colspan="' + cellCount + '"></td>').height(cellHeight);
+            }
         };
 
         $scope.docTypeTabs = {};
@@ -68,10 +96,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
     function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
 
-        //$scope.model.config.contentTypes;
-        //$scope.model.config.minItems;
-        //$scope.model.config.maxItems;
-
         var inited = false;
 
         _.each($scope.model.config.contentTypes, function (contentType) {
@@ -89,12 +113,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.minItems = $scope.model.config.minItems || 0;
         $scope.maxItems = $scope.model.config.maxItems || 0;
 
-        if ($scope.maxItems == 0)
+        if ($scope.maxItems === 0)
             $scope.maxItems = 1000;
 
-        $scope.singleMode = $scope.minItems == 1 && $scope.maxItems == 1;
-        $scope.showIcons = $scope.model.config.showIcons || true;
-        $scope.wideMode = $scope.model.config.hideLabel == "1";
+        $scope.singleMode = $scope.minItems === 1 && $scope.maxItems === 1;
+        $scope.showIcons = Object.toBoolean($scope.model.config.showIcons);
+        $scope.wideMode = Object.toBoolean($scope.model.config.hideLabel);
+        $scope.hasContentTypes = $scope.model.config.contentTypes.length > 0;
 
         $scope.labels = {};
         localizationService.localizeMany(["grid_insertControl"]).then(function(data) {
@@ -127,6 +152,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 show: false,
                 style: {},
                 filter: $scope.scaffolds.length > 15 ? true : false,
+                orderBy: "$index",
                 view: "itempicker",
                 event: $event,
                 submit: function(model) {                    
@@ -166,7 +192,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         };
 
         $scope.editNode = function (idx) {
-            if ($scope.currentNode && $scope.currentNode.key == $scope.nodes[idx].key) {
+            if ($scope.currentNode && $scope.currentNode.key === $scope.nodes[idx].key) {
                 $scope.currentNode = undefined;
             } else {
                 $scope.currentNode = $scope.nodes[idx];
@@ -175,8 +201,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.deleteNode = function (idx) {
             if ($scope.nodes.length > $scope.model.config.minItems) {
-                if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes == 1) {
-                    localizationService.localize('content_nestedContentDeleteItem').then(function (value) {
+                if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes === 1) {
+                    localizationService.localize("content_nestedContentDeleteItem").then(function (value) {
                         if (confirm(value)) {
                             $scope.nodes.splice(idx, 1);
                             $scope.setDirty();
@@ -204,7 +230,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     var item = $scope.model.value[idx];
 
                     // Add a temporary index property
-                    item['$index'] = (idx + 1);
+                    item["$index"] = (idx + 1);
 
                     var newName = contentType.nameExp(item);
                     if (newName && (newName = $.trim(newName))) {
@@ -212,7 +238,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     }
 
                     // Delete the index property as we don't want to persist it
-                    delete item['$index'];
+                    delete item["$index"];
                 }
 
             }
@@ -232,14 +258,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
 
         $scope.sortableOptions = {
-            axis: 'y',
+            axis: "y",
             cursor: "move",
             handle: ".umb-nested-content__icon--move",
             start: function (ev, ui) {
                 updateModel();
                 // Yea, yea, we shouldn't modify the dom, sue me
                 $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
-                    tinymce.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+                    tinymce.execCommand("mceRemoveEditor", false, $(this).attr("id"));
                     $(this).css("visibility", "hidden");
                 });
                 $scope.$apply(function () {
@@ -251,7 +277,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             },
             stop: function (ev, ui) {
                 $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
-                    tinymce.execCommand('mceAddEditor', true, $(this).attr('id'));
+                    tinymce.execCommand("mceAddEditor", true, $(this).attr("id"));
                     $(this).css("visibility", "visible");
                 });
                 $scope.$apply(function () {
@@ -263,13 +289,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.getScaffold = function (alias) {
             return _.find($scope.scaffolds, function (scaffold) {
-                return scaffold.contentTypeAlias == alias;
+                return scaffold.contentTypeAlias === alias;
             });
         }
 
         $scope.getContentTypeConfig = function (alias) {
             return _.find($scope.model.config.contentTypes, function (contentType) {
-                return contentType.ncAlias == alias;
+                return contentType.ncAlias === alias;
             });
         }
 
@@ -289,7 +315,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     // remove all tabs except the specified tab
                     var tabs = scaffold.variants[0].tabs;
                     var tab = _.find(tabs, function (tab) {
-                        return tab.id != 0 && (tab.alias.toLowerCase() == contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias == "");
+                        return tab.id !== 0 && (tab.alias.toLowerCase() === contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias === "");
                     });
                     scaffold.tabs = [];
                     if (tab) {
@@ -319,14 +345,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         var initIfAllScaffoldsHaveLoaded = function () {
             // Initialize when all scaffolds have loaded
-            if ($scope.model.config.contentTypes.length == scaffoldsLoaded) {
+            if ($scope.model.config.contentTypes.length === scaffoldsLoaded) {
                 // Because we're loading the scaffolds async one at a time, we need to
                 // sort them explicitly according to the sort order defined by the data type.
                 var contentTypeAliases = [];
                 _.each($scope.model.config.contentTypes, function (contentType) {
                     contentTypeAliases.push(contentType.ncAlias);
                 });
-                $scope.scaffolds = $filter('orderBy')($scope.scaffolds, function (s) {
+                $scope.scaffolds = $filter("orderBy")($scope.scaffolds, function (s) {
                     return contentTypeAliases.indexOf(s.contentTypeAlias);
                 });
 
@@ -351,7 +377,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 }
 
                 // If there is only one item, set it as current node
-                if ($scope.singleMode || ($scope.nodes.length == 1 && $scope.maxItems == 1)) {
+                if ($scope.singleMode || ($scope.nodes.length === 1 && $scope.maxItems === 1)) {
                     $scope.currentNode = $scope.nodes[0];
                 }
 
@@ -372,7 +398,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     prop.propertyAlias = prop.alias;
                     prop.alias = $scope.model.alias + "___" + prop.alias;
                     // Force validation to occur server side as this is the
-                    // only way we can have consistancy between mandatory and
+                    // only way we can have consistency between mandatory and
                     // regex validation messages. Not ideal, but it works.
                     prop.validation = {
                         mandatory: false,
@@ -428,22 +454,22 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             updateModel();
         });
 
-        $scope.$on('$destroy', function () {
+        $scope.$on("$destroy", function () {
             unsubscribe();
         });
 
         // TODO: Move this into a shared location?
         var UUID = (function () {
             var self = {};
-            var lut = []; for (var i = 0; i < 256; i++) { lut[i] = (i < 16 ? '0' : '') + (i).toString(16); }
+            var lut = []; for (var i = 0; i < 256; i++) { lut[i] = (i < 16 ? "0" : "") + (i).toString(16); }
             self.generate = function () {
                 var d0 = Math.random() * 0xffffffff | 0;
                 var d1 = Math.random() * 0xffffffff | 0;
                 var d2 = Math.random() * 0xffffffff | 0;
                 var d3 = Math.random() * 0xffffffff | 0;
-                return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + '-' +
-                  lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + '-' + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + '-' +
-                  lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + '-' + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
+                return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + "-" +
+                  lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + "-" + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + "-" +
+                  lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + "-" + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
                   lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
             }
             return self;

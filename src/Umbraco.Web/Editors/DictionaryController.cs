@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -34,7 +33,8 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class DictionaryController : BackOfficeNotificationsController
     {
-        public DictionaryController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public DictionaryController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
         }
 
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Editors
 
             if (foundDictionary == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+
             Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -137,7 +137,7 @@ namespace Umbraco.Web.Editors
         /// </param>
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>.
-        /// </returns>      
+        /// </returns>
         public DictionaryDisplay PostSave(DictionarySave dictionary)
         {
             var dictionaryItem =

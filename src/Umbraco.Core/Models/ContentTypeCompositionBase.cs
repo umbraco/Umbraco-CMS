@@ -43,9 +43,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets the property groups for the entire composition.
-        /// </summary>
+        /// <inheritdoc />
         [IgnoreDataMember]
         public IEnumerable<PropertyGroup> CompositionPropertyGroups
         {
@@ -76,9 +74,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets the property types for the entire composition.
-        /// </summary>
+        /// <inheritdoc />
         [IgnoreDataMember]
         public IEnumerable<PropertyType> CompositionPropertyTypes
         {
@@ -226,7 +222,7 @@ namespace Umbraco.Core.Models
                 return null;
 
             // create the new group
-            var group = new PropertyGroup(IsPublishing) { Name = name, SortOrder = 0 };
+            var group = new PropertyGroup(SupportsPublishing) { Name = name, SortOrder = 0 };
 
             // check if it is inherited - there might be more than 1 but we want the 1st, to
             // reuse its sort order - if there are more than 1 and they have different sort

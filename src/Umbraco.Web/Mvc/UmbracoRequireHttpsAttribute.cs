@@ -7,17 +7,17 @@ using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// If umbracoUseSSL property in web.config is set to true, this filter will redirect any http access to https.
+    /// If Umbraco.Core.UseHttps property in web.config is set to true, this filter will redirect any http access to https.
     /// </summary>
     public class UmbracoRequireHttpsAttribute : RequireHttpsAttribute
     {
         /// <summary>
-        /// If umbracoUseSSL is true and we have a non-HTTPS request, handle redirect.
+        /// If Umbraco.Core.UseHttps is true and we have a non-HTTPS request, handle redirect.
         /// </summary>
         /// <param name="filterContext">Filter context</param>
         protected override void HandleNonHttpsRequest(AuthorizationContext filterContext)
         {
-            // If umbracoUseSSL is set, let base method handle redirect.  Otherwise, we don't care.
+            // If Umbraco.Core.UseHttps is set, let base method handle redirect.  Otherwise, we don't care.
             if (Current.Configs.Global().UseHttps)
             {
                 base.HandleNonHttpsRequest(filterContext);
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
-        /// Check to see if HTTPS is currently being used if umbracoUseSSL is true.
+        /// Check to see if HTTPS is currently being used if Umbraco.Core.UseHttps is true.
         /// </summary>
         /// <param name="filterContext">Filter context</param>
         public override void OnAuthorization(AuthorizationContext filterContext)

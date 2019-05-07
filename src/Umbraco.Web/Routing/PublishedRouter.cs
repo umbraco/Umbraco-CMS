@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Routing
             // trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
             //
-            // also, OnPrepared() will make the PublishedContentRequest readonly, so nothing can change
+            // also, OnPrepared() will make the PublishedRequest readonly, so nothing can change
             //
             request.OnPrepared();
 
@@ -244,7 +244,7 @@ namespace Umbraco.Web.Routing
         #region Domain
 
         /// <summary>
-        /// Finds the site root (if any) matching the http request, and updates the PublishedContentRequest accordingly.
+        /// Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
         /// </summary>
         /// <returns>A value indicating whether a domain was found.</returns>
         internal bool FindDomain(PublishedRequest request)
@@ -375,7 +375,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Finds the Umbraco document (if any) matching the request, and updates the PublishedContentRequest accordingly.
+        /// Finds the Umbraco document (if any) matching the request, and updates the PublishedRequest accordingly.
         /// </summary>
         /// <returns>A value indicating whether a document and template were found.</returns>
         private void FindPublishedContentAndTemplate(PublishedRequest request)
@@ -594,29 +594,38 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    // grab the current member
-                    var member = membershipHelper.GetCurrentMember();
-                    // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
-                    var memberIsActive = true;
-                    if (member != null)
+                    if (membershipHelper.IsUmbracoMembershipProviderActive())
                     {
-                        if (member.HasProperty(Constants.Conventions.Member.IsApproved) == false)
-                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsApproved);
+                        // grab the current member
+                        var member = membershipHelper.GetCurrentMember();
+                        // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
+                        var memberIsActive = true;
+                        if (member != null)
+                        {
+                            if (member.HasProperty(Constants.Conventions.Member.IsApproved) == false)
+                                memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsApproved);
 
-                        if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false)
-                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsLockedOut) == false;
-                    }
+                            if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false)
+                                memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsLockedOut) == false;
+                        }
 
-                    if (memberIsActive == false)
-                    {
-                        _logger.Debug<PublishedRouter>("Current member is either unapproved or locked out, redirect to error page");
-                        var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
-                        if (errorPageId != request.PublishedContent.Id)
-                            request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
+                        if (memberIsActive == false)
+                        {
+                            _logger.Debug<PublishedRouter>(
+                                "Current member is either unapproved or locked out, redirect to error page");
+                            var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
+                            if (errorPageId != request.PublishedContent.Id)
+                                request.PublishedContent =
+                                    request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
+                        }
+                        else
+                        {
+                            _logger.Debug<PublishedRouter>("Current member has access");
+                        }
                     }
                     else
                     {
-                        _logger.Debug<PublishedRouter>("Current member has access");
+                        _logger.Debug<PublishedRouter>("Current custom MembershipProvider member has access");
                     }
                 }
             }
@@ -665,6 +674,9 @@ namespace Umbraco.Web.Routing
 
                 // TODO: When we remove the need for a database for templates, then this id should be irrelevant,
                 // not sure how were going to do this nicely.
+
+                // TODO: We need to limit altTemplate to only allow templates that are assigned to the current document type!
+                // if the template isn't assigned to the document type we should log a warning and return 404
 
                 var templateId = request.PublishedContent.TemplateId;
                 request.TemplateModel = GetTemplateModel(templateId);
@@ -728,7 +740,7 @@ namespace Umbraco.Web.Routing
 
         private ITemplate GetTemplateModel(int? templateId)
         {
-            if (templateId.HasValue == false)
+            if (templateId.HasValue == false || templateId.Value == default)
             {
                 _logger.Debug<PublishedRouter>("GetTemplateModel: No template.");
                 return null;

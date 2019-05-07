@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -15,7 +14,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -33,13 +31,13 @@ namespace Umbraco.Web.Editors
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
         private ICultureDictionary _cultureDictionary;
 
-        protected ContentTypeControllerBase(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        protected ContentTypeControllerBase(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _cultureDictionaryFactory = cultureDictionaryFactory;
         }
 
-        
+
 
         /// <summary>
         /// Returns the available composite content types for a given content type
@@ -102,7 +100,7 @@ namespace Umbraco.Web.Editors
 
             var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
 
-            
+
 
             var currCompositions = source == null ? new IContentTypeComposition[] { } : source.ContentTypeComposition.ToArray();
             var compAliases = currCompositions.Select(x => x.Alias).ToArray();
@@ -156,7 +154,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns a list of content types where a particular composition content type is used
         /// </summary>
-        /// <param name="type">Type of content Type, eg documentType or mediaType</param>      
+        /// <param name="type">Type of content Type, eg documentType or mediaType</param>
         /// <param name="contentTypeId">Id of composition content type</param>
         /// <returns></returns>
         protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId, UmbracoObjectTypes type)
@@ -502,13 +500,13 @@ namespace Umbraco.Web.Editors
             where TPropertyType : PropertyTypeBasic
         {
             InvalidCompositionException invalidCompositionException = null;
-            if (ex is AutoMapperMappingException && ex.InnerException is InvalidCompositionException)
+            if (ex is InvalidCompositionException)
             {
-                invalidCompositionException = (InvalidCompositionException)ex.InnerException;
+                invalidCompositionException = (InvalidCompositionException)ex;
             }
             else if (ex.InnerException is InvalidCompositionException)
             {
-                invalidCompositionException = (InvalidCompositionException)ex;
+                invalidCompositionException = (InvalidCompositionException)ex.InnerException;
             }
             if (invalidCompositionException != null)
             {

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ListViewListLayoutController($scope, listViewHelper, mediaHelper, mediaTypeHelper, editorService) {
+    function ListViewListLayoutController($scope, listViewHelper, mediaHelper, mediaTypeHelper, urlHelper) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -19,7 +19,7 @@
         vm.activeDrag = false;
         vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
         vm.acceptedMediatypes = [];
-
+        
         vm.selectItem = selectItem;
         vm.clickItem = clickItem;
         vm.selectAll = selectAll;
@@ -40,8 +40,8 @@
             }
         }
 
-        function selectAll($event) {
-            listViewHelper.selectAllItems($scope.items, $scope.selection, $event);
+        function selectAll() {
+            listViewHelper.selectAllItemsToggle($scope.items, $scope.selection);
         }
 
         function isSelectedAll() {
@@ -52,30 +52,9 @@
             listViewHelper.selectHandler(selectedItem, $index, $scope.items, $scope.selection, $event);
         }
 
-        function clickItem(node) {
-            
-            var contentEditor = {
-                id: node.id,
-                submit: function (model) {
-                    // update the node
-                    node.name = model.contentNode.name;
-                    // TODO: node.description = model.contentNode.description;
-                    node.published = model.contentNode.hasPublishedVersion;
-                    if (entityType !== "Member") {
-                        entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
-                            node.url = data;
-                        });
-                    }
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.contentEditor(contentEditor);
-            
+        function clickItem(item) {
+            listViewHelper.editItem(item);
         }
-
 
         function isSortDirection(col, direction) {
             return listViewHelper.setSortingDirection(col, direction, $scope.options);

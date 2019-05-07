@@ -41,7 +41,6 @@
     <key alias="domainCreated"><![CDATA[Il dominio '%0%' è stato creato]]></key>
     <key alias="domainDeleted"><![CDATA[Il dominio '%0%' è stato cancellato]]></key>
     <key alias="domainExists"><![CDATA[Il dominio '%0%' è già stato assegnato]]></key>
-    <key alias="domainHelp"><![CDATA[per esempio: yourdomain.com, www.yourdomain.com]]></key>
     <key alias="domainUpdated"><![CDATA[Il dominio '%0%' è stato aggiornato]]></key>
     <key alias="invalidDomain">Hostname non valido</key>
     <key alias="orEdit">Modifica il dominio corrente</key>
@@ -206,13 +205,6 @@
     <key alias="displayName"><![CDATA[Identificativo Cultura]]></key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Possibili nodetypes figli</key>
-    <key alias="create">Crea</key>
-    <key alias="deletetab">Cancella tab</key>
-    <key alias="description">Descrizione</key>
-    <key alias="newtab">Nuova tab</key>
-    <key alias="tab">Tab</key>
-    <key alias="thumbnail">Miniatura</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue"><![CDATA[Aggiungi valore predefinito]]></key>

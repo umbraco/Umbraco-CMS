@@ -17,90 +17,92 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
     {
-        private readonly ITemplateRepository _templateRepository;
+        public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository)
+            : base(scopeAccessor, cache, logger, commonRepository)
+        { }
 
-        public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, ITemplateRepository templateRepository)
-            : base(scopeAccessor, cache, logger)
-        {
-            _templateRepository = templateRepository;
-        }
-
-        protected override bool IsPublishing => ContentType.IsPublishingConst;
+        protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;
 
         protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy()
         {
             return new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
         }
 
+        // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
+        // since this is a FullDataSet policy - and everything is cached
+        // so here,
+        // every PerformGet/Exists just GetMany() and then filters
+        // except PerformGetAll which is the one really doing the job
+
+        // TODO: the filtering is highly inefficient as we deep-clone everything
+        // there should be a way to GetMany(predicate) right from the cache policy!
+        // and ah, well, this all caching should be refactored + the cache refreshers
+        // should to repository.Clear() not deal with magic caches by themselves
+
         protected override IContentType PerformGet(int id)
-        {
-            //use the underlying GetAll which will force cache all content types
-            return GetMany().FirstOrDefault(x => x.Id == id);
-        }
+            => GetMany().FirstOrDefault(x => x.Id == id);
 
         protected override IContentType PerformGet(Guid id)
-        {
-            //use the underlying GetAll which will force cache all content types
-            return GetMany().FirstOrDefault(x => x.Key == id);
-        }
+            => GetMany().FirstOrDefault(x => x.Key == id);
 
         protected override IContentType PerformGet(string alias)
-        {
-            //use the underlying GetAll which will force cache all content types
-            return GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-        }
+            => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
         protected override bool PerformExists(Guid id)
-        {
-            return GetMany().FirstOrDefault(x => x.Key == id) != null;
-        }
+        => GetMany().FirstOrDefault(x => x.Key == id) != null;
 
         protected override IEnumerable<IContentType> PerformGetAll(params int[] ids)
         {
-            if (ids.Any())
-            {
-                //NOTE: This logic should never be executed according to our cache policy
-                return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, IsPublishing, this, _templateRepository)
-                    .Where(x => ids.Contains(x.Id));
-            }
-
-            return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, IsPublishing, this, _templateRepository);
+            // the cache policy will always want everything
+            // even GetMany(ids) gets everything and filters afterwards
+            if (ids.Any()) throw new Exception("panic");
+            return CommonRepository.GetAllTypes().OfType<IContentType>();
         }
 
         protected override IEnumerable<IContentType> PerformGetAll(params Guid[] ids)
         {
-            // use the underlying GetAll which will force cache all content types
-            return ids.Any() ? GetMany().Where(x => ids.Contains(x.Key)) : GetMany();
+            var all = GetMany();
+            return ids.Any() ? all.Where(x => ids.Contains(x.Key)) : all;
         }
 
         protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
         {
-            var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<IContentType>(sqlClause, query);
+            var baseQuery = GetBaseQuery(false);
+            var translator = new SqlTranslator<IContentType>(baseQuery, query);
             var sql = translator.Translate();
+            var ids = Database.Fetch<int>(sql).Distinct().ToArray();
 
-            var dtos = Database.Fetch<ContentTypeTemplateDto>(sql);
-
-            return
-                //This returns a lookup from the GetAll cached lookup
-                (dtos.Any()
-                    ? GetMany(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
-                    : Enumerable.Empty<IContentType>())
-                    //order the result by name
-                    .OrderBy(x => x.Name);
+            return ids.Length > 0 ? GetMany(ids).OrderBy(x => x.Name) : Enumerable.Empty<IContentType>();
         }
 
-        /// <summary>
-        /// Gets all entities of the specified <see cref="PropertyType"/> query
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns>An enumerable list of <see cref="IContentType"/> objects</returns>
+        /// <inheritdoc />
         public IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query)
         {
             var ints = PerformGetByQuery(query).ToArray();
-            return ints.Any()
-                ? GetMany(ints)
-                : Enumerable.Empty<IContentType>();
+            return ints.Length > 0 ? GetMany(ints) : Enumerable.Empty<IContentType>();
+        }
+
+        protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
+        {
+            // used by DataTypeService to remove properties
+            // from content types if they have a deleted data type - see
+            // notes in DataTypeService.Delete as it's a bit weird
+
+            var sqlClause = Sql()
+                .SelectAll()
+                .From<PropertyTypeGroupDto>()
+                .RightJoin<PropertyTypeDto>()
+                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
+                .InnerJoin<DataTypeDto>()
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
+
+            var translator = new SqlTranslator<PropertyType>(sqlClause, query);
+            var sql = translator.Translate()
+                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
+
+            return Database
+                .FetchOneToMany<PropertyTypeGroupDto>(x => x.PropertyTypeDtos, sql)
+                .Select(x => x.ContentTypeNodeId).Distinct();
         }
 
         /// <summary>
@@ -141,7 +143,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (aliases.Length == 0) return Enumerable.Empty<int>();
 
             var sql = Sql()
-                .Select("cmsContentType.nodeId")
+                .Select<ContentTypeDto>(x => x.NodeId)
                 .From<ContentTypeDto>()
                 .InnerJoin<NodeDto>()
                 .On<ContentTypeDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
@@ -156,14 +158,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<ContentTypeTemplateDto>(r => r.Select(x => x.ContentTypeDto, r1 => r1.Select(x => x.NodeDto)));
+                : sql.Select<ContentTypeDto>(x => x.NodeId);
 
             sql
                 .From<ContentTypeDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .LeftJoin<ContentTypeTemplateDto>()
-                .On<ContentTypeTemplateDto, ContentTypeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<ContentTypeTemplateDto>().On<ContentTypeTemplateDto, ContentTypeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;

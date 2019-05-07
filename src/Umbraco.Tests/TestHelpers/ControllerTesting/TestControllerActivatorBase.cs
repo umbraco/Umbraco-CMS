@@ -9,7 +9,6 @@ using System.Web.Http.Dispatcher;
 using System.Web.Security;
 using Moq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.Membership;
@@ -140,6 +139,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 webSecurity.Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor());
 
@@ -159,9 +159,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Mock.Of<IPublishedContentQuery>(),
                 membershipHelper);
 
-            return CreateController(controllerType, request, umbCtx, umbHelper);
+            return CreateController(controllerType, request, umbracoContextAccessor, umbHelper);
         }
 
-        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, UmbracoContext umbracoContext, UmbracoHelper helper);
+        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper);
     }
 }

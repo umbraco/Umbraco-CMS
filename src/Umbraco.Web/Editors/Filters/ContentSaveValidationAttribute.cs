@@ -44,7 +44,7 @@ namespace Umbraco.Web.Editors.Filters
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var model = (ContentItemSave)actionContext.ActionArguments["contentItem"];
-            var contentItemValidator = new ContentItemValidationHelper<IContent, ContentItemSave>(_logger, _umbracoContextAccessor);
+            var contentItemValidator = new ContentSaveModelValidator(_logger, _umbracoContextAccessor);
 
             if (!ValidateAtLeastOneVariantIsBeingSaved(model, actionContext)) return;
             if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Editors.Filters
             foreach (var variant in model.Variants.Where(x => x.Save))
             {
                 if (contentItemValidator.ValidateProperties(model, variant, actionContext))
-                    contentItemValidator.ValidatePropertyData(model, variant, variant.PropertyCollectionDto, actionContext.ModelState);
+                    contentItemValidator.ValidatePropertiesData(model, variant, variant.PropertyCollectionDto, actionContext.ModelState);
             }
         }
 

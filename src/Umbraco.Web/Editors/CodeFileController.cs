@@ -1,5 +1,4 @@
 ﻿using System;
-using AutoMapper;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,7 +33,8 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
-        public CodeFileController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public CodeFileController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
         }
 
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Editors
 
             // if the parentId is root (-1) then we just need an empty string as we are
             // creating the path below and we don't want -1 in the path
-            if (parentId == Core.Constants.System.Root.ToInvariantString())
+            if (parentId == Core.Constants.System.RootString)
             {
                 parentId = string.Empty;
             }
@@ -275,7 +275,7 @@ namespace Umbraco.Web.Editors
             // Make sure that the root virtual path ends with '/'
             codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.EnsureEndsWith("/");
 
-            if (id != Core.Constants.System.Root.ToInvariantString())
+            if (id != Core.Constants.System.RootString)
             {
                 codeFileDisplay.VirtualPath += id.TrimStart("/").EnsureEndsWith("/");
                 //if it's not new then it will have a path, otherwise it won't
@@ -514,7 +514,7 @@ namespace Umbraco.Web.Editors
         private Stylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
         {
             return CreateOrUpdateFile(display, ".css", Current.FileSystems.StylesheetsFileSystem,
-                name => Services.FileService.GetStylesheetByName(name), 
+                name => Services.FileService.GetStylesheetByName(name),
                 (stylesheet, userId) => Services.FileService.SaveStylesheet(stylesheet, userId),
                 name => new Stylesheet(name)
             );

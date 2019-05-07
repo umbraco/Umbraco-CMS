@@ -34,10 +34,10 @@ namespace Umbraco.Web.Trees
         private readonly ITreeService _treeService;
         private readonly ISectionService _sectionService;
 
-        public ApplicationTreeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
+        public ApplicationTreeController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
             IRuntimeState runtimeState, ITreeService treeService, ISectionService sectionService, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
             _sectionService = sectionService;
@@ -71,8 +71,8 @@ namespace Umbraco.Web.Trees
                 //if there are no trees defined for this section but the section is defined then we can have a simple
                 //full screen section without trees
                 var name = Services.TextService.Localize("sections/" + application);
-                return TreeRootNode.CreateSingleTreeRoot(Constants.System.Root.ToInvariantString(), null, null, name, TreeNodeCollection.Empty, true);
-            }   
+                return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
+            }
 
             // handle request for a specific tree / or when there is only one tree
             if (!tree.IsNullOrWhiteSpace() || allTrees.Count == 1)
@@ -114,7 +114,7 @@ namespace Umbraco.Web.Trees
 
                 // otherwise it's a section with all empty trees, aka a fullscreen section
                 // todo is this true? what if we just failed to TryGetRootNode on all of them? SD: Yes it's true but we should check the result of TryGetRootNode and throw?
-                return TreeRootNode.CreateSingleTreeRoot(Constants.System.Root.ToInvariantString(), null, null, name, TreeNodeCollection.Empty, true);
+                return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
             }
 
             // for many groups
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Trees
             var rootNode = await GetRootNode(tree, querystring);
 
             var sectionRoot = TreeRootNode.CreateSingleTreeRoot(
-                Constants.System.Root.ToInvariantString(),
+                Constants.System.RootString,
                 rootNode.ChildNodesUrl,
                 rootNode.MenuUrl,
                 rootNode.Name,

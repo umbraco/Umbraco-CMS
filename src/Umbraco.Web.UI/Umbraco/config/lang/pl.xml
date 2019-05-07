@@ -86,9 +86,6 @@
     <key alias="domainExists">Domena '%0%' jest aktualnie przypisana</key>
     <key alias="domainUpdated">Domena '%0%' została zaktualizowana</key>
     <key alias="orEdit">Edytuj Aktualne Domeny</key>
-    <key alias="domainHelp"><![CDATA[Poprawne domeny to: "example.com", "www.example.com", "example.com:8080" lub
-    "https://www.example.com/". Wspierane są jednopoziomowe ścieżki domen, np. "example.com/en" jednakże powinno się ich unikać.
-    Preferowane jest użycie powyższych ustawień języka.]]></key>
     <key alias="inherit">Odziedziczona</key>
     <key alias="setLanguage">Język</key>
     <key alias="setLanguageHelp"><![CDATA[Wybierz język dla węzła,<br /> lub wybierz dziedziczenie języka z węzła rodzica. Zostanie to zastosowane<br />
@@ -396,13 +393,6 @@
     <key alias="usernameHint">Twoja nazwa użytkownika to przeważnie Twój adres e-mail</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Dozwolone węzły pochodne</key>
-    <key alias="create">Stwórz</key>
-    <key alias="deletetab">Usuń zakładkę</key>
-    <key alias="description">Opis</key>
-    <key alias="newtab">Nowa zakładka</key>
-    <key alias="tab">Zakładka</key>
-    <key alias="thumbnail">Miniatura</key>
     <key alias="createListView" version="7.2">Stwórz niestandardowy widok listy</key>
     <key alias="removeListView" version="7.2">Usuń niestandardowy widok listy</key>
   </area>
@@ -579,7 +569,7 @@
     <key alias="blue">Niebieski</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addTab">Dodaj zakładkę</key>
+    <key alias="addGroup">Dodaj zakładkę</key>
     <key alias="addProperty">Dodaj właściwość</key>
     <key alias="addEditor">Dodaj edytora</key>
     <key alias="addTemplate">Dodaj szablon</key>
@@ -1180,7 +1170,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompozycje</key>
-    <key alias="noTabs">Nie dodałeś żadnych zakładek</key>
+    <key alias="noGroups">Nie dodałeś żadnych zakładek</key>
     <key alias="inheritedFrom">Odziedziczone z</key>
     <key alias="addProperty">Dodaj właściwość</key>
     <key alias="requiredLabel">Wymagana etykieta</key>
@@ -1423,13 +1413,13 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="httpsCheckExpiringCertificate">Certyfikat SSL Twojej strony wygaśnie za %0% dni.</key>
     <key alias="healthCheckInvalidUrl">Błąd pingowania adresu URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Oglądasz %0% stronę używając HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'umbracoUseSSL' został ustawiony na 'false' w Twoim pliku web.config. Po uzyskaniu dostępu do strony, używając HTTPS, powinieneś go ustawić na 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">appSetting 'umbracoUseSSL' został ustawiony na '%0%' w Twoim pliku web.config, Twoje ciasteczka są %1% ustawione jako bezpieczne.</key>
-    <key alias="httpsCheckEnableHttpsError">Nie można zaktualizaować ustawień 'umbracoUseSSL' w Twoim pliku web.config file. Błąd: %0%</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'Umbraco.Core.UseHttps' został ustawiony na 'false' w Twoim pliku web.config. Po uzyskaniu dostępu do strony, używając HTTPS, powinieneś go ustawić na 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">appSetting 'Umbraco.Core.UseHttps' został ustawiony na '%0%' w Twoim pliku web.config, Twoje ciasteczka są %1% ustawione jako bezpieczne.</key>
+    <key alias="httpsCheckEnableHttpsError">Nie można zaktualizaować ustawień 'Umbraco.Core.UseHttps' w Twoim pliku web.config file. Błąd: %0%</key>
     <!-- Następujące klucze nie mają przekazanych tokenów -->
     <key alias="httpsCheckEnableHttpsButton">Włącz HTTPS</key>
     <key alias="httpsCheckEnableHttpsDescription">Ustawia umbracoSSL na 'true' w appSettings pliku web.config.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">appSetting 'umbracoUseSSL' jest teraz ustawione na 'true' w Twoim pliku web.config, Twoje ciasteczka będą oznaczone jako bezpieczne.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">appSetting 'Umbraco.Core.UseHttps' jest teraz ustawione na 'true' w Twoim pliku web.config, Twoje ciasteczka będą oznaczone jako bezpieczne.</key>
     <key alias="rectifyButton">Napraw</key>
     <key alias="cannotRectifyShouldNotEqual">Nie można naprawić sprawdzenia z wartością typu porównania 'ShouldNotEqual'.</key>
     <key alias="cannotRectifyShouldEqualWithValue">Nie można naprawić sprawdzenia z wartością typu porównania 'ShouldEqual' z wprowadzoną wartością.</key>

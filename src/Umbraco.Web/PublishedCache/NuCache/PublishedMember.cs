@@ -74,7 +74,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //    return new KeyValuePair<string, object>(property.Alias, v);
                 //})
                 //.ToDictionary(x => x.Key, x => x.Value);
-                .ToDictionary(x => x.Alias, x => new[] { new PropertyData { Value = x.GetValue() } }, StringComparer.OrdinalIgnoreCase);
+                .ToDictionary(x => x.Alias, x => new[] { new PropertyData { Value = x.GetValue(), Culture = string.Empty, Segment = string.Empty } }, StringComparer.OrdinalIgnoreCase);
 
             // see also PublishedContentType
             AddIf(contentType, properties, "Email", member.Email);
@@ -95,7 +95,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var propertyType = contentType.GetPropertyType(alias);
             if (propertyType == null || propertyType.IsUserProperty) return;
-            properties[alias] = new[] { new PropertyData { Value = value } };
+            properties[alias] = new[] { new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty } };
         }
 
         #region IPublishedMember

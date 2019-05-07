@@ -94,7 +94,7 @@
                         <div class="umb-info-local-item">
                             <strong><localize key="packager_packageReadme">Read me</localize></strong>
                             <br>
-                            <small> {{ vm.package.readme }} </small>
+                            <small ng-bind-html="vm.package.readme"></small>
                         </div>
 
                         <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == ''">

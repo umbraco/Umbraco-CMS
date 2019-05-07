@@ -5,10 +5,10 @@
                 <tr>
                     <th/>
                     <th>
-                        <localize key="content_documentType">Document Type</localize>
+                        <localize key="contentTypeEditor_elementType">Element Type</localize>
                     </th>
                     <th>
-                        <localize key="editcontenttype_tab">Tab</localize>
+                        <localize key="general_group">Group</localize>
                     </th>
                     <th>
                         <localize key="template_template">Template</localize>
@@ -18,7 +18,8 @@
             </thead>
             <tbody ui-sortable="sortableOptions" ng-model="model.value">
                 <tr ng-repeat="config in model.value">
-                    <td class="icon icon-navigation">
+                    <td>
+                        <i class="icon icon-navigation handle"></i>
                     </td>
                     <td>
                         <select id="{{model.alias}}_doctype_select"
@@ -34,7 +35,7 @@
                         <input type="text" ng-model="config.nameTemplate" />
                     </td>
                     <td>
-                        <a class="btn btn-danger" ng-click="remove($index)" ng-show="model.value.length > 1">
+                        <a class="btn btn-danger" ng-click="remove($index)">
                             <localize key="general_delete">Delete</localize>
                         </a>
                     </td>
@@ -51,8 +52,8 @@
     <br/>
     <div class="umb-nested-content__help-text" ng-show="showHelpText">
         <p>
-            <b><localize key="editcontenttype_tab">Tab</localize>:</b><br/>
-            Select the tab who's properties should be displayed. If left blank, the first tab on the doc type will be used.
+            <b><localize key="general_group">Group</localize>:</b><br/>
+            Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.
         </p>
         <p>
             <b><localize key="template_template">Template</localize>:</b><br/>

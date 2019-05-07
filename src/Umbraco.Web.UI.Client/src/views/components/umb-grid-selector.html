@@ -6,7 +6,7 @@
             <div class="umb-grid-selector__item-content">
                 <i class="umb-grid-selector__item-icon {{ defaultItem.icon }}"></i>
                 <div class="umb-grid-selector__item-label">{{ defaultItem.name }}</div>
-                <div><a href="" class="umb-grid-selector__item-default-label -blue" ng-click="openTemplate(defaultItem)"><localize key="general_open">Open</localize></a></div>
+                <div ng-show="defaultItem.id"><a href="" class="umb-grid-selector__item-default-label -blue" ng-click="openTemplate(defaultItem)"><localize key="general_open">Open</localize></a></div>
                 <span class="umb-grid-selector__item-default-label">(<localize key="general_default">Default</localize> {{itemLabel}})</span>
             </div>
             <i class="umb-grid-selector__item-remove icon-trash" ng-if="selectedItems.length === 1" ng-click="removeDefaultItem()"></i>
@@ -22,7 +22,7 @@
             <i class="umb-grid-selector__item-remove icon-trash" ng-click="removeItem(selectedItem)"></i>
         </div>
 
-        <a href="" class="umb-grid-selector__item -placeholder" ng-if="(availableItems | compareArrays:selectedItems:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+t">
+        <a href="" class="umb-grid-selector__item -placeholder" ng-if="(availableItems | compareArrays:selectedItems:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+g">
             <div class="umb-grid-selector__item-content">
                 <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem !== null"><localize key="grid_chooseExtra">Choose extra</localize> {{ itemLabel }}</div>
                 <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem === null"><localize key="grid_chooseDefault">Choose default</localize> {{ itemLabel }}</div>

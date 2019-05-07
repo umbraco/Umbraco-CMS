@@ -18,6 +18,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Cache;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 
 namespace Umbraco.Tests.Services
@@ -731,8 +732,8 @@ namespace Umbraco.Tests.Services
             IContent content = new Content("content", Constants.System.Root, contentType);
             content.SetCultureName("content-fr", langFr.IsoCode);
             content.SetCultureName("content-en", langUk.IsoCode);
-            content.PublishCulture(langFr.IsoCode);
-            content.PublishCulture(langUk.IsoCode);
+            content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault));
+            content.PublishCulture(CultureImpact.Explicit(langUk.IsoCode, langUk.IsDefault));
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
@@ -756,7 +757,7 @@ namespace Umbraco.Tests.Services
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            
+
 
         }
 
@@ -783,7 +784,7 @@ namespace Umbraco.Tests.Services
             IContent content = new Content("content", Constants.System.Root, contentType);
             content.SetCultureName("content-en", langGB.IsoCode);
             content.SetCultureName("content-fr", langFr.IsoCode);
-            
+
             Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content, new []{ langGB.IsoCode , langFr.IsoCode }).Success);
 
             //re-get
@@ -963,6 +964,18 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Not_Publish_Invalid_Cultures()
+        {
+            var contentService = ServiceContext.ContentService;
+            var content = Mock.Of<IContent>(c => c.ContentType == Mock.Of<ISimpleContentType>(s => s.Variations == ContentVariation.Culture));
+
+            Assert.Throws<InvalidOperationException>(() => contentService.SaveAndPublish(content, new[] {"*"}));
+            Assert.Throws<InvalidOperationException>(() => contentService.SaveAndPublish(content, new string[] { null }));
+            Assert.Throws<InvalidOperationException>(() => contentService.SaveAndPublish(content, new[] { "*", null }));
+            Assert.Throws<InvalidOperationException>(() => contentService.SaveAndPublish(content, new[] { "en-US", "*", "es-ES" }));
+        }
+
+        [Test]
         public void Can_Publish_Only_Valid_Content()
         {
             var contentTypeService = ServiceContext.ContentTypeService;
@@ -972,10 +985,7 @@ namespace Umbraco.Tests.Services
             const int parentId = NodeDto.NodeIdSeed + 2;
 
             var contentService = ServiceContext.ContentService;
-            var content = MockedContent.CreateSimpleContent(contentType, "Invalid Content", parentId);
-            content.SetValue("author", string.Empty);
-            contentService.Save(content);
-
+            
             var parent = contentService.GetById(parentId);
 
             var parentPublished = contentService.SaveAndPublish(parent);
@@ -985,8 +995,15 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(parentPublished.Success);
             Assert.IsTrue(parent.Published);
 
+            var content = MockedContent.CreateSimpleContent(contentType, "Invalid Content", parentId);
+            content.SetValue("author", string.Empty);
+            Assert.IsFalse(content.HasIdentity);
+
             // content cannot publish values because they are invalid
-            Assert.IsNotEmpty(content.ValidateProperties());
+            var propertyValidationService = new PropertyValidationService(Factory.GetInstance<PropertyEditorCollection>(), ServiceContext.DataTypeService);
+            var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties, CultureImpact.Invariant);
+            Assert.IsFalse(isValid);
+            Assert.IsNotEmpty(invalidProperties);
 
             // and therefore cannot be published,
             // because it did not have a published version at all
@@ -994,7 +1011,12 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(contentPublished.Success);
             Assert.AreEqual(PublishResultType.FailedPublishContentInvalid, contentPublished.Result);
             Assert.IsFalse(content.Published);
+
+            //Ensure it saved though
+            Assert.Greater(content.Id, 0);
+            Assert.IsTrue(content.HasIdentity);
         }
+        
 
         [Test]
         public void Can_Publish_And_Unpublish_Cultures_In_Single_Operation()
@@ -1014,7 +1036,7 @@ namespace Umbraco.Tests.Services
             content.SetCultureName("name-fr", langFr.IsoCode);
             content.SetCultureName("name-da", langDa.IsoCode);
 
-            content.PublishCulture(langFr.IsoCode);
+            content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault));
             var result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);
             content = ServiceContext.ContentService.GetById(content.Id);
@@ -1022,7 +1044,7 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
             content.UnpublishCulture(langFr.IsoCode);
-            content.PublishCulture(langDa.IsoCode);
+            content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault));
 
             result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);
@@ -1575,7 +1597,7 @@ namespace Umbraco.Tests.Services
 
             var contentType = MockedContentTypes.CreateAllTypesContentType("test", "test");
             ServiceContext.ContentTypeService.Save(contentType, Constants.Security.SuperUserId);
-            
+
             object obj =
                 new
                 {
@@ -2985,7 +3007,8 @@ namespace Umbraco.Tests.Services
             var accessor = (IScopeAccessor) provider;
             var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
             var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, templateRepository);
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository);
             var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
             var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;

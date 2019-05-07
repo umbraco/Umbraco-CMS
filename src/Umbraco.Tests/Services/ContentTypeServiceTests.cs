@@ -1654,17 +1654,31 @@ namespace Umbraco.Tests.Services
 
             // create 'page' content type with a 'Content_' group
             var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, false, "Content_");
-            Assert.IsTrue(page.PropertyGroups.Contains("Content_"));
+            Assert.AreEqual(1, page.PropertyGroups.Count);
+            Assert.AreEqual("Content_", page.PropertyGroups.First().Name);
             Assert.AreEqual(3, page.PropertyTypes.Count());
+            Assert.AreEqual("Title", page.PropertyTypes.First().Name);
+            Assert.AreEqual("Body Text", page.PropertyTypes.Skip(1).First().Name);
+            Assert.AreEqual("Author", page.PropertyTypes.Skip(2).First().Name);
             service.Save(page);
 
             // create 'contentPage' content type as a child of 'page'
             var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true);
+            Assert.AreEqual(1, page.PropertyGroups.Count);
+            Assert.AreEqual("Content_", page.PropertyGroups.First().Name);
             Assert.AreEqual(3, contentPage.PropertyTypes.Count());
+            Assert.AreEqual("Title", contentPage.PropertyTypes.First().Name);
+            Assert.AreEqual("Body Text", contentPage.PropertyTypes.Skip(1).First().Name);
+            Assert.AreEqual("Author", contentPage.PropertyTypes.Skip(2).First().Name);
             service.Save(contentPage);
 
             // add 'Content' group to 'meta' content type
             var meta = MockedContentTypes.CreateMetaContentType();
+            Assert.AreEqual(1, meta.PropertyGroups.Count);
+            Assert.AreEqual("Meta", meta.PropertyGroups.First().Name);
+            Assert.AreEqual(2, meta.PropertyTypes.Count());
+            Assert.AreEqual("Meta Keywords", meta.PropertyTypes.First().Name);
+            Assert.AreEqual("Meta Description", meta.PropertyTypes.Skip(1).First().Name);
             meta.AddPropertyGroup("Content");
             Assert.AreEqual(2, meta.PropertyTypes.Count());
             service.Save(meta);

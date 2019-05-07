@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
@@ -53,7 +55,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task Save_User()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
                 //setup some mocks
                 Umbraco.Core.Configuration.GlobalSettings.HasSmtpServer = true;
@@ -74,7 +76,7 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var usersController = new UsersController(
                     Factory.GetInstance<IGlobalSettings>(),
-                    umbracoContext,
+                    umbracoContextAccessor,
                     Factory.GetInstance<ISqlContext>(),
                     Factory.GetInstance<ServiceContext>(),
                     Factory.GetInstance<AppCaches>(),
@@ -123,7 +125,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             var mappers = new MapperCollection(new []
             {
-                new UserMapper()
+                new UserMapper(new Lazy<ISqlContext>(() => Current.SqlContext), new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>())
             });
 
             Mock.Get(Current.SqlContext)
@@ -134,11 +136,11 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetPagedUsers_Empty()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
                 var usersController = new UsersController(
                     Factory.GetInstance<IGlobalSettings>(),
-                    umbracoContext,
+                    umbracoContextAccessor,
                     Factory.GetInstance<ISqlContext>(),
                     Factory.GetInstance<ServiceContext>(),
                     Factory.GetInstance<AppCaches>(),
@@ -160,7 +162,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetPagedUsers_10()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
                 //setup some mocks
                 var userServiceMock = Mock.Get(Current.Services.UserService);
@@ -173,7 +175,7 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var usersController = new UsersController(
                     Factory.GetInstance<IGlobalSettings>(),
-                    umbracoContext,
+                    umbracoContextAccessor,
                     Factory.GetInstance<ISqlContext>(),
                     Factory.GetInstance<ServiceContext>(),
                     Factory.GetInstance<AppCaches>(),

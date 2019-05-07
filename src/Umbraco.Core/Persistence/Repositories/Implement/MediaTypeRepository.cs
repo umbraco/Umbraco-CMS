@@ -16,94 +16,57 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
     {
-        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
-            : base(scopeAccessor, cache, logger)
+        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository)
+            : base(scopeAccessor, cache, logger, commonRepository)
         { }
 
-        protected override bool IsPublishing => MediaType.IsPublishingConst;
+        protected override bool SupportsPublishing => MediaType.SupportsPublishingConst;
 
         protected override IRepositoryCachePolicy<IMediaType, int> CreateCachePolicy()
         {
             return new FullDataSetRepositoryCachePolicy<IMediaType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
         }
 
+        // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
+        // since this is a FullDataSet policy - and everything is cached
+        // so here,
+        // every PerformGet/Exists just GetMany() and then filters
+        // except PerformGetAll which is the one really doing the job
+
         protected override IMediaType PerformGet(int id)
-        {
-            //use the underlying GetAll which will force cache all content types
-            return GetMany().FirstOrDefault(x => x.Id == id);
-        }
+            => GetMany().FirstOrDefault(x => x.Id == id);
 
         protected override IMediaType PerformGet(Guid id)
-        {
-            //use the underlying GetAll which will force cache all content types
-            return GetMany().FirstOrDefault(x => x.Key == id);
-        }
+            => GetMany().FirstOrDefault(x => x.Key == id);
 
         protected override bool PerformExists(Guid id)
-        {
-            return GetMany().FirstOrDefault(x => x.Key == id) != null;
-        }
+            => GetMany().FirstOrDefault(x => x.Key == id) != null;
 
         protected override IMediaType PerformGet(string alias)
-        {
-            //use the underlying GetAll which will force cache all content types
-            return GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-        }
+            => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
         protected override IEnumerable<IMediaType> PerformGetAll(params int[] ids)
         {
-            if (ids.Any())
-            {
-                //NOTE: This logic should never be executed according to our cache policy
-                return ContentTypeQueryMapper.GetMediaTypes(Database, SqlSyntax, IsPublishing, this)
-                    .Where(x => ids.Contains(x.Id));
-            }
-
-            return ContentTypeQueryMapper.GetMediaTypes(Database, SqlSyntax, IsPublishing, this);
+            // the cache policy will always want everything
+            // even GetMany(ids) gets everything and filters afterwards
+            if (ids.Any()) throw new Exception("panic");
+            return CommonRepository.GetAllTypes().OfType<IMediaType>();
         }
 
         protected override IEnumerable<IMediaType> PerformGetAll(params Guid[] ids)
         {
-            //use the underlying GetAll which will force cache all content types
-
-            if (ids.Any())
-            {
-                return GetMany().Where(x => ids.Contains(x.Key));
-            }
-            else
-            {
-                return GetMany();
-            }
+            var all = GetMany();
+            return ids.Any() ? all.Where(x => ids.Contains(x.Key)) : all;
         }
 
         protected override IEnumerable<IMediaType> PerformGetByQuery(IQuery<IMediaType> query)
         {
-            var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<IMediaType>(sqlClause, query);
+            var baseQuery = GetBaseQuery(false);
+            var translator = new SqlTranslator<IMediaType>(baseQuery, query);
             var sql = translator.Translate();
+            var ids = Database.Fetch<int>(sql).Distinct().ToArray();
 
-            var dtos = Database.Fetch<ContentTypeDto>(sql);
-
-            return
-                //This returns a lookup from the GetAll cached lookup
-                (dtos.Any()
-                    ? GetMany(dtos.DistinctBy(x => x.NodeId).Select(x => x.NodeId).ToArray())
-                    : Enumerable.Empty<IMediaType>())
-                    //order the result by name
-                    .OrderBy(x => x.Name);
-        }
-
-        /// <summary>
-        /// Gets all entities of the specified <see cref="PropertyType"/> query
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns>An enumerable list of <see cref="IMediaType"/> objects</returns>
-        public IEnumerable<IMediaType> GetByQuery(IQuery<PropertyType> query)
-        {
-            var ints = PerformGetByQuery(query).ToArray();
-            return ints.Any()
-                ? GetMany(ints)
-                : Enumerable.Empty<IMediaType>();
+            return ids.Length > 0 ? GetMany(ids).OrderBy(x => x.Name) : Enumerable.Empty<IMediaType>();
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -112,12 +75,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<ContentTypeDto>(r => r.Select(x => x.NodeDto));
+                : sql.Select<ContentTypeDto>(x => x.NodeId);
 
             sql
                 .From<ContentTypeDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentTypeDto, NodeDto>( left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>( left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;

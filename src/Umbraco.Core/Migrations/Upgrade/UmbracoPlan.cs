@@ -5,6 +5,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Upgrade.V_7_12_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_14_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
+using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -136,6 +138,9 @@ namespace Umbraco.Core.Migrations.Upgrade
             .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
 
             To<RenameLabelAndRichTextPropertyEditorAliases>("{E0CBE54D-A84F-4A8F-9B13-900945FD7ED9}");
+            To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}");
+            To<ChangeNuCacheJsonFormat>("{80C0A0CB-0DD5-4573-B000-C4B7C313C70D}");
+            To<ConvertTinyMceAndGridMediaUrlsToLocalLink>("{B69B6E8C-A769-4044-A27E-4A4E18D1645A}");
 
             //FINAL
 
@@ -167,7 +172,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             From("{init-7.12.4}").To("{init-7.10.0}"); // same as 7.12.0
             From("{init-7.13.0}").To("{init-7.10.0}"); // same as 7.12.0
             From("{init-7.13.1}").To("{init-7.10.0}"); // same as 7.12.0
-
+                
             // 7.14.0 has migrations, handle it...
             //  clone going from 7.10 to 1350617A (the last one before we started to merge 7.12 migrations), then
             //  clone going from CF51B39B (after 7.12 migrations) to 0009109C (the last one before we started to merge 7.12 migrations),

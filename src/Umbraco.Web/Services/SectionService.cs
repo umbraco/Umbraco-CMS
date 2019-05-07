@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models.Trees;
+using Umbraco.Core.Models.Sections;
 using Umbraco.Core.Services;
+using Umbraco.Web.Sections;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Services
@@ -10,11 +11,11 @@ namespace Umbraco.Web.Services
     internal class SectionService : ISectionService
     {
         private readonly IUserService _userService;
-        private readonly BackOfficeSectionCollection _sectionCollection;
+        private readonly SectionCollection _sectionCollection;
 
         public SectionService(
             IUserService userService,
-            BackOfficeSectionCollection sectionCollection)
+            SectionCollection sectionCollection)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _sectionCollection = sectionCollection ?? throw new ArgumentNullException(nameof(sectionCollection));
@@ -23,11 +24,11 @@ namespace Umbraco.Web.Services
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
-        public IEnumerable<IBackOfficeSection> GetSections()
+        public IEnumerable<ISection> GetSections()
             => _sectionCollection;
 
         /// <inheritdoc />
-        public IEnumerable<IBackOfficeSection> GetAllowedSections(int userId)
+        public IEnumerable<ISection> GetAllowedSections(int userId)
         {
             var user = _userService.GetUserById(userId);
             if (user == null)
@@ -37,7 +38,7 @@ namespace Umbraco.Web.Services
         }
 
         /// <inheritdoc />
-        public IBackOfficeSection GetByAlias(string appAlias)
+        public ISection GetByAlias(string appAlias)
             => GetSections().FirstOrDefault(t => t.Alias == appAlias);
     }
 }

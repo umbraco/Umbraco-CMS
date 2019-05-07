@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
 
@@ -10,13 +11,15 @@ namespace Umbraco.Core.Logging.Viewer
     internal class JsonLogViewer : LogViewerSourceBase
     {
         private readonly string _logsPath;
+        private readonly ILogger _logger;
 
-        public JsonLogViewer(string logsPath = "", string searchPath = "") : base(searchPath)
+        public JsonLogViewer(ILogger logger, string logsPath = "", string searchPath = "") : base(searchPath)
         {
             if (string.IsNullOrEmpty(logsPath))
                 logsPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
 
             _logsPath = logsPath;
+            _logger = logger;
         }
 
         private const int FileSizeCap = 100;
@@ -36,7 +39,7 @@ namespace Umbraco.Core.Logging.Viewer
             for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
-                var filesToFind = $"*{day:yyyyMMdd}.json";
+                var filesToFind = GetSearchPattern(day);
 
                 var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
 
@@ -47,6 +50,11 @@ namespace Umbraco.Core.Logging.Viewer
             //Check if the log size is not greater than 100Mb (FileSizeCap)
             var logSizeAsMegabytes = fileSizeCount / 1024 / 1024;
             return logSizeAsMegabytes <= FileSizeCap;
+        }
+
+        private string GetSearchPattern(DateTime day)
+        {
+            return $"*{day:yyyyMMdd}*.json";
         }
 
         protected override IReadOnlyList<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take)
@@ -63,7 +71,7 @@ namespace Umbraco.Core.Logging.Viewer
             for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
-                var filesToFind = $"*{day:yyyyMMdd}.json";
+                var filesToFind = GetSearchPattern(day);
 
                 var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
 
@@ -77,8 +85,14 @@ namespace Umbraco.Core.Logging.Viewer
                         using (var stream = new StreamReader(fs))
                         {
                             var reader = new LogEventReader(stream);
-                            while (reader.TryRead(out var evt))
+                            while (TryRead(reader, out var evt))
                             {
+                                //We may get a null if log line is malformed
+                                if (evt == null)
+                                {
+                                    continue;
+                                }
+
                                 if (count > skip + take)
                                 {
                                     break;
@@ -105,5 +119,21 @@ namespace Umbraco.Core.Logging.Viewer
             return logs;
         }
 
+        private bool TryRead(LogEventReader reader, out LogEvent evt)
+        {
+            try
+            {
+                return reader.TryRead(out evt);
+            }
+            catch (JsonReaderException ex)
+            {
+                // As we are reading/streaming one line at a time in the JSON file
+                // Thus we can not report the line number, as it will always be 1
+                _logger.Error<JsonLogViewer>(ex, "Unable to parse a line in the JSON log file");
+
+                evt = null;
+                return true;
+            }
+        }
     }
 }

@@ -1,7 +1,10 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper, editorService) {
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource, 
+        userGroupsResource, userService, localizationService, contentEditingHelper, 
+        usersHelper, formHelper, notificationsService, dateHelper, editorService, 
+        listViewHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -64,8 +67,8 @@
             }
         ];
 
-        // Set card layout to active by default
-        vm.activeLayout = vm.layouts[0];
+        // Get last selected layout for "users" (defaults to first layout = card layout)
+        vm.activeLayout = listViewHelper.getLayout("users", vm.layouts); 
 
         // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
@@ -96,9 +99,11 @@
         vm.toggleFilter = toggleFilter;
         vm.setUsersViewState = setUsersViewState;
         vm.selectLayout = selectLayout;
+        vm.isSelectable = isSelectable;
         vm.selectUser = selectUser;
         vm.clearSelection = clearSelection;
         vm.clickUser = clickUser;
+        vm.getEditPath = getEditPath;
         vm.disableUsers = disableUsers;
         vm.enableUsers = enableUsers;
         vm.unlockUsers = unlockUsers;
@@ -194,16 +199,17 @@
         }
 
         function selectLayout(selectedLayout) {
-            angular.forEach(vm.layouts, function (layout) {
-                layout.active = false;
-            });
-            selectedLayout.active = true;
-            vm.activeLayout = selectedLayout;
+            // save the selected layout for "users" so it's applied next time the user visits this section
+            vm.activeLayout = listViewHelper.setLayout("users", selectedLayout, vm.layouts); 
         }
-
+        
+        function isSelectable(user) {
+            return !user.isCurrentUser;
+        }
+        
         function selectUser(user) {
             
-            if (user.isCurrentUser) {
+            if (!isSelectable(user)) {
                 return;
             }
             
@@ -226,9 +232,26 @@
             });
             vm.selection = [];
         }
+        
+        function clickUser(user, $event) {
+            
+            $event.stopPropagation();
+            
+            if ($event) {
+                // targeting a new tab/window?
+                if ($event.ctrlKey || 
+                    $event.shiftKey ||
+                    $event.metaKey || // apple
+                    ($event.button && $event.button === 1) // middle click, >IE9 + everyone else
+                ) {
+                    // yes, let the link open itself
+                    return;
+                }
+            }
+            
+            goToUser(user);
+            $event.preventDefault();
 
-        function clickUser(user) {
-            goToUser(user.id);
         }
 
         function disableUsers() {
@@ -551,8 +574,16 @@
             vm.page.copyPasswordButtonState = "init";
         }
 
-        function goToUser(userId) {
-            $location.path('users/users/user/' + userId).search("create", null).search("invite", null);
+        function goToUser(user) {
+            $location.path(pathToUser(user)).search("create", null).search("invite", null);
+        }
+        
+        function getEditPath(user) {
+            return pathToUser(user) + "?mculture=" + $location.search().mculture;
+        }
+        
+        function pathToUser(user) {
+            return "/users/users/user/" + user.id;
         }
 
         // helpers
@@ -569,7 +600,7 @@
                 vm.usersOptions.pageSize = data.pageSize;
                 vm.usersOptions.totalItems = data.totalItems;
                 vm.usersOptions.totalPages = data.totalPages;
-
+                
                 formatDates(vm.users);
                 setUserDisplayState(vm.users);
                 vm.userStatesFilter = usersHelper.getUserStatesFilter(data.userStates);

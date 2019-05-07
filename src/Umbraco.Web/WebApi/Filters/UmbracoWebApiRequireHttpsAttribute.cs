@@ -11,7 +11,7 @@ using Umbraco.Core.Configuration;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// If umbracoUseSSL property in web.config is set to true, this filter will redirect any http access to https.
+    /// If Umbraco.Core.UseHttps property in web.config is set to true, this filter will redirect any http access to https.
     /// </summary>
     /// <remarks>
     /// This will only redirect Head/Get requests, otherwise will respond with text

@@ -6,7 +6,7 @@
  * @description
  * The controller for the media type delete dialog
  */
-function MediaTypesDeleteController($scope, dataTypeResource, mediaTypeResource, treeService, navigationService) {
+function MediaTypesDeleteController($scope, mediaTypeResource, treeService, navigationService, localizationService) {
 
     $scope.performDelete = function() {
 
@@ -45,6 +45,14 @@ function MediaTypesDeleteController($scope, dataTypeResource, mediaTypeResource,
     $scope.cancel = function() {
         navigationService.hideDialog();
     };
+
+    $scope.labels = {};
+    localizationService
+        .format(["contentTypeEditor_yesDelete", "contentTypeEditor_andAllMediaItems"], "%0% " + $scope.currentNode.name + " %1%")
+        .then(function (data) {
+            $scope.labels.deleteConfirm = data;
+        });
+
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.MediaTypes.DeleteController", MediaTypesDeleteController);

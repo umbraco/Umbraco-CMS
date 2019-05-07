@@ -15,7 +15,12 @@
     [Parameter(Mandatory=$false)]
     [Alias("c")]
     [Alias("cont")]
-    [switch] $continue = $false
+    [switch] $continue = $false,
+
+    # execute a command
+    [Parameter(Mandatory=$false, ValueFromRemainingArguments=$true)]
+    [String[]]
+    $command
   )
 
   # ################################################################
@@ -382,13 +387,13 @@
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
-        -Symbols -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
+        -Symbols -SymbolPackageFormat snupkg -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Core." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Web.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
-        -Symbols -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
+        -Symbols -SymbolPackageFormat snupkg -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Web." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
@@ -475,7 +480,11 @@
   # run
   if (-not $get)
   {
-    $ubuild.Build()
+    if ($command.Length -eq 0)
+    {
+      $command = @( "Build" )
+    }
+    $ubuild.RunMethod($command);
     if ($ubuild.OnError()) { return }
   }
   if ($get) { return $ubuild }

@@ -232,7 +232,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true, true);
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true, true).Skip(skip).Take(take);
         }
 
         public override IContent GetVersion(int versionId)
@@ -982,8 +982,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // invariant: left join will yield NULL and we must use pcv to determine published
                 // variant: left join may yield NULL or something, and that determines published
 
+
                 var joins = Sql()
-                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype");
+                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype")
+                    // left join on optional culture variation
+                    //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
+                    .LeftJoin<ContentVersionCultureVariationDto>(nested =>
+                        nested.InnerJoin<LanguageDto>("langp").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccvp", "langp"), "ccvp")
+                    .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasLeft: "pcv", aliasRight: "ccvp");
 
                 sql = InsertJoins(sql, joins);
 
@@ -993,7 +999,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                     // when invariant, ie 'variations' does not have the culture flag (value 1), use the global 'published' flag on pcv.id,
                     // otherwise check if there's a version culture variation for the lang, via ccv.id
-                    ", (CASE WHEN (ctype.variations & 1) = 0 THEN (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) ELSE (CASE WHEN ccv.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
+                    ", (CASE WHEN (ctype.variations & 1) = 0 THEN (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) ELSE (CASE WHEN ccvp.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
 
                 sql = Sql(sqlText, sql.Arguments);
 

@@ -8,9 +8,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
-using System.Web.Http.Controllers;
 using System.Web.Mvc;
-using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -24,7 +22,6 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors.Filters;
@@ -32,7 +29,6 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using ActionFilterAttribute = System.Web.Http.Filters.ActionFilterAttribute;
 using Constants = Umbraco.Core.Constants;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
@@ -45,7 +41,8 @@ namespace Umbraco.Web.Editors
     [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController
     {
-        public UsersController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public UsersController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
         }
 
@@ -64,6 +61,7 @@ namespace Umbraco.Web.Editors
 
         [AppendUserModifiedHeader("id")]
         [FileUploadCleanupFilter(false)]
+        [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
             return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, id);
@@ -127,6 +125,7 @@ namespace Umbraco.Web.Editors
         }
 
         [AppendUserModifiedHeader("id")]
+        [AdminUsersAuthorize]
         public HttpResponseMessage PostClearAvatar(int id)
         {
             var found = Services.UserService.GetUserById(id);
@@ -165,6 +164,7 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
+        [AdminUsersAuthorize]
         public UserDisplay GetById(int id)
         {
             var user = Services.UserService.GetUserById(id);
@@ -238,7 +238,7 @@ namespace Umbraco.Web.Editors
 
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
-                Items = Mapper.Map<IEnumerable<UserBasic>>(result),
+                Items = Mapper.MapEnumerable<IUser, UserBasic>(result),
                 UserStates = Services.UserService.GetUserStates()
             };
 
@@ -590,6 +590,7 @@ namespace Umbraco.Web.Editors
         /// Disables the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
+        [AdminUsersAuthorize("userIds")]
         public HttpResponseMessage PostDisableUsers([FromUri]int[] userIds)
         {
             var tryGetCurrentUserId = Security.GetUserId();
@@ -621,6 +622,7 @@ namespace Umbraco.Web.Editors
         /// Enables the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
+        [AdminUsersAuthorize("userIds")]
         public HttpResponseMessage PostEnableUsers([FromUri]int[] userIds)
         {
             var users = Services.UserService.GetUsersById(userIds).ToArray();
@@ -644,6 +646,7 @@ namespace Umbraco.Web.Editors
         /// Unlocks the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
+        [AdminUsersAuthorize("userIds")]
         public async Task<HttpResponseMessage> PostUnlockUsers([FromUri]int[] userIds)
         {
             if (userIds.Length <= 0)
@@ -676,6 +679,7 @@ namespace Umbraco.Web.Editors
                 Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] { userIds.Length.ToString() }));
         }
 
+        [AdminUsersAuthorize("userIds")]
         public HttpResponseMessage PostSetUserGroupsOnUsers([FromUri]string[] userGroupAliases, [FromUri]int[] userIds)
         {
             var users = Services.UserService.GetUsersById(userIds).ToArray();
@@ -701,7 +705,8 @@ namespace Umbraco.Web.Editors
         /// Limited to users that haven't logged in to avoid issues with related records constrained
         /// with a foreign key on the user Id
         /// </remarks>
-        public async Task<HttpResponseMessage> PostDeleteNonLoggedInUser(int id)
+        [AdminUsersAuthorize]
+        public HttpResponseMessage PostDeleteNonLoggedInUser(int id)
         {
             var user = Services.UserService.GetUserById(id);
             if (user == null)

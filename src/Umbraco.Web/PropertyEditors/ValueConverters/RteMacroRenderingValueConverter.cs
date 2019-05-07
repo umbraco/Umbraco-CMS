@@ -57,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         macroAlias,
                         umbracoContext.PublishedRequest?.PublishedContent,
                         //needs to be explicitly casted to Dictionary<string, object>
-                        macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
+                        macroAttributes.ConvertTo(x => (string)x, x => x)).GetAsText()));
 
                 return sb.ToString();
             }
@@ -72,9 +72,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var sourceString = source.ToString();
 
-            // ensures string is parsed for {localLink} and urls are resolved correctly
+            // ensures string is parsed for {localLink} and urls and media are resolved correctly
             sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, Current.UmbracoContext);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
+            sourceString = TemplateUtilities.ResolveMediaFromTextString(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly
             sourceString = RenderRteMacros(sourceString, preview);

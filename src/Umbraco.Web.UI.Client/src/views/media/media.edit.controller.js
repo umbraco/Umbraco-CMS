@@ -7,9 +7,9 @@
  * The controller for the media editor
  */
 function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
-    entityResource, navigationService, notificationsService, angularHelper, 
+    entityResource, navigationService, notificationsService, localizationService, 
     serverValidationManager, contentEditingHelper, fileManager, formHelper, 
-    editorState, umbRequestHelper, $http, eventsService) {
+    editorState, umbRequestHelper, $http, eventsService, $location) {
     
     var evts = [];
     var nodeId = null;
@@ -155,12 +155,25 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
                 });
         }
     }
-    
+
+    /** Just shows a simple notification that there are client side validation issues to be fixed */
+    function showValidationNotification() {
+        //TODO: We need to make the validation UI much better, there's a lot of inconsistencies in v8 including colors, issues with the property groups and validation errors between variants
+
+        //need to show a notification else it's not clear there was an error.
+        localizationService.localizeMany([
+                "speechBubbles_validationFailedHeader",
+                "speechBubbles_validationFailedMessage"
+            ]
+        ).then(function (data) {
+            notificationsService.error(data[0], data[1]);
+        });
+    }
+
     $scope.save = function () {
 
-        if (!$scope.busy && formHelper.submitForm({ scope: $scope })) {
-
-            $scope.busy = true;
+        if (formHelper.submitForm({ scope: $scope })) {
+            
             $scope.page.saveButtonState = "busy";
 
             mediaResource.save($scope.content, create, fileManager.getFiles())
@@ -176,7 +189,6 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
                     });
 
                     editorState.set($scope.content);
-                    $scope.busy = false;
                     
                     syncTreeNode($scope.content, data.path);
 
@@ -199,12 +211,12 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
                     });
                     
                     editorState.set($scope.content);
-                    $scope.busy = false;
                     $scope.page.saveButtonState = "error";
 
                 });
-        }else{
-            $scope.busy = false;
+        }
+        else {
+            showValidationNotification();   
         }
         
     };
@@ -267,6 +279,17 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
         }
     }
 
+    $scope.showBack = function () {
+        return !infiniteMode && !!$scope.page.listViewPath;
+    }
+
+    /** Callback for when user clicks the back-icon */
+    $scope.onBack = function() {
+        if ($scope.page.listViewPath) {
+            $location.path($scope.page.listViewPath);
+        }
+    };
+    
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {
         for (var e in evts) {

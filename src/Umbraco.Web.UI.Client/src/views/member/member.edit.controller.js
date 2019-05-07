@@ -6,7 +6,7 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
+function MemberEditController($scope, $routeParams, $location, appState, memberResource, entityResource, navigationService, notificationsService, localizationService, serverValidationManager, contentEditingHelper, fileManager, formHelper, editorState, umbRequestHelper, $http) {
 
     //setup scope vars
     $scope.page = {};
@@ -15,14 +15,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null; //the editors affiliated node
     $scope.page.nameLocked = false;
-    $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
     $scope.page.exportButton = "init";
-    $scope.busy = false;
-
-    $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
-        ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
-        : null;
 
     //build a path to sync the tree with
     function buildTreePath(data) {
@@ -45,11 +39,6 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
                     editorState.set($scope.content);
 
-                    // set all groups to open
-                    angular.forEach($scope.content.tabs, function(group){
-                        group.open = true;
-                    });
-
                     $scope.page.loading = false;
 
                 });
@@ -63,11 +52,6 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     setHeaderNameState($scope.content);
 
                     editorState.set($scope.content);
-
-                    // set all groups to open
-                    angular.forEach($scope.content.tabs, function(group){
-                        group.open = true;
-                    });
 
                     $scope.page.loading = false;
 
@@ -131,14 +115,26 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
       if(content.membershipScenario === 0) {
          $scope.page.nameLocked = true;
       }
+    }
 
+    /** Just shows a simple notification that there are client side validation issues to be fixed */
+    function showValidationNotification() {
+        //TODO: We need to make the validation UI much better, there's a lot of inconsistencies in v8 including colors, issues with the property groups and validation errors between variants
+
+        //need to show a notification else it's not clear there was an error.
+        localizationService.localizeMany([
+                "speechBubbles_validationFailedHeader",
+                "speechBubbles_validationFailedMessage"
+            ]
+        ).then(function (data) {
+            notificationsService.error(data[0], data[1]);
+        });
     }
 
     $scope.save = function() {
 
-        if (!$scope.busy && formHelper.submitForm({ scope: $scope })) {
+        if (formHelper.submitForm({ scope: $scope })) {
 
-            $scope.busy = true;
             $scope.page.saveButtonState = "busy";
 
             memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
@@ -155,7 +151,6 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     });
 
                     editorState.set($scope.content);
-                    $scope.busy = false;
                     $scope.page.saveButtonState = "success";
 
                     var path = buildTreePath(data);
@@ -172,14 +167,27 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     });
 
                     editorState.set($scope.content);
-                    $scope.busy = false;
                     $scope.page.saveButtonState = "error";
 
                 });
-        }else{
-            $scope.busy = false;
+        }
+        else {
+            showValidationNotification();
         }
 
+    };
+
+    $scope.showBack = function () {
+        return !!$routeParams.listName;
+    }
+
+    /** Callback for when user clicks the back-icon */
+    $scope.onBack = function () {
+        $location.path("/member/member/list/" + $routeParams.listName);
+        $location.search("listName", null);
+        if ($routeParams.page) {
+            $location.search("page", $routeParams.page);
+        }
     };
 
     $scope.export = function() {
