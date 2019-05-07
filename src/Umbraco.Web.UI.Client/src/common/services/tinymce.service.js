@@ -431,6 +431,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 } else {
                     //Considering these fixed because UDI will now be used and thus
                     // we have no need for rel http://issues.umbraco.org/issue/U4-6228, http://issues.umbraco.org/issue/U4-6595
+                    //TODO: Kill rel attribute
                     data["rel"] = img.id;
                     data["data-id"] = img.id;
                 }
@@ -963,12 +964,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     target: target.target ? target.target : null,
                     rel: target.rel ? target.rel : null
                 };
-
-                if (hasUdi) {
-                    a["data-udi"] = target.udi;
-                } else if (target.id) {
-                    a["data-id"] = target.id;
-                }
 
                 if (target.anchor) {
                     a["data-anchor"] = target.anchor;
