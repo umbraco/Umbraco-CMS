@@ -1,4 +1,5 @@
 ﻿using NPoco;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Delete.Column;
 using Umbraco.Core.Migrations.Expressions.Delete.Constraint;
@@ -29,9 +30,11 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         }
 
         /// <inheritdoc />
-        public IExecutableBuilder KeysAndIndexes(string tableName = null)
+        public IExecutableBuilder KeysAndIndexes(string tableName, bool pk = true, bool fk = true, bool ix = true)
         {
-            return new DeleteKeysAndIndexesBuilder(_context) { TableName = tableName };
+            if (tableName.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(tableName));
+            return new DeleteKeysAndIndexesBuilder(_context) { TableName = tableName, DeletePrimaryKey = pk, DeleteForeignKeys = fk, DeleteIndexes = ix};
         }
 
         /// <inheritdoc />

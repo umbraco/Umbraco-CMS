@@ -21,7 +21,7 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         /// <summary>
         /// Specifies the table to delete keys and indexes for.
         /// </summary>
-        IExecutableBuilder KeysAndIndexes(string tableName = null);
+        IExecutableBuilder KeysAndIndexes(string tableName, bool pk = true, bool fk = true, bool ix = true);
 
         /// <summary>
         /// Specifies the column to delete.

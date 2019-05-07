@@ -302,6 +302,8 @@ namespace Umbraco.Core.Migrations
 
             while (transition != null)
             {
+                logger.Info<MigrationPlan>("Execute {MigrationType}", transition.MigrationType.Name);
+
                 var migration = migrationBuilder.Build(transition.MigrationType, context);
                 migration.Migrate();
 
@@ -326,13 +328,6 @@ namespace Umbraco.Core.Migrations
                 logger.Info<MigrationPlan>($"PostMigration: {postMigrationType.FullName}.");
                 var postMigration = migrationBuilder.Build(postMigrationType, context);
                 postMigration.Migrate();
-            }
-
-            foreach (var postMigrationType in context.PostMigrations)
-            {
-                logger.Info<MigrationPlan>($"Post: {postMigrationType.FullName}.");
-                var migration = migrationBuilder.Build(postMigrationType, context);
-                migration.Migrate();
             }
 
             logger.Info<MigrationPlan>("Done (pending scope completion).");
