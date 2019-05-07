@@ -287,10 +287,10 @@ body.touch .umb-tree {
     left: 0px;
 }
 
-.no-access {
-    .umb-tree-icon,
-    .root-link,
-    .umb-tree-item__label {
+.no-access > .umb-tree-item__inner {
+    > .umb-tree-icon,
+    > .root-link,
+    > .umb-tree-item__label {
         color: @gray-7;
         cursor: not-allowed;
     }

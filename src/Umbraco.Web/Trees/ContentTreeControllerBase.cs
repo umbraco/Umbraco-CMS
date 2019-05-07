@@ -196,22 +196,22 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
-            IEntitySlim[] result;
+            //IEntitySlim[] result;
 
             // if a request is made for the root node but user has no access to
             // root node, return start nodes instead
-            if (entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
-            {
-                result = UserStartNodes.Length > 0
-                    ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes).ToArray()
-                    : Array.Empty<IEntitySlim>();
-            }
-            else
-            {
-                result = GetChildrenFromEntityService(entityId).ToArray();
-            }
+            //if (entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
+            //{
+            //    result = UserStartNodes.Length > 0
+            //        ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes).ToArray()
+            //        : Array.Empty<IEntitySlim>();
+            //}
+            //else
+            //{
+            //    result = GetChildrenFromEntityService(entityId).ToArray();
+            //}
 
-            return result;
+            return GetChildrenFromEntityService(entityId).ToArray();
         }
 
         /// <summary>
