@@ -238,7 +238,7 @@ namespace Umbraco.Core.Models
             foreach (var property in content.Properties)
                 property.UnpublishValues(culture);
 
-            content.PublishedState = PublishedState.Publishing;
+            content.PublishedState = PublishedState.Unpublishing;
         }
 
         public static void ClearPublishInfos(this IContent content)
