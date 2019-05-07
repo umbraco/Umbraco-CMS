@@ -2,8 +2,33 @@
 
     "$scope",
     "Umbraco.PropertyEditors.NestedContent.Resources",
+    "overlayService",
+    "iconHelper",
 
-    function ($scope, ncResources) {
+    function ($scope, ncResources, overlayService, iconHelper) {
+        $scope.docTypeTabs = {};
+
+
+        init();
+
+
+        function init() {  
+     
+            ncResources.getContentTypes().then(function (docTypes) {
+                $scope.model.docTypes = docTypes;
+
+                // convert legacy icons
+                iconHelper.formatContentTypeIcons($scope.model.docTypes);
+
+                //$scope.selectedChildren = contentTypeHelper.makeObjectArrayFromId($scope.model.allowedContentTypes, contentTypes);
+
+                //if ($scope.model.id === 0) {
+                //    contentTypeHelper.insertChildNodePlaceholder($scope.contentTypes, $scope.model.name, $scope.model.icon, $scope.model.id);
+                //}             
+            });
+
+        }
+
 
         $scope.add = function () {
             $scope.model.value.push({
@@ -53,17 +78,7 @@
                 ui.placeholder.html('<td colspan="' + cellCount + '"></td>').height(cellHeight);
             }
         };
-
-        $scope.docTypeTabs = {};
-
-        ncResources.getContentTypes().then(function (docTypes) {
-            $scope.model.docTypes = docTypes;
-
-            // Populate document type tab dictionary
-            docTypes.forEach(function (value) {
-                $scope.docTypeTabs[value.alias] = value.tabs;
-            });
-        });
+       
 
         $scope.selectableDocTypesFor = function (config) {
             // return all doctypes that are:
@@ -77,10 +92,36 @@
 
         }
 
+
+        $scope.openDocTypeModal = function ($event, config) {
+            var childNodeSelectorOverlay = {
+                view: "itempicker",
+                title: "Add Element Type",
+                availableItems: $scope.selectableDocTypesFor(config),
+                selectedItems: [],
+                position: "target",
+                event: $event,
+                submit: function (model) {
+                    config.ncAlias = model.selectedItem.alias;
+
+                    $scope.docTypeTabs[model.selectedItem.alias] = model.selectedItem.tabs;
+                    overlayService.close();
+                },
+                close: function () {
+                    overlayService.close();
+                }
+            };
+
+            overlayService.open(childNodeSelectorOverlay);
+        }
+
+
+
         if (!$scope.model.value) {
             $scope.model.value = [];
             $scope.add();
         }
+
     }
 ]);
 
