@@ -79,7 +79,8 @@ HAVING COUNT(v2.id) <> 1").Any())
             // transform column versionId from guid to integer (contentVersion.id)
             if (ColumnType(PreTables.PropertyData, "versionId") == "uniqueidentifier")
             {
-                Database.Execute($"ALTER TABLE {PreTables.PropertyData} ADD COLUMN versionId2 INT NULL;");
+                Alter.Table(PreTables.PropertyData).AddColumn("versionId2").AsInt32().Nullable().Do();
+
                 // SQLCE does not support UPDATE...FROM
                 var temp = Database.Fetch<dynamic>($"SELECT id, versionId FROM {PreTables.ContentVersion}");
                 foreach (var t in temp)
