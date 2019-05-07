@@ -49,8 +49,6 @@ angular.module("umbraco.directives")
                                 } else {
                                     element.trigger("click");
                                 }
-                                
-                                keyboardService.stopPropagation()
 
                             }
 
