@@ -8,7 +8,9 @@
  * The main application controller
  * 
  */
-function MainController($scope, $location, appState, treeService, notificationsService, userService, historyService, updateChecker, assetsService, eventsService, tmhDynamicLocale, localStorageService, editorService, overlayService) {
+function MainController($scope, $location, appState, treeService, notificationsService, 
+    userService, historyService, updateChecker, assetsService, eventsService, 
+    tmhDynamicLocale, localStorageService, editorService, overlayService, focusService) {
 
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;

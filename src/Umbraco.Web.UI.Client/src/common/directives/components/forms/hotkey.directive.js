@@ -4,7 +4,7 @@
 **/
 
 angular.module("umbraco.directives")
-    .directive('hotkey', function($window, keyboardService, $log) {
+    .directive('hotkey', function($window, keyboardService, $log, focusService) {
 
         return function(scope, el, attrs) {
 
@@ -28,7 +28,9 @@ angular.module("umbraco.directives")
                     }
 
                     keyboardService.bind(keyCombo, function() {
-
+                        
+                        focusService.rememberFocus();
+                        
                         var element = $(el);
                         var activeElementType = document.activeElement.tagName;
                         var clickableElements = ["A", "BUTTON"];
@@ -47,6 +49,8 @@ angular.module("umbraco.directives")
                                 } else {
                                     element.trigger("click");
                                 }
+                                
+                                keyboardService.stopPropagation()
 
                             }
 
