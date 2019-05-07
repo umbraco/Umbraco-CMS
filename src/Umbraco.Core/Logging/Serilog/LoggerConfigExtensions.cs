@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Text;
 using System.Web;
 using Serilog;
+using Serilog.Configuration;
+using Serilog.Core;
 using Serilog.Events;
+using Serilog.Formatting;
 using Serilog.Formatting.Compact;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 
@@ -9,6 +13,7 @@ namespace Umbraco.Core.Logging.Serilog
 {
     public static class LoggerConfigExtensions
     {
+        private const string AppDomainId = "AppDomainId";
         /// <summary>
         /// This configures Serilog with some defaults
         /// Such as adding ProcessID, Thread, AppDomain etc
@@ -28,14 +33,14 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
                 .Enrich.WithThreadId()
-                .Enrich.WithProperty("AppDomainId", AppDomain.CurrentDomain.Id)
+                .Enrich.WithProperty(AppDomainId, AppDomain.CurrentDomain.Id)
                 .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.With<HttpSessionIdEnricher>()
                 .Enrich.With<HttpRequestNumberEnricher>()
                 .Enrich.With<HttpRequestIdEnricher>();
-            
+
             return logConfig;
         }
 
@@ -50,14 +55,50 @@ namespace Umbraco.Core.Logging.Serilog
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..txt",
-                    shared: true,
-                    rollingInterval: RollingInterval.Day,
-                    restrictedToMinimumLevel: minimumLevel,
-                    retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {SourceContext} - {Message:lj}{NewLine}{Exception}");
+                shared: true,
+                rollingInterval: RollingInterval.Day,
+                restrictedToMinimumLevel: minimumLevel,
+                retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {SourceContext} - {Message:lj}{NewLine}{Exception}");
 
             return logConfig;
         }
+
+
+        /// <remarks>
+        ///    Used in config - If renamed or moved to other assembly the config file also has be updated.
+        /// </remarks>
+        public static LoggerConfiguration File(this LoggerSinkConfiguration configuration, ITextFormatter formatter,
+            string path,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
+            LoggingLevelSwitch levelSwitch = null,
+            long? fileSizeLimitBytes = 1073741824,
+            TimeSpan? flushToDiskInterval = null,
+            RollingInterval rollingInterval = RollingInterval.Infinite,
+            bool rollOnFileSizeLimit = false,
+            int? retainedFileCountLimit = 31,
+            Encoding encoding = null
+   )
+        {
+            return configuration.Async(
+                asyncConfiguration => asyncConfiguration.Map(AppDomainId, (_,mapConfiguration) =>
+                        mapConfiguration.File(
+                            formatter,
+                            path,
+                            restrictedToMinimumLevel,
+                            fileSizeLimitBytes,
+                            levelSwitch,
+                            buffered:true,
+                            shared:false,
+                            flushToDiskInterval,
+                            rollingInterval,
+                            rollOnFileSizeLimit,
+                            retainedFileCountLimit,
+                            encoding),
+                    sinkMapCountLimit:0)
+                );
+        }
+
 
         /// <summary>
         /// Outputs a CLEF format JSON log at /App_Data/Logs/
