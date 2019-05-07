@@ -72,6 +72,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             foreach (var dto in dtos)
             {
+                var name = dto.Name;
                 var type = LinkType.External;
                 var url = dto.Url;
                 IPublishedContent content = null;
@@ -94,12 +95,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (content == null)
                         continue;
 
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        name = content.Name;
+                    }
+
                     url = content.Url;
                 }
 
                 var link = new Link
                 {
-                    Name = dto.Name,
+                    Name = name,
                     Target = dto.Target,
                     Type = type,
                     Udi = dto.Udi,
