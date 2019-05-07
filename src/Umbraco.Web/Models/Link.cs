@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models
 {
@@ -38,6 +39,14 @@ namespace Umbraco.Web.Models
         /// The UDI.
         /// </value>
         public Udi Udi { get; set; }
+
+        /// <summary>
+        /// Gets or sets the content.
+        /// </summary>
+        /// <value>
+        /// The content.
+        /// </value>
+        public IPublishedContent Content { get; set; }
 
         /// <summary>
         /// Gets or sets the URL.
