@@ -70,8 +70,6 @@ namespace Umbraco.Core.Logging.Serilog
         /// </remarks>
         public static LoggerConfiguration File(this LoggerSinkConfiguration configuration, ITextFormatter formatter,
             string path,
-            bool shared = false,
-            bool buffered = false,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
             LoggingLevelSwitch levelSwitch = null,
             long? fileSizeLimitBytes = 1073741824,
@@ -79,56 +77,26 @@ namespace Umbraco.Core.Logging.Serilog
             RollingInterval rollingInterval = RollingInterval.Infinite,
             bool rollOnFileSizeLimit = false,
             int? retainedFileCountLimit = 31,
-            Encoding encoding = null,
-            bool async = false,
-            bool asyncBlockWhenFull = false,
-            int asyncBufferSize = 10000,
-            bool asyncKeepFileOpen = true)
+            Encoding encoding = null
+   )
         {
-            LoggerConfiguration GetFileSink(LoggerSinkConfiguration c)
-            {
-                return c.File(
-                    formatter,
-                    path,
-                    restrictedToMinimumLevel,
-                    fileSizeLimitBytes,
-                    levelSwitch,
-                    buffered,
-                    shared,
-                    flushToDiskInterval,
-                    rollingInterval,
-                    rollOnFileSizeLimit,
-                    retainedFileCountLimit,
-                    encoding);
-            }
-
-            if (!async && !asyncKeepFileOpen)
-            {
-                throw new InvalidOperationException($"{nameof(asyncKeepFileOpen)} cannot be changed if async is false.");
-            }
-            if (!async && rollOnFileSizeLimit)
-            {
-                throw new InvalidOperationException($"{nameof(rollOnFileSizeLimit)} cannot be changed if async is false.");
-            }
-
-            if (async)
-            {
-                Action<LoggerSinkConfiguration> configure;
-                if (asyncKeepFileOpen)
-                {
-                    configure = a => GetFileSink(a);
-                }
-                else
-                {
-                    // This is a way to force the file to be closed after each log event. Read more https://github.com/serilog/serilog-sinks-file/issues/99#issuecomment-488612711
-                    // We basically map all log events with a AppDomainId property (all events) into a file sink and forces the sink to be closed, due to the sinkMapCountLimit = 0.
-                    configure = a => a.Map(AppDomainId, (name,c) => GetFileSink(c), sinkMapCountLimit:0);
-                }
-
-                return configuration.Async(configure, blockWhenFull: asyncBlockWhenFull, bufferSize: asyncBufferSize);
-
-            }
-            return GetFileSink(configuration);
+            return configuration.Async(
+                asyncConfiguration => asyncConfiguration.Map(AppDomainId, (_,mapConfiguration) =>
+                        mapConfiguration.File(
+                            formatter,
+                            path,
+                            restrictedToMinimumLevel,
+                            fileSizeLimitBytes,
+                            levelSwitch,
+                            buffered:true,
+                            shared:false,
+                            flushToDiskInterval,
+                            rollingInterval,
+                            rollOnFileSizeLimit,
+                            retainedFileCountLimit,
+                            encoding),
+                    sinkMapCountLimit:0)
+                );
         }
 
 
