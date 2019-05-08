@@ -11,6 +11,11 @@
     [Alias("loc")]
     [switch] $local = $false,
 
+	# enable docfx
+    [Parameter(Mandatory=$false)]
+    [Alias("doc")]
+    [switch] $docfx = $false,
+	
     # keep the build directories, don't clear them
     [Parameter(Mandatory=$false)]
     [Alias("c")]
@@ -31,7 +36,7 @@
   $ubuild = &"$PSScriptRoot\build-bootstrap.ps1"
   if (-not $?) { return }
   $ubuild.Boot($PSScriptRoot,
-    @{ Local = $local; },
+    @{ Local = $local; WithDocFx = $docfx },
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
 
