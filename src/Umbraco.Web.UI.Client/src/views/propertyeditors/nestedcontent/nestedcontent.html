@@ -1,7 +1,7 @@
 ﻿<div id="umb-nested-content--{{model.id}}" class="umb-nested-content"
      ng-controller="Umbraco.PropertyEditors.NestedContent.PropertyEditorController"
      ng-class="{'umb-nested-content--narrow':!wideMode, 'umb-nested-content--wide':wideMode}">
-    <ng-form>
+    <ng-form name="nestedContentForm">
 
         <div class="umb-nested-content__items" ng-hide="nodes.length == 0" ui-sortable="sortableOptions" ng-model="nodes">
 
@@ -18,7 +18,7 @@
                         <a class="umb-nested-content__icon umb-nested-content__icon--move" localize="title" title="actions_move" ng-click="$event.stopPropagation();" ng-show="$parent.nodes.length > 1" prevent-default>
                             <i class="icon icon-navigation"></i>
                         </a>
-                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': !$parent.canDeleteNode($index) }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
                             <i class="icon icon-trash"></i>
                         </a>
                     </div>
@@ -44,6 +44,14 @@
             </a>
         </div>
 
+        <!--This are here because we need ng-form fields to validate against-->
+        <input type="hidden" name="minCount" ng-model="renderModel" />
+
+        <div ng-messages="nestedContentForm.minCount.$error" show-validation-on-submit>
+            <div class="help-inline mt1" ng-message="minCount">
+                <localize key="validation_minCount">You need to add at least</localize> {{minItems}} <localize key="validation_items">items</localize>
+            </div>
+        </div>
     </ng-form>
 
     <umb-overlay
