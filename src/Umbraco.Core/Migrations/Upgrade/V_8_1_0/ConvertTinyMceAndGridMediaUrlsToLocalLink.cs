@@ -27,7 +27,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
 
             var sqlPropertyData = Sql()
                 .Select<PropertyDataDto>()
-                    .AndSelect<PropertyTypeDto>()
+                    .AndSelect<PropertyTypeDto>(x => x.Alias)
                     .AndSelect<DataTypeDto>()
                 .From<PropertyDataDto>()
                     .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
