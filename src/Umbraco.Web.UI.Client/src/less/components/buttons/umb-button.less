@@ -56,8 +56,8 @@
    margin-top: -9px;
    z-index: 100;
    border-radius: 40px;
-   border: 2px solid @btnBorder;
-   border-left-color: @green;
+   border: 2px solid @ui-option-disabled-type;
+   border-left-color: @ui-option-type;
    opacity: 1;
    animation: rotating 0.4s linear infinite;
    transition: opacity 0.25s ease;
@@ -83,6 +83,12 @@
    opacity: 1;
    font-size: 20px;
    transition: opacity 0.25s ease;
+}
+.umb-button__success {
+   color: @ui-option-type;
+}
+.umb-button__error {
+   color: @red;
 }
 
 .umb-button__success.-hidden,

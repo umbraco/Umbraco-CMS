@@ -3,11 +3,42 @@
     
     function UmbEditorNavigationItemController($scope, $element, $attrs) {
         
+        
+        var componentNode = $element[0];
+        componentNode.classList.add('umb-sub-views-nav-item');
+        
+        var timerId = null;
+        
+        function openAnchorDropdown() {
+            clearTimeout(timerId);
+            componentNode.classList.add('--open-anchor-dropdown');
+            componentNode.addEventListener('mouseout', requestCloseAnchorDropdown);
+        }
+        function requestCloseAnchorDropdown() {
+            componentNode.removeEventListener('mouseout', requestCloseAnchorDropdown);
+            componentNode.addEventListener('mouseover', cancelCloseAnchorDropdown);
+            timerId = setTimeout(doCloseAnchorDropdown, 500);
+        }
+        function cancelCloseAnchorDropdown() {
+            clearTimeout(timerId);
+            componentNode.removeEventListener('mouseover', cancelCloseAnchorDropdown);
+            componentNode.addEventListener('mouseout', requestCloseAnchorDropdown);
+        }
+        function doCloseAnchorDropdown() {
+            componentNode.classList.remove('--open-anchor-dropdown');
+        }
+        
+        
         var vm = this;
         
         vm.clicked = function() {
-            vm.onOpen({item:vm.item});
+            if (vm.item.active !== true) {
+                vm.onOpen({item:vm.item});
+            }
+            openAnchorDropdown();
         };
+        
+        
         
         vm.anchorClicked = function(anchor, $event) {
             vm.onOpenAnchor({item:vm.item, anchor:anchor});
@@ -15,19 +46,15 @@
             $event.preventDefault();
         };
         
-        // needed to make sure that we update what anchors are active.
-        vm.mouseOver = function() {
-            $scope.$digest();
-        }
+        $scope.$watch('item.active', function(newValue, oldValue) {
+            if(oldValue !== newValue && newValue === false) {
+                closeAnchorDropdown();
+            }
+        })
         
-        var componentNode = $element[0];
-        
-        componentNode.classList.add('umb-sub-views-nav-item');
-        componentNode.addEventListener('mouseover', vm.mouseOver);
-
         //ensure to unregister from all dom-events
         $scope.$on('$destroy', function () {
-            componentNode.removeEventListener("mouseover", vm.mouseOver);
+            componentNode.removeEventListener("mouseout", closeAnchorDropdown);
         });
         
     }

@@ -117,7 +117,7 @@
     
     visibility:hidden;
     opacity: 0;
-    transition: visibility 0s 500ms, opacity 250ms 250ms;
+    transition: opacity 20ms;
 }
 .umb-sub-views-nav-item__anchor_dropdown li a {
     border-left: 4px solid transparent;
@@ -126,10 +126,9 @@
     border-left-color: @ui-selected-border;
 }
 
-.umb-sub-views-nav-item:hover .umb-sub-views-nav-item__anchor_dropdown {
+.umb-sub-views-nav-item.--open-anchor-dropdown .umb-sub-views-nav-item__anchor_dropdown {
     visibility:visible;
     opacity: 1;
-    transition: visibility 0s 0s, opacity 20ms 0s;
 }
 
 
