@@ -155,6 +155,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
+            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
+
             // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
 
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
@@ -183,7 +185,7 @@ namespace Umbraco.Web.Editors
                 //this is only possible when using a membership provider if the membership provider supports AllowManuallyChangingPassword
                 if (passwordModel.NewPassword.IsNullOrWhiteSpace() == false)
                 {
-                    if (membershipProvider is MembershipProviderBase umbracoBaseProvider && umbracoBaseProvider.AllowManuallyChangingPassword)
+                    if (umbracoBaseProvider !=null && umbracoBaseProvider.AllowManuallyChangingPassword)
                     {
                         //this provider allows manually changing the password without the old password, so we can just do it
                         try
@@ -247,6 +249,25 @@ namespace Umbraco.Web.Editors
             {
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
             }
+
+            //This is an edge case and is only necessary for backwards compatibility:
+            if (umbracoBaseProvider != null && umbracoBaseProvider.AllowManuallyChangingPassword)
+            {
+                //this provider allows manually changing the password without the old password, so we can just do it
+                try
+                {
+                    var result = umbracoBaseProvider.ChangePassword(username, "", passwordModel.NewPassword);
+                    return result == false
+                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
+                        : Attempt.Succeed(new PasswordChangedModel());
+                }
+                catch (Exception ex)
+                {
+                    _logger.WarnWithException<PasswordChanger>("Could not change member password", ex);
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
+                }
+            }
+
 
             //without being able to retrieve the original password, 
             //we cannot arbitrarily change the password without knowing the old one and no old password was supplied - need to return an error
