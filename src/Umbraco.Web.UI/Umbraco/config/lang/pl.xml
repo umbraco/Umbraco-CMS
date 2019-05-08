@@ -1171,7 +1171,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompozycje</key>
     <key alias="noGroups">Nie dodałeś żadnych zakładek</key>
-    <key alias="inheritedFrom">Odziedziczone z %1%</key>
+    <key alias="inheritedFrom">Odziedziczone z %0%</key>
     <key alias="addProperty">Dodaj właściwość</key>
     <key alias="requiredLabel">Wymagana etykieta</key>
     <key alias="enableListViewHeading">Włącz widok listy</key>

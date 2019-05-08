@@ -1543,7 +1543,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="group">Group</key>
     <key alias="noGroups">You have not added any groups</key>
     <key alias="addGroup">Add group</key>
-    <key alias="inheritedFrom">Inherited from %1%</key>
+    <key alias="inheritedFrom">Inherited from %0%</key>
     <key alias="addProperty">Add property</key>
     <key alias="requiredLabel">Required label</key>
     <key alias="enableListViewHeading">Enable list view</key>

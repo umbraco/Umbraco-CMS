@@ -960,7 +960,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="compositions">Composities</key>
     <key alias="noGroups">Er zijn nog geen groepen toegevoegd</key>
     <key alias="addGroup">Voeg groep toe</key>
-    <key alias="inheritedFrom">Inherited van %1%</key>
+    <key alias="inheritedFrom">Inherited van %0%</key>
     <key alias="addProperty">Voeg property toe</key>
     <key alias="requiredLabel">Verplicht label</key>
     <key alias="enableListViewHeading">Zet list view aan</key>

@@ -1278,7 +1278,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="group">Gruppe</key>
     <key alias="noGroups">Du har ikke tilføjet nogle grupper</key>
     <key alias="addGroup">Tilføj gruppe</key>
-    <key alias="inheritedFrom">Nedarvet fra %1%</key>
+    <key alias="inheritedFrom">Nedarvet fra %0%</key>
     <key alias="addProperty">Tilføj egenskab</key>
     <key alias="requiredLabel">Påkrævet label</key>
     <key alias="enableListViewHeading">Aktiver listevisning</key>
