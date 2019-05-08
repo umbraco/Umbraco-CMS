@@ -3,9 +3,12 @@
     "$scope",
     "Umbraco.PropertyEditors.NestedContent.Resources",
     "overlayService",
+    "localizationService",
     "iconHelper",
 
-    function ($scope, ncResources, overlayService, iconHelper) {
+    function ($scope, ncResources, overlayService, localizationService, iconHelper) {
+        var selectElementTypeModalTitle = "";
+
         $scope.elemTypeTabs = [];
 
 
@@ -13,6 +16,9 @@
 
 
         function init() {
+            localizationService.localize("content_nestedContentSelectElementTypeModalTitle").then(function (value) {
+                selectElementTypeModalTitle = value;
+            });
 
             ncResources.getContentTypes().then(function (elemTypes) {
                 $scope.model.elemTypes = elemTypes;
@@ -99,7 +105,7 @@
         $scope.openElemTypeModal = function ($event, config) {
             var elemTypeSelectorOverlay = {
                 view: "itempicker",
-                title: "Add Element Type",
+                title: selectElementTypeModalTitle,
                 availableItems: $scope.selectableElemTypesFor(config),
                 selectedItems: [],
                 position: "target",

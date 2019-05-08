@@ -23,13 +23,15 @@
                     </td>
                     <td>
                         {{ph = placeholder(config);""}}
-                        <div class="umb-nested-content__placeholder" ng-if="ph">                            
-                                <div class="umb-nested-content__placeholder-icon-holder">
-                                    <i class="umb-nested-content__placeholder-icon {{ ph.icon }}"></i>
-                                </div>
-                                <a href ng-click="openElemTypeModal($event, config)" class="umb-nested-content__placeholder-name"> {{ ph.name }}</a>                            
+                        <div class="umb-nested-content__placeholder" ng-if="ph">
+                            <div class="umb-nested-content__placeholder-icon-holder">
+                                <i class="umb-nested-content__placeholder-icon {{ ph.icon }}"></i>
+                            </div>
+                            <a href ng-click="openElemTypeModal($event, config)" class="umb-nested-content__placeholder-name"> {{ ph.name }}</a>
                         </div>
-                        <a href ng-click="openElemTypeModal($event, config)" ng-if="!ph">Add Element Type</a>
+                        <a href ng-click="openElemTypeModal($event, config)" ng-if="!ph">
+                            <localize key="content_nestedContentAddElementType">Add element type</localize>
+                        </a>
                     </td>
                     <td>
                         <select id="{{model.alias}}_tab_select"
