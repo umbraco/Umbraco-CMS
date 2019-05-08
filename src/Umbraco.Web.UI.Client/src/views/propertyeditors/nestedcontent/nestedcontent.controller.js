@@ -6,25 +6,24 @@
     "iconHelper",
 
     function ($scope, ncResources, overlayService, iconHelper) {
-        $scope.docTypeTabs = {};
+        $scope.elemTypeTabs = [];
 
 
         init();
 
 
-        function init() {  
-     
-            ncResources.getContentTypes().then(function (docTypes) {
-                $scope.model.docTypes = docTypes;
+        function init() {
+
+            ncResources.getContentTypes().then(function (elemTypes) {
+                $scope.model.elemTypes = elemTypes;
 
                 // convert legacy icons
-                iconHelper.formatContentTypeIcons($scope.model.docTypes);
+                iconHelper.formatContentTypeIcons($scope.model.elemTypes);
 
-                //$scope.selectedChildren = contentTypeHelper.makeObjectArrayFromId($scope.model.allowedContentTypes, contentTypes);
-
-                //if ($scope.model.id === 0) {
-                //    contentTypeHelper.insertChildNodePlaceholder($scope.contentTypes, $scope.model.name, $scope.model.icon, $scope.model.id);
-                //}             
+                // Populate document type tab dictionary
+                elemTypes.forEach(function (value) {
+                    $scope.elemTypeTabs[value.alias] = value.tabs;
+                });          
             });
 
         }
@@ -36,9 +35,8 @@
                 // For good measure we'll also prefix the tab alias "nc"
                 ncAlias: "",
                 ncTabAlias: "",
-                nameTemplate: ""
-            }
-            );
+                nameTemplate: ""           
+            });
         }
 
         $scope.remove = function (index) {
@@ -78,33 +76,36 @@
                 ui.placeholder.html('<td colspan="' + cellCount + '"></td>').height(cellHeight);
             }
         };
-       
 
-        $scope.selectableDocTypesFor = function (config) {
-            // return all doctypes that are:
+        $scope.placeholder = function (config) {
+            return _.find($scope.model.elemTypes, function (elType) {
+                return elType.alias === config.ncAlias;
+            });
+        }
+
+        $scope.selectableElemTypesFor = function (config) {
+            // return all elemTypes that are:
             // 1. either already selected for this config, or
             // 2. not selected in any other config
-            return _.filter($scope.model.docTypes, function (docType) {
-                return docType.alias === config.ncAlias || !_.find($scope.model.value, function(c) {
-                    return docType.alias === c.ncAlias;
+            return _.filter($scope.model.elemTypes, function (elType) {
+                return elType.alias === config.ncAlias || !_.find($scope.model.value, function (c) {
+                    return elType.alias === c.ncAlias;
                 });
             });
 
         }
 
 
-        $scope.openDocTypeModal = function ($event, config) {
-            var childNodeSelectorOverlay = {
+        $scope.openElemTypeModal = function ($event, config) {
+            var elemTypeSelectorOverlay = {
                 view: "itempicker",
                 title: "Add Element Type",
-                availableItems: $scope.selectableDocTypesFor(config),
+                availableItems: $scope.selectableElemTypesFor(config),
                 selectedItems: [],
                 position: "target",
                 event: $event,
                 submit: function (model) {
-                    config.ncAlias = model.selectedItem.alias;
-
-                    $scope.docTypeTabs[model.selectedItem.alias] = model.selectedItem.tabs;
+                    config.ncAlias = model.selectedItem.alias;                   
                     overlayService.close();
                 },
                 close: function () {
@@ -112,7 +113,7 @@
                 }
             };
 
-            overlayService.open(childNodeSelectorOverlay);
+            overlayService.open(elemTypeSelectorOverlay);
         }
 
 
@@ -163,7 +164,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.hasContentTypes = $scope.model.config.contentTypes.length > 0;
 
         $scope.labels = {};
-        localizationService.localizeMany(["grid_insertControl"]).then(function(data) {
+        localizationService.localizeMany(["grid_insertControl"]).then(function (data) {
             $scope.labels.docTypePickerTitle = data[0];
         });
 
@@ -196,14 +197,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
-                submit: function(model) {                    
-                    if(model && model.selectedItem) {
+                submit: function (model) {
+                    if (model && model.selectedItem) {
                         $scope.addNode(model.selectedItem.alias);
                     }
                     $scope.overlayMenu.show = false;
                     $scope.overlayMenu = null;
                 },
-                close: function() {
+                close: function () {
                     $scope.overlayMenu.show = false;
                     $scope.overlayMenu = null;
                 }
@@ -341,9 +342,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
 
         var notSupported = [
-          "Umbraco.Tags",
-          "Umbraco.UploadField",
-          "Umbraco.ImageCropper"
+            "Umbraco.Tags",
+            "Umbraco.UploadField",
+            "Umbraco.ImageCropper"
         ];
 
         // Initialize
@@ -509,9 +510,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 var d2 = Math.random() * 0xffffffff | 0;
                 var d3 = Math.random() * 0xffffffff | 0;
                 return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + "-" +
-                  lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + "-" + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + "-" +
-                  lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + "-" + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
-                  lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
+                    lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + "-" + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + "-" +
+                    lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + "-" + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
+                    lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
             }
             return self;
         })();
