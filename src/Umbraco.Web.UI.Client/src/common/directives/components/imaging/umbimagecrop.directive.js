@@ -6,7 +6,7 @@
 **/
 angular.module("umbraco.directives")
 	.directive('umbImageCrop',
-		function ($timeout, localizationService, cropperHelper,  $log) {
+		function ($timeout, cropperHelper) {
 	    return {
 				restrict: 'E',
 				replace: true,
@@ -21,6 +21,9 @@ angular.module("umbraco.directives")
 				},
 
 				link: function(scope, element, attrs) {
+
+                    let sliderRef = null;
+
 					scope.width = 400;
 					scope.height = 320;
 
@@ -30,12 +33,56 @@ angular.module("umbraco.directives")
 						viewport:{},
 						margin: 20,
 						scale: {
-							min: 0.3,
+							min: 0,
 							max: 3,
 							current: 1
 						}
-					};
+                    };
 
+                    scope.sliderOptions = {
+                        "start": scope.dimensions.scale.current,
+                        "step": 0.001,
+                        "tooltips": [false],
+                        "format": {
+                            to: function (value) {
+                                return parseFloat(parseFloat(value).toFixed(3)); //Math.round(value);
+                            },
+                            from: function (value) {
+                                return parseFloat(parseFloat(value).toFixed(3)); //Math.round(value);
+                            }
+                        },
+                        "range": {
+                            "min": scope.dimensions.scale.min,
+                            "max": scope.dimensions.scale.max
+                        }
+                    };
+
+                    scope.setup = function (slider) {
+                        sliderRef = slider;
+
+                        // Set slider handle position
+                        sliderRef.noUiSlider.set(scope.dimensions.scale.current);
+
+                        // Update slider range min/max
+                        sliderRef.noUiSlider.updateOptions({
+                            "range": {
+                                "min": scope.dimensions.scale.min,
+                                "max": scope.dimensions.scale.max
+                            }
+                        });
+                    };
+
+                    scope.slide = function (values) {
+                        if (values) {
+                            scope.dimensions.scale.current = parseFloat(values);
+                        }
+                    };
+
+                    scope.change = function (values) {
+                        if (values) {
+                            scope.dimensions.scale.current = parseFloat(values);
+                        }
+                    };
 
 					//live rendering of viewport and image styles
 					scope.style = function () {
@@ -62,7 +109,6 @@ angular.module("umbraco.directives")
 						constraints.left.min = scope.dimensions.margin + scope.dimensions.cropper.width - scope.dimensions.image.width;
 						constraints.top.min = scope.dimensions.margin + scope.dimensions.cropper.height - scope.dimensions.image.height;
 					};
-
 
 					var setDimensions = function(originalImage){
 						originalImage.width("auto");
@@ -131,12 +177,10 @@ angular.module("umbraco.directives")
 
 						scope.dimensions.scale.current = scope.dimensions.image.ratio;
 
-						//min max based on original width/height
+						// Update min and max based on original width/height
 						scope.dimensions.scale.min = ratioCalculation.ratio;
-						scope.dimensions.scale.max = 2;
+                        scope.dimensions.scale.max = 2;
 					};
-
-
 
 					var validatePosition = function(left, top){
 						if(left > constraints.left.max)
@@ -191,8 +235,6 @@ angular.module("umbraco.directives")
 						}
 					});
 
-
-
 					var init = function(image){
 						scope.loaded = false;
 
@@ -219,10 +261,10 @@ angular.module("umbraco.directives")
 					};
 
 
-					/// WATCHERS ////
+					// Watchers
 					scope.$watchCollection('[width, height]', function(newValues, oldValues){
-							//we have to reinit the whole thing if
-							//one of the external params changes
+							// We have to reinit the whole thing if
+							// one of the external params changes
 							if(newValues !== oldValues){
 								setDimensions($image);
 								setConstraints();
@@ -230,29 +272,18 @@ angular.module("umbraco.directives")
 					});
 
 					var throttledResizing = _.throttle(function(){
-						resizeImageToScale(scope.dimensions.scale.current);
+                        resizeImageToScale(scope.dimensions.scale.current);
 						calculateCropBox();
 					}, 15);
 
-
-					//happens when we change the scale
-					scope.$watch("dimensions.scale.current", function(){
-						if(scope.loaded){
+					// Happens when we change the scale
+                    scope.$watch("dimensions.scale.current", function (newValue, oldValue) {
+						if (scope.loaded) {
 							throttledResizing();
 						}
 					});
 
-					//ie hack
-					if(window.navigator.userAgent.indexOf("MSIE ") >= 0){
-						var ranger = element.find("input");
-						ranger.on("change",function(){
-							scope.$apply(function(){
-								scope.dimensions.scale.current = ranger.val();
-							});
-						});
-					}
-
-					//// INIT /////
+					// Init
 					$image.on("load", function(){
 						$timeout(function(){
 							init($image);

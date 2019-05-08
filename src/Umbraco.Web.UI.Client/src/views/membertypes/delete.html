@@ -2,7 +2,7 @@
     <div class="umb-dialog-body">
 
         <p class="abstract">
-        	<localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
+            <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
         </p>
 
         <p>
@@ -13,10 +13,8 @@
 
         <hr />
 
-        <label class="checkbox">
-            <input type="checkbox" ng-model="confirmed" />
-            <localize key="contentTypeEditor_yesDelete">Yes, delete</localize> {{currentNode.name}} <localize key="contentTypeEditor_andAllMembers">and all members using this type</localize>
-        </label>
+        <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}">
+        </umb-checkbox>
 
         <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel">
         </umb-confirm>

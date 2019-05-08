@@ -6,6 +6,7 @@ using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Logging.Serilog;
 
 namespace Umbraco.Web
 {
@@ -143,6 +144,7 @@ namespace Umbraco.Web
                 Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
             }
 
+            Current.Logger.DisposeIfDisposable();
             // dispose the container and everything
             Current.Reset();
         }

@@ -95,6 +95,21 @@ namespace Umbraco.Core.Models
 
         protected void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            //enable this to detect duplicate property aliases. We do want this, however making this change in a
+            //patch release might be a little dangerous
+
+            ////detect if there are any duplicate aliases - this cannot be allowed
+            //if (e.Action == NotifyCollectionChangedAction.Add
+            //    || e.Action == NotifyCollectionChangedAction.Replace)
+            //{
+            //    var allAliases = _noGroupPropertyTypes.Concat(PropertyGroups.SelectMany(x => x.PropertyTypes)).Select(x => x.Alias);
+            //    if (allAliases.HasDuplicates(false))
+            //    {
+            //        var newAliases = string.Join(", ", e.NewItems.Cast<PropertyType>().Select(x => x.Alias));
+            //        throw new InvalidOperationException($"Other property types already exist with the aliases: {newAliases}");
+            //    }   
+            //}
+
             OnPropertyChanged(nameof(PropertyTypes));
         }
 
@@ -388,15 +403,16 @@ namespace Umbraco.Core.Models
             var group = PropertyGroups[propertyGroupName];
             if (group == null) return;
 
-            // re-assign the group's properties to no group
+            // first remove the group
+            PropertyGroups.RemoveItem(propertyGroupName);
+
+            // Then re-assign the group's properties to no group
             foreach (var property in group.PropertyTypes)
             {
                 property.PropertyGroupId = null;
                 _noGroupPropertyTypes.Add(property);
             }
 
-            // actually remove the group
-            PropertyGroups.RemoveItem(propertyGroupName);
             OnPropertyChanged(nameof(PropertyGroups));
         }
 

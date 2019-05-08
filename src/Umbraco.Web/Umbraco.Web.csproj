@@ -214,7 +214,11 @@
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
+    <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
+    <Compile Include="Routing\IMediaUrlProvider.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
+    <Compile Include="Routing\MediaUrlProviderCollection.cs" />
+    <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />

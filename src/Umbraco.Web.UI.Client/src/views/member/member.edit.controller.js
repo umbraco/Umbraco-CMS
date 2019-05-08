@@ -15,13 +15,8 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null; //the editors affiliated node
     $scope.page.nameLocked = false;
-    $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
     $scope.page.exportButton = "init";
-
-    $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
-        ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
-        : null;
 
     //build a path to sync the tree with
     function buildTreePath(data) {
@@ -44,11 +39,6 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
                     editorState.set($scope.content);
 
-                    // set all groups to open
-                    angular.forEach($scope.content.tabs, function(group){
-                        group.open = true;
-                    });
-
                     $scope.page.loading = false;
 
                 });
@@ -62,11 +52,6 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
                     setHeaderNameState($scope.content);
 
                     editorState.set($scope.content);
-
-                    // set all groups to open
-                    angular.forEach($scope.content.tabs, function(group){
-                        group.open = true;
-                    });
 
                     $scope.page.loading = false;
 
@@ -190,6 +175,19 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
             showValidationNotification();
         }
 
+    };
+
+    $scope.showBack = function () {
+        return !!$routeParams.listName;
+    }
+
+    /** Callback for when user clicks the back-icon */
+    $scope.onBack = function () {
+        $location.path("/member/member/list/" + $routeParams.listName);
+        $location.search("listName", null);
+        if ($routeParams.page) {
+            $location.search("page", $routeParams.page);
+        }
     };
 
     $scope.export = function() {
