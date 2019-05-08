@@ -5,7 +5,7 @@
 
     <div class="umb-split-view__content" ng-show="!vm.editor.loading">
 
-        <ng-form name="contentHeaderForm">
+        <ng-form name="contentHeaderForm" ng-if="vm.editor.content.apps.length > 0">
             <umb-editor-content-header
                 menu="vm.page.menu"
                 hide-menu="vm.page.hideActionsMenu"
@@ -26,12 +26,19 @@
             </umb-editor-content-header>
         </ng-form>
 
-        <umb-editor-container>
+        <umb-editor-container ng-if="vm.editor.content.apps.length > 0">
             <div class="umb-editor-sub-views">
                 <div ng-repeat="app in vm.editor.content.apps track by app.alias">
                     <umb-editor-sub-view model="app" content="vm.content" />
                 </div>
             </div>
         </umb-editor-container>
+
+        <umb-empty-state
+            ng-if="vm.editor.content.apps.length === 0"
+            position="center">
+            <localize key="content_noProperties"></localize>
+        </umb-empty-state>
+
     </div>
 </div>

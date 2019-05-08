@@ -431,6 +431,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 } else {
                     //Considering these fixed because UDI will now be used and thus
                     // we have no need for rel http://issues.umbraco.org/issue/U4-6228, http://issues.umbraco.org/issue/U4-6595
+                    //TODO: Kill rel attribute
                     data["rel"] = img.id;
                     data["data-id"] = img.id;
                 }
@@ -453,6 +454,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
                     }
 				    editor.dom.setAttrib(imgElm, 'id', null);
+                    
+                    editor.fire('Change');
+                    
                 }, 500);
             }
         },
@@ -961,12 +965,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     rel: target.rel ? target.rel : null
                 };
 
-                if (hasUdi) {
-                    a["data-udi"] = target.udi;
-                } else if (target.id) {
-                    a["data-id"] = target.id;
-                }
-
                 if (target.anchor) {
                     a["data-anchor"] = target.anchor;
                     a.href = a.href + target.anchor;
@@ -993,8 +991,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 return;
             }
 
-            //if we have an id, it must be a locallink:id, aslong as the isMedia flag is not set
-            if (id && (angular.isUndefined(target.isMedia) || !target.isMedia)) {
+            //if we have an id, it must be a locallink:id
+            if (id) {
 
                 href = "/{localLink:" + id + "}";
 
@@ -1002,9 +1000,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 return;
             }
 
-            // Is email and not //user@domain.com
-            if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf('mailto:') === -1) {
-                href = 'mailto:' + href;
+		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
+		    if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
+		        // assume it's a mailto link
+				href = 'mailto:' + href;
                 insertLink();
                 return;
             }
@@ -1257,6 +1256,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     view: 'views/propertyeditors/rte/codeeditor.html',
                     submit: function (model) {
                         args.editor.setContent(model.content);
+                        args.editor.fire('Change');
                         editorService.close();
                     },
                     close: function () {
