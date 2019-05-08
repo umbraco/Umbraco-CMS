@@ -83,9 +83,6 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            //set the default
-            menu.DefaultMenuAlias = ActionNew.ActionAlias;
-
             if (id == Constants.System.RootString)
             {
                 // if the user's start node is not the root then the only menu item to display is refresh
@@ -94,6 +91,9 @@ namespace Umbraco.Web.Trees
                     menu.Items.Add(new RefreshNode(Services.TextService, true));
                     return menu;
                 }
+
+                //set the default
+                menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
                 menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
