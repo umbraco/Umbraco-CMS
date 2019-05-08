@@ -6,7 +6,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     [HealthCheck(
         "E2048C48-21C5-4BE1-A80B-8062162DF124",
         "Cookie hijacking and protocol downgrade attacks Protection (Strict-Transport-Security Header (HSTS))",
-        Description = "Checks if your site, when running with HTTPS, contains the Strict-Transport-Security Header (HSTS). If not, it adds with a default of 100 days.",
+        Description = "Checks if your site, when running with HTTPS, contains the Strict-Transport-Security Header (HSTS). If not, it adds with a default of 126 days.",
         Group = "Security")]
     public class HstsCheck : BaseHttpHeaderCheck
     {
