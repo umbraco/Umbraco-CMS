@@ -971,7 +971,7 @@
   <area alias="contentTypeEditor">
     <key alias="compositions">组合</key>
     <key alias="noGroups">您没有添加任何选项卡</key>
-    <key alias="inheritedFrom">继承自</key>
+    <key alias="inheritedFrom">继承自 %1%</key>
     <key alias="addProperty">添加属性</key>
     <key alias="requiredLabel">必需的标签</key>
     <key alias="enableListViewHeading">启用列表视图</key>
