@@ -27,7 +27,7 @@
         vm.focusSearch = focusSearch;
         
         //we need to capture the focus before this element is initialized.
-        vm.focusBeforeOpening = focusService.lastKnownFocus;
+        vm.focusBeforeOpening = focusService.getLastKnownFocus();
 
         function onInit() {
             vm.searchQuery = "";

@@ -13,14 +13,17 @@
     function focusService() {
         
         
+        var currentFocus = null;
+        var lastKnownFocus = null;
+        
+        
         function focusInApp(e) {
-            service.currentFocus = e.target;
+            currentFocus = e.target;
         }
         document.addEventListener('focusin', focusInApp);
         
         
         var service = {
-            currentFocus: null,
             
             /**
     		 * @ngdoc property
@@ -32,7 +35,9 @@
              * This variable is avaiable for directives that are not able to figure out the focused element on init, and there this service will help remembering it untill the directive is initialized.
              * 
              */
-            lastKnownFocus: null,
+            getLastKnownFocus: function() {
+                return lastKnownFocus;
+            },
             
             /**
              * @ngdoc function
@@ -45,7 +50,7 @@
              * 
              */
             rememberFocus: function() {
-                service.lastKnownFocus = service.currentFocus;
+                lastKnownFocus = currentFocus;
             },
             
             /**
@@ -59,7 +64,7 @@
              * 
              */
             setLastKnownFocus: function(element) {
-                service.lastKnownFocus = element;
+                lastKnownFocus = element;
             }
         };
 
