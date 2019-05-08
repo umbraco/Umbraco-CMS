@@ -38,14 +38,19 @@ function valPropertyMsg(serverValidationManager) {
             
             var currentProperty = umbPropCtrl.property;
             scope.currentProperty = currentProperty;
-            var currentCulture = currentProperty.culture;            
-            var currentVariant = umbVariantCtrl.editor.content;
-            
-            // Lets check if we have variants and we are on the default language then ...
-            if(umbVariantCtrl && umbVariantCtrl.content.variants.length > 1 && !currentVariant.language.isDefault && !currentCulture && !currentProperty.unlockInvariantValue) {
-                //This property is locked cause its a invariant property shown on a non-default language.
-                //Therefor do not validate this field.
-                return;
+            var currentCulture = currentProperty.culture;         
+
+            if (umbVariantCtrl) {
+                //if we are inside of an umbVariantContent directive
+
+                var currentVariant = umbVariantCtrl.editor.content;
+
+                // Lets check if we have variants and we are on the default language then ...
+                if (umbVariantCtrl.content.variants.length > 1 && !currentVariant.language.isDefault && !currentCulture && !currentProperty.unlockInvariantValue) {
+                    //This property is locked cause its a invariant property shown on a non-default language.
+                    //Therefor do not validate this field.
+                    return;
+                }
             }
             
             // if we have reached this part, and there is no culture, then lets fallback to invariant. To get the validation feedback for invariant language.
