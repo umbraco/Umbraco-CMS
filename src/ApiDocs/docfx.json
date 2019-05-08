@@ -10,8 +10,7 @@
           ],
           "exclude": [
             "**/obj/**",
-            "**/bin/**",
-            "../../build.tmp/_site/**"
+            "**/bin/**"
           ]
         }
       ],
@@ -35,19 +34,7 @@
           "*.md"
         ],
         "exclude": [
-          "obj/**",
-          "../../build.tmp/_site/**"
-        ]
-      }
-    ],
-    "resource": [
-      {
-        "files": [
-          "images/**"
-        ],
-        "exclude": [
-          "obj/**",
-          "../../build.tmp/_site/**"
+          "obj/**"
         ]
       }
     ],
@@ -57,8 +44,7 @@
           "**.md"
         ],
         "exclude": [
-          "obj/**",
-          "../../build.tmp/_site/**"
+          "obj/**"
         ]
       }
     ],
