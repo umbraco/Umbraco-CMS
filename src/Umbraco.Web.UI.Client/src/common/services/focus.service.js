@@ -26,12 +26,13 @@
         var service = {
             
             /**
-    		 * @ngdoc property
-             * @name umbraco.services.focusService#lastKnownFocus
-		     * @propertyOf umbraco.services.focusService
+            * @ngdoc function
+            * @name umbraco.services.focusService#getLastKnownFocus
+            * @methodOf umbraco.services.focusService
+            * @function
              *
              * @description
-             * A element set to be remembered, the directive using this should store the value of this to make sure that its not changed white using that directive.
+             * Gives the element that was set to be remembered, the directive using this should store the value of this to make sure that its not changed white using that directive.
              * This variable is avaiable for directives that are not able to figure out the focused element on init, and there this service will help remembering it untill the directive is initialized.
              * 
              */
