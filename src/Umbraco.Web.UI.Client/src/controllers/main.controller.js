@@ -25,6 +25,7 @@ function MainController($scope, $location, appState, treeService, notificationsS
     function handleFirstTab(evt) {
         if (evt.keyCode === 9) {
             $scope.tabbingActive = true;
+            $scope.$digest();
             window.removeEventListener('keydown', handleFirstTab);
             window.addEventListener('mousedown', disableTabbingActive);
         }
@@ -32,6 +33,7 @@ function MainController($scope, $location, appState, treeService, notificationsS
     
     function disableTabbingActive(evt) {
         $scope.tabbingActive = false;
+        $scope.$digest();
         window.removeEventListener('mousedown', disableTabbingActive);
         window.addEventListener("keydown", handleFirstTab);
     }
