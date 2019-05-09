@@ -1,5 +1,4 @@
-function multiUrlPickerController($scope, angularHelper, localizationService, entityResource, iconHelper) {
-
+angular.module("umbraco").controller("Umbraco.PropertyEditors.MultiUrlPickerController", function ($scope, angularHelper, localizationService, entityResource, iconHelper) {
     $scope.renderModel = [];
 
     if ($scope.preview) {
@@ -61,6 +60,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
     $scope.openLinkPicker = function (link, $index) {
         var target = link ? {
             name: link.name,
+            nodeName: link.nodeName,
             anchor: link.queryString,
             // the linkPicker breaks if it get an udi for media
             udi: link.isMedia ? null : link.udi,
@@ -70,6 +70,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         
         $scope.linkPickerOverlay = {
             view: "linkpicker",
+            useNodeName: true,
             currentTarget: target,
             ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === "1",
             show: true,
@@ -79,6 +80,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                     if (model.target.anchor && model.target.anchor[0] !== '?' && model.target.anchor[0] !== '#') {
                         model.target.anchor = (model.target.anchor.indexOf('=') === -1 ? '#' : '?') + model.target.anchor;
                     }
+
                     if (link) {
                         if (link.isMedia && link.url === model.target.url) {
                             // we can assume the existing media item is changed and no new file has been selected
@@ -88,14 +90,16 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                             link.isMedia = model.target.isMedia;
                         }
 
-                        link.name = model.target.name || model.target.url || model.target.anchor;
+                        link.name = model.target.name;
+                        link.nodeName = model.target.nodeName;
                         link.queryString = model.target.anchor;
                         link.target = model.target.target;
                         link.url = model.target.url;
                     } else {
                         link = {
                             isMedia: model.target.isMedia,
-                            name: model.target.name || model.target.url || model.target.anchor,
+                            name: model.target.name,
+                            nodeName: model.target.nodeName,
                             queryString: model.target.anchor,
                             target: model.target.target,
                             udi: model.target.udi,
@@ -128,7 +132,4 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             }
         };
     };
-}
-
-angular.module("umbraco").controller("Umbraco.PropertyEditors.MultiUrlPickerController", multiUrlPickerController);
-
+});
