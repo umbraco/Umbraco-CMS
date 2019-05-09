@@ -24,9 +24,8 @@
 
     <umb-control-group label="@defaultdialogs_nodeNameLinkPicker">
         <input type="text"
-               localize="placeholder"
-               placeholder="@placeholders_entername"
-               class="umb-editor umb-textstring"
+               placeholder="{{model.useNodeName && model.target.nodeName ? model.target.nodeName : placeholders_entername}}"
+               class="umb-editor umb-textstring -full-width-input"
                ng-model="model.target.name" />
     </umb-control-group>
 
@@ -50,7 +49,7 @@
                                  search-from-id="{{searchInfo.searchFromId}}"
                                  search-from-name="{{searchInfo.searchFromName}}"
                                  show-search="{{searchInfo.showSearch}}"
-								 ignore-user-startnodes="{{searchInfo.ignoreUserStartNodes}}"
+                                 ignore-user-startnodes="{{searchInfo.ignoreUserStartNodes}}"
                                  section="{{section}}">
             </umb-tree-search-box>
 
@@ -65,7 +64,7 @@
                 <umb-tree section="content"
                           hideheader="true"
                           hideoptions="true"
-						  customtreeparams="{{customTreeParams}}"
+                          customtreeparams="{{customTreeParams}}"
                           eventhandler="dialogTreeEventHandler"
                           enablelistviewexpand="true"
                           isdialog="true"
