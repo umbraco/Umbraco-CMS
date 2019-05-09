@@ -893,7 +893,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     return UmbracoObjectTypes.Media;
                 case UmbracoEntityTypes.MemberType:
-                    return UmbracoObjectTypes.MediaType;
+                    return UmbracoObjectTypes.MemberType;
                 case UmbracoEntityTypes.MemberGroup:
                     return UmbracoObjectTypes.MemberGroup;
                 case UmbracoEntityTypes.MediaType:
