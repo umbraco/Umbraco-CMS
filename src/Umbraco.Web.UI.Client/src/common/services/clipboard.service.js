@@ -118,7 +118,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @param aliases {string} umbraco A array of strings providing the alias of the data you want to test for.
     *
     * @description
-    * Determins wether the current clipboard has entries that matches given type and a one of the aliases.
+    * Determines whether the current clipboard has entries that match a given type and one of the aliases.
     */
     service.hasEntriesOfType = function(type, aliases) {
         
@@ -144,7 +144,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         
         var storage = retriveStorage();
         
-        // Find entries that are furfilling the criterias for this nodeType and nodeTypesAliases.
+        // Find entries that are fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
                 return (entry.type === type && aliases.filter(alias => alias === entry.alias).length > 0);
@@ -184,7 +184,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         
         var storage = retriveStorage();
         
-        // Find entries that are NOT furfilling the criterias for this nodeType and nodeTypesAliases.
+        // Find entries that are NOT fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
                 return !(entry.type === type && aliases.filter(alias => alias === entry.alias).length > 0);
