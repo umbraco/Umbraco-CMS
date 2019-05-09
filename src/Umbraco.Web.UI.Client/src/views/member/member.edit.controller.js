@@ -131,6 +131,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
             $scope.busy = true;
             $scope.page.saveButtonState = "busy";
 
+            //anytime a user is changing a member's password, we are in effect resetting it so we need to set that flag here
+            var passwordProp = _.find(contentEditingHelper.getAllProps($scope.content), function (e) { return e.alias === '_umb_password' });
+            passwordProp.value.reset = true;
+
             memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
                 .then(function(data) {
 
