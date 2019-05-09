@@ -16,7 +16,8 @@
                     ng-repeat="property in group.properties track by property.alias"
                     property="property"
                     show-inherit="content.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
-                    inherits-from="defaultVariant.language.name"
+                    on-select-variant="onSelectVariant(variant)"
+                    inherits-from="defaultVariant"
                     ng-class="{'--disabled': content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}"
                     >
 

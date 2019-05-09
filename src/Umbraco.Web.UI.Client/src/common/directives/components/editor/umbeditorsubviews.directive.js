@@ -17,6 +17,7 @@
             replace: true,
             templateUrl: 'views/components/editor/umb-editor-sub-views.html',
             scope: {
+                onSelectVariant: "&",
                 subViews: "=",
                 model: "="
             },
