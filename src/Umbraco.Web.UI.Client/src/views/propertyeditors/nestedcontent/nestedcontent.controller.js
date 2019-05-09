@@ -29,7 +29,7 @@
                 // Populate document type tab dictionary
                 elemTypes.forEach(function (value) {
                     $scope.elemTypeTabs[value.alias] = value.tabs;
-                });          
+                });
             });
 
         }
@@ -41,7 +41,7 @@
                 // For good measure we'll also prefix the tab alias "nc"
                 ncAlias: "",
                 ncTabAlias: "",
-                nameTemplate: ""           
+                nameTemplate: ""
             });
         }
 
@@ -98,7 +98,14 @@
                     return elType.alias === c.ncAlias;
                 });
             });
+        }
 
+        $scope.thereIsAvailableElemTypes = function () {
+            return _.some($scope.model.elemTypes, function (elType) {
+                return !_.find($scope.model.value, function (c) {
+                    return elType.alias === c.ncAlias;
+                });
+            });
         }
 
 
@@ -111,7 +118,7 @@
                 position: "target",
                 event: $event,
                 submit: function (model) {
-                    config.ncAlias = model.selectedItem.alias;                   
+                    config.ncAlias = model.selectedItem.alias;
                     overlayService.close();
                 },
                 close: function () {

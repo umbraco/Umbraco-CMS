@@ -3,7 +3,7 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th/>
+                    <th />
                     <th>
                         <localize key="contentTypeEditor_elementType">Element Type</localize>
                     </th>
@@ -23,20 +23,26 @@
                     </td>
                     <td>
                         {{ph = placeholder(config);""}}
-                        <div class="umb-nested-content__placeholder" ng-if="ph">
-                            <div class="umb-nested-content__placeholder-icon-holder">
-                                <i class="umb-nested-content__placeholder-icon {{ ph.icon }}"></i>
+                        <a class="umb-nested-content__placeholder" ng-click="openElemTypeModal($event, config)">
+                            <div ng-if="ph">
+                                <div class="umb-nested-content__placeholder-icon-holder" >
+                                    <i class="umb-nested-content__placeholder-icon {{ ph.icon }}"></i>
+                                </div>
+                                <span class="umb-nested-content__placeholder-name">
+                                    {{ ph.name }}
+                                </span>
                             </div>
-                            <a href ng-click="openElemTypeModal($event, config)" class="umb-nested-content__placeholder-name"> {{ ph.name }}</a>
-                        </div>
-                        <a href ng-click="openElemTypeModal($event, config)" ng-if="!ph">
-                            <localize key="content_nestedContentAddElementType">Add element type</localize>
+
+                            <div ng-if="!ph">
+                                <localize key="content_nestedContentAddElementType">Add element type</localize>
+                            </div>
                         </a>
+
                     </td>
                     <td>
                         <select id="{{model.alias}}_tab_select"
-                            ng-options="t for t in elemTypeTabs[config.ncAlias]"
-                            ng-model="config.ncTabAlias" required></select>
+                                ng-options="t for t in elemTypeTabs[config.ncAlias]"
+                                ng-model="config.ncTabAlias" required></select>
                     </td>
                     <td>
                         <input type="text" ng-model="config.nameTemplate" />
@@ -50,21 +56,21 @@
             </tbody>
         </table>
         <div>
-            <a class="btn" ng-click="add()">
+            <a class="btn" ng-click="add()" ng-show="thereIsAvailableElemTypes()">
                 <localize key="general_add">Add</localize>
             </a>
             <i class="icon icon-help-alt medium umb-nested-content__help-icon" ng-click="showHelpText = !showHelpText"></i>
         </div>
     </div>
-    <br/>
+    <br />
     <div class="umb-nested-content__help-text" ng-show="showHelpText">
         <p>
-            <b><localize key="general_group">Group</localize>:</b><br/>
+            <b><localize key="general_group">Group</localize>:</b><br />
             Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.
         </p>
         <p>
-            <b><localize key="template_template">Template</localize>:</b><br/>
-            Enter an angular expression to evaluate against each item for its name. Use <code ng-non-bindable>{{$index}}</code> to display the item index  
+            <b><localize key="template_template">Template</localize>:</b><br />
+            Enter an angular expression to evaluate against each item for its name. Use <code ng-non-bindable>{{$index}}</code> to display the item index
         </p>
     </div>
 </div>
