@@ -37,6 +37,11 @@
 
 // displays property inline with preceeding
 .umb-property {
+    
+    .umb-el-wrap {
+        position:relative;
+    }
+    
 	&--pull {
 		float:left;
 		width:60%;
@@ -54,11 +59,45 @@
 		}
 	}
     
-    &.--disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        pointer-events: none;
+    .umb-property__inheriting-from-default {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: @gray;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 3px;
+        z-index: 10;
+        margin-left: 85px;
+        margin-bottom: 20px;
     }
+    &.--disabled {
+        
+        user-select: none;
+        cursor: not-allowed;
+        
+        .control-label {
+            pointer-events: none;
+        }
+        
+        .controls {
+            opacity: 0.4;
+            pointer-events: none;
+            transition: opacity 240ms;
+        }
+        
+        &:hover {
+            .controls {
+                opacity: 0.1;
+            }
+            .umb-property__inheriting-from-default {
+                display: block;
+            }
+        }
+    }
+    
 }
 
 .umb-property .alert {

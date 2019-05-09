@@ -11,17 +11,18 @@
                     {{property.label}}
 
                     <span ng-if="property.validation.mandatory">
-                        <strong class="umb-control-required">*</strong>
+                        <strong class="umb-control-required" ng-class="{'--as-grey': showInherit}">*</strong>
                     </span>
                     <small ng-bind-html="property.description | preserveNewLineInHtml"></small>
-                </label>
 
-                <small ng-if="showInherit" class="inheritsFromDefaultLanguage">
-                    <localize key="contentTypeEditor_inheritedFrom" tokens="[inheritsFrom]"></localize>
-                </small>
+                </label>
 
                 <div class="controls" ng-transclude>
                 </div>
+
+                <small ng-if="showInherit" class="umb-property__inheriting-from-default" on-click="openDefaultVariant(inheritsFrom);">
+                    <localize key="contentTypeEditor_inheritedFrom" tokens="[inheritsFrom.language.name]" watchTokens="true"></localize>
+                </small>
             </div>
         </div>
     </ng-form>
