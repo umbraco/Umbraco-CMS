@@ -295,7 +295,8 @@ Opens an overlay to show a custom YSOD. </br>
                           scope.closeOverLay();
                       });
                   }
-
+                  
+                  event.stopPropagation();
                   event.preventDefault();
                }
 
