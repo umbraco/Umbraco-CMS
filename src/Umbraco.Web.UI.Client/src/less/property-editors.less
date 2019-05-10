@@ -60,10 +60,11 @@
 	}
     
     .umb-property__inheriting-from-default {
-        background-color: @inputBorder;
+        background-color: @gray-11;
+        color:@gray-3;
         padding: 4px 8px;
         border-radius: 3px;
-        transition: background-color 120ms;
+        transition: background-color 120ms, color 120ms;
         
         @media (min-width: 768px) {
             border-bottom-left-radius: 0;
@@ -90,7 +91,8 @@
                 opacity: 0.3;
             }*/
             .umb-property__inheriting-from-default {
-                background-color: @inputBorderFocus;
+                background-color: @gray-10;
+                color: black;
             }
         }
     }
