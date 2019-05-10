@@ -298,6 +298,8 @@
     <key alias="readyToSave">Ready to Save?</key>
     <key alias="sendForApproval">Send for approval</key>
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
+    <key alias="createEmpty">Create new</key>
+    <key alias="createFromClipboard">Paste from clipboard</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>

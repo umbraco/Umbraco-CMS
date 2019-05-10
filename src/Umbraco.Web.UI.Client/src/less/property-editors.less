@@ -897,9 +897,10 @@
 //
 // Tags
 // --------------------------------------------------
-.umb-tags{
+.umb-tags {
     border: @inputBorder solid 1px;
-    padding: 10px;
+    padding: 5px;
+    min-height: 54px;
     font-size: 13px;
     text-shadow: none;
     box-sizing: border-box;
@@ -907,17 +908,19 @@
 
     .tag {
         cursor: default;
-        margin: 7px;
-        padding: 10px;
-        background: @blueDark;
+        margin: 10px;
+        padding: 10px 15px;
+        background: @blueExtraDark;
         position: relative;
-
-        .icon-trash{
-            cursor: pointer;
-            padding: 2px;
-            font-size: 12px;
+        user-select: all;
+        
+        .icon-trash {
             position: relative;
-            right: -6px;
+            cursor: pointer;
+            padding-left: 2px;
+            font-size: 15px;
+            right: -5px;
+            bottom: -1px;
         }
 
         .umb_confirm-action__overlay.-left{
@@ -927,9 +930,18 @@
         }
     }
 
-    input{
+    input {
         border: none;
         background: @white;
+    }
+    
+    .twitter-typeahead {
+        margin: 10px;
+        margin-top: 16px;
+        vertical-align: top;
+        input {
+            padding-left: 0;
+        }
     }
 }
 
