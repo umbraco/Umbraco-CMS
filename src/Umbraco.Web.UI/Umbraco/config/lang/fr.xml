@@ -1366,6 +1366,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="compositions">Compositions</key>
     <key alias="noGroups">Vous n'avez pas ajouté d'onglet</key>
     <key alias="inheritedFrom">Hérité de %0%</key>
+    <key alias="invariantValueInheritedFrom">Hérité de %0%</key>
     <key alias="addProperty">Ajouter une propriété</key>
     <key alias="requiredLabel">Label requis</key>
     <key alias="enableListViewHeading">Activer la vue en liste</key>

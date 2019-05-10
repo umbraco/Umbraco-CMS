@@ -17,12 +17,15 @@
 
                 </label>
 
+                <div class="umb-property__stickers">
+                    <small ng-if="showInherit" class="umb-property__inheriting-from-default" on-click="openDefaultVariant();">
+                        <localize key="contentTypeEditor_inheritedFrom" tokens="[inheritsFrom.language.name]" watchTokens="true"></localize>
+                    </small>
+                </div>
+
                 <div class="controls" ng-transclude>
                 </div>
 
-                <small ng-if="showInherit" class="umb-property__inheriting-from-default" on-click="openDefaultVariant(inheritsFrom);">
-                    <localize key="contentTypeEditor_inheritedFrom" tokens="[inheritsFrom.language.name]" watchTokens="true"></localize>
-                </small>
             </div>
         </div>
     </ng-form>

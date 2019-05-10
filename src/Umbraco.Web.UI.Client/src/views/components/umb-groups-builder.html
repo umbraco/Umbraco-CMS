@@ -223,8 +223,7 @@
 
                                     <div class="umb-group-builder__property-tag" ng-if="property.inherited">
                                         <i class="icon icon-merge"></i>
-                                        <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom"></localize></span>
-                                        {{property.contentTypeName}}
+                                        <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom" tokens="[property.contentTypeName]"></localize></span>
                                     </div>
 
                                     <div class="umb-group-builder__property-tag" ng-if="property.locked">

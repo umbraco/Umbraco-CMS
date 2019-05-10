@@ -744,6 +744,10 @@ legend + .control-group {
   -webkit-margin-top-collapse: separate;
 }
 
+.umb-property__stickers {
+  margin-bottom:10px;
+}
+
 // Horizontal-specific styles
 // --------------------------
 
@@ -766,6 +770,11 @@ legend + .control-group {
     &:first-child {
       *padding-left: @horizontalComponentOffset;
     }
+  }
+  
+  .umb-property__stickers {
+    margin-left: @horizontalComponentOffset;
+    margin-bottom:2px;
   }
 
  
@@ -813,6 +822,10 @@ legend + .control-group {
   }
   .form-horizontal .controls {
     margin-left: 0;
+  }
+  .form-horizontal .umb-property__stickers {
+    margin-left: 0;
+    margin-bottom:10px;
   }
 
 }

@@ -60,18 +60,15 @@
 	}
     
     .umb-property__inheriting-from-default {
-        display: none;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: @gray;
-        color: white;
-        padding: 10px 20px;
+        background-color: @inputBorder;
+        padding: 4px 8px;
         border-radius: 3px;
-        z-index: 10;
-        margin-left: 85px;
-        margin-bottom: 20px;
+        transition: background-color 120ms;
+        
+        @media (min-width: 768px) {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
     }
     &.--disabled {
         
@@ -89,11 +86,11 @@
         }
         
         &:hover {
-            .controls {
-                opacity: 0.1;
-            }
+            /*.controls {
+                opacity: 0.3;
+            }*/
             .umb-property__inheriting-from-default {
-                display: block;
+                background-color: @inputBorderFocus;
             }
         }
     }

@@ -926,6 +926,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="compositions">構成</key>
     <key alias="noGroups">タブが追加されていません</key>
     <key alias="inheritedFrom">次から継承: %0%</key>
+    <key alias="invariantValueInheritedFrom">次から継承: %0%</key>
     <key alias="addProperty">プロパティの追加</key>
     <key alias="requiredLabel">必要なラベル</key>
     <key alias="enableListViewHeading">リスト ビューの有効化</key>
