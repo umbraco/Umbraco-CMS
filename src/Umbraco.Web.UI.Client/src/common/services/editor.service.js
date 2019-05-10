@@ -164,9 +164,22 @@ When building a custom infinite editor view you can use the same components as a
     "use strict";
 
     function editorService(eventsService, keyboardService, $timeout) {
-
+        
+        
         let editorsKeyboardShorcuts = [];
         var editors = [];
+        var isEnabled = true;
+        
+        
+        // events for backdrop
+        eventsService.on("appState.backdrop", function (name, args) {
+            if (args.show === true) {
+                blur();
+            } else {
+                focus();
+            }
+        });
+        
 
         /**
          * @ngdoc method
@@ -191,7 +204,43 @@ When building a custom infinite editor view you can use the same components as a
         function getNumberOfEditors() {
             return editors.length;
         };
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#blur
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Method to tell editors that they are begin blurred.
+         */
+        function blur() {
 
+            /* keyboard shortcuts will be overwritten by the new infinite editor
+                so we need to store the shortcuts for the current editor so they can be rebound
+                when the infinite editor closes
+            */
+            unbindKeyboardShortcuts();
+            isEnabled = false;
+        }
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#blur
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Method to tell editors that they are gaining focus again.
+         */
+        function focus() {
+            if(isEnabled === false) {
+                /* keyboard shortcuts will be overwritten by the new infinite editor
+                    so we need to store the shortcuts for the current editor so they can be rebound
+                    when the infinite editor closes
+                */
+                rebindKeyboardShortcuts();
+                isEnabled = true;
+            }
+        }
+        
         /**
          * @ngdoc method
          * @name umbraco.services.editorService#open
