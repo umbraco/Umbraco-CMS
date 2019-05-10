@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Migrations.Install;
 
-namespace Umbraco.Core.Migrations.Upgrade.Post
+namespace Umbraco.Core.Migrations.Upgrade.Common
 {
     public class CreateKeysAndIndexes : MigrationBase
     {
@@ -10,8 +10,8 @@ namespace Umbraco.Core.Migrations.Upgrade.Post
 
         public override void Migrate()
         {
-            // really make sure there is nothing left
-            Delete.KeysAndIndexes().Do();
+            // remove those that may already have keys
+            Delete.KeysAndIndexes(Constants.DatabaseSchema.Tables.KeyValue).Do();
 
             // re-create *all* keys and indexes
             foreach (var x in DatabaseSchemaCreator.OrderedTables)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using NPoco;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
@@ -18,11 +19,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            // delete *all* keys and indexes - because of FKs
-            Delete.KeysAndIndexes().Do();
-            if (!Context.PostMigrations.Contains(typeof(Post.CreateKeysAndIndexes)))
-                Context.PostMigrations.Add(typeof(Post.CreateKeysAndIndexes));
-
             // drop and create columns
             Delete.Column("pk").FromTable("cmsDataType").Do();
 
@@ -69,8 +65,23 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     if (aliases.Length != group.Count() || aliases.Any(string.IsNullOrWhiteSpace))
                         throw new InvalidOperationException($"Cannot migrate datatype w/ id={dataType.NodeId} preValues: duplicate or null/empty alias.");
 
+                    // must take care of all odd situations ;-(
+                    object FmtPreValue(string alias, string preValue)
+                    {
+                        Current.Logger.Debug(typeof(DataTypeMigration), "DEBUG " + dataType.EditorAlias + " / " + alias);
+                        if (dataType.EditorAlias == "Umbraco.MediaPicker2")
+                        {
+                            if (alias == "multiPicker" ||
+                                alias == "onlyImages" ||
+                                alias == "disableFolderSelect")
+                                return preValue == "1";
+                        }
+
+                        return preValue.DetectIsJson() ? JsonConvert.DeserializeObject(preValue) : preValue;
+                    }
+
                     // dictionary-base prevalues
-                    var values = group.ToDictionary(x => x.Alias, x => x.Value);
+                    var values = group.ToDictionary(x => x.Alias, x => FmtPreValue(x.Alias, x.Value));
                     dataType.Configuration = JsonConvert.SerializeObject(values);
                 }
 

@@ -2,6 +2,7 @@
 using System.Configuration;
 using Semver;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Migrations.Upgrade.Common;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
@@ -89,9 +90,12 @@ namespace Umbraco.Core.Migrations.Upgrade
             //
             From("{init-7.14.0}");
 
+            To<DeleteKeysAndIndexes>("{B36B9ABD-374E-465B-9C5F-26AB0D39326F}");
+
             To<AddLockObjects>("{7C447271-CA3F-4A6A-A913-5D77015655CB}");
-            To<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}");
-            To<RefactorXmlColumns>("{3D18920C-E84D-405C-A06A-B7CEE52FE5DD}");
+            To<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}"); // fixme cascade
+            //To<RefactorXmlColumns>("{3D18920C-E84D-405C-A06A-B7CEE52FE5DD}"); // we're going to drop them anyways
+            To<RenameMediaVersionTable>("{5CB66059-45F4-48BA-BCBD-C5035D79206B}");
             To<VariantsMigration>("{FB0A5429-587E-4BD0-8A67-20F0E7E62FF7}");
             To<DropMigrationsTable>("{F0C42457-6A3B-4912-A7EA-F27ED85A2092}");
             To<DataTypeMigration>("{8640C9E4-A1C0-4C59-99BB-609B4E604981}");
@@ -113,14 +117,14 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<UpdateDefaultMandatoryLanguage>("{5F4597F4-A4E0-4AFE-90B5-6D2F896830EB}");
             To<RefactorVariantsModel>("{290C18EE-B3DE-4769-84F1-1F467F3F76DA}");
             To<DropTaskTables>("{6A2C7C1B-A9DB-4EA9-B6AB-78E7D5B722A7}");
-            To<FixLockTablePrimaryKey>("{77874C77-93E5-4488-A404-A630907CEEF0}");
+            //To<FixLockTablePrimaryKey>("{77874C77-93E5-4488-A404-A630907CEEF0}"); // we're going to recreate keys at the end
             To<AddLogTableColumns>("{8804D8E8-FE62-4E3A-B8A2-C047C2118C38}");
             To<DropPreValueTable>("{23275462-446E-44C7-8C2C-3B8C1127B07D}");
             To<DropDownPropertyEditorsMigration>("{6B251841-3069-4AD5-8AE9-861F9523E8DA}");
             To<TagsMigrationFix>("{EE429F1B-9B26-43CA-89F8-A86017C809A3}");
             To<DropTemplateDesignColumn>("{08919C4B-B431-449C-90EC-2B8445B5C6B1}");
             To<TablesForScheduledPublishing>("{7EB0254C-CB8B-4C75-B15B-D48C55B449EB}");
-            To<DropTaskTables>("{648A2D5F-7467-48F8-B309-E99CEEE00E2A}");
+            //To<DropTaskTables>("{648A2D5F-7467-48F8-B309-E99CEEE00E2A}"); // duplicate (see above)
             To<MakeTagsVariant>("{C39BF2A7-1454-4047-BBFE-89E40F66ED63}");
             To<MakeRedirectUrlVariant>("{64EBCE53-E1F0-463A-B40B-E98EFCCA8AE2}");
             To<AddContentTypeIsElementColumn>("{0009109C-A0B8-4F3F-8FEB-C137BBDDA268}");
@@ -134,6 +138,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             .With()
                 .To<RadioAndCheckboxAndDropdownPropertyEditorsMigration>("{940FD19A-00A8-4D5C-B8FF-939143585726}")
             .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
+
+            To<CreateKeysAndIndexes>("{3F9764F5-73D0-4D45-8804-1240A66E43A2}");
 
             To<RenameLabelAndRichTextPropertyEditorAliases>("{E0CBE54D-A84F-4A8F-9B13-900945FD7ED9}");
             To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}"); // release-8.0.0

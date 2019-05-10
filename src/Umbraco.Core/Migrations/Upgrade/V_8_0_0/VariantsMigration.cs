@@ -18,11 +18,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            // delete *all* keys and indexes - because of FKs
-            Delete.KeysAndIndexes().Do();
-            if (!Context.PostMigrations.Contains(typeof(Post.CreateKeysAndIndexes)))
-                Context.PostMigrations.Add(typeof(Post.CreateKeysAndIndexes));
-
             MigratePropertyData();
             MigrateContentAndPropertyTypes();
             MigrateContent();
@@ -318,7 +313,7 @@ WHERE v1.propertyTypeId=v2.propertyTypeId AND v1.languageId=v2.languageId AND v1
 
             public const string Tag = "cmsTags";
             public const string TagRelationship = "cmsTagRelationship";
-            
+
             // ReSharper restore UnusedMember.Local
         }
     }
