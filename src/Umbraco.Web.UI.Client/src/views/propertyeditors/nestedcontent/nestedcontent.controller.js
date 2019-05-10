@@ -96,7 +96,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
     function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
 
-        var inited = false;
+        $scope.inited = false;
 
         _.each($scope.model.config.contentTypes, function (contentType) {
             contentType.nameExp = !!contentType.nameTemplate
@@ -381,7 +381,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     $scope.currentNode = $scope.nodes[0];
                 }
 
-                inited = true;
+                $scope.inited = true;
             }
         }
 
@@ -421,7 +421,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             if ($scope.realCurrentNode) {
                 $scope.$broadcast("ncSyncVal", { key: $scope.realCurrentNode.key });
             }
-            if (inited) {
+            if ($scope.inited) {
                 var newValues = [];
                 for (var i = 0; i < $scope.nodes.length; i++) {
                     var node = $scope.nodes[i];
