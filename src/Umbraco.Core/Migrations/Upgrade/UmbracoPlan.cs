@@ -133,7 +133,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Merge()
                 .To<DropXmlTables>("{CDBEDEE4-9496-4903-9CF2-4104E00FF960}")
             .With()
-                .To<RadioAndCheckboxAndDropdownPropertyEditorsMigration>("{940FD19A-00A8-4D5C-B8FF-939143585726}")
+                .To<RadioAndCheckboxPropertyEditorsMigration>("{940FD19A-00A8-4D5C-B8FF-939143585726}")
             .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
 
             To<FixLanguageIsoCodeLength>("{48AD6CCD-C7A4-4305-A8AB-38728AD23FC5}");

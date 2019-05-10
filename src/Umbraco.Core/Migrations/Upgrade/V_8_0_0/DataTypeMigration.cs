@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Newtonsoft.Json;
-using NPoco;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
@@ -13,9 +11,13 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
     public class DataTypeMigration : MigrationBase
     {
-        public DataTypeMigration(IMigrationContext context)
+        private readonly PreValueMigratorCollection _preValueMigrators;
+
+        public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators)
             : base(context)
-        { }
+        {
+            _preValueMigrators = preValueMigrators;
+        }
 
         public override void Migrate()
         {
@@ -37,7 +39,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             // from preValues to configuration...
             var sql = Sql()
                 .Select<DataTypeDto>()
-                .AndSelect<PreValueDto>(x => x.Alias, x => x.SortOrder, x => x.Value)
+                .AndSelect<PreValueDto>(x => x.Id, x => x.Alias, x => x.SortOrder, x => x.Value)
                 .From<DataTypeDto>()
                 .InnerJoin<PreValueDto>().On<DataTypeDto, PreValueDto>((left, right) => left.NodeId == right.NodeId)
                 .OrderBy<DataTypeDto>(x => x.NodeId)
@@ -52,58 +54,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     .From<DataTypeDto>()
                     .Where<DataTypeDto>(x => x.NodeId == group.Key)).First();
 
-                var aliases = group.Select(x => x.Alias).Distinct().ToArray();
-                if (aliases.Length == 1 && string.IsNullOrWhiteSpace(aliases[0]))
-                {
-                    // array-based prevalues
-                    var values = new Dictionary<string, object> { ["values"] = group.OrderBy(x => x.SortOrder).Select(x => x.Value).ToArray() };
-                    dataType.Configuration = JsonConvert.SerializeObject(values);
-                }
-                else
-                {
-                    // assuming we don't want to fall back to array
-                    if (aliases.Length != group.Count() || aliases.Any(string.IsNullOrWhiteSpace))
-                        throw new InvalidOperationException($"Cannot migrate datatype w/ id={dataType.NodeId} preValues: duplicate or null/empty alias.");
-
-                    // must take care of all odd situations ;-(
-                    object FmtPreValue(string alias, string preValue)
-                    {
-                        Current.Logger.Debug(typeof(DataTypeMigration), "DEBUG " + dataType.EditorAlias + " / " + alias);
-                        if (dataType.EditorAlias == "Umbraco.MediaPicker2")
-                        {
-                            if (alias == "multiPicker" ||
-                                alias == "onlyImages" ||
-                                alias == "disableFolderSelect")
-                                return preValue == "1";
-                        }
-
-                        return preValue.DetectIsJson() ? JsonConvert.DeserializeObject(preValue) : preValue;
-                    }
-
-                    // dictionary-base prevalues
-                    var values = group.ToDictionary(x => x.Alias, x => FmtPreValue(x.Alias, x.Value));
-                    dataType.Configuration = JsonConvert.SerializeObject(values);
-                }
+                var migrator = _preValueMigrators.GetMigrator(dataType.EditorAlias) ?? new DefaultPreValueMigrator();
+                var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, group.ToDictionary(x => x.Alias, x => x));
+                dataType.Configuration = JsonConvert.SerializeObject(config);
 
                 Database.Update(dataType);
             }
-        }
-
-        [TableName("cmsDataTypePreValues")]
-        [ExplicitColumns]
-        public class PreValueDto
-        {
-            [Column("datatypeNodeId")]
-            public int NodeId { get; set; }
-
-            [Column("alias")]
-            public string Alias { get; set; }
-
-            [Column("sortorder")]
-            public int SortOrder { get; set; }
-
-            [Column("value")]
-            public string Value { get; set; }
         }
     }
 }
