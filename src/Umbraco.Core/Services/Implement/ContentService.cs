@@ -757,7 +757,7 @@ namespace Umbraco.Core.Services.Implement
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException("Cannot save (un)publishing content, use the dedicated SavePublished method.");
 
-            if (content.Name.Length > 255)
+            if (content.Name != null && content.Name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -875,7 +875,7 @@ namespace Umbraco.Core.Services.Implement
                     throw new NotSupportedException($"Culture \"{culture}\" is not supported by invariant content types.");
             }
 
-            if(content.Name.Length > 255)
+            if(content.Name != null && content.Name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -910,7 +910,7 @@ namespace Umbraco.Core.Services.Implement
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (cultures == null) throw new ArgumentNullException(nameof(cultures));
 
-            if (content.Name.Length > 255)
+            if (content.Name != null && content.Name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
