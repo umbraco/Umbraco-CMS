@@ -34,7 +34,7 @@
         vm.filter = filter;
         vm.checkEnabled = checkEnabled;
              
-        function openAddRedirectOverlay() {
+        function openAddRedirectOverlay() {            
             vm.addRedirectOverlay = {
                 view: "redirecturlpicker",                
                 show: true,

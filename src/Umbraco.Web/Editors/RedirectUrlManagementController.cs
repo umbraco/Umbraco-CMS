@@ -124,15 +124,32 @@ namespace Umbraco.Web.Editors
             return Ok(string.Format("URL tracker is now {0}d", action));
         }
 
+
+        /// <summary>
+        /// Returns true/false of whether redirect tracking is enabled and the user has permission to add redirects
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IHttpActionResult GetEnableStateForContent(int contentId)
+        {
+            var enabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
+            var userIsAllowed = IsUserRedirectEditEnabled(contentId);
+            return Ok(new { enabled, userIsAllowed });
+        }
+
+        private bool IsUserRedirectEditEnabled(int contentId)
+        {
+            var user = Umbraco.UmbracoContext.Security.CurrentUser;
+            //Validate user
+            var permissions = Services.UserService.GetPermissions(user, contentId);
+            return permissions.Any(p => p.AssignedPermissions.Contains(ActionPublish.Instance.Letter.ToString()) == true && p.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString()) == true);
+        }
+
         [HttpPost]
         public IHttpActionResult AddRedirect(string url, int contentId)
         {
-            var user = Umbraco.UmbracoContext.Security.CurrentUser;
             
-
-            //Validate user
-            var permissions = Services.UserService.GetPermissions(user, contentId);
-            if(!permissions.Any(p => p.AssignedPermissions.Contains(ActionPublish.Instance.Letter.ToString())))
+            if(IsUserRedirectEditEnabled(contentId) == false)
             {
                 return Unauthorized();
             }
@@ -163,7 +180,7 @@ namespace Umbraco.Web.Editors
 
             var target = Services.ContentService.GetById(contentId);
             Services.RedirectUrlService.Register(url, target.Key);
-            return Ok(string.Format("Url {0} now redirects to {1}", url, target.Name));
+            return Ok(string.Format("Url {0} now redirects to {1}", url, target.Name));                  
         }
     }
 }

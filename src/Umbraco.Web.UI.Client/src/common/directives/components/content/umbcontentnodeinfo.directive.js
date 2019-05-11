@@ -48,6 +48,7 @@
 
                 //default setting for redirect url management
                 scope.urlTrackerDisabled = false;
+                scope.editRedirectEnabled = false;
 
                 // Declare a fallback URL for the <umb-node-preview/> directive
                 if (scope.documentType !== null) {
@@ -133,8 +134,9 @@
             function loadRedirectUrls() {
                 scope.loadingRedirectUrls = true;
                 //check if Redirect Url Management is enabled
-                redirectUrlsResource.getEnableState().then(function (response) {
+                redirectUrlsResource.getEnableStateForContentItem(scope.node.id).then(function (response) {
                     scope.urlTrackerDisabled = response.enabled !== true;
+                    scope.editRedirectEnabled = response.userIsAllowed == true;
                     if (scope.urlTrackerDisabled === false) {
 
                         redirectUrlsResource.getRedirectsForContentItem(scope.node.udi)

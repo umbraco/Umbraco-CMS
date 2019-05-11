@@ -33,9 +33,9 @@
                         <div class="umb-table">
 
                             <div class="umb-table-head">
-                                <div class="umb-table-row">
+                                <div ng-show="editRedirectEnabled" class="umb-table-row">
                                     <div class="umb-table-cell flx-s1 flx-g1 flx-b8 items-center not-fixed">
-                                        <a class="bold" style="color: #00aea2; text-decoration: underline;" prevent-default href="#" ng-click="openAddRedirectOverlay()">
+                                        <a  class="bold" style="color: #00aea2; text-decoration: underline;" prevent-default href="#" ng-click="openAddRedirectOverlay()">
                                             <localize key="redirectUrls_addRedirect" class="ng-isolate-scope ng-scope">Add Redirect</localize>
                                         </a>
                                     </div>
@@ -50,7 +50,7 @@
                                         <div class="flx-s1 flx-g1 flx-b0" style="margin-right: 20px;">
                                             <a href="{{redirectUrl.originalUrl}}" target="_blank"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
                                         </div>
-                                        <button class="umb-era-button umb-button--s -red" prevent-default ng-click="deleteRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
+                                        <button ng-show="editRedirectEnabled" class="umb-era-button umb-button--s -red" prevent-default ng-click="deleteRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
                                     </div>
                                 </div>
                             </div>
@@ -60,7 +60,7 @@
                         <umb-empty-state position="center" size="small">
                             <localize key="redirectUrls_noRedirects"></localize>
                             <br />
-                            <a class="bold" style="color: #00aea2; text-decoration: underline;" prevent-default href="#" ng-click="openAddRedirectOverlay()">
+                            <a ng-show="editRedirectEnabled" class="bold" style="color: #00aea2; text-decoration: underline;" prevent-default href="#" ng-click="openAddRedirectOverlay()">
                                 <localize key="redirectUrls_addRedirect" class="ng-isolate-scope ng-scope">Add Redirect</localize>
                             </a>
                         </umb-empty-state>

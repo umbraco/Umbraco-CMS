@@ -76,7 +76,16 @@
                         "GetEnableState")),
                 'Failed to retrieve data to check if the 301 redirect is enabled');
         }
-     
+
+        function getEnableStateForContentItem(id) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "redirectUrlManagementApiBaseUrl",
+                        "GetEnableStateForContent", { contentId: id })),
+                'Failed to retrieve data to check if the 301 redirect is enabled');
+        }
         /**
          * @ngdoc function
          * @name umbraco.resources.redirectUrlResource#deleteRedirectUrl
@@ -160,6 +169,7 @@
             deleteRedirectUrl: deleteRedirectUrl,
             toggleUrlTracker: toggleUrlTracker,
             getEnableState: getEnableState,
+            getEnableStateForContentItem: getEnableStateForContentItem,
             getRedirectsForContentItem: getRedirectsForContentItem,
             addRedirect: addRedirect
         };
