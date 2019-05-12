@@ -83,6 +83,12 @@ namespace Umbraco.Web.HealthCheck
         public string ProvidedValueValidationRegex { get; set; }
 
         /// <summary>
+        /// Indicates if a value required, what property type to render
+        /// </summary>
+        [DataMember(Name = "providedValuePropertyType")]
+        public string ProvidedValuePropertyType { get; set; }
+
+        /// <summary>
         /// Provides a value to rectify the issue
         /// </summary>
         [DataMember(Name = "providedValue")]
