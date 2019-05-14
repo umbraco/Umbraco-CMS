@@ -368,8 +368,8 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-        Edytuj różne wersje językowe dla elementu słownika '<em>%0%</em>' poniżej.
-    ]]></key>
+    Edytuj różne wersje językowe dla elementu słownika '<em>%0%</em>' poniżej.<br/>
+    Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="displayName">Nazwa języka</key>
     <key alias="changeKeyError"><![CDATA[
       Klucz '%0%' już istnieje.

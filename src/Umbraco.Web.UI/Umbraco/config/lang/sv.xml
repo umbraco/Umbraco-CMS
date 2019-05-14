@@ -253,7 +253,7 @@
     <key alias="viewCacheItem">Se cachat objekt</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">Redigera de olika översättningarna för ordboksinlägget %0% nedan.</key>
+    <key alias="description">Redigera de olika översättningarna för ordboksinlägget %0% nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
     <key alias="displayName">Språknamn</key>
   </area>
   <area alias="editcontenttype">

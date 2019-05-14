@@ -366,7 +366,7 @@
     <key alias="selectSnippet">Selecciona snippet</key>
   </area>
   <area alias="dictionaryItem">
-        <key alias="description">Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo.</key>
+        <key alias="description">Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo añadir otros idiomas en el menú de 'idiomas' en el menú de la izquierda</key>
     <key alias="displayName"><![CDATA[nombre de la cultura
 ]]></key>
     <key alias="changeKeyError"><![CDATA[

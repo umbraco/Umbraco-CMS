@@ -293,7 +293,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      為此字典項目 '<em>%0%</em>' 編輯不同語言版本
+      為此字典項目 '<em>%0%</em>' 編輯不同語言版本，<br />您可以在左方選單「語言」中增添新的語言
    ]]></key>
     <key alias="displayName">語言名稱</key>
   </area>

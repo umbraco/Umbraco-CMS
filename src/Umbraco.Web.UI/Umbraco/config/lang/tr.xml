@@ -225,7 +225,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Sözlük öğe için farklı dil sürümlerini düzenle '<em>%0%</em>' aşağıda
+      Sözlük öğe için farklı dil sürümlerini düzenle '<em>%0%</em>' aşağıda<br/>Sol taraftaki menüden 'diller' başlığı altında ek dil ekleyebilirsiniz
    ]]></key>
     <key alias="displayName">Kültür adı</key>
   </area>

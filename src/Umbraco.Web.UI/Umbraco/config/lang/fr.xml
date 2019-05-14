@@ -380,7 +380,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Editez les différentes versions de langues pour l'élément de dictionaire '<em>%0%</em>' ci-dessous.
+      Editez les différentes versions de langues pour l'élément de dictionaire '<em>%0%</em>' ci-dessous.<br/>Vous pouvez ajouter d'autres langues depuis le menu ci-dessous "Langues".
    ]]></key>
     <key alias="displayName">Nom de Culture</key>
     <key alias="changeKeyError"><![CDATA[

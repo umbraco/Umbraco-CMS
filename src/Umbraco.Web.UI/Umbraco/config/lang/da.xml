@@ -455,7 +455,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder.</key>
+      Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder.<br />Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
       ]]></key>
     <key alias="displayName">Kulturnavn</key>
     <key alias="changeKeyError"><![CDATA[

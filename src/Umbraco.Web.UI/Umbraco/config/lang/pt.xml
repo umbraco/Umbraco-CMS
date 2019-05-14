@@ -195,7 +195,7 @@
     <key alias="viewCacheItem">Ver Item em Cache</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description"><![CDATA[Editar as diferente versões de linguagem para o item de dicionário '<em>%0%</em>' abaixo]]></key>
+    <key alias="description"><![CDATA[Editar as diferente versões de linguagem para o item de dicionário '<em>%0%</em>' abaixo <br /> Você pode adicionar mais linguagens sob 'linguagens' no menu à esquerda]]></key>
     <key alias="displayName">Nome da Cultura</key>
   </area>
   <area alias="editcontenttype">

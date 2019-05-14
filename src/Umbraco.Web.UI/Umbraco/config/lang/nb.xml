@@ -255,7 +255,7 @@
     <key alias="viewCacheItem">Se buffret node</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description"><![CDATA[Rediger de forskjellige språkversjonene for ordbokelementet '<em>%0%</em>' under.]]></key>
+    <key alias="description"><![CDATA[Rediger de forskjellige språkversjonene for ordbokelementet '<em>%0%</em>' under.<br/>Du kan legge til flere språk under 'språk' i menyen til venstre.]]></key>
     <key alias="displayName">Språk</key>
   </area>
   <area alias="placeholders">

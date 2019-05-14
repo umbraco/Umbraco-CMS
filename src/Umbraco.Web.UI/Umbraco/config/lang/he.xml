@@ -197,7 +197,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      ערוך את גרסאות השפות השונות לפריט המילון '<em>%0%</em>' למטה
+      ערוך את גרסאות השפות השונות לפריט המילון '<em>%0%</em>' למטה<br/>ניתן להוסיף שפות נוספות תחת "שפות" בתפריט בצד שמאל
    ]]></key>
     <key alias="displayName">שם התצוגה לשפה</key>
   </area>

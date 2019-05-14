@@ -201,7 +201,7 @@
     <key alias="viewCacheItem">Visualizza gli elementi in cache</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description"><![CDATA[Modifica le traduzioni per l'elemento '%0%'.]]></key>
+    <key alias="description"><![CDATA[Modifica le traduzioni per l'elemento '%0%'. Puoi aggiungere una lingua sotto "Lingue" nel menù a sinistra]]></key>
     <key alias="displayName"><![CDATA[Identificativo Cultura]]></key>
   </area>
   <area alias="editcontenttype">
