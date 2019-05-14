@@ -41,6 +41,7 @@
         vm.removeTag = removeTag;
         vm.showPrompt = showPrompt;
         vm.hidePrompt = hidePrompt;
+        vm.onKeyUpOnTag = onKeyUpOnTag;
 
         vm.htmlId = "t" + String.CreateGuid();
         vm.isLoading = true;
@@ -270,6 +271,12 @@
 
         function hidePrompt() {
             vm.promptIsVisible = "-1";
+        }
+        
+        function onKeyUpOnTag(tag, $event) {
+            if ($event.keyCode === 8 || $event.keyCode === 46) {
+                removeTag(tag);
+            }
         }
         
         // helper method to remove current tags

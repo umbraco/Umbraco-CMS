@@ -64,8 +64,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         var target = link ? {
             name: link.name,
             anchor: link.queryString,
-            // the linkPicker breaks if it get an udi for media
-            udi: link.isMedia ? null : link.udi,
+            udi: link.udi,
             url: link.url,
             target: link.target
         } : null;
@@ -80,21 +79,13 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                         model.target.anchor = (model.target.anchor.indexOf('=') === -1 ? '#' : '?') + model.target.anchor;
                     }
                     if (link) {
-                        if (link.isMedia && link.url === model.target.url) {
-                            // we can assume the existing media item is changed and no new file has been selected
-                            // so we don't need to update the udi and isMedia fields
-                        } else {
-                            link.udi = model.target.udi;
-                            link.isMedia = model.target.isMedia;
-                        }
-
+                        link.udi = model.target.udi;
                         link.name = model.target.name || model.target.url || model.target.anchor;
                         link.queryString = model.target.anchor;
                         link.target = model.target.target;
                         link.url = model.target.url;
                     } else {
                         link = {
-                            isMedia: model.target.isMedia,
                             name: model.target.name || model.target.url || model.target.anchor,
                             queryString: model.target.anchor,
                             target: model.target.target,
@@ -105,7 +96,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                     }
 
                     if (link.udi) {
-                        var entityType = link.isMedia ? "media" : "document";
+                        var entityType = model.target.isMedia ? "Media" : "Document";
 
                         entityResource.getById(link.udi, entityType).then(function (data) {
                             link.icon = iconHelper.convertFromLegacyIcon(data.icon);
