@@ -311,9 +311,8 @@ Opens an overlay to show a custom YSOD. </br>
                      var submitOnEnter = document.activeElement.hasAttribute("overlay-submit-on-enter");
                      var submitOnEnterValue = submitOnEnter ? document.activeElement.getAttribute("overlay-submit-on-enter") : "";
 
-                     if(clickableElements.indexOf(activeElementType) === 0) {
-                        document.activeElement.trigger("click");
-                        event.preventDefault();
+                     if(clickableElements.indexOf(activeElementType) >= 0) {
+                         // don't do anything, let the browser Enter key handle this
                      } else if(activeElementType === "TEXTAREA" && !submitOnEnter) {
 
 
