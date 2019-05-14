@@ -51,6 +51,13 @@ namespace Umbraco.Web.PropertyEditors
                     View = "number",
                     Name = "Maximum number of items"
                 });
+                Fields.Add(new PreValueField
+                {
+                    Key = "hideTarget",
+                    View = "boolean",
+                    Name = "Hide target",
+                    Description = "Hides the option to open the link in a new window or tab."
+                });
             }
         }
 

@@ -73,6 +73,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.MultiUrlPickerCont
             useNodeName: true,
             currentTarget: target,
             ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === "1",
+            hideTarget: $scope.model.config.hideTarget === "1",
             show: true,
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {
