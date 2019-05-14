@@ -259,7 +259,7 @@
     <key alias="viewCacheItem">Zwischenspeicher-Element anzeigen</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">Bearbeiten Sie nachfolgend die verschiedenen Sprachversionen für den Wörterbucheintrag '&lt;em&gt;%0%&lt;/em&gt;'. &lt;br/&gt;Unter dem links angezeigten Menüpunkt 'Sprachen' können Sie weitere hinzufügen.</key>
+    <key alias="description">Bearbeiten Sie nachfolgend die verschiedenen Sprachversionen für den Wörterbucheintrag '&lt;em&gt;%0%&lt;/em&gt;'.</key>
     <key alias="displayName">Name der Kultur</key>
   </area>
   <area alias="placeholders">

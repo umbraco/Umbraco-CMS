@@ -297,7 +297,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-       为字典项编辑不同语言的版本‘<em>%0%</em>’<br/>您可以在左侧的“语言”中添加一种语言
+       为字典项编辑不同语言的版本‘<em>%0%</em>’
     ]]></key>
     <key alias="displayName">语言名称</key>
     <key alias="changeKeyError"><![CDATA[

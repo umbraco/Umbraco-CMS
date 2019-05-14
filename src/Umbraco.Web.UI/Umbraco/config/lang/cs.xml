@@ -247,7 +247,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Editujte různé jazykové verze pro položku slovníku '<em>%0%</em>' níže.<br/>Můžete přidat další jazyky v nabídce 'jazyky' nalevo.]]></key>
+      Editujte různé jazykové verze pro položku slovníku '<em>%0%</em>' níže.]]></key>
     <key alias="displayName">Název jazyka</key>
   </area>
   <area alias="placeholders">
