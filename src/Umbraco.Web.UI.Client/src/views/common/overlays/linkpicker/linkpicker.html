@@ -1,5 +1,12 @@
 <div ng-controller="Umbraco.Overlays.LinkPickerController">
 
+    <umb-control-group label="@defaultdialogs_nodeNameLinkPicker">
+        <input type="text"
+               placeholder="{{model.useNodeName && model.target.nodeName ? model.target.nodeName : placeholders_entername}}"
+               class="umb-editor umb-textstring -full-width-input"
+               ng-model="model.target.name" />
+    </umb-control-group>
+
     <umb-control-group label="@defaultdialogs_urlLinkPicker" class="umb-property--pull">
         <input type="text"
                localize="placeholder"
@@ -20,13 +27,6 @@
         <datalist id="anchors">
             <option value="{{a}}" ng-repeat="a in anchorValues"></option>
         </datalist>
-    </umb-control-group>
-
-    <umb-control-group label="@defaultdialogs_nodeNameLinkPicker">
-        <input type="text"
-               placeholder="{{model.useNodeName && model.target.nodeName ? model.target.nodeName : placeholders_entername}}"
-               class="umb-editor umb-textstring -full-width-input"
-               ng-model="model.target.name" />
     </umb-control-group>
 
     <umb-control-group ng-if="showTarget" label="@content_target">
