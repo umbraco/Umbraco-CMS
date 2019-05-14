@@ -472,7 +472,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left
+      Edit the different language versions for the dictionary item '<em>%0%</em>' below
    ]]></key>
     <key alias="displayName">Culture Name</key>
     <key alias="changeKeyError"><![CDATA[
