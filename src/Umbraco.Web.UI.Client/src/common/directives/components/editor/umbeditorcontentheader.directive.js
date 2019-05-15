@@ -5,8 +5,6 @@
 
         function link(scope, el, attr, ctrl) {
             
-            
-            var valFormManager = ctrl[0];
             var unsubscribe = [];
             
             if (!scope.serverValidationNameField) {
@@ -25,22 +23,12 @@
             scope.vm.errorsOnOtherVariants = false;// maintained variable, indicating wether to show that other variants than the current has errors.
             
             function checkErrorsOnOtherVariants() {
-                /*
-                var currentCulturesOpen = [];
-                for(var i = 0; i<scope.openVariants.length; i++) {
-                    if (scope.openVariants[i] === scope.vm.defaultVariant.language.culture) {
-                        currentCulturesOpen.push(null);// push invaraint culture.
-                    }
-                    currentCulturesOpen.push(scope.openVariants[i]);
-                }
-                */
                 var check = false;
                 angular.forEach(scope.content.variants, function (variant) {
                     if (scope.openVariants.indexOf(variant.language.culture) === -1 && scope.variantHasError(variant.language.culture)) {
                         check = true;
                     }
                 });
-                console.log("errorsOnOtherVariants", check);
                 scope.vm.errorsOnOtherVariants = check;
             }
             
@@ -76,38 +64,13 @@
                 });
                 
                 
-                if (valFormManager) {
-                    /*
-                    valFormManager = valFormManager.parent || valFormManager;
-                    
-                    //listen for form validation changes
-                    valFormManager.onValidationStatusChanged(function (evt, args) {
-                        
-                        scope.vm.culturesWithError = [];
-                        
-                        if (!args.form.$valid) {
-                            // error:
-                            
-                            // loop through cultures.
-                            angular.forEach(scope.content.variants, function (variant) {
-                                if(serverValidationManager.hasCultureError(variant.language.culture)) {
-                                    scope.vm.culturesWithError.push(variant);
-                                }
-                            });
-                            
-                            
-                        } else {
-                            // no error
-                        }
-                    });
-                    */
-                    angular.forEach(scope.content.variants, function (variant) {
-                        unsubscribe.push(serverValidationManager.subscribe(null, variant.language.culture, null, onCultureValidation));
-                    });
-                    
-                    unsubscribe.push(serverValidationManager.subscribe(null, null, null, onCultureValidation));
-                    
-                }
+                angular.forEach(scope.content.variants, function (variant) {
+                    unsubscribe.push(serverValidationManager.subscribe(null, variant.language.culture, null, onCultureValidation));
+                });
+                
+                unsubscribe.push(serverValidationManager.subscribe(null, null, null, onCultureValidation));
+                
+                
                 
             }
 
@@ -216,7 +179,6 @@
             restrict: 'E',
             replace: true,
             templateUrl: 'views/components/editor/umb-editor-content-header.html',
-            require: ['^^?valFormManager'],
             scope: {
                 name: "=",
                 nameDisabled: "<?",
