@@ -430,19 +430,16 @@
     $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
   })
   
-  $ubuild.DefineMethod("PrepareCSharpDocs",
+  $ubuild.DefineMethod("BuildCSharpDocs",
   {
-    Write-Host "Prepare C# Documentation"
+    Write-Host "Building C# Documentation"
 	
     $src = "$($this.SolutionRoot)\src"
-      $tmp = $this.BuildTemp
-      $out = $this.BuildOutput
+    $tmp = $this.BuildTemp
+    $out = $this.BuildOutput
     $DocFxJson = Join-Path -Path $src "\ApiDocs\docfx.json"
     $DocFxSiteOutput = Join-Path -Path $tmp "\_site\*.*"
 	
-
-	#restore nuget packages
-	$this.RestoreNuGet()
     # run DocFx
     $DocFx = $this.BuildEnv.DocFx
     
@@ -453,24 +450,26 @@
     & $this.BuildEnv.Zip a -tzip -r "$out\csharp-docs.zip" $DocFxSiteOutput
   })
   
-  $ubuild.DefineMethod("PrepareAngularDocs",
+  $ubuild.DefineMethod("BuildAngularDocs",
   {
-    Write-Host "Prepare Angular Documentation"
+    Write-Host "Building Angular Documentation"
 	
     $src = "$($this.SolutionRoot)\src"
-      $out = $this.BuildOutput
+    $out = $this.BuildOutput
     
-    $this.CompileBelle()
+    # Check if the solution has been built
+    if (!(Test-Path "$src\Umbraco.Web.UI.Client\node_modules")) {throw "Umbraco needs to be built before generating the Angular Docs"}
 
-    "Moving to Umbraco.Web.UI.Client folder"
-    cd .\src\Umbraco.Web.UI.Client
+    Push-Location "$src\Umbraco.Web.UI.Client"
 
     "Generating the docs and waiting before executing the next commands"
     & gulp docs | Out-Null
 
+    Pop-Location
+    
     # change baseUrl
     $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
-    $IndexPath = "./docs/api/index.html"
+    $IndexPath = "$src\Umbraco.Web.UI.Client\docs\api\index.html"
     (Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
 
     # zip it
