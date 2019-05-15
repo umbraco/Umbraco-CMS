@@ -20,7 +20,7 @@
             scope.vm.variantsWithError = [];
             scope.vm.defaultVariant = null;
             
-            scope.vm.errorsOnOtherVariants = false;// maintained variable, indicating wether to show that other variants than the current has errors.
+            scope.vm.errorsOnOtherVariants = false;// indicating wether to show that other variants, than the current, have errors.
             
             function checkErrorsOnOtherVariants() {
                 var check = false;
