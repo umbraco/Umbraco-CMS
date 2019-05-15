@@ -1,10 +1,14 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader() {
+    function EditorContentHeader(serverValidationManager) {
 
         function link(scope, el, attr, ctrl) {
-
+            
+            
+            var valFormManager = ctrl[0];
+            var unsubscribe = [];
+            
             if (!scope.serverValidationNameField) {
                 scope.serverValidationNameField = "Name";
             }
@@ -15,8 +19,26 @@
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
-
+            scope.vm.culturesWithError = [];
+            scope.vm.defaultVariant = null;
+            
+            function onCultureValidation(valid, errors) {
+                if(errors.length > 0) {
+                    _.foreach(errors, (error) => {
+                        var culture = error.culture;
+                        console.log("onCultureValidation", culture, error);
+                    });
+                }
+            }
+            
             function onInit() {
+                
+                // find default.
+                angular.forEach(scope.content.variants, function (variant) {
+                    if (variant.language.isDefault) {
+                        scope.vm.defaultVariant = variant;
+                    }
+                });
                 
                 setCurrentVariant();
                 
@@ -25,6 +47,44 @@
                         app.anchors = scope.content.tabs;
                     }
                 });
+                
+                
+                if (valFormManager) {
+                    
+                    valFormManager = valFormManager.parent || valFormManager;
+                    console.log("EditorContentHeader", valFormManager);
+                    
+                    //listen for form validation changes
+                    valFormManager.onValidationStatusChanged(function (evt, args) {
+                        
+                        console.log("onValidationStatusChanged", args.form.$valid, args.form, "length of server errors:", serverValidationManager.items.length);
+                        scope.vm.culturesWithError = [];
+                        
+                        if (!args.form.$valid) {
+                            // error:
+                            console.log("We have error from the form: ", args.form.$error);
+                            
+                            // loop through cultures.
+                            angular.forEach(scope.content.variants, function (variant) {
+                                console.log("errors for: ", variant)
+                                if(serverValidationManager.hasCultureError(variant.language.culture)) {
+                                    scope.vm.culturesWithError.push(variant);
+                                }
+                            });
+                            
+                            
+                        } else {
+                            // no error
+                        }
+                    });
+                    
+                    angular.forEach(scope.content.variants, function (variant) {
+                        unsubscribe.push(serverValidationManager.subscribe(null, variant.language.culture, null, onCultureValidation));
+                    });
+                    
+                    unsubscribe.push(serverValidationManager.subscribe(null, null, null, onCultureValidation));
+                    
+                }
                 
             }
 
@@ -103,6 +163,12 @@
                     }
                 });
             }
+            
+            scope.$on('$destroy', function () {
+                for (var u in unsubscribe) {
+                    unsubscribe[u]();
+                }
+            });
         }
 
 
@@ -111,6 +177,7 @@
             restrict: 'E',
             replace: true,
             templateUrl: 'views/components/editor/umb-editor-content-header.html',
+            require: ['^^?valFormManager'],
             scope: {
                 name: "=",
                 nameDisabled: "<?",

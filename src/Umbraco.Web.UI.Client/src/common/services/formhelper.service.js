@@ -139,6 +139,9 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          * @param {object} err The error object returned from the http promise
          */
         handleServerValidation: function (modelState) {
+            
+            console.log("FormHelper::handleServerValidation")
+            
             for (var e in modelState) {
 
                 //This is where things get interesting....
@@ -158,6 +161,8 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                 //If it is not prefixed with "_Properties" that means the error is for a field of the object directly.
 
                 var parts = e.split(".");
+    
+                console.log(e, parts[0]);
 
                 //Check if this is for content properties - specific to content/media/member editors because those are special 
                 // user defined properties with custom controls.
@@ -173,6 +178,8 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                             culture = null;
                         }
                     }
+                    
+                    console.log(propertyAlias, culture);
 
                     //if it contains 3 '.' then we will wire it up to a property's html field
                     if (parts.length > 3) {
@@ -184,8 +191,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                         serverValidationManager.addPropertyError(propertyAlias, culture, "", modelState[e][0]);
                     }
 
-                }
-                else {
+                } else {
 
                     //Everthing else is just a 'Field'... the field name could contain any level of 'parts' though, for example:
                     // Groups[0].Properties[2].Alias

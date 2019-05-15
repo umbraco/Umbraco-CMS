@@ -41,8 +41,15 @@ function serverValidationManager($timeout) {
         }
 
         //find all errors for this property
-        return _.filter(self.items, function (item) {            
+        return _.filter(self.items, function (item) {
             return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+        });
+    }
+    
+    function getCultureErrors(self, culture) {
+        //find all errors for this property
+        return _.filter(self.items, function (item) {
+            return (item.culture === culture);
         });
     }
 
@@ -242,6 +249,23 @@ function serverValidationManager($timeout) {
         
         /**
          * @ngdoc function
+         * @name getCultureCallbacks
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
+         *
+         * @description
+         * Gets all callbacks that has been registered using the subscribe method for the culture.         
+         */
+        getCultureCallbacks: function (culture) {
+            var found = _.filter(callbacks, function (item) {
+                //returns any callback that have been registered directly against the field
+                return (item.culture === culture);
+            });
+            return found;
+        },
+        
+        /**
+         * @ngdoc function
          * @name addFieldError
          * @methodOf umbraco.services.serverValidationManager
          * @function
@@ -311,7 +335,7 @@ function serverValidationManager($timeout) {
             for (var cb in cbs) {
                 executeCallback(this, errorsForCallback, cbs[cb].callback);
             }
-        },        
+        },      
         
         /**
          * @ngdoc function
@@ -451,6 +475,28 @@ function serverValidationManager($timeout) {
             return err ? true : false;
         },
         
+        
+        /**
+         * @ngdoc function
+         * @name hasCultureError
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
+         *
+         * @description
+         * Checks if the given culture has an error
+         */
+        hasCultureError: function (culture) {
+            
+            //normalize culture to null
+            if (!culture) {
+                culture = null;
+            }
+            
+            var err = _.find(this.items, function (item) {
+                return item.culture === culture;
+            });
+            return err ? true : false;
+        },
         /** The array of error messages */
         items: []
     };
