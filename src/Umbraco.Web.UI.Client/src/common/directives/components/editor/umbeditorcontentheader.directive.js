@@ -19,16 +19,43 @@
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
-            scope.vm.culturesWithError = [];
+            scope.vm.variantsWithError = [];
             scope.vm.defaultVariant = null;
             
-            function onCultureValidation(valid, errors) {
-                if(errors.length > 0) {
-                    _.foreach(errors, (error) => {
-                        var culture = error.culture;
-                        console.log("onCultureValidation", culture, error);
-                    });
+            scope.vm.errorsOnOtherVariants = false;// maintained variable, indicating wether to show that other variants than the current has errors.
+            
+            function checkErrorsOnOtherVariants() {
+                /*
+                var currentCulturesOpen = [];
+                for(var i = 0; i<scope.openVariants.length; i++) {
+                    if (scope.openVariants[i] === scope.vm.defaultVariant.language.culture) {
+                        currentCulturesOpen.push(null);// push invaraint culture.
+                    }
+                    currentCulturesOpen.push(scope.openVariants[i]);
                 }
+                */
+                var check = false;
+                angular.forEach(scope.content.variants, function (variant) {
+                    if (scope.openVariants.indexOf(variant.language.culture) === -1 && scope.variantHasError(variant.language.culture)) {
+                        check = true;
+                    }
+                });
+                console.log("errorsOnOtherVariants", check);
+                scope.vm.errorsOnOtherVariants = check;
+            }
+            
+            function onCultureValidation(valid, errors, allErrors, culture) {
+                var index = scope.vm.variantsWithError.indexOf(culture);
+                if(valid === true) {
+                    if (index !== -1) {
+                        scope.vm.variantsWithError.splice(index, 1);
+                    }
+                } else {
+                    if (index === -1) {
+                        scope.vm.variantsWithError.push(culture);
+                    }
+                }
+                checkErrorsOnOtherVariants();
             }
             
             function onInit() {
@@ -50,23 +77,19 @@
                 
                 
                 if (valFormManager) {
-                    
+                    /*
                     valFormManager = valFormManager.parent || valFormManager;
-                    console.log("EditorContentHeader", valFormManager);
                     
                     //listen for form validation changes
                     valFormManager.onValidationStatusChanged(function (evt, args) {
                         
-                        console.log("onValidationStatusChanged", args.form.$valid, args.form, "length of server errors:", serverValidationManager.items.length);
                         scope.vm.culturesWithError = [];
                         
                         if (!args.form.$valid) {
                             // error:
-                            console.log("We have error from the form: ", args.form.$error);
                             
                             // loop through cultures.
                             angular.forEach(scope.content.variants, function (variant) {
-                                console.log("errors for: ", variant)
                                 if(serverValidationManager.hasCultureError(variant.language.culture)) {
                                     scope.vm.culturesWithError.push(variant);
                                 }
@@ -77,7 +100,7 @@
                             // no error
                         }
                     });
-                    
+                    */
                     angular.forEach(scope.content.variants, function (variant) {
                         unsubscribe.push(serverValidationManager.subscribe(null, variant.language.culture, null, onCultureValidation));
                     });
@@ -92,6 +115,7 @@
                 angular.forEach(scope.content.variants, function (variant) {
                     if (variant.active) {
                         scope.vm.currentVariant = variant;
+                        checkErrorsOnOtherVariants();
                     }
                 });
             }
@@ -140,9 +164,24 @@
              * @param {any} culture
              */
             scope.variantIsOpen = function(culture) {
-                if(scope.openVariants.indexOf(culture) !== -1) {
+                return (scope.openVariants.indexOf(culture) !== -1);
+            }
+            
+            /**
+             * Check whether a variant has a error, used to display errors in variant switcher.
+             * @param {any} culture
+             */
+            scope.variantHasError = function(culture) {
+                // if we are looking for the default language we also want to check for invariant (null)
+                if (culture === scope.vm.defaultVariant.language.culture) {
+                    if(scope.vm.variantsWithError.indexOf(null) !== -1) {
+                        return true;
+                    }
+                }
+                if(scope.vm.variantsWithError.indexOf(culture) !== -1) {
                     return true;
                 }
+                return false;
             }
 
             onInit();

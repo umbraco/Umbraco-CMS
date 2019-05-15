@@ -13,12 +13,15 @@ function serverValidationManager($timeout) {
     var callbacks = [];
     
     /** calls the callback specified with the errors specified, used internally */
-    function executeCallback(self, errorsForCallback, callback) {
+    function executeCallback(self, errorsForCallback, callback, culture) {
 
         callback.apply(self, [
-                 false,                  //pass in a value indicating it is invalid
-                 errorsForCallback,      //pass in the errors for this item
-                 self.items]);           //pass in all errors in total
+                false,                 // pass in a value indicating it is invalid
+                errorsForCallback,     // pass in the errors for this item
+                self.items,            // pass in all errors in total
+                culture                // pass the culture that we are listing for.
+            ]
+        );
     }
 
     function getFieldErrors(self, fieldName) {
@@ -55,18 +58,24 @@ function serverValidationManager($timeout) {
 
     function notifyCallbacks(self) {
         for (var cb in callbacks) {
-            if (callbacks[cb].propertyAlias === null) {
+            if (callbacks[cb].propertyAlias === null && callbacks[cb].fieldName !== null) {
                 //its a field error callback
                 var fieldErrors = getFieldErrors(self, callbacks[cb].fieldName);
                 if (fieldErrors.length > 0) {
-                    executeCallback(self, fieldErrors, callbacks[cb].callback);
+                    executeCallback(self, fieldErrors, callbacks[cb].callback, callbacks[cb].culture);
                 }
             }
-            else {
+            else if (callbacks[cb].propertyAlias != null) {
                 //its a property error
                 var propErrors = getPropertyErrors(self, callbacks[cb].propertyAlias, callbacks[cb].culture, callbacks[cb].fieldName);
                 if (propErrors.length > 0) {
-                    executeCallback(self, propErrors, callbacks[cb].callback);
+                    executeCallback(self, propErrors, callbacks[cb].callback, callbacks[cb].culture);
+                }
+            } else {
+                //its a property error
+                var cultureErrors = getCultureErrors(self, callbacks[cb].culture);
+                if (cultureErrors.length > 0) {
+                    executeCallback(self, cultureErrors, callbacks[cb].callback, callbacks[cb].culture);
                 }
             }
         }
@@ -294,7 +303,7 @@ function serverValidationManager($timeout) {
             var cbs = this.getFieldCallbacks(fieldName);
             //call each callback for this error
             for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback);
+                executeCallback(this, errorsForCallback, cbs[cb].callback, null);
             }
         },
 
@@ -333,7 +342,7 @@ function serverValidationManager($timeout) {
             var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName);
             //call each callback for this error
             for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback);
+                executeCallback(this, errorsForCallback, cbs[cb].callback, culture);
             }
         },      
         
