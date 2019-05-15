@@ -30,6 +30,14 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         }
 
         /// <inheritdoc />
+        public IExecutableBuilder KeysAndIndexes<TDto>(bool pk = true, bool fk = true, bool ix = true)
+        {
+            var syntax = _context.SqlContext.SqlSyntax;
+            var tableDefinition = DefinitionFactory.GetTableDefinition(typeof(TDto), syntax);
+            return KeysAndIndexes(tableDefinition.Name, pk, fk, ix);
+        }
+
+        /// <inheritdoc />
         public IExecutableBuilder KeysAndIndexes(string tableName, bool pk = true, bool fk = true, bool ix = true)
         {
             if (tableName.IsNullOrWhiteSpace())

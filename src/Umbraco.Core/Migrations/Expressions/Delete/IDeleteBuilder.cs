@@ -19,7 +19,12 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         IExecutableBuilder Table(string tableName);
 
         /// <summary>
-        /// Specifies the table to delete keys and indexes for.
+        /// Builds a Delete Keys and Indexes expression, and executes.
+        /// </summary>
+        IExecutableBuilder KeysAndIndexes<TDto>(bool pk = true, bool fk = true, bool ix = true);
+
+        /// <summary>
+        /// Builds a Delete Keys and Indexes expression, and executes.
         /// </summary>
         IExecutableBuilder KeysAndIndexes(string tableName, bool pk = true, bool fk = true, bool ix = true);
 

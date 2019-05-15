@@ -94,7 +94,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<DeleteKeysAndIndexes>("{B36B9ABD-374E-465B-9C5F-26AB0D39326F}");
 
             To<AddLockObjects>("{7C447271-CA3F-4A6A-A913-5D77015655CB}");
-            To<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}"); // fixme cascade
+            To<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}");
             To<RenameMediaVersionTable>("{5CB66059-45F4-48BA-BCBD-C5035D79206B}");
             To<VariantsMigration>("{FB0A5429-587E-4BD0-8A67-20F0E7E62FF7}");
             To<DropMigrationsTable>("{F0C42457-6A3B-4912-A7EA-F27ED85A2092}");
@@ -152,6 +152,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             // to 8.1.0...
             To<ConvertTinyMceAndGridMediaUrlsToLocalLink>("{B69B6E8C-A769-4044-A27E-4A4E18D1645A}");
             To<RenameUserLoginDtoDateIndex>("{0372A42B-DECF-498D-B4D1-6379E907EB94}");
+            To<FixContentNuCascade>("{5B1E0D93-F5A3-449B-84BA-65366B84E2D4}");
 
             //FINAL
         }
