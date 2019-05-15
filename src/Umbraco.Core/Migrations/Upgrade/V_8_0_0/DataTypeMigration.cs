@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
@@ -12,11 +15,15 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
     public class DataTypeMigration : MigrationBase
     {
         private readonly PreValueMigratorCollection _preValueMigrators;
+        private readonly PropertyEditorCollection _propertyEditors;
+        private readonly ILogger _logger;
 
-        public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators)
+        public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators, PropertyEditorCollection propertyEditors, ILogger logger)
             : base(context)
         {
             _preValueMigrators = preValueMigrators;
+            _propertyEditors = propertyEditors;
+            _logger = logger;
         }
 
         public override void Migrate()
@@ -54,10 +61,40 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     .From<DataTypeDto>()
                     .Where<DataTypeDto>(x => x.NodeId == group.Key)).First();
 
+                // migrate the preValues to configuration
                 var migrator = _preValueMigrators.GetMigrator(dataType.EditorAlias) ?? new DefaultPreValueMigrator();
                 var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, group.ToDictionary(x => x.Alias, x => x));
-                dataType.Configuration = JsonConvert.SerializeObject(config);
+                var json = JsonConvert.SerializeObject(config);
 
+                // validate - and kill the migration if it fails
+                var newAlias = migrator.GetNewAlias(dataType.EditorAlias);
+                if (newAlias == null)
+                {
+                    _logger.Warn<DataTypeMigration>($"Skipping validation of configuration for data type {dataType.NodeId} : {dataType.EditorAlias}."
+                                                    + $" Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.");
+                }
+                else if (!_propertyEditors.TryGet(newAlias, out var propertyEditor))
+                {
+                    _logger.Warn<DataTypeMigration>($"Skipping validation of configuration for data type {dataType.NodeId} : {newAlias}{(dataType.EditorAlias == newAlias ? "" : $" ({dataType.EditorAlias})")}"
+                                                    + $" because no property editor with alias {newAlias} was found."
+                                                    + $" Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.");
+                }
+                else
+                {
+                    var configEditor = propertyEditor.GetConfigurationEditor();
+                    try
+                    {
+                        var _ = configEditor.FromDatabase(json);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Warn<DataTypeMigration>($"Failed to validate configuration for data type {dataType.NodeId} : {newAlias}{(dataType.EditorAlias == newAlias ? "" : $" ({dataType.EditorAlias})")}."
+                                                        + $" Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.");
+                    }
+                }
+
+                // update
+                dataType.Configuration = JsonConvert.SerializeObject(config);
                 Database.Update(dataType);
             }
         }

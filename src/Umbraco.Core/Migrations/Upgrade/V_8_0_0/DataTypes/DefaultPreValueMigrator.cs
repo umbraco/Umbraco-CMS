@@ -10,6 +10,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
         public virtual bool CanMigrate(string editorAlias)
             => true;
 
+        public virtual string GetNewAlias(string editorAlias)
+            => editorAlias;
+
         public object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)
         {
             var preValuesA = preValues.Values.ToList();

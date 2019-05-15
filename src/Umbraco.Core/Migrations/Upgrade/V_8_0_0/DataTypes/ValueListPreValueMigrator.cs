@@ -9,11 +9,17 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
         private readonly string[] _editors =
         {
             "Umbraco.RadioButtonList",
-            "Umbraco.DropDown"
+            "Umbraco.DropDown",
+            "Umbraco.DropdownlistPublishingKeys",
+            "Umbraco.DropDownMultiple",
+            "Umbraco.DropdownlistMultiplePublishKeys"
         };
 
         public bool CanMigrate(string editorAlias)
             => _editors.Contains(editorAlias);
+
+        public virtual string GetNewAlias(string editorAlias)
+            => null;
 
         public object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)
         {

@@ -11,8 +11,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
             // it will be automatically used if nothing matches
 
             composition.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()
+                .Append<RenamingPreValueMigrator>()
+                .Append<RichTextPreValueMigrator>()
                 .Append<UmbracoSliderPreValueMigrator>()
                 .Append<MediaPickerPreValueMigrator>()
+                .Append<ContentPickerPreValueMigrator>()
                 .Append<NestedContentPreValueMigrator>()
                 .Append<DecimalPreValueMigrator>()
                 .Append<ListViewPreValueMigrator>()

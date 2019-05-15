@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
 {
@@ -13,6 +12,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
 
         public override bool CanMigrate(string editorAlias)
             => _editors.Contains(editorAlias);
+
+        public override string GetNewAlias(string editorAlias)
+            => "Umbraco.MediaPicker";
 
         // you wish - but MediaPickerConfiguration lives in Umbraco.Web
         /*
@@ -29,7 +31,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
                 preValue.Alias == "disableFolderSelect")
                 return preValue.Value == "1";
 
-            return preValue.Value.DetectIsJson() ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
+            return base.GetPreValueValue(preValue);
         }
     }
 }
