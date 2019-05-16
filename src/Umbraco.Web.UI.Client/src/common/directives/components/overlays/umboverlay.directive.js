@@ -295,7 +295,8 @@ Opens an overlay to show a custom YSOD. </br>
                           scope.closeOverLay();
                       });
                   }
-
+                  
+                  event.stopPropagation();
                   event.preventDefault();
                }
 
@@ -511,6 +512,7 @@ Opens an overlay to show a custom YSOD. </br>
             model: "=",
             view: "=",
             position: "@",
+            size: "=?",
             parentScope: "=?"
          },
          link: link
