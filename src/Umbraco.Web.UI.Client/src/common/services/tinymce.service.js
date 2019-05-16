@@ -418,23 +418,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         insertMediaInEditor: function (editor, img) {
             if (img) {
 
-                var hasUdi = img.udi ? true : false;
-
                 var data = {
                     alt: img.altText || "",
                     src: (img.url) ? img.url : "nothing.jpg",
-                    id: '__mcenew'
+                    id: '__mcenew',
+                    'data-udi': img.udi
                 };
-
-                if (hasUdi) {
-                    data["data-udi"] = img.udi;
-                } else {
-                    //Considering these fixed because UDI will now be used and thus
-                    // we have no need for rel http://issues.umbraco.org/issue/U4-6228, http://issues.umbraco.org/issue/U4-6595
-                    //TODO: Kill rel attribute
-                    data["rel"] = img.id;
-                    data["data-id"] = img.id;
-                }
                 
                 editor.selection.setContent(editor.dom.createHTML('img', data));
 
