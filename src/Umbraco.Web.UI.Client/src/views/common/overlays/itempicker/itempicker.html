@@ -30,7 +30,7 @@
         </li>
     </ul>
 
-    <div class="umb-overlay__section-header" ng-if="(model.availableItems | filter:searchTerm).length > 0">
+    <div class="umb-overlay__section-header" ng-if="model.pasteItems.length > 0 && (model.availableItems | filter:searchTerm).length > 0">
         <h5><localize key="content_createEmpty">Create new</localize></h5>
     </div>
 
