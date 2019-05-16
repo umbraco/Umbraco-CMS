@@ -16,12 +16,14 @@
       add-ellipsis={{defaultButton.addEllipsis}}>
    </umb-button>
 
-   <a data-element="button-group-toggle" 
-      class="btn btn-{{buttonStyle}} dropdown-toggle umb-button-group__toggle umb-button--{{size}}" 
-      ng-if="subButtons.length > 0"
-      ng-click="toggleDropdown()">
-      <span class="caret"></span>
-   </a>
+    <a data-element="button-group-toggle"
+       href="#"
+       prevent-default
+       class="btn btn-{{buttonStyle}} dropdown-toggle umb-button-group__toggle umb-button--{{size}}"
+       ng-if="subButtons.length > 0"
+       ng-click="toggleDropdown()">
+        <span class="caret"></span>
+    </a>
 
    <umb-dropdown ng-if="subButtons.length > 0 && dropdown.isOpen" class="umb-button-group__sub-buttons" on-close="closeDropdown()" ng-class="{'-align-right': float === 'right'}">
       <umb-dropdown-item ng-repeat="subButton in subButtons">
