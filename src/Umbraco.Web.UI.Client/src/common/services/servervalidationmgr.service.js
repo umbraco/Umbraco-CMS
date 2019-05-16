@@ -31,7 +31,7 @@ function serverValidationManager($timeout) {
 
         //find errors for this field name
         return _.filter(self.items, function (item) {
-            return (item.propertyAlias === null && item.culture === null && item.fieldName === fieldName);
+            return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
         });
     }
     
@@ -42,6 +42,10 @@ function serverValidationManager($timeout) {
         if (fieldName && !angular.isString(fieldName)) {
             throw "fieldName must be a string";
         }
+        
+        if (!culture) {
+            culture = "invariant";
+        }
 
         //find all errors for this property
         return _.filter(self.items, function (item) {
@@ -50,6 +54,11 @@ function serverValidationManager($timeout) {
     }
     
     function getCultureErrors(self, culture) {
+        
+        if (!culture) {
+            culture = "invariant";
+        }
+        
         //find all errors for this property
         return _.filter(self.items, function (item) {
             return (item.culture === culture);
@@ -146,11 +155,14 @@ function serverValidationManager($timeout) {
             }
 
             var id = String.CreateGuid();
-
+            if (!culture) {
+                culture = "invariant";
+            }
+            
             if (propertyAlias === null) {
                 callbacks.push({
                     propertyAlias: null,
-                    culture: null,
+                    culture: culture,
                     fieldName: fieldName,
                     callback: callback,
                     id: id
@@ -158,12 +170,11 @@ function serverValidationManager($timeout) {
             }
             else if (propertyAlias !== undefined) {
                 //normalize culture to null
-                if (!culture) {
-                    culture = null;
-                }
+                
                 callbacks.push({
                     propertyAlias: propertyAlias,
-                    culture: culture, fieldName: fieldName,
+                    culture: culture, 
+                    fieldName: fieldName,
                     callback: callback,
                     id: id
                 });
@@ -189,21 +200,20 @@ function serverValidationManager($timeout) {
          */
         unsubscribe: function (propertyAlias, culture, fieldName) {
             
+            //normalize culture to null
+            if (!culture) {
+                culture = "invariant";
+            }
+            
             if (propertyAlias === null) {
 
                 //remove all callbacks for the content field
                 callbacks = _.reject(callbacks, function (item) {
-                    return item.propertyAlias === null && item.culture === null && item.fieldName === fieldName;
+                    return item.propertyAlias === null && item.culture === culture && item.fieldName === fieldName;
                 });
 
             }
             else if (propertyAlias !== undefined) {
-
-                //normalize culture to null
-                if (!culture) {
-                    culture = null;
-                }
-
                 //remove all callbacks for the content property
                 callbacks = _.reject(callbacks, function (item) {
                     return item.propertyAlias === propertyAlias && item.culture === culture &&
@@ -229,7 +239,7 @@ function serverValidationManager($timeout) {
 
             //normalize culture to null
             if (!culture) {
-                culture = null;
+                culture = "invariant";
             }
 
             var found = _.filter(callbacks, function (item) {
@@ -251,7 +261,7 @@ function serverValidationManager($timeout) {
         getFieldCallbacks: function (fieldName) {
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly against the field
-                return (item.propertyAlias === null && item.culture === null && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
             });
             return found;
         },
@@ -291,7 +301,7 @@ function serverValidationManager($timeout) {
             if (!this.hasFieldError(fieldName)) {
                 this.items.push({
                     propertyAlias: null,
-                    culture: null,
+                    culture: "invariant",
                     fieldName: fieldName,
                     errorMsg: errorMsg
                 });
@@ -321,9 +331,9 @@ function serverValidationManager($timeout) {
                 return;
             }
 
-            //normalize culture to null
+            //normalize culture to "invariant"
             if (!culture) {
-                culture = null;
+                culture = "invariant";
             }
 
             //only add the item if it doesn't exist                
@@ -363,7 +373,7 @@ function serverValidationManager($timeout) {
 
             //normalize culture to null
             if (!culture) {
-                culture = null;
+                culture = "invariant";
             }
 
             //remove the item
@@ -417,7 +427,7 @@ function serverValidationManager($timeout) {
 
             //normalize culture to null
             if (!culture) {
-                culture = null;
+                culture = "invariant";
             }
 
             var err = _.find(this.items, function (item) {
@@ -439,7 +449,7 @@ function serverValidationManager($timeout) {
         getFieldError: function (fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === null && item.culture === null && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
             });
             return err;
         },
@@ -457,7 +467,7 @@ function serverValidationManager($timeout) {
 
             //normalize culture to null
             if (!culture) {
-                culture = null;
+                culture = "invariant";
             }
 
             var err = _.find(this.items, function (item) {
@@ -479,7 +489,7 @@ function serverValidationManager($timeout) {
         hasFieldError: function (fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === null && item.culture === null && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
             });
             return err ? true : false;
         },
@@ -498,7 +508,7 @@ function serverValidationManager($timeout) {
             
             //normalize culture to null
             if (!culture) {
-                culture = null;
+                culture = "invariant";
             }
             
             var err = _.find(this.items, function (item) {

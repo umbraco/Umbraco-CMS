@@ -135,9 +135,9 @@
              * @param {any} culture
              */
             scope.variantHasError = function(culture) {
-                // if we are looking for the default language we also want to check for invariant (null)
+                // if we are looking for the default language we also want to check for invariant.
                 if (culture === scope.vm.defaultVariant.language.culture) {
-                    if(scope.vm.variantsWithError.indexOf(null) !== -1) {
+                    if(scope.vm.variantsWithError.indexOf("invariant") !== -1) {
                         return true;
                     }
                 }
