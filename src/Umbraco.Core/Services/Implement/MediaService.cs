@@ -290,7 +290,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
-            
+
             if (withIdentity == false)
                 return;
 
@@ -717,7 +717,7 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
         #region Delete
-        
+
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
@@ -976,9 +976,8 @@ namespace Umbraco.Core.Services.Implement
             media.ParentId = parentId;
 
             // get the level delta (old pos to new pos)
-            var levelDelta = parent == null
-                ? 1 - media.Level + (parentId == Constants.System.RecycleBinMedia ? 1 : 0)
-                : parent.Level + 1 - media.Level;
+            // note that recycle bin (id:-20) level is 0!
+            var levelDelta = 1 - media.Level + (parent?.Level ?? 0);
 
             var paths = new Dictionary<int, string>();
 
@@ -1032,7 +1031,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
-        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
         public OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId)
         {
             var nodeObjectType = Constants.ObjectTypes.Media;

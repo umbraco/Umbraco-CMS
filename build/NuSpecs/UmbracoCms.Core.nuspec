@@ -39,6 +39,8 @@
                 <dependency id="Serilog.Formatting.Compact.Reader" version="[1.0.3,1.999999)" />
                 <dependency id="Serilog.Settings.AppSettings" version="[2.2.2,2.999999)" />
                 <dependency id="Serilog.Sinks.File" version="[4.0.0,4.999999)" />
+                <dependency id="Serilog.Sinks.Map" version="[1.0.0,1.999999)" />
+                <dependency id="Serilog.Sinks.Async" version="[1.3.0,1.999999)" />
                 <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.999999)" />
                 <dependency id="NPoco" version="[3.9.4,3.999999)" />
             </group>

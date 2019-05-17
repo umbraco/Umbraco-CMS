@@ -8,7 +8,9 @@
  * The main application controller
  * 
  */
-function MainController($scope, $location, appState, treeService, notificationsService, userService, historyService, updateChecker, assetsService, eventsService, tmhDynamicLocale, localStorageService, editorService, overlayService) {
+function MainController($scope, $location, appState, treeService, notificationsService, 
+    userService, historyService, updateChecker, assetsService, eventsService, 
+    tmhDynamicLocale, localStorageService, editorService, overlayService, focusService) {
 
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
@@ -25,8 +27,17 @@ function MainController($scope, $location, appState, treeService, notificationsS
     function handleFirstTab(evt) {
         if (evt.keyCode === 9) {
             $scope.tabbingActive = true;
+            $scope.$digest();
             window.removeEventListener('keydown', handleFirstTab);
+            window.addEventListener('mousedown', disableTabbingActive);
         }
+    }
+    
+    function disableTabbingActive(evt) {
+        $scope.tabbingActive = false;
+        $scope.$digest();
+        window.removeEventListener('mousedown', disableTabbingActive);
+        window.addEventListener("keydown", handleFirstTab);
     }
 
     window.addEventListener("keydown", handleFirstTab);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
-        /// A constructor used to set an explicit content Id to the PublishedContentRequest that will be created
+        /// A constructor used to set an explicit content Id to the PublishedRequest that will be created
         /// </summary>
         /// <param name="contentId"></param>
         public EnsurePublishedContentRequestAttribute(int contentId)
@@ -121,7 +121,7 @@ namespace Umbraco.Web.Mvc
                 {
                     throw new InvalidOperationException("The data token resolved with name " + _dataTokenName + " was not an instance of " + typeof(IPublishedContent));
                 }
-                request.PublishedContent = (IPublishedContent) result;
+                request.PublishedContent = (IPublishedContent)result;
             }
 
             PublishedRouter.PrepareRequest(request);
