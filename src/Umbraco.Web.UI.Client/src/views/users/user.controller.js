@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService) {
+    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService, dialogService) {
 
         var vm = this;
 
@@ -53,8 +53,7 @@
                 "content_contentRoot",
                 "media_mediaRoot",
                 "user_noStartNodes",
-                "user_defaultInvitationMessage",
-                "user_deleteUserConfirmation"
+                "user_defaultInvitationMessage"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -67,7 +66,6 @@
                 vm.labels.mediaRoot = values[6];
                 vm.labels.noStartNodes = values[7];
                 vm.labels.defaultInvitationMessage = values[8];
-                vm.labels.deleteUserConfirmation = values[9];
             });
 
             // get user
@@ -368,19 +366,27 @@
         function deleteNonLoggedInUser() {
             vm.deleteNotLoggedInUserButtonState = "busy";
 
-            var confirmationMessage = vm.labels.deleteUserConfirmation;
-            if (!confirm(confirmationMessage)) {
-                vm.deleteNotLoggedInUserButtonState = "danger";
-                return;
-            }
-
-            usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
-                formHelper.showNotifications(data);
-                goToPage(vm.breadcrumbs[0]);
-            }, function (error) {
-                vm.deleteNotLoggedInUserButtonState = "error";
-                formHelper.showNotifications(error.data);
-            });
+            dialogService.confirmDelete(
+                // cancel dialog callback:
+                function () {
+                    vm.deleteNotLoggedInUserButtonState = "danger";
+                },
+                // submit dialog callback:
+                function () {
+                    usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
+                        formHelper.showNotifications(data);
+                        goToPage(vm.breadcrumbs[0]);
+                    }, function (error) {
+                        vm.deleteNotLoggedInUserButtonState = "error";
+                        formHelper.showNotifications(error.data);
+                    });
+                },
+                // additional dialog args
+                {
+                    titleKey: "user_deleteUser",
+                    contentKey: "user_deleteUserConfirmation"
+                }
+            );
         }
 
         function clearAvatar() {
