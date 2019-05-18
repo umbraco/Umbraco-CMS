@@ -385,7 +385,7 @@
                             overlayService.close();
                         },
                         submit: function () {
-                            //performDelete();
+                            performDelete();
                             overlayService.close();
                         }
                     };
