@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService) {
+    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService, overlayService) {
 
         var vm = this;
 
@@ -369,11 +369,34 @@
             vm.deleteNotLoggedInUserButtonState = "busy";
 
             var confirmationMessage = vm.labels.deleteUserConfirmation;
-            if (!confirm(confirmationMessage)) {
-                vm.deleteNotLoggedInUserButtonState = "danger";
-                return;
-            }
 
+            localizationService.localizeMany(["general_delete", "general_cancel", "contentTypeEditor_yesDelete"])
+                .then(function (data) {
+
+                    const overlay = {
+                        view: "confirm",
+                        title: data[0],
+                        content: confirmationMessage,
+                        confirmMessage: "This will delete the account.",
+                        confirmMessageStyle: "danger",
+                        closeButtonLabel: data[1],
+                        submitButtonLabel: data[2],
+                        submitButtonStyle: "danger",
+                        close: function () {
+                            vm.deleteNotLoggedInUserButtonState = "danger";
+                            overlayService.close();
+                        },
+                        submit: function () {
+                            //performDelete();
+                            overlayService.close();
+                        }
+                    };
+                    overlayService.open(overlay);
+
+                });
+        }
+
+        function performDelete() {
             usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
                 formHelper.showNotifications(data);
                 goToPage(vm.breadcrumbs[0]);
