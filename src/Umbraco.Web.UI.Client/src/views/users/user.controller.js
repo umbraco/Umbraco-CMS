@@ -377,8 +377,6 @@
                         view: "confirm",
                         title: data[0],
                         content: confirmationMessage,
-                        confirmMessage: "This will delete the account.",
-                        confirmMessageStyle: "danger",
                         closeButtonLabel: data[1],
                         submitButtonLabel: data[2],
                         submitButtonStyle: "danger",
