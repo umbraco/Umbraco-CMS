@@ -4,6 +4,6 @@ namespace Umbraco.Web.PropertyEditors
 {
     internal class BlockEditorConfigurationEditor : ConfigurationEditor<BlockEditorConfiguration>
     {
-        // TODO: implement
+
     }
 }

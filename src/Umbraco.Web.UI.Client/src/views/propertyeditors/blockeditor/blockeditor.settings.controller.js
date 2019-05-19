@@ -3,7 +3,20 @@
         "$scope",
         "contentTypeResource",
         function ($scope, contentTypeResource) {
-            $scope.model.value = [];
+
+            if (!$scope.model.value) {
+                $scope.model.value = [];
+            }
+
+            $scope.addBlock = function (elementType) {
+
+                var block = {
+                    elementType: elementType.udi,
+                    settings: null
+                };
+
+                $scope.model.value.push(block);
+            }
 
             $scope.elementTypes = [];
 
