@@ -211,6 +211,7 @@
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
+    <Compile Include="PropertyEditors\BlockEditorPropertyEditor.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
