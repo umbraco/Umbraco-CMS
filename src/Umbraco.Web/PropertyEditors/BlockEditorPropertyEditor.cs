@@ -11,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
             : base(logger)
         { }
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => base.CreateConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new BlockEditorConfigurationEditor();
 
         protected override IDataValueEditor CreateValueEditor() => base.CreateValueEditor();
     }
