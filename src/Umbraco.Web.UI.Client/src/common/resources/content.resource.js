@@ -520,6 +520,20 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 });
         },
 
+        getScaffoldByUdi: function (parentId, udi) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmpty",
+                        [{ udi: udi }, { parentId: parentId }])),
+                'Failed to retrieve data for empty content item with udi ' + udi)
+                .then(function (result) {
+                    return $q.when(umbDataFormatter.formatContentGetData(result));
+                });
+        },
+
         getBlueprintScaffold: function (parentId, blueprintId) {
 
             return umbRequestHelper.resourcePromise(
