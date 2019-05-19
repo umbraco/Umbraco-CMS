@@ -2,7 +2,6 @@
     var vm = this;
 
     vm.scaffolds = [];
-    vm.blocks = [];
     vm.loading = true;
     vm.sortableOptions = {
         axis: "y",
@@ -47,19 +46,42 @@
     }
 
     function add(scaffold) {
-        var block = angular.copy(scaffold);
-        edit(block);
+        var element = angular.copy(scaffold);
+        var block = {
+            udi: element.udi
+        };
+        open(element, block);
     }
 
     function edit(block) {
+        var scaffold = _.findWhere(vm.scaffolds, {udi: block.udi});
+        var element = angular.copy(scaffold);
+        _.each(element.variants[0].tabs, function (tab) {
+            _.each(tab.properties, function (property) {
+                if (block[property.alias]) {
+                    property.value = block[property.alias];
+                }
+            });
+        });
+        
+        open(element, block);
+    }
+
+    function open(element, block) {
         var options = {
-            node: block,
+            element: element,
             title: "TODO: Edit block title here",
             view: "views/propertyeditors/blockeditor/blockeditor.editblock.html",
             submit: function(model) {
-                if (vm.blocks.indexOf(block) < 0) {
-                    vm.blocks.push(block);
+                _.each(element.variants[0].tabs, function (tab) {
+                    _.each(tab.properties, function (property) {
+                        block[property.alias] = property.value;
+                    });
+                });
+                if ($scope.model.value.indexOf(block) < 0) {
+                    $scope.model.value.push(block);
                 }
+
                 editorService.close();
             },
             close: function() {
@@ -71,7 +93,7 @@
 
     function remove(block) {
         if (confirm("TODO: Are you sure?")) {
-            vm.blocks.splice(vm.blocks.indexOf(block), 1);
+            $scope.model.value.splice($scope.model.value.indexOf(block), 1);
         }
     }
 

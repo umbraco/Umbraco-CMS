@@ -2,7 +2,7 @@
     var vm = this;
     vm.submit = submit;
     vm.close = close;
-    vm.content = $scope.model.node.variants[0];
+    vm.content = $scope.model.element.variants[0];
 
     function init() {
 
