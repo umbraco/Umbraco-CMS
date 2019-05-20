@@ -192,7 +192,6 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
-    <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -1518,6 +1517,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Auditing\" />
+    <Folder Include="Exceptions" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
