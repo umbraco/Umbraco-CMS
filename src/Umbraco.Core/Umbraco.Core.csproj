@@ -199,7 +199,6 @@
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />
     <Compile Include="Composing\IBuilderCollection.cs" />
     <Compile Include="Composing\ICollectionBuilder.cs" />
-    <Compile Include="Composing\IDiscoverable.cs" />
     <Compile Include="Composing\IFactory.cs" />
     <Compile Include="Composing\IRegister.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
@@ -319,12 +318,6 @@
     <Compile Include="Constants.cs" />
     <Compile Include="RegisterExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
-    <Compile Include="Dashboards\AccessRule.cs" />
-    <Compile Include="Dashboards\AccessRuleType.cs" />
-    <Compile Include="Dashboards\DashboardSlim.cs" />
-    <Compile Include="Dashboards\IAccessRule.cs" />
-    <Compile Include="Dashboards\IDashboard.cs" />
-    <Compile Include="Dashboards\IDashboardSlim.cs" />
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EnumExtensions.cs" />
