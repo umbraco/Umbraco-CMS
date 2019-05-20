@@ -667,9 +667,6 @@
     <Compile Include="Manifest\ManifestWatcher.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\DataEditorConverter.cs" />
-    <Compile Include="Media\IEmbedProvider.cs" />
-    <Compile Include="Media\OEmbedResult.cs" />
-    <Compile Include="Media\OEmbedStatus.cs" />
     <Compile Include="Migrations\MigrationBuilder.cs" />
     <Compile Include="Migrations\MigrationPlan.cs" />
     <Compile Include="Migrations\NoopMigration.cs" />
