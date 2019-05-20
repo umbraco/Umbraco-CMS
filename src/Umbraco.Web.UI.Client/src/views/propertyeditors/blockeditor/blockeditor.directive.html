@@ -1,0 +1,7 @@
+﻿<div>
+    <div style="position:relative" ng-if="vm.loading">
+        <umb-load-indicator />
+    </div>
+
+    <div ng-if="!vm.loading" ng-include="view"></div>
+</div>

@@ -32,6 +32,10 @@
                 openSettingsPicker(block);
             };
 
+            $scope.$on("formSubmitting", function () {
+                $scope.model.value = $scope.blocks;
+            });
+
             function openElementPicker(block) {
 
                 var pickerOptions = {

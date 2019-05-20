@@ -1,14 +1,13 @@
-﻿<div class="umb-node-preview umb-node-preview--sortable">
-    <i ng-if="icon" class="umb-node-preview__icon {{ icon }}"></i>
-    <div class="umb-node-preview__content">
-        
-        <div class="umb-node-preview__name" ng-attr-title="{{alias}}">A name for block to identify it</div>
-        <div class="umb-node-preview__description" ng-if="description">{{ description }}</div>
-
+﻿<div>
+    <div>
+        <div style="cursor:pointer" ng-click="vm.editSettings(block)" class="di">
+            <i class="icon icon-settings"></i>
+        </div>
+        <div style="cursor:pointer" ng-click="vm.remove(block)" class="di">
+            <i class="icon icon-trash"></i>
+        </div>
     </div>
-    <div class="umb-node-preview__actions">
-        <a class="umb-node-preview__action" title="Edit" href="" ng-click="vm.editContent(block)"><localize key="general_edit">Edit</localize></a>
-        <a class="umb-node-preview__action" title="Settings" href="" ng-click="vm.editSettings(block)"><localize key="general_settings">Settings</localize></a>
-        <a class="umb-node-preview__action umb-node-preview__action--red" title="Remove" ng-href="" ng-click="vm.remove(block)"><localize key="general_remove">Remove</localize></a>
+    <div style="cursor:pointer" ng-click="vm.editContent(block)">
+        Eventually a block identifier will go here (e.g. element type icon)
     </div>
 </div>
