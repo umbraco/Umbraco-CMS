@@ -3,14 +3,6 @@
 namespace Umbraco.Core.Configuration
 {
     /// <summary>
-    /// Represents an Umbraco configuration section which can be used to pass to UmbracoConfiguration.For{T}
-    /// </summary>
-    public interface IUmbracoConfigurationSection
-    {
-
-    }
-
-    /// <summary>
     /// Represents an Umbraco section within the configuration file.
     /// </summary>
     /// <remarks>

@@ -180,6 +180,7 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
+    <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -231,9 +232,6 @@
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="Configuration\Grid\GridConfig.cs" />
     <Compile Include="Configuration\Grid\GridEditorsConfig.cs" />
-    <Compile Include="Configuration\Grid\IGridConfig.cs" />
-    <Compile Include="Configuration\Grid\IGridEditorConfig.cs" />
-    <Compile Include="Configuration\Grid\IGridEditorsConfig.cs" />
     <Compile Include="Configuration\HealthChecks\DisabledHealthCheckElement.cs" />
     <Compile Include="Configuration\HealthChecks\DisabledHealthChecksElementCollection.cs" />
     <Compile Include="Configuration\HealthChecks\HealthCheckNotificationSettingsElement.cs" />
@@ -248,9 +246,7 @@
     <Compile Include="Configuration\HealthChecks\NotificationMethodsElementCollection.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElement.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElementCollection.cs" />
-    <Compile Include="Configuration\IGlobalSettings.cs" />
     <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
-    <Compile Include="Configuration\LocalTempStorage.cs" />
     <Compile Include="Configuration\OptionalCommaDelimitedConfigurationElement.cs" />
     <Compile Include="Configuration\OptionalInnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\RawXmlConfigurationElement.cs" />
@@ -264,19 +260,8 @@
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IImagingAutoFillUploadField.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ILoggingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IRequestHandlerSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ISecuritySection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
@@ -286,7 +271,6 @@
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
-    <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Constants-Applications.cs" />
     <Compile Include="Constants-Conventions.cs" />
     <Compile Include="Constants-DatabaseProviders.cs" />
