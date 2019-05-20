@@ -11,7 +11,7 @@
     };
 
     vm.add = add;
-    vm.edit = edit;
+    vm.editContent = editContent;
     vm.remove = remove;
 
     // it would be awesome if we could load all scaffolds in one go... however we need to have an eye out for performance,
@@ -22,6 +22,8 @@
         _.each($scope.model.config.blocks, function (blockConfig) {
             contentResource.getScaffoldByUdi(-20, blockConfig.elementType).then(function (scaffold) {
                 if (scaffold.isElement) {
+                    // the scaffold udi is not the same as the element type udi, but we need it to be for comparison
+                    scaffold.udi = blockConfig.elementType;
                     vm.scaffolds.push(scaffold);
                 }
                 scaffoldsLoaded++;
@@ -48,26 +50,28 @@
     function add(scaffold) {
         var element = angular.copy(scaffold);
         var block = {
-            udi: element.udi
+            udi: element.udi,
+            content: {},
+            settings: {}
         };
-        open(element, block);
+        openContent(element, block);
     }
 
-    function edit(block) {
+    function editContent(block) {
         var scaffold = _.findWhere(vm.scaffolds, {udi: block.udi});
         var element = angular.copy(scaffold);
         _.each(element.variants[0].tabs, function (tab) {
             _.each(tab.properties, function (property) {
-                if (block[property.alias]) {
-                    property.value = block[property.alias];
+                if (block.content[property.alias]) {
+                    property.value = block.content[property.alias];
                 }
             });
         });
         
-        open(element, block);
+        openContent(element, block);
     }
 
-    function open(element, block) {
+    function openContent(element, block) {
         var options = {
             element: element,
             title: "TODO: Edit block title here",
@@ -75,7 +79,7 @@
             submit: function(model) {
                 _.each(element.variants[0].tabs, function (tab) {
                     _.each(tab.properties, function (property) {
-                        block[property.alias] = property.value;
+                        block.content[property.alias] = property.value;
                     });
                 });
                 if ($scope.model.value.indexOf(block) < 0) {

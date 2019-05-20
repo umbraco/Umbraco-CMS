@@ -6,7 +6,7 @@
     <div ng-if="!vm.loading">
         <div ui-sortable="vm.sortableOptions" ng-model="model.value">
             <div ng-repeat="block in model.value">
-                <div style="cursor:pointer" ng-click="vm.edit(block)" class="di">
+                <div style="cursor:pointer" ng-click="vm.editContent(block)" class="di">
                     TODO: block identifier, e.g. icon
                 </div>
                 <div style="cursor:pointer" ng-click="vm.remove(block)" class="di">
