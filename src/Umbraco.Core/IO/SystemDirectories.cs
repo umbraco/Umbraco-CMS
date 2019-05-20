@@ -39,6 +39,8 @@ namespace Umbraco.Core.IO
 
         public static string Preview => Data + "/preview";
 
+        public static string Thumbnails => Config + "/thumbnails";
+
         private static string _root;
 
         /// <summary>
