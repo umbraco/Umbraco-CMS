@@ -1,23 +1,20 @@
 ﻿<div ng-controller="Umbraco.PropertyEditors.BlockEditor.SettingsController">
 
-    <pre>{{model.value | json}}</pre>
-
-    <div ng-repeat="block in blocks">
-        <strong>
-            {{block.elementType}}
-        </strong>
-
-        <a href="" ng-click="editSettings(block)">
-            <localize key="general_settings">Settings</localize>
-        </a>
-
-        <a href="" ng-click="removeBlock($index)">
-            <localize key="general_remove">Remove</localize>
-        </a>
-    </div>
+    <umb-node-preview ng-repeat="block in blocks"
+                      name="getBlockName(block)"
+                      alias="block.elementType"
+                      icon="icon-folder"
+                      allow-edit="true"
+                      on-edit="editSettings(block)"
+                      allow-remove="true"
+                      on-remove="removeBlock($index)">
+    </umb-node-preview>
 
     <a href="" class="umb-node-preview-add" ng-click="addBlock()">
         <localize key="general_add">Add</localize>
     </a>
+
+    <hr />
+    <pre>{{model.value | json}}</pre>
 
 </div>
