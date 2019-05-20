@@ -10,7 +10,7 @@ namespace Umbraco.Core.Collections
     /// A List that can be deep cloned with deep cloned elements and can reset the collection's items dirty flags
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
+    public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
     {
         private readonly ListCloneBehavior _listCloneBehavior;
 
