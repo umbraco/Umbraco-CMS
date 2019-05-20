@@ -1,4 +1,4 @@
-﻿function BlockEditorEditBlockController($scope) {
+﻿function BlockEditorEditContentController($scope) {
     var vm = this;
     vm.submit = submit;
     vm.close = close;
@@ -22,4 +22,4 @@
 
     init();
 }
-angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockEditor.EditBlockController", BlockEditorEditBlockController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockEditor.EditContentController", BlockEditorEditContentController);

@@ -4,8 +4,8 @@
     </div>
 
     <div ng-if="!vm.loading">
-        <div ui-sortable="vm.sortableOptions" ng-model="model.value">
-            <div ng-repeat="block in model.value">
+        <ul class="unstyled" ui-sortable="vm.sortableOptions" ng-model="model.value">
+            <li ng-repeat="block in model.value">
                 <div style="cursor:pointer" ng-click="vm.editContent(block)" class="di">
                     TODO: block identifier, e.g. icon
                 </div>
@@ -18,8 +18,8 @@
                 <div style="cursor:pointer" ng-click="vm.remove(block)" class="di">
                     <i class="icon icon-trash"></i>
                 </div>
-            </div>
-        </div>
+            </li>
+        </ul>
 
         <div>
             Add:

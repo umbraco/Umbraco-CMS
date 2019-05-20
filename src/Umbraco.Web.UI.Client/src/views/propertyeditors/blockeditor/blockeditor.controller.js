@@ -76,7 +76,7 @@
         var options = {
             element: element,
             title: "TODO: Edit block title here",
-            view: "views/propertyeditors/blockeditor/blockeditor.editblock.html",
+            view: "views/propertyeditors/blockeditor/blockeditor.editcontent.html",
             submit: function(model) {
                 _.each(element.variants[0].tabs, function (tab) {
                     _.each(tab.properties, function (property) {
