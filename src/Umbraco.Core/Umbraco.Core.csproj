@@ -319,7 +319,6 @@
     <Compile Include="RegisterExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
-    <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="Events\CancellableEnumerableObjectEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgsOfTEventObject.cs" />
@@ -627,7 +626,6 @@
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
     <Compile Include="GuidUdi.cs" />
-    <Compile Include="HashCodeCombiner.cs" />
     <Compile Include="HashCodeHelper.cs" />
     <Compile Include="HashGenerator.cs" />
     <Compile Include="HttpContextExtensions.cs" />
@@ -663,7 +661,6 @@
     <Compile Include="Logging\ProfilerExtensions.cs" />
     <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
-    <Compile Include="Macros\MacroErrorBehaviour.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
