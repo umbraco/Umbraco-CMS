@@ -117,7 +117,6 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
-    <Compile Include="AsyncLock.cs" />
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
@@ -196,6 +195,7 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
+    <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -234,6 +234,7 @@
     <Compile Include="PublishedModelFactoryExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Composing\WeightAttribute.cs" />
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
@@ -343,7 +344,6 @@
     <Compile Include="IO\IFileSystems.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="GuidUtils.cs" />
-    <Compile Include="HexEncoder.cs" />
     <Compile Include="IO\MediaPathSchemes\CombinedGuidsMediaPathScheme.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
@@ -545,7 +545,6 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
     <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
-    <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
@@ -562,7 +561,6 @@
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />
-    <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="Deploy\ArtifactBase.cs" />
     <Compile Include="Deploy\ArtifactDependency.cs" />
@@ -592,8 +590,6 @@
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Logging\DisposableTimer.cs" />
     <Compile Include="EmailSender.cs" />
-    <Compile Include="Enum.cs" />
-    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
     <Compile Include="Events\ContentCacheEventArgs.cs" />
@@ -636,14 +632,7 @@
     <Compile Include="Events\TransientEventMessagesFactory.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\UninstallPackageEventArgs.cs" />
-    <Compile Include="Exceptions\ArgumentNullOrEmptyException.cs" />
-    <Compile Include="Exceptions\AuthorizationException.cs" />
-    <Compile Include="Exceptions\BootFailedException.cs" />
-    <Compile Include="Exceptions\ConnectionException.cs" />
-    <Compile Include="Exceptions\DataOperationException.cs" />
-    <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
-    <Compile Include="Exceptions\WontImplementException.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
@@ -653,7 +642,6 @@
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="IEmailSender.cs" />
-    <Compile Include="IfExtensions.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
     <Compile Include="IO\FileSystemExtensions.cs" />
@@ -672,7 +660,6 @@
     <Compile Include="IRuntime.cs" />
     <Compile Include="IRuntimeState.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
-    <Compile Include="ListExtensions.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\IProfiler.cs" />
@@ -943,7 +930,6 @@
     <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\DefinitionFactory.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\DeletionDataDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\Direction.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\ForeignKeyDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\IndexColumnDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\IndexDefinition.cs" />
@@ -1473,7 +1459,6 @@
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
     <Compile Include="SimpleMainDom.cs" />
-    <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\CleanStringType.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
@@ -1517,9 +1502,16 @@
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />
-    <Compile Include="WaitHandleExtensions.cs" />
-    <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
+    <Compile Include="PackageActions\IPackageAction.cs" />
+    <Compile Include="PackageActions\PackageActionCollection.cs" />
+    <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
+    <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="Xml\DynamicContext.cs" />
     <Compile Include="Xml\UmbracoXPathPathSyntaxParser.cs" />
     <Compile Include="Xml\XmlHelper.cs" />
@@ -1534,15 +1526,6 @@
     <Compile Include="Xml\XPath\MacroNavigator.cs" />
     <Compile Include="Xml\XPath\NavigableNavigator.cs" />
     <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
-    <Compile Include="PackageActions\IPackageAction.cs" />
-    <Compile Include="PackageActions\PackageActionCollection.cs" />
-    <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
-    <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="..\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="FileResources\BlockingWeb.config" />

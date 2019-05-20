@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Exceptions
 {
-    internal class DataOperationException<T> : Exception
+    public class DataOperationException<T> : Exception
     {
         public T Operation { get; private set; }
 

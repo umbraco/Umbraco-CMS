@@ -21,7 +21,7 @@ namespace Umbraco.Core
     // been closed, the Semaphore system object is destroyed - so in any case
     // an iisreset should clean up everything
     //
-    internal class AsyncLock
+    public class AsyncLock
     {
         private readonly SemaphoreSlim _semaphore;
         private readonly Semaphore _semaphore2;
