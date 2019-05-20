@@ -534,7 +534,6 @@
     <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
-    <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreInitialComponent.cs" />
@@ -1294,7 +1293,6 @@
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="ReflectionUtilities.cs" />
-    <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
     <Compile Include="SafeCallContext.cs" />
@@ -1438,7 +1436,6 @@
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
-    <Compile Include="Settable.cs" />
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
@@ -1473,7 +1470,6 @@
     <Compile Include="Sync\ServerRole.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
     <Compile Include="SystemUtilities.cs" />
-    <Compile Include="ThreadExtensions.cs" />
     <Compile Include="Collections\TopoGraph.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
