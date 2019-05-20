@@ -116,10 +116,8 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     -->
-    <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
-    <Compile Include="BindingRedirects.cs" />
     <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\AppCacheExtensions.cs" />
@@ -348,9 +346,7 @@
     <Compile Include="Logging\Viewer\LogMessage.cs" />
     <Compile Include="Logging\Viewer\LogViewerComposer.cs" />
     <Compile Include="Logging\Viewer\LogViewerSourceBase.cs" />
-    <Compile Include="Logging\IProfilingLogger.cs" />
     <Compile Include="Logging\LogHttpRequest.cs" />
-    <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Logging\MessageTemplates.cs" />
     <Compile Include="Logging\Serilog\Enrichers\HttpRequestIdEnricher.cs" />
     <Compile Include="Logging\Serilog\Enrichers\HttpRequestNumberEnricher.cs" />
@@ -533,7 +529,6 @@
     <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
-    <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreInitialComponent.cs" />
@@ -545,9 +540,6 @@
     <Compile Include="Migrations\Expressions\Delete\KeysAndIndexes\DeleteKeysAndIndexesBuilder.cs" />
     <Compile Include="Migrations\IMigrationBuilder.cs" />
     <Compile Include="Migrations\Install\DatabaseBuilder.cs" />
-    <Compile Include="DataTableExtensions.cs" />
-    <Compile Include="DateTimeExtensions.cs" />
-    <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="Deploy\ArtifactBase.cs" />
     <Compile Include="Deploy\ArtifactDependency.cs" />
@@ -575,7 +567,6 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
-    <Compile Include="Logging\DisposableTimer.cs" />
     <Compile Include="EmailSender.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
@@ -648,16 +639,11 @@
     <Compile Include="IRuntimeState.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
-    <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Logging\IProfiler.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
-    <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogProfiler.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
-    <Compile Include="Logging\ProfilerExtensions.cs" />
-    <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
@@ -1293,7 +1279,6 @@
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="ReflectionUtilities.cs" />
-    <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
     <Compile Include="SafeCallContext.cs" />
@@ -1437,7 +1422,6 @@
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
-    <Compile Include="Settable.cs" />
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
@@ -1471,6 +1455,7 @@
     <Compile Include="Sync\ServerRole.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
     <Compile Include="ThreadExtensions.cs" />
+    <Compile Include="SystemUtilities.cs" />
     <Compile Include="Collections\TopoGraph.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />

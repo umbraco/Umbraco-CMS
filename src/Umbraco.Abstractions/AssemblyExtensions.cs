@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace Umbraco.Core
 {
-    internal static class AssemblyExtensions
+    public static class AssemblyExtensions
     {
         /// <summary>
         /// Returns the file used to load the assembly

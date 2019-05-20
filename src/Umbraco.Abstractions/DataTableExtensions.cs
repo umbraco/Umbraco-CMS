@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading;
 
 namespace Umbraco.Core
 {
-
-
     /// <summary>
     /// Static and extension methods for the DataTable object
     /// </summary>
     internal static class DataTableExtensions
     {
-
-
         /// <summary>
         /// Creates a DataTable with the specified alias and columns and uses a callback to populate the headers.
         /// </summary>
