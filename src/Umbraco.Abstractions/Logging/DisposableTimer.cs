@@ -80,7 +80,7 @@ namespace Umbraco.Core.Logging
 
             if ((Stopwatch.ElapsedMilliseconds >= _thresholdMilliseconds || _failed)
                 && _loggerType != null && _logger != null
-                && (_endMessage.IsNullOrWhiteSpace() == false || _failed))
+                && (string.IsNullOrWhiteSpace(_endMessage) == false || _failed))
             {
                 if (_failed)
                 {

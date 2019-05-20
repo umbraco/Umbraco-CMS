@@ -347,9 +347,7 @@
     <Compile Include="Logging\Viewer\LogMessage.cs" />
     <Compile Include="Logging\Viewer\LogViewerComposer.cs" />
     <Compile Include="Logging\Viewer\LogViewerSourceBase.cs" />
-    <Compile Include="Logging\IProfilingLogger.cs" />
     <Compile Include="Logging\LogHttpRequest.cs" />
-    <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Logging\MessageTemplates.cs" />
     <Compile Include="Logging\Serilog\Enrichers\HttpRequestIdEnricher.cs" />
     <Compile Include="Logging\Serilog\Enrichers\HttpRequestNumberEnricher.cs" />
@@ -570,7 +568,6 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
-    <Compile Include="Logging\DisposableTimer.cs" />
     <Compile Include="EmailSender.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
@@ -643,16 +640,11 @@
     <Compile Include="IRuntimeState.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
-    <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Logging\IProfiler.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
-    <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogProfiler.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
-    <Compile Include="Logging\ProfilerExtensions.cs" />
-    <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
