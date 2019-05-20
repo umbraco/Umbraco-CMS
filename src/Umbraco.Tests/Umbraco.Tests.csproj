@@ -540,6 +540,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
+      <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
+      <Name>Umbraco.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
       <Name>Umbraco.Core</Name>
