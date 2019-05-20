@@ -12,6 +12,7 @@
 
     vm.add = add;
     vm.editContent = editContent;
+    vm.editSettings = editSettings;
     vm.remove = remove;
 
     // it would be awesome if we could load all scaffolds in one go... however we need to have an eye out for performance,
@@ -86,6 +87,23 @@
                     $scope.model.value.push(block);
                 }
 
+                editorService.close();
+            },
+            close: function() {
+                editorService.close();
+            }
+        };
+        editorService.open(options);
+    }
+
+    function editSettings(block) {
+        var options = {
+            settings: block.settings,
+            title: "TODO: Edit settings title here",
+            view: "views/propertyeditors/blockeditor/blockeditor.editsettings.html",
+            size: "medium",
+            submit: function(model) {
+                console.log("TODO: something with block settings", model)
                 editorService.close();
             },
             close: function() {

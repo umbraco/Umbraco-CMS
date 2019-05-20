@@ -1,0 +1,42 @@
+﻿<div ng-controller="Umbraco.PropertyEditors.BlockEditor.EditSettingsController as vm">
+    <umb-editor-view>
+        <umb-editor-header name="model.title"
+                           name-locked="true"
+                           hide-alias="true"
+                           hide-icon="true"
+                           hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-load-indicator ng-if="vm.loading" />
+
+            <div ng-if="!loading">
+                <umb-box>
+                    <umb-box-content>
+                        <ng-form name="editBlockForm" val-form-manager>
+                            <h3>Here be settings editing</h3>
+                        </ng-form>
+                    </umb-box-content>
+                </umb-box>
+            </div>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button type="button"
+                            button-style="link"
+                            label-key="general_cancel"
+                            shortcut="esc"
+                            action="vm.close()">
+                </umb-button>
+                <umb-button type="button"
+                            button-style="success"
+                            label-key="general_ok"
+                            action="vm.submit()">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>
