@@ -673,7 +673,6 @@
     <Compile Include="Logging\ProfilerExtensions.cs" />
     <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
-    <Compile Include="Macros\MacroErrorBehaviour.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
