@@ -5,7 +5,7 @@ using Semver;
 
 namespace Umbraco.Core
 {
-    internal static class VersionExtensions
+    public static class VersionExtensions
     {
         public static Version GetVersion(this SemVersion semVersion, int maxParts = 4)
         {
