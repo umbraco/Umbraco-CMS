@@ -4,22 +4,7 @@
     </div>
 
     <div ng-if="!vm.loading">
-        <ul class="unstyled" ui-sortable="vm.sortableOptions" ng-model="model.value">
-            <li ng-repeat="block in model.value">
-                <div style="cursor:pointer" ng-click="vm.editContent(block)" class="di">
-                    TODO: block identifier, e.g. icon
-                </div>
-                <div style="cursor:pointer" ng-click="vm.editSettings(block)" class="di">
-                    <i class="icon icon-settings"></i>
-                </div>
-                <div style="cursor:move" class="di handle">
-                    <i class="icon icon-navigation"></i>
-                </div>
-                <div style="cursor:pointer" ng-click="vm.remove(block)" class="di">
-                    <i class="icon icon-trash"></i>
-                </div>
-            </li>
-        </ul>
+        <umb-block-editor-blocks></umb-block-editor-blocks>
 
         <div>
             Add:
