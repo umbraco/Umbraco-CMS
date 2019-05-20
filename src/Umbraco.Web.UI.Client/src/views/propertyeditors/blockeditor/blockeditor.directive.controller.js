@@ -15,9 +15,6 @@
         if (!$scope.blocks) {
             $scope.blocks = [];
         }
-        if (!$scope.view) {
-            $scope.view = "views/propertyeditors/blockeditor/blockeditor.default.html";
-        }
         
         _.each($scope.config, function (config) {
             contentResource.getScaffoldByUdi(-20, config.elementType).then(function (scaffold) {
