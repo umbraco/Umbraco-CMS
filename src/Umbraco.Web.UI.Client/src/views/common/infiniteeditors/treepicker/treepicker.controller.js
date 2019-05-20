@@ -93,6 +93,14 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     });
                 }
             }
+            if (vm.treeAlias === "documentTypes") {
+                vm.entityType = "DocumentType";
+                if (!$scope.model.title) {
+                    localizationService.localize("defaultdialogs_selectContentType").then(function(value){
+                        $scope.model.title = value;
+                    });
+                }
+            }
             else if (vm.treeAlias === "member" || vm.section === "member") {
                 vm.entityType = "Member";
                 if (!$scope.model.title) {
