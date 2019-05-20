@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Umbraco.Core.Strings.Css
 {
-    internal class StylesheetRule
+    public class StylesheetRule
     {
         public string Name { get; set; }
 

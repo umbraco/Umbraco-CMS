@@ -63,7 +63,7 @@ namespace Umbraco.Core.Configuration
 
             public void Dispose()
             {
-                ObjectExtensions.DisposeIfDisposable(_stringEnumerator);
+                _stringEnumerator.DisposeIfDisposable();
             }
         }
     }

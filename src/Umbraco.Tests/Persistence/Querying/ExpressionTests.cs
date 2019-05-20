@@ -246,7 +246,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             //Console.WriteLine(result2);
 
-            Expression<Func<UserDto, UserGroupDto, object>> predicate3 = (user, group) => NPocoSqlExtensions.Statics.SqlText<bool>(user.Login, group.Name, (n1, n2) => $"({n1} LIKE concat({n2}, ',%'))");
+            Expression<Func<UserDto, UserGroupDto, object>> predicate3 = (user, group) => SqlExtensionsStatics.SqlText<bool>(user.Login, group.Name, (n1, n2) => $"({n1} LIKE concat({n2}, ',%'))");
             var modelToSqlExpressionHelper3 = new PocoToSqlExpressionVisitor<UserDto, UserGroupDto>(SqlContext, null, null);
             var result3 = modelToSqlExpressionHelper3.Visit(predicate3);
 

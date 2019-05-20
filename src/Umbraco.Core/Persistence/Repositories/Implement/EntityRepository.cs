@@ -4,11 +4,10 @@ using System.Linq;
 using NPoco;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
+using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 

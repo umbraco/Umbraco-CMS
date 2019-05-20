@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Umbraco.Core.Strings.Css
 {
-    internal class StylesheetHelper
+    public class StylesheetHelper
     {
         private const string RuleRegexFormat = @"/\*\*\s*umb_name:\s*(?<Name>{0}?)\s*\*/\s*(?<Selector>[^,{{]*?)\s*{{\s*(?<Styles>.*?)\s*}}";
 

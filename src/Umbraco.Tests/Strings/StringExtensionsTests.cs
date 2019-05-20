@@ -210,10 +210,10 @@ namespace Umbraco.Tests.Strings
         {
             var bytes = Encoding.UTF8.GetBytes(value);
             Console.WriteLine("base64: " + Convert.ToBase64String(bytes));
-            var encoded = StringExtensions.UrlTokenEncode(bytes);
+            var encoded = bytes.UrlTokenEncode();
             Assert.AreEqual(expected, encoded);
 
-            var backBytes = StringExtensions.UrlTokenDecode(encoded);
+            var backBytes = encoded.UrlTokenDecode();
             var backString = Encoding.UTF8.GetString(backBytes);
             Assert.AreEqual(value, backString);
         }
