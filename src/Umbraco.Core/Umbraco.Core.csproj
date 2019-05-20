@@ -196,10 +196,7 @@
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />
     <Compile Include="Composing\IBuilderCollection.cs" />
     <Compile Include="Composing\ICollectionBuilder.cs" />
-    <Compile Include="Composing\IFactory.cs" />
-    <Compile Include="Composing\IRegister.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
-    <Compile Include="Composing\Lifetime.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
     <Compile Include="Composing\OrderedCollectionBuilderBase.cs" />
@@ -619,7 +616,6 @@
     <Compile Include="HashGenerator.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
-    <Compile Include="IEmailSender.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
     <Compile Include="IO\FileSystemExtensions.cs" />
@@ -637,7 +633,6 @@
     <Compile Include="IO\ViewHelper.cs" />
     <Compile Include="IRuntime.cs" />
     <Compile Include="IRuntimeState.cs" />
-    <Compile Include="LambdaExpressionCacheKey.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
@@ -867,7 +862,6 @@
     <Compile Include="Models\ObjectTypes.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
-    <Compile Include="MonitorLock.cs" />
     <Compile Include="NamedUdiRange.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="NetworkHelper.cs" />
