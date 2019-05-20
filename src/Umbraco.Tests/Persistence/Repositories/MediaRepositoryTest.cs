@@ -3,20 +3,18 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Services;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

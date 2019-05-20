@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
+﻿namespace Umbraco.Core
 {
     public enum Direction
     {
