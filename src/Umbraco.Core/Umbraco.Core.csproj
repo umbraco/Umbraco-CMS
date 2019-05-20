@@ -326,7 +326,6 @@
     <Compile Include="Dashboards\IDashboard.cs" />
     <Compile Include="Dashboards\IDashboardSlim.cs" />
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
-    <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="Events\CancellableEnumerableObjectEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgsOfTEventObject.cs" />
