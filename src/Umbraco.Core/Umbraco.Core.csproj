@@ -542,7 +542,6 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
     <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
-    <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
@@ -559,7 +558,6 @@
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />
-    <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="Deploy\ArtifactBase.cs" />
     <Compile Include="Deploy\ArtifactDependency.cs" />
@@ -589,7 +587,6 @@
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Logging\DisposableTimer.cs" />
     <Compile Include="EmailSender.cs" />
-    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
     <Compile Include="Events\ContentCacheEventArgs.cs" />
@@ -643,7 +640,6 @@
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="IEmailSender.cs" />
-    <Compile Include="IfExtensions.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
     <Compile Include="IO\FileSystemExtensions.cs" />
@@ -662,7 +658,6 @@
     <Compile Include="IRuntime.cs" />
     <Compile Include="IRuntimeState.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
-    <Compile Include="ListExtensions.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\IProfiler.cs" />
@@ -933,7 +928,6 @@
     <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\DefinitionFactory.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\DeletionDataDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\Direction.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\ForeignKeyDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\IndexColumnDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\IndexDefinition.cs" />
@@ -1506,7 +1500,6 @@
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />
-    <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="PackageActions\IPackageAction.cs" />
     <Compile Include="PackageActions\PackageActionCollection.cs" />
