@@ -195,6 +195,7 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
+    <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -233,6 +234,7 @@
     <Compile Include="PublishedModelFactoryExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Composing\WeightAttribute.cs" />
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
@@ -631,14 +633,7 @@
     <Compile Include="Events\TransientEventMessagesFactory.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\UninstallPackageEventArgs.cs" />
-    <Compile Include="Exceptions\ArgumentNullOrEmptyException.cs" />
-    <Compile Include="Exceptions\AuthorizationException.cs" />
-    <Compile Include="Exceptions\BootFailedException.cs" />
-    <Compile Include="Exceptions\ConnectionException.cs" />
-    <Compile Include="Exceptions\DataOperationException.cs" />
-    <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
-    <Compile Include="Exceptions\WontImplementException.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
@@ -1466,7 +1461,6 @@
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
     <Compile Include="SimpleMainDom.cs" />
-    <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\CleanStringType.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
@@ -1512,6 +1506,15 @@
     <Compile Include="VersionExtensions.cs" />
     <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
+    <Compile Include="PackageActions\IPackageAction.cs" />
+    <Compile Include="PackageActions\PackageActionCollection.cs" />
+    <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
+    <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="Xml\DynamicContext.cs" />
     <Compile Include="Xml\UmbracoXPathPathSyntaxParser.cs" />
     <Compile Include="Xml\XmlHelper.cs" />
@@ -1526,15 +1529,6 @@
     <Compile Include="Xml\XPath\MacroNavigator.cs" />
     <Compile Include="Xml\XPath\NavigableNavigator.cs" />
     <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
-    <Compile Include="PackageActions\IPackageAction.cs" />
-    <Compile Include="PackageActions\PackageActionCollection.cs" />
-    <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
-    <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="..\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="FileResources\BlockingWeb.config" />
