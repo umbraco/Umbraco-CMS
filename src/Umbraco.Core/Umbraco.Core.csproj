@@ -1495,7 +1495,6 @@
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiType.cs" />
     <Compile Include="UdiTypeConverter.cs" />
-    <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />
     <Compile Include="XmlExtensions.cs" />
