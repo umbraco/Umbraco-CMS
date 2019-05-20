@@ -118,7 +118,6 @@
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Cache\AppCaches.cs" />
-    <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\AppCacheExtensions.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherCollection.cs" />
@@ -131,10 +130,6 @@
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
     <Compile Include="Cache\HttpRequestAppCache.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
-    <Compile Include="Cache\IAppCache.cs" />
-    <Compile Include="Cache\ICacheRefresher.cs" />
-    <Compile Include="Cache\IJsonCacheRefresher.cs" />
-    <Compile Include="Cache\IPayloadCacheRefresher.cs" />
     <Compile Include="Cache\IRepositoryCachePolicy.cs" />
     <Compile Include="Cache\IAppPolicyCache.cs" />
     <Compile Include="Cache\IsolatedCaches.cs" />
@@ -1444,10 +1439,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="FileResources\Files.resx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Auditing\" />
-    <Folder Include="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
