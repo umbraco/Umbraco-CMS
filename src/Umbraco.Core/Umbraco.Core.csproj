@@ -190,7 +190,6 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
-    <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -533,7 +532,6 @@
     <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
-    <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreInitialComponent.cs" />
@@ -662,9 +660,6 @@
     <Compile Include="Manifest\ManifestWatcher.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\DataEditorConverter.cs" />
-    <Compile Include="Media\IEmbedProvider.cs" />
-    <Compile Include="Media\OEmbedResult.cs" />
-    <Compile Include="Media\OEmbedStatus.cs" />
     <Compile Include="Migrations\MigrationBuilder.cs" />
     <Compile Include="Migrations\MigrationPlan.cs" />
     <Compile Include="Migrations\NoopMigration.cs" />
@@ -1293,7 +1288,6 @@
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="ReflectionUtilities.cs" />
-    <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
     <Compile Include="SafeCallContext.cs" />
@@ -1437,7 +1431,6 @@
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
-    <Compile Include="Settable.cs" />
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
@@ -1472,7 +1465,6 @@
     <Compile Include="Sync\ServerRole.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
     <Compile Include="SystemUtilities.cs" />
-    <Compile Include="ThreadExtensions.cs" />
     <Compile Include="Collections\TopoGraph.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
@@ -1480,9 +1472,7 @@
     <Compile Include="UdiEntityType.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiRange.cs" />
-    <Compile Include="UdiType.cs" />
     <Compile Include="UdiTypeConverter.cs" />
-    <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />
     <Compile Include="XmlExtensions.cs" />
@@ -1518,6 +1508,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Auditing\" />
+    <Folder Include="Exceptions" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">

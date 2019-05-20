@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Umbraco.Core
 {
-    static class ThreadExtensions
+    public static class ThreadExtensions
     {
         public static void SanitizeThreadCulture(this Thread thread)
         {

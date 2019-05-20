@@ -27,7 +27,7 @@ namespace Umbraco.Core.Exceptions
         {
             get
             {
-                return AddedCompositionAlias.IsNullOrWhiteSpace()
+                return string.IsNullOrWhiteSpace(AddedCompositionAlias)
                     ? string.Format(
                         "ContentType with alias '{0}' has an invalid composition " +
                         "and there was a conflict on the following PropertyTypes: '{1}'. " +
