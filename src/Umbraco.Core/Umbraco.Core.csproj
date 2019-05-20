@@ -630,8 +630,6 @@
     <Compile Include="IO\SystemDirectories.cs" />
     <Compile Include="IO\SystemFiles.cs" />
     <Compile Include="IO\ViewHelper.cs" />
-    <Compile Include="IRuntime.cs" />
-    <Compile Include="IRuntimeState.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
@@ -1444,7 +1442,6 @@
     <Compile Include="Sync\RefreshInstructionEnvelope.cs" />
     <Compile Include="Sync\RefreshMethodType.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />
-    <Compile Include="Sync\ServerRole.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
     <Compile Include="Collections\TopoGraph.cs" />
     <Compile Include="TypeExtensions.cs" />
@@ -1455,7 +1452,6 @@
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiTypeConverter.cs" />
     <Compile Include="UriExtensions.cs" />
-    <Compile Include="VersionExtensions.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="PackageActions\IPackageAction.cs" />
     <Compile Include="PackageActions\PackageActionCollection.cs" />
