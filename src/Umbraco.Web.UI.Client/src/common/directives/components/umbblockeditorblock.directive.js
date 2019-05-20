@@ -1,12 +1,12 @@
 ﻿angular.module("umbraco.directives").directive('umbBlockEditorBlock', [
     function () {
         var link = function (scope, el, attr, ctrl) {
-            scope.view = attr.view;
+            scope.view = attr.view || "views/propertyeditors/blockeditor/blockeditor.block.default.html";
         };
 
         return {
             restrict: "E",
-            templateUrl: "views/propertyeditors/blockeditor/blockeditor.block.html",
+            template: "<div ng-include='view'></div>",
             link: link
         };
     }
