@@ -151,9 +151,6 @@
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
     <Compile Include="Cache\DictionaryAppCache.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
-    <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
-    <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
-    <Compile Include="CodeAnnotations\UmbracoUdiTypeAttribute.cs" />
     <Compile Include="Collections\CompositeNStringNStringKey.cs" />
     <Compile Include="Collections\CompositeStringStringKey.cs" />
     <Compile Include="Collections\CompositeIntStringKey.cs" />
