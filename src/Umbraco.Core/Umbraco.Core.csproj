@@ -1448,8 +1448,6 @@
     <Compile Include="Sync\ServerMessengerBase.cs" />
     <Compile Include="Sync\ServerRole.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
-    <Compile Include="ThreadExtensions.cs" />
-    <Compile Include="SystemUtilities.cs" />
     <Compile Include="Collections\TopoGraph.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
