@@ -8,7 +8,7 @@ namespace Umbraco.Core
     /// <summary>
     /// Static and extension methods for the DataTable object
     /// </summary>
-    internal static class DataTableExtensions
+    public static class DataTableExtensions
     {
         /// <summary>
         /// Creates a DataTable with the specified alias and columns and uses a callback to populate the headers.
@@ -57,7 +57,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// This is for legacy code, I didn't want to go creating custom classes for these
         /// </remarks>
-        internal static List<System.Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>> CreateTableData()
+        public static List<System.Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>> CreateTableData()
         {
             return new List<System.Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>>();
         }
@@ -71,7 +71,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// This is for legacy code, I didn't want to go creating custom classes for these
         /// </remarks>
-        internal static void AddRowData(
+        public static void AddRowData(
             List<System.Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>> rowData,
             IEnumerable<KeyValuePair<string, object>> standardVals,
             IEnumerable<KeyValuePair<string, object>> userVals)
