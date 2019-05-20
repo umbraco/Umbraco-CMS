@@ -3,7 +3,7 @@ using System.Linq;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
+using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_7_8_0
 {

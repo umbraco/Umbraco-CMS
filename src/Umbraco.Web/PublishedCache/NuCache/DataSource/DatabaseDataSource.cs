@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.Composing;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
+using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {

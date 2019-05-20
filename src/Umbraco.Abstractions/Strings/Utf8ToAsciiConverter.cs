@@ -11,7 +11,7 @@ namespace Umbraco.Core.Strings
     /// <para>Removes all non-Utf8 (unicode) characters, so in fact it can sort-of "convert" Unicode to Ascii.</para>
     /// <para>Replaces symbols with '?'.</para>
     /// </remarks>
-    internal static class Utf8ToAsciiConverter
+    public static class Utf8ToAsciiConverter
     {
         /// <summary>
         /// Converts an Utf8 string into an Ascii string.

@@ -63,7 +63,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
             ids = ids
-                .Select(x => StringExtensions.EnsureEndsWith(x, ".css"))
+                .Select(x => x.EnsureEndsWith(".css"))
                 .Distinct()
                 .ToArray();
 

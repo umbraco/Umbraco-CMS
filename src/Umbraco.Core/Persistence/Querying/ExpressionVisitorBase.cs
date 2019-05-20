@@ -619,7 +619,7 @@ namespace Umbraco.Core.Persistence.Querying
                 //                                GetQuotedColumnName(RemoveQuoteFromAlias(RemoveQuote(args[0].ToString()))));
 
                 case "SqlText":
-                    if (m.Method.DeclaringType != typeof(NPocoSqlExtensions.Statics))
+                    if (m.Method.DeclaringType != typeof(SqlExtensionsStatics))
                         goto default;
                     if (m.Arguments.Count == 2)
                     {
