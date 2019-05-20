@@ -8,7 +8,7 @@ namespace Umbraco.Core.Collections
     /// </summary>
     /// <remarks>Types in the list are, or derive from, or implement, the base type.</remarks>
     /// <typeparam name="TBase">The base type.</typeparam>
-    internal class TypeList<TBase>
+    public class TypeList<TBase>
     {
         private readonly List<Type> _list = new List<Type>();
 

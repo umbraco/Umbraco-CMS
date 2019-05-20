@@ -117,6 +117,8 @@
     </Compile>
     -->
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
+    <Compile Include="Collections\DeepCloneableList.cs" />
+    <Compile Include="Collections\ListCloneBehavior.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
@@ -149,15 +151,6 @@
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
     <Compile Include="Cache\DictionaryAppCache.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
-    <Compile Include="Collections\CompositeNStringNStringKey.cs" />
-    <Compile Include="Collections\CompositeStringStringKey.cs" />
-    <Compile Include="Collections\CompositeIntStringKey.cs" />
-    <Compile Include="Collections\CompositeTypeTypeKey.cs" />
-    <Compile Include="Collections\ConcurrentHashSet.cs" />
-    <Compile Include="Collections\DeepCloneableList.cs" />
-    <Compile Include="Collections\ListCloneBehavior.cs" />
-    <Compile Include="Collections\ObservableDictionary.cs" />
-    <Compile Include="Collections\TypeList.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\Composers.cs" />
@@ -863,7 +856,6 @@
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="NetworkHelper.cs" />
     <Compile Include="ObjectExtensions.cs" />
-    <Compile Include="Collections\OrderedHashSet.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
     <Compile Include="Models\Packaging\UninstallationSummary.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
@@ -1443,7 +1435,6 @@
     <Compile Include="Sync\RefreshMethodType.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
-    <Compile Include="Collections\TopoGraph.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />
