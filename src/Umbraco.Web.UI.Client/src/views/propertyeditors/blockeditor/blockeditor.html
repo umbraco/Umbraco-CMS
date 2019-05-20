@@ -1,16 +1,1 @@
-﻿<div ng-controller="Umbraco.PropertyEditors.BlockEditor.PropertyEditorController as vm">
-    <div style="position:relative" ng-if="vm.loading">
-        <umb-load-indicator />
-    </div>
-
-    <div ng-if="!vm.loading">
-        <umb-block-editor-blocks></umb-block-editor-blocks>
-
-        <div>
-            Add:
-            <div style="cursor:pointer" ng-click="vm.add(scaffold)" ng-repeat="scaffold in vm.scaffolds" class="di">
-                <i class="icon {{scaffold.documentType.icon}}"></i>
-            </div>
-        </div>
-    </div>
-</div>
+﻿<umb-block-editor blocks="model.value" config="model.config.blocks"></umb-block-editor>

@@ -1,0 +1,14 @@
+﻿<div ng-controller="Umbraco.PropertyEditors.BlockEditor.DefaultController">
+    <ul class="unstyled" ui-sortable="sortableOptions" ng-model="blocks">
+        <li ng-repeat="block in blocks" style="border: 1px solid silver; margin-bottom: 4px; padding: 4px;">
+            <umb-block-editor-block></umb-block-editor-block>
+        </li>
+    </ul>
+
+    <div>
+        Add:
+        <div style="cursor:pointer" ng-click="vm.add(scaffold)" ng-repeat="scaffold in vm.scaffolds" class="di">
+            <i class="icon {{scaffold.documentType.icon}}"></i>
+        </div>
+    </div>
+</div>

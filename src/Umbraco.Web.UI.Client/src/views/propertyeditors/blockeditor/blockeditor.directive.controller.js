@@ -1,32 +1,29 @@
-﻿function BlockEditorPropertyEditorController($scope, contentResource, editorService) {
+﻿function BlockEditorDirectiveController($scope, contentResource, editorService) {
     var vm = this;
 
     vm.scaffolds = [];
     vm.loading = true;
-    vm.sortableOptions = {
-        axis: "y",
-        cursor: "move",
-        handle: ".handle",
-        tolerance: 'pointer'
-    };
-
     vm.add = add;
     vm.editContent = editContent;
     vm.editSettings = editSettings;
     vm.remove = remove;
-    // TODO: this needs to be configurable on data type level
-    vm.blocksView = null; // "/App_Plugins/MyBlockEditor/myblockeditor.html";
 
     // it would be awesome if we could load all scaffolds in one go... however we need to have an eye out for performance,
     // oddly enough it's been shown to actually be slower to load them all at once instead of one at a time
     var scaffoldsLoaded = 0;
     function init() {
-        $scope.model.value = $scope.model.value || [];
-        _.each($scope.model.config.blocks, function (blockConfig) {
-            contentResource.getScaffoldByUdi(-20, blockConfig.elementType).then(function (scaffold) {
+        if (!$scope.blocks) {
+            $scope.blocks = [];
+        }
+        if (!$scope.view) {
+            $scope.view = "views/propertyeditors/blockeditor/blockeditor.default.html";
+        }
+        
+        _.each($scope.config, function (config) {
+            contentResource.getScaffoldByUdi(-20, config.elementType).then(function (scaffold) {
                 if (scaffold.isElement) {
                     // the scaffold udi is not the same as the element type udi, but we need it to be for comparison
-                    scaffold.udi = blockConfig.elementType;
+                    scaffold.udi = config.elementType;
                     vm.scaffolds.push(scaffold);
                 }
                 scaffoldsLoaded++;
@@ -40,14 +37,14 @@
 
     function initIfAllScaffoldsHaveLoaded() {
         // Initialize when all scaffolds have loaded
-        if ($scope.model.config.blocks.length === scaffoldsLoaded) {
+        if ($scope.config.length === scaffoldsLoaded) {
             vm.scaffolds = _.sortBy(vm.scaffolds, function (scaffold) {
-                return _.findIndex($scope.model.config.blocks, function (blockConfig) {
+                return _.findIndex($scope.config, function (blockConfig) {
                     return blockConfig.elementType === scaffold.udi;
                 });
             });
 
-            _.each($scope.model.value, function (block) {
+            _.each($scope.blocks, function (block) {
                 applyFakeSettings(block);
             });
 
@@ -91,8 +88,8 @@
                         block.content[property.alias] = property.value;
                     });
                 });
-                if ($scope.model.value.indexOf(block) < 0) {
-                    $scope.model.value.push(block);
+                if ($scope.blocks.indexOf(block) < 0) {
+                    $scope.blocks.push(block);
                     applyFakeSettings(block);
                 }
 
@@ -125,7 +122,7 @@
     function remove(block) {
         // this should be replaced by a custom dialog (pending some PRs)
         if (confirm("TODO: Are you sure?")) {
-            $scope.model.value.splice($scope.model.value.indexOf(block), 1);
+            $scope.blocks.splice($scope.blocks.indexOf(block), 1);
         }
     }
 
@@ -137,4 +134,4 @@
         block.settings["rows"] = 1 + Math.floor(Math.random() * 2);
     }
 }
-angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockEditor.PropertyEditorController", BlockEditorPropertyEditorController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockEditor.DirectiveController", BlockEditorDirectiveController);

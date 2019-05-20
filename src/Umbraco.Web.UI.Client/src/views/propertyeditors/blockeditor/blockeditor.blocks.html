@@ -1,8 +1,0 @@
-﻿<div>
-    <div ng-if="vm.blocksView" ng-include="vm.blocksView"></div>
-    <ul ng-if="!vm.blocksView" class="unstyled" ui-sortable="vm.sortableOptions" ng-model="model.value">
-        <li ng-repeat="block in model.value" style="border: 1px solid silver; margin-bottom: 4px; padding: 4px;">
-            <umb-block-editor-block></umb-block-editor-block>
-        </li>
-    </ul>
-</div>
