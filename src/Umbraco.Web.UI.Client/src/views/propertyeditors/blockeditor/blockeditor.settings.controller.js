@@ -2,28 +2,77 @@
     .controller("Umbraco.PropertyEditors.BlockEditor.SettingsController", [
         "$scope",
         "contentTypeResource",
-        function ($scope, contentTypeResource) {
+        "editorService",
+        function ($scope, contentTypeResource, editorService) {
 
-            if (!$scope.model.value) {
-                $scope.model.value = [];
-            }
-
-            $scope.addBlock = function (elementType) {
-
-                var block = {
-                    elementType: elementType.udi,
-                    settings: null
-                };
-
-                $scope.model.value.push(block);
-            }
-
+            $scope.blocks = [];
             $scope.elementTypes = [];
 
+            if ($scope.model.value) {
+                $scope.blocks = $scope.model.value;
+            }
+
             contentTypeResource.getAll()
-                .then(function (data) {
-                    $scope.elementTypes = _.where(data, { isElement: true });
+                .then(function (contentType) {
+                    $scope.elementTypes.push(contentType);
                 });
+
+            $scope.addBlock = function () {
+                var block = {};
+                openElementPicker(block);
+            };
+
+            $scope.removeBlock = function (index) {
+                $scope.blocks.splice(index, 1);
+            };
+
+            $scope.editSettings = function (block) {
+                openSettingsPicker(block);
+            };
+
+            function openElementPicker(block) {
+
+                var pickerOptions = {
+                    title: "Pick an element type",
+                    view: "views/common/infiniteeditors/treepicker/treepicker.html",
+                    size: "small",
+                    multiPicker: false,
+                    section: "settings",
+                    treeAlias: "documentTypes",
+                    entityType: "documentType",
+                    submit: function (model) {
+                        _.each(model.selection, function (elementType) {
+                            block.elementType = elementType.udi;
+                            $scope.blocks.push(block);
+                        });
+
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+
+                editorService.open(pickerOptions);
+            }
+
+            function openSettingsPicker(block) {
+
+                var pickerOptions = {
+                    title: "Block settings",
+                    view: "views/propertyeditors/blockeditor/block.settings.html",
+                    size: "small",
+                    submit: function (model) {
+                        block.settings = model;
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+
+                editorService.open(pickerOptions);
+            }
         }
     ]
 );

@@ -1,11 +1,23 @@
 ﻿<div ng-controller="Umbraco.PropertyEditors.BlockEditor.SettingsController">
-    <pre>
-        {{model.value | json}}
-    </pre>
 
-    <ul>
-        <li ng-repeat="elementType in elementTypes">
-            {{elementType.name}} <a href="" ng-click="addBlock(elementType)">Add</a>
-        </li>
-    </ul>
+    <pre>{{model.value | json}}</pre>
+
+    <div ng-repeat="block in blocks">
+        <strong>
+            {{block.elementType}}
+        </strong>
+
+        <a href="" ng-click="editSettings(block)">
+            <localize key="general_settings">Settings</localize>
+        </a>
+
+        <a href="" ng-click="removeBlock($index)">
+            <localize key="general_remove">Remove</localize>
+        </a>
+    </div>
+
+    <a href="" class="umb-node-preview-add" ng-click="addBlock()">
+        <localize key="general_add">Add block</localize>
+    </a>
+
 </div>
