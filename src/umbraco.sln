@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -103,6 +103,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemp
 		..\.github\ISSUE_TEMPLATE\5_Security_issue.md = ..\.github\ISSUE_TEMPLATE\5_Security_issue.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Abstractions", "Umbraco.Abstractions\Umbraco.Abstractions.csproj", "{29AA69D9-B597-4395-8D42-43B1263C240A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,10 @@ Global
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29AA69D9-B597-4395-8D42-43B1263C240A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29AA69D9-B597-4395-8D42-43B1263C240A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29AA69D9-B597-4395-8D42-43B1263C240A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29AA69D9-B597-4395-8D42-43B1263C240A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
