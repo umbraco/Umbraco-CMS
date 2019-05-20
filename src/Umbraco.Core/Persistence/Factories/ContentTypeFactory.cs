@@ -110,7 +110,6 @@ namespace Umbraco.Core.Persistence.Factories
             entity.Alias = dto.Alias;
             entity.Name = dto.NodeDto.Text;
             entity.Icon = dto.Icon;
-            entity.Thumbnail = dto.Thumbnail;
             entity.SortOrder = dto.NodeDto.SortOrder;
             entity.Description = dto.Description;
             entity.CreateDate = dto.NodeDto.CreateDate;

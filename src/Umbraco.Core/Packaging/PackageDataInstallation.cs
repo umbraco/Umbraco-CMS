@@ -572,7 +572,6 @@ namespace Umbraco.Core.Packaging
 
             contentType.Name = infoElement.Element("Name").Value;
             contentType.Icon = infoElement.Element("Icon").Value;
-            contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
 
             //NOTE AllowAtRoot is a new property in the package xml so we need to verify it exists before using it.

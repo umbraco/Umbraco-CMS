@@ -76,48 +76,6 @@ namespace Umbraco.Web.Models.Trees
         public string MenuUrl { get; set; }
 
         /// <summary>
-        /// Returns true if the icon represents a CSS class instead of a file path
-        /// </summary>
-        [DataMember(Name = "iconIsClass")]
-        public bool IconIsClass
-        {
-            get
-            {
-                if (Icon.IsNullOrWhiteSpace())
-                {
-                    return true;
-                }
-
-                if (Icon.StartsWith(".."))
-                    return false;
-
-
-                //if it starts with a '.' or doesn't contain a '.' at all then it is a class
-                return Icon.StartsWith(".") || Icon.Contains(".") == false;
-            }
-        }
-
-        /// <summary>
-        /// Returns the icon file path if the icon is not a class, otherwise returns an empty string
-        /// </summary>
-        [DataMember(Name = "iconFilePath")]
-        public string IconFilePath
-        {
-            get
-            {
-                if (IconIsClass)
-                    return string.Empty;
-
-                //absolute path with or without tilde
-                if (Icon.StartsWith("~") || Icon.StartsWith("/"))
-                    return IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
-
-                //legacy icon path
-                return string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
-            }
-        }
-
-        /// <summary>
         /// A list of additional/custom css classes to assign to the node
         /// </summary>
         [DataMember(Name = "cssClasses")]

@@ -33,7 +33,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets the Thumbnail for the ContentType
         /// </summary>
-        string Thumbnail { get; set; }
+        string Thumbnail { get; }
 
         /// <summary>
         /// Gets or Sets a boolean indicating whether this ContentType is allowed at the root
