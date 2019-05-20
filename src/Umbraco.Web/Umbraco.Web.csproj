@@ -212,8 +212,9 @@
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\BlockEditorConfiguration.cs" />
-    <Compile Include="PropertyEditors\BlockEditorConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\BlockEditorPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\SimpleGridConfiguration.cs" />
+    <Compile Include="PropertyEditors\SimpleGridConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\SimpleGridPropertyEditor.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />

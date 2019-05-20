@@ -4,7 +4,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    public class BlockEditorConfiguration
+    public abstract class BlockEditorConfiguration
     {
         [ConfigurationField("blocks", "Blocks", "views/propertyeditors/blockeditor/blockeditor.settings.html")]
         public Block[] Blocks { get; set; }
