@@ -117,8 +117,6 @@
     </Compile>
     -->
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
-    <Compile Include="Collections\DeepCloneableList.cs" />
-    <Compile Include="Collections\ListCloneBehavior.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
@@ -151,17 +149,8 @@
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
     <Compile Include="Cache\DictionaryAppCache.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
-    <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
-    <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
-    <Compile Include="CodeAnnotations\UmbracoUdiTypeAttribute.cs" />
-    <Compile Include="Collections\CompositeNStringNStringKey.cs" />
-    <Compile Include="Collections\CompositeStringStringKey.cs" />
-    <Compile Include="Collections\CompositeIntStringKey.cs" />
-    <Compile Include="Collections\ConcurrentHashSet.cs" />
     <Compile Include="Collections\DeepCloneableList.cs" />
     <Compile Include="Collections\ListCloneBehavior.cs" />
-    <Compile Include="Collections\ObservableDictionary.cs" />
-    <Compile Include="Collections\TypeList.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\Composers.cs" />
@@ -220,7 +209,6 @@
     <Compile Include="Models\ContentBaseExtensions.cs" />
     <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
-    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />
@@ -231,12 +219,6 @@
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
     <Compile Include="StringExtensions.cs" />
-    <Compile Include="Strings\DefaultShortStringHelper.cs" />
-    <Compile Include="Strings\DefaultShortStringHelperConfig.cs" />
-    <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
-    <Compile Include="Strings\IUrlSegmentProvider.cs" />
-    <Compile Include="Strings\UrlSegmentProviderCollection.cs" />
-    <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Composing\WeightAttribute.cs" />
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
@@ -641,8 +623,6 @@
     <Compile Include="IO\SystemDirectories.cs" />
     <Compile Include="IO\SystemFiles.cs" />
     <Compile Include="IO\ViewHelper.cs" />
-    <Compile Include="IRuntime.cs" />
-    <Compile Include="IRuntimeState.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
@@ -875,7 +855,6 @@
     <Compile Include="NamedUdiRange.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="NetworkHelper.cs" />
-    <Compile Include="Collections\OrderedHashSet.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
     <Compile Include="Models\Packaging\UninstallationSummary.cs" />
@@ -1428,20 +1407,12 @@
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
-    <Compile Include="SimpleMainDom.cs" />
-    <Compile Include="Strings\CleanStringType.cs" />
-    <Compile Include="Strings\ContentBaseExtensions.cs" />
-    <Compile Include="Strings\Css\StylesheetHelper.cs" />
-    <Compile Include="Strings\Css\StylesheetRule.cs" />
     <Compile Include="Strings\DefaultShortStringHelper.cs" />
     <Compile Include="Strings\DefaultShortStringHelperConfig.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
-    <Compile Include="Strings\Diff.cs" />
-    <Compile Include="Strings\IShortStringHelper.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollection.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
-    <Compile Include="Strings\Utf8ToAsciiConverter.cs" />
     <Compile Include="StringUdi.cs" />
     <Compile Include="Sync\ApplicationUrlHelper.cs" />
     <Compile Include="Sync\DatabaseServerMessenger.cs" />
@@ -1465,9 +1436,6 @@
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiTypeConverter.cs" />
     <Compile Include="UriExtensions.cs" />
-    <Compile Include="VersionExtensions.cs" />
-    <Compile Include="WriteLock.cs" />
-    <Compile Include="XmlExtensions.cs" />
     <Compile Include="PackageActions\IPackageAction.cs" />
     <Compile Include="PackageActions\PackageActionCollection.cs" />
     <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
