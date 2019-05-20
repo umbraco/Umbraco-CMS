@@ -117,7 +117,6 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
-    <Compile Include="AsyncLock.cs" />
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
@@ -345,7 +344,6 @@
     <Compile Include="IO\IFileSystems.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="GuidUtils.cs" />
-    <Compile Include="HexEncoder.cs" />
     <Compile Include="IO\MediaPathSchemes\CombinedGuidsMediaPathScheme.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
@@ -594,7 +592,6 @@
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Logging\DisposableTimer.cs" />
     <Compile Include="EmailSender.cs" />
-    <Compile Include="Enum.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
@@ -1512,7 +1509,6 @@
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />
-    <Compile Include="WaitHandleExtensions.cs" />
     <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="PackageActions\IPackageAction.cs" />

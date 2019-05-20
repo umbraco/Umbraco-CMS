@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Core
 {
-    internal static class WaitHandleExtensions
+    public static class WaitHandleExtensions
     {
 
         // http://stackoverflow.com/questions/25382583/waiting-on-a-named-semaphore-with-waitone100-vs-waitone0-task-delay100
