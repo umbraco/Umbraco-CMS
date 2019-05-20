@@ -529,7 +529,6 @@
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreInitialComponent.cs" />
-    <Compile Include="CustomBooleanTypeConverter.cs" />
     <Compile Include="Migrations\Expressions\Common\ExecutableBuilder.cs" />
     <Compile Include="Migrations\Expressions\Common\IExecutableBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\KeysAndIndexes\CreateKeysAndIndexesBuilder.cs" />
