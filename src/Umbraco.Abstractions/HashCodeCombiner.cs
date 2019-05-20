@@ -15,38 +15,38 @@ namespace Umbraco.Core
     /// NOTE: It's probably best to not relying on the hashing result across AppDomains! If you need a constant/reliable hash value
     /// between AppDomains use SHA1. This is perfect for hashing things in a very fast way for a single AppDomain.
     /// </remarks>
-    internal class HashCodeCombiner
+    public class HashCodeCombiner
     {
         private long _combinedHash = 5381L;
 
-        internal void AddInt(int i)
+        public void AddInt(int i)
         {
             _combinedHash = ((_combinedHash << 5) + _combinedHash) ^ i;
         }
 
-        internal void AddObject(object o)
+        public void AddObject(object o)
         {
             AddInt(o.GetHashCode());
         }
 
-        internal void AddDateTime(DateTime d)
+        public void AddDateTime(DateTime d)
         {
             AddInt(d.GetHashCode());
         }
 
-        internal void AddString(string s)
+        public void AddString(string s)
         {
             if (s != null)
                 AddInt((StringComparer.InvariantCulture).GetHashCode(s));
         }
 
-        internal void AddCaseInsensitiveString(string s)
+        public void AddCaseInsensitiveString(string s)
         {
             if (s != null)
                 AddInt((StringComparer.InvariantCultureIgnoreCase).GetHashCode(s));
         }
 
-        internal void AddFileSystemItem(FileSystemInfo f)
+        public void AddFileSystemItem(FileSystemInfo f)
         {
             //if it doesn't exist, don't proceed.
             if (!f.Exists)
@@ -77,12 +77,12 @@ namespace Umbraco.Core
             }
         }
 
-        internal void AddFile(FileInfo f)
+        public void AddFile(FileInfo f)
         {
             AddFileSystemItem(f);
         }
 
-        internal void AddFolder(DirectoryInfo d)
+        public void AddFolder(DirectoryInfo d)
         {
             AddFileSystemItem(d);
         }
@@ -91,7 +91,7 @@ namespace Umbraco.Core
         /// Returns the hex code of the combined hash code
         /// </summary>
         /// <returns></returns>
-        internal string GetCombinedHashCode()
+        public string GetCombinedHashCode()
         {
             return _combinedHash.ToString("x", CultureInfo.InvariantCulture);
         }

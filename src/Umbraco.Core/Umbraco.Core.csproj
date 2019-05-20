@@ -116,10 +116,10 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     -->
-    <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
+    <Compile Include="Collections\DeepCloneableList.cs" />
+    <Compile Include="Collections\ListCloneBehavior.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
-    <Compile Include="BindingRedirects.cs" />
     <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\AppCacheExtensions.cs" />
@@ -194,18 +194,13 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
-    <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />
     <Compile Include="Composing\IBuilderCollection.cs" />
     <Compile Include="Composing\ICollectionBuilder.cs" />
-    <Compile Include="Composing\IDiscoverable.cs" />
-    <Compile Include="Composing\IFactory.cs" />
-    <Compile Include="Composing\IRegister.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
-    <Compile Include="Composing\Lifetime.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
     <Compile Include="Composing\OrderedCollectionBuilderBase.cs" />
@@ -329,14 +324,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="RegisterExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
-    <Compile Include="Dashboards\AccessRule.cs" />
-    <Compile Include="Dashboards\AccessRuleType.cs" />
-    <Compile Include="Dashboards\DashboardSlim.cs" />
-    <Compile Include="Dashboards\IAccessRule.cs" />
-    <Compile Include="Dashboards\IDashboard.cs" />
-    <Compile Include="Dashboards\IDashboardSlim.cs" />
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
-    <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="Events\CancellableEnumerableObjectEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgsOfTEventObject.cs" />
@@ -347,7 +335,6 @@
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
-    <Compile Include="IMainDom.cs" />
     <Compile Include="IO\IFileSystems.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="GuidUtils.cs" />
@@ -368,9 +355,7 @@
     <Compile Include="Logging\Viewer\LogMessage.cs" />
     <Compile Include="Logging\Viewer\LogViewerComposer.cs" />
     <Compile Include="Logging\Viewer\LogViewerSourceBase.cs" />
-    <Compile Include="Logging\IProfilingLogger.cs" />
     <Compile Include="Logging\LogHttpRequest.cs" />
-    <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Logging\MessageTemplates.cs" />
     <Compile Include="Logging\Serilog\Enrichers\HttpRequestIdEnricher.cs" />
     <Compile Include="Logging\Serilog\Enrichers\HttpRequestNumberEnricher.cs" />
@@ -552,9 +537,7 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
     <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
-    <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
-    <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreInitialComponent.cs" />
@@ -565,9 +548,6 @@
     <Compile Include="Migrations\Expressions\Delete\KeysAndIndexes\DeleteKeysAndIndexesBuilder.cs" />
     <Compile Include="Migrations\IMigrationBuilder.cs" />
     <Compile Include="Migrations\Install\DatabaseBuilder.cs" />
-    <Compile Include="DataTableExtensions.cs" />
-    <Compile Include="DateTimeExtensions.cs" />
-    <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="Deploy\ArtifactBase.cs" />
     <Compile Include="Deploy\ArtifactDependency.cs" />
@@ -595,7 +575,6 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
-    <Compile Include="Logging\DisposableTimer.cs" />
     <Compile Include="EmailSender.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
@@ -643,12 +622,10 @@
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
     <Compile Include="GuidUdi.cs" />
-    <Compile Include="HashCodeCombiner.cs" />
     <Compile Include="HashCodeHelper.cs" />
     <Compile Include="HashGenerator.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
-    <Compile Include="IEmailSender.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
     <Compile Include="IO\FileSystemExtensions.cs" />
@@ -667,27 +644,18 @@
     <Compile Include="IRuntime.cs" />
     <Compile Include="IRuntimeState.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
-    <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Logging\IProfiler.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
-    <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogProfiler.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
-    <Compile Include="Logging\ProfilerExtensions.cs" />
-    <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
-    <Compile Include="Macros\MacroErrorBehaviour.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
     <Compile Include="Manifest\ManifestWatcher.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\DataEditorConverter.cs" />
-    <Compile Include="Media\IEmbedProvider.cs" />
-    <Compile Include="Media\OEmbedResult.cs" />
-    <Compile Include="Media\OEmbedStatus.cs" />
     <Compile Include="Migrations\MigrationBuilder.cs" />
     <Compile Include="Migrations\MigrationPlan.cs" />
     <Compile Include="Migrations\NoopMigration.cs" />
@@ -904,11 +872,11 @@
     <Compile Include="Models\ObjectTypes.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
-    <Compile Include="MonitorLock.cs" />
     <Compile Include="NamedUdiRange.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="NetworkHelper.cs" />
     <Compile Include="Collections\OrderedHashSet.cs" />
+    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
     <Compile Include="Models\Packaging\UninstallationSummary.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
@@ -1315,10 +1283,8 @@
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="ReflectionUtilities.cs" />
-    <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
-    <Compile Include="SafeCallContext.cs" />
     <Compile Include="Scoping\IInstanceIdentifiable.cs" />
     <Compile Include="Scoping\IScope.cs" />
     <Compile Include="Scoping\IScopeAccessor.cs" />
@@ -1459,11 +1425,23 @@
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
-    <Compile Include="Settable.cs" />
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
     <Compile Include="SimpleMainDom.cs" />
+    <Compile Include="Strings\CleanStringType.cs" />
+    <Compile Include="Strings\ContentBaseExtensions.cs" />
+    <Compile Include="Strings\Css\StylesheetHelper.cs" />
+    <Compile Include="Strings\Css\StylesheetRule.cs" />
+    <Compile Include="Strings\DefaultShortStringHelper.cs" />
+    <Compile Include="Strings\DefaultShortStringHelperConfig.cs" />
+    <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
+    <Compile Include="Strings\Diff.cs" />
+    <Compile Include="Strings\IShortStringHelper.cs" />
+    <Compile Include="Strings\IUrlSegmentProvider.cs" />
+    <Compile Include="Strings\UrlSegmentProviderCollection.cs" />
+    <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
+    <Compile Include="Strings\Utf8ToAsciiConverter.cs" />
     <Compile Include="StringUdi.cs" />
     <Compile Include="Sync\ApplicationUrlHelper.cs" />
     <Compile Include="Sync\DatabaseServerMessenger.cs" />
@@ -1478,23 +1456,18 @@
     <Compile Include="Sync\RefreshInstructionEnvelope.cs" />
     <Compile Include="Sync\RefreshMethodType.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />
-    <Compile Include="Sync\ServerRole.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
-    <Compile Include="SystemUtilities.cs" />
-    <Compile Include="ThreadExtensions.cs" />
-    <Compile Include="Collections\TopoGraph.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />
     <Compile Include="UdiEntityType.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiRange.cs" />
-    <Compile Include="UdiType.cs" />
     <Compile Include="UdiTypeConverter.cs" />
-    <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />
     <Compile Include="WriteLock.cs" />
+    <Compile Include="XmlExtensions.cs" />
     <Compile Include="PackageActions\IPackageAction.cs" />
     <Compile Include="PackageActions\PackageActionCollection.cs" />
     <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
@@ -1528,6 +1501,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Auditing\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
