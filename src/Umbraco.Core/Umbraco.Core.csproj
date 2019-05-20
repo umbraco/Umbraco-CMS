@@ -196,10 +196,7 @@
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />
     <Compile Include="Composing\IBuilderCollection.cs" />
     <Compile Include="Composing\ICollectionBuilder.cs" />
-    <Compile Include="Composing\IFactory.cs" />
-    <Compile Include="Composing\IRegister.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
-    <Compile Include="Composing\Lifetime.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
     <Compile Include="Composing\OrderedCollectionBuilderBase.cs" />
@@ -1508,7 +1505,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Auditing\" />
-    <Folder Include="Exceptions" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
