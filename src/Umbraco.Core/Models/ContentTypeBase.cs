@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
@@ -20,7 +22,6 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private string _icon = "icon-folder";
-        private string _thumbnail = "folder.png";
         private bool _allowedAsRoot; // note: only one that's not 'pure element type'
         private bool _isContainer;
         private bool _isElement;
@@ -152,8 +153,14 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Thumbnail
         {
-            get => _thumbnail;
-            set => SetPropertyValueAndDetectChanges(value, ref _thumbnail, nameof(Thumbnail));
+            get
+            {
+                var thumbsFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Thumbnails));
+                var files = Directory.GetFiles(thumbsFolder.FullName, $"{Alias}.*");
+
+                return files.Length == 1 ?
+                    IOHelper.ResolveVirtualUrl($"{SystemDirectories.Thumbnails}/{System.IO.Path.GetFileName(files[0])}") : null;
+            }
         }
 
         /// <summary>
@@ -472,7 +479,7 @@ namespace Umbraco.Core.Models
         {
             base.PerformDeepClone(clone);
 
-            var clonedEntity = (ContentTypeBase) clone;
+            var clonedEntity = (ContentTypeBase)clone;
 
             if (clonedEntity._noGroupPropertyTypes != null)
             {
@@ -481,14 +488,14 @@ namespace Umbraco.Core.Models
                 // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
 
                 clonedEntity._noGroupPropertyTypes.CollectionChanged -= PropertyTypesChanged;                    //clear this event handler if any
-                clonedEntity._noGroupPropertyTypes = (PropertyTypeCollection) _noGroupPropertyTypes.DeepClone(); //manually deep clone
+                clonedEntity._noGroupPropertyTypes = (PropertyTypeCollection)_noGroupPropertyTypes.DeepClone(); //manually deep clone
                 clonedEntity._noGroupPropertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;              //re-assign correct event handler
             }
 
             if (clonedEntity._propertyGroups != null)
             {
                 clonedEntity._propertyGroups.CollectionChanged -= PropertyGroupsChanged;              //clear this event handler if any
-                clonedEntity._propertyGroups = (PropertyGroupCollection) _propertyGroups.DeepClone(); //manually deep clone
+                clonedEntity._propertyGroups = (PropertyGroupCollection)_propertyGroups.DeepClone(); //manually deep clone
                 clonedEntity._propertyGroups.CollectionChanged += clonedEntity.PropertyGroupsChanged;        //re-assign correct event handler
             }
         }
