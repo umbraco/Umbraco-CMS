@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Runtime.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -45,71 +46,19 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Description { get; set; }
 
         [DataMember(Name = "thumbnail")]
-        public string Thumbnail { get; set; }
-
-        /// <summary>
-        /// Returns true if the icon represents a CSS class instead of a file path
-        /// </summary>
-        [DataMember(Name = "iconIsClass")]
         [ReadOnly(true)]
-        public bool IconIsClass
+        public string Thumbnail
         {
             get
             {
-                if (Icon.IsNullOrWhiteSpace())
+                var thumbsFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Thumbnails));
+                var files = Directory.GetFiles(thumbsFolder.FullName, $"{Alias}.*");
+                if (files.Length == 1) // ignore duplicates
                 {
-                    return true;
+                    return IOHelper.ResolveVirtualUrl($"{SystemDirectories.Thumbnails}/{System.IO.Path.GetFileName(files[0])}");
                 }
-                //if it starts with a '.' or doesn't contain a '.' at all then it is a class
-                return Icon.StartsWith(".") || Icon.Contains(".") == false;
-            }
-        }
 
-        /// <summary>
-        /// Returns the icon file path if the icon is not a class, otherwise returns an empty string
-        /// </summary>
-        [DataMember(Name = "iconFilePath")]
-        [ReadOnly(true)]
-        public string IconFilePath
-        {
-            get
-            {
-                return IconIsClass
-                    ? string.Empty
-                    : string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
-            }
-        }
-
-        /// <summary>
-        /// Returns true if the icon represents a CSS class instead of a file path
-        /// </summary>
-        [DataMember(Name = "thumbnailIsClass")]
-        [ReadOnly(true)]
-        public bool ThumbnailIsClass
-        {
-            get
-            {
-                if (Thumbnail.IsNullOrWhiteSpace())
-                {
-                    return true;
-                }
-                //if it starts with a '.' or doesn't contain a '.' at all then it is a class
-                return Thumbnail.StartsWith(".") || Thumbnail.Contains(".") == false;
-            }
-        }
-
-        /// <summary>
-        /// Returns the icon file path if the icon is not a class, otherwise returns an empty string
-        /// </summary>
-        [DataMember(Name = "thumbnailFilePath")]
-        [ReadOnly(true)]
-        public string ThumbnailFilePath
-        {
-            get
-            {
-                return ThumbnailIsClass
-                           ? string.Empty
-                           : IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + Thumbnail);
+                return null;                
             }
         }
 
