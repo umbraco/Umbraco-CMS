@@ -118,9 +118,6 @@
     -->
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="AsyncLock.cs" />
-    <Compile Include="Attempt.cs" />
-    <Compile Include="AttemptOfTResult.cs" />
-    <Compile Include="AttemptOfTResultTStatus.cs" />
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
