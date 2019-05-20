@@ -1,26 +1,30 @@
 <div ng-controller="Umbraco.Overlays.ItemPickerOverlay" class="umb-itempicker">
 
-    <div class="form-search" ng-hide="model.filter === false" style="margin-bottom: 15px;">
+    <div class="form-search" 
+         ng-hide="model.filter === false" 
+         style="margin-bottom: 15px;">
         <i class="icon-search"></i>
-        <input type="text"
-               ng-model="searchTerm"
-               class="umb-search-field search-query input-block-level -full-width-input"
-               localize="placeholder"
-               placeholder="@placeholders_filter"
-               umb-auto-focus
-               no-dirty-check />
+        
+        <input type="text" 
+               ng-model="searchTerm" 
+               class="umb-search-field search-query input-block-level -full-width-input" 
+               localize="placeholder" placeholder="@placeholders_filter" 
+               umb-auto-focus no-dirty-check />
     </div>
 
     <div class="umb-overlay__section-header" ng-if="(model.pasteItems | filter:searchTerm).length > 0">
-        <h5><localize key="content_createFromClipboard">Paste from clipboard</localize></h5>
-        <button ng-if="model.clickClearPaste" ng-click="model.clickClearPaste($event)" alt="Clear clipboard for entries accepted in this context.">
+        <h5>
+            <localize key="content_createFromClipboard">Paste from clipboard</localize>
+        </h5>
+        <button ng-if="model.clickClearPaste" 
+                ng-click="model.clickClearPaste($event)" 
+                alt="Clear clipboard for entries accepted in this context.">
             <i class="icon-trash"></i>
         </button>
     </div>
 
     <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
-        <li ng-repeat="pasteItem in model.pasteItems | filter:searchTerm"
-            ng-click="model.clickPasteItem(pasteItem)">
+        <li ng-repeat="pasteItem in model.pasteItems | filter:searchTerm" ng-click="model.clickPasteItem(pasteItem)">
             <a class="umb-card-grid-item" href="" title="{{ pasteItem.name }}">
                 <span>
                     <i class="{{ pasteItem.icon }}"></i>
@@ -31,19 +35,37 @@
     </ul>
 
     <div class="umb-overlay__section-header" ng-if="model.pasteItems.length > 0 && (model.availableItems | filter:searchTerm).length > 0">
-        <h5><localize key="content_createEmpty">Create new</localize></h5>
+        <h5>
+            <localize key="content_createEmpty">Create new</localize>
+        </h5>
     </div>
 
-    <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
-        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:searchTerm"
-            ng-click="selectItem(availableItem)">
-            <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
-                <span>
+
+    <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7, '-detailed': hasThumbs()}">
+        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:searchTerm" ng-click="selectItem(availableItem)">
+            <a class="umb-card-grid-item" 
+               ng-class="{'-has-thumbnail': availableItem.thumbnail}" 
+               href="" 
+               title="{{ availableItem.name }}">
+                <span ng-if="!hasThumbs()">
                     <i class="{{ availableItem.icon }}"></i>
                     {{ availableItem.name }}
                 </span>
+                <div ng-if="hasThumbs()" class="flex">
+                    <i ng-if="!availableItem.thumbnail" class="{{ availableItem.icon }}"></i>
+                    <img ng-if="availableItem.thumbnail" 
+                         class="umb-card-grid-item--thumbnail self-start" 
+                         ng-src="{{ availableItem.thumbnail }}?width=120px" />
+                    <div class="flex flex-column justify-center">
+                        <span class="umb-card-grid-item--title" ng-bind="availableItem.name"></span>
+                        <span ng-if="availableItem.description" 
+                              class="umb-card-grid-item--description" 
+                              ng-bind="availableItem.description"></span>
+                    </div>
+                </div>
             </a>
         </li>
     </ul>
+
 
 </div>

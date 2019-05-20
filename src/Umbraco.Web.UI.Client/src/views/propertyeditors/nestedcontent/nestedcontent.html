@@ -37,7 +37,8 @@
 
         <div class="umb-nested-content__footer-bar" ng-hide="hasContentTypes === false || nodes.length >= maxItems">
             <a href class="umb-nested-content__add-content" ng-class="{ '--disabled': !scaffolds.length }" ng-click="openNodeTypePicker($event)" prevent-default>
-                <localize key="grid_addElement"></localize>
+                <localize key="grid_addElement" ng-if="scaffolds.length > 1"></localize>
+                <span ng-if="scaffolds.length === 1"><localize key="general_add"></localize> {{ scaffolds[0].contentTypeName }}</span>
             </a>
         </div>
 

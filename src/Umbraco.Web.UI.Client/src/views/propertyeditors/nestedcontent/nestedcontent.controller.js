@@ -184,7 +184,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 $scope.overlayMenu.availableItems.push({
                     alias: scaffold.contentTypeAlias,
                     name: scaffold.contentTypeName,
-                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
+                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon),
+                    thumbnail: scaffold.thumbnail,
+                    description: scaffold.documentType.description
                 });
             });
 
@@ -192,7 +194,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return;
             }
             
-            $scope.overlayMenu.size = $scope.overlayMenu.availableItems.length > 6 ? "medium" : "small";
+            if ($scope.overlayMenu.availableItems.some(x => x.thumbnail)) {
+                $scope.overlayMenu.size = 'large';
+            } else {
+                $scope.overlayMenu.size = $scope.overlayMenu.availableItems.length > 6 ? "medium" : "small";            
+            }    
             
             $scope.overlayMenu.pasteItems = [];
             var availableNodesForPaste = clipboardService.retriveDataOfType("elementType", contentTypeAliases);
@@ -399,6 +405,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                             });
                     }
 
+                    // pass the thumbnail on to the scaffold
+                    scaffold.thumbnail = contentType.thumbnail;
+                    
                     // Store the scaffold object
                     $scope.scaffolds.push(scaffold);
                 }
