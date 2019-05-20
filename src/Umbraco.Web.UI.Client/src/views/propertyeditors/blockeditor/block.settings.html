@@ -1,0 +1,92 @@
+﻿<div>
+
+    <umb-editor-view>
+
+        <umb-editor-header name="model.title"
+                           name-locked="true"
+                           hide-alias="true"
+                           hide-icon="true"
+                           hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container class="block-form">
+            <umb-box>
+                <umb-box-content>
+
+                    <div class="content-type-editor-dialog edit-property-settings">
+
+                        <div class="umb-control-group" ng-if="!model.property.locked">
+                            <div class="control-group">
+                                <textarea class="editor-label"
+                                          data-element="property-name"
+                                          name="propertyLabel"
+                                          ng-model="model.property.label"
+                                          localize="placeholder"
+                                          placeholder="@placeholders_entername"
+                                          umb-auto-focus
+                                          focus-on-filled="true"
+                                          umb-auto-resize
+                                          required
+                                          ng-keypress="vm.submitOnEnter($event)">
+                                </textarea>
+                            </div>
+
+                            <div class="control-group -no-margin">
+                                <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
+                            </div>
+                        </div>
+
+                        <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
+
+                            <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
+                                <localize key="shortcuts_addEditor"></localize>
+                            </a>
+
+                            <div class="editor clearfix" ng-if="model.property.editor">
+
+                                <a href="" class="editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
+                                    <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
+                                </a>
+
+                                <div class="editor-details">
+                                    <a href="" class="editor-name" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.dataTypeName }}</a>
+                                    <a href="" class="editor-editor" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.editor }}</a>
+                                </div>
+
+                                <a href class="editor-settings-icon pull-right"
+                                   ng-click="vm.openDataTypeSettings(model.property)"
+                                   hotkey="alt+shift+d"
+                                   ng-if="model.property.editor">
+                                    <i class="icon icon-settings"></i>
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button type="button"
+                            button-style="link"
+                            label-key="general_close"
+                            shortcut="esc"
+                            action="close()">
+                </umb-button>
+                <umb-button type="button"
+                            button-style="success"
+                            label-key="general_submit"
+                            state="saveButtonState"
+                            action="submit(model)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>
