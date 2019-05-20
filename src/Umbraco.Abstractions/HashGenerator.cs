@@ -14,7 +14,7 @@ namespace Umbraco.Core
     /// This will use the crypto libs to generate the hash and will try to ensure that
     /// strings, etc... are not re-allocated so it's not consuming much memory.
     /// </remarks>
-    internal class HashGenerator : DisposableObjectSlim
+    public class HashGenerator : DisposableObjectSlim
     {
         public HashGenerator()
         {
@@ -24,33 +24,33 @@ namespace Umbraco.Core
         private readonly MemoryStream _ms = new MemoryStream();
         private StreamWriter _writer;
 
-        internal void AddInt(int i)
+        public void AddInt(int i)
         {
             _writer.Write(i);
         }
 
-        internal void AddLong(long i)
+        public void AddLong(long i)
         {
             _writer.Write(i);
         }
 
-        internal void AddObject(object o)
+        public void AddObject(object o)
         {
             _writer.Write(o);
         }
 
-        internal void AddDateTime(DateTime d)
+        public void AddDateTime(DateTime d)
         {
             _writer.Write(d.Ticks);;
         }
 
-        internal void AddString(string s)
+        public void AddString(string s)
         {
             if (s != null)
                 _writer.Write(s);
         }
 
-        internal void AddCaseInsensitiveString(string s)
+        public void AddCaseInsensitiveString(string s)
         {
             //I've tried to no allocate a new string with this which can be done if we use the CompareInfo.GetSortKey method which will create a new
             //byte array that we can use to write to the output, however this also allocates new objects so i really don't think the performance
@@ -63,7 +63,7 @@ namespace Umbraco.Core
                 _writer.Write(s.ToUpperInvariant());
         }
 
-        internal void AddFileSystemItem(FileSystemInfo f)
+        public void AddFileSystemItem(FileSystemInfo f)
         {
             //if it doesn't exist, don't proceed.
             if (f.Exists == false)
@@ -94,12 +94,12 @@ namespace Umbraco.Core
             }
         }
 
-        internal void AddFile(FileInfo f)
+        public void AddFile(FileInfo f)
         {
             AddFileSystemItem(f);
         }
 
-        internal void AddFolder(DirectoryInfo d)
+        public void AddFolder(DirectoryInfo d)
         {
             AddFileSystemItem(d);
         }
@@ -108,7 +108,7 @@ namespace Umbraco.Core
         /// Returns the generated hash output of all added objects
         /// </summary>
         /// <returns></returns>
-        internal string GenerateHash()
+        public string GenerateHash()
         {
             //flush,close,dispose the writer,then create a new one since it's possible to keep adding after GenerateHash is called.
 

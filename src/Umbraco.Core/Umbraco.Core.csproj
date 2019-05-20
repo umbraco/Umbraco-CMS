@@ -307,7 +307,6 @@
     <Compile Include="RegisterExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
-    <Compile Include="EnumExtensions.cs" />
     <Compile Include="Events\CancellableEnumerableObjectEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgsOfTEventObject.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />
@@ -445,7 +444,6 @@
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\SimpleContentType.cs" />
-    <Compile Include="Models\Sections\ISection.cs" />
     <Compile Include="PackageActions\AllowDoctype.cs" />
     <Compile Include="PackageActions\PublishRootDocument.cs" />
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
@@ -545,7 +543,6 @@
     <Compile Include="Deploy\IUniqueIdentifyingServiceConnector.cs" />
     <Compile Include="Deploy\IValueConnector.cs" />
     <Compile Include="Diagnostics\MiniDump.cs" />
-    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="EmailSender.cs" />
@@ -595,8 +592,6 @@
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
     <Compile Include="GuidUdi.cs" />
-    <Compile Include="HashCodeHelper.cs" />
-    <Compile Include="HashGenerator.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="IntExtensions.cs" />
