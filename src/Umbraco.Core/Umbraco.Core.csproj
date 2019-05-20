@@ -1485,7 +1485,6 @@
     <Compile Include="UdiEntityType.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiRange.cs" />
-    <Compile Include="UdiType.cs" />
     <Compile Include="UdiTypeConverter.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />
