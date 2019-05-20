@@ -16,6 +16,8 @@
     vm.remove = remove;
     vm.openNodeTypePicker = openNodeTypePicker;
 
+    let allowedElements = [];
+    
     // it would be awesome if we could load all scaffolds in one go... however we need to have an eye out for performance,
     // oddly enough it's been shown to actually be slower to load them all at once instead of one at a time
     var scaffoldsLoaded = 0;
@@ -48,6 +50,9 @@
                     return blockConfig.elementType === scaffold.udi;
                 });
             });
+            
+            allowedElements = vm.scaffolds.map(x => x.contentTypeAlias);
+            
             vm.loading = false;
         }
     }
@@ -92,7 +97,7 @@
 
         // this could be used for future limiting on node types
         vm.overlayMenu.availableItems = [];
-        _.each(vm.scaffolds, function (scaffold) {
+        vm.scaffolds.forEach(function (scaffold) {
             vm.overlayMenu.availableItems.push({
                 alias: scaffold.contentTypeAlias,
                 name: scaffold.contentTypeName,
@@ -113,24 +118,22 @@
         }
 
         vm.overlayMenu.pasteItems = [];
-//        var availableNodesForPaste = clipboardService.retriveDataOfType("elementType", contentTypeAliases);
-//        _.each(availableNodesForPaste, function (node) {
-//            vm.overlayMenu.pasteItems.push({
-//                alias: node.contentTypeAlias,
-//                name: node.name, //contentTypeName
-//                data: node,
-//                icon: iconHelper.convertFromLegacyIcon(node.icon)
-//            });
-//        });
-//
-//        vm.overlayMenu.title = vm.overlayMenu.pasteItems.length > 0 ? $scope.labels.grid_addElement : $scope.labels.content_createEmpty;
-//
-//        vm.overlayMenu.clickClearPaste = function ($event) {
-//            $event.stopPropagation();
-//            $event.preventDefault();
-//            clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
-//            vm.overlayMenu.pasteItems = []; // This dialog is not connected via the clipboardService events, so we need to update manually.
-//        };
+        var availableNodesForPaste = clipboardService.retriveDataOfType("elementType", allowedElements);
+        availableNodesForPaste.forEach(function (node) {
+            vm.overlayMenu.pasteItems.push({
+                alias: node.contentTypeAlias,
+                name: node.name, //contentTypeName
+                data: node,
+                icon: iconHelper.convertFromLegacyIcon(node.icon)
+            });
+        });
+
+        vm.overlayMenu.clickClearPaste = function ($event) {
+            $event.stopPropagation();
+            $event.preventDefault();
+            clipboardService.clearEntriesOfType("elementType", allowedElements);
+            vm.overlayMenu.pasteItems = []; // This dialog is not connected via the clipboardService events, so we need to update manually.
+        };
 
         if (vm.overlayMenu.availableItems.length === 1 && vm.overlayMenu.pasteItems.length === 0) {
             // only one scaffold type - no need to display the picker
@@ -144,7 +147,7 @@
 
     function editContent(block) {
         var scaffold = _.findWhere(vm.scaffolds, {
-            udi: block.udi
+            udi: block.udi 
         });
         var element = angular.copy(scaffold);
         _.each(element.variants[0].tabs, function (tab) {
@@ -161,7 +164,7 @@
     function openContent(element, block) {
         var options = {
             element: element,
-            title: "TODO: Edit block title here",
+            title: 'Edit block',
             view: "views/propertyeditors/blockeditor/blockeditor.editcontent.html",
             submit: function (model) {
                 _.each(element.variants[0].tabs, function (tab) {
@@ -169,10 +172,11 @@
                         block.content[property.alias] = property.value;
                     });
                 });
+                            
                 if ($scope.model.value.indexOf(block) < 0) {
                     $scope.model.value.push(block);
                 }
-
+                
                 editorService.close();
             },
             close: function () {

@@ -10,6 +10,8 @@
 
             if ($scope.model.value) {
                 $scope.blocks = $scope.model.value;
+            } else {
+                $scope.model.value = [];
             }
 
             contentTypeResource.getAll()
@@ -23,7 +25,7 @@
             };
 
             $scope.removeBlock = function (index) {
-                $scope.blocks.splice(index, 1);
+                $scope.model.value.splice(index, 1);
             };
 
             $scope.editSettings = function (block) {
@@ -43,7 +45,7 @@
                     submit: function (model) {
                         _.each(model.selection, function (elementType) {
                             block.elementType = elementType.udi;
-                            $scope.blocks.push(block);
+                            $scope.model.value.push(block);
                         });
 
                         editorService.close();

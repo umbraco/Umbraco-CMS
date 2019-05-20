@@ -100,7 +100,7 @@
 
         function link(scope, el, attr, ctrl) {
             if (!scope.editLabelKey) {
-                scope.editLabelKey = "general_edit";
+                scope.editLabelKey = "general_edit"; 
             }
             userService.getCurrentUser().then(function (u) {
                 var isAdmin = u.userGroups.indexOf('admin') !== -1;
