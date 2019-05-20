@@ -116,10 +116,8 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     -->
-    <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
-    <Compile Include="BindingRedirects.cs" />
     <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\AppCacheExtensions.cs" />
@@ -547,9 +545,6 @@
     <Compile Include="Migrations\Expressions\Delete\KeysAndIndexes\DeleteKeysAndIndexesBuilder.cs" />
     <Compile Include="Migrations\IMigrationBuilder.cs" />
     <Compile Include="Migrations\Install\DatabaseBuilder.cs" />
-    <Compile Include="DataTableExtensions.cs" />
-    <Compile Include="DateTimeExtensions.cs" />
-    <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="Deploy\ArtifactBase.cs" />
     <Compile Include="Deploy\ArtifactDependency.cs" />
