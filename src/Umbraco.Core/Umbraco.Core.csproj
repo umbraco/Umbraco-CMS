@@ -328,7 +328,6 @@
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
-    <Compile Include="IMainDom.cs" />
     <Compile Include="IO\IFileSystems.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="GuidUtils.cs" />
@@ -1442,7 +1441,6 @@
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
-    <Compile Include="SimpleMainDom.cs" />
     <Compile Include="Strings\CleanStringType.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
@@ -1472,7 +1470,6 @@
     <Compile Include="Sync\ServerMessengerBase.cs" />
     <Compile Include="Sync\ServerRole.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
-    <Compile Include="SystemUtilities.cs" />
     <Compile Include="ThreadExtensions.cs" />
     <Compile Include="Collections\TopoGraph.cs" />
     <Compile Include="TypeExtensions.cs" />
@@ -1517,7 +1514,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Auditing\" />
-    <Folder Include="Exceptions" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
