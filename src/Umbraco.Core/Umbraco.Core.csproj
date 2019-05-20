@@ -545,7 +545,6 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
     <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
-    <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
@@ -1509,7 +1508,6 @@
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />
-    <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="PackageActions\IPackageAction.cs" />
     <Compile Include="PackageActions\PackageActionCollection.cs" />
