@@ -5,7 +5,6 @@
 
         return {
             restrict: "E",
-            replace: true,
             templateUrl: "views/propertyeditors/blockeditor/blockeditor.blocks.html",
             link: link
         };

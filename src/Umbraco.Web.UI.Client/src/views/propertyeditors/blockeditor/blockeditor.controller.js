@@ -14,6 +14,8 @@
     vm.editContent = editContent;
     vm.editSettings = editSettings;
     vm.remove = remove;
+    // TODO: this needs to be configurable on data type level
+    vm.blocksView = null; // "/App_Plugins/MyBlockEditor/myblockeditor.html";
 
     // it would be awesome if we could load all scaffolds in one go... however we need to have an eye out for performance,
     // oddly enough it's been shown to actually be slower to load them all at once instead of one at a time
@@ -44,6 +46,12 @@
                     return blockConfig.elementType === scaffold.udi;
                 });
             });
+
+            _.each($scope.model.value, function (block) {
+                applyFakeSettings(block);
+            });
+
+
             vm.loading = false;
         }
     }
@@ -85,6 +93,7 @@
                 });
                 if ($scope.model.value.indexOf(block) < 0) {
                     $scope.model.value.push(block);
+                    applyFakeSettings(block);
                 }
 
                 editorService.close();
@@ -103,7 +112,7 @@
             view: "views/propertyeditors/blockeditor/blockeditor.editsettings.html",
             size: "medium",
             submit: function(model) {
-                console.log("TODO: something with block settings", model)
+                applyFakeSettings(block);
                 editorService.close();
             },
             close: function() {
@@ -114,11 +123,18 @@
     }
 
     function remove(block) {
+        // this should be replaced by a custom dialog (pending some PRs)
         if (confirm("TODO: Are you sure?")) {
             $scope.model.value.splice($scope.model.value.indexOf(block), 1);
         }
     }
 
     init();
+
+    // TODO: remove this (only for testing)
+    function applyFakeSettings(block) {
+        block.settings["cols"] = 1 + Math.floor(Math.random() * 3);
+        block.settings["rows"] = 1 + Math.floor(Math.random() * 2);
+    }
 }
 angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockEditor.PropertyEditorController", BlockEditorPropertyEditorController);
