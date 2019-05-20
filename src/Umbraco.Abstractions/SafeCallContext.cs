@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core
 {
-    internal class SafeCallContext : IDisposable
+    public class SafeCallContext : IDisposable
     {
         private static readonly List<Func<object>> EnterFuncs = new List<Func<object>>();
         private static readonly List<Action<object>> ExitActions = new List<Action<object>>();

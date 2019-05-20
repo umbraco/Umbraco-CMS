@@ -1275,7 +1275,6 @@
     <Compile Include="ReflectionUtilities.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
-    <Compile Include="SafeCallContext.cs" />
     <Compile Include="Scoping\IInstanceIdentifiable.cs" />
     <Compile Include="Scoping\IScope.cs" />
     <Compile Include="Scoping\IScopeAccessor.cs" />
