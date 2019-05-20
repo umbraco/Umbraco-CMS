@@ -648,7 +648,6 @@
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
     <Compile Include="GuidUdi.cs" />
-    <Compile Include="HashCodeCombiner.cs" />
     <Compile Include="HashCodeHelper.cs" />
     <Compile Include="HashGenerator.cs" />
     <Compile Include="HttpContextExtensions.cs" />
