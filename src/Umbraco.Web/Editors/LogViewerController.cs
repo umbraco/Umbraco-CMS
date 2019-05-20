@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Http;
+using Umbraco.Core;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 

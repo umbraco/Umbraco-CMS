@@ -2,15 +2,12 @@
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

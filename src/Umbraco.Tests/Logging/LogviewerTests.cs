@@ -3,9 +3,9 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Logging
 {
