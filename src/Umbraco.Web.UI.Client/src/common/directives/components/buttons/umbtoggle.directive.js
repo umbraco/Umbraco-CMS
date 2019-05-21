@@ -79,7 +79,7 @@
                 // otherwise other property editors might not yet be ready to receive the event
                 $timeout(function () {
                     eventsService.emit("toggleValue", { value: scope.checked });
-                });
+                }, 100);
             }
 
             function setLabelText() {
