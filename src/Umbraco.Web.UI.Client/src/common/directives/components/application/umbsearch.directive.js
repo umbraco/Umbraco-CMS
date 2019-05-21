@@ -13,7 +13,7 @@
         }
     };
     
-    function umbSearchController($timeout, $element, backdropService, searchService, focusService) {
+    function umbSearchController($timeout, backdropService, searchService, focusService) {
 
         var vm = this;
 
