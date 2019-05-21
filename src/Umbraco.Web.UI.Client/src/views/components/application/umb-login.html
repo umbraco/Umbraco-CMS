@@ -146,7 +146,7 @@
 
                     </div>
 
-                    <form method="POST" name="vm.loginForm" ng-submit="vm.loginSubmit(vm.login, vm.password)">
+                    <form method="POST" name="vm.loginForm" ng-submit="vm.loginSubmit()">
 
                         <div class="control-group" ng-show="vm.loginForm.$invalid">
                             <div class="text-error">{{vm.errorMsg}}</div>
@@ -258,6 +258,11 @@
                         <a class="muted" href="#" prevent-default ng-click="vm.showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
                     </div>
                 </div>
+
+                <div ng-show="vm.view == '2fa-login'">
+                    <div ng-include='vm.twoFactor.view'></div>
+                </div>
+
             </div>
         </div>
     </div>
