@@ -1,5 +1,4 @@
 ﻿<div>
-
     <umb-editor-view>
 
         <umb-editor-header name="model.title"
@@ -27,7 +26,7 @@
                                           focus-on-filled="true"
                                           umb-auto-resize
                                           required
-                                          ng-keypress="vm.submitOnEnter($event)">
+                                          ng-keypress="submitOnEnter($event)">
                                 </textarea>
                             </div>
 
@@ -38,19 +37,19 @@
 
                         <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
 
-                            <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
+                            <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="openDataTypePicker(model.property)">
                                 <localize key="shortcuts_addEditor"></localize>
                             </a>
 
                             <div class="editor clearfix" ng-if="model.property.editor">
 
-                                <a href="" class="editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
+                                <a href="" class="editor-icon-wrapper" ng-click="openDataTypePicker(model.property)">
                                     <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
                                 </a>
 
                                 <div class="editor-details">
-                                    <a href="" class="editor-name" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.dataTypeName }}</a>
-                                    <a href="" class="editor-editor" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.editor }}</a>
+                                    <a href="" class="editor-name" ng-click="openDataTypePicker(model.property)" ng-bind="model.property.dataTypeName"></a>
+                                    <a href="" class="editor-editor" ng-click="openDataTypePicker(model.property)" ng-bind="model.property.editor"></a>
                                 </div>
 
                                 <a href class="editor-settings-icon pull-right"
@@ -88,5 +87,4 @@
         </umb-editor-footer>
 
     </umb-editor-view>
-
 </div>

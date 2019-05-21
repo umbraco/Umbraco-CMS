@@ -28,8 +28,9 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Icon { get; set; }
 
-        [Column("thumbnail")]
-        [Constraint(Default = "folder.png")]
+        //[Column("thumbnail")]
+        //[Constraint(Default = "folder.png")]
+        [ResultColumn]
         public string Thumbnail { get; set; }
 
         [Column("description")]

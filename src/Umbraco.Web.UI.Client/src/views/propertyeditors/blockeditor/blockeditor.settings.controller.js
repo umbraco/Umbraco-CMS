@@ -19,24 +19,17 @@
                     $scope.elementTypes.push(contentType);
                 });
 
-            $scope.addBlock = function () {
-                var block = {};
-                openElementPicker(block);
-            };
-
-            $scope.removeBlock = function (index) {
-                $scope.model.value.splice(index, 1);
-            };
-
-            $scope.editSettings = function (block) {
-                openSettingsPicker(block);
-            };
-
             $scope.$on("formSubmitting", function () {
                 $scope.model.value = $scope.blocks;
             });
 
-            function openElementPicker(block) {
+            $scope.getBlockName = function(udi) {
+                return 'Get block name from somewhere...';
+            }
+            
+            $scope.addBlock = function () {
+
+                var block = {};
 
                 var pickerOptions = {
                     title: "Pick an element type",
@@ -49,6 +42,9 @@
                     submit: function (model) {
                         _.each(model.selection, function (elementType) {
                             block.elementType = elementType.udi;
+                            block.settings = {
+                                view: 'views/propertyeditors/blockeditor/blockeditor.block.html'
+                            }
                             $scope.model.value.push(block);
                         });
 
@@ -62,12 +58,16 @@
                 editorService.open(pickerOptions);
             }
 
-            function openSettingsPicker(block) {
+            $scope.removeBlock = function (index) {
+                $scope.model.value.splice(index, 1);
+            };
+
+            $scope.editSettings = function (block) {
 
                 var pickerOptions = {
                     title: "Block settings",
                     view: "views/propertyeditors/blockeditor/block.settings.html",
-                    size: "small",
+                    size: "small",                    
                     submit: function (model) {
                         block.settings = model;
                         editorService.close();
@@ -80,5 +80,4 @@
                 editorService.open(pickerOptions);
             }
         }
-    ]
-);
+    ]);

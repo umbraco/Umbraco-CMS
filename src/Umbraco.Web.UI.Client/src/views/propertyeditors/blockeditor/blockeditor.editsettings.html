@@ -13,8 +13,10 @@
             <div ng-if="!loading">
                 <umb-box>
                     <umb-box-content>
-                        <ng-form name="editBlockForm" val-form-manager>
-                            <h3>Here be settings editing</h3>
+                        <ng-form name="editBlockForm" class="form-horizontal" val-form-manager>                            
+                            <umb-control-group label="{{key}}" description="" ng-repeat="(key, value) in model.settings">
+                                <input type="text" ng-model="model.settings[key]" ng-model-options="{ debounce: 5000 }"/>
+                            </umb-control-group>
                         </ng-form>
                     </umb-box-content>
                 </umb-box>

@@ -1,26 +1,20 @@
-﻿function BlockEditorDirectiveController($scope, contentResource, editorService) {
-function BlockEditorPropertyEditorController($scope, contentResource, editorService, iconHelper, clipboardService) {
+﻿function BlockEditorDirectiveController($scope, contentResource, editorService, iconHelper, clipboardService) {  
     var vm = this;
 
-    vm.scaffolds = [];
+    vm.scaffolds = []; 
     vm.loading = true;
-    vm.add = add;
-    vm.editContent = editContent;
-    vm.editSettings = editSettings;
-    vm.remove = remove;
-    vm.openNodeTypePicker = openNodeTypePicker;
 
-    let allowedElements = [];
-    
+    let allowedElements = []; 
+     
     // it would be awesome if we could load all scaffolds in one go... however we need to have an eye out for performance,
     // oddly enough it's been shown to actually be slower to load them all at once instead of one at a time
     var scaffoldsLoaded = 0;
-
+ 
     function init() {
         if (!$scope.blocks) {
             $scope.blocks = [];
         }
-        
+
         _.each($scope.config, function (config) {
             contentResource.getScaffoldByUdi(-20, config.elementType).then(function (scaffold) {
                 if (scaffold.isElement) {
@@ -39,7 +33,7 @@ function BlockEditorPropertyEditorController($scope, contentResource, editorServ
         });
     }
 
-    function initIfAllScaffoldsHaveLoaded() {
+    function initIfAllScaffoldsHaveLoaded() { 
         // Initialize when all scaffolds have loaded
         if ($scope.config.length === scaffoldsLoaded) {
             vm.scaffolds = _.sortBy(vm.scaffolds, function (scaffold) {
@@ -51,8 +45,6 @@ function BlockEditorPropertyEditorController($scope, contentResource, editorServ
             _.each($scope.blocks, function (block) {
                 applyFakeSettings(block);
             });
-
-
             
             allowedElements = vm.scaffolds.map(x => x.contentTypeAlias);
             
@@ -60,18 +52,8 @@ function BlockEditorPropertyEditorController($scope, contentResource, editorServ
         }
     }
 
-    function add(scaffold) {
-        var element = angular.copy(scaffold);
-        var block = {
-            udi: element.udi,
-            content: {},
-            settings: {}
-        };
-        openContent(element, block);
-    }
-
-    // nw => this needs to be refined, is currently largely a copy from nested content
-    function openNodeTypePicker($event) {
+    
+    vm.openNodeTypePicker = function($event) {
         
         vm.overlayMenu = {
             show: false,
@@ -81,16 +63,16 @@ function BlockEditorPropertyEditorController($scope, contentResource, editorServ
             view: "itempicker",
             event: $event,
             clickPasteItem: function (item) {
-                $scope.pasteFromClipboard(item.data);
+                vm.pasteFromClipboard(item.data);
                 vm.overlayMenu.show = false;
                 vm.overlayMenu = null;
             },
             submit: function (model) {
                 if (model && model.selectedItem) {                    
-                    add(vm.scaffolds.filter(x => x.contentTypeAlias === model.selectedItem.alias)[0]);
+                    vm.add(vm.scaffolds.filter(x => x.contentTypeAlias === model.selectedItem.alias)[0]);
                 }
                 vm.overlayMenu.show = false;
-                vm.overlayMenu = null;
+                vm.overlayMenu = null; 
             },
             close: function () {
                 vm.overlayMenu.show = false;
@@ -140,15 +122,28 @@ function BlockEditorPropertyEditorController($scope, contentResource, editorServ
 
         if (vm.overlayMenu.availableItems.length === 1 && vm.overlayMenu.pasteItems.length === 0) {
             // only one scaffold type - no need to display the picker
-            add(vm.scaffolds[0]);
+            vm.add(vm.scaffolds[0]);
             return;
         }
 
         vm.overlayMenu.show = true;
+    } 
+    
+     vm.add = function(scaffold) {
+        var element = angular.copy(scaffold);
+        var block = {
+            udi: element.udi,
+            icon: element.icon, 
+            description: element.documentType.description, // probably don't want to persist these.
+            content: {},
+            settings: {
+                view: 'views/propertyeditors/blockeditor/blockeditor.block.html'
+            }  
+        };
+        vm.openContent(element, block);
     }
 
-
-    function editContent(block) {
+    vm.editContent = function(block) {
         var scaffold = _.findWhere(vm.scaffolds, {
             udi: block.udi 
         });
@@ -161,10 +156,10 @@ function BlockEditorPropertyEditorController($scope, contentResource, editorServ
             });
         });
 
-        openContent(element, block);
+        vm.openContent(element, block);
     }
 
-    function openContent(element, block) {
+    vm.openContent = function(element, block) {
         var options = {
             element: element,
             title: 'Edit block',
@@ -189,14 +184,13 @@ function BlockEditorPropertyEditorController($scope, contentResource, editorServ
         editorService.open(options);
     }
 
-    function editSettings(block) {
+    vm.editSettings = function(block) {
         var options = {
             settings: block.settings,
-            title: "TODO: Edit settings title here",
+            title: "Edit settings",
             view: "views/propertyeditors/blockeditor/blockeditor.editsettings.html",
-            size: "medium",
+            size: "small",
             submit: function(model) {
-                applyFakeSettings(block);
                 editorService.close();
             },
             close: function () {
@@ -206,19 +200,22 @@ function BlockEditorPropertyEditorController($scope, contentResource, editorServ
         editorService.open(options);
     }
 
-    function remove(block) {
+    vm.remove = function(block) {
         // this should be replaced by a custom dialog (pending some PRs)
         if (confirm("TODO: Are you sure?")) {
             $scope.blocks.splice($scope.blocks.indexOf(block), 1);
         }
     }
-
-    init();
-
-    // TODO: remove this (only for testing)
+    
+        // TODO: remove this (only for testing)
+    // currently pushes random values for setting a css grid location
     function applyFakeSettings(block) {
-        block.settings["cols"] = 1 + Math.floor(Math.random() * 3);
-        block.settings["rows"] = 1 + Math.floor(Math.random() * 2);
+        block.settings["col"] = 1 + Math.floor(Math.random() * 7);
+        block.settings["row"] = 1 + Math.floor(Math.random() * 7);
+        block.settings["w"] = 1 + Math.floor(Math.random() * 3);
+        block.settings["h"] = 1 + Math.floor(Math.random() * 3);
     }
+    
+    init();
 }
-angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockEditor.DirectiveController", BlockEditorDirectiveController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockEditor.DirectiveController", ['$scope', 'contentResource', 'editorService', 'iconHelper', 'clipboardService', BlockEditorDirectiveController]);

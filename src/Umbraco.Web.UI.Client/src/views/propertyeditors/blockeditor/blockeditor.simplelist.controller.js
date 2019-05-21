@@ -1,9 +1,9 @@
-﻿function BlockEditorSimpleListController($scope, contentResource, editorService) {
+﻿function BlockEditorSimpleListController($scope) {
     $scope.sortableOptions = {
-        axis: "y",
+        axis: "y", 
         cursor: "move",
         handle: ".handle",
         tolerance: 'pointer'
     };
 }
-angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockEditor.SimpleListController", BlockEditorSimpleListController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockEditor.SimpleListController", ['$scope', BlockEditorSimpleListController]);

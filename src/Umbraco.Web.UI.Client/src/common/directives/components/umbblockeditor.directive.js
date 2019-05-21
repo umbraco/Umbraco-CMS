@@ -1,11 +1,7 @@
 ﻿angular.module("umbraco.directives").directive('umbBlockEditor', [
     function () {
-        var link = function (scope, el, attr, ctrl) {
-            scope.view = attr.view || "views/propertyeditors/blockeditor/blockeditor.simplelist.html";
-        };
-
         return {
-            restrict: "E",
+            restrict: "E", 
             templateUrl: "views/propertyeditors/blockeditor/blockeditor.directive.html",
             scope: {
                 config: "=",
@@ -14,7 +10,7 @@
             },
             controller: "Umbraco.PropertyEditors.BlockEditor.DirectiveController",
             controllerAs: "vm",
-            link: link
         };
-    }
-]);
+    } 
+]); 
+ 

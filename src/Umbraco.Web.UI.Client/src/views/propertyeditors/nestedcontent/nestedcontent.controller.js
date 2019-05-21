@@ -18,7 +18,7 @@
         $scope.remove = function (index) {
             $scope.model.value.splice(index, 1);
         }
-
+  
         $scope.sortableOptions = {
             axis: "y",
             cursor: "move",
