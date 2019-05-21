@@ -13,7 +13,7 @@
         }
     };
     
-    function umbSearchController($timeout, backdropService, searchService, focusService) {
+    function umbSearchController($timeout, $element, backdropService, searchService, focusService) {
 
         var vm = this;
 
@@ -22,12 +22,15 @@
         vm.search = search;
         vm.clickItem = clickItem;
         vm.clearSearch = clearSearch;
-        vm.handleKeyUp = handleKeyUp;
+        vm.handleKeyDown = handleKeyDown;
         vm.closeSearch = closeSearch;
         vm.focusSearch = focusSearch;
         
         //we need to capture the focus before this element is initialized.
         vm.focusBeforeOpening = focusService.getLastKnownFocus();
+
+        vm.activeResult = null;
+        vm.activeResultGroup = null;
 
         function onInit() {
             vm.searchQuery = "";
@@ -72,14 +75,66 @@
          * Handles all keyboard events
          * @param {object} event
          */
-        function handleKeyUp(event) {
-            
-            event.stopPropagation();
-            event.preventDefault();
+        function handleKeyDown(event) {
             
             // esc
             if(event.keyCode === 27) {
+                event.stopPropagation();
+                event.preventDefault();
+                
                 closeSearch();
+                return;            
+            }
+
+            // up/down (navigate search results)
+            if (vm.hasResults && (event.keyCode === 38 || event.keyCode === 40)) {
+                event.stopPropagation();
+                event.preventDefault();
+
+                var allGroups = _.values(vm.searchResults);
+                var down = event.keyCode === 40;
+                if (vm.activeResultGroup === null) {
+                    // it's the first time navigating, pick the appropriate group and result 
+                    // - first group and first result when navigating down
+                    // - last group and last result when navigating up
+                    vm.activeResultGroup = down ? _.first(allGroups) : _.last(allGroups);
+                    vm.activeResult = down ? _.first(vm.activeResultGroup.results) : _.last(vm.activeResultGroup.results);
+                }
+                else if (down) {
+                    // handle navigation down through the groups and results
+                    if (vm.activeResult === _.last(vm.activeResultGroup.results)) {
+                        if (vm.activeResultGroup === _.last(allGroups)) {
+                            vm.activeResultGroup = _.first(allGroups);
+                        }
+                        else {
+                            vm.activeResultGroup = allGroups[allGroups.indexOf(vm.activeResultGroup) + 1];
+                        }
+                        vm.activeResult = _.first(vm.activeResultGroup.results);
+                    }
+                    else {
+                        vm.activeResult = vm.activeResultGroup.results[vm.activeResultGroup.results.indexOf(vm.activeResult) + 1];
+                    }
+                }
+                else {
+                    // handle navigation up through the groups and results
+                    if (vm.activeResult === _.first(vm.activeResultGroup.results)) {
+                        if (vm.activeResultGroup === _.first(allGroups)) {
+                            vm.activeResultGroup = _.last(allGroups);
+                        }
+                        else {
+                            vm.activeResultGroup = allGroups[allGroups.indexOf(vm.activeResultGroup) - 1];
+                        }
+                        vm.activeResult = _.last(vm.activeResultGroup.results);
+                    }
+                    else {
+                        vm.activeResult = vm.activeResultGroup.results[vm.activeResultGroup.results.indexOf(vm.activeResult) - 1];
+                    }
+                }
+
+                $timeout(function () {
+                    var resultElementLink = angular.element(".umb-search-item[active-result='true'] .umb-search-result__link");
+                    resultElementLink[0].focus();
+                });
             }
         }
 
