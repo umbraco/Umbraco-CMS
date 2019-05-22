@@ -178,6 +178,7 @@ namespace Umbraco.Web.Models.Mapping
             var result = Roles.GetAllRoles().Distinct()
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 .Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
+                .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x, x => false);
 
             // if user has no roles, just return the dictionary
