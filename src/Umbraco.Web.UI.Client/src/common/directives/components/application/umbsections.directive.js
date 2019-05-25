@@ -42,7 +42,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
             function calculateWidth() {
                 $timeout(function () {
                     //total width minus room for avatar, search, and help icon
-                    var windowWidth = $(window).width() - 200;
+                    var windowWidth = $(window).width()-150;
                     var sectionsWidth = 0;
                     scope.totalSections = scope.sections.length;
                     scope.maxSections = maxSections;
