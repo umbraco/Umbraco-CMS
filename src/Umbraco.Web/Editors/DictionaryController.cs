@@ -48,9 +48,16 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage DeleteById(int id)
         {
             var foundDictionary = Services.LocalizationService.GetDictionaryItemById(id);
-
+            
             if (foundDictionary == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var foundDictionaryDescendants = Services.LocalizationService.GetDictionaryItemDescendants(foundDictionary.Key);
+
+            foreach (var dictionaryItem in foundDictionaryDescendants)
+            {
+                Services.LocalizationService.Delete(dictionaryItem, Security.CurrentUser.Id);
+            }
 
             Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
 
