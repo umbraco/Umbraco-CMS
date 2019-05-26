@@ -406,6 +406,29 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 });
         },
 
+        getGroupsAssignedToBlueprintById: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetGroupsAssignedToBlueprintById",
+                        [{ id: id }])),
+                'Failed to retrieve user groups assigned to blueprint for id ' + id);
+        },
+
+        assignGroupsToBlueprintById: function (id, userGroupIds) {
+            if (!id) {
+                throw "contentId cannot be null";
+            }
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "AssignGroupsToBlueprintById",
+                        { id: id, userGroupIds: userGroupIds })),
+                'Failed to assign user groups for blueprint id ' + id);
+        },
+
         getNotifySettingsById: function (id) {
             return umbRequestHelper.resourcePromise(
                 $http.get(

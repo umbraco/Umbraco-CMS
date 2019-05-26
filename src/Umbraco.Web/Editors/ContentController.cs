@@ -265,6 +265,17 @@ namespace Umbraco.Web.Editors
             return content;
         }
 
+        public IEnumerable<UserGroupBasic> GetGroupsAssignedToBlueprintById(int id)
+        {
+            return Mapper.MapEnumerable<IUserGroup, UserGroupBasic>(Services.ContentService.GetGroupsAssignedToBlueprintById(id));
+        }
+
+        [HttpPost]
+        public void AssignGroupsToBlueprintById([FromUri]int id, [FromUri]int[] userGroupIds)
+        {
+            Services.ContentService.AssignGroupsToBlueprintById(id, userGroupIds);
+        }
+
         private static void SetupBlueprint(ContentItemDisplay content, IContent persistedContent)
         {
             content.AllowPreview = false;

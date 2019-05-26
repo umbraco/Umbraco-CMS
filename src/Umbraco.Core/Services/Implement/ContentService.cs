@@ -2915,6 +2915,25 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IEnumerable<IUserGroup> GetGroupsAssignedToBlueprintById(int id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentBlueprintRepository.GetGroupsAssignedToBlueprint(id);
+            }
+        }
+
+        public void AssignGroupsToBlueprintById(int id, int[] userGroupIds)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.WriteLock(Constants.Locks.ContentTree);
+                 _documentBlueprintRepository.AssignGroupsToBlueprint(id, userGroupIds);
+                scope.Complete();
+            }
+        }
+
         public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())

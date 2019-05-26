@@ -141,6 +141,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}");
             To<ChangeNuCacheJsonFormat>("{80C0A0CB-0DD5-4573-B000-C4B7C313C70D}");
             To<ConvertTinyMceAndGridMediaUrlsToLocalLink>("{B69B6E8C-A769-4044-A27E-4A4E18D1645A}");
+            To<AddUserGroupToContentTemplateTables>("{3E6E7580-F332-4C48-A152-9102443AAD10}");
 
             //FINAL
 

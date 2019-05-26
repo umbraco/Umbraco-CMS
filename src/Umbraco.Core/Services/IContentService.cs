@@ -31,6 +31,16 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeId);
 
         /// <summary>
+        /// Gets the collection of user groups assigned to the blueprint.
+        /// </summary>
+        IEnumerable<IUserGroup> GetGroupsAssignedToBlueprintById(int id);
+
+        /// <summary>
+        /// Assigns the set of uer groups to the blueprint
+        /// </summary>
+        void AssignGroupsToBlueprintById(int id, int[] userGroupIds);
+
+        /// <summary>
         /// Saves a blueprint.
         /// </summary>
         void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);

@@ -2,13 +2,13 @@
 
 namespace Umbraco.Web.Actions
 {
-    public class ActionCreateBlueprintFromContent : IAction
+    public class ActionRestrictBlueprintToUserGroups : IAction
     {
-        public char Letter => 'ï';
+        public char Letter => 'ü';
         public bool ShowInNotifier => false;
         public bool CanBePermissionAssigned => true;
-        public string Icon => "blueprint";
-        public string Alias => "createblueprint";
+        public string Icon => "users";
+        public string Alias => "restrictToUserGroups";
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
     }
 }

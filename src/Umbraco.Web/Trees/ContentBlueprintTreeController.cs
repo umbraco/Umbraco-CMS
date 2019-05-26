@@ -23,7 +23,6 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class ContentBlueprintTreeController : TreeController
     {
-
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
@@ -111,6 +110,7 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
+            menu.Items.Add<ActionRestrictBlueprintToUserGroups>(Services.TextService, opensDialog: true);
             menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             return menu;

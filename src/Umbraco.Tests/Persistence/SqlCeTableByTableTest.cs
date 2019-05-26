@@ -521,5 +521,20 @@ namespace Umbraco.Tests.Persistence
                 scope.Complete();
             }
         }
+
+        [Test]
+        public void Can_Create_umbracoUserGroup2ContentTemplate_Table()
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var helper = new DatabaseSchemaCreator(scope.Database, Mock.Of<ILogger>());
+
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<UserGroupDto>();
+                helper.CreateTable<UserGroup2ContentTemplateDto>();
+
+                scope.Complete();
+            }
+        }
     }
 }
