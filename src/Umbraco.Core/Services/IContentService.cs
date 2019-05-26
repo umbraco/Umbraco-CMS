@@ -33,7 +33,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets blueprints for a content type.
         /// </summary>
-        IEnumerable<IContent> GetBlueprintsForContentTypes(int contentTypeId);
+        IEnumerable<IContent> GetBlueprintsForContentTypes(int contentTypeId, int[] userGroupIds = null);
 
         /// <summary>
         /// Gets blueprints for a content type.

@@ -153,7 +153,8 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(ct2.DefaultTemplate);
             contentTypeService.Save(ct2);
 
-            for (int i = 0; i < 10; i++)
+            // Create 10 blueprints across 2 content types
+            for (var i = 0; i < 10; i++)
             {
                 var blueprint = MockedContent.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, Constants.System.Root);
                 contentService.SaveBlueprint(blueprint);
@@ -167,6 +168,53 @@ namespace Umbraco.Tests.Services
 
             found = contentService.GetBlueprintsForContentTypes(ct2.Id).ToArray();
             Assert.AreEqual(5, found.Length);
+        }
+
+        [Test]
+        public void Get_All_Blueprints_Available_To_User_Groups()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var ct1 = MockedContentTypes.CreateTextPageContentType("ct1");
+            ServiceContext.FileService.SaveTemplate(ct1.DefaultTemplate);
+            contentTypeService.Save(ct1);
+            var ct2 = MockedContentTypes.CreateTextPageContentType("ct2");
+            ServiceContext.FileService.SaveTemplate(ct2.DefaultTemplate);
+            contentTypeService.Save(ct2);
+
+            // Create 10 blueprints across 2 content types
+            // - assign #1 to a matching user group
+            // - assign #2 to a non-matching user group
+            for (var i = 0; i < 10; i++)
+            {
+                var blueprint = MockedContent.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, Constants.System.Root);
+                contentService.SaveBlueprint(blueprint);
+
+                if (i == 0)
+                {
+                    contentService.AssignGroupsToBlueprintById(blueprint.Id, new[] { 2, 3});
+                }
+                else if (i == 1)
+                {
+                    contentService.AssignGroupsToBlueprintById(blueprint.Id, new[] { 3, 4 });
+                }
+            }
+
+            var userGroupIds = new[] { 2, 5 };
+            var found = contentService.GetBlueprintsForContentTypes(new[] { ct1.Id, ct2.Id }, userGroupIds).ToArray();
+            Assert.AreEqual(9, found.Length);
+
+            found = contentService.GetBlueprintsForContentTypes(ct1.Id, userGroupIds).ToArray();
+            Assert.AreEqual(5, found.Length);
+
+            found = contentService.GetBlueprintsForContentTypes(ct2.Id, userGroupIds).ToArray();
+            Assert.AreEqual(4, found.Length);
+
+            // With the administrator user group, all blueprints should be available
+            userGroupIds = new[] { Constants.Security.AdminGroupId };
+            found = contentService.GetBlueprintsForContentTypes(new[] { ct1.Id, ct2.Id }, userGroupIds).ToArray();
+            Assert.AreEqual(10, found.Length);
         }
 
         [Test]

@@ -2903,9 +2903,9 @@ namespace Umbraco.Core.Services.Implement
             return GetBlueprintsForContentTypes(new int[0]);
         }
 
-        public IEnumerable<IContent> GetBlueprintsForContentTypes(int contentTypeId)
+        public IEnumerable<IContent> GetBlueprintsForContentTypes(int contentTypeId, int[] userGroupIds = null)
         {
-            return GetBlueprintsForContentTypes(new[] { contentTypeId });
+            return GetBlueprintsForContentTypes(new[] { contentTypeId }, userGroupIds);
         }
 
         public IEnumerable<IContent> GetBlueprintsForContentTypes(int[] contentTypeIds, int[] userGroupIds = null)
