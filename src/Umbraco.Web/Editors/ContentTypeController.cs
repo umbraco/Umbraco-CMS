@@ -441,7 +441,9 @@ namespace Umbraco.Web.Editors
             }
 
             //map the blueprints
-            var blueprints = Services.ContentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray()).ToArray();
+            var contentTypeIds = types.Select(x => x.Id).ToArray();
+            var userGroupIds = Security.CurrentUser.Groups.Select(x => x.Id).ToArray();
+            var blueprints = Services.ContentService.GetBlueprintsForContentTypes(contentTypeIds, userGroupIds).ToArray();
             foreach (var basic in basics)
             {
                 var docTypeBluePrints = blueprints.Where(x => x.ContentTypeId == (int) basic.Id).ToArray();

@@ -35,6 +35,7 @@ namespace Umbraco.Web.Trees
 
             return root;
         }
+
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();

@@ -10,7 +10,6 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-
     /// <summary>
     /// Override the base content repository so we can change the node object type
     /// </summary>
@@ -67,6 +66,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     };
                 Database.Insert(dto);
             }
+        }
+
+        public IEnumerable<int> GetBlueprintsAvailableToUserGroups(int[] userGroupIds)
+        {
+            // Any blueprint that aren't assigned to any user groups are available.
+            var inSql = Sql()
+                .Select<UserGroup2ContentTemplateDto>(x => x.NodeId)
+                .From<UserGroup2ContentTemplateDto>();
+
+            var sql = Sql()
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .WhereNotIn<NodeDto>(x => x.NodeId, inSql);
+            var nodeIds = Database.Fetch<NodeDto>(sql).Select(x => x.NodeId).ToList();
+            if (userGroupIds == null || userGroupIds.Length == 0)
+            {
+                return nodeIds;
+            }
+
+            // Also, any blue prints that are assigned to one of the provided user groups are available for use.
+            sql = Sql()
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .LeftJoin<UserGroup2ContentTemplateDto>()
+                .On<NodeDto, UserGroup2ContentTemplateDto>(left => left.NodeId, right => right.NodeId)
+                .Where<UserGroup2ContentTemplateDto>(x => userGroupIds.Contains(x.UserGroupId));
+            nodeIds.AddRange(Database.Fetch<NodeDto>(sql).Select(x => x.NodeId));
+            return nodeIds;
         }
     }
 }
