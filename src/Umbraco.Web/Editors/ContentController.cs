@@ -552,6 +552,8 @@ namespace Umbraco.Web.Editors
 
             Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId().ResultOr(0));
 
+            AssignUserGroupsToBlueprint(blueprint);
+
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
                 Services.TextService.Localize("blueprints/createdBlueprintHeading"),
@@ -559,6 +561,29 @@ namespace Umbraco.Web.Editors
             );
 
             return notificationModel;
+        }
+
+        private void AssignUserGroupsToBlueprint(IContent blueprint)
+        {
+            // If user is non-admin and has a non-root content start node, we'll default the blueprint to only be available to
+            // other users in the same groups.
+            // That way, in for example a multi-site context, each "site"'s users will only have access to their own blueprints
+            // even if document types and templates are shared.
+            var currentUser = Security.CurrentUser;
+            if (ShouldAssignUserGroupsToBlueprint(currentUser))
+            {
+                Services.ContentService.AssignGroupsToBlueprintById(
+                    blueprint.Id,
+                    currentUser.Groups.Select(x => x.Id).ToArray());
+            }
+        }
+
+        private static bool ShouldAssignUserGroupsToBlueprint(IUser currentUser)
+        {
+            return !currentUser.IsAdmin() &&
+                   currentUser.Groups.Any() &&
+                   currentUser.StartContentIds != null &&
+                   !currentUser.StartContentIds.Contains(Constants.System.Root);
         }
 
         private void EnsureUniqueName(string name, IContent content, string modelName)
