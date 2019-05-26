@@ -248,8 +248,11 @@ namespace Umbraco.Web.Trees
 	                OpensDialog = true
 	            });
             }
-			
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
+
+            if((item is DocumentEntitySlim documentEntity && documentEntity.IsContainer) == false)
+            {
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+            }
 
             return menu;
         }
