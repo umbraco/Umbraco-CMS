@@ -372,7 +372,7 @@ namespace Umbraco.Web.Models.Mapping
                 .Where(x => x.CanBePermissionAssigned)
                 .Select(GetPermission)
                 .GroupBy(x => x.Category)
-                .ToDictionary(x => x.Key, x => (IEnumerable<Permission>)x.ToArray());
+                .ToDictionary(x => x.Key, x => (IEnumerable<Permission>)x.OrderBy(y => y.Name).ToArray());
         }
 
         private static string MapContentTypeIcon(EntitySlim entity)
