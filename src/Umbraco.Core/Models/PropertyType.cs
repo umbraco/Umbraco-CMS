@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
@@ -407,7 +406,7 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedEntity = (PropertyType)clone;
-            
+
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {

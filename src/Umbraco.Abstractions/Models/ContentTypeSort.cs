@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models
     public class ContentTypeSort : IValueObject, IDeepCloneable
     {
         // this parameterless ctor should never be used BUT is required by AutoMapper in EntityMapperProfile
-        internal ContentTypeSort() { }
+        public ContentTypeSort() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Object"/> class.
