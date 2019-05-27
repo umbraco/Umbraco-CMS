@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Events
 {
-    internal class EventDefinition : EventDefinitionBase
+    public class EventDefinition : EventDefinitionBase
     {
         private readonly EventHandler _trackedEvent;
         private readonly object _sender;
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Events
         }
     }
 
-    internal class EventDefinition<TEventArgs> : EventDefinitionBase
+    public class EventDefinition<TEventArgs> : EventDefinitionBase
     {
         private readonly EventHandler<TEventArgs> _trackedEvent;
         private readonly object _sender;
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Events
         }
     }
 
-    internal class EventDefinition<TSender, TEventArgs> : EventDefinitionBase
+    public class EventDefinition<TSender, TEventArgs> : EventDefinitionBase
     {
         private readonly TypedEventHandler<TSender, TEventArgs> _trackedEvent;
         private readonly TSender _sender;

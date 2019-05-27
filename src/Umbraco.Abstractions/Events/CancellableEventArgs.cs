@@ -96,7 +96,7 @@ namespace Umbraco.Core.Events
         /// This allows for a bit of flexibility in our event raising - it's not pretty but we need to maintain backwards compatibility
         /// so we cannot change the strongly typed nature for some events.
         /// </remarks>
-        public ReadOnlyDictionary<string, object> AdditionalData { get; internal set; }
+        public ReadOnlyDictionary<string, object> AdditionalData { get; set; }
 
         /// <summary>
         /// This can be used by event subscribers to store state in the event args so they easily deal with custom state data between a starting ("ing")
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Events
         public IDictionary<string, object> EventState
         {
             get => _eventState ?? (_eventState = new Dictionary<string, object>());
-            internal set => _eventState = value;
+            set => _eventState = value;
         }
 
         public bool Equals(CancellableEventArgs other)

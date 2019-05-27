@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Events
 {
-    internal interface IDeletingMediaFilesEventArgs
+    public interface IDeletingMediaFilesEventArgs
     {
         List<string> MediaFilesToDelete { get; }
     }

@@ -22,6 +22,6 @@
         /// <summary>
         /// This is used to track if this message should be used as a default message so that Umbraco doesn't also append it's own default messages
         /// </summary>
-        internal bool IsDefaultEventMessage { get; set; }
+        public bool IsDefaultEventMessage { get; set; }
     }
 }

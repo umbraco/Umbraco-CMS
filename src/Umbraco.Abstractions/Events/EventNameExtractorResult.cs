@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Events
 {
-    internal class EventNameExtractorResult
+    public class EventNameExtractorResult
     {
         public EventNameExtractorError? Error { get; private set; }
         public string Name { get; private set; }

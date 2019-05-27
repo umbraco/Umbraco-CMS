@@ -41,6 +41,6 @@ namespace Umbraco.Core.Events
         /// <remarks>
         /// This is protected so that inheritors can expose it with their own name
         /// </remarks>
-        internal object EventObject { get; set; }
+        public object EventObject { get; set; }
     }
 }

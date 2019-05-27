@@ -8,7 +8,7 @@ namespace Umbraco.Core.Events
     /// will mean that the event will not be dispatched or the args will be filtered to exclude the entity.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    internal class SupersedeEventAttribute : Attribute
+    public class SupersedeEventAttribute : Attribute
     {
         public Type SupersededEventArgsType { get; private set; }
 
