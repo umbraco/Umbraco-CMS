@@ -6,7 +6,7 @@ namespace Umbraco.Web.Actions
     {
         public char Letter => 'ü';
         public bool ShowInNotifier => false;
-        public bool CanBePermissionAssigned => true;
+        public bool CanBePermissionAssigned => false;
         public string Icon => "users";
         public string Alias => "restrictToUserGroups";
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;

@@ -5,9 +5,6 @@ namespace Umbraco.Web.Actions
     /// <summary>
     /// Defines a back office action that can be permission assigned or subscribed to for notifications
     /// </summary>
-    /// <remarks>
-    /// If an IAction returns false for both ShowInNotifier and CanBePermissionAssigned then the IAction should not exist
-    /// </remarks>
     public interface IAction : IDiscoverable
     {
         /// <summary>
