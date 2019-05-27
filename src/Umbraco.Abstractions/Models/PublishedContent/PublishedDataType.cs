@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedDataType"/> class.
         /// </summary>
-        internal PublishedDataType(int id, string editorAlias, Lazy<object> lazyConfiguration)
+        public PublishedDataType(int id, string editorAlias, Lazy<object> lazyConfiguration)
         {
             _lazyConfiguration = lazyConfiguration;
 

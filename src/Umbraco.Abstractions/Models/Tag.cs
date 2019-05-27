@@ -54,6 +54,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public int NodeCount { get; internal set; }
+        public int NodeCount { get; set; }
     }
 }

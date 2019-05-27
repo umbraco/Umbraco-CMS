@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
             : this(path, null)
         { }
 
-        internal Stylesheet(string path, Func<File, string> getFileContent)
+        public Stylesheet(string path, Func<File, string> getFileContent)
             : base(string.IsNullOrEmpty(path) ? path : path.EnsureEndsWith(".css"), getFileContent)
         {
             InitializeProperties();
