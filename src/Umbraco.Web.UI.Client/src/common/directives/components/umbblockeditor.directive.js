@@ -5,12 +5,11 @@
             templateUrl: "views/propertyeditors/blockeditor/blockeditor.directive.html",
             scope: {
                 config: "=",
-                view: "=?",
+                view: "@",
                 blocks: "="
             },
             controller: "Umbraco.PropertyEditors.BlockEditor.DirectiveController",
-            controllerAs: "vm",
+            controllerAs: "vm"
         };
     } 
 ]); 
- 
