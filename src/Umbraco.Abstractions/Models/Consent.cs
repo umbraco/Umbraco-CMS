@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class Consent : EntityBase, IConsent
+    public class Consent : EntityBase, IConsent
     {
         private bool _current;
         private string _source;
@@ -81,6 +81,6 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the previous states of this consent.
         /// </summary>
-        internal List<IConsent> HistoryInternal { get; set; }
+        public List<IConsent> HistoryInternal { get; set; }
     }
 }

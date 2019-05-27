@@ -188,7 +188,6 @@
     <Compile Include="Composing\OrderedCollectionBuilderBase.cs" />
     <Compile Include="Composing\TargetedServiceFactory.cs" />
     <Compile Include="Composing\TypeFinder.cs" />
-    <Compile Include="Composing\TypeHelper.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
     <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
     <Compile Include="Mapping\MapperContext.cs" />
@@ -201,9 +200,6 @@
     <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
     <Compile Include="Models\ContentBaseExtensions.cs" />
     <Compile Include="Models\CultureImpact.cs" />
-    <Compile Include="Models\DeepCloneHelper.cs" />
-    <Compile Include="Models\Entities\EntityBase.cs" />
-    <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
@@ -382,9 +378,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdatePickerIntegerValuesToUdi.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Models\AuditEntry.cs" />
-    <Compile Include="Models\Consent.cs" />
-    <Compile Include="Models\ConsentExtensions.cs" />
-    <Compile Include="Models\ConsentState.cs" />
     <Compile Include="Models\ContentEditing\ContentApp.cs" />
     <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
     <Compile Include="Models\ContentRepositoryExtensions.cs" />
@@ -399,7 +392,6 @@
     <Compile Include="Models\Editors\ContentPropertyFile.cs" />
     <Compile Include="Models\IAuditEntry.cs" />
     <Compile Include="Models\IAuditItem.cs" />
-    <Compile Include="Models\IConsent.cs" />
     <Compile Include="Models\ISimpleContentType.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
@@ -1266,7 +1258,6 @@
     <Compile Include="Serialization\UdiJsonConverter.cs" />
     <Compile Include="Serialization\UdiRangeJsonConverter.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
-    <Compile Include="Services\IConsentService.cs" />
     <Compile Include="Services\IContentTypeBaseServiceProvider.cs" />
     <Compile Include="Services\IEntityXmlSerializer.cs" />
     <Compile Include="Services\Implement\AuditService.cs" />
@@ -1322,7 +1313,6 @@
     <Compile Include="Services\IRedirectUrlService.cs" />
     <Compile Include="Services\IRelationService.cs" />
     <Compile Include="Services\IServerRegistrationService.cs" />
-    <Compile Include="Services\IService.cs" />
     <Compile Include="Services\ITagService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\Implement\LocalizationService.cs" />
@@ -1423,6 +1413,9 @@
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Abstractions</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\Entities" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

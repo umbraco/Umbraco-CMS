@@ -75,7 +75,7 @@ namespace Umbraco.Core.Models.Entities
         /// <summary>
         /// Resets the entity identity.
         /// </summary>
-        internal virtual void ResetIdentity()
+        public virtual void ResetIdentity()
         {
             _id = default;
             _key = Guid.Empty;
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models.Entities
         /// <summary>
         /// Updates the entity when it is being saved for the first time.
         /// </summary>
-        internal virtual void AddingEntity()
+        public virtual void AddingEntity()
         {
             var now = DateTime.Now;
 
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Models.Entities
         /// <summary>
         /// Updates the entity when it is being saved.
         /// </summary>
-        internal virtual void UpdatingEntity()
+        public virtual void UpdatingEntity()
         {
             var now = DateTime.Now;
 

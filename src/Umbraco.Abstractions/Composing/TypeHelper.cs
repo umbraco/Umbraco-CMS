@@ -12,7 +12,7 @@ namespace Umbraco.Core.Composing
     /// A utility class for type checking, this provides internal caching so that calls to these methods will be faster
     /// than doing a manual type check in c#
     /// </summary>
-    internal static class TypeHelper
+    public static class TypeHelper
     {
         private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache
             = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Composing
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
         /// If it cannot be done, null is returned.
         /// </summary>
-        internal static IList CreateGenericEnumerableFromObject(object obj)
+        public static IList CreateGenericEnumerableFromObject(object obj)
         {
             var type = obj.GetType();
 
@@ -323,7 +323,7 @@ namespace Umbraco.Core.Composing
             return MatchType(implementation, contract, new Dictionary<string, Type>());
         }
 
-        internal static bool MatchType(Type implementation, Type contract, IDictionary<string, Type> bindings, bool variance = true)
+        public static bool MatchType(Type implementation, Type contract, IDictionary<string, Type> bindings, bool variance = true)
         {
             if (contract.IsGenericType)
             {

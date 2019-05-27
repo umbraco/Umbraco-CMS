@@ -483,7 +483,7 @@ namespace Umbraco.Core.Models
         /// Method to call when Entity is being saved
         /// </summary>
         /// <remarks>Created date is set and a Unique key is assigned</remarks>
-        internal override void AddingEntity()
+        public override void AddingEntity()
         {
             base.AddingEntity();
 
