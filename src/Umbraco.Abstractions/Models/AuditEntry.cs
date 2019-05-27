@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class AuditEntry : EntityBase, IAuditEntry
+    public class AuditEntry : EntityBase, IAuditEntry
     {
         private int _performingUserId;
         private string _performingDetails;

@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models
         {
         }
 
-        public Guid AccessEntryId { get; internal set; }
+        public Guid AccessEntryId { get; set; }
 
         public string RuleValue
         {

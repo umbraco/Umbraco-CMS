@@ -212,8 +212,11 @@
     <Compile Include="Models\IMediaType.cs" />
     <Compile Include="Models\IMember.cs" />
     <Compile Include="Models\IMemberType.cs" />
+    <Compile Include="Models\MacroProperty.cs" />
+    <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
+    <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
@@ -389,9 +392,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdateDefaultMandatoryLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdatePickerIntegerValuesToUdi.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
-    <Compile Include="Models\AuditEntry.cs" />
-    <Compile Include="Models\ContentEditing\ContentApp.cs" />
-    <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
     <Compile Include="Models\ContentRepositoryExtensions.cs" />
     <Compile Include="Models\ContentSchedule.cs" />
     <Compile Include="Models\ContentScheduleAction.cs" />
@@ -607,7 +607,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddLockTable.cs" />
     <Compile Include="Migrations\Upgrade\Upgrader.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropMigrationsTable.cs" />
-    <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\Content.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="ContentExtensions.cs" />
@@ -624,8 +623,6 @@
     <Compile Include="Models\Editors\ContentPropertyData.cs" />
     <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="Models\EntityExtensions.cs" />
-    <Compile Include="Models\File.cs" />
-    <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\GridValue.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
@@ -635,7 +632,6 @@
     <Compile Include="Models\Identity\IIdentityUserLogin.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Macro.cs" />
-    <Compile Include="Models\MacroProperty.cs" />
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\MediaExtensions.cs" />
     <Compile Include="Models\MediaType.cs" />
@@ -645,11 +641,6 @@
     <Compile Include="Models\Membership\EntityPermission.cs" />
     <Compile Include="Models\Membership\EntityPermissionCollection.cs" />
     <Compile Include="Models\Membership\EntityPermissionSet.cs" />
-    <Compile Include="Models\Membership\IMembershipUser.cs" />
-    <Compile Include="Models\Membership\IProfile.cs" />
-    <Compile Include="Models\Membership\IReadOnlyUserGroup.cs" />
-    <Compile Include="Models\Membership\IUser.cs" />
-    <Compile Include="Models\Membership\IUserGroup.cs" />
     <Compile Include="Models\Membership\MemberCountType.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\Membership\MembershipUserExtensions.cs" />
@@ -660,7 +651,6 @@
     <Compile Include="Models\Membership\UserGroup.cs" />
     <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
-    <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
@@ -668,16 +658,12 @@
     <Compile Include="Models\Packaging\InstallationSummary.cs" />
     <Compile Include="Models\Packaging\PackageAction.cs" />
     <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
-    <Compile Include="Models\PagedResult.cs" />
-    <Compile Include="Models\PartialView.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
     <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\PropertyTypeCollection.cs" />
-    <Compile Include="Models\PublicAccessEntry.cs" />
-    <Compile Include="Models\PublicAccessRule.cs" />
     <Compile Include="Models\PublishedContent\IndexedArrayItem.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContent.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentTypeFactory.cs" />
@@ -702,8 +688,6 @@
     <Compile Include="Models\PublishedContent\PublishedPropertyType.cs" />
     <Compile Include="Models\PublishedContent\PublishedSearchResult.cs" />
     <Compile Include="Models\PublishedContent\RawValueProperty.cs" />
-    <Compile Include="Models\PublishedState.cs" />
-    <Compile Include="Models\Range.cs" />
     <Compile Include="Persistence\Dtos\AccessDto.cs" />
     <Compile Include="Persistence\Dtos\AccessRuleDto.cs" />
     <Compile Include="Persistence\Dtos\CacheInstructionDto.cs" />
@@ -751,7 +735,6 @@
     <Compile Include="Persistence\Dtos\UserGroup2NodePermissionDto.cs" />
     <Compile Include="Persistence\Dtos\UserGroupDto.cs" />
     <Compile Include="Persistence\Dtos\UserStartNodeDto.cs" />
-    <Compile Include="Models\RedirectUrl.cs" />
     <Compile Include="Models\Relation.cs" />
     <Compile Include="Models\RelationType.cs" />
     <Compile Include="Models\Script.cs" />
@@ -818,7 +801,6 @@
     <Compile Include="Persistence\Factories\DictionaryTranslationFactory.cs" />
     <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
     <Compile Include="Persistence\Factories\LanguageFactory.cs" />
-    <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Factories\ContentBaseFactory.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />

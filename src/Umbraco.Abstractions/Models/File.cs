@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         // cannot simply use HasIdentity as some classes (eg Script) override it
         // in a weird way.
         private string _content;
-        internal Func<File, string> GetFileContent { get; set; }
+        public Func<File, string> GetFileContent { get; set; }
 
         protected File(string path, Func<File, string> getFileContent = null)
         {
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
         /// </summary>
         public string VirtualPath { get; set; }
-        
+
         // this exists so that class that manage name and alias differently, eg Template,
         // can implement their own cloning - (though really, not sure it's even needed)
         protected virtual void DeepCloneNameAndAlias(File clone)
