@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Models.Membership
 {
-    internal class MemberExportProperty
+    public class MemberExportProperty
     {
         public int Id { get; set; }
         public string Alias { get; set; }

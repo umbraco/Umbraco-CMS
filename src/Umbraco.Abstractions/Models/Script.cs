@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
+
 
 namespace Umbraco.Core.Models
 {
@@ -16,7 +15,7 @@ namespace Umbraco.Core.Models
             : this(path, (Func<File, string>) null)
         { }
 
-        internal Script(string path, Func<File, string> getFileContent)
+        public Script(string path, Func<File, string> getFileContent)
             : base(path, getFileContent)
         { }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
@@ -17,7 +16,7 @@ namespace Umbraco.Core.Models
         public ContentCultureInfosCollection()
             : base(x => x.Culture, StringComparer.InvariantCultureIgnoreCase)
         { }
-        
+
         /// <summary>
         /// Adds or updates a <see cref="ContentCultureInfos"/> instance.
         /// </summary>

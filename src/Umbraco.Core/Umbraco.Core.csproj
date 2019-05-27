@@ -208,11 +208,18 @@
     <Compile Include="Models\IDataEditor.cs" />
     <Compile Include="Models\IDataType.cs" />
     <Compile Include="Models\IDataValueEditor.cs" />
+    <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\IMedia.cs" />
     <Compile Include="Models\IMediaType.cs" />
     <Compile Include="Models\IMember.cs" />
     <Compile Include="Models\IMemberType.cs" />
     <Compile Include="Models\MacroProperty.cs" />
+    <Compile Include="Models\Membership\ContentPermissionSet.cs" />
+    <Compile Include="Models\Membership\UserGroup.cs" />
+    <Compile Include="Models\Membership\UserGroupExtensions.cs" />
+    <Compile Include="Models\Packaging\PackageDefinition.cs" />
+    <Compile Include="Models\Property.cs" />
+    <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
@@ -398,21 +405,12 @@
     <Compile Include="Models\ContentScheduleCollection.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
-    <Compile Include="Models\ContentCultureInfos.cs" />
-    <Compile Include="Models\ContentCultureInfosCollection.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
-    <Compile Include="Models\Editors\ContentPropertyFile.cs" />
-    <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
-    <Compile Include="Models\Membership\MemberExportModel.cs" />
-    <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\NotificationEmailBodyParams.cs" />
     <Compile Include="Models\NotificationEmailSubjectParams.cs" />
-    <Compile Include="Models\Packaging\ActionRunAt.cs" />
     <Compile Include="Models\Packaging\CompiledPackage.cs" />
     <Compile Include="Models\Packaging\CompiledPackageDocument.cs" />
     <Compile Include="Models\Packaging\CompiledPackageFile.cs" />
-    <Compile Include="Models\Packaging\IPackageInfo.cs" />
-    <Compile Include="Models\Packaging\PackageDefinition.cs" />
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
     <Compile Include="Models\PublishedContent\Fallback.cs" />
@@ -438,7 +436,6 @@
     <Compile Include="Packaging\PackageFileInstallation.cs" />
     <Compile Include="Packaging\PackageInstallType.cs" />
     <Compile Include="Packaging\PackagesRepository.cs" />
-    <Compile Include="Models\Packaging\RequirementsType.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentScheduleDto.cs" />
@@ -620,16 +617,11 @@
     <Compile Include="Models\DictionaryItem.cs" />
     <Compile Include="Models\DictionaryItemExtensions.cs" />
     <Compile Include="Models\DictionaryTranslation.cs" />
-    <Compile Include="Models\Editors\ContentPropertyData.cs" />
     <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="Models\EntityExtensions.cs" />
     <Compile Include="Models\GridValue.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
-    <Compile Include="Models\Identity\IdentityUserClaim.cs" />
-    <Compile Include="Models\Identity\IdentityUserLogin.cs" />
-    <Compile Include="Models\Identity\IdentityUserRole.cs" />
-    <Compile Include="Models\Identity\IIdentityUserLogin.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Macro.cs" />
     <Compile Include="Models\Media.cs" />
@@ -637,29 +629,16 @@
     <Compile Include="Models\MediaType.cs" />
     <Compile Include="Models\Member.cs" />
     <Compile Include="Models\MemberGroup.cs" />
-    <Compile Include="Models\Membership\ContentPermissionSet.cs" />
-    <Compile Include="Models\Membership\EntityPermission.cs" />
-    <Compile Include="Models\Membership\EntityPermissionCollection.cs" />
-    <Compile Include="Models\Membership\EntityPermissionSet.cs" />
-    <Compile Include="Models\Membership\MemberCountType.cs" />
-    <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\Membership\MembershipUserExtensions.cs" />
-    <Compile Include="Models\Membership\ReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\Membership\User.cs" />
-    <Compile Include="Models\Membership\UserGroup.cs" />
-    <Compile Include="Models\Membership\UserGroupExtensions.cs" />
-    <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\Packaging\InstallationSummary.cs" />
-    <Compile Include="Models\Packaging\PackageAction.cs" />
     <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
-    <Compile Include="Models\Property.cs" />
-    <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
     <Compile Include="Models\PropertyType.cs" />
@@ -737,7 +716,6 @@
     <Compile Include="Persistence\Dtos\UserStartNodeDto.cs" />
     <Compile Include="Models\Relation.cs" />
     <Compile Include="Models\RelationType.cs" />
-    <Compile Include="Models\Script.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\Stylesheet.cs" />
     <Compile Include="Models\StylesheetProperty.cs" />
@@ -1369,9 +1347,6 @@
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Abstractions</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Entities" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
