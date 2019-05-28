@@ -61,7 +61,7 @@ namespace Umbraco.Core.Models
         [FriendlyName("Member Group")]
         [UmbracoUdiType(Constants.UdiEntityType.MemberGroup)]
         MemberGroup,
-        
+
         /// <summary>
         /// "Media Type
         /// </summary>

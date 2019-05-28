@@ -4,7 +4,7 @@ using Umbraco.Core.Events;
 namespace Umbraco.Core.Services
 {
     // TODO: no need for Attempt<OperationResult> - the operation result SHOULD KNOW if it's a success or a failure!
-    // but then each WhateverResultType must 
+    // but then each WhateverResultType must
 
     /// <summary>
     /// Represents the result of a service operation.
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Services
 
         // TODO: this exists to support services that still return Attempt<OperationResult>
         // these services should directly return an OperationResult, and then this static class should be deleted
-        internal static class Attempt
+        public static class Attempt
         {
             /// <summary>
             /// Creates a successful operation attempt.

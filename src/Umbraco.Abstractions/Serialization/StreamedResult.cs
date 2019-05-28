@@ -4,7 +4,7 @@ namespace Umbraco.Core.Serialization
 {
     public class StreamedResult : IStreamedResult
     {
-        internal StreamedResult(Stream stream, bool success)
+        public StreamedResult(Stream stream, bool success)
         {
             ResultStream = stream;
             Success = success;

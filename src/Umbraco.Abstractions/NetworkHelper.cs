@@ -5,7 +5,7 @@ namespace Umbraco.Core
     /// <summary>
     /// Currently just used to get the machine name in med trust and to format a machine name for use with file names
     /// </summary>
-    internal class NetworkHelper
+    public class NetworkHelper
     {
         /// <summary>
         /// Returns the machine name that is safe to use in file paths.
