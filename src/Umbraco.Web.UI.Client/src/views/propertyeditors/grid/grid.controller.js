@@ -134,17 +134,17 @@ angular.module("umbraco")
                         (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                         $scope.$apply(function () {
-                            event.target.getScope_HackForSortable().area.dropNotAllowed = true;
+                            area.dropNotAllowed = true;
                         });
 
                         ui.placeholder.hide();
                         cancelMove = true;
                     }
                     else {
-                        if (event.target.getScope_HackForSortable().area.controls.length == 0) {
+                        if (area.controls.length == 0) {
 
                             $scope.$apply(function () {
-                                event.target.getScope_HackForSortable().area.dropOnEmpty = true;
+                                area.dropOnEmpty = true;
                             });
                             ui.placeholder.hide();
                         } else {
