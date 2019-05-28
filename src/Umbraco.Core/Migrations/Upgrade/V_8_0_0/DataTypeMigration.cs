@@ -70,14 +70,16 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 var newAlias = migrator.GetNewAlias(dataType.EditorAlias);
                 if (newAlias == null)
                 {
-                    _logger.Warn<DataTypeMigration>($"Skipping validation of configuration for data type {dataType.NodeId} : {dataType.EditorAlias}."
-                                                    + $" Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.");
+                    _logger.Warn<DataTypeMigration>("Skipping validation of configuration for data type {NodeId} : {EditorAlias}."
+                                                    + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
+                                                    dataType.NodeId, dataType.EditorAlias);
                 }
                 else if (!_propertyEditors.TryGet(newAlias, out var propertyEditor))
                 {
-                    _logger.Warn<DataTypeMigration>($"Skipping validation of configuration for data type {dataType.NodeId} : {newAlias}{(dataType.EditorAlias == newAlias ? "" : $" ({dataType.EditorAlias})")}"
-                                                    + $" because no property editor with alias {newAlias} was found."
-                                                    + $" Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.");
+                    _logger.Warn<DataTypeMigration>("Skipping validation of configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})"
+                                                    + " because no property editor with that alias was found."
+                                                    + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
+                                                    dataType.NodeId, newAlias, dataType.EditorAlias);
                 }
                 else
                 {
@@ -88,8 +90,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     }
                     catch (Exception e)
                     {
-                        _logger.Warn<DataTypeMigration>($"Failed to validate configuration for data type {dataType.NodeId} : {newAlias}{(dataType.EditorAlias == newAlias ? "" : $" ({dataType.EditorAlias})")}."
-                                                        + $" Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.");
+                        _logger.Warn<DataTypeMigration>(e, "Failed to validate configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})."
+                                                        + " Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.",
+                                                        dataType.NodeId, newAlias, dataType.EditorAlias);
                     }
                 }
 
