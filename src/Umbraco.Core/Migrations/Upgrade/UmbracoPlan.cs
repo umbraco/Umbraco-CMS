@@ -14,6 +14,9 @@ namespace Umbraco.Core.Migrations.Upgrade
     /// </summary>
     public class UmbracoPlan : MigrationPlan
     {
+        private const string InitPrefix = "{init-";
+        private const string InitSuffix = "}";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoPlan"/> class.
         /// </summary>
@@ -21,6 +24,27 @@ namespace Umbraco.Core.Migrations.Upgrade
             : base(Constants.System.UmbracoUpgradePlanName)
         {
             DefinePlan();
+        }
+
+        /// <summary>
+        /// Gets the initial state corresponding to a version.
+        /// </summary>
+        private static string GetInitState(SemVersion version)
+            => InitPrefix + version + InitSuffix;
+
+        /// <summary>
+        /// Tries to extract a version from an initial state.
+        /// </summary>
+        private static bool TryGetInitStateVersion(string state, out string version)
+        {
+            if (state.StartsWith(InitPrefix) && state.EndsWith(InitSuffix))
+            {
+                version = state.TrimStart(InitPrefix).TrimEnd(InitSuffix);
+                return true;
+            }
+
+            version = null;
+            return false;
         }
 
         /// <inheritdoc />
@@ -51,15 +75,14 @@ namespace Umbraco.Core.Migrations.Upgrade
                                                         + $" Please upgrade first to at least {minVersion}.");
 
                 // initial state is eg "{init-7.14.0}"
-                return "{init-" + currentVersion + "}";
+                return GetInitState(currentVersion);
             }
         }
 
         protected override void ThrowOnUnknownInitialState(string state)
         {
-            if (state.StartsWith("{init-") && state.EndsWith("}"))
+            if (TryGetInitStateVersion(state, out var initVersion))
             {
-                var initVersion = state.TrimStart("{init-").TrimEnd("}");
                 throw new InvalidOperationException($"Version {UmbracoVersion.SemanticVersion} does not support migrating from {initVersion}."
                                                     + $" Please verify which versions support migrating from {initVersion}.");
             }
@@ -88,7 +111,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // plan starts at 7.14.0 (anything before 7.14.0 is not supported)
             //
-            From("{init-7.14.0}");
+            From(GetInitState(new SemVersion(7, 14, 0)));
 
             // begin migrating from v7 - remove all keys and indexes
             To<DeleteKeysAndIndexes>("{B36B9ABD-374E-465B-9C5F-26AB0D39326F}");
