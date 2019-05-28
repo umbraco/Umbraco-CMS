@@ -132,6 +132,16 @@ ORDER BY TABLE_NAME, INDEX_NAME");
                     item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, item.UNIQUE));
         }
 
+        /// <inheritdoc />
+        public override string GetDefaultConstraint(IDatabase db, string tableName, string columnName)
+        {
+            // cannot return a true default constraint name (does not exist on SqlCe)
+            // but we won't really need it anyways - just check whether there is a constraint
+            var hasDefault = db.Fetch<bool>(@"select column_hasdefault from information_schema.columns
+where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault();
+            return hasDefault ? "XXXXX" : string.Empty;
+        }
+
         public override bool DoesTableExist(IDatabase db, string tableName)
         {
             var result =
@@ -175,7 +185,7 @@ ORDER BY TABLE_NAME, INDEX_NAME");
         {
             get
             {
-                return "ALTER TABLE [{0}] ALTER COLUMN [{1}] DROP DEFAULT";
+                return "ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT";
             }
         }
 

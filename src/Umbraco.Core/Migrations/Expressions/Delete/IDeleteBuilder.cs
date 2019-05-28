@@ -21,12 +21,12 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         /// <summary>
         /// Builds a Delete Keys and Indexes expression, and executes.
         /// </summary>
-        IExecutableBuilder KeysAndIndexes<TDto>(bool pk = true, bool fk = true, bool ix = true);
+        IExecutableBuilder KeysAndIndexes<TDto>(bool local = true, bool foreign = true);
 
         /// <summary>
         /// Builds a Delete Keys and Indexes expression, and executes.
         /// </summary>
-        IExecutableBuilder KeysAndIndexes(string tableName, bool pk = true, bool fk = true, bool ix = true);
+        IExecutableBuilder KeysAndIndexes(string tableName, bool local = true, bool foreign = true);
 
         /// <summary>
         /// Specifies the column to delete.

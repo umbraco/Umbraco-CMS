@@ -10,9 +10,13 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint
         IDeleteDefaultConstraintOnTableBuilder,
         IDeleteDefaultConstraintOnColumnBuilder
     {
-        public DeleteDefaultConstraintBuilder(DeleteDefaultConstraintExpression expression)
+        private readonly IMigrationContext _context;
+
+        public DeleteDefaultConstraintBuilder(IMigrationContext context, DeleteDefaultConstraintExpression expression)
             : base(expression)
-        { }
+        {
+            _context = context;
+        }
 
         /// <inheritdoc />
         public IDeleteDefaultConstraintOnColumnBuilder OnTable(string tableName)
@@ -24,6 +28,8 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint
         /// <inheritdoc />
         public IExecutableBuilder OnColumn(string columnName)
         {
+            var defaultConstraint = _context.SqlContext.SqlSyntax.GetDefaultConstraint(_context.Database, Expression.TableName, columnName);
+            Expression.ConstraintName = defaultConstraint ?? string.Empty;
             Expression.ColumnName = columnName;
             return new ExecutableBuilder(Expression);
         }

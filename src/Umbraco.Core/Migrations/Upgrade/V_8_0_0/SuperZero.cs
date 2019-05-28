@@ -15,7 +15,12 @@
 
             Database.Execute("set identity_insert umbracoUser on;");
             Database.Execute(@"
-                insert into umbracoUser select
+                insert into umbracoUser (id,
+                    userDisabled, userNoConsole, userName, userLogin, userPassword, passwordConfig,
+                    userEmail, userLanguage, securityStampToken, failedLoginAttempts, lastLockoutDate,
+	                lastPasswordChangeDate, lastLoginDate, emailConfirmedDate, invitedDate, 
+	                createDate, updateDate, avatar, tourData)
+                select
                     -1 id,
                     userDisabled, userNoConsole, userName, substring(userLogin, 1, len(userLogin) - 2) userLogin, userPassword, passwordConfig,
 	                userEmail, userLanguage, securityStampToken, failedLoginAttempts, lastLockoutDate,

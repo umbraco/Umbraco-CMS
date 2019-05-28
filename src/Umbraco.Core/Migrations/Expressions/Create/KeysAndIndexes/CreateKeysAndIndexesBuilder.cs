@@ -34,6 +34,16 @@ namespace Umbraco.Core.Migrations.Expressions.Create.KeysAndIndexes
                 ExecuteSql(sql);
             foreach (var sql in syntax.Format(tableDefinition.ForeignKeys))
                 ExecuteSql(sql);
+
+            // note: we do *not* create the DF_ default constraints
+            /*
+            foreach (var column in tableDefinition.Columns)
+            {
+                var sql = syntax.FormatDefaultConstraint(column);
+                if (!sql.IsNullOrWhiteSpace())
+                    ExecuteSql(sql);
+            }
+            */
         }
 
         private void ExecuteSql(string sql)

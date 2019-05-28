@@ -219,9 +219,9 @@ namespace Umbraco.Tests.Migrations
                 // drops *all* tables keys and indexes
                 var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToList();
                 foreach (var table in tables)
-                    Delete.KeysAndIndexes(table, false).Do();
+                    Delete.KeysAndIndexes(table, false, true).Do();
                 foreach (var table in tables)
-                    Delete.KeysAndIndexes(table, true, false, false).Do();
+                    Delete.KeysAndIndexes(table, true, false).Do();
             }
         }
 

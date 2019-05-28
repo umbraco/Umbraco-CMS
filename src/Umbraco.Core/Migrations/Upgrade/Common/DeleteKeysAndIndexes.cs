@@ -67,9 +67,9 @@
             // delete *all* keys and indexes - because of FKs
             // on known v7 tables only
             foreach (var table in tables)
-                Delete.KeysAndIndexes(table, false, true, false).Do();
+                Delete.KeysAndIndexes(table, false, true).Do();
             foreach (var table in tables)
-                Delete.KeysAndIndexes(table, true, false, true).Do();
+                Delete.KeysAndIndexes(table, true, false).Do();
         }
     }
 }

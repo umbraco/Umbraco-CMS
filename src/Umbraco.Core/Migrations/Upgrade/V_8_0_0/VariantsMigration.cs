@@ -213,8 +213,10 @@ WHERE versionId NOT IN (SELECT (versionId) FROM {PreTables.ContentVersion} WHERE
             Delete.Column("text").FromTable(PreTables.Document).Do();
             Delete.Column("templateId").FromTable(PreTables.Document).Do();
             Delete.Column("documentUser").FromTable(PreTables.Document).Do();
+            Delete.DefaultConstraint().OnTable(PreTables.Document).OnColumn("updateDate").Do();
             Delete.Column("updateDate").FromTable(PreTables.Document).Do();
             Delete.Column("versionId").FromTable(PreTables.Document).Do();
+            Delete.DefaultConstraint().OnTable(PreTables.Document).OnColumn("newest").Do();
             Delete.Column("newest").FromTable(PreTables.Document).Do();
 
             // add and populate edited column

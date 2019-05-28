@@ -18,11 +18,9 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
 
         public string TableName { get; set; }
 
-        public bool DeletePrimaryKey { get; set; }
+        public bool DeleteLocal { get; set; }
 
-        public bool DeleteForeignKeys { get; set; }
-
-        public bool DeleteIndexes { get; set; }
+        public bool DeleteForeign { get; set; }
 
         /// <inheritdoc />
         public void Do()
@@ -30,19 +28,26 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
             _context.BuildingExpression = false;
 
             // drop keys
-            if (DeleteForeignKeys || DeletePrimaryKey)
+            if (DeleteLocal || DeleteForeign)
             {
-                var keys = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database).DistinctBy(x => x.Item2).ToList();
-                if (DeleteForeignKeys)
-                    foreach (var key in keys.Where(x => x.Item1 == TableName && x.Item2.StartsWith("FK_")))
+                // table, constraint
+                var tableKeys = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database).DistinctBy(x => x.Item2).ToList();
+                if (DeleteForeign)
+                {
+                    foreach (var key in tableKeys.Where(x => x.Item1 == TableName && x.Item2.StartsWith("FK_")))
                         Delete.ForeignKey(key.Item2).OnTable(key.Item1).Do();
-                if (DeletePrimaryKey)
-                    foreach (var key in keys.Where(x => x.Item1 == TableName && x.Item2.StartsWith("PK_")))
+                }
+                if (DeleteLocal)
+                {
+                    foreach (var key in tableKeys.Where(x => x.Item1 == TableName && x.Item2.StartsWith("PK_")))
                         Delete.PrimaryKey(key.Item2).FromTable(key.Item1).Do();
+
+                    // note: we do *not* delete the DEFAULT constraints
+                }
             }
 
             // drop indexes
-            if (DeleteIndexes)
+            if (DeleteLocal)
             {
                 var indexes = _context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(_context.Database).DistinctBy(x => x.IndexName).ToList();
                 foreach (var index in indexes.Where(x => x.TableName == TableName))
