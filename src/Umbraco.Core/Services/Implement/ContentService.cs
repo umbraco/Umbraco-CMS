@@ -2950,6 +2950,11 @@ namespace Umbraco.Core.Services.Implement
 
         public void AssignGroupsToBlueprintById(int id, int[] userGroupIds)
         {
+            if (userGroupIds == null || userGroupIds.Length == 0)
+            {
+                return;
+            }
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.WriteLock(Constants.Locks.ContentTree);

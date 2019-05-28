@@ -566,7 +566,7 @@ namespace Umbraco.Web.Editors
         private void AssignUserGroupsToBlueprint(IContent blueprint)
         {
             // If user is non-admin and has a non-root content start node, we'll default the blueprint to only be available to
-            // other users in the same groups.
+            // other users in the same groups (that also have non-root, and non-null, start nodes).
             // That way, in for example a multi-site context, each "site"'s users will only have access to their own blueprints
             // even if document types and templates are shared.
             var currentUser = Security.CurrentUser;
@@ -574,14 +574,16 @@ namespace Umbraco.Web.Editors
             {
                 Services.ContentService.AssignGroupsToBlueprintById(
                     blueprint.Id,
-                    currentUser.Groups.Select(x => x.Id).ToArray());
+                    currentUser.Groups
+                        .Where(x => x.StartContentId.HasValue && x.StartContentId != Constants.System.Root)
+                        .Select(x => x.Id)
+                        .ToArray());
             }
         }
 
         private static bool ShouldAssignUserGroupsToBlueprint(IUser currentUser)
         {
             return !currentUser.IsAdmin() &&
-                   currentUser.Groups.Any() &&
                    currentUser.StartContentIds != null &&
                    !currentUser.StartContentIds.Contains(Constants.System.Root);
         }
