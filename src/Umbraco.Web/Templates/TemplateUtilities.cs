@@ -60,7 +60,7 @@ namespace Umbraco.Web.Templates
                             if (guidUdi.EntityType == Constants.UdiEntityType.Document)
                                 newLink = urlProvider.GetUrl(guidUdi.Guid);
                             else if (guidUdi.EntityType == Constants.UdiEntityType.Media)
-                                newLink = mediaCache.GetById(guidUdi.Guid)?.Url;
+                                newLink = mediaCache.GetById(guidUdi.Guid)?.Url();
 
                             if (newLink == null)
                                 newLink = "#";

@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Web
             var snapshotService = Mock.Of<IPublishedSnapshotService>();
             Mock.Get(snapshotService).Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot);
             var media = Mock.Of<IPublishedContent>();
-            Mock.Get(media).Setup(x => x.Url).Returns("/media/1001/my-image.jpg");
+            Mock.Get(media).Setup(x => x.Url(It.IsAny<string>(), It.IsAny<UrlMode>())).Returns("/media/1001/my-image.jpg");
             var mediaCache = Mock.Of<IPublishedMediaCache>();
             Mock.Get(mediaCache).Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media);
 
