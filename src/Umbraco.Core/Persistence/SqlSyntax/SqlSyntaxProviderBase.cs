@@ -223,7 +223,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public abstract IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
 
-        public abstract string GetDefaultConstraint(IDatabase db, string tableName, string columnName);
+        public abstract bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
 
         public virtual bool DoesTableExist(IDatabase db, string tableName)
         {

@@ -28,9 +28,10 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint
         /// <inheritdoc />
         public IExecutableBuilder OnColumn(string columnName)
         {
-            var defaultConstraint = _context.SqlContext.SqlSyntax.GetDefaultConstraint(_context.Database, Expression.TableName, columnName);
-            Expression.ConstraintName = defaultConstraint ?? string.Empty;
             Expression.ColumnName = columnName;
+            Expression.HasDefaultConstraint = _context.SqlContext.SqlSyntax.TryGetDefaultConstraint(_context.Database, Expression.TableName, columnName, out var constraintName);
+            Expression.ConstraintName = constraintName ?? string.Empty;
+
             return new ExecutableBuilder(Expression);
         }
     }

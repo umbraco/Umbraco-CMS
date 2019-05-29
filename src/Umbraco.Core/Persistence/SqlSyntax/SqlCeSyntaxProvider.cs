@@ -133,13 +133,14 @@ ORDER BY TABLE_NAME, INDEX_NAME");
         }
 
         /// <inheritdoc />
-        public override string GetDefaultConstraint(IDatabase db, string tableName, string columnName)
+        public override bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName)
         {
             // cannot return a true default constraint name (does not exist on SqlCe)
             // but we won't really need it anyways - just check whether there is a constraint
+            constraintName = null;
             var hasDefault = db.Fetch<bool>(@"select column_hasdefault from information_schema.columns
 where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault();
-            return hasDefault ? "XXXXX" : string.Empty;
+            return hasDefault;
         }
 
         public override bool DoesTableExist(IDatabase db, string tableName)

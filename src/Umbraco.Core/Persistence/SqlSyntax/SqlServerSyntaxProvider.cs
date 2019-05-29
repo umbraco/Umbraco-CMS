@@ -226,14 +226,15 @@ order by T.name, I.name");
         }
 
         /// <inheritdoc />
-        public override string GetDefaultConstraint(IDatabase db, string tableName, string columnName)
+        public override bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName)
         {
-            return db.Fetch<string>(@"select con.[name] as [constraintName]
+            constraintName = db.Fetch<string>(@"select con.[name] as [constraintName]
 from sys.default_constraints con
 join sys.columns col on con.object_id=col.default_object_id
 join sys.tables tbl on col.object_id=tbl.object_id
 where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
-                       .FirstOrDefault() ?? string.Empty;
+                       .FirstOrDefault();
+            return !constraintName.IsNullOrWhiteSpace();
         }
 
         public override bool DoesTableExist(IDatabase db, string tableName)

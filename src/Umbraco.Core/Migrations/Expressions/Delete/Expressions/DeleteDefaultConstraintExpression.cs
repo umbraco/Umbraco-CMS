@@ -11,15 +11,16 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
         public virtual string TableName { get; set; }
         public virtual string ColumnName { get; set; }
         public virtual string ConstraintName { get; set; }
+        public virtual bool HasDefaultConstraint { get; set; }
 
         protected override string GetSql()
         {
-            return ConstraintName.IsNullOrWhiteSpace()
-                ? string.Empty
-                : string.Format(SqlSyntax.DeleteDefaultConstraint,
+            return HasDefaultConstraint
+                ? string.Format(SqlSyntax.DeleteDefaultConstraint,
                     SqlSyntax.GetQuotedTableName(TableName),
                     SqlSyntax.GetQuotedColumnName(ColumnName),
-                    SqlSyntax.GetQuotedName(ConstraintName));
+                    SqlSyntax.GetQuotedName(ConstraintName))
+                : string.Empty;
         }
     }
 }

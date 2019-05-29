@@ -108,12 +108,18 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
 
         /// <summary>
-        /// Gets the name of the default constraint on a column.
+        /// Tries to gets the name of the default constraint on a column.
         /// </summary>
         /// <param name="db">The database.</param>
         /// <param name="tableName">The table name.</param>
         /// <param name="columnName">The column name.</param>
-        /// <returns>The name of the default constraint, or the empty string if there is no default constraint.</returns>
-        string GetDefaultConstraint(IDatabase db, string tableName, string columnName);
+        /// <param name="constraintName">The constraint name.</param>
+        /// <returns>A value indicating whether a default constraint was found.</returns>
+        /// <remarks>
+        /// <para>Some database engines (e.g. SqlCe) may not have names for default constraints,
+        /// in which case the function may return true, but <paramref name="constraintName"/> is
+        /// unspecified.</para>
+        /// </remarks>
+        bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
     }
 }
