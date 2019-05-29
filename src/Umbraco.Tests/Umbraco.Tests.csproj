@@ -139,6 +139,7 @@
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
+    <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />

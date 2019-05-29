@@ -36,5 +36,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             Node.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor);
         }
+
+        public ContentNodeKit Clone()
+            => new ContentNodeKit
+            {
+                ContentTypeId = ContentTypeId,
+                DraftData = DraftData,
+                PublishedData = PublishedData,
+                Node = new ContentNode(Node)
+            };
     }
 }
