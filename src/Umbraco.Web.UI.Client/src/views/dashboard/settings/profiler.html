@@ -1,0 +1,41 @@
+<div ng-controller="Umbraco.Dashboard.ProfilerController as vm" ng-hide="vm.loading">
+    <umb-box>
+        <umb-box-content>
+            <h3 class="bold">Performance profiling</h3>
+            <div ng-show="vm.profilerEnabled">
+                <p>
+                    Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.
+                </p>
+                <p>
+                    If you want to activate the profiler for a specific page rendering, simply add <b>umbDebug=true</b> to the querystring when requesting the page.
+                </p>
+                <p>
+                    If you want the profiler to be activated by default for all page renderings, you can use the toggle below.
+                    It will set a cookie in your browser, which then activates the profiler automatically.
+                    In other words, the profiler will only be active by default in <i>your</i> browser - not everyone else's.
+                </p>
+                <p>&nbsp;</p>
+                <div class="sub-view-columns">
+                    <div class="sub-view-column-left">
+                        <h5>Activate the profiler by default</h5>
+                    </div>
+                    <div class="sub-view-column-right">
+                        <umb-toggle checked="vm.alwaysOn" on-click="vm.toggle()"></umb-toggle>
+                    </div>
+                </div>
+                <h4>Friendly reminder</h4>
+                <p>
+                    You should never let a production site run in debug mode. Debug mode is turned off by setting <b>debug="false"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+                </p>
+            </div>
+            <div ng-hide="vm.profilerEnabled">
+                <p>
+                    Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.
+                </p>
+                <p>
+                    Debug mode is turned on by setting <b>debug="true"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+                </p>
+            </div>
+        </umb-box-content>
+    </umb-box>
+</div>

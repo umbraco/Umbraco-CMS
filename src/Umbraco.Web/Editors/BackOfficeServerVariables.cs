@@ -20,6 +20,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
@@ -308,6 +309,10 @@ namespace Umbraco.Web.Editors
 						{
                             "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
                                 controller => controller.GetNumberOfErrors())
+                        },
+                        {
+                            "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
+                                controller => controller.GetStatus())
                         }
                     }
                 },

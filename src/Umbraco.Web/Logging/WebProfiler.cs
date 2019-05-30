@@ -68,6 +68,7 @@ namespace Umbraco.Web.Logging
             if (request.Result.Url.IsClientSideRequest()) return false;
             if (bool.TryParse(request.Result.QueryString["umbDebug"], out var umbDebug)) return umbDebug;
             if (bool.TryParse(request.Result.Headers["X-UMB-DEBUG"], out var xUmbDebug)) return xUmbDebug;
+            if (bool.TryParse(request.Result.Cookies["UMB-DEBUG"]?.Value, out var cUmbDebug)) return cUmbDebug;
             return false;
         }
 
