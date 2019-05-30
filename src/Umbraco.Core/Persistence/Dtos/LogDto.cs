@@ -41,9 +41,8 @@ namespace Umbraco.Core.Persistence.Dtos
         public DateTime Datestamp { get; set; }
 
         // TODO: Should we have an index on this since we allow searching on it?
-        [Column("logHeader")]
-        [Length(50)]
-        public string Header { get; set; }
+        [Column("logHeader")]      
+        public int Header { get; set; }
 
         [Column("logComment")]
         [NullSetting(NullSetting = NullSettings.Null)]

@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 Comment = entity.Comment,
                 Datestamp = DateTime.Now,
-                Header = entity.AuditType.ToString(),
+                Header = (int)entity.AuditType,
                 NodeId = entity.Id,
                 UserId = entity.UserId,
                 EntityType = entity.EntityType,
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 Comment = entity.Comment,
                 Datestamp = DateTime.Now,
-                Header = entity.AuditType.ToString(),
+                Header = (int)entity.AuditType,
                 NodeId = entity.Id,
                 UserId = entity.UserId,
                 EntityType = entity.EntityType,
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var dto = Database.First<LogDto>(sql);
             return dto == null
                 ? null
-                : new AuditItem(dto.NodeId, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters);
+                : new AuditItem(dto.NodeId, (AuditType)dto.Header, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters);
         }
 
         protected override IEnumerable<IAuditItem> PerformGetAll(params int[] ids)
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<LogDto>(sql);
 
-            return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters)).ToList();
+            return dtos.Select(x => new AuditItem(x.NodeId, (AuditType)x.Header, x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters)).ToList();
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -162,7 +162,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             totalRecords = page.TotalItems;
 
             var items = page.Items.Select(
-                dto => new AuditItem(dto.Id, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters)).ToList();
+                dto => new AuditItem(dto.Id, Enum<AuditType>.ParseOrNull(dto.Header.ToString()) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters)).ToList();
 
             // map the DateStamp
             for (var i = 0; i < items.Count; i++)
