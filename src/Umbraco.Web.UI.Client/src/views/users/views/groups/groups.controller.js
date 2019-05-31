@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupsController($scope, $timeout, $location, userService, userGroupsResource, 
+    function UserGroupsController($scope, $timeout, $location, $filter, userService, userGroupsResource, 
         formHelper, localizationService, listViewHelper) {
 
         var vm = this;
@@ -31,6 +31,7 @@
                         ug.hasAccess = user.userGroups.indexOf(ug.alias) !== -1 || user.userGroups.indexOf("admin") !== -1;
                         return ug;
                     });
+                    vm.filteredUserGroups = vm.userGroups;
 
                     vm.loading = false;
                 });
@@ -117,6 +118,14 @@
             });
             vm.selection = [];
         }
+
+        var unbindFilterWatcher = $scope.$watch("vm.filter", function (newVal, oldVal) {
+            vm.filteredUserGroups = $filter('filter')(vm.userGroups, vm.filter);
+        });
+
+        $scope.$on("$destroy", function () {
+            unbindFilterWatcher();
+        });
 
         onInit();
 
