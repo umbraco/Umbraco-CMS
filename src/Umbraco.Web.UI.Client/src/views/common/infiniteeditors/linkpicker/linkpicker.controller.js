@@ -95,7 +95,6 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
                     contentResource.getById(id, options).then(function (resp) {
                         handleContentTarget(resp);
-                        $scope.model.target.url = resp.urls[0].text;
                     });
                 }
             } else if ($scope.model.target.url.length) {
