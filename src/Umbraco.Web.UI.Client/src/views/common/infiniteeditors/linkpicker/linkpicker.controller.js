@@ -95,7 +95,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
                     contentResource.getById(id, options).then(function (resp) {
                         $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-                        $scope.model.target.url = resp.urls[0].text;
+                        $scope.model.target.url = resp.urls.filter(item => item.culture === $scope.currentNode.metaData.culture)[0].text;
                     });
                 }
             } else if ($scope.model.target.url.length) {
@@ -149,7 +149,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
                 contentResource.getById(args.node.id, options).then(function (resp) {
                     $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-                    $scope.model.target.url = resp.urls[0].text;
+                    $scope.model.target.url = resp.urls.filter(item => item.culture === $scope.currentNode.metaData.culture)[0].text;
                 });
             }
 
