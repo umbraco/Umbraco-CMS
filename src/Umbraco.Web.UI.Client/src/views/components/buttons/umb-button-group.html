@@ -16,7 +16,9 @@
       add-ellipsis={{defaultButton.addEllipsis}}>
    </umb-button>
 
-   <a data-element="button-group-toggle" 
+   <a data-element="button-group-toggle"
+      href="#"
+      prevent-default
       class="btn btn-{{buttonStyle}} dropdown-toggle umb-button-group__toggle umb-button--{{size}}" 
       ng-if="subButtons.length > 0"
       ng-click="toggleDropdown()">
