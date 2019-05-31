@@ -30,7 +30,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    [SearchableTree("searchResultFormatter", "configureContentResult")]
+    [SearchableTree("searchResultFormatter", "configureContentResult", 10)]
     public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
