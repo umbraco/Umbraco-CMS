@@ -95,8 +95,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "eventsService",
     
     function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService) {
-
-        var inited = false;
         
         var contentTypeAliases = [];
         _.each($scope.model.config.contentTypes, function (contentType) {
@@ -114,6 +112,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.realCurrentNode = undefined;
         $scope.scaffolds = undefined;
         $scope.sorting = false;
+        $scope.inited = false;
 
         $scope.minItems = $scope.model.config.minItems || 0;
         $scope.maxItems = $scope.model.config.maxItems || 0;
@@ -450,7 +449,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     $scope.currentNode = $scope.nodes[0];
                 }
 
-                inited = true;
+                $scope.inited = true;
                 
                 checkAbilityToPasteContent();
             }
@@ -519,7 +518,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         function updateModel() {
             syncCurrentNode();
             
-            if (inited) {
+            if ($scope.inited) {
                 var newValues = [];
                 for (var i = 0; i < $scope.nodes.length; i++) {
                     newValues.push(convertNodeIntoNCEntry($scope.nodes[i]));
