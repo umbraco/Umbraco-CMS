@@ -356,6 +356,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             newNode.key = String.CreateGuid();
             
             $scope.nodes.push(newNode);
+            $scope.setDirty();
             //updateModel();// done by setting current node...
             
             $scope.currentNode = newNode;
