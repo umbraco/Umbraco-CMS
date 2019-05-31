@@ -49,6 +49,7 @@
     <key alias="setPermissions">Set permissions</key>
     <key alias="unlock">Unlock</key>
     <key alias="createblueprint">Create Content Template</key>
+    <key alias="restrictToUserGroups">Restrict To User Groups</key>
     <key alias="resendInvite">Resend Invitation</key>
   </area>
   <area alias="actionCategories">
@@ -309,6 +310,7 @@
     <key alias="createdBlueprintMessage">A Content Template was created from '%0%'</key>
     <key alias="duplicateBlueprintMessage">Another Content Template with the same name already exists</key>
     <key alias="blueprintDescription">A Content Template is pre-defined content that an editor can select to use as the basis for creating new content</key>
+    <key alias="groupsHelp">Select one or more user groups to restrict access to the selected content template to just members of those groups.  If no groups are selected, the content template is available to all.</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>

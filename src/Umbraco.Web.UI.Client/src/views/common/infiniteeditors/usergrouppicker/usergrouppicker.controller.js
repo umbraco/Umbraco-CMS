@@ -30,7 +30,7 @@
                 $scope.model.selection = [];
             }
 
-            // get venues
+            // get user groups
             userGroupsResource.getUserGroups().then(function(userGroups){
                 vm.userGroups = userGroups;
                 

@@ -2898,20 +2898,68 @@ namespace Umbraco.Core.Services.Implement
             return content;
         }
 
-        public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
+        public IEnumerable<IContent> GetBlueprintsForContentTypes()
+        {
+            return GetBlueprintsForContentTypes(new int[0]);
+        }
+
+        public IEnumerable<IContent> GetBlueprintsForContentTypes(int contentTypeId, int[] userGroupIds = null)
+        {
+            return GetBlueprintsForContentTypes(new[] { contentTypeId }, userGroupIds);
+        }
+
+        public IEnumerable<IContent> GetBlueprintsForContentTypes(int[] contentTypeIds, int[] userGroupIds = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IContent>();
-                if (contentTypeId.Length > 0)
+                if (contentTypeIds.Length > 0)
                 {
-                    query.Where(x => contentTypeId.Contains(x.ContentTypeId));
+                    query.Where(x => contentTypeIds.Contains(x.ContentTypeId));
                 }
-                return _documentBlueprintRepository.Get(query).Select(x =>
+
+                var blueprints = _documentBlueprintRepository.Get(query).Select(x =>
                 {
                     x.Blueprint = true;
                     return x;
                 });
+
+                // If no user groups are provided or they contain the administrators group, all blueprints are available
+                // for selection.
+                if (userGroupIds == null ||
+                    userGroupIds.Length == 0 ||
+                    userGroupIds.Contains(Constants.Security.AdminGroupId))
+                {
+                    return blueprints;
+                }
+
+                var bluePrintIdsAvailableToUserGroups = _documentBlueprintRepository.GetBlueprintsAvailableToUserGroups(userGroupIds);
+                return blueprints
+                    .Where(x => bluePrintIdsAvailableToUserGroups.Contains(x.Id));
+            }
+        }
+
+        public IEnumerable<IUserGroup> GetGroupsAssignedToBlueprintById(int id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentBlueprintRepository.GetGroupsAssignedToBlueprint(id);
+            }
+        }
+
+        public void AssignGroupsToBlueprintById(int id, int[] userGroupIds)
+        {
+            if (userGroupIds == null || userGroupIds.Length == 0)
+            {
+                return;
+            }
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.WriteLock(Constants.Locks.ContentTree);
+                 _documentBlueprintRepository.AssignGroupsToBlueprint(id, userGroupIds);
+                scope.Complete();
             }
         }
 

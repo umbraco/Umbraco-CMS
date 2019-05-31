@@ -28,7 +28,27 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets blueprints for a content type.
         /// </summary>
-        IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeId);
+        IEnumerable<IContent> GetBlueprintsForContentTypes();
+
+        /// <summary>
+        /// Gets blueprints for a content type.
+        /// </summary>
+        IEnumerable<IContent> GetBlueprintsForContentTypes(int contentTypeId, int[] userGroupIds = null);
+
+        /// <summary>
+        /// Gets blueprints for a content type.
+        /// </summary>
+        IEnumerable<IContent> GetBlueprintsForContentTypes(int[] contentTypeIds, int[] userGroupIds = null);
+
+        /// <summary>
+        /// Gets the collection of user groups assigned to the blueprint.
+        /// </summary>
+        IEnumerable<IUserGroup> GetGroupsAssignedToBlueprintById(int id);
+
+        /// <summary>
+        /// Assigns the set of uer groups to the blueprint
+        /// </summary>
+        void AssignGroupsToBlueprintById(int id, int[] userGroupIds);
 
         /// <summary>
         /// Saves a blueprint.

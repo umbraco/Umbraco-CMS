@@ -22,6 +22,7 @@ namespace Umbraco.Core
             /// </remarks>
             public const int UnknownUserId = 0;
 
+            public const int AdminGroupId = 1;
             public const string AdminGroupAlias = "admin";
             public const string SensitiveDataGroupAlias = "sensitiveData";
             public const string TranslatorGroupAlias = "translator";

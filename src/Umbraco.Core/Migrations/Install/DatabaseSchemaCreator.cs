@@ -69,6 +69,7 @@ namespace Umbraco.Core.Migrations.Install
             typeof (LockDto),
             typeof (UserGroupDto),
             typeof (User2UserGroupDto),
+            typeof (UserGroup2ContentTemplateDto),
             typeof (UserGroup2NodePermissionDto),
             typeof (UserGroup2AppDto),
             typeof (UserStartNodeDto),

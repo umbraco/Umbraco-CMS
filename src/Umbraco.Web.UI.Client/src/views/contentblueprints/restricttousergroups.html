@@ -1,0 +1,40 @@
+<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.ContentBlueprint.RestrictToUserGroupsController as vm">
+    <div class="umb-dialog-body" auto-scale="90">
+
+        <p>
+            <localize key="blueprints_groupsHelp"></localize>
+        </p>
+
+        <umb-user-group-preview ng-repeat="userGroup in vm.userGroups"
+                                icon="userGroup.icon"
+                                name="userGroup.name"
+                                allow-remove="true"
+                                hide-content-start-node="true"
+                                hide-media-start-node="true"
+                                on-remove="vm.removeSelectedItem($index, vm.userGroups)">
+        </umb-user-group-preview>
+
+        <a href=""
+           style="max-width: 100%;"
+           class="umb-node-preview-add"
+           ng-click="vm.openUserGroupPicker()"
+           prevent-default>
+            <localize key="general_add">Add</localize>
+        </a>
+
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <umb-button label-key="general_cancel"
+                    action="cancel()"
+                    type="button"
+                    button-style="link">
+        </umb-button>
+        <umb-button label-key="buttons_save"
+                    type="submit"
+                    ng-click="vm.saveChanges()"
+                    state="vm.submitButtonState"
+                    button-style="success">
+        </umb-button>
+    </div>
+</div>

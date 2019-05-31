@@ -50,6 +50,7 @@ namespace Umbraco.Core
                 public const string User2UserGroup = TableNamePrefix + "User2UserGroup";
                 public const string User2NodeNotify = TableNamePrefix + "User2NodeNotify";
                 public const string UserGroup2App = TableNamePrefix + "UserGroup2App";
+                public const string UserGroup2ContentTemplate = TableNamePrefix + "UserGroup2ContentTemplate";
                 public const string UserGroup2NodePermission = TableNamePrefix + "UserGroup2NodePermission";
                 public const string ExternalLogin = TableNamePrefix + "ExternalLogin";
 

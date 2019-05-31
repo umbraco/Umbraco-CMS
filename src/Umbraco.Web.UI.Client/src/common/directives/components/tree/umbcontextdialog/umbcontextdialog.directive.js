@@ -1,12 +1,16 @@
 (function() {
     'use strict';
 
-    function UmbContextDialog(navigationService, keyboardService) {
+    function UmbContextDialog(navigationService, keyboardService, editorService) {
 
         function link($scope) {
             
-            $scope.outSideClick = function() {
-                navigationService.hideDialog();
+            $scope.outSideClick = function () {
+                // Only close dialog if there's not an editor open (e.g. a picker has been launched).  Clicks within the edito
+                // will trigger this functions, so we want to avoid closing the dialog that launched the editor.
+                if (editorService.getNumberOfEditors() === 0) {
+                    navigationService.hideDialog();
+                }
             }
 
             keyboardService.bind("esc", function() {
