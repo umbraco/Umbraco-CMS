@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
-    function ($scope, eventsService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService, editorService, contentEditingHelper) {
+    function ($scope, eventsService, entityResource, contentResource, mediaResource, mediaHelper, udiParser, userService, localizationService, tinyMceService, editorService, contentEditingHelper) {
         
         var vm = this;
         var dialogOptions = $scope.model;
@@ -66,8 +66,22 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                 //will be either a udi or an int
                 var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
 
-                // is it a content link?
-                if (!$scope.model.target.isMedia) {
+                if ($scope.model.target.udi) {
+                    // extract the entity type from the udi and set target.isMedia accordingly
+                    var udi = udiParser.parse(id);
+
+                    if (udi && udi.entityType === "media") {
+                        $scope.model.target.isMedia = true;
+                    } else {
+                        delete $scope.model.target.isMedia;
+                    }
+                }
+
+                if ($scope.model.target.isMedia) {
+                    mediaResource.getById(id).then(function (resp) {
+                        $scope.model.target.url = resp.mediaLink;
+                    });
+                } else {
                     // get the content path
                     entityResource.getPath(id, "Document").then(function (path) {
                         $scope.model.target.path = path;
@@ -81,6 +95,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
                     contentResource.getById(id, options).then(function (resp) {
                         handleContentTarget(resp);
+                        $scope.model.target.url = resp.urls[0].text;
                     });
                 }
             } else if ($scope.model.target.url.length) {
@@ -95,9 +110,9 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                 }
             }
 
-            // need to translate the link target ("_blank" or "") into a boolean value for umb-checkbox 
+            // need to translate the link target ("_blank" or "") into a boolean value for umb-checkbox
             vm.openInNewWindow = $scope.model.target.target === "_blank";
-        } 
+        }
         else if (dialogOptions.anchors) {
             $scope.anchorValues = dialogOptions.anchors;
         }
@@ -144,7 +159,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
         function handleContentTarget(content) {
             $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(contentEditingHelper.getAllProps(content.variants[0])));
-            $scope.model.target.url = content.urls[0].text;
+            $scope.model.target.url = content.urls.filter(item => item.culture === $scope.currentNode.metaData.culture)[0].text;
         }
 
         function nodeExpandedHandler(args) {

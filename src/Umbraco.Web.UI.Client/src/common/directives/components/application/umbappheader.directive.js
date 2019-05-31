@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function AppHeaderDirective(eventsService, appState, userService) {
+    function AppHeaderDirective(eventsService, appState, userService, focusService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -54,7 +54,9 @@
                     }
                 });
             }));
-
+            
+            scope.rememberFocus = focusService.rememberFocus;
+            
             scope.searchClick = function() {
                 var showSearch = appState.getSearchState("show");
                 appState.setSearchState("show", !showSearch);

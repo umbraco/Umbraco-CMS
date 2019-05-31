@@ -29,6 +29,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Macros;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
@@ -81,7 +82,7 @@ namespace Umbraco.Tests.Runtimes
 
             var composerTypes = typeLoader.GetTypes<IComposer>() // all of them
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests.")) // exclude test components
-                .Where(x => x != typeof(WebInitialComposer)); // exclude web runtime
+                .Where(x => x != typeof(WebInitialComposer) && x != typeof(WebFinalComposer)); // exclude web runtime
             var composers = new Composers(composition, composerTypes, profilingLogger);
             composers.Compose();
 
@@ -101,6 +102,8 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             composition.RegisterUnique<IExamineManager>(f => ExamineManager.Instance);
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
+            composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
+            composition.RegisterUnique<MediaUrlProviderCollection>(_ => new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()));
 
             // initialize some components only/individually
             composition.WithCollectionBuilder<ComponentCollectionBuilder>()
@@ -124,14 +127,15 @@ namespace Umbraco.Tests.Runtimes
             if (true || runtimeState.Level == RuntimeLevel.Install)
             {
                 var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var file = Path.Combine(path, "Umbraco.sdf");
+                var file = databaseFactory.Configured ? Path.Combine(path, "UmbracoNPocoTests.sdf") : Path.Combine(path, "Umbraco.sdf");
                 if (File.Exists(file))
                     File.Delete(file);
 
                 // create the database file
                 // databaseBuilder.ConfigureEmbeddedDatabaseConnection() can do it too,
                 // but then it wants to write the connection string to web.config = bad
-                using (var engine = new SqlCeEngine("Data Source=|DataDirectory|\\Umbraco.sdf;Flush Interval=1;"))
+                var connectionString = databaseFactory.Configured ? databaseFactory.ConnectionString : "Data Source=|DataDirectory|\\Umbraco.sdf;Flush Interval=1;";
+                using (var engine = new SqlCeEngine(connectionString))
                 {
                     engine.CreateDatabase();
                 }
@@ -140,7 +144,8 @@ namespace Umbraco.Tests.Runtimes
                 //databaseFactory.Configure(DatabaseBuilder.EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
                 //databaseBuilder.CreateDatabaseSchemaAndData();
 
-                databaseFactory.Configure(DatabaseBuilder.EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+                if (!databaseFactory.Configured)
+                    databaseFactory.Configure(DatabaseBuilder.EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
 
                 var scopeProvider = factory.GetInstance<IScopeProvider>();
                 using (var scope = scopeProvider.CreateScope())
@@ -153,6 +158,8 @@ namespace Umbraco.Tests.Runtimes
 
             // done installing
             runtimeState.Level = RuntimeLevel.Run;
+
+            components.Initialize();
 
             // instantiate to register events
             // should be done by Initialize?

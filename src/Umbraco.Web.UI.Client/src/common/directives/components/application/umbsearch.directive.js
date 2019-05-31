@@ -13,7 +13,7 @@
         }
     };
     
-    function umbSearchController($timeout, backdropService, searchService) {
+    function umbSearchController($timeout, backdropService, searchService, focusService) {
 
         var vm = this;
 
@@ -25,6 +25,9 @@
         vm.handleKeyUp = handleKeyUp;
         vm.closeSearch = closeSearch;
         vm.focusSearch = focusSearch;
+        
+        //we need to capture the focus before this element is initialized.
+        vm.focusBeforeOpening = focusService.getLastKnownFocus();
 
         function onInit() {
             vm.searchQuery = "";
@@ -70,6 +73,10 @@
          * @param {object} event
          */
         function handleKeyUp(event) {
+            
+            event.stopPropagation();
+            event.preventDefault();
+            
             // esc
             if(event.keyCode === 27) {
                 closeSearch();
@@ -80,6 +87,9 @@
          * Used to proxy a callback
          */
         function closeSearch() {
+            if(vm.focusBeforeOpening) {
+                vm.focusBeforeOpening.focus();
+            }
             if(vm.onClose) {
                 vm.onClose();
             }

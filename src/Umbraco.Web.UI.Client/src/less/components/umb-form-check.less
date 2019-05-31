@@ -30,23 +30,13 @@
         }
         &:checked ~ .umb-form-check__state .umb-form-check__check {
             border-color: @ui-option-type;
-            background-color: @ui-option-type;
         }
         &:checked:hover ~ .umb-form-check__state .umb-form-check__check {
             &::before {
                 background: @ui-option-type-hover;
             }
         }
-
-        &:focus:checked ~ .umb-form-check .umb-form-check__check,
-        &:focus ~ .umb-form-check__state .umb-form-check__check {
-            border-color: @inputBorderFocus;
-            
-            .tabbing-active & {
-                outline: 2px solid @inputBorderTabFocus;
-            }
-        }
-
+        
         &:checked ~ .umb-form-check__state {
             .umb-form-check__check {
                 // This only happens if the state has a radiobutton modifier
@@ -71,6 +61,19 @@
                 }
             }
         }
+    }
+    
+    
+    .tabbing-active &.umb-form-check--radiobutton &__input:focus ~ .umb-form-check__state .umb-form-check__check {
+        //outline: 2px solid @inputBorderTabFocus;
+        border: 2px solid @inputBorderTabFocus;
+        margin: -1px;
+    }
+    .tabbing-active &.umb-form-check--checkbox &__input:focus ~ .umb-form-check__state .umb-form-check__check {
+        outline: 2px solid @inputBorderTabFocus;
+    }
+    .tabbing-active &.umb-form-check--checkbox &__input:checked:focus ~ .umb-form-check__state .umb-form-check__check {
+        border-color: white;
     }
 
     &__state {
