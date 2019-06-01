@@ -26,6 +26,9 @@
 
         vm.buttonLabel = "";
 
+        vm.packageVersionRegex = /^(\d+\.)(\d+\.)?(\*|\d+)$/;
+        vm.umbracoVersionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;
+
         const packageId = $routeParams.id;
         const create = $routeParams.create;
 
