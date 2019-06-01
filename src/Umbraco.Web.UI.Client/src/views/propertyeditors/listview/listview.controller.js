@@ -1,4 +1,4 @@
-function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
+function listViewController($scope, $q, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -630,6 +630,8 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     }
 
     function getCustomPropertyValue(alias, properties) {
+        var deferred = $q.defer();
+
         var value = '';
         var index = 0;
         var foundAlias = false;
@@ -642,10 +644,23 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         }
 
         if (foundAlias) {
+
             value = properties[index].value;
+
+            if (value.startsWith("umb://")) {
+                contentResource.getById(value).then(function (node) {
+                    if (node) {
+                        deferred.resolve(node.variants[0].name);
+                    }
+                })
+            } else {
+                deferred.resolve(value);
+            }
+        } else {
+            deferred.reject();
         }
 
-        return value;
+        return deferred.promise;
     }
 
     /** This ensures that the correct value is set for each item in a row, we don't want to call a function during interpolation or ng-bind as performance is really bad that way */
@@ -668,7 +683,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
             // If we've got nothing yet, look at a user defined property
             if (typeof value === 'undefined') {
-                value = getCustomPropertyValue(alias, result.properties);
+                getCustomPropertyValue(alias, result.properties).then(function (val) {
+                    result[alias] = val;
+                });
             }
 
             // If we have a date, format it
