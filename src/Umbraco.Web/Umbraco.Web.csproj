@@ -142,6 +142,7 @@
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ProvidedValueValidation.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\WebProfiler.cs" />

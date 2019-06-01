@@ -116,7 +116,12 @@
 
                                             <div ng-if="action.valueRequired">
                                                 <div><label class="bold">Set new value:</label></div>
-                                                <input name="providedValue" type="text" ng-model="action.providedValue" required val-email/>
+
+                                                <div ng-switch on="action.providedValueValidation">
+                                                    <input ng-switch-when="email" name="providedValue" type="text" ng-model="action.providedValue" required val-email />
+                                                    <input ng-switch-when="regex" name="providedValue" type="text" ng-model="action.providedValue" required ng-pattern="vm.parseRegex(action.providedValueValidationRegex)" />
+                                                    <input ng-switch-default name="providedValue" type="text" ng-model="action.providedValue" required />
+                                                </div>
                                             </div>
 
                                             <umb-button
