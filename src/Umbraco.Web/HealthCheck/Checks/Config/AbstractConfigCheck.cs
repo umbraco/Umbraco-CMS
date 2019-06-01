@@ -44,12 +44,19 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         public abstract ValueComparisonType ValueComparisonType { get; }
 
         /// <summary>
+        /// Indicates validation method for provided value
+        /// </summary>
+        public virtual ProvidedValueValidation ProvidedValueValidation => ProvidedValueValidation.None;
+
+        /// <summary>
+        /// If provided value validation requires a regex, it's provided here
+        /// </summary>
+        public virtual string ProvidedValueValidationRegex => string.Empty;
+
+        /// <summary>
         /// Gets the flag indicating if the check is considered successful if the config value is missing (defaults to false - an error - if missing)
         /// </summary>
-        public virtual bool ValidIfConfigMissing
-        {
-            get { return false; }
-        }
+        public virtual bool ValidIfConfigMissing => false;
 
         protected AbstractConfigCheck(ILocalizedTextService textService)
         {
@@ -159,6 +166,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 Name = TextService.Localize("healthcheck/rectifyButton"),
                 ValueRequired = CanRectifyWithValue,
             };
+
+            if (rectifyAction.ValueRequired)
+            {
+                rectifyAction.ProvidedValueValidation = ProvidedValueValidation.ToString().ToLower();
+                rectifyAction.ProvidedValueValidationRegex = ProvidedValueValidationRegex;
+            }
 
             var resultMessage = string.Format(CheckErrorMessage, FileName, XPath, Values, CurrentValue);
             return new[]
