@@ -250,7 +250,6 @@
     <key alias="updateData">Choisissez un type et un titre</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Il n'y a aucun type de document disponible. Vous devez d'abord les activer dans la section Paramètres, dans <strong>"Types de documents"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Il n'y a aucun type de média disponible. Vous devez d'abord les activer dans la section Paramètres, dans <strong>"Types de médias"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">Type de document sans modèle</key>
     <key alias="newFolder">Nouveau répertoire</key>
     <key alias="newDataType">Nouveau type de données</key>
     <key alias="newJavascriptFile">Nouveau fichier javascript</key>

@@ -183,7 +183,6 @@
     <key alias="updateData">選擇類型和標題</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[此處沒有被允許的文檔類型。請至設定中的 <strong>"文檔類型"</strong>處變更。]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[此處沒有被允許的媒體類型。請至設定中的 <strong>"媒體類型"</strong>處變更。]]></key>
-    <key alias="documentTypeWithoutTemplate">文檔類型沒有相關範本</key>
     <key alias="newFolder">沒有資料夾</key>
     <key alias="newDataType">新資料類別</key>
   </area>

@@ -109,19 +109,24 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     };
 
     // Disabling logic for creating document type with template if disableTemplates is set to true
-    if (!disableTemplates) {
-        $scope.createDocType = function () {
-            $location.search('create', null);
-            $location.search('notemplate', null);
-            $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
-            navigationService.hideMenu();
-        };
-    }
+    $scope.createDocType = function (cultureVariant) {
+        $location.search("notemplate", null);
+        $location.search("element", null);
+        $location.search("variant", null);
+        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
+        if (disableTemplates) {
+            $location.search("notemplate", "true");
+        }
+        if (cultureVariant) {
+            $location.search("variant", "true");
+        }
+        navigationService.hideMenu();
+    };
 
-    $scope.createComponent = function () {
-        $location.search('create', null);
-        $location.search('notemplate', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
+    $scope.createElementType = function () {
+        $location.search("notemplate", null);
+        $location.search("variant", null);
+        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("element", "true");
         navigationService.hideMenu();
     };
 

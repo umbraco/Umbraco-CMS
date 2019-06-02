@@ -320,7 +320,6 @@
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа документов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы документов"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа медиа-материалов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы медиа-материалов"</strong>.]]></key>
     <key alias="updateData">Выберите тип и заголовок</key>
-    <key alias="documentTypeWithoutTemplate">Тип документа без сопоставленного шаблона</key>
     <key alias="newJavascriptFile">Новый файл javascript</key>
     <key alias="newEmptyPartialView">Новое пустое частичное представление</key>
     <key alias="newPartialViewMacro">Новый макрос-представление</key>

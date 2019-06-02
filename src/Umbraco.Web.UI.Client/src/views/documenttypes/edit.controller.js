@@ -17,7 +17,7 @@
         var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
         var documentTypeId = $routeParams.id;
         var create = $routeParams.create;
-        var noTemplate = $routeParams.notemplate;
+        var noTemplate = $routeParams.notemplate || $routeParams.element;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
 
         vm.save = save;
@@ -59,7 +59,7 @@
             if(infiniteMode) {
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
-                noTemplate = $scope.model.notemplate;
+                noTemplate = $scope.model.notemplate || $scope.model.element;
                 vm.submitButtonKey = "buttons_saveAndClose";
                 vm.generateModelsKey = "buttons_generateModelsAndClose";
             }
@@ -259,6 +259,12 @@
             //we are creating so get an empty data type item
             contentTypeResource.getScaffold(documentTypeId)
                 .then(function (dt) {
+                    if ($routeParams.element) {
+                        dt.isElement = true;
+                    }
+                    if ($routeParams.variant) {
+                        dt.allowCultureVariant = true;
+                    }
                     init(dt);
                     vm.page.loading = false;
                 });

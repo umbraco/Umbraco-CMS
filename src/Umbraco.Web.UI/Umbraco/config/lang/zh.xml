@@ -186,7 +186,6 @@
     <key alias="updateData">选择类型和标题</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[没有允许的文档类型可用。必须在 <strong> "文档类型" </strong> 下的 "设置" 部分中启用这些内容。]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[没有允许的媒体类型可用。必须在 <strong> "媒体类型" </strong> 下的 "设置" 部分中启用这些内容。]]></key>
-    <key alias="documentTypeWithoutTemplate">没有模板的文档类型</key>
     <key alias="newFolder">新建文件夹</key>
     <key alias="newDataType">新数据类型</key>
   </area>

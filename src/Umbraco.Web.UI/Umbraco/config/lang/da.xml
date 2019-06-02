@@ -322,7 +322,8 @@
     <key alias="updateData">Vælg en type og skriv en titel</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">Dokumenttype uden skabelon</key>
+    <key alias="documentTypeCultureVariant">Documenttype med sprogvarians</key>
+    <key alias="elementType">Element-type</key>
     <key alias="newFolder">Ny mappe</key>
     <key alias="newDataType">Ny datatype</key>
     <key alias="newJavascriptFile">Ny JavaScript-fil</key>

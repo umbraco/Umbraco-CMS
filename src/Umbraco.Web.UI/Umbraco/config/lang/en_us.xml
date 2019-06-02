@@ -336,7 +336,8 @@
     <key alias="updateData">Choose a type and a title</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+    <key alias="documentTypeCultureVariant">Document Type - varying by culture</key>
+    <key alias="elementType">Element Type</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
     <key alias="newJavascriptFile">New JavaScript file</key>

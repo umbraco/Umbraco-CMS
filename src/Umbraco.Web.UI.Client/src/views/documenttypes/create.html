@@ -6,20 +6,27 @@
             <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
             <ul class="umb-actions umb-actions-child">
-                <li data-element="action-documentType" class="umb-action" ng-hide="model.disableTemplates">
-                    <a href="" ng-click="createDocType()" class="umb-action-link" umb-auto-focus>
+                <li data-element="action-documentType" class="umb-action">
+                    <a href="" ng-click="createDocType(false)" class="umb-action-link" umb-auto-focus>
                         <i class="large icon icon-item-arrangement"></i>
                         <span class="menu-label">
                             <localize key="content_documentType">Document type</localize>
                         </span>
                     </a>
                 </li>
-                <li data-element="action-documentTypeWithoutTemplate" class="umb-action">
-                    <a href="" ng-click="createComponent()" class="umb-action-link">
+                <li data-element="action-documentTypeCultureVariant" class="umb-action">
+                    <a href="" ng-click="createDocType(true)" class="umb-action-link">
                         <i class="large icon icon-item-arrangement"></i>
                         <span class="menu-label">
-                            <localize ng-if="model.disableTemplates === false" key="create_documentTypeWithoutTemplate"></localize>
-                            <localize ng-if="model.disableTemplates === true" key="content_documentType">Document type></localize>
+                            <localize key="create_documentTypeCultureVariant"></localize>
+                        </span>
+                    </a>
+                </li>
+                <li data-element="action-elementType" class="umb-action">
+                    <a href="" ng-click="createElementType()" class="umb-action-link">
+                        <i class="large icon icon-item-arrangement"></i>
+                        <span class="menu-label">
+                            <localize key="create_elementType"></localize>
                         </span>
                     </a>
                 </li>

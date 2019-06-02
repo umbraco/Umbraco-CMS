@@ -177,7 +177,6 @@
     <key alias="updateData">型とタイトルを選んでください</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[利用可能なドキュメントタイプがありません。以下の設定セクションでこれらを有効にする必要があります。<strong>"document types"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[利用可能なメディアタイプがありません。以下の設定セクションでこれらを有効にする必要があります。<strong>"media types"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">テンプレートなしのドキュメント タイプ</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">ウェブサイトを参照する</key>

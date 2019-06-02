@@ -195,7 +195,6 @@
     <key alias="updateData">Kies een type en een titel</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Er zijn geen toegestane ​​documenttypes beschikbaar. Schakel deze in in de sectie Instellingen onder <strong>"Documenttypes"</ strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Er zijn geen toegestande mediatypes beschikbaar. Schakel deze in in de sectie Instellingen onder <strong>"Mediatypes"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">Document Type zonder template</key>
     <key alias="newFolder">Nieuwe map</key>
     <key alias="newDataType">Nieuw data type</key>
   </area>
