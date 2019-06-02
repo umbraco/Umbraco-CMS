@@ -6,9 +6,15 @@
             <h5 ng-show="selectContentType"><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
             <h5 ng-show="selectBlueprint"><localize key="blueprints_selectBlueprint">Select a blueprint</localize></h5>
 
-            <p class="abstract" ng-if="allowedTypes && allowedTypes.length === 0">
-                <localize key="create_noDocumentTypes" />
-            </p>
+            <div ng-if="allowedTypes && allowedTypes.length === 0">
+                <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noDocumentTypesWithNoSettingsAccess"/></p>
+                <div ng-if="hasSettingsAccess">
+                    <p class="abstract"><localize key="create_noDocumentTypes" /></p>
+                    <a class="btn" href="#settings/documentTypes/edit/{{contentTypeId}}?view=permissions" ng-click="close()">
+                        <localize key="create_noDocumentTypesEditPermissions"/>
+                    </a>
+                </div>
+            </div>
 
             <ul class="umb-actions umb-actions-child" ng-if="selectContentType && allowedTypes.length > 0">
 

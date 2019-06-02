@@ -12,7 +12,7 @@
     function MediaTypesEditController($scope, $routeParams, mediaTypeResource, 
         dataTypeResource, editorState, contentEditingHelper, formHelper, 
         navigationService, iconHelper, contentTypeHelper, notificationsService, 
-        $filter, $q, localizationService, overlayHelper, eventsService, angularHelper) {
+        $q, localizationService, overlayHelper, eventsService, angularHelper) {
 
         var vm = this;
         var evts = [];
@@ -36,7 +36,7 @@
 
         function onInit() {
             // get init values from model when in infinite mode
-            if(infiniteMode) {
+            if (infiniteMode) {
                 mediaTypeId = $scope.model.id;
                 create = $scope.model.create;
                 vm.saveButtonKey = "buttons_saveAndClose";
@@ -81,8 +81,7 @@
                     "name": vm.labels.design,
                     "alias": "design",
                     "icon": "icon-document-dashed-line",
-                    "view": "views/mediatypes/views/design/design.html",
-                    "active": true
+                    "view": "views/mediatypes/views/design/design.html"
                 },
                 {
                     "name": vm.labels.listview,
@@ -153,7 +152,30 @@
                     ]
                 }
             ];
+
+            initializeActiveNavigationPanel();
         });
+
+        function initializeActiveNavigationPanel() {
+            // Initialise first loaded page based on page route paramater
+            // i.e. ?view=design|listview|permissions
+            var initialViewSetFromRouteParams = false;
+            var view = $routeParams.view;
+            if (view) {
+                var viewPath = "views/mediatypes/views/" + view + "/" + view + ".html";
+                for (var i = 0; i < vm.page.navigation.length; i++) {
+                    if (vm.page.navigation[i].view === viewPath) {
+                        vm.page.navigation[i].active = true;
+                        initialViewSetFromRouteParams = true;
+                        break;
+                    }
+                }
+            }
+
+            if (initialViewSetFromRouteParams === false) {
+                vm.page.navigation[0].active = true;
+            }
+        }
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
             vm.page.modelsBuilder = result;
