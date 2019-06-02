@@ -334,9 +334,12 @@
     <key alias="createContentBlueprint">Select the document type you want to make a content template for</key>
     <key alias="enterFolderName">Enter a folder name</key>
     <key alias="updateData">Choose a type and a title</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
-    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
+    <key alias="noDocumentTypesWithNoSettingsAccess">The selected page in the content tree doesn't allow for any pages to be created below it.</key>
+    <key alias="noDocumentTypesEditPermissions">Edit permissions for this document type</key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
+    <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
+    <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
     <key alias="newJavascriptFile">New JavaScript file</key>
