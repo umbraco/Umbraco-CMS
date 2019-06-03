@@ -117,10 +117,21 @@
                                             <div ng-if="action.valueRequired">
                                                 <div><label class="bold">Set new value:</label></div>
 
-                                                <div ng-switch on="action.providedValueValidation">
-                                                    <input ng-switch-when="email" name="providedValue" type="text" ng-model="action.providedValue" required val-email />
-                                                    <input ng-switch-when="regex" name="providedValue" type="text" ng-model="action.providedValue" required ng-pattern="vm.parseRegex(action.providedValueValidationRegex)" />
-                                                    <input ng-switch-default name="providedValue" type="text" ng-model="action.providedValue" required />
+                                                <div ng-switch on="action.providedValuePropertyType">
+                                                    <div ng-switch-when="textinput">
+                                                        <div ng-switch on="action.providedValueValidation">
+                                                            <input ng-switch-when="email" name="providedValue" type="text" ng-model="action.providedValue" required val-email />
+                                                            <input ng-switch-when="regex" name="providedValue" type="text" ng-model="action.providedValue" required ng-pattern="parseRegex(action.providedValueValidationRegex)" />
+                                                            <input ng-switch-default name="providedValue" type="text" ng-model="action.providedValue" required />
+                                                        </div>
+                                                    </div>
+                                                    <div ng-switch-when="contentpicker">
+                                                        <umb-property-editor model="action.picker"></umb-property-editor>
+                                                        <input name="providedValue" type="hidden" ng-model="action.picker.value" required />
+                                                    </div>
+                                                    <div ng-switch-default>
+                                                        <input name="providedValue" type="text" ng-model="action.providedValue" required />
+                                                    </div>
                                                 </div>
                                             </div>
 

@@ -54,6 +54,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         public virtual string ProvidedValueValidationRegex => string.Empty;
 
         /// <summary>
+        /// If a value is required, what property type to render is provided here
+        /// </summary>
+        public virtual ProvidedValuePropertyType ProvidedValuePropertyType
+        {
+            get { return ProvidedValuePropertyType.TextInput; }
+        }
+
+        /// <summary>
         /// Gets the flag indicating if the check is considered successful if the config value is missing (defaults to false - an error - if missing)
         /// </summary>
         public virtual bool ValidIfConfigMissing => false;
@@ -171,6 +179,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             {
                 rectifyAction.ProvidedValueValidation = ProvidedValueValidation.ToString().ToLower();
                 rectifyAction.ProvidedValueValidationRegex = ProvidedValueValidationRegex;
+                rectifyAction.ProvidedValuePropertyType = ProvidedValuePropertyType.ToString().ToLower();
             }
 
             var resultMessage = string.Format(CheckErrorMessage, FileName, XPath, Values, CurrentValue);

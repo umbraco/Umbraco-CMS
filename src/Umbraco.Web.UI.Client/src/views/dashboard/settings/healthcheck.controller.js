@@ -21,6 +21,27 @@
         vm.setViewState = setViewState;
         vm.parseRegex = parseRegex;
 
+        var contentPickerConfig = // used to assign to property pickers of type contentpicker
+        {
+            view: 'contentpicker',
+            config: {
+                multiPicker: "1",
+                entityType: "Document",
+                idType: "udi",
+                startNode: {
+                    query: "",
+                    type: "content",
+                    id: -1
+                },
+                filter: "",
+                minNumber: 1,
+                maxNumber: 1
+            },
+            value: "",
+            alias: "contentPicker"
+        };
+
+
         // Get a (grouped) list of all health checks
         healthCheckResource.getAllChecks()
             .then(function(response) {
@@ -74,6 +95,11 @@
         }
 
         function executeAction(check, index, action) {
+
+            if (action.providedValuePropertyType === 'contentpicker') {
+                action.providedValue = action.picker.value;
+            }
+
             check.loading = true;
             healthCheckResource.executeAction(action)
                 .then(function(response) {
@@ -103,6 +129,19 @@
                     healthCheckResource.getStatus(check.id)
                         .then(function(response) {
                             check.status = response;
+                            
+                            if (response.length > 0) {
+
+                                angular.forEach(response[0].actions,
+                                    function (action) {
+                                        if (action.providedValuePropertyType === 'contentpicker') { // check if the property type is a content picker and assign a content picker config
+                                            action.picker = {}; // assign empty object
+                                            angular.extend(action.picker, contentPickerConfig);
+                                        }
+                                    });
+
+                            }
+
                             group.checkCounter = group.checkCounter + 1;
                             check.loading = false;
 
