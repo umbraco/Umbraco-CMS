@@ -30,7 +30,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    [SearchableTree("searchResultFormatter", "configureContentResult")]
+    [SearchableTree("searchResultFormatter", "configureContentResult", 10)]
     public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
@@ -109,7 +109,7 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 var menu = new MenuItemCollection();
 
@@ -248,8 +248,11 @@ namespace Umbraco.Web.Trees
 	                OpensDialog = true
 	            });
             }
-			
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
+
+            if((item is DocumentEntitySlim documentEntity && documentEntity.IsContainer) == false)
+            {
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+            }
 
             return menu;
         }

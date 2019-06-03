@@ -55,9 +55,9 @@
                 }
                 
             }
-            
+
             // if we still dont have a app, lets show the first one:
-            if (isAppPresent === false) {
+            if (isAppPresent === false && content.apps.length) {
                 content.apps[0].active = true;
                 $scope.appChanged(content.apps[0]);
             }
@@ -67,16 +67,12 @@
             //We fetch all ancestors of the node to generate the footer breadcrumb navigation
             if (!$scope.page.isNew) {
                 if (content.parentId && content.parentId !== -1) {
-                    entityResource.getAncestors(content.id, "document", $scope.culture)
-                        .then(function (anc) {
-                            $scope.ancestors = anc;
-                        });
+                    loadBreadcrumb();
                     $scope.$watch('culture',
                         function (value, oldValue) {
-                            entityResource.getAncestors(content.id, "document", value)
-                                .then(function (anc) {
-                                    $scope.ancestors = anc;
-                                });
+                            if (value !== oldValue) {
+                                loadBreadcrumb();
+                            }
                         });
                 }
             }
@@ -86,6 +82,12 @@
             resetVariantFlags();
         }
 
+        function loadBreadcrumb() {
+            entityResource.getAncestors($scope.content.id, "document", $scope.culture)
+                .then(function (anc) {
+                    $scope.ancestors = anc;
+                });
+        }
 
         /**
          * This will reset isDirty flags if save is true.
@@ -116,6 +118,13 @@
         function isContentCultureVariant() {
             return $scope.content.variants.length > 1;
         }
+        
+        function reload() {
+            $scope.page.loading = true;
+            loadContent().then(function() {
+                $scope.page.loading = false;
+            });
+        }
 
         function bindEvents() {
             //bindEvents can be called more than once and we don't want to have multiple bound events
@@ -123,13 +132,10 @@
                 eventsService.unsubscribe(evts[e]);
             }
 
-            evts.push(eventsService.on("editors.content.reload", function (name, args) {
+            evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
                 // if this content item uses the updated doc type we need to reload the content item
-                if(args && args.node && args.node.key === $scope.content.key) {
-                    $scope.page.loading = true;
-                    loadContent().then(function() {
-                        $scope.page.loading = false;
-                    });
+                if(args && args.documentType && $scope.content.documentType.id === args.documentType.id) {
+                    reload();
                 }
             }));
 
@@ -331,34 +337,6 @@
 
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
-            
-            // Check that all variants for publishing have a name.
-            if (args.action === "publish" || args.action === "sendToPublish") {
-                
-                if ($scope.content.variants) {
-                    var iVariant;
-                    for (var i = 0; i < $scope.content.variants.length; i++) {
-                        iVariant = $scope.content.variants[i];
-                        
-                        iVariant.notifications = [];// maybe not needed, need to investigate.
-                        
-                        if(iVariant.publish === true) {
-                            if (iVariant.name == null) {
-                                
-                                var tokens = [iVariant.language.name];
-                                
-                                localizationService.localize("publish_contentPublishedFailedByMissingName", tokens).then(function (value) {
-                                    iVariant.notifications.push({"message": value, "type": 1});
-                                });
-                                
-                                return $q.reject();
-                            }
-                        }
-                    }
-                }
-                
-            }
-            
             
             //Used to check validility of nested form - coming from Content Apps mostly
             //Set them all to be invalid

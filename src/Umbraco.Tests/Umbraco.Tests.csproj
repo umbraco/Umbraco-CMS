@@ -78,7 +78,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="Castle.Core" Version="4.3.1" />
     <PackageReference Include="Examine" Version="1.0.0" />
     <PackageReference Include="HtmlAgilityPack">
@@ -131,16 +130,20 @@
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Logging\LogviewerTests.cs" />
     <Compile Include="Manifest\ManifestContentAppTests.cs" />
+    <Compile Include="Mapping\MappingTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\ContentScheduleTests.cs" />
+    <Compile Include="Models\CultureImpactTests.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
+    <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
+    <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="Services\AmbiguousEventTests.cs" />
@@ -152,6 +155,7 @@
     <Compile Include="Packaging\CreatedPackagesRepositoryTests.cs" />
     <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="Services\MediaTypeServiceTests.cs" />
+    <Compile Include="Services\PropertyValidationServiceTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -163,7 +167,6 @@
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\AdvancedMigrationTests.cs" />
-    <Compile Include="Models\Mapping\AutoMapper6Tests.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
     <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
@@ -247,6 +250,7 @@
     <Compile Include="Web\HealthChecks\HealthCheckResultsTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
+    <Compile Include="Web\ModelStateExtensionsTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
@@ -271,7 +275,6 @@
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
     <Compile Include="Testing\TestingTests\MockTests.cs" />
     <Compile Include="Models\MacroTests.cs" />
-    <Compile Include="Models\Mapping\AutoMapperTests.cs" />
     <Compile Include="Models\Collections\Item.cs" />
     <Compile Include="Models\Collections\OrderItem.cs" />
     <Compile Include="Models\Collections\SimpleOrder.cs" />

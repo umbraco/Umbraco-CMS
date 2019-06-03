@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Events;
@@ -10,7 +11,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
 
@@ -505,7 +506,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public IEnumerable<int> GetVersionIds(int id, int maxRows)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _documentRepository.GetVersionIds(id, maxRows);
             }
@@ -533,7 +534,7 @@ namespace Umbraco.Core.Services.Implement
             //null check otherwise we get exceptions
             if (content.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IContent>();
 
-            var rootId = Constants.System.Root.ToInvariantString();
+            var rootId = Constants.System.RootString;
             var ids = content.Path.Split(',')
                 .Where(x => x != rootId && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
             if (ids.Any() == false)
@@ -756,6 +757,11 @@ namespace Umbraco.Core.Services.Implement
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException("Cannot save (un)publishing content, use the dedicated SavePublished method.");
 
+            if (content.Name != null && content.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
             var evtMsgs = EventMessagesFactory.Get();
 
             using (var scope = ScopeProvider.CreateScope())
@@ -869,6 +875,11 @@ namespace Umbraco.Core.Services.Implement
                     throw new NotSupportedException($"Culture \"{culture}\" is not supported by invariant content types.");
             }
 
+            if(content.Name != null && content.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
@@ -877,38 +888,15 @@ namespace Umbraco.Core.Services.Implement
                 if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
 
-                Property[] invalidProperties;
-
                 // if culture is specific, first publish the invariant values, then publish the culture itself.
                 // if culture is '*', then publish them all (including variants)
 
-                // explicitly SaveAndPublish a specific culture also publishes invariant values
-                if (!culture.IsNullOrWhiteSpace() && culture != "*")
-                {
-                    // publish the invariant values
-                    var publishInvariant = content.PublishCulture(null);
-                    if (!publishInvariant)
-                        return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
-
-                    //validate the property values
-                    if (!_propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties))
-                        return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
-                        {
-                            InvalidProperties = invalidProperties
-                        };
-                }
+                //this will create the correct culture impact even if culture is * or null
+                var impact = CultureImpact.Create(culture, _languageRepository.IsDefault(culture), content);
 
                 // publish the culture(s)
-                var publishCulture = content.PublishCulture(culture);
-                if (!publishCulture)
-                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
-
-                //validate the property values
-                if (!_propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties))
-                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
-                    {
-                        InvalidProperties = invalidProperties
-                    };
+                // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+                content.PublishCulture(impact);
 
                 var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, userId, raiseEvents);
                 scope.Complete();
@@ -921,6 +909,11 @@ namespace Umbraco.Core.Services.Implement
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (cultures == null) throw new ArgumentNullException(nameof(cultures));
+
+            if (content.Name != null && content.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -941,16 +934,15 @@ namespace Umbraco.Core.Services.Implement
                         : new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
                 }
 
+                if (cultures.Any(x => x == null || x == "*"))
+                    throw new InvalidOperationException("Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
 
-                if (cultures.Select(content.PublishCulture).Any(isValid => !isValid))
-                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
+                var impacts = cultures.Select(x => CultureImpact.Explicit(x, _languageRepository.IsDefault(x)));
 
-                //validate the property values
-                if (!_propertyValidationService.Value.IsPropertyDataValid(content, out var invalidProperties))
-                    return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
-                    {
-                        InvalidProperties = invalidProperties
-                    };
+                // publish the culture(s)
+                // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+                foreach (var impact in impacts)
+                    content.PublishCulture(impact);
 
                 var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, userId, raiseEvents);
                 scope.Complete();
@@ -1096,6 +1088,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (publishing)
             {
+                //determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
                 culturesUnpublishing = content.GetCulturesUnpublishing();
                 culturesPublishing = variesByCulture
                         ? content.PublishCultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
@@ -1147,7 +1140,7 @@ namespace Umbraco.Core.Services.Implement
                     // note: This unpublishes the entire document (not different variants)
                     unpublishResult = StrategyCanUnpublish(scope, content, evtMsgs);
                     if (unpublishResult.Success)
-                        unpublishResult = StrategyUnpublish(scope, content, userId, evtMsgs);
+                        unpublishResult = StrategyUnpublish(content, evtMsgs);
                     else
                     {
                         // reset published state from temp values (publishing, unpublishing) to original value
@@ -1330,7 +1323,8 @@ namespace Umbraco.Core.Services.Implement
 
                             //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                             Property[] invalidProperties = null;
-                            var tryPublish = d.PublishCulture(culture) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties);
+                            var impact = CultureImpact.Explicit(culture, _languageRepository.IsDefault(culture));
+                            var tryPublish = d.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                             if (invalidProperties != null && invalidProperties.Length > 0)
                                 Logger.Warn<ContentService>("Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
                                     d.Id, culture, string.Join(",", invalidProperties.Select(x => x.Alias)));
@@ -1426,9 +1420,17 @@ namespace Umbraco.Core.Services.Implement
 
             // variant content type - publish specified cultures
             // invariant content type - publish only the invariant culture
-            return content.ContentType.VariesByCulture()
-                ? culturesToPublish.All(culture => content.PublishCulture(culture) && _propertyValidationService.Value.IsPropertyDataValid(content, out _))
-                : content.PublishCulture() && _propertyValidationService.Value.IsPropertyDataValid(content, out _);
+            if (content.ContentType.VariesByCulture())
+            {
+                return culturesToPublish.All(culture =>
+                {
+                    var impact = CultureImpact.Create(culture, _languageRepository.IsDefault(culture), content);
+                    return content.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
+                });
+            }
+
+            return content.PublishCulture(CultureImpact.Invariant)
+                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, CultureImpact.Invariant);
         }
 
         // utility 'ShouldPublish' func used by SaveAndPublishBranch
@@ -1902,9 +1904,8 @@ namespace Umbraco.Core.Services.Implement
             content.ParentId = parentId;
 
             // get the level delta (old pos to new pos)
-            var levelDelta = parent == null
-                ? 1 - content.Level + (parentId == Constants.System.RecycleBinContent ? 1 : 0)
-                : parent.Level + 1 - content.Level;
+            // note that recycle bin (id:-20) level is 0!
+            var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
 
             var paths = new Dictionary<int, string>();
 
@@ -1922,7 +1923,7 @@ namespace Umbraco.Core.Services.Implement
             // if uow is not immediate, content.Path will be updated only when the UOW commits,
             // and because we want it now, we have to calculate it by ourselves
             //paths[content.Id] = content.Path;
-            paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : "-1") : parent.Path) + "," + content.Id;
+            paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString) : parent.Path) + "," + content.Id;
 
             const int pageSize = 500;
             var page = 0;
@@ -1953,7 +1954,14 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
-        public OperationResult EmptyRecycleBin()
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
+        public OperationResult EmptyRecycleBin() => EmptyRecycleBin(Constants.Security.SuperUserId);
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
+        /// </summary>
+        public OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId)
         {
             var nodeObjectType = Constants.ObjectTypes.Document;
             var deleted = new List<IContent>();
@@ -1988,7 +1996,7 @@ namespace Umbraco.Core.Services.Implement
                 recycleBinEventArgs.RecycleBinEmptiedSuccessfully = true; // oh my?!
                 scope.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
-                Audit(AuditType.Delete, 0, Constants.System.RecycleBinContent, "Recycle bin emptied");
+                Audit(AuditType.Delete, userId, Constants.System.RecycleBinContent, "Recycle bin emptied");
 
                 scope.Complete();
             }
@@ -2500,10 +2508,29 @@ namespace Umbraco.Core.Services.Implement
 
             var variesByCulture = content.ContentType.VariesByCulture();
 
-            //First check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
+            var impactsToPublish = culturesPublishing == null
+                ? new[] {CultureImpact.Invariant} //if it's null it's invariant
+                : culturesPublishing.Select(x => CultureImpact.Explicit(x, _languageRepository.IsDefault(x))).ToArray();
+
+            // publish the culture(s)
+            if (!impactsToPublish.All(content.PublishCulture))
+                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
+
+            //validate the property values
+            Property[] invalidProperties = null;
+            if (!impactsToPublish.All(x => _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x)))
+                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
+                {
+                    InvalidProperties = invalidProperties
+                };
+
+            //Check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
             // be changed to Unpublished and any culture currently published will not be visible.
             if (variesByCulture)
             {
+                if (culturesPublishing == null)
+                    throw new InvalidOperationException("Internal error, variesByCulture but culturesPublishing is null.");
+
                 if (content.Published && culturesPublishing.Count == 0 && culturesUnpublishing.Count == 0) // no published cultures = cannot be published
                     return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
 
@@ -2639,15 +2666,13 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Unpublishes a document
         /// </summary>
-        /// <param name="scope"></param>
         /// <param name="content"></param>
-        /// <param name="userId"></param>
         /// <param name="evtMsgs"></param>
         /// <returns></returns>
         /// <remarks>
         /// It is assumed that all unpublishing checks have passed before calling this method like <see cref="StrategyCanUnpublish"/>
         /// </remarks>
-        private PublishResult StrategyUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
+        private PublishResult StrategyUnpublish(IContent content, EventMessages evtMsgs)
         {
             var attempt = new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
 
@@ -2875,31 +2900,22 @@ namespace Umbraco.Core.Services.Implement
             {
                 foreach (var property in blueprint.Properties)
                 {
-                    if (property.PropertyType.VariesByCulture())
-                    {
-                        content.SetValue(property.Alias, property.GetValue(culture), culture);
-                    }
-                    else
-                    {
-                        content.SetValue(property.Alias, property.GetValue());
-                    }
+					var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
+                    content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
                 }
 
-                content.Name = blueprint.Name;
                 if (!string.IsNullOrEmpty(culture))
                 {
                     content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
                 }
             }
 
-
-
             return content;
         }
 
         public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IContent>();
                 if (contentTypeId.Length > 0)

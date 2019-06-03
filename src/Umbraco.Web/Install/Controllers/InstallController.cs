@@ -60,10 +60,10 @@ namespace Umbraco.Web.Install.Controllers
             }
 
             // gen the install base url
-            ViewBag.InstallApiBaseUrl = Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup");
+            ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup"));
 
             // get the base umbraco folder
-            ViewBag.UmbracoBaseFolder = IOHelper.ResolveUrl(SystemDirectories.Umbraco);
+            ViewData.SetUmbracoBaseFolder(IOHelper.ResolveUrl(SystemDirectories.Umbraco));
 
             _installHelper.InstallStatus(false, "");
 

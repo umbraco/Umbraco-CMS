@@ -4,8 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Filters;
-using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -104,7 +102,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<UserGroupBasic> GetUserGroups(bool onlyCurrentUserGroups = true)
         {
-            var allGroups = Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups())
+            var allGroups = Mapper.MapEnumerable<IUserGroup, UserGroupBasic>(Services.UserService.GetAllUserGroups())
                 .ToList();
 
             var isAdmin = Security.CurrentUser.IsAdmin();

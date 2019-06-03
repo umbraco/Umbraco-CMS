@@ -1,13 +1,17 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService, editorService) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, 
+      dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, 
+      localizationService, editorService, eventsService, overlayService) {
     
     function link(scope, el, attr, ctrl) {
-
+        
+        var eventBindings = [];
         var validationTranslated = "";
         var tabNoSortOrderTranslated = "";
 
+      scope.dataTypeHasChanged = false;
       scope.sortingMode = false;
       scope.toolbar = [];
       scope.sortableOptionsGroup = {};
@@ -470,10 +474,11 @@
         if (!property.inherited) {
 
           var oldPropertyModel = angular.copy(property);
+          var propertyModel = angular.copy(property);
 
           var propertySettings = {
             title: "Property settings",
-            property: property,
+            property: propertyModel,
             contentType: scope.contentType,
             contentTypeName: scope.model.name,
             contentTypeAllowCultureVariant: scope.model.allowCultureVariant,
@@ -483,7 +488,24 @@
 
               property.inherited = false;
               property.dialogIsOpen = false;
-  
+              property.propertyState = "active";
+
+              // apply all property changes
+              property.label = propertyModel.label;
+              property.alias = propertyModel.alias;
+              property.description = propertyModel.description;
+              property.config = propertyModel.config;
+              property.editor = propertyModel.editor;
+              property.view = propertyModel.view;
+              property.dataTypeId = propertyModel.dataTypeId;
+              property.dataTypeIcon = propertyModel.dataTypeIcon;
+              property.dataTypeName = propertyModel.dataTypeName;
+              property.validation.mandatory = propertyModel.validation.mandatory;
+              property.validation.pattern = propertyModel.validation.pattern;
+              property.showOnMemberProfile = propertyModel.showOnMemberProfile;
+              property.memberCanEdit = propertyModel.memberCanEdit;
+              property.isSensitiveValue = propertyModel.isSensitiveValue;
+
               // update existing data types
               if(model.updateSameDataTypes) {
                 updateSameDataTypes(property);
@@ -504,42 +526,37 @@
 
             },
             close: function() {
+              if(_.isEqual(oldPropertyModel, propertyModel) === false) {
+                localizationService.localizeMany(["general_confirm", "contentTypeEditor_propertyHasChanges", "general_cancel", "general_ok"]).then(function (data) {
+	              const overlay = {
+		            title: data[0],
+		            content: data[1],
+		            closeButtonLabel: data[2],
+		            submitButtonLabel: data[3],
+		            submitButtonStyle: "danger",
+		            close: function () {
+			          overlayService.close();
+		            },
+		            submit: function () {
+                      // close the confirmation
+			          overlayService.close();
+                      // close the editor
+                      editorService.close();
+		            }
+	              };
 
-              // reset all property changes
-              property.label = oldPropertyModel.label;
-              property.alias = oldPropertyModel.alias;
-              property.description = oldPropertyModel.description;
-              property.config = oldPropertyModel.config;
-              property.editor = oldPropertyModel.editor;
-              property.view = oldPropertyModel.view;
-              property.dataTypeId = oldPropertyModel.dataTypeId;
-              property.dataTypeIcon = oldPropertyModel.dataTypeIcon;
-              property.dataTypeName = oldPropertyModel.dataTypeName;
-              property.validation.mandatory = oldPropertyModel.validation.mandatory;
-              property.validation.pattern = oldPropertyModel.validation.pattern;
-              property.showOnMemberProfile = oldPropertyModel.showOnMemberProfile;
-              property.memberCanEdit = oldPropertyModel.memberCanEdit;
-              property.isSensitiveValue = oldPropertyModel.isSensitiveValue;
-
-              // because we set state to active, to show a preview, we have to check if has been filled out
-              // label is required so if it is not filled we know it is a placeholder
-              if(oldPropertyModel.editor === undefined || oldPropertyModel.editor === null || oldPropertyModel.editor === "") {
-                property.propertyState = "init";
-              } else {
-                property.propertyState = oldPropertyModel.propertyState;
+	              overlayService.open(overlay);
+                });
               }
-
-              // remove the editor
-              editorService.close();
-              
+              else {
+                // remove the editor
+                editorService.close();
+              }
             }
           };
 
           // open property settings editor
           editorService.open(propertySettings);
-
-          // set state to active to access the preview
-          property.propertyState = "active";
 
           // set property states
           property.dialogIsOpen = true;
@@ -613,18 +630,44 @@
           });
         });
       }
-
-
-      var unbindModelWatcher = scope.$watch('model', function(newValue, oldValue) {
-        if (newValue !== undefined && newValue.groups !== undefined) {
-          activate();
+      
+        function hasPropertyOfDataTypeId(dataTypeId) {
+            
+            // look at each property
+            var result = _.filter(scope.model.groups, function(group) {
+                return _.filter(group.properties, function(property) {
+                    return (property.dataTypeId === dataTypeId);
+                });
+            });
+            
+            return (result.length > 0);
         }
-      });
 
-      // clean up
-      scope.$on('$destroy', function(){
-        unbindModelWatcher();
-      });
+
+        eventBindings.push(scope.$watch('model', function(newValue, oldValue) {
+            if (newValue !== undefined && newValue.groups !== undefined) {
+                activate();
+            }
+        }));
+        
+        // clean up
+        eventBindings.push(eventsService.on("editors.dataTypeSettings.saved", function (name, args) {
+            if(hasPropertyOfDataTypeId(args.dataType.id)) {
+                scope.dataTypeHasChanged = true;
+            }
+        }));
+        
+        // clean up
+        eventBindings.push(scope.$on('$destroy', function() {
+            for(var e in eventBindings) {
+                eventBindings[e]();
+            }
+            // if a dataType has changed, we want to notify which properties that are affected by this dataTypeSettings change
+            if(scope.dataTypeHasChanged === true) {
+                var args = {documentType: scope.model};
+                eventsService.emit("editors.documentType.saved", args);
+            }
+        }));
 
     }
 

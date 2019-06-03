@@ -52,7 +52,6 @@
     <key alias="domainExists">Die Domain '%0%' ist bereits zugeordnet</key>
     <key alias="domainUpdated">Domain '%0%' aktualisiert</key>
     <key alias="orEdit">Domains bearbeiten</key>
-    <key alias="domainHelp">Beispiel: example.com, www.example.com</key>
     <key alias="inherit">Vererben</key>
     <key alias="setLanguage">Kultur</key>
     <key alias="setLanguageHelp">Definiert die Kultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>
@@ -274,13 +273,6 @@
     <key alias="usernameHint">Der Benutzername ist normalerweise Ihre E-Mail-Adresse</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Dokumenttypen, die unterhalb dieses Typs erlaubt sind</key>
-    <key alias="create">Erstellen</key>
-    <key alias="deletetab">Registerkarte löschen</key>
-    <key alias="description">Beschreibung</key>
-    <key alias="newtab">Neue Registerkarte</key>
-    <key alias="tab">Registerkarte</key>
-    <key alias="thumbnail">Illustration</key>
     <key alias="createListView" version="7.2">Angepasste Listenansicht erstellen</key>
     <key alias="removeListView" version="7.2">Angepasste Listenansicht entfernen</key>
   </area>

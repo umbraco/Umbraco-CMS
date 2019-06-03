@@ -71,6 +71,7 @@ namespace Umbraco.Tests.PublishedContent
                 new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor());
 

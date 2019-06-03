@@ -1,44 +1,46 @@
 ﻿<div id="umb-nested-content--{{model.id}}" class="umb-nested-content"
      ng-controller="Umbraco.PropertyEditors.NestedContent.PropertyEditorController"
      ng-class="{'umb-nested-content--narrow':!wideMode, 'umb-nested-content--wide':wideMode}">
-    <ng-form>
 
-        <div class="umb-nested-content__items" ng-hide="nodes.length == 0" ui-sortable="sortableOptions" ng-model="nodes">
+    <umb-load-indicator ng-if="!inited"></umb-load-indicator>
 
-            <div class="umb-nested-content__item" ng-repeat="node in nodes" ng-class="{ 'umb-nested-content__item--active' : $parent.realCurrentNode.key == node.key, 'umb-nested-content__item--single' : $parent.singleMode }">
+    <ng-form ng-if="inited">
+
+        <div class="umb-nested-content__items" ng-hide="nodes.length === 0" ui-sortable="sortableOptions" ng-model="nodes">
+
+            <div class="umb-nested-content__item" ng-repeat="node in nodes" ng-class="{ 'umb-nested-content__item--active' : $parent.realCurrentNode.key === node.key, 'umb-nested-content__item--single' : $parent.singleMode }">
 
                 <div class="umb-nested-content__header-bar" ng-click="$parent.editNode($index)" ng-hide="$parent.singleMode">
 
-                    <div class="umb-nested-content__heading" ng-class="{'-with-icon': showIcons}"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-bind="$parent.getName($index)"></span></div>
+                    <div class="umb-nested-content__heading"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-bind="$parent.getName($index)"></span></div>
 
                     <div class="umb-nested-content__icons">
-                        <a class="umb-nested-content__icon umb-nested-content__icon--edit" localize="title" title="general_edit" ng-class="{ 'umb-nested-content__icon--active' : $parent.realCurrentNode.id == node.id }" ng-click="$parent.editNode($index); $event.stopPropagation();" ng-show="$parent.maxItems > 1" prevent-default>
-                            <i class="icon icon-edit"></i>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{copyIconTitle}}" ng-click="clickCopy($event, node);" ng-if="showCopy" prevent-default>
+                            <i class="icon icon-documents"></i>
                         </a>
-                        <a class="umb-nested-content__icon umb-nested-content__icon--move" localize="title" title="actions_move" ng-click="$event.stopPropagation();" ng-show="$parent.nodes.length > 1" prevent-default>
-                            <i class="icon icon-navigation"></i>
-                        </a>
-                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.requestDeleteNode($index); $event.stopPropagation();" prevent-default>
                             <i class="icon icon-trash"></i>
                         </a>
                     </div>
 
                 </div>
 
-                <div class="umb-nested-content__content" ng-if="$parent.realCurrentNode.key == node.key && !$parent.sorting">
+                <div class="umb-nested-content__content" ng-if="$parent.realCurrentNode.key === node.key && !$parent.sorting">
                     <umb-nested-content-editor ng-model="node" tab-alias="ncTabAlias" />
                 </div>
             </div>
 
         </div>
 
-        <div class="umb-nested-content__help-text" ng-show="nodes.length == 0">
-            <localize key="grid_addElement"></localize>
+        <div ng-hide="hasContentTypes">
+            <div class="umb-nested-content__help-text">
+                <localize key="content_nestedContentNoContentTypes"></localize>
+            </div>
         </div>
 
-        <div class="umb-nested-content__footer-bar" ng-hide="nodes.length >= maxItems">
-            <a href class="umb-nested-content__icon" ng-click="openNodeTypePicker($event)" prevent-default>
-                <i class="icon icon-add"></i>
+        <div class="umb-nested-content__footer-bar" ng-hide="hasContentTypes === false || nodes.length >= maxItems">
+            <a href class="umb-nested-content__add-content" ng-class="{ '--disabled': !scaffolds.length }" ng-click="openNodeTypePicker($event)" prevent-default>
+                <localize key="grid_addElement"></localize>
             </a>
         </div>
 
@@ -47,6 +49,7 @@
     <umb-overlay
         ng-if="overlayMenu.show"
         position="target"
+        size="overlayMenu.size"
         view="overlayMenu.view"
         model="overlayMenu">
     </umb-overlay>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
@@ -33,6 +33,7 @@ namespace Umbraco.Web
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
+            IEnumerable<IMediaUrlProvider> mediaUrlProviders,
             IGlobalSettings globalSettings,
             IVariationContextAccessor variationContextAccessor)
         {
@@ -41,6 +42,7 @@ namespace Umbraco.Web
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
+            if (mediaUrlProviders == null) throw new ArgumentNullException(nameof(mediaUrlProviders));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
@@ -71,7 +73,7 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
-            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, variationContextAccessor);
+            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, mediaUrlProviders, variationContextAccessor);
         }
 
         /// <summary>
@@ -131,7 +133,7 @@ namespace Umbraco.Web
         public UrlProvider UrlProvider { get; }
 
         /// <summary>
-        /// Gets/sets the PublishedContentRequest object
+        /// Gets/sets the PublishedRequest object
         /// </summary>
         public PublishedRequest PublishedRequest { get; set; }
 

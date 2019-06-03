@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     public class PropertyCollection : KeyedCollection<string, Property>, INotifyCollectionChanged, IDeepCloneable
     {
         private readonly object _addLocker = new object();
-        internal Action OnAdd;
+        
         internal Func<Property, bool> AdditionValidator { get; set; }
 
         /// <summary>
@@ -49,10 +49,12 @@ namespace Umbraco.Core.Models
         /// </summary>
         internal void Reset(IEnumerable<Property> properties)
         {
+            //collection events will be raised in each of these calls
             Clear();
+
+            //collection events will be raised in each of these calls
             foreach (var property in properties)
                 Add(property);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         /// <summary>
@@ -60,8 +62,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         protected override void SetItem(int index, Property property)
         {
+            var oldItem = index >= 0 ? this[index] : property;
             base.SetItem(index, property);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, property, index));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, property, oldItem));
         }
 
         /// <summary>
@@ -120,10 +123,8 @@ namespace Umbraco.Core.Models
                     }
                 }
 
+                //collection events will be raised in InsertItem with Add
                 base.Add(property);
-
-                OnAdd?.Invoke();
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, property));
             }
         }
 

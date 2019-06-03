@@ -18,9 +18,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            // delete *all* keys and indexes - because of FKs
-            Delete.KeysAndIndexes().Do();
-
             MigratePropertyData();
             MigrateContentAndPropertyTypes();
             MigrateContent();
@@ -46,10 +43,6 @@ HAVING COUNT(v2.id) <> 1").Any())
                 Debugger.Break();
                 throw new Exception("Migration failed: missing or duplicate 'current' content versions.");
             }
-
-            // re-create *all* keys and indexes
-            foreach (var x in DatabaseSchemaCreator.OrderedTables)
-                Create.KeysAndIndexes(x).Do();
         }
 
         private void MigratePropertyData()
@@ -79,7 +72,8 @@ HAVING COUNT(v2.id) <> 1").Any())
             // transform column versionId from guid to integer (contentVersion.id)
             if (ColumnType(PreTables.PropertyData, "versionId") == "uniqueidentifier")
             {
-                Database.Execute($"ALTER TABLE {PreTables.PropertyData} ADD COLUMN versionId2 INT NULL;");
+                Alter.Table(PreTables.PropertyData).AddColumn("versionId2").AsInt32().Nullable().Do();
+
                 // SQLCE does not support UPDATE...FROM
                 var temp = Database.Fetch<dynamic>($"SELECT id, versionId FROM {PreTables.ContentVersion}");
                 foreach (var t in temp)
@@ -219,8 +213,10 @@ WHERE versionId NOT IN (SELECT (versionId) FROM {PreTables.ContentVersion} WHERE
             Delete.Column("text").FromTable(PreTables.Document).Do();
             Delete.Column("templateId").FromTable(PreTables.Document).Do();
             Delete.Column("documentUser").FromTable(PreTables.Document).Do();
+            Delete.DefaultConstraint().OnTable(PreTables.Document).OnColumn("updateDate").Do();
             Delete.Column("updateDate").FromTable(PreTables.Document).Do();
             Delete.Column("versionId").FromTable(PreTables.Document).Do();
+            Delete.DefaultConstraint().OnTable(PreTables.Document).OnColumn("newest").Do();
             Delete.Column("newest").FromTable(PreTables.Document).Do();
 
             // add and populate edited column
@@ -319,7 +315,7 @@ WHERE v1.propertyTypeId=v2.propertyTypeId AND v1.languageId=v2.languageId AND v1
 
             public const string Tag = "cmsTags";
             public const string TagRelationship = "cmsTagRelationship";
-            
+
             // ReSharper restore UnusedMember.Local
         }
     }

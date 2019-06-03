@@ -78,9 +78,6 @@
     <key alias="domainCreated">Создан новый домен '%0%'</key>
     <key alias="domainDeleted">Домен '%0%' удален</key>
     <key alias="domainExists">Домен с именем '%0%' уже существует</key>
-    <key alias="domainHelp"><![CDATA[Примеры допустимых доменных имен: "example.com", "www.example.com", "example.com:8080" или
-        "https://www.example.com/".<br /><br />Также здесь допустимы части адресов URL первого уровня, например "example.com/en",
-        однако их следует по возможности избегать. Рекомендуется использовать настройку культуры (языка), расположенную выше.]]></key>
     <key alias="domainUpdated">Домен '%0%' обновлен</key>
     <key alias="duplicateDomain">Такой домен уже назначен.</key>
     <key alias="inherit">Унаследовать</key>
@@ -430,15 +427,8 @@
     <key alias="overviewTitle">Обзор словаря</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Допустимые типы дочерних узлов</key>
-    <key alias="create">Создать</key>
     <key alias="createListView" version="7.2">Создать пользовательский список</key>
-    <key alias="deletetab">Удалить вкладку</key>
-    <key alias="description">Описание</key>
-    <key alias="newtab">Новая вкладка</key>
     <key alias="removeListView" version="7.2">Удалить пользовательский список</key>
-    <key alias="tab">Вкладка</key>
-    <key alias="thumbnail">Миниатюра</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Добавить предустановленное значение</key>
@@ -753,7 +743,7 @@
     <key alias="noSniffSetHeaderInConfigSuccess">Значение, добавляющее заголовок, препятствующий использованию MIME-уязвимостей, успешно добавлено в файл web.config.</key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[Заголовок <strong>Strict-Transport-Security</strong>, известный также как HSTS-header, обнаружен.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[Заголовок <strong>Strict-Transport-Security</strong> не найден.]]></key>
-    <key alias="hSTSSetHeaderInConfigDescription">Добавляет заголовок 'Strict-Transport-Security' и его значение 'max-age=10886400; preload' в секцию httpProtocol/customHeaders файла web.config. Применяйте этот способ только в случае, если доступ к Вашим сайтам будет осуществляться по протоколу https как минимум ближайшие 18 недель.</key>
+    <key alias="hSTSSetHeaderInConfigDescription">Добавляет заголовок 'Strict-Transport-Security' и его значение 'max-age=10886400' в секцию httpProtocol/customHeaders файла web.config. Применяйте этот способ только в случае, если доступ к Вашим сайтам будет осуществляться по протоколу https как минимум ближайшие 18 недель.</key>
     <key alias="hSTSSetHeaderInConfigSuccess">Заголовок HSTS-header успешно добавлен в файл web.config.</key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[Заголовок <strong>X-XSS-Protection</strong> обнаружен.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Заголовок <strong>X-XSS-Protection</strong> не найден.]]></key>

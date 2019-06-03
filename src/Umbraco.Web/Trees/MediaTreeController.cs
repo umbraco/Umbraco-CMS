@@ -30,7 +30,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Media, Constants.Trees.Media)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    [SearchableTree("searchResultFormatter", "configureMediaResult")]
+    [SearchableTree("searchResultFormatter", "configureMediaResult", 20)]
     public class MediaTreeController : ContentTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Trees
             //set the default
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 // if the user's start node is not the root then the only menu item to display is refresh
                 if (UserStartNodes.Contains(Constants.System.Root) == false)
