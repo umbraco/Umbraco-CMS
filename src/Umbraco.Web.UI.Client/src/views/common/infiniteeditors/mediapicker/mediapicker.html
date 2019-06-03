@@ -33,7 +33,7 @@
 
                         <div class="form-search__toggle">
                             <label>
-                                <input type="checkbox" ng-model="excludeSubFolders" ng-change="toggle()" />
+                                <input type="checkbox" ng-model="filterOptions.excludeSubFolders" ng-change="toggle()" />
                                 <localize key="general_excludeFromSubFolders">Search only this folder</localize>
                             </label>
                         </div>
@@ -99,7 +99,7 @@
                         item-min-width="100"
                         item-min-height="100"
                         only-images={{onlyImages}}
-                        include-sub-folders={{!excludeSubFolders}}
+                        include-sub-folders={{!filterOptions.excludeSubFolders}}
                         current-Folder-id="{{currentFolder.id}}">
                 </umb-media-grid>
 

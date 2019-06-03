@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-    function ($scope, mediaResource, entityResource, mediaHelper, mediaTypeHelper, eventsService, userService, treeService, localStorageService, localizationService, editorService) {
+    function ($scope, mediaResource, entityResource, mediaHelper, mediaTypeHelper, eventsService, userService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
 
             var dialogOptions = $scope.model;
 
@@ -15,7 +15,10 @@ angular.module("umbraco")
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
             $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
-            $scope.excludeSubFolders = false;
+
+            $scope.filterOptions = {
+                excludeSubFolders: umbSessionStorage.get("mediaPickerExcludeSubFolders") || false
+            };
 
             var userStartNodes = []; 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -326,6 +329,7 @@ angular.module("umbraco")
             };
 
             $scope.toggle = function() {
+                umbSessionStorage.set("mediaPickerExcludeSubFolders", $scope.filterOptions.excludeSubFolders)
                 // Make sure to activate the changeSearch function everytime the toggle is clicked
                 $scope.changeSearch();
             }
@@ -338,7 +342,7 @@ angular.module("umbraco")
 
             function searchMedia() {
                 $scope.loading = true;
-                entityResource.getPagedDescendants($scope.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", $scope.searchOptions)
+                entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", $scope.searchOptions)
                     .then(function(data) {
                         // update image data to work with image grid
                         angular.forEach(data.items, function(mediaItem) {
