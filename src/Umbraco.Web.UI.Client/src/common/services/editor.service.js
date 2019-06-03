@@ -355,6 +355,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @param {Object} editor rendering options
          * @param {Boolean} editor.multiPicker Pick one or multiple items
+         * @param {String} editor.culture The culture for which we want to render the content tree
          * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
          * @param {Function} editor.close Callback function when the close button is clicked.
          *

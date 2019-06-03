@@ -27,6 +27,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.section = $scope.model.section;
         vm.treeAlias = $scope.model.treeAlias;
         vm.multiPicker = $scope.model.multiPicker;
+        vm.culture = $scope.model.culture;
         vm.hideHeader = (typeof $scope.model.hideHeader) === "boolean" ? $scope.model.hideHeader : true;
         vm.searchInfo = {
             searchFromId: $scope.model.startNodeId,
@@ -72,19 +73,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
          */
         function onInit () {
 
-            // load languages
-            languageResource.getAll().then(function (languages) {
-                vm.languages = languages;
-
-                // set the default language
-                vm.languages.forEach(function (language) {
-                    if (language.isDefault) {
-                        vm.selectedLanguage = language;
-                        vm.languageSelectorIsOpen = false;
-                    }
-                });
-            });
-
+            // Set the dialog title
             if (vm.treeAlias === "content") {
                 vm.entityType = "Document";
                 if (!$scope.model.title) {
@@ -127,11 +116,11 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     if (node.metaData.IsContainer) {
                         openMiniListView(node);
                     }
-                    initTree();
+                    initCultureTree();
                 });
             }
             else {
-                initTree();
+                initCultureTree();
             }
 
             //Configures filtering
@@ -164,6 +153,36 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         }
 
         /**
+         * When working with a specified culture we need to follow some steps before rendering the tree
+         */
+        function initCultureTree() {
+            // passed in culture by using the editorservice, so no languageselector
+            if (!vm.showLanguageSelector && vm.culture) {
+                // load languages
+                languageResource.getById(vm.culture).then(function (language) {
+                    vm.selectedLanguage = language;
+
+                    initTree();
+                });
+            } else {
+                // load languages
+                languageResource.getAll().then(function (languages) {
+                    vm.languages = languages;
+
+                    // set the default language
+                    vm.languages.forEach(function (language) {
+                        if (language.isDefault) {
+                            vm.selectedLanguage = language;
+                            vm.languageSelectorIsOpen = false;
+                        }
+                    });
+                });
+
+                initTree();
+            }
+        }
+
+        /**
          * Updates the tree's query parameters
          */
         function initTree() {
@@ -178,8 +197,9 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if (vm.selectedLanguage && vm.selectedLanguage.id) {
                 queryParams["culture"] = vm.selectedLanguage.culture;
             }
+
             var queryString = $.param(queryParams); //create the query string from the params object
-            
+
             if (!queryString) {
                 vm.customTreeParams = $scope.model.customTreeParams;
             }
