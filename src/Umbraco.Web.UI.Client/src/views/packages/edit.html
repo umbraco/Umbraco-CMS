@@ -36,7 +36,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Version" required="true">
-                            <input class="umb-property-editor" name="version" type="text" ng-model="vm.package.version" val-server-field="model.Version" required ng-pattern="vm.packageVersionRegex" />
+                            <input class="umb-property-editor" name="version" type="text" ng-model="vm.package.version" val-server-field="model.Version" required ng-pattern="vm.versionRegex" />
 
                             <span ng-messages="editPackageForm.version.$error" show-validation-on-submit >
                                 <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
@@ -54,7 +54,7 @@
                         </umb-control-group>-->
 
                         <umb-control-group label="Umbraco version">
-                            <input class="umb-property-editor" name="umbracoVersion" type="text" ng-model="vm.package.umbracoVersion" val-server-field="model.umbracoVersion" ng-pattern="vm.umbracoVersionRegex" />
+                            <input class="umb-property-editor" name="umbracoVersion" type="text" ng-model="vm.package.umbracoVersion" val-server-field="model.umbracoVersion" ng-pattern="vm.versionRegex" />
 
                             <span ng-messages="editPackageForm.umbracoVersion.$error" show-validation-on-submit >
                                 <span class="help-inline" ng-message="valServerField">{{editPackageForm.umbracoVersion.errorMsg}}</span>
