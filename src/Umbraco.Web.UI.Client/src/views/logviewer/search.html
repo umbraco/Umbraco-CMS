@@ -107,15 +107,15 @@
                                 Total Items: {{ vm.logItems.totalItems }}
                             </div>
 
-                            <table class="table table-hover" ng-if="vm.logItems.totalItems > 0">
+                            <table class="table table-hover" style="table-layout: fixed;" ng-if="vm.logItems.totalItems > 0">
                                 <thead>
                                     <tr>
-                                        <th style="min-width:100px;" ng-click="vm.toggleOrderBy()">
+                                        <th style="width: 20%;" ng-click="vm.toggleOrderBy()">
                                             Timestamp
                                             <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
                                         </th>
-                                        <th>Level</th>
-                                        <th>Machine</th>
+                                        <th style="width: 15%;">Level</th>
+                                        <th style="width: 20%;">Machine</th>
                                         <th>Message</th>
                                     </tr>
                                 </thead>
@@ -124,7 +124,7 @@
                                         <td>{{ log.Timestamp | date:'medium' }}</td>
                                         <td><umb-badge size="s" color="{{ log.logTypeColor }}">{{ log.Level }}</umb-badge></td>
                                         <td><small>{{ log.Properties.MachineName.Value }}</small></td>
-                                        <td>{{ log.RenderedMessage }}</td>
+                                        <td style="word-break: break-word;">{{ log.RenderedMessage }}</td>
                                     </tr>
 
                                     <!-- Log Details (Exception & Properties) -->
