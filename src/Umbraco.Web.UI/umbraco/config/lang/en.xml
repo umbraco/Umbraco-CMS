@@ -508,7 +508,7 @@
     <key alias="password">Enter your password</key>
     <key alias="confirmPassword">Confirm your password</key>
     <key alias="nameentity">Name the %0%...</key>
-    <key alias="a11yEnterName">Enter a name...</key>
+    <key alias="entername">Enter a name...</key>
     <key alias="enteremail">Enter an email...</key>
     <key alias="enterusername">Enter a username...</key>
     <key alias="label">Label...</key>
@@ -520,11 +520,8 @@
     <key alias="enterMessage">Enter a message...</key>
     <key alias="usernameHint">Your username is usually your email</key>
     <key alias="anchor">#value or ?key=value</key>
-    <key alias="enterAlias">Enter alias...</key>
-    <key alias="generatingAlias">Generating alias...</key>
-    <key alias="a11yName">Name</key>
-    <key alias="a11yCreateItem">Create item</key>
-    <key alias="a11yEdit">Edit</key>
+        <key alias="enterAlias">Enter alias...</key>
+        <key alias="generatingAlias">Generating alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
