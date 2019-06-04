@@ -43,7 +43,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             => PropertyCacheLevel.Snapshot;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => typeof (IEnumerable<IPublishedContent>);
+            => IsSingleNodePicker(propertyType)
+                ? typeof(IPublishedContent)
+                : typeof(IEnumerable<IPublishedContent>);
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
@@ -73,6 +75,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
                 {
                     var udis = (Udi[])source;
+                    var isSingleNodePicker = IsSingleNodePicker(propertyType);
 
                     if ((propertyType.Alias != null && PropertiesToExclude.InvariantContains(propertyType.Alias)) == false)
                     {
@@ -102,9 +105,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             if (multiNodeTreePickerItem != null && multiNodeTreePickerItem.ItemType != PublishedItemType.Element)
                             {
                                 multiNodeTreePicker.Add(multiNodeTreePickerItem);
+                                if (isSingleNodePicker)
+                                {
+                                    break;
+                                }
                             }
                         }
 
+                        if (isSingleNodePicker)
+                        {
+                            return multiNodeTreePicker.FirstOrDefault();
+                        }
                         return multiNodeTreePicker;
                     }
 
@@ -140,6 +151,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 actualType = expectedType;
             }
             return content;
+        }
+
+        private static bool IsSingleNodePicker(PublishedPropertyType propertyType)
+        {
+            return propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>().MaxNumber == 1;
         }
     }
 }

@@ -134,7 +134,9 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
                                  {
                                      Name = foreignKeyName,
                                      ForeignTable = tableName,
-                                     PrimaryTable = referencedTable.Value
+                                     PrimaryTable = referencedTable.Value,
+                                     OnDelete = attribute.OnDelete,
+                                     OnUpdate = attribute.OnUpdate
                                  };
             definition.ForeignColumns.Add(columnName);
             definition.PrimaryColumns.Add(referencedColumn);
