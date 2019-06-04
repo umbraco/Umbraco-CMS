@@ -472,7 +472,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Edit the different language versions for the dictionary item '<em>%0%</em>' below
+      Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left
    ]]></key>
     <key alias="displayName">Culture Name</key>
     <key alias="changeKeyError"><![CDATA[
@@ -522,6 +522,9 @@
     <key alias="anchor">#value or ?key=value</key>
         <key alias="enterAlias">Enter alias...</key>
         <key alias="generatingAlias">Generating alias...</key>
+      <key alias="a11yCreateItem">Create item</key>
+      <key alias="a11yEdit">Edit</key>
+      <key alias="a11yName">Name</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
@@ -1595,7 +1598,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="elementHeading">Is an Element type</key>
     <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
     <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
-    <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2039,7 +2041,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noSniffSetHeaderInConfigSuccess">A setting to create a header protecting against MIME sniffing vulnerabilities has been added to your web.config file.</key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[The header <strong>Strict-Transport-Security</strong> was not found.]]></key>
-    <key alias="hSTSSetHeaderInConfigDescription">Adds the header 'Strict-Transport-Security' with the value 'max-age=10886400' to the httpProtocol/customHeaders section of web.config. Use this fix only if you will have your domains running with https for the next 18 weeks (minimum).</key>
+    <key alias="hSTSSetHeaderInConfigDescription">Adds the header 'Strict-Transport-Security' with the value 'max-age=10886400; preload' to the httpProtocol/customHeaders section of web.config. Use this fix only if you will have your domains running with https for the next 18 weeks (minimum).</key>
     <key alias="hSTSSetHeaderInConfigSuccess">The HSTS header has been added to your web.config file.</key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
