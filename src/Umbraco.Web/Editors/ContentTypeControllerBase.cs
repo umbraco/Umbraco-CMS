@@ -160,7 +160,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns a list of content types where a particular composition content type is used
         /// </summary>
-        /// <param name="type">Type of content Type, eg documentType or mediaType</param>      
+        /// <param name="type">Type of content Type, eg documentType or mediaType</param>
         /// <param name="contentTypeId">Id of composition content type</param>
         /// <returns></returns>
         protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId,
@@ -211,7 +211,7 @@ namespace Umbraco.Web.Editors
                 .Select(x =>
                 {
                     //translate the name
-                    x.Name = TranslateItem(x.Name);               
+                    x.Name = TranslateItem(x.Name);
 
                     return x;
                 })
@@ -303,9 +303,12 @@ namespace Umbraco.Web.Editors
                 //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
                 //always filter these 0 types out
                 var allowItselfAsChild = false;
+                var allowIfselfAsChildSortOrder = -1;
                 if (contentTypeSave.AllowedContentTypes != null)
                 {
+                    allowIfselfAsChildSortOrder = contentTypeSave.AllowedContentTypes.IndexOf(0);
                     allowItselfAsChild = contentTypeSave.AllowedContentTypes.Any(x => x == 0);
+
                     contentTypeSave.AllowedContentTypes = contentTypeSave.AllowedContentTypes.Where(x => x > 0).ToList();
                 }
 
@@ -336,8 +339,10 @@ namespace Umbraco.Web.Editors
                 //we need to save it twice to allow itself under itself.
                 if (allowItselfAsChild)
                 {
-                    //NOTE: This will throw if the composition isn't right... but it shouldn't be at this stage
-                    newCt.AddContentType(newCt);
+                    newCt.AllowedContentTypes =
+                        newCt.AllowedContentTypes.Union(
+                            new []{ new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder) }
+                        );
                     saveContentType(newCt);
                 }
                 return newCt;
