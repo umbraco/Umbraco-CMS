@@ -337,10 +337,11 @@ namespace Umbraco.Web.Editors
                 saveContentType(newCt);
 
                 //we need to save it twice to allow itself under itself.
-                if (allowItselfAsChild)
+                if (allowItselfAsChild && newCt != null)
                 {
                     newCt.AllowedContentTypes =
-                        newCt.AllowedContentTypes.Union(
+                        newCt.AllowedContentTypes
+                            .Union(
                             new []{ new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder) }
                         );
                     saveContentType(newCt);
