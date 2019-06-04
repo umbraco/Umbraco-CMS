@@ -31,9 +31,14 @@ module.exports = {
             umbraco: {files: ["./src/views/**/*.html"], folder: ""},
             installer: {files: ["./src/installer/steps/*.html"], folder: "install/"}
         },
+        
+        plugins:{
+            app: {files: ["./src/App_Plugins/**/*"], folder: ""}
+        },
 
         //globs for file-watching
         globs:{
+            plugins: "./src/App_Plugins/**",
             views: "./src/views/**/*.html",
             less: "./src/less/**/*.less",
             js: "./src/*.js",
@@ -41,12 +46,13 @@ module.exports = {
             assets: "./src/assets/**"
         }
     },
-    root: "../Umbraco.Web.UI/Umbraco/",
+    root: "../Umbraco.Web.UI/",
     targets: {
-        js: "js/",
-        lib: "lib/",
-        views: "views/",
-        css: "assets/css/",
-        assets: "assets/"
+        js: "Umbraco/js/",
+        lib: "Umbraco/lib/",
+        views: "Umbraco/views/",
+        plugins: "App_Plugins/",
+        css: "Umbraco/assets/css/",
+        assets: "Umbraco/assets/"
     }
 };

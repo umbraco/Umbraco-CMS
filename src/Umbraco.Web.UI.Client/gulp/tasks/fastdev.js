@@ -9,5 +9,5 @@ gulp.task('fastdev', function(cb) {
     
     global.isProd = false;
     
-    runSequence(["dependencies", "js", "less", "views"], "watch", cb);
+    runSequence(["dependencies", "js", "less", "views", "plugins"], "watch", cb);
 });

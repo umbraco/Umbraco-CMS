@@ -48,11 +48,18 @@ gulp.task('watch', function () {
         .pipe(gulp.dest(config.root + config.targets.views))
     );
 
+
     //watch all app js files that will not be merged - copy single file changes
     stream.add(
         watch(config.sources.globs.js, { interval: watchInterval })
         .pipe(gulp.dest(config.root + config.targets.js))
     );
-
+    
+    //watch all views - copy single file changes
+    stream.add(
+        watch(config.sources.globs.plugins, { interval: watchInterval })
+        .pipe(gulp.dest(config.root + config.targets.plugins))
+    );
+    
     return stream;
 });
