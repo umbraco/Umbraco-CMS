@@ -276,8 +276,8 @@ function listViewController($scope, $q, $routeParams, $injector, $timeout, curre
             if ($scope.listViewResultSet.items) {
                 _.each($scope.listViewResultSet.items, function (e, index) {
                     setPropertyValues(e);
-               // create the folders collection (only for media list views)
-               if (section === "media" && !mediaHelper.hasFilePropertyType(e)) {
+                    // create the folders collection (only for media list views)
+                    if (section === "media" && !mediaHelper.hasFilePropertyType(e)) {
                         $scope.folders.push(e);
                     }
                 });
@@ -650,7 +650,16 @@ function listViewController($scope, $q, $routeParams, $injector, $timeout, curre
             if (value.startsWith("umb://")) {
                 contentResource.getById(value).then(function (node) {
                     if (node) {
-                        deferred.resolve(node.variants[0].name);
+                        var variant = node.variants.filter(v => v.language.culture === $scope.options.cultureName)[0];
+
+                        // Set the first variant to active if we can't find it.
+                        // If the content item is invariant, then only one item exists in the array.
+                        if (!variant) {
+                            variant = node.variants[0];
+                        }
+                        deferred.resolve(variant.name);
+                    } else {
+                        deferred.reject();
                     }
                 })
             } else {
@@ -715,24 +724,24 @@ function listViewController($scope, $q, $routeParams, $injector, $timeout, curre
         }
 
         getContentTypesCallback(id).then(function (listViewAllowedTypes) {
-          $scope.listViewAllowedTypes = listViewAllowedTypes;
+            $scope.listViewAllowedTypes = listViewAllowedTypes;
 
-          var blueprints = false;
-          _.each(listViewAllowedTypes, function (allowedType) {
-              if (_.isEmpty(allowedType.blueprints)) {
-                // this helps the view understand that there are no blueprints available
-                allowedType.blueprints = null;
-              }
-              else {
-                blueprints = true;
-                // turn the content type blueprints object into an array of sortable objects for the view
-                allowedType.blueprints = _.map(_.pairs(allowedType.blueprints || {}), function (pair) {
-                  return {
-                    id: pair[0],
-                    name: pair[1]
-                  };
-                });
-              }
+            var blueprints = false;
+            _.each(listViewAllowedTypes, function (allowedType) {
+                if (_.isEmpty(allowedType.blueprints)) {
+                    // this helps the view understand that there are no blueprints available
+                    allowedType.blueprints = null;
+                }
+                else {
+                    blueprints = true;
+                    // turn the content type blueprints object into an array of sortable objects for the view
+                    allowedType.blueprints = _.map(_.pairs(allowedType.blueprints || {}), function (pair) {
+                        return {
+                            id: pair[0],
+                            name: pair[1]
+                        };
+                    });
+                }
             });
 
             if (listViewAllowedTypes.length === 1 && blueprints === false) {
