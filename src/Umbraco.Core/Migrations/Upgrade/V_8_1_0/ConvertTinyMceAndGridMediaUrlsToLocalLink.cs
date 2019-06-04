@@ -26,9 +26,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                 RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             var sqlPropertyData = Sql()
-                .Select<PropertyDataDto>()
-                    .AndSelect<PropertyTypeDto>()
-                    .AndSelect<DataTypeDto>()
+                .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
                 .From<PropertyDataDto>()
                     .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
                     .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)

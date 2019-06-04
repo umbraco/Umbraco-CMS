@@ -83,10 +83,10 @@ namespace Umbraco.Core.Services
         internal static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text)
         {
             var cultureDictionary = CultureDictionary;
-            return UmbracoDictionaryTranslate(text, cultureDictionary);
+            return manager.UmbracoDictionaryTranslate(text, cultureDictionary);
         }
 
-        private static string UmbracoDictionaryTranslate(string text, ICultureDictionary cultureDictionary)
+        private static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text, ICultureDictionary cultureDictionary)
         {
             if (text == null)
                 return null;
@@ -95,7 +95,14 @@ namespace Umbraco.Core.Services
                 return text;
 
             text = text.Substring(1);
-            return cultureDictionary[text].IfNullOrWhiteSpace(text);
+            var value = cultureDictionary[text];
+            if (value.IsNullOrWhiteSpace() == false)
+            {
+                return value;
+            }
+
+            value = manager.Localize(text.Replace('_', '/'));
+            return value.StartsWith("[") ? text : value;
         }
 
         private static ICultureDictionary CultureDictionary

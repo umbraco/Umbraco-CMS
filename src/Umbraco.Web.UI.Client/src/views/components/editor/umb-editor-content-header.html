@@ -26,7 +26,7 @@
                             umb-auto-focus
                             val-server-field="{{serverValidationNameField}}"
                             required
-                            autocomplete="off" />
+                            autocomplete="off" maxlength="255" />
                     </ng-form>
 
                     <a ng-if="content.variants.length > 0 && hideChangeVariant !== true" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" ng-class="{'--error': vm.errorsOnOtherVariants}">

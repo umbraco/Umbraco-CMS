@@ -12,8 +12,7 @@
                 ncAlias: "",
                 ncTabAlias: "",
                 nameTemplate: ""
-            }
-            );
+            });
         }
 
         $scope.remove = function (index) {
@@ -58,7 +57,7 @@
 
         ncResources.getContentTypes().then(function (docTypes) {
             $scope.model.docTypes = docTypes;
-
+            
             // Populate document type tab dictionary
             docTypes.forEach(function (value) {
                 $scope.docTypeTabs[value.alias] = value.tabs;
@@ -74,7 +73,6 @@
                     return docType.alias === c.ncAlias;
                 });
             });
-
         }
 
         if (!$scope.model.value) {
@@ -93,10 +91,15 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "contentResource",
     "localizationService",
     "iconHelper",
-
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
-
-        var inited = false;
+    "clipboardService",
+    "eventsService",
+    
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService) {
+        
+        var contentTypeAliases = [];
+        _.each($scope.model.config.contentTypes, function (contentType) {
+            contentTypeAliases.push(contentType.ncAlias);
+        });
 
         _.each($scope.model.config.contentTypes, function (contentType) {
             contentType.nameExp = !!contentType.nameTemplate
@@ -109,6 +112,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.realCurrentNode = undefined;
         $scope.scaffolds = undefined;
         $scope.sorting = false;
+        $scope.inited = false;
 
         $scope.minItems = $scope.model.config.minItems || 0;
         $scope.maxItems = $scope.model.config.maxItems || 0;
@@ -122,8 +126,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.hasContentTypes = $scope.model.config.contentTypes.length > 0;
 
         $scope.labels = {};
-        localizationService.localizeMany(["grid_insertControl"]).then(function(data) {
-            $scope.labels.docTypePickerTitle = data[0];
+        localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function(data) {
+            $scope.labels.grid_addElement = data[0];
+            $scope.labels.content_createEmpty = data[1];
         });
 
         // helper to force the current form into the dirty state
@@ -136,7 +141,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.addNode = function (alias) {
             var scaffold = $scope.getScaffold(alias);
 
-            var newNode = initNode(scaffold, null);
+            var newNode = createNode(scaffold, null);
 
             $scope.currentNode = newNode;
             $scope.setDirty();
@@ -148,14 +153,18 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             }
 
             $scope.overlayMenu = {
-                title: $scope.labels.docTypePickerTitle,
                 show: false,
                 style: {},
-                filter: $scope.scaffolds.length > 15 ? true : false,
+                filter: $scope.scaffolds.length > 12 ? true : false,
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
-                submit: function(model) {                    
+                clickPasteItem: function(item) {
+                    $scope.pasteFromClipboard(item.data);
+                    $scope.overlayMenu.show = false;
+                    $scope.overlayMenu = null;
+                },
+                submit: function(model) {
                     if(model && model.selectedItem) {
                         $scope.addNode(model.selectedItem.alias);
                     }
@@ -181,13 +190,35 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             if ($scope.overlayMenu.availableItems.length === 0) {
                 return;
             }
-
-            if ($scope.overlayMenu.availableItems.length === 1) {
+            
+            $scope.overlayMenu.size = $scope.overlayMenu.availableItems.length > 6 ? "medium" : "small";
+            
+            $scope.overlayMenu.pasteItems = [];
+            var availableNodesForPaste = clipboardService.retriveDataOfType("elementType", contentTypeAliases);
+            _.each(availableNodesForPaste, function (node) {
+                $scope.overlayMenu.pasteItems.push({
+                    alias: node.contentTypeAlias,
+                    name: node.name, //contentTypeName
+                    data: node,
+                    icon: iconHelper.convertFromLegacyIcon(node.icon)
+                });
+            });
+            
+            $scope.overlayMenu.title = $scope.overlayMenu.pasteItems.length > 0 ? $scope.labels.grid_addElement : $scope.labels.content_createEmpty;
+            
+            $scope.overlayMenu.clickClearPaste = function($event) {
+                $event.stopPropagation();
+                $event.preventDefault();
+                clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
+                $scope.overlayMenu.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+            };
+            
+            if ($scope.overlayMenu.availableItems.length === 1 && $scope.overlayMenu.pasteItems.length === 0) {
                 // only one scaffold type - no need to display the picker
                 $scope.addNode($scope.scaffolds[0].contentTypeAlias);
                 return;
             }
-
+            
             $scope.overlayMenu.show = true;
         };
 
@@ -201,66 +232,84 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.deleteNode = function (idx) {
             if ($scope.nodes.length > $scope.model.config.minItems) {
-                if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes === 1) {
-                    localizationService.localize("content_nestedContentDeleteItem").then(function (value) {
-                        if (confirm(value)) {
-                            $scope.nodes.splice(idx, 1);
-                            $scope.setDirty();
-                            updateModel();
-                        }
-                    });
-                } else {
-                    $scope.nodes.splice(idx, 1);
-                    $scope.setDirty();
-                    updateModel();
-                }
+                $scope.nodes.splice(idx, 1);
+                $scope.setDirty();
+                updateModel();
+            }
+        };
+        $scope.requestDeleteNode = function (idx) {
+            if ($scope.model.config.confirmDeletes === true) {
+                localizationService.localize("content_nestedContentDeleteItem").then(function (value) {
+                    if (confirm(value)) {
+                        $scope.deleteNode(idx);
+                    }
+                });
+            } else {
+                $scope.deleteNode(idx);
             }
         };
 
         $scope.getName = function (idx) {
 
-            var name = "Item " + (idx + 1);
+            var name = "";
 
             if ($scope.model.value[idx]) {
 
                 var contentType = $scope.getContentTypeConfig($scope.model.value[idx].ncContentTypeAlias);
 
-                if (contentType != null && contentType.nameExp) {
-                    // Run the expression against the stored dictionary value, NOT the node object
-                    var item = $scope.model.value[idx];
+                if (contentType != null) {
+                    // first try getting a name using the configured label template
+                    if (contentType.nameExp) {
+                        // Run the expression against the stored dictionary value, NOT the node object
+                        var item = $scope.model.value[idx];
 
-                    // Add a temporary index property
-                    item["$index"] = (idx + 1);
+                        // Add a temporary index property
+                        item["$index"] = (idx + 1);
 
-                    var newName = contentType.nameExp(item);
-                    if (newName && (newName = $.trim(newName))) {
-                        name = newName;
+                        var newName = contentType.nameExp(item);
+                        if (newName && (newName = $.trim(newName))) {
+                            name = newName;
+                        }
+
+                        // Delete the index property as we don't want to persist it
+                        delete item["$index"];
                     }
 
-                    // Delete the index property as we don't want to persist it
-                    delete item["$index"];
+                    // if we still do not have a name and we have multiple content types to choose from, use the content type name (same as is shown in the content type picker)
+                    if (!name && $scope.scaffolds.length > 1) {
+                        var scaffold = $scope.getScaffold(contentType.ncAlias);
+                        if (scaffold) {
+                            name = scaffold.contentTypeName;
+                        }
+                    }
                 }
 
+            }
+
+            if (!name) {
+                name = "Item " + (idx + 1);
             }
 
             // Update the nodes actual name value
             if ($scope.nodes[idx].name !== name) {
                 $scope.nodes[idx].name = name;
             }
-
-
+            
             return name;
         };
-
+        
         $scope.getIcon = function (idx) {
             var scaffold = $scope.getScaffold($scope.model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
         }
-
         $scope.sortableOptions = {
             axis: "y",
             cursor: "move",
-            handle: ".umb-nested-content__icon--move",
+            handle:'.umb-nested-content__header-bar',
+            distance: 10,
+            opacity: 0.7,
+            tolerance: "pointer",
+            scroll: true,
             start: function (ev, ui) {
                 updateModel();
                 // Yea, yea, we shouldn't modify the dom, sue me
@@ -298,7 +347,41 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return contentType.ncAlias === alias;
             });
         }
-
+        
+        $scope.showCopy = clipboardService.isSupported();
+        
+        $scope.showPaste = false;
+        
+        $scope.clickCopy = function($event, node) {
+            
+            syncCurrentNode();
+            
+            clipboardService.copy("elementType", node.contentTypeAlias, node);
+            $event.stopPropagation();
+        }
+        
+        $scope.pasteFromClipboard = function(newNode) {
+            
+            if (newNode === undefined) {
+                return;
+            }
+            
+            // generate a new key.
+            newNode.key = String.CreateGuid();
+            
+            $scope.nodes.push(newNode);
+            $scope.setDirty();
+            //updateModel();// done by setting current node...
+            
+            $scope.currentNode = newNode;
+        }
+        
+        function checkAbilityToPasteContent() {
+            $scope.showPaste = clipboardService.hasEntriesOfType("elementType", contentTypeAliases);
+        }
+        
+        eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
+        
         var notSupported = [
           "Umbraco.Tags",
           "Umbraco.UploadField",
@@ -317,9 +400,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     var tab = _.find(tabs, function (tab) {
                         return tab.id !== 0 && (tab.alias.toLowerCase() === contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias === "");
                     });
-                    scaffold.tabs = [];
+                    scaffold.variants[0].tabs = [];
                     if (tab) {
-                        scaffold.tabs.push(tab);
+                        scaffold.variants[0].tabs.push(tab);
 
                         angular.forEach(tab.properties,
                             function (property) {
@@ -348,7 +431,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             if ($scope.model.config.contentTypes.length === scaffoldsLoaded) {
                 // Because we're loading the scaffolds async one at a time, we need to
                 // sort them explicitly according to the sort order defined by the data type.
-                var contentTypeAliases = [];
+                contentTypeAliases = [];
                 _.each($scope.model.config.contentTypes, function (contentType) {
                     contentTypeAliases.push(contentType.ncAlias);
                 });
@@ -365,7 +448,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                             // No such scaffold - the content type might have been deleted. We need to skip it.
                             continue;
                         }
-                        initNode(scaffold, item);
+                        createNode(scaffold, item);
                     }
                 }
 
@@ -381,65 +464,79 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     $scope.currentNode = $scope.nodes[0];
                 }
 
-                inited = true;
+                $scope.inited = true;
+                
+                checkAbilityToPasteContent();
             }
         }
-
-        var initNode = function (scaffold, item) {
+        
+        function createNode(scaffold, fromNcEntry) {
             var node = angular.copy(scaffold);
-
-            node.key = item && item.key ? item.key : UUID.generate();
-            node.ncContentTypeAlias = scaffold.contentTypeAlias;
-
-            for (var t = 0; t < node.tabs.length; t++) {
-                var tab = node.tabs[t];
-                for (var p = 0; p < tab.properties.length; p++) {
-                    var prop = tab.properties[p];
-                    prop.propertyAlias = prop.alias;
-                    prop.alias = $scope.model.alias + "___" + prop.alias;
-                    // Force validation to occur server side as this is the
-                    // only way we can have consistency between mandatory and
-                    // regex validation messages. Not ideal, but it works.
-                    prop.validation = {
-                        mandatory: false,
-                        pattern: ""
-                    };
-                    if (item) {
-                        if (item[prop.propertyAlias]) {
-                            prop.value = item[prop.propertyAlias];
+            
+            node.key = fromNcEntry && fromNcEntry.key ? fromNcEntry.key : String.CreateGuid();
+            
+            for (var v = 0; v < node.variants.length; v++) {
+                var variant = node.variants[v];
+                
+                for (var t = 0; t < variant.tabs.length; t++) {
+                    var tab = variant.tabs[t];
+                    
+                    for (var p = 0; p < tab.properties.length; p++) {
+                        var prop = tab.properties[p];
+                        
+                        prop.propertyAlias = prop.alias;
+                        prop.alias = $scope.model.alias + "___" + prop.alias;
+                        // Force validation to occur server side as this is the
+                        // only way we can have consistency between mandatory and
+                        // regex validation messages. Not ideal, but it works.
+                        prop.validation = {
+                            mandatory: false,
+                            pattern: ""
+                        };
+                        
+                        if (fromNcEntry && fromNcEntry[prop.propertyAlias]) {
+                            prop.value = fromNcEntry[prop.propertyAlias];
                         }
                     }
                 }
             }
-
+            
             $scope.nodes.push(node);
 
             return node;
         }
-
-        var updateModel = function () {
+        
+        function convertNodeIntoNCEntry(node) {
+            var obj = {
+                key: node.key,
+                name: node.name,
+                ncContentTypeAlias: node.contentTypeAlias
+            };
+            for (var t = 0; t < node.variants[0].tabs.length; t++) {
+                var tab = node.variants[0].tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+                    if (typeof prop.value !== "function") {
+                        obj[prop.propertyAlias] = prop.value;
+                    }
+                }
+            }
+            return obj;
+        }
+        
+        function syncCurrentNode() {
             if ($scope.realCurrentNode) {
                 $scope.$broadcast("ncSyncVal", { key: $scope.realCurrentNode.key });
             }
-            if (inited) {
+        }
+        
+        function updateModel() {
+            syncCurrentNode();
+            
+            if ($scope.inited) {
                 var newValues = [];
                 for (var i = 0; i < $scope.nodes.length; i++) {
-                    var node = $scope.nodes[i];
-                    var newValue = {
-                        key: node.key,
-                        name: node.name,
-                        ncContentTypeAlias: node.ncContentTypeAlias
-                    };
-                    for (var t = 0; t < node.tabs.length; t++) {
-                        var tab = node.tabs[t];
-                        for (var p = 0; p < tab.properties.length; p++) {
-                            var prop = tab.properties[p];
-                            if (typeof prop.value !== "function") {
-                                newValue[prop.propertyAlias] = prop.value;
-                            }
-                        }
-                    }
-                    newValues.push(newValue);
+                    newValues.push(convertNodeIntoNCEntry($scope.nodes[i]));
                 }
                 $scope.model.value = newValues;
             }
@@ -457,23 +554,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.$on("$destroy", function () {
             unsubscribe();
         });
-
-        // TODO: Move this into a shared location?
-        var UUID = (function () {
-            var self = {};
-            var lut = []; for (var i = 0; i < 256; i++) { lut[i] = (i < 16 ? "0" : "") + (i).toString(16); }
-            self.generate = function () {
-                var d0 = Math.random() * 0xffffffff | 0;
-                var d1 = Math.random() * 0xffffffff | 0;
-                var d2 = Math.random() * 0xffffffff | 0;
-                var d3 = Math.random() * 0xffffffff | 0;
-                return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + "-" +
-                  lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + "-" + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + "-" +
-                  lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + "-" + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
-                  lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
-            }
-            return self;
-        })();
+        
     }
 
 ]);
