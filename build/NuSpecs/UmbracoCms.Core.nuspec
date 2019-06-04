@@ -32,7 +32,7 @@
       <dependency id="ClientDependency-Mvc5" version="[1.8.0.0, 2.0.0)" />
       <dependency id="AutoMapper" version="[3.3.1, 4.0.0)" />
       <dependency id="Newtonsoft.Json" version="[10.0.2, 11.0.0)" />
-      <dependency id="Examine" version="[0.1.89, 1.0.0)" />
+      <dependency id="Examine" version="[0.1.90, 1.0.0)" />
       <dependency id="ImageProcessor" version="[2.5.6, 3.0.0)" />
       <dependency id="ImageProcessor.Web" version="[4.8.7, 5.0.0)" />
       <dependency id="semver" version="[1.1.2, 3.0.0)" />
