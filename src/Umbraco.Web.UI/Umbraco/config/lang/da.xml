@@ -308,6 +308,8 @@
     <key alias="copyFailed">Kopiering af mediet fejlede</key>
     <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
     <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
+    <key alias="uploadFileDisallowedHeadline">Filtypen blev afvist</key>
+    <key alias="uploadFileDisallowedDescription">Kan ikke uploade filer af typen %0%, denne filtype er ikke godkendt</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
