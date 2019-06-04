@@ -92,13 +92,13 @@ Use this directive make an element sticky and follow the page when scrolling. `u
 
         function link(scope, el, attr, ctrl) {
             
-            let _el = el[0];           
+            let current = el[0];           
             let container = _el.closest('[data-element="editor-container"]');
             
-            addSentinels(_el);
+            addSentinels(current);
 
-            observeHeader(_el, container);
-            observeFooter(_el, container);            
+            observeHeader(current, container);
+            observeFooter(current, container);            
         }
 
         var directive = {
