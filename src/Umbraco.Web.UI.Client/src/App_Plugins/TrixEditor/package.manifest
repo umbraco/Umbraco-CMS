@@ -1,0 +1,21 @@
+{
+	// you can define multiple editors
+	propertyEditors: [
+		{
+			alias: "Umbraco.Core.Trix",
+			name: "Rich Text Editor — Trix",
+			icon: "icon-wand",
+			group: "Rich Content",
+			editor: {
+				view: "~/App_Plugins/TrixEditor/umbraco-trix.html",
+                "valueType": "TEXT"
+			}
+		}
+	]
+	,
+	javascript: [
+		'~/App_Plugins/TrixEditor/umbraco-trix.js',
+		'~/App_Plugins/TrixEditor/trix.directive.js'
+	]
+
+}
