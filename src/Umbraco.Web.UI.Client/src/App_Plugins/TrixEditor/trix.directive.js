@@ -17,11 +17,12 @@
                 trixAttachmentRemove: '&'
                 */
             },
-            link: function($scope, element, attrs, ngModel, notificationsService) {
+            link: function($scope, element, ngModel, notificationsService, localizationService) {
                 
                 
-                
+                // TODO: retrive from configuration:
                 var acceptedFileTypes = ["image/jpeg", "image/png"];
+                
                 
                 var editorElement = element[0];
                 
@@ -33,8 +34,7 @@
                         editorElement.editor.loadHTML(ngModel.$modelValue);
                     }
                     
-                    addUploadFeature()
-                    
+                    addUploadFeature();
                     
                 }
                 
