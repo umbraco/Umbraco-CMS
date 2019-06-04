@@ -188,17 +188,22 @@ angular.module('umbraco.services')
          * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key' 
          * alternatively if no section is set such as 'key' then we assume the key is to be looked in
          * the 'general' section
+         
+         * @param {Array} tokens is an array of arrays which has will be containing parameter values for the key
+         * This replaces %0% and %1% etc in the dictionary key value with the passed in keys
          * 
          * @returns {Array} An array of localized resource string in the same order
          */
-        localizeMany: function(keys) {
+        localizeMany: function(keys, tokens) {
             if(keys){
-
+                
+                tokens = tokens || [];
+                
                 //The LocalizationService.localize promises we want to resolve
                 var promises = [];
 
                 for(var i = 0; i < keys.length; i++){
-                    promises.push(service.localize(keys[i], undefined));
+                    promises.push(service.localize(keys[i], tokens[i]));
                 }
 
                 return $q.all(promises).then(function(localizedValues){
