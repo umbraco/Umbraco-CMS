@@ -157,6 +157,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
 
+    // if we can't pick more than one item, explicitly disable multiPicker in the dialog options
+    if ($scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) === 1) {
+        dialogOptions.multiPicker = false;
+    }
+
     // add the current filter (if any) as title for the filtered out nodes
     if ($scope.model.config.filter) {
         localizationService.localize("contentPicker_allowedItemTypes", [$scope.model.config.filter]).then(function (data) {

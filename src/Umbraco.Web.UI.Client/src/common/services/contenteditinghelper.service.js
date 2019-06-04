@@ -197,6 +197,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             letter: ch,
                             labelKey: "buttons_schedulePublish",
                             handler: args.methods.schedulePublish,
+                            hotKey: "alt+shift+s",
+                            hotKeyWhenHidden: true,
                             alias: "schedulePublish",
                             addEllipsis: "true"
                         };
@@ -207,6 +209,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             letter: ch,
                             labelKey: "buttons_publishDescendants",
                             handler: args.methods.publishDescendants,
+                            hotKey: "alt+shift+p",
+                            hotKeyWhenHidden: true,
                             alias: "publishDescendant",
                             addEllipsis: "true"
                         };
