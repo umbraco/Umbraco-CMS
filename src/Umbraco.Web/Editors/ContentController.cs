@@ -53,14 +53,16 @@ namespace Umbraco.Web.Editors
     public class ContentController : ContentControllerBase
     {
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly ICreatedBluePrintAssignmentToUserGroupBehaviour _createdBluePrintAssignmentToUserGroupBehaviour;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
 
         public object Domains { get; private set; }
 
-        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, ICreatedBluePrintAssignmentToUserGroupBehaviour createdBluePrintAssignmentToUserGroupBehaviour)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _createdBluePrintAssignmentToUserGroupBehaviour = createdBluePrintAssignmentToUserGroupBehaviour ?? throw new ArgumentNullException(nameof(createdBluePrintAssignmentToUserGroupBehaviour));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
         }
 
@@ -552,7 +554,14 @@ namespace Umbraco.Web.Editors
 
             Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId().ResultOr(0));
 
-            AssignUserGroupsToBlueprint(blueprint);
+            // By defult, if user is non-admin and has a non-root content start node, we'll default the blueprint to only be available to
+            // other users in the same groups (that also have non-root, and non-null, start nodes).
+            // That way, in for example a multi-site context, each "site"'s users will only have access to their own blueprints
+            // even if document types and templates are shared.
+            // This behaviour is defined in DefaultCreatedBluePrintAssignmentToUserGroupBehaviour so can be replaced
+            // if implementation specific logic is required by replacing the registration for ICreatedBluePrintAssignmentToUserGroupBehaviour.
+            var currentUser = Security.CurrentUser;
+            _createdBluePrintAssignmentToUserGroupBehaviour.AssignUserGroupsToBlueprint(blueprint, currentUser);
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
@@ -561,31 +570,6 @@ namespace Umbraco.Web.Editors
             );
 
             return notificationModel;
-        }
-
-        private void AssignUserGroupsToBlueprint(IContent blueprint)
-        {
-            // If user is non-admin and has a non-root content start node, we'll default the blueprint to only be available to
-            // other users in the same groups (that also have non-root, and non-null, start nodes).
-            // That way, in for example a multi-site context, each "site"'s users will only have access to their own blueprints
-            // even if document types and templates are shared.
-            var currentUser = Security.CurrentUser;
-            if (ShouldAssignUserGroupsToBlueprint(currentUser))
-            {
-                Services.ContentService.AssignGroupsToBlueprintById(
-                    blueprint.Id,
-                    currentUser.Groups
-                        .Where(x => x.StartContentId.HasValue && x.StartContentId != Constants.System.Root)
-                        .Select(x => x.Id)
-                        .ToArray());
-            }
-        }
-
-        private static bool ShouldAssignUserGroupsToBlueprint(IUser currentUser)
-        {
-            return !currentUser.IsAdmin() &&
-                   currentUser.StartContentIds != null &&
-                   !currentUser.StartContentIds.Contains(Constants.System.Root);
         }
 
         private void EnsureUniqueName(string name, IContent content, string modelName)

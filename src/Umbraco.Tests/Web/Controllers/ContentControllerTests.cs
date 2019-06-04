@@ -21,12 +21,9 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.PublishedCache;
-
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Core.Dictionary;
 using Umbraco.Web.PropertyEditors;
-using System;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Trees;
 using System.Globalization;
@@ -35,6 +32,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Security;
 using Umbraco.Web.Actions;
 
 namespace Umbraco.Tests.Web.Controllers
@@ -255,7 +253,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<ICreatedBluePrintAssignmentToUserGroupBehaviour>());
 
                 return controller;
             }
@@ -288,7 +287,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<ICreatedBluePrintAssignmentToUserGroupBehaviour>());
 
                 return controller;
             }
@@ -329,7 +329,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<ICreatedBluePrintAssignmentToUserGroupBehaviour>());
 
                 return controller;
             }
@@ -375,7 +376,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<ICreatedBluePrintAssignmentToUserGroupBehaviour>());
 
                 return controller;
             }
@@ -413,7 +415,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<ICreatedBluePrintAssignmentToUserGroupBehaviour>());
 
                 return controller;
             }
@@ -457,7 +460,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<ICreatedBluePrintAssignmentToUserGroupBehaviour>());
 
                 return controller;
             }

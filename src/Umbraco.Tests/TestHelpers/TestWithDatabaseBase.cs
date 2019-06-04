@@ -29,6 +29,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Security;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing.Objects.Accessors;
 
@@ -75,6 +76,7 @@ namespace Umbraco.Tests.TestHelpers
             Composition.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
             Composition.Register(factory => PublishedSnapshotService);
             Composition.Register(factory => DefaultCultureAccessor);
+            Composition.RegisterUnique<ICreatedBluePrintAssignmentToUserGroupBehaviour, DefaultCreatedBluePrintAssignmentToUserGroupBehaviour>();
 
             Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
