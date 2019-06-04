@@ -32,15 +32,32 @@
     border-radius: 3px;
 }
 
-.umb-editor-sub-header.-umb-sticky-bar {
-    box-shadow: 0 6px 3px -3px rgba(0,0,0,.16);
+[umb-sticky-bar] {
     transition: box-shadow 240ms;
-    margin-top: 0;
+    margin-top: 0; 
     margin-bottom: 0;
-    top: calc(@appHeaderHeight + @editorHeaderHeight);
+    position:sticky;
+    z-index: 99;
     
-    .umb-editor--infinityMode & {
-        top: calc(@editorHeaderHeight);
+    &.umb-sticky-bar--active {
+        box-shadow: 0 6px 3px -3px rgba(0,0,0,.16);
+    }
+}
+
+.umb-sticky-sentinel {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    
+    &.-top {
+        top:0px;
+        height:1px;
+    }
+    
+    &.-bottom {        
+        bottom:50px;
+        height:10px;
     }
 }
 
