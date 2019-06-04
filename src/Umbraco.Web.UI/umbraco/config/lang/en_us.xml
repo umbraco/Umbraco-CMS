@@ -526,9 +526,6 @@
     <key alias="anchor">#value or ?key=value</key>
     <key alias="enterAlias">Enter alias...</key>
     <key alias="generatingAlias">Generating alias...</key>
-    <key alias="a11yName">Name</key>
-      <key alias="a11yCreateItem">Create item</key>
-      <key alias="a11yEdit">Edit</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
