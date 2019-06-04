@@ -1,7 +1,6 @@
 (function () {
     'use strict';
-
-    function EditorContentHeader() {
+    function EditorContentHeader(localizationService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -11,7 +10,21 @@
             if (!scope.serverValidationAliasField) {
                 scope.serverValidationAliasField = "Alias";
             }
-            
+
+            scope.isNew =scope.content.state == "NotCreated";
+        
+            localizationService.localizeMany([
+                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit", 
+                    "placeholders_a11yName"]
+            ).then(function (data) {
+                scope.a11yMessage = data[0];
+                scope.a11yName = data[1];
+                if (!scope.isNew) {
+                    scope.a11yMessage+=" "+scope.content.name;
+
+                }
+            });
+
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
@@ -19,13 +32,11 @@
             function onInit() {
                 
                 setCurrentVariant();
-                
                 angular.forEach(scope.content.apps, (app) => {
                     if (app.alias === "umbContent") {
                         app.anchors = scope.content.tabs;
                     }
                 });
-                
             }
 
             function setCurrentVariant() {
@@ -132,10 +143,8 @@
             },
             link: link
         };
-
         return directive;
     }
-
     angular.module('umbraco.directives').directive('umbEditorContentHeader', EditorContentHeader);
-
 })();
+
