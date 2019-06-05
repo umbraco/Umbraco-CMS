@@ -20,6 +20,13 @@ angular.module("umbraco")
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
 
+            var width = parseInt(editorConfig.dimensions.width, 10) || null;
+            var height = parseInt(editorConfig.dimensions.height, 10) || null;
+
+            $scope.containerWidth = editorConfig.mode === "distraction-free" ? (width ? width : "auto") : "auto";
+            $scope.containerHeight = editorConfig.mode === "distraction-free" ? (height ? height : "auto") : "auto";
+            $scope.containerOverflow = editorConfig.mode === "distraction-free" ? (height ? "auto" : "inherit") : "inherit";
+
             var promises = [];
 
             //queue file loading
@@ -41,9 +48,6 @@ angular.module("umbraco")
             $q.all(promises).then(function (result) {
 
                 var standardConfig = result[promises.length - 1];
-                
-                var width = parseInt(editorConfig.dimensions.width, 10) || null;
-                var height = parseInt(editorConfig.dimensions.height, 10) || null;
                 
                 if (height !== null) {
                     standardConfig.plugins.splice(standardConfig.plugins.indexOf("autoresize"), 1);
