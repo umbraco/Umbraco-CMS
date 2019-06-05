@@ -42,8 +42,8 @@ angular.module("umbraco")
 
                 var standardConfig = result[promises.length - 1];
                 
-                var width = parseInt(editorConfig.dimensions.width, 10) || null
-                var height = parseInt(editorConfig.dimensions.height, 10) || null
+                var width = parseInt(editorConfig.dimensions.width, 10) || null;
+                var height = parseInt(editorConfig.dimensions.height, 10) || null;
                 
                 if (height !== null) {
                     standardConfig.plugins.splice(standardConfig.plugins.indexOf("autoresize"), 1);
