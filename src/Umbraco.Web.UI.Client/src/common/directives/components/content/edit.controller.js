@@ -67,16 +67,12 @@
             //We fetch all ancestors of the node to generate the footer breadcrumb navigation
             if (!$scope.page.isNew) {
                 if (content.parentId && content.parentId !== -1) {
-                    entityResource.getAncestors(content.id, "document", $scope.culture)
-                        .then(function (anc) {
-                            $scope.ancestors = anc;
-                        });
+                    loadBreadcrumb();
                     $scope.$watch('culture',
                         function (value, oldValue) {
-                            entityResource.getAncestors(content.id, "document", value)
-                                .then(function (anc) {
-                                    $scope.ancestors = anc;
-                                });
+                            if (value !== oldValue) {
+                                loadBreadcrumb();
+                            }
                         });
                 }
             }
@@ -86,6 +82,12 @@
             resetVariantFlags();
         }
 
+        function loadBreadcrumb() {
+            entityResource.getAncestors($scope.content.id, "document", $scope.culture)
+                .then(function (anc) {
+                    $scope.ancestors = anc;
+                });
+        }
 
         /**
          * This will reset isDirty flags if save is true.

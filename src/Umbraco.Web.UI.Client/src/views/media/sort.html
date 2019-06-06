@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Editors.Media.SortController as vm" ng-cloak>
     
-    <div class="umb-dialog-body with-footer">
+    <div class="umb-dialog-body with-footer sort-order">
         
         <div class="umb-pane">
 
@@ -19,7 +19,7 @@
                 <table class="table table-condensed table-sortable" ng-if="vm.children">
                     <thead>
                         <tr>
-                            <th>
+                            <th colspan="2">
                                 <a ng-href="#" ng-click="vm.sort('name')" prevent-default>
                                     <localize key="general_name"></localize>
                                     <span ng-if="vm.sortOrder.column === 'name'">
@@ -37,22 +37,13 @@
                                     </span>
                                 </a>
                             </th>
-                            <th>
-                                <a ng-href="#" ng-click="vm.sort('sortOrder')" prevent-default>
-                                    <localize key="sort_sortOrder"></localize>
-                                    <span ng-if="vm.sortOrder.column === 'sortOrder'">
-                                        <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
-                                        <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
-                                    </span>
-                                </a>
-                            </th>
                         </tr>
                     </thead>
                     <tbody ui-sortable="vm.sortableOptions" ng-model="vm.children">
                         <tr ng-repeat="child in vm.children">
+                            <td class="tree-icon"><i class="{{ child.icon }}"></i></td>
                             <td>{{ child.name }}</td>
                             <td>{{ child.createDate }}</td>
-                            <td>{{ child.sortOrder }}</td>
                         </tr>
                     </tbody>
                 </table>
