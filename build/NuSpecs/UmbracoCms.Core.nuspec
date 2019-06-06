@@ -18,13 +18,13 @@
             <group targetFramework="net452">
                 <dependency id="log4net" version="[2.0.8, 3.0.0)" />
                 <dependency id="Log4Net.Async" version="[2.0.4, 3.0.0)" />
-                <dependency id="Microsoft.AspNet.Mvc" version="[5.2.6, 6.0.0)" />
-                <dependency id="Microsoft.AspNet.WebApi" version="[5.2.6, 6.0.0)" />
+                <dependency id="Microsoft.AspNet.Mvc" version="[5.2.7, 6.0.0)" />
+                <dependency id="Microsoft.AspNet.WebApi" version="[5.2.7, 6.0.0)" />
                 <dependency id="Microsoft.AspNet.Identity.Owin" version="[2.2.2, 3.0.0)" />
-                <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.3.0, 3.0.0)" />
-                <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.0, 5.0.0)" />
-                <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.0, 5.0.0)" />
-                <dependency id="Microsoft.Owin.Host.SystemWeb" version="[4.0.0, 5.0.0)" />
+                <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.4.1, 3.0.0)" />
+                <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.1, 5.0.0)" />
+                <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.1, 5.0.0)" />
+                <dependency id="Microsoft.Owin.Host.SystemWeb" version="[4.0.1, 5.0.0)" />
                 <dependency id="MiniProfiler" version="[2.1.0, 3.0.0)" />
                 <dependency id="HtmlAgilityPack" version="[1.8.8, 2.0.0)" />
                 <dependency id="Lucene.Net" version="[2.9.4.1, 3.0.0.0)" />
@@ -32,10 +32,10 @@
                 <dependency id="ClientDependency" version="[1.9.7, 2.0.0)" />
                 <dependency id="ClientDependency-Mvc5" version="[1.8.0.0, 2.0.0)" />
                 <dependency id="AutoMapper" version="[3.3.1, 4.0.0)" />
-                <dependency id="Newtonsoft.Json" version="[10.0.2, 11.0.0)" />
+                <dependency id="Newtonsoft.Json" version="[12.0.2, 13.0.0)" />
                 <dependency id="Examine" version="[0.1.90, 1.0.0)" />
-                <dependency id="ImageProcessor" version="[2.6.2.25, 3.0.0)" />
-                <dependency id="ImageProcessor.Web" version="[4.9.3.25, 5.0.0)" />
+                <dependency id="ImageProcessor" version="[2.7.0.100, 3.0.0)" />
+                <dependency id="ImageProcessor.Web" version="[4.10.0.100, 5.0.0)" />
                 <dependency id="semver" version="[1.1.2, 3.0.0)" />
                 <!-- Markdown can not be updated due to: https://github.com/hey-red/markdownsharp/issues/71#issuecomment-233585487 -->
                 <dependency id="Markdown" version="[1.14.7, 2.0.0)" />
