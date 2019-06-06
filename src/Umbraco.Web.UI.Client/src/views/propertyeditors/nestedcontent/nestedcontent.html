@@ -42,6 +42,9 @@
             <a href class="umb-nested-content__add-content" ng-class="{ '--disabled': !scaffolds.length }" ng-click="openNodeTypePicker($event)" prevent-default>
                 <localize key="grid_addElement"></localize>
             </a>
+            <a class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{copyIconTitle}}" ng-click="clickCopyAll();" ng-if="showCopy && nodes.length" prevent-default>
+                <i class="icon icon-documents"></i>
+            </a>
         </div>
 
     </ng-form>
