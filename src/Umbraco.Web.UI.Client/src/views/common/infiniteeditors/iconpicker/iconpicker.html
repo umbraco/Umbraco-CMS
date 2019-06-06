@@ -19,7 +19,7 @@
 
                 <div class="umb-control-group">
                     <div class="form-search">
-                        <i class="icon-search"></i>
+                        <umb-icon icon-name="icon-search" class="icon-search" />
                         <input type="text"
                                 style="width: 100%"
                                 ng-model="searchTerm"
@@ -45,10 +45,10 @@
 
                 <div class="umb-control-group" ng-show="!vm.loading && filtered.length > 0 ">
                     <ul class="umb-iconpicker" ng-class="vm.color.value" ng-show="vm.icons">
-                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: searchTerm) track by $id(icon)">
-                            <a href="#" title="{{icon}}" ng-click="vm.selectIcon(icon, vm.color.value)" prevent-default>
-                                <i class="{{icon}} large"></i>
-                            </a>
+                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon.name == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: searchTerm) track by $id(icon.name)">
+                            <button class="umb-iconpicker-btn" title="{{icon.name}}" ng-click="vm.selectIcon(icon.name, vm.color.value)" prevent-default>
+                                <umb-icon class="umb-iconpicker-svg" svg-string="icon.svgString" request-icon="false"></span>
+                            </button>
                         </li>
                     </ul>
                 </div>
