@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
 EndProject
@@ -28,7 +28,7 @@ EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_3961"
 		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Web.UI.Client\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_3961\"
