@@ -212,29 +212,10 @@ namespace Umbraco.Web.Editors
             if (contentId == Constants.System.RecycleBinContent)
                 return Enumerable.Empty<ContentTypeBasic>();
 
-            IEnumerable<IMediaType> types;
-            if (contentId == Constants.System.Root)
+            var types = GetAllowedMediaTypes(contentId);
+            if (types.Count == 0)
             {
-                types = Services.MediaTypeService.GetAll().ToList();
-
-                //if no allowed root types are set, just return everything
-                if (types.Any(x => x.AllowedAsRoot))
-                    types = types.Where(x => x.AllowedAsRoot);
-            }
-            else
-            {
-                var contentItem = Services.MediaService.GetById(contentId);
-                if (contentItem == null)
-                {
-                    return Enumerable.Empty<ContentTypeBasic>();
-                }
-
-                var contentType = Services.MediaTypeService.Get(contentItem.ContentTypeId);
-                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
-
-                if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
-
-                types = Services.MediaTypeService.GetAll(ids).ToList();
+                return Enumerable.Empty<ContentTypeBasic>();
             }
 
             var basics = types.Select(Mapper.Map<IMediaType, ContentTypeBasic>).ToList();
@@ -246,6 +227,39 @@ namespace Umbraco.Web.Editors
             }
 
             return basics.OrderBy(x => x.Name);
+        }
+
+
+        /// <summary>
+        /// Returns the allowed child content type objects for the content item id passed in - based on an INT id
+        /// </summary>
+        /// <param name="contentId"></param>
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public IEnumerable<MediaTypeDisplay> GetAllowedImageChildren(int contentId)
+        {
+            if(contentId == Constants.System.RecycleBinContent)
+            {
+                return Enumerable.Empty<MediaTypeDisplay>();
+            }
+
+            // we'll consider it an "image" media type if it contains an image cropper or an upload field
+            var types = GetAllowedMediaTypes(contentId)
+                .Where(t => t.PropertyTypes.Any(p => p.PropertyEditorAlias == "Umbraco.ImageCropper" || p.PropertyEditorAlias == "Umbraco.UploadField"))
+                .ToArray();
+            if(types.Length == 0)
+            {
+                return Enumerable.Empty<MediaTypeDisplay>();
+            }
+
+            var mediaTypes = types.Select(Mapper.Map<IMediaType, MediaTypeDisplay>).ToList();
+
+            foreach(var mediaType in mediaTypes)
+            {
+                mediaType.Name = TranslateItem(mediaType.Name);
+                mediaType.Description = TranslateItem(mediaType.Description);
+            }
+
+            return mediaTypes.OrderBy(x => x.Name);
         }
 
         /// <summary>
@@ -312,6 +326,32 @@ namespace Umbraco.Web.Editors
                 doCopy: (type, i) => Services.MediaTypeService.Copy(type, i));
         }
 
+        private IList<IMediaType> GetAllowedMediaTypes(int contentId)
+        {
+            if (contentId == Constants.System.Root)
+            {
+                var types = Services.MediaTypeService.GetAll().ToList();
 
+                 //if no allowed root types are set, just return everything
+                if (types.Any(x => x.AllowedAsRoot))
+                {
+                    types.RemoveAll(t => t.AllowedAsRoot == false);
+                }
+                return types;
+            }
+
+            var contentItem = Services.MediaService.GetById(contentId);
+            if (contentItem == null)
+            {
+                return new List<IMediaType>();
+            }
+
+            var contentType = Services.MediaTypeService.Get(contentItem.ContentTypeId);
+            var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+
+             return ids.Any()
+                ? Services.MediaTypeService.GetAll(ids).ToList()
+                : new List<IMediaType>();
+        }
     }
 }
