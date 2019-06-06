@@ -3,7 +3,7 @@
 * @name umbraco.services.iconHelper
 * @description A helper service for dealing with icons, mostly dealing with legacy tree icons
 **/
-function iconHelper($q, $timeout) {
+function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
 
     var converter = [
         { oldIcon: ".sprNew", newIcon: "add" },
@@ -89,7 +89,9 @@ function iconHelper($q, $timeout) {
             {oldImage: "contour.png", newIcon: "icon-umb-contour"}
             ];
 
-    var collectedIcons;
+    var iconCache = [];
+    var liveRequests = [];
+    var allIconsRequested = false;
             
     return {
         
@@ -154,54 +156,6 @@ function iconHelper($q, $timeout) {
             return false;
         },
 
-        /** Return a list of icons, optionally filter them */
-        /** It fetches them directly from the active stylesheets in the browser */
-        getIcons: function(){
-            var deferred = $q.defer();
-            $timeout(function(){
-                if(collectedIcons){
-                    deferred.resolve(collectedIcons);
-                }else{
-                    collectedIcons = [];
-                    var c = ".icon-";
-
-                    for (var i = document.styleSheets.length - 1; i >= 0; i--) {
-                        var classes = null;
-                        try {
-                            classes = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
-                        } catch (e) {
-                            console.warn("Can't read the css rules of: " + document.styleSheets[i].href, e);
-                            continue;
-                        }
-                        
-                        if (classes !== null) {
-                            for(var x=0;x<classes.length;x++) {
-                                var cur = classes[x];
-                                if(cur.selectorText && cur.selectorText.indexOf(c) === 0) {
-                                    var s = cur.selectorText.substring(1);
-                                    var hasSpace = s.indexOf(" ");
-                                    if(hasSpace>0){
-                                        s = s.substring(0, hasSpace);
-                                    }
-                                    var hasPseudo = s.indexOf(":");
-                                    if(hasPseudo>0){
-                                        s = s.substring(0, hasPseudo);
-                                    }
-
-                                    if(collectedIcons.indexOf(s) < 0){
-                                        collectedIcons.push(s);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    deferred.resolve(collectedIcons);
-                }
-            }, 100);
-            
-            return deferred.promise;
-        },
-
         /** Converts the icon from legacy to a new one if an old one is detected */
         convertFromLegacyIcon: function (icon) {
             if (this.isLegacyIcon(icon)) {
@@ -227,6 +181,92 @@ function iconHelper($q, $timeout) {
                 return this.convertFromLegacyIcon(treeNode.icon);
             }
             return treeNode.icon;
+        },
+
+        /** Gets a single IconModel */
+        getIcon: function(iconName) {
+            return $q((resolve, reject) => {
+                var icon = this._getIconFromCache(iconName);
+
+                 if(icon !== undefined) {
+                    resolve(icon);
+                } else {
+                    var iconRequestPath = Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl +  'GetIcon?iconName=' + iconName;
+
+                     // If the current icon is being requested, wait a bit so that we don't have to make another http request and can instead get the icon from the cache.
+                    // This is a bit rough and ready and could probably be improved used an event based system
+                    if(liveRequests.indexOf(iconRequestPath) >= 0) {
+                        setTimeout(() => {
+                            resolve(this.getIcon(iconName));
+                        }, 10);
+                    } else {
+                        liveRequests.push(iconRequestPath);
+                        // TODO - fix bug where Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl is undefinied when help icon
+                        umbRequestHelper.resourcePromise(
+                            $http.get(iconRequestPath)
+                            ,'Failed to retrieve icon: ' + iconName)
+                        .then(icon => {
+                            if(icon) {
+                                var trustedIcon = {
+                                    name: icon.Name,
+                                    svgString: $sce.trustAsHtml(icon.SvgString)
+                                };
+                                this._cacheIcon(trustedIcon);
+
+                                 liveRequests = _.filter(liveRequests, iconRequestPath);
+
+                                 resolve(trustedIcon);
+                            }
+                        })
+                        .catch(err => {
+                            console.warn(err);
+                        });
+                    };
+
+                 }
+            });
+        },
+
+        /** Gets all the available icons in the backoffice icon folder and returns them as an array of IconModels */
+         getAllIcons: function() {
+            return $q((resolve, reject) => {
+                if(allIconsRequested === false) {
+                    allIconsRequested = true;
+
+                     umbRequestHelper.resourcePromise(
+                        $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetAllIcons')
+                        ,'Failed to retrieve icons')
+                    .then(icons => {
+                        icons.forEach(icon => {
+                            var trustedIcon = {
+                                name: icon.Name,
+                                svgString: $sce.trustAsHtml(icon.SvgString)
+                            };
+
+                            this._cacheIcon(trustedIcon);
+                        });
+
+                         resolve(iconCache);
+                    })
+                    .catch(err => {
+                        console.warn(err);
+                    });;
+                } else {
+                    resolve(iconCache);
+                }
+            });
+        },
+
+        /** A simple cache to ensure that the icon is only requested from the server if is isn't already in memory */
+         _cacheIcon: function(icon) {
+            if(_.find(iconCache, {name: icon.name}) === undefined) {
+                iconCache = _.union(iconCache, [icon]);
+			}
+        },
+
+         /** Returns the caches icon or undefined */
+        _getIconFromCache: function(iconName) {
+            return _.find(iconCache, {name: iconName});
         }
     };
 }
