@@ -286,7 +286,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
     /** Callback for when user clicks the back-icon */
     $scope.onBack = function() {
         if ($scope.page.listViewPath) {
-            $location.path($scope.page.listViewPath);
+            $location.path($scope.page.listViewPath.split("?")[0]);
         }
     };
     
