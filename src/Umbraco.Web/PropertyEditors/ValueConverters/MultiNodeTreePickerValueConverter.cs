@@ -153,7 +153,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return content;
         }
 
-        private static bool IsSingleNodePicker(PublishedPropertyType propertyType)
+        private static bool IsSingleNodePicker(IPublishedPropertyType propertyType)
         {
             return propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>().MaxNumber == 1;
         }
