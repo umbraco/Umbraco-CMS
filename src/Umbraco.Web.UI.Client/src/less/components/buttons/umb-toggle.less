@@ -10,6 +10,10 @@
     }
 }
 
+.umb-toggle:focus .umb-toggle__toggle{
+    box-shadow: 0 1px 3px fade(@black, 12%), 0 1px 2px fade(@black, 24%);
+}
+
 .umb-toggle__handler {
     position: absolute;
     top: 0;
@@ -24,16 +28,23 @@
 
 .umb-toggle__toggle {
     cursor: pointer;
-    display: inline-block;
+    align-items: center;
+    display: flex;
     width: 48px;
     height: 24px;
     background: @gray-8;
     border-radius: 90px;
     position: relative;
+    transition: box-shadow .3s;
 }
 
 .umb-toggle--checked .umb-toggle__toggle {
     background-color: @green;
+}
+
+.umb-toggle--disabled .umb-toggle__toggle {
+    cursor: not-allowed;
+    opacity: 0.8;
 }
 
 .umb-toggle--checked .umb-toggle__handler {
@@ -43,7 +54,6 @@
 /* Labels */
 
 .umb-toggle__label {
-    font-size: 12px;
     color: @gray-2;
 }
 
@@ -59,7 +69,7 @@
 
 .umb-toggle__icon {
     position: absolute;
-    top: 3px;
+    line-height: 1em;
     text-decoration: none;
     transition: all 0.2s ease;
 }

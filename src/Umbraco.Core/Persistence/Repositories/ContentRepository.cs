@@ -199,7 +199,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
                                "DELETE FROM umbracoAccess WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id"                               
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }
@@ -468,7 +468,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
             entity.Path = nodeDto.Path;
             entity.SortOrder = sortOrder;
-            entity.Level = level;            
+            entity.Level = level;
 
             //Create the Content specific data - cmsContent
             var contentDto = dto.ContentVersionDto.ContentDto;
@@ -644,7 +644,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     contentVersionDto.Id = contentVerDto.Id;
                     Database.Update(contentVersionDto);
                 }
-                
+
                 Database.Update(dto);
             }
 
@@ -752,7 +752,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IContent> GetBlueprints(IQuery<IContent> query)
         {
             Func<SqlTranslator<IContent>, Sql> translate = t => t.Translate();
-            
+
             var sqlFull = GetBaseQuery(BaseQueryType.FullMultiple);
             var translatorFull = new SqlTranslator<IContent>(sqlFull, query);
             var sqlIds = GetBaseQuery(BaseQueryType.Ids);
@@ -835,6 +835,61 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
         }
 
+        public XmlDocument BuildPreviewXmlCache()
+        {
+            var xmlDoc = new XmlDocument();
+            var doctype = xmlDoc.CreateDocumentType("root", null, null,
+                ApplicationContext.Current.Services.ContentTypeService.GetContentTypesDtd());
+            xmlDoc.AppendChild(doctype);
+            var parent = xmlDoc.CreateElement("root");
+            var pIdAtt = xmlDoc.CreateAttribute("id");
+            pIdAtt.Value = "-1";
+            parent.Attributes.Append(pIdAtt);
+            xmlDoc.AppendChild(parent);
+
+            //Ensure that only nodes that have published versions are selected
+            var sql = string.Format(@"select umbracoNode.id, umbracoNode.parentID, umbracoNode.sortOrder, cmsPreviewXml.{0}, umbracoNode.{1} from umbracoNode
+inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
+inner join cmsDocument on cmsPreviewXml.versionId = cmsDocument.versionId and cmsDocument.newest=1
+order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
+                SqlSyntax.GetQuotedColumnName("xml"),
+                SqlSyntax.GetQuotedColumnName("level"),
+                SqlSyntax.GetQuotedColumnName("level"));
+
+            XmlElement last = null;
+
+            //NOTE: Query creates a reader - does not load all into memory
+            foreach (var row in Database.Query<dynamic>(sql, new { type = NodeObjectTypeId }))
+            {
+                string parentId = ((int)row.parentID).ToInvariantString();
+                string xml = row.xml;
+                int sortOrder = row.sortOrder;
+
+                //if the parentid is changing
+                if (last != null && last.GetAttribute("parentID") != parentId)
+                {
+                    parent = xmlDoc.GetElementById(parentId);
+                    if (parent == null)
+                    {
+                        //Need to short circuit here, if the parent is not there it means that the parent is unpublished
+                        // and therefore the child is not published either so cannot be included in the xml cache
+                        continue;
+                    }
+                }
+
+                var xmlDocFragment = xmlDoc.CreateDocumentFragment();
+                xmlDocFragment.InnerXml = xml;
+
+                last = (XmlElement)parent.AppendChild(xmlDocFragment);
+
+                // fix sortOrder - see notes in UpdateSortOrder
+                last.Attributes["sortOrder"].Value = sortOrder.ToInvariantString();
+            }
+
+            return xmlDoc;
+
+        }
+
         public int CountPublished(string contentTypeAlias = null)
         {
             if (contentTypeAlias.IsNullOrWhiteSpace())
@@ -868,9 +923,9 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="groupIds"></param>        
+        /// <param name="groupIds"></param>
         public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds)
-        {            
+        {
             _permissionRepository.AssignEntityPermission(entity, permission, groupIds);
         }
 
@@ -882,7 +937,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         public EntityPermissionCollection GetPermissionsForEntity(int entityId)
         {
             return _permissionRepository.GetPermissionsForEntity(entityId);
-        }        
+        }
 
         /// <summary>
         /// Adds/updates content/published xml
@@ -1220,7 +1275,14 @@ ORDER BY cmsContentVersion.id DESC
                 if (def.DocumentDto.TemplateId.HasValue)
                     templates.TryGetValue(def.DocumentDto.TemplateId.Value, out template); // else null
                 cc.Template = template;
-                cc.Properties = propertyData[cc.Version];
+                if (propertyData.ContainsKey(cc.Version))
+                {
+                    cc.Properties = propertyData[cc.Version];
+                }
+                else
+                {
+                    throw new InvalidOperationException($"No property data found for version: '{cc.Version}'.");
+                }
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946

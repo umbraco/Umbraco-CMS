@@ -19,7 +19,6 @@ angular.module("umbraco")
                             $scope.classes.splice(0, 0, "noclass");
                         })
 
-                    assetsService.loadCss("/App_Plugins/Lecoati.uSky.Grid/lib/uSky.Grid.ApprovedColorPicker.css", $scope);
                     assetsService.loadCss(cssPath, $scope);
 			    });
 });

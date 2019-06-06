@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,12 +10,13 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using System.Globalization;
+using System.Web.Http.ModelBinding;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -31,8 +31,7 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        [HttpQueryStringFilter("queryStrings")]
-        public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
+        public TreeNode GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             int asInt;
             Guid asGuid = Guid.Empty;
@@ -70,7 +69,7 @@ namespace Umbraco.Web.Trees
         {
             var node = base.CreateRootNode(queryStrings);
 
-            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false)
+            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false && IgnoreUserStartNodes(queryStrings) == false)
             {
                 node.AdditionalData["noAccess"] = true;
             }
@@ -92,7 +91,7 @@ namespace Umbraco.Web.Trees
         {
             bool hasPathAccess;
             var entityIsAncestorOfStartNodes = Security.CurrentUser.IsInBranchOfStartNode(e, Services.EntityService, RecycleBinId, out hasPathAccess);
-            if (entityIsAncestorOfStartNodes == false)
+            if (IgnoreUserStartNodes(queryStrings) == false && entityIsAncestorOfStartNodes == false)
                 return null;
 
             var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
@@ -102,7 +101,7 @@ namespace Umbraco.Web.Trees
                 //the node so we need to return null;
                 return null;
             }
-            if (hasPathAccess == false)
+            if (IgnoreUserStartNodes(queryStrings) == false && hasPathAccess == false)
             {
                 treeNode.AdditionalData["noAccess"] = true;
             }
@@ -142,7 +141,7 @@ namespace Umbraco.Web.Trees
 
                 // ensure that the user has access to that node, otherwise return the empty tree nodes collection
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
-                if (HasPathAccess(id, queryStrings) == false)
+                if (IgnoreUserStartNodes(queryStrings) == false && HasPathAccess(id, queryStrings) == false)
                 {
                     LogHelper.Warn<ContentTreeControllerBase>("User " + Security.CurrentUser.Username + " does not have access to node with id " + id);
                     return nodes;
@@ -159,7 +158,7 @@ namespace Umbraco.Web.Trees
 
             // get child entities - if id is root, but user's start nodes do not contain the
             // root node, this returns the start nodes instead of root's children
-            var entities = GetChildEntities(id).ToList();
+            var entities = GetChildEntities(id, queryStrings).ToList();
             nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings)).Where(x => x != null));
 
             // if the user does not have access to the root node, what we have is the start nodes,
@@ -191,7 +190,7 @@ namespace Umbraco.Web.Trees
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
-        protected IEnumerable<IUmbracoEntity> GetChildEntities(string id)
+        protected IEnumerable<IUmbracoEntity> GetChildEntities(string id, FormDataCollection queryStrings)
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
@@ -203,8 +202,15 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
-            return Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
+            return GetChildrenFromEntityService(entityId);
         }
+
+        /// <summary>
+        /// Abstract method to fetch the entities from the entity service
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
+        internal abstract IEnumerable<IUmbracoEntity> GetChildrenFromEntityService(int entityId);
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
@@ -340,8 +346,15 @@ namespace Umbraco.Web.Trees
         {
             if (RecycleBinId.ToInvariantString() == id)
             {
+                // get the default assigned permissions for this user
+                var actions = ActionsResolver.Current.FromActionSymbols(Security.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, Services.UserService)).ToList();
+
                 var menu = new MenuItemCollection();
-                menu.Items.Add<ActionEmptyTranscan>(ui.Text("actions", "emptyTrashcan"));
+                // only add empty recycle bin if the current user is allowed to delete by default 
+                if (actions.Contains(ActionDelete.Instance))
+                {
+                    menu.Items.Add<ActionEmptyTranscan>(ui.Text("actions", "emptyTrashcan"));
+                }
                 menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
@@ -369,6 +382,11 @@ namespace Umbraco.Web.Trees
             foreach (var m in notAllowed)
             {
                 menuWithAllItems.Items.Remove(m);
+                // if the disallowed action is set as default action, make sure to reset the default action as well
+                if (menuWithAllItems.DefaultMenuAlias == m.Alias)
+                {
+                    menuWithAllItems.DefaultMenuAlias = null;
+                }
             }
         }
 

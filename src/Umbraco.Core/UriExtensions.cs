@@ -150,9 +150,9 @@ namespace Umbraco.Core
                 var toInclude = new[] {".aspx", ".ashx", ".asmx", ".axd", ".svc"};
                 return toInclude.Any(ext.InvariantEquals) == false;
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                LogHelper.Error(typeof(UriExtensions), "Failed to determine if request was client side", ex);
+                LogHelper.Debug(typeof(UriExtensions), "Failed to determine if request was client side. Due to invalid characters in path: {0}", () => url.LocalPath);
                 return false;
             }
         }

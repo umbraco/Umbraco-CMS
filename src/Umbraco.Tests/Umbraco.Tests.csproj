@@ -67,6 +67,8 @@
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.8.8.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.8.8\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="Examine, Version=0.1.90.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.90\lib\net45\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -196,6 +198,7 @@
     <Compile Include="PublishedContent\StronglyTypedModels\Home.cs" />
     <Compile Include="Services\AuditServiceTests.cs" />
     <Compile Include="Services\ConsentServiceTests.cs" />
+    <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingMiddleware.cs" />
     <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />

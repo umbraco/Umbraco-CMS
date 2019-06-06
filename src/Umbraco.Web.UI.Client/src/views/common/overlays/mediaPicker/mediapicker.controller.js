@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Overlays.MediaPickerController",
-        function($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, mediaTypeHelper, eventsService, treeService, $element, $timeout, $cookies, localStorageService, localizationService) {
+    function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, mediaTypeHelper, eventsService, treeService, $element, $timeout, userService, $cookies, localStorageService, localizationService) {
 
             if (!$scope.model.title) {
                 $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
@@ -17,6 +17,8 @@ angular.module("umbraco")
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
+
+            var userStartNodes = []; 
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
@@ -47,7 +49,8 @@ angular.module("umbraco")
                 pageSize: 100,
                 totalItems: 0,
                 totalPages: 0,
-                filter: ''
+                filter: '',
+                ignoreUserStartNodes: $scope.model.ignoreUserStartNodes
             };
 
             //preload selected item
@@ -57,15 +60,19 @@ angular.module("umbraco")
             }
 
             function onInit() {
-                if ($scope.startNodeId !== -1) {
-                    entityResource.getById($scope.startNodeId, "media")
-                        .then(function (ent) {
-                            $scope.startNodeId = ent.id;
-                            run();
-                        });
-                } else {
-                    run();
-                }
+                userService.getCurrentUser().then(function (userData) {
+                    userStartNodes = userData.startMediaIds;
+
+                    if ($scope.startNodeId !== -1) {
+                        entityResource.getById($scope.startNodeId, "media")
+                            .then(function (ent) {
+                                $scope.startNodeId = ent.id;
+                                run();
+                            });
+                    } else {
+                        run();
+                    }
+                });
             }
 
             function run() {
@@ -150,7 +157,7 @@ angular.module("umbraco")
                 }
 
                 if (folder.id > 0) {
-                    entityResource.getAncestors(folder.id, "media")
+                    entityResource.getAncestors(folder.id, "media", { ignoreUserStartNodes: $scope.model.ignoreUserStartNodes })
                         .then(function(anc) {              
                             $scope.path = _.filter(anc,
                                 function(f) {
@@ -161,13 +168,13 @@ angular.module("umbraco")
                 } else {
                     $scope.path = [];
                 }
-
+              
                 mediaTypeHelper.getAllowedImagetypes(folder.id)
                     .then(function (types) {
                         $scope.acceptedMediatypes = types;
                     });
-
-                $scope.lockedFolder = folder.id === -1 && $scope.model.startNodeIsVirtual;
+              
+                $scope.lockedFolder = (folder.id === -1 && $scope.model.startNodeIsVirtual) || hasFolderAccess(folder) === false;
 
                 $scope.currentFolder = folder;
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
@@ -237,7 +244,10 @@ angular.module("umbraco")
             $scope.onUploadComplete = function(files) {
                 $scope.gotoFolder($scope.currentFolder).then(function() {
                     if (files.length === 1 && $scope.model.selectedImages.length === 0) {
-                        selectImage($scope.images[$scope.images.length - 1]);
+                        var image = $scope.images[$scope.images.length - 1];
+                        $scope.target = image;
+                        $scope.target.url = mediaHelper.resolveFile(image);
+                        selectImage(image);
                     }
                 });
             };
@@ -258,6 +268,17 @@ angular.module("umbraco")
                     $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
                     return false;
                 }
+            }
+
+            function hasFolderAccess(node) {
+                var nodePath = node.path ? node.path.split(',') : [node.id];
+
+                for (var i = 0; i < nodePath.length; i++) {
+                    if (userStartNodes.indexOf(parseInt(nodePath[i])) !== -1)
+                        return true;
+                }
+                
+                return false;
             }
 
             function gotoStartNode(err) {
@@ -294,7 +315,8 @@ angular.module("umbraco")
                                 pageSize: 100,
                                 totalItems: 0,
                                 totalPages: 0,
-                                filter: ''
+                                filter: '',
+                                ignoreUserStartNodes: $scope.model.ignoreUserStartNodes
                             };
                             getChildren($scope.currentFolder.id);
                         }
@@ -306,6 +328,11 @@ angular.module("umbraco")
                 debounceSearchMedia();
             };
 
+            $scope.toggle = function() {
+                // Make sure to activate the changeSearch function everytime the toggle is clicked
+                $scope.changeSearch();
+            }
+
             $scope.changePagination = function(pageNumber) {
                 $scope.loading = true;
                 $scope.searchOptions.pageNumber = pageNumber;
@@ -314,7 +341,7 @@ angular.module("umbraco")
 
             function searchMedia() {
                 $scope.loading = true;
-                entityResource.getPagedDescendants($scope.startNodeId, "Media", $scope.searchOptions)
+                entityResource.getPagedDescendants($scope.currentFolder.id, "Media", $scope.searchOptions)
                     .then(function(data) {
                         // update image data to work with image grid
                         angular.forEach(data.items,
@@ -361,7 +388,7 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 $scope.loading = true;
-                return mediaResource.getChildren(id)
+                return mediaResource.getChildren(id, { ignoreUserStartNodes: $scope.model.ignoreUserStartNodes })
                     .then(function(data) {
                         $scope.searchOptions.filter = "";
                         $scope.images = data.items ? data.items : [];

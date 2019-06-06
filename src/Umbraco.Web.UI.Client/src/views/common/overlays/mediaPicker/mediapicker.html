@@ -11,7 +11,6 @@
 
             <umb-load-indicator ng-if="loading">
             </umb-load-indicator>
-
             <div class="form-search">
                 <i class="icon-search"></i>
                 <input class="umb-search-field search-query -full-width-input"
@@ -21,6 +20,13 @@
                        ng-change="changeSearch()"
                        type="text"
                        no-dirty-check />
+
+                <div class="form-search__toggle">
+                    <input type="checkbox" ng-model="showChilds" ng-change="toggle()" />
+                    <label>
+                        <localize key="general_includeFromsubFolders">Include subfolders in search</localize>
+                    </label>
+                </div>
             </div>
 
             <div class="upload-button">
@@ -83,7 +89,9 @@
                         item-max-height="150"
                         item-min-width="100"
                         item-min-height="100"
-                        only-images={{onlyImages}}>
+                        only-images={{onlyImages}}
+                        include-sub-folders={{showChilds}}
+                        current-Folder-id="{{currentFolder.id}}">
         </umb-media-grid>
 
         <div class="flex justify-center">

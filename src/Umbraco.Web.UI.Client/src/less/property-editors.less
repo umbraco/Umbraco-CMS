@@ -1,3 +1,5 @@
+@checkered-background: url(../img/checkered-background.png);
+
 //
 // Container styles
 // --------------------------------------------------
@@ -11,7 +13,16 @@
 
 	&-push {
 		float:right;
-	}
+    }
+
+    &--list{
+        float: left;
+    }
+
+    &__item{
+        line-height: 1;
+        margin: 0 0 5px;
+    }
 }
 
 .umb-editor-tiny {
@@ -102,11 +113,11 @@ div.umb-codeeditor {
   border: 1px solid @gray-8;
 }
 div.umb-codeeditor .umb-el-wrap {
-  padding: 0px;
+  padding: 0;
 }
 div.umb-codeeditor .umb-btn-toolbar {
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   border-bottom: @gray-8 1px solid;
   background: @gray-10;
 }
@@ -115,7 +126,14 @@ div.umb-codeeditor .umb-btn-toolbar {
 //
 // RTE
 // --------------------------------------------------
-.mce-tinymce{border: 1px solid @gray-8 !important; border-radius: 0px !important;}
+.umb-rte {
+    position: relative;
+
+    .-loading {
+        position: absolute;
+    }
+}
+.mce-tinymce{border: 1px solid @gray-8 !important; border-radius: 0 !important;}
 .mce-panel{background: @gray-10 !important; border-color: @gray-8 !important;}
 .mce-btn-group, .mce-btn{border: none !important; background: none !important;}
 .mce-ico{font-size: 12px !important; color: @gray-1 !important;}
@@ -133,42 +151,19 @@ div.umb-codeeditor .umb-btn-toolbar {
 //
 // Color picker
 // --------------------------------------------------
-ul.color-picker li {
-    padding: 2px;
-    margin: 3px;
-    border: 2px solid transparent;
-    width: 60px;
-
-    &.active {
-        .check_circle {
-            opacity: 1;
-        }
-    }
-
-    .thumbnail{
-        min-width: auto;
-        width: inherit;
-        padding: 0;
-    }
-
-    a {
-        height: 50px;
-        display:flex;
-        align-items: center;
-        justify-content: center;
-        cursor:pointer;
-        margin: 0 0 5px;
-    }
-}
 
 /* pre-value editor */
 .control-group.color-picker-preval {
     .thumbnail {
-        width: 36px;
+        width: 34px;
+        height: 34px;
         min-width: auto;
         border: none;
         cursor: move;
         border-radius: 3px;
+        margin-top: auto;
+        margin-bottom: auto;
+        flex: 0 0 auto;
     }
 
     .handle {
@@ -180,19 +175,19 @@ ul.color-picker li {
     div.color-picker-prediv {
         display: inline-flex;
         align-items: center;
-        max-width: 80%;
+        max-width: 100%;
+        flex: 1;
 
         pre {
             display: inline-flex;
             font-family: monospace;
-            margin-right: 10px;
-            margin-left: 10px;
+            margin-left: 15px;
+            margin-right: 15px;
             white-space: nowrap;
             overflow: hidden;
             margin-bottom: 0;
             vertical-align: middle;
-            padding-top: 7px;
-            padding-bottom: 7px;
+            padding: 6px 10px;
             background: #f7f7f7;
             flex: 0 0 auto;
         }
@@ -220,14 +215,57 @@ ul.color-picker li {
     }
 
     label {
-        border: 1px solid #fff;
-        padding: 7px 10px;
+        border: 1px solid @white;
+        padding: 6px 10px;
         font-family: monospace;
         border: 1px solid #dfdfe1;
         background: #f7f7f7;
-        margin: 0 15px 0 0;
+        margin: 0 15px 0 3px;
         border-radius: 3px;
     }
+}
+
+//
+// Image Cropper
+// --------------------------------------------------
+
+.umb-prevalues-multivalues.umb-cropsizes{
+
+    max-width: 500px;
+    width: 100%;
+    min-width: 66.6%;
+
+    @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px) {
+        max-width: none;
+    }
+
+    .umb-overlay__form & {
+        width: 100%;
+    }
+}
+
+.umb-cropsizes {
+
+    &__add {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    &__controls {
+        margin: 24px 0 0;
+        display: flex;
+    }
+
+    &__input {
+        width: 100%;
+        &-wrap{
+            flex: 1 1 auto;
+            margin-right: 10px;
+            &--narrow {
+                flex: 0 1 100px;
+            }
+        }
+   }
 }
 
 
@@ -249,6 +287,18 @@ ul.color-picker li {
     &:hover {
         color: @turquoise-d1;
         border-color: @turquoise;
+    }
+}
+
+.umb-mediapicker .label{
+    &__trashed{
+        background-color: @red;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1;
+        transform: translate3d(-50%,-50%,0);
+        margin: 0;
     }
 }
 
@@ -332,7 +382,7 @@ ul.color-picker li {
 
 .umb-mediapicker .umb-sortable-thumbnails li {
     flex-direction: column;
-    margin: 0 5px 5px 0;
+    margin: 0 0 5px 5px;
     padding: 5px;
 }
 
@@ -347,10 +397,10 @@ ul.color-picker li {
     max-height:100%;
     margin:auto;
     display:block;
-    background-image: url(../img/checkered-background.png);
+    background-image: @checkered-background;
 }
 
-.umb-sortable-thumbnails li img.trashed {
+.umb-sortable-thumbnails li .trashed {
     opacity:0.3;
 }
 
@@ -560,12 +610,18 @@ ul.color-picker li {
         vertical-align: top;
     }
 
-    .gravity-container .viewport {
-        max-width: 600px;
-    }
+    .gravity-container {
+        border: 1px solid @gray-8;
+        line-height: 0;
 
-    .gravity-container .viewport:hover {
-        cursor: pointer;
+        .viewport {
+            max-width: 600px;
+            background: @checkered-background;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 
     .imagecropper {
@@ -578,6 +634,10 @@ ul.color-picker li {
             float: left;
             max-width: 100%;
         }
+
+        .viewport img {
+            background: @checkered-background;
+        }
     }
 
     .imagecropper .umb-cropper__container {
@@ -588,6 +648,16 @@ ul.color-picker li {
 
         @media (min-width: 769px) {
             width: 600px;
+        }
+    }
+
+    .imagecropper .umb-cropper__container .button-drawer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px;
+
+        button {
+            margin-left: 4px;
         }
     }
 
@@ -714,8 +784,8 @@ ul.color-picker li {
 
 
 .umb-photo-folder .picrow div, .umb-photo-preview{
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   border: none;
   display: inline-block;
   vertical-align: top;
@@ -752,9 +822,9 @@ ul.color-picker li {
 //this is a temp hack, to provide selectors in the dialog:
 .umb-photo-folder .pic:hover .selector-overlay {
   position: absolute;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 5px;
   background: @black;
   z-index: 100;
@@ -834,7 +904,11 @@ ul.color-picker li {
 .umb-fileupload ul {
   list-style: none;
   vertical-align: middle;
-  margin-bottom: 0px;
+  margin-bottom: 0;
+
+  img {
+    background: @checkered-background;
+  }
 }
 
 .umb-fileupload label {
@@ -992,7 +1066,20 @@ ul.color-picker li {
 
 //
 // Nested boolean (e.g. list view bulk action permissions)
-// ---------------------=====-----------------------------
+// -------------------------------------------------------
 .umb-nested-boolean label {margin-bottom: 8px; float: left; width: 320px;}
 .umb-nested-boolean label span {float: left; width: 80%;}
 .umb-nested-boolean label input[type='checkbox'] {margin-right: 10px; float: left;}
+
+//
+// Custom styles of property editors in property preview in document type editor
+// -----------------------------------------------------------------------------
+.umb-group-builder__property-preview {
+    .umb-property-editor {
+        .slider {
+            .tooltip {
+                display: none;
+            }
+        }
+    }
+}

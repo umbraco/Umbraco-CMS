@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
@@ -31,8 +32,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="onlyInitialized">An optional bool (defaults to true), if set to false it will also load uninitialized trees</param>
         /// <returns></returns>
-        [HttpQueryStringFilter("queryStrings")]
-        public async Task<SectionRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
+        public async Task<SectionRootNode> GetApplicationTrees(string application, string tree, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings, bool onlyInitialized = true)
         {
             application = application.CleanForXss();
 
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Trees
             //find all tree definitions that have the current application alias
             var appTrees = Services.ApplicationTreeService.GetApplicationTrees(application, onlyInitialized).ToArray();
 
-            if (string.IsNullOrEmpty(tree) == false || appTrees.Length == 1 || appTrees.Any() == false)
+            if (string.IsNullOrEmpty(tree) == false || appTrees.Length == 1)
             {
                 var apptree = string.IsNullOrEmpty(tree) == false 
                     ? appTrees.SingleOrDefault(x => x.Alias == tree)

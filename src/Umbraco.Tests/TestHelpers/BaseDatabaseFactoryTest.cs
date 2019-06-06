@@ -183,8 +183,8 @@ namespace Umbraco.Tests.TestHelpers
                 {
                     RemoveDatabaseFile(ex =>
                     {
-                        //if this doesn't work we have to make sure everything is reset! otherwise
-                        // well run into issues because we've already set some things up
+                        //If this doesn't work we have to make sure everything is reset! otherwise
+                        // we'll run into issues because we've already set some things up
                         TearDown();
                         throw ex;
                     });

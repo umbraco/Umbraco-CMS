@@ -75,15 +75,19 @@
 
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <style> .umb-dialog { overflow: auto; } .umb-dialog-footer { position: relative; }</style>
 
     <input id="tempFile" type="hidden" name="tempFile" runat="server" />
 
-    <cc1:Feedback ID="feedback" runat="server" />
+    <asp:Panel ID="p_feedback" runat="server" Visible="False">
+        <div class="alert alert-success">
+            <asp:Literal runat="server" ID="feedback_text"></asp:Literal>
+        </div>
+        <button class="btn btn-primary" onclick="UmbClientMgr.closeModalWindow()"><%= umbraco.ui.Text("general", "ok")%></button>
+    </asp:Panel>
 
     <asp:Panel ID="p_mode" runat="server" CssClass="pa-umb-overlay">
 
-        <div class="umg-dialog-body">
+        <div class="umb-dialog-body">
 
             <cc1:Pane ID="pane_chooseMode" runat="server" Text="Choose how to restict access to this page">
 
@@ -116,74 +120,72 @@
 
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
             <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
-            <asp:Button ID="bt_selectMode" runat="server" Text="select" CssClass="btn btn-primary" OnClick="selectMode" />
+            <asp:Button ID="bt_selectMode" runat="server" CssClass="btn btn-primary" OnClick="selectMode" />
         </div>
     </asp:Panel>
 
+    <asp:Panel ID="p_setup" runat="server" Visible="false" CssClass="pa-umb-overlay">
+        <div class="umb-dialog-body">
+            <cc1:Pane ID="pane_simple" runat="server" Visible="false" Text="Set the login and password for this page" CssClass="pa-umb-overlay">
 
-    <cc1:Pane ID="pane_simple" runat="server" Visible="false" Text="Set the login and password for this page" CssClass="pa-umb-overlay">
-
-        <div class="pa-form">
-            <cc1:PropertyPanel Text="Login" ID="pp_login" runat="server">
-                <asp:TextBox ID="simpleLogin" runat="server" Width="250px"></asp:TextBox>
-                <asp:Label runat="server" ID="SimpleLoginLabel" Visible="False"></asp:Label>
-            </cc1:PropertyPanel>
-        </div>
-
-        <div class="pa-form">
-            <cc1:PropertyPanel Text="Password" ID="pp_pass" runat="server">
-                <asp:TextBox ID="simplePassword" runat="server" Width="250px"></asp:TextBox>
-            </cc1:PropertyPanel>
-        </div>
-
-        <asp:CustomValidator CssClass="alert alert-danger" runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
-           <p class="alert">Member name already exists, click <asp:LinkButton runat="server" OnClick="ChangeOnClick" CssClass="btn btn-mini btn-warning">Change</asp:LinkButton> to use a different name or Update to continue</p>
-        </asp:CustomValidator>
-    </cc1:Pane>
-
-    <cc1:Pane ID="pane_advanced" runat="server" Visible="false" Text="Role based protection">
-        <cc1:PropertyPanel ID="PropertyPanel3" runat="server">
-            <p><%= umbraco.ui.Text("publicAccess", "paSelectRoles", UmbracoUser)%></p>
-        </cc1:PropertyPanel>
-        <cc1:PropertyPanel ID="PropertyPanel2" runat="server">
-            <asp:PlaceHolder ID="groupsSelector" runat="server"></asp:PlaceHolder>
-        </cc1:PropertyPanel>
-    </cc1:Pane>
-
-    <asp:Panel ID="p_buttons" runat="server" Visible="false" CssClass="pa-umb-overlay">
-        <cc1:Pane runat="server" ID="pane_pages" Text="Select the pages that contain login form and error messages">
-
-            <cc1:PropertyPanel runat="server" ID="pp_loginPage" CssClass="pa-select-pages">
-                <small class="umb-detail">
-                    <%=umbraco.ui.Text("paLoginPageHelp")%>
-                </small>
-                <div class="pa-choose-page">
-                    <asp:PlaceHolder ID="ph_loginpage" runat="server" />
+                <div class="pa-form">
+                    <cc1:PropertyPanel Text="Login" ID="pp_login" runat="server">
+                        <asp:TextBox ID="simpleLogin" runat="server" Width="250px"></asp:TextBox>
+                        <asp:Label runat="server" ID="SimpleLoginLabel" Visible="False"></asp:Label>
+                    </cc1:PropertyPanel>
                 </div>
 
-                <asp:CustomValidator ErrorMessage="Please pick a login page" runat="server" ID="cv_loginPage" ForeColor="Red" />
-            </cc1:PropertyPanel>
-
-
-            <cc1:PropertyPanel runat="server" ID="pp_errorPage" CssClass="pa-select-pages">
-                <small class="umb-detail">
-                    <%=umbraco.ui.Text("paErrorPageHelp")%>
-                </small>
-                <div class="pa-choose-page">
-                    <asp:PlaceHolder ID="ph_errorpage" runat="server" />
+                <div class="pa-form">
+                    <cc1:PropertyPanel Text="Password" ID="pp_pass" runat="server">
+                        <asp:TextBox ID="simplePassword" runat="server" Width="250px"></asp:TextBox>
+                    </cc1:PropertyPanel>
                 </div>
-                <asp:CustomValidator ErrorMessage="Please pick an error page" runat="server" ID="cv_errorPage"  ForeColor="Red" />
-            </cc1:PropertyPanel>
 
-        </cc1:Pane>
+                <asp:CustomValidator CssClass="alert alert-danger" runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
+                    <p class="alert">Member name already exists, click <asp:LinkButton runat="server" OnClick="ChangeOnClick" CssClass="btn btn-mini btn-warning">Change</asp:LinkButton> to use a different name or Update to continue</p>
+                </asp:CustomValidator>
+            </cc1:Pane>
+
+            <cc1:Pane ID="pane_advanced" runat="server" Visible="false" Text="Role based protection">
+                <cc1:PropertyPanel ID="PropertyPanel3" runat="server">
+                    <p><%= umbraco.ui.Text("publicAccess", "paSelectRoles", UmbracoUser)%></p>
+                </cc1:PropertyPanel>
+                <cc1:PropertyPanel ID="PropertyPanel2" runat="server">
+                    <asp:PlaceHolder ID="groupsSelector" runat="server"></asp:PlaceHolder>
+                </cc1:PropertyPanel>
+            </cc1:Pane>
+
+            <cc1:Pane runat="server" ID="pane_pages" Text="Select the pages that contain login form and error messages">
+
+                <cc1:PropertyPanel runat="server" ID="pp_loginPage" CssClass="pa-select-pages">
+                    <small class="umb-detail">
+                        <%=umbraco.ui.Text("paLoginPageHelp")%>
+                    </small>
+                    <div class="pa-choose-page">
+                        <asp:PlaceHolder ID="ph_loginpage" runat="server" />
+                    </div>
+
+                    <asp:CustomValidator ErrorMessage="Please pick a login page" runat="server" ID="cv_loginPage" ForeColor="Red" />
+                </cc1:PropertyPanel>
 
 
+                <cc1:PropertyPanel runat="server" ID="pp_errorPage" CssClass="pa-select-pages">
+                    <small class="umb-detail">
+                        <%=umbraco.ui.Text("paErrorPageHelp")%>
+                    </small>
+                    <div class="pa-choose-page">
+                        <asp:PlaceHolder ID="ph_errorpage" runat="server" />
+                    </div>
+                    <asp:CustomValidator ErrorMessage="Please pick an error page" runat="server" ID="cv_errorPage"  ForeColor="Red" />
+                </cc1:PropertyPanel>
+
+            </cc1:Pane>
+        </div>
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
             <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
             <asp:Button ID="bt_protect" CssClass="btn btn-primary" runat="server" OnCommand="protect_Click"></asp:Button>
             <asp:Button ID="bt_buttonRemoveProtection" CssClass="btn btn-danger" runat="server" Visible="False" OnClick="buttonRemoveProtection_Click" />
         </div>
-
     </asp:Panel>
 
     <input id="errorId" type="hidden" runat="server" /><input id="loginId" type="hidden" runat="server" />

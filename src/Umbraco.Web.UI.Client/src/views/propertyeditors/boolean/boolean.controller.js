@@ -1,4 +1,4 @@
-function booleanEditorController($scope, $rootScope, assetsService) {
+function booleanEditorController($scope, angularHelper) {
 
     function setupViewModel() {
         $scope.renderModel = {
@@ -28,7 +28,8 @@ function booleanEditorController($scope, $rootScope, assetsService) {
     };
 
     // Update the value when the toggle is clicked
-    $scope.toggle = function(){
+    $scope.toggle = function () {
+        angularHelper.getCurrentForm($scope).$setDirty();
         if($scope.renderModel.value){
             $scope.model.value = "0";
             setupViewModel();

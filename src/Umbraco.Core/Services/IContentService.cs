@@ -124,6 +124,8 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         XmlDocument BuildXmlCache();
 
+        XmlDocument BuildPreviewXmlCache();
+
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
@@ -438,7 +440,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
         void EmptyRecycleBin();
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
+        /// </summary>
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        void EmptyRecycleBin(int userId = 0);
 
         /// <summary>
         /// Rollback an <see cref="IContent"/> object to a previous version.

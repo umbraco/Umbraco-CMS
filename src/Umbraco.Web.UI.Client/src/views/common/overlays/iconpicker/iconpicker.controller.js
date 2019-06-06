@@ -12,25 +12,25 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
     $scope.model.hideSubmitButton = false;
 
     $scope.colors = [
-        { name: "Black", value: "color-black" },
-        { name: "Blue Grey", value: "color-blue-grey" },
-        { name: "Grey", value: "color-grey" },
-        { name: "Brown", value: "color-brown" },
-        { name: "Blue", value: "color-blue" },
-        { name: "Light Blue", value: "color-light-blue" },
-        { name: "Indigo", value: "color-indigo" },
-        { name: "Purple", value: "color-purple" },
-        { name: "Deep Purple", value: "color-deep-purple" },
-        { name: "Cyan", value: "color-cyan" },
-        { name: "Green", value: "color-green" },
-        { name: "Light Green", value: "color-light-green" },
-        { name: "Lime", value: "color-lime" },
-        { name: "Yellow", value: "color-yellow" },
-        { name: "Amber", value: "color-amber" },
-        { name: "Orange", value: "color-orange" },
-        { name: "Deep Orange", value: "color-deep-orange" },
-        { name: "Red", value: "color-red" },
-        { name: "Pink", value: "color-pink" }
+        { label: "Black", value: "color-black" },
+        { label: "Blue Grey", value: "color-blue-grey" },
+        { label: "Grey", value: "color-grey" },
+        { label: "Brown", value: "color-brown" },
+        { label: "Blue", value: "color-blue" },
+        { label: "Light Blue", value: "color-light-blue" },
+        { label: "Indigo", value: "color-indigo" },
+        { label: "Purple", value: "color-purple" },
+        { label: "Deep Purple", value: "color-deep-purple" },
+        { label: "Cyan", value: "color-cyan" },
+        { label: "Green", value: "color-green" },
+        { label: "Light Green", value: "color-light-green" },
+        { label: "Lime", value: "color-lime" },
+        { label: "Yellow", value: "color-yellow" },
+        { label: "Amber", value: "color-amber" },
+        { label: "Orange", value: "color-orange" },
+        { label: "Deep Orange", value: "color-deep-orange" },
+        { label: "Red", value: "color-red" },
+        { label: "Pink", value: "color-pink" }
     ];
 
     if (!$scope.color) {

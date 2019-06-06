@@ -152,7 +152,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IProfile GetProfile(string username)
         {
-            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.UserName == username, SqlSyntax);
+            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.Login == username, SqlSyntax);
 
             var dto = Database.Fetch<UserDto>(sql)
                 .FirstOrDefault();
@@ -267,8 +267,8 @@ ORDER BY colName";
 
             var fromDate = DateTime.UtcNow - timespan;
 
-            var count = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUserLogin WHERE lastValidatedUtc=@fromDate", new { fromDate = fromDate });
-            Database.Execute("DELETE FROM umbracoUserLogin WHERE lastValidatedUtc=@fromDate", new { fromDate = fromDate });
+            var count = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUserLogin WHERE lastValidatedUtc<=@fromDate", new { fromDate = fromDate });
+            Database.Execute("DELETE FROM umbracoUserLogin WHERE lastValidatedUtc<=@fromDate", new { fromDate = fromDate });
             return count;
         }
 
@@ -382,6 +382,7 @@ ORDER BY colName";
                 "DELETE FROM cmsTask WHERE parentUserId = @Id",
                 "DELETE FROM umbracoUser2UserGroup WHERE userId = @Id",
                 "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
+                "DELETE FROM umbracoUserStartNode WHERE userId = @Id",
                 "DELETE FROM umbracoUser WHERE id = @Id",
                 "DELETE FROM umbracoExternalLogin WHERE id = @Id"
             };

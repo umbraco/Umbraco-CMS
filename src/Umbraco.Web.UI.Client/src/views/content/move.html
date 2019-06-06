@@ -11,7 +11,9 @@
 
             <div ng-show="success">
                 <div class="alert alert-success">
-                    <strong>{{currentNode.name}}</strong> was moved underneath&nbsp;<strong>{{target.name}}</strong>
+                    <strong>{{currentNode.name}}</strong>
+                    <localize key="actions_wasMovedTo">was moved to</localize>
+                    <strong>{{target.name}}</strong>
                 </div>
                 <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
             </div>
@@ -73,10 +75,10 @@
 
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-if="!busy">
+        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-show="!busy">
             <localize key="general_cancel">Cancel</localize>
         </a>
-        <button class="btn btn-primary" ng-click="move()" ng-disabled="busy">
+        <button class="btn btn-primary" ng-click="move()" ng-disabled="busy || !target">
             <localize key="actions_move">Move</localize>
         </button>
     </div>
