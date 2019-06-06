@@ -1,54 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata minClientVersion="3.4.4">
-    <id>UmbracoCms</id>
-    <version>7.0.0</version>
-    <title>Umbraco Cms</title>
-    <authors>Umbraco HQ</authors>
-    <owners>Umbraco HQ</owners>
-    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
-    <projectUrl>http://umbraco.com/</projectUrl>
-    <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Installs Umbraco Cms in your Visual Studio ASP.NET project</description>
-    <summary>Installs Umbraco Cms in your Visual Studio ASP.NET project</summary>
-    <language>en-US</language>
-    <tags>umbraco</tags>
-    <dependencies>
-      <dependency id="UmbracoCms.Core" version="[$version$]" />
-      <dependency id="Newtonsoft.Json" version="[10.0.2, 11.0.0)" />
-      <dependency id="Umbraco.ModelsBuilder" version="[3.0.10, 4.0.0)" />
-      <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.1, 3.0.0)" />
-	  <dependency id="ImageProcessor.Web.Config" version="[2.3.1, 3.0.0)" />
-      <dependency id="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="[2.0.0, 3.0.0)" />
-    </dependencies>
-  </metadata>
-  <files>
-    <file src="$BuildTmp$\Configs\**" target="Content\Config" exclude="$BuildTmp$\Configs\Web.config.transform" />
-    <file src="$BuildTmp$\WebApp\Views\**" target="Content\Views" exclude="$BuildTmp$\WebApp\Views\Web.config" />
-    <file src="$BuildTmp$\WebApp\default.aspx" target="Content\default.aspx" />
-    <file src="$BuildTmp$\WebApp\Global.asax" target="Content\Global.asax" />
-    <file src="$BuildTmp$\WebApp\Web.config" target="UmbracoFiles\Web.config" />
-    <file src="$BuildTmp$\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
-    <file src="$BuildTmp$\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
-    <file src="$BuildTmp$\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
-    <file src="$BuildTmp$\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />
-    <file src="$BuildTmp$\WebApp\config\BackOfficeTours\**" target="Content\Config\BackOfficeTours" />
-    <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
-    <file src="$BuildTmp$\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
-    <file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />
-    <file src="tools\install.ps1" target="tools\install.ps1" />
-    <file src="tools\Readme.txt" target="tools\Readme.txt" />
-    <file src="tools\ReadmeUpgrade.txt" target="tools\ReadmeUpgrade.txt" />
-    <file src="tools\Web.config.install.xdt" target="Content\Web.config.install.xdt" />
-    <file src="tools\applications.config.install.xdt" target="Content\config\applications.config.install.xdt" />
-    <file src="tools\ClientDependency.config.install.xdt" target="Content\config\ClientDependency.config.install.xdt" />
-    <file src="tools\Dashboard.config.install.xdt" target="Content\config\Dashboard.config.install.xdt" />
-    <file src="tools\trees.config.install.xdt" target="Content\config\trees.config.install.xdt" />
-    <file src="tools\umbracoSettings.config.install.xdt" target="Content\config\umbracoSettings.config.install.xdt" />
-    <file src="tools\Views.Web.config.install.xdt" target="Views\Web.config.install.xdt" />
-    <file src="tools\processing.config.install.xdt" target="Content\Config\imageprocessor\processing.config.install.xdt" />
-    <file src="tools\cache.config.install.xdt" target="Content\Config\imageprocessor\cache.config.install.xdt" />
-    <file src="build\**" target="build" />
-  </files>
+    <metadata minClientVersion="3.4.4">
+        <id>UmbracoCms</id>
+        <version>7.0.0</version>
+        <title>Umbraco Cms</title>
+        <authors>Umbraco HQ</authors>
+        <owners>Umbraco HQ</owners>
+        <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+        <projectUrl>http://umbraco.com/</projectUrl>
+        <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Installs Umbraco Cms in your Visual Studio ASP.NET project</description>
+        <summary>Installs Umbraco Cms in your Visual Studio ASP.NET project</summary>
+        <language>en-US</language>
+        <tags>umbraco</tags>
+        <dependencies>
+            <group targetFramework="net452">
+                <dependency id="UmbracoCms.Core" version="[$version$]" />
+                <dependency id="Newtonsoft.Json" version="[12.0.2, 13.0.0)" />
+                <dependency id="Umbraco.ModelsBuilder" version="[3.0.10, 4.0.0)" />
+                <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.4.1, 3.0.0)" />
+                <dependency id="ImageProcessor.Web.Config" version="[2.5.0.100, 3.0.0)" />
+                <dependency id="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="[2.0.1, 3.0.0)" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="$BuildTmp$\Configs\**" target="Content\Config" exclude="$BuildTmp$\Configs\Web.config.transform" />
+        <file src="$BuildTmp$\WebApp\Views\**" target="Content\Views" exclude="$BuildTmp$\WebApp\Views\Web.config" />
+        <file src="$BuildTmp$\WebApp\default.aspx" target="Content\default.aspx" />
+        <file src="$BuildTmp$\WebApp\Global.asax" target="Content\Global.asax" />
+        <file src="$BuildTmp$\WebApp\Web.config" target="UmbracoFiles\Web.config" />
+        <file src="$BuildTmp$\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
+        <file src="$BuildTmp$\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
+        <file src="$BuildTmp$\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
+        <file src="$BuildTmp$\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />
+        <file src="$BuildTmp$\WebApp\config\BackOfficeTours\**" target="Content\Config\BackOfficeTours" />
+        <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
+        <file src="$BuildTmp$\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
+        <file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />
+        <file src="tools\install.ps1" target="tools\install.ps1" />
+        <file src="tools\Readme.txt" target="tools\Readme.txt" />
+        <file src="tools\ReadmeUpgrade.txt" target="tools\ReadmeUpgrade.txt" />
+        <file src="tools\Web.config.install.xdt" target="Content\Web.config.install.xdt" />
+        <file src="tools\applications.config.install.xdt" target="Content\config\applications.config.install.xdt" />
+        <file src="tools\ClientDependency.config.install.xdt" target="Content\config\ClientDependency.config.install.xdt" />
+        <file src="tools\Dashboard.config.install.xdt" target="Content\config\Dashboard.config.install.xdt" />
+        <file src="tools\trees.config.install.xdt" target="Content\config\trees.config.install.xdt" />
+        <file src="tools\umbracoSettings.config.install.xdt" target="Content\config\umbracoSettings.config.install.xdt" />
+        <file src="tools\Views.Web.config.install.xdt" target="Views\Web.config.install.xdt" />
+        <file src="tools\processing.config.install.xdt" target="Content\Config\imageprocessor\processing.config.install.xdt" />
+        <file src="tools\cache.config.install.xdt" target="Content\Config\imageprocessor\cache.config.install.xdt" />
+        <file src="build\**" target="build" />
+    </files>
 </package>

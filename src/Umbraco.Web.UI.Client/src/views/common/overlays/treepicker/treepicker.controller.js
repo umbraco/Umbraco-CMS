@@ -16,6 +16,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             searchFromId: dialogOptions.startNodeId,
             searchFromName: null,
             showSearch: false,
+            ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes,
             results: [],
             selectedSearchResults: []
         }
@@ -132,8 +133,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         function initTree() {
             //create the custom query string param for this tree
-            $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
-            $scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";
+            var params = [];
+
+            if (dialogOptions.startNodeId)
+                params.push("startNodeId=" + dialogOptions.startNodeId);
+
+            if (dialogOptions.ignoreUserStartNodes)
+                params.push("ignoreUserStartNodes=" + dialogOptions.ignoreUserStartNodes);
+
+            if (dialogOptions.customTreeParams)
+                params.push(dialogOptions.customTreeParams);
+
+            $scope.customTreeParams = params.join('&');
+
             $scope.treeReady = true;
         }
 

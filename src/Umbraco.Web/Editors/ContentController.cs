@@ -262,10 +262,11 @@ namespace Umbraco.Web.Editors
         /// Gets the content json for the content id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(int id)
+        public ContentItemDisplay GetById(int id, [FromUri]bool ignoreUserStartNodes = false)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
             if (foundContent == null)
@@ -850,7 +851,7 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, 'D')]
         public HttpResponseMessage EmptyRecycleBin()
         {
-            Services.ContentService.EmptyRecycleBin();
+            Services.ContentService.EmptyRecycleBin(Security.CurrentUser.Id);
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
@@ -1116,6 +1117,7 @@ namespace Umbraco.Web.Editors
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
         /// <param name="permissionsToCheck"></param>
         /// <param name="contentItem">Specifies the already resolved content item to check against</param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         internal static bool CheckPermissions(
                 IDictionary<string, object> storage,
@@ -1125,7 +1127,8 @@ namespace Umbraco.Web.Editors
                 IEntityService entityService,
                 int nodeId,
                 char[] permissionsToCheck = null,
-                IContent contentItem = null)
+                IContent contentItem = null,
+                bool ignoreUserStartNodes = false)
         {
             if (storage == null) throw new ArgumentNullException("storage");
             if (user == null) throw new ArgumentNullException("user");
@@ -1144,6 +1147,11 @@ namespace Umbraco.Web.Editors
             if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if(ignoreUserStartNodes)
+            {
+                return true;
             }
 
             var hasPathAccess = (nodeId == Constants.System.Root)

@@ -56,6 +56,13 @@
 
                 // only allow configuring scheduled publishing if the user has publish ("U") and unpublish ("Z") permissions on this node
                 scope.allowScheduledPublishing = _.contains(scope.node.allowedActions, "U") && _.contains(scope.node.allowedActions, "Z");
+
+                ensureUniqueUrls();
+            }
+
+            // make sure we don't show duplicate URLs in case multiple URL providers assign the same URLs to the content (see issue 3842 for details)
+            function ensureUniqueUrls() {
+                scope.node.urls = _.uniq(scope.node.urls);
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -296,11 +303,12 @@
                 if (!newValue) { return; }
                 if (newValue === oldValue) { return; }
 
-                if(isInfoTab) {
+                if (isInfoTab) {
                     loadAuditTrail();
                     loadRedirectUrls();
                     formatDatesToLocal();
                     setNodePublishStatus(scope.node);
+                    ensureUniqueUrls();
                 }
             });
 
