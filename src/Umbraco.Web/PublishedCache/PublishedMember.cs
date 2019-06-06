@@ -73,13 +73,17 @@ namespace Umbraco.Web.PublishedCache
 
         #region IPublishedContent
 
+        public override PublishedItemType ItemType => PublishedItemType.Member;
+
         public override bool IsDraft(string culture = null) => false;
 
         public override bool IsPublished(string culture = null) => true;
 
-        public override IPublishedContent Parent() => null;
+        public override IPublishedContent Parent => null;
 
-        public override IEnumerable<IPublishedContent> Children(string culture = null) => Enumerable.Empty<IPublishedContent>();
+        public override IEnumerable<IPublishedContent> Children => Enumerable.Empty<IPublishedContent>();
+
+        public override IEnumerable<IPublishedContent> ChildrenForAllCultures => Enumerable.Empty<IPublishedContent>();
 
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 
@@ -129,17 +133,11 @@ namespace Umbraco.Web.PublishedCache
 
         public override int SortOrder => 0;
 
-        public override string Name(string culture = null)
-        {
-            // member name does not vary, ignore culture
-            return _member.Name;
-        }
+        public override string Name => _member.Name;
 
-        public override DateTime CultureDate(string culture = null) => throw new NotSupportedException();
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
 
-        public override IReadOnlyCollection<string> Cultures => throw new NotSupportedException();
-
-        public override string UrlSegment(string culture = null) => throw new NotSupportedException();
+        public override string UrlSegment => throw new NotSupportedException();
 
         // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
         public override string WriterName => _member.GetCreatorProfile().Name;

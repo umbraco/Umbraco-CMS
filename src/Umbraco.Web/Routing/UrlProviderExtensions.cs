@@ -188,7 +188,7 @@ namespace Umbraco.Web.Routing
                 while (o != null)
                 {
                     l.Add(o.Name());
-                    o = o.Parent();
+                    o = o.Parent;
                 }
                 l.Reverse();
                 var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";

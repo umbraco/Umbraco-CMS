@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.Models
 {
@@ -34,10 +33,10 @@ namespace Umbraco.Web.Models
         public abstract int Id { get; }
 
         /// <inheritdoc />
-        public abstract string Name(string culture = null);
+        public virtual string Name => this.Name();
 
         /// <inheritdoc />
-        public abstract string UrlSegment(string culture = null);
+        public virtual string UrlSegment => this.UrlSegment();
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }
@@ -70,10 +69,13 @@ namespace Umbraco.Web.Models
         public abstract DateTime UpdateDate { get; }
 
         /// <inheritdoc />
-        public abstract DateTime CultureDate(string culture = null);
+        public virtual string Url => this.Url();
 
         /// <inheritdoc />
-        public abstract IReadOnlyCollection<string> Cultures { get; }
+        public abstract IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
+
+        /// <inheritdoc />
+        public abstract PublishedItemType ItemType { get; }
 
         /// <inheritdoc />
         public abstract bool IsDraft(string culture = null);
@@ -86,10 +88,13 @@ namespace Umbraco.Web.Models
         #region Tree
 
         /// <inheritdoc />
-        public abstract IPublishedContent Parent();
+        public abstract IPublishedContent Parent { get; }
 
         /// <inheritdoc />
-        public abstract IEnumerable<IPublishedContent> Children(string culture = null);
+        public virtual IEnumerable<IPublishedContent> Children => this.Children();
+
+        /// <inheritdoc />
+        public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 
         #endregion
 

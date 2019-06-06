@@ -19,7 +19,7 @@
 {
     @* Get the starting page *@
     var startNode = Umbraco.Content(startNodeId);
-    var selection = startNode.Children().Where(x => x.IsVisible()).ToArray();
+    var selection = startNode.Children.Where(x => x.IsVisible()).ToArray();
 
     if (selection.Length > 0)
     {

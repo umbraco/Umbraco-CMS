@@ -10,7 +10,7 @@
     - It then generates links so the visitor can go to each page
 *@
 
-@{ var selection = Model.Content.Children().Where(x => x.IsVisible()).OrderByDescending(x => x.CreateDate).ToArray(); }
+@{ var selection = Model.Content.Children.Where(x => x.IsVisible()).OrderByDescending(x => x.CreateDate).ToArray(); }
 
 @if (selection.Length > 0)
 {

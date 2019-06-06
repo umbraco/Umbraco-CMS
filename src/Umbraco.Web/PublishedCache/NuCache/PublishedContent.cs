@@ -110,7 +110,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         internal static Func<IPublishedSnapshot, bool, int, IPublishedContent> GetMediaByIdFunc { get; set; }
             = (publishedShapshot, previewing, id) => publishedShapshot.Media.GetById(previewing, id);
 
-        private Func<IPublishedSnapshot, bool, int, IPublishedContent> GetGetterById(PublishedItemType itemType)
+        private Func<IPublishedSnapshot, bool, int, IPublishedContent> GetGetterById()
         {
             switch (ContentType.ItemType)
             {
@@ -148,36 +148,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int Id => _contentNode.Id;
 
         /// <inheritdoc />
-        public override string Name(string culture = null)
-        {
-            // invariant has invariant value (whatever the requested culture)
-            if (!ContentType.VariesByCulture())
-                return ContentData.Name;
-
-            // handle context culture for variant
-            if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-
-            // get
-            return culture != "" && ContentData.CultureInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
-        }
-
-        /// <inheritdoc />
-        public override string UrlSegment(string culture = null)
-        {
-            // invariant has invariant value (whatever the requested culture)
-            if (!ContentType.VariesByCulture())
-                return _urlSegment;
-
-            // handle context culture for variant
-            if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-
-            // get
-            return ContentData.CultureInfos.TryGetValue(culture, out var infos) ? infos.UrlSegment : null;
-        }
-
-        /// <inheritdoc />
         public override int SortOrder => _contentNode.SortOrder;
 
         /// <inheritdoc />
@@ -207,36 +177,30 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override DateTime UpdateDate => ContentData.VersionDate;
 
-        /// <inheritdoc />
-        public override DateTime CultureDate(string culture = null)
-        {
-            // invariant has invariant value (whatever the requested culture)
-            if (!ContentType.VariesByCulture())
-                return UpdateDate;
-
-            // handle context culture for variant
-            if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-
-            // get
-            return culture != "" && ContentData.CultureInfos.TryGetValue(culture, out var infos) ? infos.Date : DateTime.MinValue;
-        }
-
         // ReSharper disable once CollectionNeverUpdated.Local
-        private static readonly List<string> EmptyListOfString = new List<string>();
-        private IReadOnlyCollection<string> _cultures;
+        private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> EmptyCultures = new Dictionary<string, PublishedCultureInfo>();
+        private IReadOnlyDictionary<string, PublishedCultureInfo> _cultures;
 
         /// <inheritdoc />
-        public override IReadOnlyCollection<string> Cultures
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
         {
             get
             {
                 if (!ContentType.VariesByCulture())
-                    return EmptyListOfString;
+                    return EmptyCultures;
 
-                return _cultures ?? (_cultures = new HashSet<string>(ContentData.CultureInfos.Keys, StringComparer.OrdinalIgnoreCase));
+                if (_cultures != null) return _cultures;
+
+                if (ContentData.CultureInfos == null)
+                    throw new Exception("panic: _contentDate.CultureInfos is null.");
+
+                return _cultures = ContentData.CultureInfos
+                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date), StringComparer.OrdinalIgnoreCase);
             }
         }
+
+        /// <inheritdoc />
+        public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
 
         /// <inheritdoc />
         public override bool IsDraft(string culture = null)
@@ -288,38 +252,35 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Tree
 
         /// <inheritdoc />
-        public override IPublishedContent Parent()
+        public override IPublishedContent Parent
         {
-            var getById = GetGetterById(ContentType.ItemType);
-            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
-            return getById(publishedSnapshot, IsPreviewing, ParentId);
+            get
+            {
+                var getById = GetGetterById();
+                var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+                return getById(publishedSnapshot, IsPreviewing, ParentId);
+            }
         }
 
         /// <inheritdoc />
-        public override IEnumerable<IPublishedContent> Children(string culture = null)
+        public override IEnumerable<IPublishedContent> ChildrenForAllCultures
         {
-            // invariant has invariant value (whatever the requested culture)
-            if (!ContentType.VariesByCulture() && culture != "*")
-                culture = "";
-
-            // handle context culture for variant
-            if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-
-            var getById = GetGetterById(ContentType.ItemType);
-            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
-            var id = _contentNode.FirstChildContentId;
-
-            while (id > 0)
+            get
             {
-                var content = getById(publishedSnapshot, IsPreviewing, id);
-                if (content == null)
-                    throw new Exception("panic: failed to get content");
+                var getById = GetGetterById();
+                var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+                var id = _contentNode.FirstChildContentId;
 
-                if (culture == "*" || content.IsInvariantOrHasCulture(culture))
+                while (id > 0)
+                {
+                    var content = getById(publishedSnapshot, IsPreviewing, id);
+                    if (content == null)
+                        throw new Exception("panic: failed to get content");
+
                     yield return content;
 
-                id = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
+                    id = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
+                }
             }
         }
 
@@ -381,7 +342,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // includes all children, published or unpublished
         // NavigableNavigator takes care of selecting those it wants
         // note: this is not efficient - we do not try to be (would require a double-linked list)
-        internal IList<int> ChildIds => Children().Select(x => x.Id).ToList();
+        internal IList<int> ChildIds => Children.Select(x => x.Id).ToList();
 
         // used by Property
         // gets a value indicating whether the content or media exists in

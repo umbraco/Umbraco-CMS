@@ -168,36 +168,6 @@ namespace Umbraco.Web
         #region Variations
 
         /// <summary>
-        /// Determines whether the content has a culture.
-        /// </summary>
-        /// <remarks>Culture is case-insensitive.</remarks>
-        public static bool HasCulture(this IPublishedContent content, string culture)
-            => content.Cultures.Contains(culture ?? string.Empty);
-
-        /// <summary>
-        /// Determines whether the content is invariant, or has a culture.
-        /// </summary>
-        /// <remarks>Culture is case-insensitive.</remarks>
-        public static bool IsInvariantOrHasCulture(this IPublishedContent content, string culture)
-            => !content.ContentType.VariesByCulture() || content.Cultures.Contains(culture ?? "");
-
-        /// <summary>
-        /// Filters a sequence of <see cref="IPublishedContent"/> to return invariant items, and items that are published for the specified culture.
-        /// </summary>
-        /// <param name="contents">The content items.</param>
-        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null).</param>
-        internal static IEnumerable<T> WhereIsInvariantOrHasCulture<T>(this IEnumerable<T> contents, string culture = null)
-            where T : class, IPublishedContent
-        {
-            if (contents == null) throw new ArgumentNullException(nameof(contents));
-
-            culture = culture ?? Current.VariationContextAccessor.VariationContext?.Culture ?? "";
-
-            // either does not vary by culture, or has the specified culture
-            return contents.Where(x => !x.ContentType.VariesByCulture() || x.HasCulture(culture));
-        }
-
-        /// <summary>
         /// Gets the culture assigned to a document by domains, in the context of a current Uri.
         /// </summary>
         /// <param name="content">The document.</param>
@@ -555,7 +525,7 @@ namespace Umbraco.Web
         /// <remarks>This method is here for consistency purposes but does not make much sense.</remarks>
         public static IPublishedContent Ancestor(this IPublishedContent content)
         {
-            return content.Parent();
+            return content.Parent;
         }
 
         /// <summary>
@@ -687,7 +657,7 @@ namespace Umbraco.Web
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
-            while ((content = content.Parent()) != null)
+            while ((content = content.Parent) != null)
                 yield return content;
         }
 
@@ -891,7 +861,7 @@ namespace Umbraco.Web
             where T : class, IPublishedContent
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            return content.Parent() as T;
+            return content.Parent as T;
         }
 
         #endregion
@@ -1111,8 +1081,8 @@ namespace Umbraco.Web
         /// <returns>The siblings of the content including the node itself.</returns>
         public static IEnumerable<IPublishedContent> SiblingsAndSelf(this IPublishedContent content, string culture = null)
         {
-            return content.Parent() != null
-                ? content.Parent().Children(culture)
+            return content.Parent != null
+                ? content.Parent.Children(culture)
                 : PublishedSnapshot.Content.GetAtRoot().WhereIsInvariantOrHasCulture(culture);
         }
 
@@ -1125,8 +1095,8 @@ namespace Umbraco.Web
         /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
         public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.Parent() != null
-                ? content.Parent().ChildrenOfType(contentTypeAlias, culture)
+            return content.Parent != null
+                ? content.Parent.ChildrenOfType(contentTypeAlias, culture)
                 : PublishedSnapshot.Content.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(culture);
         }
 
@@ -1140,8 +1110,8 @@ namespace Umbraco.Web
         public static IEnumerable<T> SiblingsAndSelf<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.Parent() != null
-                ? content.Parent().Children<T>(culture)
+            return content.Parent != null
+                ? content.Parent.Children<T>(culture)
                 : PublishedSnapshot.Content.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(culture);
         }
 

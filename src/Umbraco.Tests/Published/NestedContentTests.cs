@@ -271,10 +271,12 @@ namespace Umbraco.Tests.Published
             }
 
             // ReSharper disable UnassignedGetOnlyAutoProperty
+            public override PublishedItemType ItemType { get; }
             public override bool IsDraft(string culture = null) => false;
             public override bool IsPublished(string culture = null) => true;
-            public override IPublishedContent Parent() => null;
-            public override IEnumerable<IPublishedContent> Children(string culture = null) => Enumerable.Empty<IPublishedContent>();
+            public override IPublishedContent Parent { get; }
+            public override IEnumerable<IPublishedContent> Children { get; }
+            public override IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
             public override IPublishedContentType ContentType { get; }
             // ReSharper restore UnassignedGetOnlyAutoProperty
 
@@ -282,10 +284,9 @@ namespace Umbraco.Tests.Published
             public override int Id { get; }
             public override int? TemplateId { get; }
             public override int SortOrder { get; }
-            public override string Name(string culture = null) => default;
-            public override DateTime CultureDate(string culture = null) => throw new NotSupportedException();
-            public override IReadOnlyCollection<string> Cultures => throw new NotSupportedException();
-            public override string UrlSegment(string culture = null) => default;
+            public override string Name { get; }
+            public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+            public override string UrlSegment { get; }
             public override string WriterName { get; }
             public override string CreatorName { get; }
             public override int WriterId { get; }

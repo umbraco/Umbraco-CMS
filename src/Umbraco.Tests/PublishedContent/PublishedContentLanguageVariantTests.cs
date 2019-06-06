@@ -122,8 +122,11 @@ namespace Umbraco.Tests.PublishedContent
             {
                 Id = 1,
                 SortOrder = 0,
+                Name = "Content 1",
+                UrlSegment = "content-1",
                 Path = "/1",
                 Level = 1,
+                Url = "/content-1",
                 ParentId = -1,
                 ChildIds = new[] { 2 },
                 Properties = new Collection<IPublishedProperty>
@@ -131,16 +134,16 @@ namespace Umbraco.Tests.PublishedContent
                         prop1, prop2, noprop
                     }
             };
-            item1.SetName("Content 1");
-            item1.SetUrlSegment("content-1");
-            item1.SetUrl("/content-1");
 
             var item2 = new SolidPublishedContent(contentType1)
             {
                 Id = 2,
                 SortOrder = 0,
+                Name = "Content 2",
+                UrlSegment = "content-2",
                 Path = "/1/2",
                 Level = 2,
+                Url = "/content-1/content-2",
                 ParentId = 1,
                 ChildIds = new int[] { 3 },
                 Properties = new Collection<IPublishedProperty>
@@ -148,9 +151,6 @@ namespace Umbraco.Tests.PublishedContent
                         prop3
                     }
             };
-            item2.SetName("Content 2");
-            item2.SetUrlSegment("content-2");
-            item2.SetUrl("/content-1/content-2");
 
             var prop4 = new SolidPublishedPropertyWithLanguageVariants
             {
@@ -164,8 +164,11 @@ namespace Umbraco.Tests.PublishedContent
             {
                 Id = 3,
                 SortOrder = 0,
+                Name = "Content 3",
+                UrlSegment = "content-3",
                 Path = "/1/2/3",
                 Level = 3,
+                Url = "/content-1/content-2/content-3",
                 ParentId = 2,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -173,15 +176,12 @@ namespace Umbraco.Tests.PublishedContent
                     prop4
                 }
             };
-            item3.SetName("Content 3");
-            item3.SetUrlSegment("content-3");
-            item3.SetUrl("/content-1/content-2/content-3");
 
-            item1.SetChildren(new List<IPublishedContent> { item2 });
-            item2.SetParent(item1);
+            item1.Children = new List<IPublishedContent> { item2 };
+            item2.Parent = item1;
 
-            item2.SetChildren(new List<IPublishedContent> { item3 });
-            item3.SetParent(item2);
+            item2.Children = new List<IPublishedContent> { item3 };
+            item3.Parent = item2;
 
             cache.Add(item1);
             cache.Add(item2);
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Do_Not_Get_Content_Recursively_Unless_Requested()
         {
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
             var value = content.Value("welcomeText2");
             Assert.IsNull(value);
         }
@@ -255,7 +255,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_Recursively()
         {
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
             var value = content.Value("welcomeText2", fallback: Fallback.ToAncestors);
             Assert.AreEqual("Welcome", value);
         }
@@ -263,7 +263,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Do_Not_Get_Content_Recursively_Unless_Requested2()
         {
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First().Children.First();
             Assert.IsNull(content.GetProperty("welcomeText2"));
             var value = content.Value("welcomeText2");
             Assert.IsNull(value);
@@ -272,7 +272,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_Recursively2()
         {
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First().Children.First();
             Assert.IsNull(content.GetProperty("welcomeText2"));
             var value = content.Value("welcomeText2", fallback: Fallback.ToAncestors);
             Assert.AreEqual("Welcome", value);
@@ -281,7 +281,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_Recursively3()
         {
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First().Children.First();
             Assert.IsNull(content.GetProperty("noprop"));
             var value = content.Value("noprop", fallback: Fallback.ToAncestors);
             // property has no value but we still get the value (ie, the converter would do something)
@@ -292,7 +292,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_With_Recursive_Priority()
         {
             Current.VariationContextAccessor.VariationContext = new VariationContext("nl");
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
 
             var value = content.Value("welcomeText", "nl", fallback: Fallback.To(Fallback.Ancestors, Fallback.Language));
 
@@ -303,7 +303,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_With_Fallback_Language_Priority()
         {
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
             var value = content.Value("welcomeText", "nl", fallback: Fallback.ToLanguage);
 
             // No Dutch value is directly assigned.  Check has fallen back to English value from language variant.
@@ -313,14 +313,14 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Throws_For_Non_Supported_Fallback()
         {
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
             Assert.Throws<NotSupportedException>(() => content.Value("welcomeText", "nl", fallback: Fallback.To(999)));
         }
 
         [Test]
         public void Can_Fallback_To_Default_Value()
         {
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
 
             // no Dutch value is assigned, so getting null
             var value = content.Value("welcomeText", "nl");
@@ -338,7 +338,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Have_Custom_Default_Value()
         {
-            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children().First();
+            var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
 
             // HACK: the value, pretend the converter would return something
             var prop = content.GetProperty("welcomeText") as SolidPublishedPropertyWithLanguageVariants;

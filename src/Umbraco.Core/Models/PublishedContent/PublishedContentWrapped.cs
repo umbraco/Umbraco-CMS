@@ -58,10 +58,10 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual int Id => _content.Id;
 
         /// <inheritdoc />
-        public virtual string Name(string culture = null) => _content.Name(culture);
+        public virtual string Name => _content.Name;
 
         /// <inheritdoc />
-        public virtual string UrlSegment(string culture = null) => _content.UrlSegment(culture);
+        public virtual string UrlSegment => _content.UrlSegment;
 
         /// <inheritdoc />
         public virtual int SortOrder => _content.SortOrder;
@@ -94,10 +94,13 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual DateTime UpdateDate => _content.UpdateDate;
 
         /// <inheritdoc />
-        public DateTime CultureDate(string culture = null) => _content.CultureDate(culture);
+        public virtual string Url => _content.Url;
 
         /// <inheritdoc />
-        public IReadOnlyCollection<string> Cultures => _content.Cultures;
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
+
+        /// <inheritdoc />
+        public virtual PublishedItemType ItemType => _content.ItemType;
 
         /// <inheritdoc />
         public virtual bool IsDraft(string culture = null) => _content.IsDraft(culture);
@@ -110,10 +113,13 @@ namespace Umbraco.Core.Models.PublishedContent
         #region Tree
 
         /// <inheritdoc />
-        public virtual IPublishedContent Parent() => _content.Parent();
+        public virtual IPublishedContent Parent => _content.Parent;
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children(string culture = null) => _content.Children(culture);
+        public virtual IEnumerable<IPublishedContent> Children => _content.Children;
+
+        /// <inheritdoc />
+        public virtual IEnumerable<IPublishedContent> ChildrenForAllCultures => _content.ChildrenForAllCultures;
 
         #endregion
 

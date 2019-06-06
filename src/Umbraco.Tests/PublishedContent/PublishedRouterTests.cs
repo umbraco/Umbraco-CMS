@@ -58,13 +58,13 @@ namespace Umbraco.Tests.PublishedContent
         {
             var pc = new Mock<IPublishedContent>();
             pc.Setup(content => content.Id).Returns(1);
-            pc.Setup(content => content.Name(It.IsAny<string>())).Returns("test");
+            pc.Setup(content => content.Name).Returns("test");
             pc.Setup(content => content.WriterName).Returns("admin");
             pc.Setup(content => content.CreatorName).Returns("admin");
             pc.Setup(content => content.CreateDate).Returns(DateTime.Now);
             pc.Setup(content => content.UpdateDate).Returns(DateTime.Now);
             pc.Setup(content => content.Path).Returns("-1,1");
-            pc.Setup(content => content.Parent()).Returns(() => null);
+            pc.Setup(content => content.Parent).Returns(() => null);
             pc.Setup(content => content.Properties).Returns(new Collection<IPublishedProperty>());
             pc.Setup(content => content.ContentType).Returns(new PublishedContentType(22, "anything", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing));
             return pc;

@@ -35,9 +35,9 @@ namespace Umbraco.Web.Macros
                 throw new ArgumentException("Document request has no node.", nameof(frequest));
 
             PopulatePageData(frequest.PublishedContent.Id,
-                frequest.PublishedContent.Name(), frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
+                frequest.PublishedContent.Name, frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
                 frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
-                frequest.PublishedContent.Path, frequest.PublishedContent.Parent()?.Id ?? -1);
+                frequest.PublishedContent.Path, frequest.PublishedContent.Parent?.Id ?? -1);
 
             if (frequest.HasTemplate)
             {
@@ -57,9 +57,9 @@ namespace Umbraco.Web.Macros
             if (doc == null) throw new ArgumentNullException(nameof(doc));
 
             PopulatePageData(doc.Id,
-                doc.Name(), doc.ContentType.Id, doc.ContentType.Alias,
+                doc.Name, doc.ContentType.Id, doc.ContentType.Alias,
                 doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
-                doc.Path, doc.Parent()?.Id ?? -1);
+                doc.Path, doc.Parent?.Id ?? -1);
 
             if (doc.TemplateId.HasValue)
             {
@@ -182,8 +182,8 @@ namespace Umbraco.Web.Macros
         {
             private readonly IContent _inner;
             private readonly IPublishedProperty[] _properties;
+            private IReadOnlyDictionary<string, PublishedCultureInfo> _cultureInfos;
             private readonly IVariationContextAccessor _variationContextAccessor;
-            private readonly IPublishedContent _parent;
 
             private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> NoCultureInfos = new Dictionary<string, PublishedCultureInfo>();
 
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Macros
                     .Cast<IPublishedProperty>()
                     .ToArray();
 
-                _parent = new PagePublishedContent(_inner.ParentId);
+                Parent = new PagePublishedContent(_inner.ParentId);
             }
 
             public IPublishedContentType ContentType { get; }
@@ -228,37 +228,25 @@ namespace Umbraco.Web.Macros
 
             public int SortOrder => _inner.SortOrder;
 
-            public string Name(string culture = null) => _inner.GetCultureName(culture);
+            public string Name => _inner.Name;
 
-            public DateTime CultureDate(string culture = null)
-            {
-                // invariant has invariant value (whatever the requested culture)
-                if (!ContentType.VariesByCulture())
-                    return UpdateDate;
-
-                // handle context culture for variant
-                if (culture == null)
-                    culture = _variationContextAccessor.VariationContext.Culture;
-
-                // get
-                return culture != "" && _inner.PublishCultureInfos.TryGetValue(culture, out var infos) ? infos.Date : DateTime.MinValue;
-            }
-
-            // ReSharper disable once CollectionNeverUpdated.Local
-            private static readonly List<string> EmptyListOfString = new List<string>();
-            private IReadOnlyList<string> _cultures;
-
-            public IReadOnlyCollection<string> Cultures
+            public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
             {
                 get
                 {
                     if (!_inner.ContentType.VariesByCulture())
-                        return EmptyListOfString;
-                    return _cultures ?? (_cultures = _inner.PublishCultureInfos.Values.Select(x => x.Culture).ToList());
+                        return NoCultureInfos;
+
+                    if (_cultureInfos != null)
+                        return _cultureInfos;
+
+                    var urlSegmentProviders = Current.UrlSegmentProviders; // TODO inject
+                    return _cultureInfos = _inner.PublishCultureInfos.Values
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(urlSegmentProviders, x.Culture), x.Date));
                 }
             }
 
-            public string UrlSegment(string culture = null) => throw new NotImplementedException();
+            public string UrlSegment => throw new NotImplementedException();
 
             public string WriterName { get; }
 
@@ -276,7 +264,9 @@ namespace Umbraco.Web.Macros
 
             public int Level => _inner.Level;
 
-            public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => throw new NotSupportedException();
+            public string Url => throw new NotImplementedException();
+
+            public PublishedItemType ItemType => PublishedItemType.Content;
 
             public bool IsDraft(string culture = null)
             {
@@ -288,9 +278,11 @@ namespace Umbraco.Web.Macros
                 throw new NotImplementedException();
             }
 
-            public IPublishedContent Parent() => _parent;
+            public IPublishedContent Parent { get; }
 
-            public IEnumerable<IPublishedContent> Children(string culture = null) => throw new NotImplementedException();
+            public IEnumerable<IPublishedContent> Children => throw new NotImplementedException();
+
+            public IEnumerable<IPublishedContent> ChildrenForAllCultures => throw new NotImplementedException();
 
             public IEnumerable<IPublishedProperty> Properties => _properties;
 

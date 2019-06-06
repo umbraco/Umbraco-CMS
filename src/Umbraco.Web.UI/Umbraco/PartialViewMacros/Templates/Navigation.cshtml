@@ -7,7 +7,7 @@
     It also highlights the current active page/section in the navigation with the CSS class "current".
 *@
 
-@{ var selection = Model.Content.Root().Children().Where(x => x.IsVisible()).ToArray(); }
+@{ var selection = Model.Content.Root().Children.Where(x => x.IsVisible()).ToArray(); }
 
 @if (selection.Length > 0)
 {

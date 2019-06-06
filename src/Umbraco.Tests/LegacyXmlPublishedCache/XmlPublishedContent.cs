@@ -71,11 +71,16 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private bool _isDraft;
 
 
-        public override IEnumerable<IPublishedContent> Children(string culture = null)
+        public override IEnumerable<IPublishedContent> Children
         {
-            EnsureNodeInitialized(andChildren: true);
-            return _children;
+            get
+            {
+                EnsureNodeInitialized(andChildren: true);
+                return _children;
+            }
         }
+
+        public override IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
         public override IPublishedProperty GetProperty(string alias)
         {
@@ -84,10 +89,15 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _properties.TryGetValue(alias, out property) ? property : null;
         }
 
-        public override IPublishedContent Parent()
+        public override PublishedItemType ItemType => PublishedItemType.Content;
+
+        public override IPublishedContent Parent
         {
-            EnsureNodeInitialized(andParent: true);
-            return _parent;
+            get
+            {
+                EnsureNodeInitialized(andParent: true);
+                return _parent;
+            }
         }
 
         public override int Id
@@ -126,17 +136,17 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
-        public override string Name(string culture = null)
+        public override string Name
         {
-			EnsureNodeInitialized();
-            return _name;
+            get
+            {
+				EnsureNodeInitialized();
+                return _name;
+            }
         }
 
-        public override DateTime CultureDate(string culture = null) => UpdateDate;
-
-        // ReSharper disable once CollectionNeverUpdated.Local
-        private static readonly List<string> EmptyListOfString = new List<string>();
-        public override IReadOnlyCollection<string> Cultures => EmptyListOfString;
+        private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
 
         public override string WriterName
         {
@@ -201,10 +211,13 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
-        public override string UrlSegment(string culture = null)
+        public override string UrlSegment
         {
-            EnsureNodeInitialized();
-            return _urlName;
+            get
+            {
+                EnsureNodeInitialized();
+                return _urlName;
+            }
         }
 
         public override int Level

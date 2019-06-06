@@ -7,38 +7,20 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     internal class TestPublishedContent : PublishedElement, IPublishedContent
     {
-        private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
-        private readonly Dictionary<string, string> _urlSegments = new Dictionary<string, string>();
-        private readonly Dictionary<string, DateTime> _cultures;
-
-        public TestPublishedContent(IPublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, DateTime> cultures = null)
+        public TestPublishedContent(IPublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfo> cultures = null)
             : base(contentType, key, values, previewing)
         {
             Id = id;
-            _cultures = cultures ??  new Dictionary<string, DateTime>();
+            Cultures = cultures ??  new Dictionary<string, PublishedCultureInfo>();
         }
 
         public int Id { get; }
         public int? TemplateId { get; set; }
         public int SortOrder { get; set; }
-        public string Name(string culture = null) => _names.TryGetValue(culture ?? "", out var name) ? name : null;
-        public void SetName(string name, string culture = null) => _names[culture ?? ""] = name;
+        public string Name { get; set; }
         public IVariationContextAccessor VariationContextAccessor { get; set; }
-        public DateTime CultureDate(string culture = null)
-        {
-            // handle context culture
-            if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture;
-
-            // no invariant culture infos
-            if (culture == "" || Cultures == null) return UpdateDate;
-
-            // get
-            return _cultures.TryGetValue(culture, out var date) ? date : DateTime.MinValue;
-        }
-        public IReadOnlyCollection<string> Cultures { get; set; }
-        public string UrlSegment(string culture = null) => _urlSegments.TryGetValue(culture ?? "", out var urlSegment) ? urlSegment : null;
-        public void SetUrlSegment(string urlSegment, string culture = null) => _urlSegments[culture ?? ""] = urlSegment;
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; set; }
+        public string UrlSegment { get; set; }
         public string DocumentTypeAlias => ContentType.Alias;
         public int DocumentTypeId { get; set; }
         public string WriterName { get; set; }
@@ -50,15 +32,13 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public DateTime UpdateDate { get; set; }
         public Guid Version { get; set; }
         public int Level { get; set; }
-        public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => throw new NotSupportedException();
+        public string Url { get; set; }
+        public PublishedItemType ItemType => ContentType.ItemType;
         public bool IsDraft(string culture = null) => false;
         public bool IsPublished(string culture = null) => true;
-        private IPublishedContent _parent;
-        public IPublishedContent Parent() => _parent;
-        public void SetParent(IPublishedContent parent) => _parent = parent;
-        private IEnumerable<IPublishedContent> _children;
-        public IEnumerable<IPublishedContent> Children(string culture = null) => _children;
-        public void SetChildren(IEnumerable<IPublishedContent> children) => _children = children;
+        public IPublishedContent Parent { get; set; }
+        public IEnumerable<IPublishedContent> Children { get; set; }
+        public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
         // copied from PublishedContentBase
         public IPublishedProperty GetProperty(string alias, bool recurse)
@@ -70,7 +50,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             var firstNonNullProperty = property;
             while (content != null && (property == null || property.HasValue() == false))
             {
-                content = content.Parent();
+                content = content.Parent;
                 property = content?.GetProperty(alias);
                 if (firstNonNullProperty == null && property != null) firstNonNullProperty = property;
             }

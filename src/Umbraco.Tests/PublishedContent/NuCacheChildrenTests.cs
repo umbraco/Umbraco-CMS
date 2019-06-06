@@ -231,22 +231,22 @@ namespace Umbraco.Tests.PublishedContent
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
 
-            Assert.IsNull(snapshot.Content.GetById(1).Parent());
-            Assert.IsNull(snapshot.Content.GetById(2).Parent());
-            Assert.IsNull(snapshot.Content.GetById(3).Parent());
+            Assert.IsNull(snapshot.Content.GetById(1).Parent);
+            Assert.IsNull(snapshot.Content.GetById(2).Parent);
+            Assert.IsNull(snapshot.Content.GetById(3).Parent);
 
-            Assert.AreEqual(1, snapshot.Content.GetById(4).Parent()?.Id);
-            Assert.AreEqual(1, snapshot.Content.GetById(5).Parent()?.Id);
-            Assert.AreEqual(1, snapshot.Content.GetById(6).Parent()?.Id);
+            Assert.AreEqual(1, snapshot.Content.GetById(4).Parent?.Id);
+            Assert.AreEqual(1, snapshot.Content.GetById(5).Parent?.Id);
+            Assert.AreEqual(1, snapshot.Content.GetById(6).Parent?.Id);
 
-            Assert.AreEqual(2, snapshot.Content.GetById(7).Parent()?.Id);
-            Assert.AreEqual(2, snapshot.Content.GetById(8).Parent()?.Id);
-            Assert.AreEqual(2, snapshot.Content.GetById(9).Parent()?.Id);
+            Assert.AreEqual(2, snapshot.Content.GetById(7).Parent?.Id);
+            Assert.AreEqual(2, snapshot.Content.GetById(8).Parent?.Id);
+            Assert.AreEqual(2, snapshot.Content.GetById(9).Parent?.Id);
 
-            Assert.AreEqual(3, snapshot.Content.GetById(10).Parent()?.Id);
+            Assert.AreEqual(3, snapshot.Content.GetById(10).Parent?.Id);
 
-            Assert.AreEqual(4, snapshot.Content.GetById(11).Parent()?.Id);
-            Assert.AreEqual(4, snapshot.Content.GetById(12).Parent()?.Id);
+            Assert.AreEqual(4, snapshot.Content.GetById(11).Parent?.Id);
+            Assert.AreEqual(4, snapshot.Content.GetById(12).Parent?.Id);
         }
 
         [Test]
@@ -288,7 +288,7 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetById(3).Children().ToArray();
             AssertDocuments(documents);
 
-            Assert.IsNull(snapshot.Content.GetById(10).Parent());
+            Assert.IsNull(snapshot.Content.GetById(10).Parent);
         }
 
         [Test]
@@ -330,7 +330,7 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetById(10).Children().ToArray();
             AssertDocuments(documents, "N1");
 
-            Assert.AreEqual(10, snapshot.Content.GetById(1).Parent()?.Id);
+            Assert.AreEqual(10, snapshot.Content.GetById(1).Parent?.Id);
         }
 
         [Test]
@@ -509,7 +509,7 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetById(2).Children().ToArray();
             AssertDocuments(documents, "N9", "N8");
 
-            Assert.AreEqual(1, snapshot.Content.GetById(7).Parent()?.Id);
+            Assert.AreEqual(1, snapshot.Content.GetById(7).Parent?.Id);
         }
 
         private void AssertDocuments(IPublishedContent[] documents, params string[] names)

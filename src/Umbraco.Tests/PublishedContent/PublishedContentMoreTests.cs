@@ -29,8 +29,11 @@ namespace Umbraco.Tests.PublishedContent
             {
                 Id = 1,
                 SortOrder = 0,
+                Name = "Content 1",
+                UrlSegment = "content-1",
                 Path = "/1",
                 Level = 1,
+                Url = "/content-1",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -44,17 +47,17 @@ namespace Umbraco.Tests.PublishedContent
                     }
                 }
             };
-            content.SetName("Content 1");
-            content.SetUrlSegment("content-1");
-            content.SetUrl("/content-1");
             cache.Add(content);
 
             content = new SolidPublishedContent(contentType2)
             {
                 Id = 2,
                 SortOrder = 1,
+                Name = "Content 2",
+                UrlSegment = "content-2",
                 Path = "/2",
                 Level = 1,
+                Url = "/content-2",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -68,17 +71,17 @@ namespace Umbraco.Tests.PublishedContent
                     }
                 }
             };
-            content.SetName("Content 2");
-            content.SetUrlSegment("content-2");
-            content.SetUrl("/content-2");
             cache.Add(content);
 
             content = new SolidPublishedContent(contentType2Sub)
             {
                 Id = 3,
                 SortOrder = 2,
+                Name = "Content 2Sub",
+                UrlSegment = "content-2sub",
                 Path = "/3",
                 Level = 1,
+                Url = "/content-2sub",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -92,9 +95,6 @@ namespace Umbraco.Tests.PublishedContent
                     }
                 }
             };
-            content.SetName("Content 2Sub");
-            content.SetUrlSegment("content-2sub");
-            content.SetUrl("/content-2sub");
             cache.Add(content);
         }
 
@@ -114,17 +114,17 @@ namespace Umbraco.Tests.PublishedContent
                 .ToIndexedArray();
 
             var item = items[0];
-            Assert.AreEqual("Content 1", item.Content.Name());
+            Assert.AreEqual("Content 1", item.Content.Name);
             Assert.IsTrue(item.IsFirst());
             Assert.IsFalse(item.IsLast());
 
             item = items[1];
-            Assert.AreEqual("Content 2", item.Content.Name());
+            Assert.AreEqual("Content 2", item.Content.Name);
             Assert.IsFalse(item.IsFirst());
             Assert.IsFalse(item.IsLast());
 
             item = items[2];
-            Assert.AreEqual("Content 2Sub", item.Content.Name());
+            Assert.AreEqual("Content 2Sub", item.Content.Name);
             Assert.IsFalse(item.IsFirst());
             Assert.IsTrue(item.IsLast());
         }
@@ -157,7 +157,7 @@ namespace Umbraco.Tests.PublishedContent
             var content = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First(x => x.Prop1 == 1234);
-            Assert.AreEqual("Content 2", content.Name());
+            Assert.AreEqual("Content 2", content.Name);
             Assert.AreEqual(1234, content.Prop1);
         }
 

@@ -157,7 +157,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 pathParts.Add(urlSegment);
 
                 // move to parent node
-                n = n.Parent();
+                n = n.Parent;
                 if (n != null)
                     urlSegment = n.UrlSegment(culture);
 
@@ -206,7 +206,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // "/foo" fails (looking for "/*/foo") we try also "/foo".
             // this does not make much sense anyway esp. if both "/foo/" and "/bar/foo" exist, but
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
-            if (content.Parent() == null)
+            if (content.Parent == null)
             {
                 var rootNode = GetByRoute(preview, "/", true);
                 if (rootNode == null)

@@ -136,7 +136,12 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly Func<DictionaryPublishedContent, string, IPublishedProperty> _getProperty;
         private readonly IAppCache _appCache;
 
-        public override IPublishedContent Parent() => _getParent.Value;
+        /// <summary>
+        /// Returns 'Media' as the item type
+        /// </summary>
+        public override PublishedItemType ItemType => PublishedItemType.Media;
+
+        public override IPublishedContent Parent => _getParent.Value;
 
         public int ParentId { get; private set; }
 
@@ -148,15 +153,12 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override int SortOrder => _sortOrder;
 
-        public override string Name(string culture = null) => _name;
+        public override string Name => _name;
 
-        public override DateTime CultureDate(string culture = null) => UpdateDate;
+        private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
 
-        // ReSharper disable once CollectionNeverUpdated.Local
-        private static readonly List<string> EmptyListOfString = new List<string>();
-        public override IReadOnlyCollection<string> Cultures => EmptyListOfString;
-
-        public override string UrlSegment(string culture = null) => _urlName;
+        public override string UrlSegment => _urlName;
 
         public override string WriterName => _creatorName;
 
@@ -180,7 +182,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 
-        public override IEnumerable<IPublishedContent> Children(string culture = null) => _getChildren.Value;
+        public override IEnumerable<IPublishedContent> Children => _getChildren.Value;
+
+        public override IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
         public override IPublishedProperty GetProperty(string alias)
         {

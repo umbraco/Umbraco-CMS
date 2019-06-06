@@ -102,7 +102,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
         {
-            return _content.Values.Where(x => x.Parent() == null);
+            return _content.Values.Where(x => x.Parent == null);
         }
 
         public override IPublishedContent GetSingleByXPath(bool preview, string xpath, Core.Xml.XPathVariable[] vars)
@@ -158,10 +158,6 @@ namespace Umbraco.Tests.PublishedContent
 
     internal class SolidPublishedContent : IPublishedContent
     {
-        private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
-        private readonly Dictionary<string, string> _urlSegments = new Dictionary<string, string>();
-        private readonly Dictionary<string, string> _urls = new Dictionary<string, string>();
-
         #region Constructor
 
         public SolidPublishedContent(IPublishedContentType contentType)
@@ -184,12 +180,10 @@ namespace Umbraco.Tests.PublishedContent
         public Guid Key { get; set; }
         public int? TemplateId { get; set; }
         public int SortOrder { get; set; }
-        public string Name(string culture = null) => _names.TryGetValue(culture ?? "", out var name) ? name : null;
-        public void SetName(string name, string culture = null) => _names[culture ?? ""] = name;
-        public DateTime CultureDate(string culture = null) => throw new NotSupportedException();
-        public IReadOnlyCollection<string> Cultures => throw new NotSupportedException();
-        public string UrlSegment(string culture = null) => _urlSegments.TryGetValue(culture ?? "", out var urlSegment) ? urlSegment : null;
-        public void SetUrlSegment(string urlSegment, string culture = null) => _urlSegments[culture ?? ""] = urlSegment;
+        public string Name { get; set; }
+        public PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+        public string UrlSegment { get; set; }
         public string WriterName { get; set; }
         public string CreatorName { get; set; }
         public int WriterId { get; set; }
@@ -199,9 +193,9 @@ namespace Umbraco.Tests.PublishedContent
         public DateTime UpdateDate { get; set; }
         public Guid Version { get; set; }
         public int Level { get; set; }
-        public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => _urls.TryGetValue(culture ?? "", out var url) ? url : null;
-        public void SetUrl(string url, string culture = null) => _urls[culture ?? ""] = url;
+        public string Url { get; set; }
 
+        public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
         public bool IsDraft(string culture = null) => false;
         public bool IsPublished(string culture = null) => true;
 
@@ -212,12 +206,9 @@ namespace Umbraco.Tests.PublishedContent
         public int ParentId { get; set; }
         public IEnumerable<int> ChildIds { get; set; }
 
-        private IPublishedContent _parent;
-        public IPublishedContent Parent() => _parent;
-        public void SetParent(IPublishedContent parent) => _parent = parent;
-        private IEnumerable<IPublishedContent> _children;
-        public IEnumerable<IPublishedContent> Children(string culture = null) => _children;
-        public void SetChildren(IEnumerable<IPublishedContent> children) => _children = children;
+        public IPublishedContent Parent { get; set; }
+        public IEnumerable<IPublishedContent> Children { get; set; }
+        public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
         #endregion
 
@@ -244,7 +235,7 @@ namespace Umbraco.Tests.PublishedContent
             IPublishedContent content = this;
             while (content != null && (property == null || property.HasValue() == false))
             {
-                content = content.Parent();
+                content = content.Parent;
                 property = content == null ? null : content.GetProperty(alias);
             }
 

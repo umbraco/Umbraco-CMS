@@ -10,9 +10,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using PublishedContentExtensions = Umbraco.Web.PublishedContentExtensions;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetContent(true, 1);
             //change a doc type alias
-            var c = (TestPublishedContent)doc.Children().ElementAt(0);
+            var c = (TestPublishedContent)doc.Children.ElementAt(0);
             c.ContentType = new PublishedContentType(22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
 
             var dt = doc.ChildrenAsTable(Current.Services, "Child");
@@ -139,6 +139,8 @@ namespace Umbraco.Tests.PublishedContent
                     TemplateId = 5,
                     UpdateDate = DateTime.Now,
                     Path = "-1,3",
+                    UrlSegment = "home-page",
+                    Name = "Page" + Guid.NewGuid().ToString(),
                     Version = Guid.NewGuid(),
                     WriterId = 1,
                     WriterName = "Shannon",
@@ -146,8 +148,6 @@ namespace Umbraco.Tests.PublishedContent
                     Level = 1,
                     Children = new List<IPublishedContent>()
                 };
-            d.SetName("Page" + Guid.NewGuid());
-            d.SetUrlSegment("home-page");
             d.Properties = new Collection<IPublishedProperty>(new List<IPublishedProperty>
             {
                 new RawValueProperty(factory.CreatePropertyType("property1", 1), d, "value" + indexVals),
@@ -183,26 +183,16 @@ namespace Umbraco.Tests.PublishedContent
         // l8tr...
         private class TestPublishedContent : IPublishedContent
         {
-            private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
-            private readonly Dictionary<string, string> _urlSegments = new Dictionary<string, string>();
-
-            public string Url(string culture = null, UrlMode mode = UrlMode.Auto) => default;
-
-            IPublishedContent IPublishedContent.Parent() => Parent;
-
-            IEnumerable<IPublishedContent> IPublishedContent.Children(string culture = null) => Children;
-
+            public string Url { get; set; }
+            public PublishedItemType ItemType { get; set; }
             public IPublishedContent Parent { get; set; }
             public int Id { get; set; }
             public Guid Key { get; set; }
             public int? TemplateId { get; set; }
             public int SortOrder { get; set; }
-            public string Name(string culture = null) => _names.TryGetValue(culture ?? "", out var name) ? name : null;
-            public void SetName(string name, string culture = null) => _names[culture ?? ""] = name;
-            public DateTime CultureDate(string culture = null) => throw new NotSupportedException();
-            public IReadOnlyCollection<string> Cultures => throw new NotSupportedException();
-            public string UrlSegment(string culture = null) => _urlSegments.TryGetValue(culture ?? "", out var urlSegment) ? urlSegment : null;
-            public void SetUrlSegment(string urlSegment, string culture = null) => _urlSegments[culture ?? ""] = urlSegment;
+            public string Name { get; set; }
+            public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+            public string UrlSegment { get; set; }
             public string WriterName { get; set; }
             public string CreatorName { get; set; }
             public int WriterId { get; set; }
@@ -218,6 +208,7 @@ namespace Umbraco.Tests.PublishedContent
             public IEnumerable<IPublishedProperty> Properties { get; set; }
 
             public IEnumerable<IPublishedContent> Children { get; set; }
+            public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
             public IPublishedProperty GetProperty(string alias)
             {
@@ -232,7 +223,7 @@ namespace Umbraco.Tests.PublishedContent
                 IPublishedContent content = this;
                 while (content != null && (property == null || property.HasValue() == false))
                 {
-                    content = content.Parent();
+                    content = content.Parent;
                     property = content == null ? null : content.GetProperty(alias);
                 }
 

@@ -160,7 +160,7 @@ namespace Umbraco.Web.Models.PublishedContent
             IPublishedProperty property; // if we are here, content's property has no value
             do
             {
-                content = content.Parent();
+                content = content.Parent;
 
                 var propertyType = content?.ContentType.GetPropertyType(alias);
 

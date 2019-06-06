@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
-
     /// <inheritdoc />
     /// <summary>
     /// Represents a published content item.
@@ -27,16 +26,14 @@ namespace Umbraco.Core.Models.PublishedContent
         int Id { get; }
 
         /// <summary>
-        /// Gets the name of the content item.
+        /// Gets the name of the content item for the current culture.
         /// </summary>
-        /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
-        string Name(string culture = null);
+        string Name { get; }
 
         /// <summary>
-        /// Gets the url segment of the content item.
+        /// Gets the url segment of the content item for the current culture.
         /// </summary>
-        /// <param name="culture">The specific culture to get the url segment for. If null is used the current culture is used (Default is null).</param>
-        string UrlSegment(string culture = null);
+        string UrlSegment { get; }
 
         /// <summary>
         /// Gets the sort order of the content item.
@@ -94,20 +91,29 @@ namespace Umbraco.Core.Models.PublishedContent
         DateTime UpdateDate { get; }
 
         /// <summary>
-        /// Gets the culture date of the content item.
+        /// Gets the url of the content item for the current culture.
         /// </summary>
-        /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
-        DateTime CultureDate(string culture = null);
+        /// <remarks>
+        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
+        /// if any.</para>
+        /// </remarks>
+        string Url { get; }
 
         /// <summary>
-        /// Gets all available cultures.
+        /// Gets available culture infos.
         /// </summary>
         /// <remarks>
         /// <para>Contains only those culture that are available. For a published content, these are
         /// the cultures that are published. For a draft content, those that are 'available' ie
         /// have a non-empty content name.</para>
+        /// <para>Does not contain the invariant culture.</para> // fixme?
         /// </remarks>
-        IReadOnlyCollection<string> Cultures { get; }
+        IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
+
+        /// <summary>
+        /// Gets the type of the content item (document, media...).
+        /// </summary>
+        PublishedItemType ItemType { get; }
 
         /// <summary>
         /// Gets a value indicating whether the content is draft.
@@ -145,18 +151,17 @@ namespace Umbraco.Core.Models.PublishedContent
         /// Gets the parent of the content item.
         /// </summary>
         /// <remarks>The parent of root content is <c>null</c>.</remarks>
-        IPublishedContent Parent();
+        IPublishedContent Parent { get; }
 
         /// <summary>
-        /// Gets the children of the content item.
+        /// Gets the children of the content item that are available for the current culture.
         /// </summary>
-        /// <param name="culture">The specific culture to get the url children for. If null is used the current culture is used (Default is null).</param>
-        /// <remarks>
-        /// <para>Gets children that are available for the specified culture.</para>
-        /// <para>Children are sorted by their sortOrder.</para>
-        /// <para>The '*' culture and supported and returns everything.</para>
-        /// </remarks>
-        IEnumerable<IPublishedContent> Children(string culture = null);
+        IEnumerable<IPublishedContent> Children { get; }
+
+        /// <summary>
+        /// Gets all the children of the content item, regardless of whether they are available for the current culture.
+        /// </summary>
+        IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 
         #endregion
     }

@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
             var i = 0;
             _builtInValues = new []
                 {
-                    XmlString(i++, _content.Name()),
+                    XmlString(i++, _content.Name),
                     XmlString(i++, _content.ParentId),
                     XmlString(i++, _content.CreateDate),
                     XmlString(i++, _content.UpdateDate),
@@ -28,7 +28,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
                     XmlString(i++, _content.TemplateId),
                     XmlString(i++, _content.WriterId),
                     XmlString(i++, _content.CreatorId),
-                    XmlString(i++, _content.UrlSegment()),
+                    XmlString(i++, _content.UrlSegment),
                     XmlString(i, _content.IsDraft())
                 };
         }
