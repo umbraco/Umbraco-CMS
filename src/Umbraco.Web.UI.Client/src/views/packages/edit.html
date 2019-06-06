@@ -21,7 +21,7 @@
 
                     <div class="umb-expansion-panel__header" ng-click="vm.propertiesOpen = !vm.propertiesOpen">
                         <div><localize key="packager_packageProperties">Package Properties</localize></div>
-                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.propertiesOpen, 'icon-navigation-up': vm.propertiesOpen}">&nbsp;</ins>
+                        <umb-icon icon-name="{{vm.propertiesOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.propertiesOpen, 'icon-navigation-up': vm.propertiesOpen}">&nbsp;</umb-icon>
                     </div>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.propertiesOpen">
@@ -105,7 +105,7 @@
 
                     <div class="umb-expansion-panel__header" ng-click="vm.contentOpen = !vm.contentOpen">
                         <div><localize key="packager_packageContent">Package Content</localize></div>
-                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.contentOpen, 'icon-navigation-up': vm.contentOpen}">&nbsp;</ins>
+                        <umb-icon icon-name="vm.contentOpen ? 'icon-navigation-up' : 'icon-navigation-down'" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.contentOpen, 'icon-navigation-up': vm.contentOpen}">&nbsp;</umb-icon>
                     </div>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.contentOpen">
@@ -231,7 +231,7 @@
 
                     <div class="umb-expansion-panel__header" ng-click="vm.filesOpen = !vm.filesOpen">
                         <div><localize key="packager_packageFiles">Package Files</localize></div>
-                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.filesOpen, 'icon-navigation-up': vm.filesOpen}">&nbsp;</ins>
+                        <umb-icon icon-name="{{vm.filesOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.filesOpen, 'icon-navigation-up': vm.filesOpen}">&nbsp;</umb-icon>
                     </div>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.filesOpen">
@@ -290,7 +290,7 @@
                 <div class="umb-expansion-panel">
                     <div class="umb-expansion-panel__header" ng-click="vm.actionsOpen = !vm.actionsOpen">
                         <div><localize key="packager_packageActions">Package Actions</localize></div>
-                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.actionsOpen, 'icon-navigation-up': vm.actionsOpen}">&nbsp;</ins>
+                        <umb-icon icon-name="vm.actionsOpen ? 'icon-navigation-up' : 'icon-navigation-down'" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.actionsOpen, 'icon-navigation-up': vm.actionsOpen}">&nbsp;</umb-icon>
                     </div>
                     <div class="umb-expansion-panel__content" ng-show="vm.actionsOpen">
                         <umb-control-group

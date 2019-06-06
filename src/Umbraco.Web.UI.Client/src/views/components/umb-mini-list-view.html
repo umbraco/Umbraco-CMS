@@ -1,7 +1,7 @@
 <div class="umb-minilistview">
 
-    <div class="umb-mini-list-view umb-animated" 
-        ng-class="{'umb-mini-list-view--forward': listViewAnimation === 'in', 'umb-mini-list-view--backwards': listViewAnimation === 'out'}" 
+    <div class="umb-mini-list-view umb-animated"
+        ng-class="{'umb-mini-list-view--forward': listViewAnimation === 'in', 'umb-mini-list-view--backwards': listViewAnimation === 'out'}"
         ng-repeat="miniListView in miniListViews">
 
         <div class="umb-mini-list-view__title">
@@ -66,9 +66,9 @@
                     ng-class="{'-selected':child.selected, 'not-allowed':!child.allowed}">
                     <div class="umb-table-cell umb-table-cell--auto-width" ng-class="{'umb-table-cell--faded':child.published === false}">
                         <div class="flex items-center">
-                            <ins class="icon-navigation-right umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</ins>
-                            <i class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></i>
-                            <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                                <umb-icon icon-name="icon-navigation-right" class="icon-navigation-right umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</umb-icon>
+                                <umb-icon icon-name="{{child.icon}}" class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}" />
+                                <umb-icon icon-name="icon-check" class="umb-table-body__icon umb-table-body__checkicon icon-check" />
                         </div>
                     </div>
                     <div class="umb-table-cell black" ng-class="{'umb-table-cell--faded':child.published === false}">{{ child.name }}</div>

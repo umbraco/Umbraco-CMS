@@ -54,13 +54,13 @@
                             <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%; padding-right: 160px;" placeholder="Search logs&hellip;" />
 
                             <!-- Save Search & Clear Search icon buttons -->
-                            <ins class="icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="position: absolute; top: 0; line-height: 32px; right: 140px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
-                            <ins class="icon-wrong" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="position: absolute; top: 0; line-height: 32px; right: 120px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
+                            <umb-icon icon-name="icon-rate" class="icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 140px; color: #fdb45c; cursor: pointer;">&nbsp;</umb-icon>
+                            <umb-icon icon-name="icon-wrong" class="icon-wrong" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 120px; color: #bbbabf; cursor: pointer;">&nbsp;</umb-icon>
 
                             <!-- Saved Searches -->
                             <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top: 1px; right: 0; position: absolute;">
                                 <span class="ng-binding">Saved Searches</span>
-                                <ins class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}" style="margin-top: 0;"></ins>
+                                <umb-icon icon-name="icon-navigation-down" class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</umb-icon>
                             </a>
 
                             <!-- Saved Searches Dropdown -->
@@ -112,7 +112,7 @@
                                     <tr>
                                         <th style="width: 20%;" ng-click="vm.toggleOrderBy()">
                                             Timestamp
-                                            <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
+                                            <umb-icon icon-name="{{vm.logOptions.orderDirection === 'Descending ? 'icon-navigation-down' : 'icon-navigation-up'}}" class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</umb-icon>
                                         </th>
                                         <th style="width: 15%;">Level</th>
                                         <th style="width: 20%;">Machine</th>
@@ -161,7 +161,7 @@
 
                                             <div class="btn-group">
                                                 <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
-                                                    <i class="icon-search"></i> <localize key="general_search">Search</localize>
+                                                    <umb-icon icon-name="icon-search" class="icon-search" /> <localize key="general_search">Search</localize>
                                                     <span class="caret"></span>
                                                 </a>
 
