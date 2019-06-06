@@ -990,7 +990,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 }
             }
 
-            if (!href) {
+            if (!href && !target.anchor) {
                 editor.execCommand('unlink');
                 return;
             }
@@ -1002,6 +1002,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 insertLink();
                 return;
+            }
+
+            if (!href) {
+                href = "";
             }
 
 		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
