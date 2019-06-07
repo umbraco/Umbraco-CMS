@@ -203,6 +203,24 @@ namespace Umbraco.Core
                 /// <remarks>Must be a valid <see cref="ValueTypes"/> value.</remarks>
                 public const string DataValueType = "umbracoDataValueType";
             }
+
+            /// <summary>
+            /// Defines Umbraco's built-in property editor groups.
+            /// </summary>
+            public static class Groups
+            {
+                public const string Common = "Common";
+
+                public const string Lists = "Lists";
+
+                public const string Media = "Media";
+
+                public const string People = "People";
+
+                public const string Pickers = "Pickers";
+
+                public const string RichContent = "Rich Content";
+            }
         }
     }
 }
