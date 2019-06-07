@@ -1,0 +1,81 @@
+<div ng-controller="Umbraco.Editors.MediaPickerDetailsController">
+    <umb-editor-view>
+        
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <div class="umb-control-group">
+                <div ng-if="model.imageUrl">
+                    <umb-image-gravity src="model.imageUrl" center="model.item.focalPoint"></umb-image-gravity>
+                </div>
+
+                <div ng-if="model.cropSize">
+
+                    <h5>
+                        <localize key="general_preview">Preview</localize>
+                    </h5>
+
+                    <umb-image-thumbnail center="model.item.focalPoint" src="model.imageUrl" height="{{model.cropSize.height}}" width="{{model.cropSize.width}}" max-size="400">
+                    </umb-image-thumbnail>
+
+                </div>
+
+            </div>
+
+            <div class="umb-control-group">
+                <label>
+                    <localize key="@general_url"></localize>
+                </label>
+                <input type="text" 
+                       localize="placeholder" 
+                       placeholder="@general_url" 
+                       class="umb-property-editor umb-textstring" 
+                       ng-model="model.imageUrl" 
+                       ng-disabled="model.itemDetails.id" />
+            </div>
+
+            <div class="umb-control-group">
+                <label>
+                    <localize key="@content_captionOptional"></localize>
+                </label>
+                <input type="text" 
+                       class="umb-property-editor umb-textstring" 
+                       ng-model="model.itemDetails.caption" />
+            </div>
+
+            <div class="umb-control-group">
+                <label>
+                    <localize key="@content_altTextOptional"></localize>
+                </label>
+                <input type="text" 
+                       class="umb-property-editor umb-textstring" 
+                       ng-model="model.itemDetails.altText" />
+            </div>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+
+                <umb-button action="close()" 
+                            button-style="link" 
+                            shortcut="esc" 
+                            label-key="general_cancel" 
+                            type="button">
+                </umb-button>
+
+                <umb-button button-style="success" 
+                            label-key="general_ok" 
+                            type="button"                             
+                            action="submit()">
+                </umb-button>
+
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+    </umb-editor-view>
+</div>
