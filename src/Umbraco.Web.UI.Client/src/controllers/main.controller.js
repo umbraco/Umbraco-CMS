@@ -8,7 +8,9 @@
  * The main application controller
  * 
  */
-function MainController($scope, $location, appState, treeService, notificationsService, userService, historyService, updateChecker, assetsService, eventsService, tmhDynamicLocale, localStorageService, editorService, overlayService) {
+function MainController($scope, $location, appState, treeService, notificationsService, 
+    userService, historyService, updateChecker, assetsService, eventsService, 
+    tmhDynamicLocale, localStorageService, editorService, overlayService, focusService) {
 
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
@@ -18,7 +20,29 @@ function MainController($scope, $location, appState, treeService, notificationsS
     $scope.drawer = {};
     $scope.search = {};
     $scope.login = {};
+    $scope.tabbingActive = false;
     
+    // There are a number of ways to detect when a focus state should be shown when using the tab key and this seems to be the simplest solution. 
+    // For more information about this approach, see https://hackernoon.com/removing-that-ugly-focus-ring-and-keeping-it-too-6c8727fefcd2
+    function handleFirstTab(evt) {
+        if (evt.keyCode === 9) {
+            $scope.tabbingActive = true;
+            $scope.$digest();
+            window.removeEventListener('keydown', handleFirstTab);
+            window.addEventListener('mousedown', disableTabbingActive);
+        }
+    }
+    
+    function disableTabbingActive(evt) {
+        $scope.tabbingActive = false;
+        $scope.$digest();
+        window.removeEventListener('mousedown', disableTabbingActive);
+        window.addEventListener("keydown", handleFirstTab);
+    }
+
+    window.addEventListener("keydown", handleFirstTab);
+
+
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
     };

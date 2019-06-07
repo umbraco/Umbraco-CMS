@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using AutoMapper;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -15,7 +12,6 @@ using Umbraco.Web.WebApi;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 
@@ -139,6 +135,8 @@ namespace Umbraco.Web.Editors
 
             //They've successfully set their password, we can now update their user account to be approved
             Security.CurrentUser.IsApproved = true;
+            //They've successfully set their password, and will now get fully logged into the back office, so the lastlogindate is set so the backoffice shows they have logged in
+            Security.CurrentUser.LastLoginDate = DateTime.UtcNow;
             Services.UserService.Save(Security.CurrentUser);
 
             //now we can return their full object since they are now really logged into the back office

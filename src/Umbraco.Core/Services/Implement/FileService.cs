@@ -1034,10 +1034,12 @@ namespace Umbraco.Core.Services.Implement
                 //strip the @inherits if it's there
                 snippetContent = StripPartialViewHeader(snippetContent);
 
-                //Update Model.Content. to be Model. when used as PartialView
+                //Update Model.Content to be Model when used as PartialView
                 if (partialViewType == PartialViewType.PartialView)
                 {
-                    snippetContent = snippetContent.Replace("Model.Content.", "Model.");
+                    snippetContent = snippetContent
+                        .Replace("Model.Content.", "Model.")
+                        .Replace("(Model.Content)", "(Model)");
                 }
 
                 var content = $"{partialViewHeader}{Environment.NewLine}{snippetContent}";

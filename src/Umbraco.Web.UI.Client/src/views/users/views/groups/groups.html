@@ -70,38 +70,58 @@
         </div>
     </div>
 
-    <table class="table table-hover" ng-if="!vm.loading">
-        <thead>
-            <tr>
-                <th style="width: 20px; padding-right: 5px"></th>
-                <th>Group</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="group in vm.userGroups | filter:vm.filter"
-                ng-click="vm.goToUserGroup(group)"
-                ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess, '--selected': group.selected}">
+    <div class="umb-table" ng-if="!vm.loading && vm.filteredUserGroups.length">
 
-                <td style="padding-right: 5px">
-                    <input
-                        ng-show="group.hasAccess && group.group.alias !== 'admin' && group.group.alias !== 'translator'"
-                        type="checkbox"
-                        ng-model="group.selected"
-                        ng-click="vm.selectUserGroup(group, vm.selection, $event)"
-                        style="width: 20px; height: 100px;"/>
-                </td>
-                <td>
-                    <umb-user-group-preview
-                        style="border-bottom: none; margin-bottom: 0; padding: 0;"
-                        icon="group.group.icon"
-                        name="group.group.name"
-                        sections="group.group.sections"
-                        content-start-node="group.group.contentStartNode"
-                        media-start-node="group.group.mediaStartNode">
-                    </umb-user-group-preview>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell"></div>
+                <div class="umb-table-cell"><localize key="general_name">Name</localize></div>
+                <div class="umb-table-cell"><localize key="main_sections">Sections</localize></div>
+                <div class="umb-table-cell umb-table-cell--small"><localize key="user_startnode">Content start node</localize></div>
+                <div class="umb-table-cell umb-table-cell--small"><localize key="user_mediastartnode">Media start node</localize></div>
+            </div>
+        </div>
+
+        <div class="umb-table-body">
+            <div class="umb-table-row"
+                ng-repeat="group in vm.filteredUserGroups track by $index"
+                ng-click="vm.selectUserGroup(group, $index, $event)"
+                ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && group.alias !== 'admin' && group.alias !== 'translator'}">
+
+                <div class="umb-table-cell">
+                    <i ng-if="group.icon" class="umb-table-body__icon umb-table-body__fileicon {{ group.icon }}"></i>
+                    <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                </div>
+                <div class="umb-table-cell">
+                    <a
+                        class="umb-table-body__link"
+                        ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess}"
+                        ng-click="vm.clickUserGroupName(group, $event)"
+                        ng-href="#{{::vm.getEditPath(group)}}"
+                        ng-bind="group.name">
+                    </a>
+                </div>
+                <div class="umb-table-cell">
+                    <div>
+                        <span ng-repeat="section in group.sections">{{ section.name }}<span ng-if="!$last">, </span></span>
+                        <span ng-if="group.sections.length === 0">All sections</span>
+                    </div>
+                </div>
+                <div class="umb-table-cell umb-table-cell--small">
+                    <span ng-if="!group.contentStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                    <span ng-if="group.contentStartNode">{{ group.contentStartNode.name }}</span>
+                </div>
+                <div class="umb-table-cell umb-table-cell--small">
+                    <span ng-if="!group.mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                    <span ng-if="group.mediaStartNode">{{ group.mediaStartNode.name }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty states -->
+    <umb-empty-state ng-if="!vm.loading && !vm.filteredUserGroups.length" position="center">
+        <localize key="general_searchNoResult"></localize>
+    </umb-empty-state>
 
 </div>

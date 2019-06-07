@@ -18,34 +18,38 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
 
         public string TableName { get; set; }
 
+        public bool DeleteLocal { get; set; }
+
+        public bool DeleteForeign { get; set; }
+
         /// <inheritdoc />
         public void Do()
         {
-            if (TableName == null)
-            {
-                // drop keys
-                var keys = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database).DistinctBy(x => x.Item2).ToArray();
-                foreach (var key in keys.Where(x => x.Item2.StartsWith("FK_")))
-                    Delete.ForeignKey(key.Item2).OnTable(key.Item1).Do();
-                foreach (var key in keys.Where(x => x.Item2.StartsWith("PK_")))
-                    Delete.PrimaryKey(key.Item2).FromTable(key.Item1).Do();
+            _context.BuildingExpression = false;
 
-                // drop indexes
-                var indexes = _context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(_context.Database).DistinctBy(x => x.IndexName).ToArray();
-                foreach (var index in indexes)
-                    Delete.Index(index.IndexName).OnTable(index.TableName).Do();
+            // drop keys
+            if (DeleteLocal || DeleteForeign)
+            {
+                // table, constraint
+                var tableKeys = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database).DistinctBy(x => x.Item2).ToList();
+                if (DeleteForeign)
+                {
+                    foreach (var key in tableKeys.Where(x => x.Item1 == TableName && x.Item2.StartsWith("FK_")))
+                        Delete.ForeignKey(key.Item2).OnTable(key.Item1).Do();
+                }
+                if (DeleteLocal)
+                {
+                    foreach (var key in tableKeys.Where(x => x.Item1 == TableName && x.Item2.StartsWith("PK_")))
+                        Delete.PrimaryKey(key.Item2).FromTable(key.Item1).Do();
+
+                    // note: we do *not* delete the DEFAULT constraints
+                }
             }
-            else
-            {
-                // drop keys
-                var keys = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database).DistinctBy(x => x.Item2).ToArray();
-                foreach (var key in keys.Where(x => x.Item1 == TableName && x.Item2.StartsWith("FK_")))
-                    Delete.ForeignKey(key.Item2).OnTable(key.Item1).Do();
-                foreach (var key in keys.Where(x => x.Item1 == TableName && x.Item2.StartsWith("PK_")))
-                    Delete.PrimaryKey(key.Item2).FromTable(key.Item1).Do();
 
-                // drop indexes
-                var indexes = _context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(_context.Database).DistinctBy(x => x.IndexName).ToArray();
+            // drop indexes
+            if (DeleteLocal)
+            {
+                var indexes = _context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(_context.Database).DistinctBy(x => x.IndexName).ToList();
                 foreach (var index in indexes.Where(x => x.TableName == TableName))
                     Delete.Index(index.IndexName).OnTable(index.TableName).Do();
             }

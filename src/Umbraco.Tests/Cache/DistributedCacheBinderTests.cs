@@ -159,6 +159,7 @@ namespace Umbraco.Tests.Cache
                 TestObjects.GetUmbracoSettings(),
                 TestObjects.GetGlobalSettings(),
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>());
 
             // just assert it does not throw

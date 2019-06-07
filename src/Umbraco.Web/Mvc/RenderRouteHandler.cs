@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Web;
 using System.Web.Compilation;
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Mvc
             var request = UmbracoContext.PublishedRequest;
             if (request == null)
             {
-                throw new NullReferenceException("There is no current PublishedContentRequest, it must be initialized before the RenderRouteHandler executes");
+                throw new NullReferenceException("There is no current PublishedRequest, it must be initialized before the RenderRouteHandler executes");
             }
 
             SetupRouteDataForRequest(

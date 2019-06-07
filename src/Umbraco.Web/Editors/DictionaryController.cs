@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -52,6 +51,13 @@ namespace Umbraco.Web.Editors
 
             if (foundDictionary == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var foundDictionaryDescendants = Services.LocalizationService.GetDictionaryItemDescendants(foundDictionary.Key);
+
+            foreach (var dictionaryItem in foundDictionaryDescendants)
+            {
+                Services.LocalizationService.Delete(dictionaryItem, Security.CurrentUser.Id);
+            }
 
             Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
 

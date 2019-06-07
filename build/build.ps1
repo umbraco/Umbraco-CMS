@@ -11,6 +11,11 @@
     [Alias("loc")]
     [switch] $local = $false,
 
+	# enable docfx
+    [Parameter(Mandatory=$false)]
+    [Alias("doc")]
+    [switch] $docfx = $false,
+	
     # keep the build directories, don't clear them
     [Parameter(Mandatory=$false)]
     [Alias("c")]
@@ -31,7 +36,7 @@
   $ubuild = &"$PSScriptRoot\build-bootstrap.ps1"
   if (-not $?) { return }
   $ubuild.Boot($PSScriptRoot,
-    @{ Local = $local; },
+    @{ Local = $local; WithDocFx = $docfx },
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
 
@@ -387,13 +392,13 @@
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
-        -Symbols -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
+        -Symbols -SymbolPackageFormat snupkg -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Core." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Web.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
-        -Symbols -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
+        -Symbols -SymbolPackageFormat snupkg -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Web." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
@@ -423,6 +428,53 @@
   {
     Write-Host "Prepare Azure Gallery"
     $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
+  })
+  
+  $ubuild.DefineMethod("PrepareCSharpDocs",
+  {
+    Write-Host "Prepare C# Documentation"
+	
+    $src = "$($this.SolutionRoot)\src"
+      $tmp = $this.BuildTemp
+      $out = $this.BuildOutput
+    $DocFxJson = Join-Path -Path $src "\ApiDocs\docfx.json"
+    $DocFxSiteOutput = Join-Path -Path $tmp "\_site\*.*"
+	
+
+	#restore nuget packages
+	$this.RestoreNuGet()
+    # run DocFx
+    $DocFx = $this.BuildEnv.DocFx
+    
+    & $DocFx metadata $DocFxJson
+    & $DocFx build $DocFxJson
+
+    # zip it
+    & $this.BuildEnv.Zip a -tzip -r "$out\csharp-docs.zip" $DocFxSiteOutput
+  })
+  
+  $ubuild.DefineMethod("PrepareAngularDocs",
+  {
+    Write-Host "Prepare Angular Documentation"
+	
+    $src = "$($this.SolutionRoot)\src"
+      $out = $this.BuildOutput
+    
+    $this.CompileBelle()
+
+    "Moving to Umbraco.Web.UI.Client folder"
+    cd .\src\Umbraco.Web.UI.Client
+
+    "Generating the docs and waiting before executing the next commands"
+    & gulp docs | Out-Null
+
+    # change baseUrl
+    $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
+    $IndexPath = "./docs/api/index.html"
+    (Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
+
+    # zip it
+    & $this.BuildEnv.Zip a -tzip -r "$out\ui-docs.zip" "$src\Umbraco.Web.UI.Client\docs\api\*.*"
   })
 
   $ubuild.DefineMethod("Build",
@@ -456,6 +508,7 @@
     if ($this.OnError()) { return }
     $this.PostPackageHook()
     if ($this.OnError()) { return }
+
     Write-Host "Done"
   })
 

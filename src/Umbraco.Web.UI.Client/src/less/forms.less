@@ -250,7 +250,10 @@ input[type="color"],
   &:focus {
     border-color: @inputBorderFocus;
     outline: 0;
-    outline: none \9; /* IE6-9 */
+
+    .tabbing-active & {
+        outline: 2px solid @inputBorderTabFocus;
+    }
   }
 }
 
@@ -533,6 +536,10 @@ div.help {
 }
 
 
+table.domains .help-inline {
+    color:@red;
+}
+
 // INPUT GROUPS
 // ------------
 
@@ -802,6 +809,7 @@ legend + .control-group {
 
   // Labels on own row
   .form-horizontal .control-label {
+    float:none;
     width: 100%;
   }
   .form-horizontal .controls {

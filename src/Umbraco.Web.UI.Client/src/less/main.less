@@ -118,7 +118,6 @@ h5.-black {
 .umb-control-group {
   border-bottom: 1px solid @gray-11;
   padding-bottom: 20px;
-  margin-bottom: 15px !important;
 }
 
 .umb-control-group.-no-border {
@@ -231,13 +230,15 @@ label:not([for]) {
   align-items: center;
 }
 
-.controls-row > .vertical-align-items > input.umb-property-editor-tiny {
-  margin-left: 5px;
-  margin-right: 5px;
+.controls-row > .vertical-align-items > input.umb-property-editor-tiny,
+.controls-row > .vertical-align-items > input.umb-property-editor-small {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
-.controls-row > .vertical-align-items > input.umb-property-editor-tiny:first-child {
-  margin-left: 0;
+.controls-row > .vertical-align-items > input.umb-property-editor-tiny:first-child
+.controls-row > .vertical-align-items > input.umb-property-editor-small:first-child {
+    margin-left: 0;
 }
 
 .thumbnails .selected {

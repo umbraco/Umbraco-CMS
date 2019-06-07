@@ -9,7 +9,7 @@
 function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
     entityResource, navigationService, notificationsService, localizationService, 
     serverValidationManager, contentEditingHelper, fileManager, formHelper, 
-    editorState, umbRequestHelper, $http, eventsService) {
+    editorState, umbRequestHelper, $http, eventsService, $location) {
     
     var evts = [];
     var nodeId = null;
@@ -279,6 +279,17 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
         }
     }
 
+    $scope.showBack = function () {
+        return !infiniteMode && !!$scope.page.listViewPath;
+    }
+
+    /** Callback for when user clicks the back-icon */
+    $scope.onBack = function() {
+        if ($scope.page.listViewPath) {
+            $location.path($scope.page.listViewPath);
+        }
+    };
+    
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {
         for (var e in evts) {

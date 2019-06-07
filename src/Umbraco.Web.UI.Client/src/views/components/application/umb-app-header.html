@@ -1,7 +1,7 @@
 <div>
 
     <div class="umb-app-header">
-        
+
         <umb-sections
             ng-if="authenticated"
             sections="sections">
@@ -10,7 +10,7 @@
         <div class="flex items-center">
             <ul class="umb-app-header__actions">
                 <li data-element="global-search" class="umb-app-header__action">
-                    <a href="#" hotkey="ctrl+space" ng-click="searchClick()" prevent-default style="font-size: 20px;">
+                    <a href="#" hotkey="ctrl+space" ng-click="searchClick()" ng-mousedown="rememberFocus()" prevent-default style="font-size: 20px;">
                         <i class="umb-app-header__action-icon icon-search"></i>
                     </a>
                 </li>
@@ -20,7 +20,7 @@
                     </a>
                 </li>
                 <li data-element="global-user" class="umb-app-header__action">
-                    <a ng-href="" href="" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
+                    <a href="#" hotkey="ctrl+shift+u" ng-click="avatarClick()" prevent-default title="{{user.name}}" >
                         <umb-avatar
                             size="xxs"
                             color="secondary"
@@ -44,4 +44,3 @@
     </umb-overlay>
 
 </div>
-

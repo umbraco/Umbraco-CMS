@@ -286,16 +286,17 @@ Opens an overlay to show a custom YSOD. </br>
 
             $(document).on("keydown.overlay-" + overlayNumber, function(event) {
 
-               if (event.which === 27) {
+                if (event.which === 27) {
 
                   numberOfOverlays = overlayHelper.getNumberOfOverlays();
 
-                  if (numberOfOverlays === overlayNumber) {
+                  if (numberOfOverlays === overlayNumber && !scope.model.disableEscKey) {
                       scope.$apply(function () {
                           scope.closeOverLay();
                       });
                   }
-
+                  
+                  event.stopPropagation();
                   event.preventDefault();
                }
 
@@ -511,6 +512,7 @@ Opens an overlay to show a custom YSOD. </br>
             model: "=",
             view: "=",
             position: "@",
+            size: "=?",
             parentScope: "=?"
          },
          link: link
