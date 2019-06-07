@@ -14,17 +14,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
     {
         private readonly ContentStore.Snapshot _snapshot;
-        private readonly IAppCache _snapshotCache;
-        private readonly IAppCache _elementsCache;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
         #region Constructors
 
-        public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache)
+        public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, IVariationContextAccessor variationContextAccessor)
             : base(previewDefault)
         {
             _snapshot = snapshot;
-            _snapshotCache = snapshotCache;
-            _elementsCache = elementsCache;
+            _variationContextAccessor = variationContextAccessor;
         }
 
         #endregion
@@ -65,30 +63,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return n != null;
         }
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        IEnumerable<IPublishedContent> INavigableData.GetAtRoot(bool preview) => GetAtRoot(preview);
+
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
         {
-            if (PublishedSnapshotService.CacheContentCacheRoots == false)
-                return GetAtRootNoCache();
+            // handle context culture for variant
+            if (culture == null)
+                culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
 
-            var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
-                ? _elementsCache
-                : _snapshotCache;
-
-            if (cache == null)
-                return GetAtRootNoCache();
-
-            // note: ToArray is important here, we want to cache the result, not the function!
-            return (IEnumerable<IPublishedContent>)cache.Get(
-                CacheKeys.MediaCacheRoots(false), // ignore preview, only 1 key!
-                () => GetAtRootNoCache().ToArray());
-        }
-
-        private IEnumerable<IPublishedContent> GetAtRootNoCache()
-        {
-            var c = _snapshot.GetAtRoot();
-
-            // ignore preview, there's only draft for media
-            return c.Select(n => n.PublishedModel);
+            var atRoot = _snapshot.GetAtRoot().Select(x => x.PublishedModel);
+            return culture == "*" ? atRoot : atRoot.Where(x => x.IsInvariantOrHasCulture(culture));
         }
 
         public override bool HasContent(bool preview)

@@ -63,18 +63,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // so making it configurable.
         public static readonly bool FullCacheWhenPreviewing = true;
 
-        // define constant - determines whether to cache the published content
-        // objects (in the elements cache, or snapshot cache, depending on preview)
-        // or to re-fetch them all the time. caching is faster but uses more
-        // memory. not sure what we want.
-        public static readonly bool CachePublishedContentChildren = true;
-
-        // define constant - determines whether to cache the content cache root
-        // objects (in the elements cache, or snapshot cache, depending on preview)
-        // or to re-fetch them all the time. caching is faster but uses more
-        // memory - not sure what we want.
-        public static readonly bool CacheContentCacheRoots = true;
-
         #region Constructors
 
         //private static int _singletonCheck;
@@ -1070,8 +1058,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             return new PublishedSnapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, _globalSettings),
-                MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
+                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, _globalSettings, VariationContextAccessor),
+                MediaCache = new MediaCache(previewDefault, mediaSnap, VariationContextAccessor),
                 MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,

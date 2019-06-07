@@ -38,10 +38,18 @@ namespace Umbraco.Tests.PublishedContent
         private void Init()
         {
             Current.Reset();
-            Current.UnlockConfigs();
-            Current.Configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
-            Current.Configs.Add<IGlobalSettings>(() => new GlobalSettings());
-            var globalSettings = Current.Configs.Global();
+
+            var factory = Mock.Of<IFactory>();
+            Current.Factory = factory;
+
+            var configs = new Configs();
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
+            var globalSettings = new GlobalSettings();
+            configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            configs.Add<IGlobalSettings>(() => globalSettings);
+
+            var publishedModelFactory = new NoopPublishedModelFactory();
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
 
             // create a content node kit
             var kit = new ContentNodeKit
@@ -184,6 +192,8 @@ namespace Umbraco.Tests.PublishedContent
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
+
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
 
         [Test]

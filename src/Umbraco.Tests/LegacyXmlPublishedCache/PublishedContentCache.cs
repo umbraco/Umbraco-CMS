@@ -382,7 +382,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return GetXml(preview).CreateNavigator().MoveToId(contentId.ToString(CultureInfo.InvariantCulture));
         }
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
         {
             return ConvertToDocuments(GetXml(preview).SelectNodes(XPathStrings.RootDocuments), preview);
         }

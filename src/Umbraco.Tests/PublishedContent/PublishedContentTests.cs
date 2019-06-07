@@ -821,7 +821,7 @@ namespace Umbraco.Tests.PublishedContent
             var level1_2 = GetNode(1175);
             var level1_3 = GetNode(4444);
 
-            _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot()).Returns(new []{root});
+            _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot(It.IsAny<string>())).Returns(new []{root});
 
             CollectionAssertAreEqual(new []{root}, root.SiblingsAndSelf());
 
@@ -860,7 +860,7 @@ namespace Umbraco.Tests.PublishedContent
             var level1_2 = GetNode(1175);
             var level1_3 = GetNode(4444);
 
-            _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot()).Returns(new []{root});
+            _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot(It.IsAny<string>())).Returns(new []{root});
 
             CollectionAssertAreEqual(new IPublishedContent[0], root.Siblings());
 

@@ -84,16 +84,18 @@ namespace Umbraco.Web.PublishedCache
         /// Gets contents at root.
         /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="culture">A culture.</param>
         /// <returns>The contents.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IEnumerable<IPublishedContent> GetAtRoot(bool preview);
+        IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null);
 
         /// <summary>
         /// Gets contents at root.
         /// </summary>
+        /// <param name="culture">A culture.</param>
         /// <returns>The contents.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IEnumerable<IPublishedContent> GetAtRoot();
+        IEnumerable<IPublishedContent> GetAtRoot(string culture = null);
 
         /// <summary>
         /// Gets a content resulting from an XPath query.

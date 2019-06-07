@@ -105,7 +105,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return GetUmbracoMedia(contentId) != null;
         }
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
         {
             var searchProvider = GetSearchProviderSafe();
 

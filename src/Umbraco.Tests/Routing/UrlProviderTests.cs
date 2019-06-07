@@ -10,8 +10,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.LegacyXmlPublishedCache;
+using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -142,7 +142,7 @@ namespace Umbraco.Tests.Routing
                 new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings: globalSettings.Object);
 
-            
+
             var result = umbracoContext.UrlProvider.GetUrl(nodeId);
             Assert.AreEqual(niceUrlMatch, result);
         }
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Routing
 
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
-            var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+            var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
             publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.Routing
             var umbracoSettings = Current.Configs.Settings();
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
-            var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+            var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
             publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
@@ -258,7 +258,7 @@ namespace Umbraco.Tests.Routing
             var umbracoSettings = Current.Configs.Settings();
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
-            var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+            var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
             publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
@@ -332,7 +332,7 @@ namespace Umbraco.Tests.Routing
             }, globalSettings: globalSettings.Object);
 
             //mock the Umbraco settings that we need
-            
+
             Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
 
             umbracoContext.UrlProvider.Mode = UrlMode.Absolute;

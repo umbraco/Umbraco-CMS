@@ -37,11 +37,11 @@ namespace Umbraco.Web.PublishedCache
         public bool HasById(int contentId)
             => HasById(PreviewDefault, contentId);
 
-        public abstract IEnumerable<IPublishedContent> GetAtRoot(bool preview);
+        public abstract IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null);
 
-        public IEnumerable<IPublishedContent> GetAtRoot()
+        public IEnumerable<IPublishedContent> GetAtRoot(string culture = null)
         {
-            return GetAtRoot(PreviewDefault);
+            return GetAtRoot(PreviewDefault, culture);
         }
 
         public abstract IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars);

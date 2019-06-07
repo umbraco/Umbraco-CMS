@@ -186,10 +186,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             get
             {
-                if (!ContentType.VariesByCulture())
-                    return EmptyCultures;
-
                 if (_cultures != null) return _cultures;
+
+                if (!ContentType.VariesByCulture())
+                    return _cultures = new Dictionary<string, PublishedCultureInfo>
+                    {
+                        { "", new PublishedCultureInfo("", ContentData.Name, _urlSegment, CreateDate) }
+                    };
 
                 if (ContentData.CultureInfos == null)
                     throw new Exception("panic: _contentDate.CultureInfos is null.");

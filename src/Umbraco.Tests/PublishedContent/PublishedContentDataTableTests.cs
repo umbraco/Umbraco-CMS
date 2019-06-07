@@ -97,7 +97,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetContent(true, 1);
             //change a doc type alias
-            var c = (TestPublishedContent)doc.Children.ElementAt(0);
+            var c = (SolidPublishedContent)doc.Children.ElementAt(0);
             c.ContentType = new PublishedContentType(22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
 
             var dt = doc.ChildrenAsTable(Current.Services, "Child");
@@ -129,7 +129,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var contentTypeAlias = createChildren ? "Parent" : "Child";
-            var d = new TestPublishedContent
+            var contentType = new PublishedContentType(22, contentTypeAlias, PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
+            var d = new SolidPublishedContent(contentType)
                 {
                     CreateDate = DateTime.Now,
                     CreatorId = 1,
@@ -140,7 +141,7 @@ namespace Umbraco.Tests.PublishedContent
                     UpdateDate = DateTime.Now,
                     Path = "-1,3",
                     UrlSegment = "home-page",
-                    Name = "Page" + Guid.NewGuid().ToString(),
+                    Name = "Page" + Guid.NewGuid(),
                     Version = Guid.NewGuid(),
                     WriterId = 1,
                     WriterName = "Shannon",
@@ -175,62 +176,7 @@ namespace Umbraco.Tests.PublishedContent
                     new RawValueProperty(factory.CreatePropertyType("property3", 1), d, "value" + (indexVals + 2)));
             }
 
-            d.ContentType = new PublishedContentType(22, contentTypeAlias, PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             return d;
-        }
-
-        // note - could probably rewrite those tests using SolidPublishedContentCache
-        // l8tr...
-        private class TestPublishedContent : IPublishedContent
-        {
-            public string Url { get; set; }
-            public PublishedItemType ItemType { get; set; }
-            public IPublishedContent Parent { get; set; }
-            public int Id { get; set; }
-            public Guid Key { get; set; }
-            public int? TemplateId { get; set; }
-            public int SortOrder { get; set; }
-            public string Name { get; set; }
-            public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
-            public string UrlSegment { get; set; }
-            public string WriterName { get; set; }
-            public string CreatorName { get; set; }
-            public int WriterId { get; set; }
-            public int CreatorId { get; set; }
-            public string Path { get; set; }
-            public DateTime CreateDate { get; set; }
-            public DateTime UpdateDate { get; set; }
-            public Guid Version { get; set; }
-            public int Level { get; set; }
-            public bool IsDraft(string culture = null) => false;
-            public bool IsPublished(string culture = null) => true;
-
-            public IEnumerable<IPublishedProperty> Properties { get; set; }
-
-            public IEnumerable<IPublishedContent> Children { get; set; }
-            public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
-
-            public IPublishedProperty GetProperty(string alias)
-            {
-                return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-            }
-
-            public IPublishedProperty GetProperty(string alias, bool recurse)
-            {
-                var property = GetProperty(alias);
-                if (recurse == false) return property;
-
-                IPublishedContent content = this;
-                while (content != null && (property == null || property.HasValue() == false))
-                {
-                    content = content.Parent;
-                    property = content == null ? null : content.GetProperty(alias);
-                }
-
-                return property;
-            }
-
-            public IPublishedContentType ContentType { get; set; }
         }
     }
 }

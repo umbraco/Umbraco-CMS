@@ -37,7 +37,7 @@ namespace Umbraco.Core
             culture = culture ?? Current.VariationContextAccessor.VariationContext?.Culture ?? "";
 
             // either does not vary by culture, or has the specified culture
-            return contents.Where(x => !ContentVariationExtensions.VariesByCulture((IPublishedContentType) x.ContentType) || HasCulture(x, culture));
+            return contents.Where(x => !x.ContentType.VariesByCulture() || HasCulture(x, culture));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Umbraco.Core
         {
             // invariant has invariant value (whatever the requested culture)
             if (!content.ContentType.VariesByCulture())
-                return "NAME??"; // fixme where should the invariant one come from? should Cultures contain it?
+                return content.Cultures.TryGetValue("", out var invariantInfos) ? invariantInfos.Name : null;
 
             // handle context culture for variant
             if (culture == null)
@@ -69,7 +69,7 @@ namespace Umbraco.Core
         {
             // invariant has invariant value (whatever the requested culture)
             if (!content.ContentType.VariesByCulture())
-                return "URLSEGMENT??"; // fixme where should the invariant one come from? should Cultures contain it?
+                return content.Cultures.TryGetValue("", out var invariantInfos) ? invariantInfos.UrlSegment : null;
 
             // handle context culture for variant
             if (culture == null)

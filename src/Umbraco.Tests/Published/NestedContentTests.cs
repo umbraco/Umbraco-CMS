@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models;
@@ -167,12 +168,16 @@ namespace Umbraco.Tests.Published
 
             var key = Guid.NewGuid();
             var keyA = Guid.NewGuid();
-            var content = new TestPublishedContent(contentType1, key, new[]
+            var content = new SolidPublishedContent(contentType1)
             {
-                new TestPublishedProperty(contentType1.GetPropertyType("property1"), $@"[
+                Key = key,
+                Properties = new []
+                {
+                    new TestPublishedProperty(contentType1.GetPropertyType("property1"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }}
                 ]")
-            });
+                }
+            };
             var value = content.Value("property1");
 
             // nested single converter returns proper TestModel value
@@ -194,13 +199,17 @@ namespace Umbraco.Tests.Published
             var key = Guid.NewGuid();
             var keyA = Guid.NewGuid();
             var keyB = Guid.NewGuid();
-            var content = new TestPublishedContent(contentType2, key, new[]
+            var content = new SolidPublishedContent(contentType2)
             {
-                new TestPublishedProperty(contentType2.GetPropertyType("property2"), $@"[
+                Key = key,
+                Properties = new[]
+                {
+                    new TestPublishedProperty(contentType2.GetPropertyType("property2"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }},
                     {{ ""key"": ""{keyB}"", ""propertyN1"": ""bar"", ""ncContentTypeAlias"": ""contentN1"" }}
                 ]")
-            });
+                }
+            };
             var value = content.Value("property2");
 
             // nested many converter returns proper IEnumerable<TestModel> value
@@ -256,53 +265,6 @@ namespace Umbraco.Tests.Published
             public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
             public override object GetValue(string culture = null, string segment = null) => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
             public override object GetXPathValue(string culture = null, string segment = null) => throw new WontImplementException();
-        }
-
-        class TestPublishedContent : PublishedContentBase
-        {
-            public TestPublishedContent(IPublishedContentType contentType, Guid key, IEnumerable<TestPublishedProperty> properties)
-            {
-                ContentType = contentType;
-                Key = key;
-                var propertiesA = properties.ToArray();
-                Properties = propertiesA;
-                foreach (var property in propertiesA)
-                    property.SetOwner(this);
-            }
-
-            // ReSharper disable UnassignedGetOnlyAutoProperty
-            public override PublishedItemType ItemType { get; }
-            public override bool IsDraft(string culture = null) => false;
-            public override bool IsPublished(string culture = null) => true;
-            public override IPublishedContent Parent { get; }
-            public override IEnumerable<IPublishedContent> Children { get; }
-            public override IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
-            public override IPublishedContentType ContentType { get; }
-            // ReSharper restore UnassignedGetOnlyAutoProperty
-
-            // ReSharper disable UnassignedGetOnlyAutoProperty
-            public override int Id { get; }
-            public override int? TemplateId { get; }
-            public override int SortOrder { get; }
-            public override string Name { get; }
-            public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
-            public override string UrlSegment { get; }
-            public override string WriterName { get; }
-            public override string CreatorName { get; }
-            public override int WriterId { get; }
-            public override int CreatorId { get; }
-            public override string Path { get; }
-            public override DateTime CreateDate { get; }
-            public override DateTime UpdateDate { get; }
-            public override int Level { get; }
-            public override Guid Key { get; }
-            // ReSharper restore UnassignedGetOnlyAutoProperty
-
-            public override IEnumerable<IPublishedProperty> Properties { get; }
-            public override IPublishedProperty GetProperty(string alias)
-            {
-                return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-            }
         }
     }
 }

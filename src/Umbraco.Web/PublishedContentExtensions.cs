@@ -833,7 +833,7 @@ namespace Umbraco.Web
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
 
-            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants()))
+            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants(culture)))
                 yield return desc;
         }
 
@@ -841,7 +841,7 @@ namespace Umbraco.Web
         {
             yield return content;
 
-            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants()))
+            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants(culture)))
                 yield return desc;
         }
 

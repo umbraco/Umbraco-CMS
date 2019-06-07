@@ -145,8 +145,15 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
-        private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
-        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
+        private Dictionary<string, PublishedCultureInfo> _cultures;
+
+        private Dictionary<string, PublishedCultureInfo> GetCultures()
+        {
+            EnsureNodeInitialized();
+            return new Dictionary<string, PublishedCultureInfo> { { "", new PublishedCultureInfo("", _name, _urlName, _updateDate) } };
+        }
+
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ?? (_cultures = GetCultures());
 
         public override string WriterName
         {

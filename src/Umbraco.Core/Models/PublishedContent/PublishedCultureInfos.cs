@@ -13,10 +13,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         public PublishedCultureInfo(string culture, string name, string urlSegment, DateTime date)
         {
-            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentNullOrEmptyException(nameof(culture));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
-            Culture = culture;
+            Culture = culture ?? throw new ArgumentNullException(nameof(culture));
             Name = name;
             UrlSegment = urlSegment;
             Date = date;

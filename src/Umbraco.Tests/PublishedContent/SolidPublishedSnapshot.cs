@@ -100,7 +100,7 @@ namespace Umbraco.Tests.PublishedContent
             return _content.ContainsKey(contentId);
         }
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
         {
             return _content.Values.Where(x => x.Parent == null);
         }
@@ -176,13 +176,19 @@ namespace Umbraco.Tests.PublishedContent
 
         #region Content
 
+        private Dictionary<string, PublishedCultureInfo> _cultures;
+
+        private Dictionary<string, PublishedCultureInfo> GetCultures()
+        {
+            return new Dictionary<string, PublishedCultureInfo> { { "", new PublishedCultureInfo("", Name, UrlSegment, UpdateDate) } };
+        }
+
         public int Id { get; set; }
         public Guid Key { get; set; }
         public int? TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
-        public PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
-        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ?? (_cultures = GetCultures());
         public string UrlSegment { get; set; }
         public string WriterName { get; set; }
         public string CreatorName { get; set; }
@@ -195,7 +201,7 @@ namespace Umbraco.Tests.PublishedContent
         public int Level { get; set; }
         public string Url { get; set; }
 
-        public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
+        public PublishedItemType ItemType => PublishedItemType.Content;
         public bool IsDraft(string culture = null) => false;
         public bool IsPublished(string culture = null) => true;
 
@@ -214,7 +220,7 @@ namespace Umbraco.Tests.PublishedContent
 
         #region ContentType
 
-        public IPublishedContentType ContentType { get; private set; }
+        public IPublishedContentType ContentType { get; set; }
 
         #endregion
 
@@ -236,7 +242,7 @@ namespace Umbraco.Tests.PublishedContent
             while (content != null && (property == null || property.HasValue() == false))
             {
                 content = content.Parent;
-                property = content == null ? null : content.GetProperty(alias);
+                property = content?.GetProperty(alias);
             }
 
             return property;

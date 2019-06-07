@@ -20,6 +20,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
@@ -33,20 +34,25 @@ namespace Umbraco.Tests.PublishedContent
         private IPublishedSnapshotService _snapshotService;
         private IVariationContextAccessor _variationAccesor;
         private IPublishedSnapshotAccessor _snapshotAccessor;
-        private ContentType _contentType;
-        private PropertyType _propertyType;
+        private ContentType _contentTypeInvariant;
+        private ContentType _contentTypeVariant;
         private TestDataSource _source;
 
         private void Init(IEnumerable<ContentNodeKit> kits)
         {
             Current.Reset();
-            Current.UnlockConfigs();
-            Current.Configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
-            Current.Configs.Add<IGlobalSettings>(() => new GlobalSettings());
-            var globalSettings = Current.Configs.Global();
 
-            // create a data source for NuCache
-            _source = new TestDataSource(kits);
+            var factory = Mock.Of<IFactory>();
+            Current.Factory = factory;
+
+            var configs = new Configs();
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
+            var globalSettings = new GlobalSettings();
+            configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            configs.Add<IGlobalSettings>(() => globalSettings);
+
+            var publishedModelFactory = new NoopPublishedModelFactory();
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
 
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
@@ -59,13 +65,18 @@ namespace Umbraco.Tests.PublishedContent
                 dataType
             };
 
-            _propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Nothing };
-            _contentType = new ContentType(-1) { Id = 2, Alias = "ctype", Variations = ContentVariation.Nothing };
-            _contentType.AddPropertyType(_propertyType);
+            var propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Nothing };
+            _contentTypeInvariant = new ContentType(-1) { Id = 2, Alias = "itype", Variations = ContentVariation.Nothing };
+            _contentTypeInvariant.AddPropertyType(propertyType);
+
+            propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
+            _contentTypeVariant = new ContentType(-1) { Id = 3, Alias = "vtype", Variations = ContentVariation.Culture };
+            _contentTypeVariant.AddPropertyType(propertyType);
 
             var contentTypes = new[]
             {
-                _contentType
+                _contentTypeInvariant,
+                _contentTypeVariant
             };
 
             var contentTypeService = Mock.Of<IContentTypeService>();
@@ -109,6 +120,9 @@ namespace Umbraco.Tests.PublishedContent
             _variationAccesor = new TestVariationContextAccessor();
             _snapshotAccessor = new TestPublishedSnapshotAccessor();
 
+            // create a data source for NuCache
+            _source = new TestDataSource(kits);
+
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
@@ -133,9 +147,11 @@ namespace Umbraco.Tests.PublishedContent
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
+
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
 
-        private IEnumerable<ContentNodeKit> GetKits()
+        private IEnumerable<ContentNodeKit> GetInvariantKits()
         {
             var paths = new Dictionary<int, string> { { -1, "-1" } };
 
@@ -146,10 +162,11 @@ namespace Umbraco.Tests.PublishedContent
 
                 var path = paths[id] = parentPath + "," + id;
                 var level = path.Count(x => x == ',');
+                var now = DateTime.Now;
 
                 return new ContentNodeKit
                 {
-                    ContentTypeId = 2,
+                    ContentTypeId = _contentTypeInvariant.Id,
                     Node = new ContentNode(id, Guid.NewGuid(), level, path, sortOrder, parentId, DateTime.Now, 0),
                     DraftData = null,
                     PublishedData = new ContentData
@@ -158,10 +175,73 @@ namespace Umbraco.Tests.PublishedContent
                         Published = true,
                         TemplateId = 0,
                         VersionId = 1,
-                        VersionDate = DateTime.Now,
+                        VersionDate = now,
                         WriterId = 0,
                         Properties = new Dictionary<string, PropertyData[]>(),
                         CultureInfos = new Dictionary<string, CultureVariation>()
+                    }
+                };
+            }
+
+            yield return CreateKit(1, -1, 1);
+            yield return CreateKit(2, -1, 2);
+            yield return CreateKit(3, -1, 3);
+
+            yield return CreateKit(4, 1, 1);
+            yield return CreateKit(5, 1, 2);
+            yield return CreateKit(6, 1, 3);
+
+            yield return CreateKit(7, 2, 3);
+            yield return CreateKit(8, 2, 2);
+            yield return CreateKit(9, 2, 1);
+
+            yield return CreateKit(10, 3, 1);
+
+            yield return CreateKit(11, 4, 1);
+            yield return CreateKit(12, 4, 2);
+        }
+
+        private IEnumerable<ContentNodeKit> GetVariantKits()
+        {
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+            Dictionary<string, CultureVariation> GetCultureInfos(int id, DateTime now)
+            {
+                var en = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+                var fr = new[] { 1, 3, 4, 6, 7, 9, 10, 12 };
+
+                var infos = new Dictionary<string, CultureVariation>();
+                if (en.Contains(id))
+                    infos["en-US"] = new CultureVariation { Name = "N" + id + "-" + "en-US", Date = now, IsDraft = false };
+                if (fr.Contains(id))
+                    infos["fr-FR"] = new CultureVariation { Name = "N" + id + "-" + "fr-FR", Date = now, IsDraft = false };
+                return infos;
+            }
+
+            ContentNodeKit CreateKit(int id, int parentId, int sortOrder)
+            {
+                if (!paths.TryGetValue(parentId, out var parentPath))
+                    throw new Exception("Unknown parent.");
+
+                var path = paths[id] = parentPath + "," + id;
+                var level = path.Count(x => x == ',');
+                var now = DateTime.Now;
+
+                return new ContentNodeKit
+                {
+                    ContentTypeId = _contentTypeVariant.Id,
+                    Node = new ContentNode(id, Guid.NewGuid(), level, path, sortOrder, parentId, DateTime.Now, 0),
+                    DraftData = null,
+                    PublishedData = new ContentData
+                    {
+                        Name = "N" + id,
+                        Published = true,
+                        TemplateId = 0,
+                        VersionId = 1,
+                        VersionDate = now,
+                        WriterId = 0,
+                        Properties = new Dictionary<string, PropertyData[]>(),
+                        CultureInfos = GetCultureInfos(id, now)
                     }
                 };
             }
@@ -199,7 +279,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void ChildrenTest()
         {
-            Init(GetKits());
+            Init(GetInvariantKits());
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -226,7 +306,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void ParentTest()
         {
-            Init(GetKits());
+            Init(GetInvariantKits());
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -252,7 +332,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void MoveToRootTest()
         {
-            Init(GetKits());
+            Init(GetInvariantKits());
 
             // get snapshot
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
@@ -294,7 +374,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void MoveFromRootTest()
         {
-            Init(GetKits());
+            Init(GetInvariantKits());
 
             // get snapshot
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
@@ -336,7 +416,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void ReOrderTest()
         {
-            Init(GetKits());
+            Init(GetInvariantKits());
 
             // get snapshot
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
@@ -411,7 +491,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void MoveTest()
         {
-            Init(GetKits());
+            Init(GetInvariantKits());
 
             // get snapshot
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
@@ -512,11 +592,90 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(1, snapshot.Content.GetById(7).Parent?.Id);
         }
 
+        [Test]
+        public void VariantChildrenTest()
+        {
+            Init(GetVariantKits());
+
+            var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
+            _snapshotAccessor.PublishedSnapshot = snapshot;
+
+            _variationAccesor.VariationContext = new VariationContext("en-US");
+
+            var documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1-en-US", "N2-en-US", "N3-en-US");
+
+            documents = snapshot.Content.GetById(1).Children().ToArray();
+            AssertDocuments(documents, "N4-en-US", "N5-en-US", "N6-en-US");
+
+            documents = snapshot.Content.GetById(2).Children().ToArray();
+            AssertDocuments(documents, "N9-en-US", "N8-en-US", "N7-en-US");
+
+            documents = snapshot.Content.GetById(3).Children().ToArray();
+            AssertDocuments(documents, "N10-en-US");
+
+            documents = snapshot.Content.GetById(4).Children().ToArray();
+            AssertDocuments(documents, "N11-en-US", "N12-en-US");
+
+            documents = snapshot.Content.GetById(10).Children().ToArray();
+            AssertDocuments(documents);
+
+
+            _variationAccesor.VariationContext = new VariationContext("fr-FR");
+
+            documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1-fr-FR", "N3-fr-FR");
+
+            documents = snapshot.Content.GetById(1).Children().ToArray();
+            AssertDocuments(documents, "N4-fr-FR", "N6-fr-FR");
+
+            documents = snapshot.Content.GetById(2).Children().ToArray();
+            AssertDocuments(documents, "N9-fr-FR", "N7-fr-FR");
+
+            documents = snapshot.Content.GetById(3).Children().ToArray();
+            AssertDocuments(documents, "N10-fr-FR");
+
+            documents = snapshot.Content.GetById(4).Children().ToArray();
+            AssertDocuments(documents, "N12-fr-FR");
+
+            documents = snapshot.Content.GetById(10).Children().ToArray();
+            AssertDocuments(documents);
+
+            documents = snapshot.Content.GetById(1).Children("*").ToArray();
+            AssertDocuments(documents, "N4-fr-FR", null, "N6-fr-FR");
+            AssertDocuments("en-US", documents, "N4-en-US", "N5-en-US", "N6-en-US");
+
+            documents = snapshot.Content.GetById(1).Children("en-US").ToArray();
+            AssertDocuments(documents, "N4-fr-FR", null, "N6-fr-FR");
+            AssertDocuments("en-US", documents, "N4-en-US", "N5-en-US", "N6-en-US");
+
+            documents = snapshot.Content.GetById(1).ChildrenForAllCultures.ToArray();
+            AssertDocuments(documents, "N4-fr-FR", null, "N6-fr-FR");
+            AssertDocuments("en-US", documents, "N4-en-US", "N5-en-US", "N6-en-US");
+
+
+            documents = snapshot.Content.GetAtRoot("*").ToArray();
+            AssertDocuments(documents, "N1-fr-FR", null, "N3-fr-FR");
+
+            documents = snapshot.Content.GetById(1).DescendantsOrSelf().ToArray();
+            AssertDocuments(documents, "N1-fr-FR", "N4-fr-FR", "N12-fr-FR", "N6-fr-FR");
+
+            documents = snapshot.Content.GetById(1).DescendantsOrSelf("*").ToArray();
+            AssertDocuments(documents, "N1-fr-FR", "N4-fr-FR", null /*11*/, "N12-fr-FR", null /*5*/, "N6-fr-FR");
+        }
+
         private void AssertDocuments(IPublishedContent[] documents, params string[] names)
         {
             Assert.AreEqual(names.Length, documents.Length);
             for (var i = 0; i < names.Length; i++)
-                Assert.AreEqual(names[i], documents[i].Name());
+                Assert.AreEqual(names[i], documents[i].Name);
+        }
+
+        private void AssertDocuments(string culture, IPublishedContent[] documents, params string[] names)
+        {
+            Assert.AreEqual(names.Length, documents.Length);
+            for (var i = 0; i < names.Length; i++)
+                Assert.AreEqual(names[i], documents[i].Name(culture));
         }
     }
 }
