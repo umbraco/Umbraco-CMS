@@ -72,7 +72,12 @@ namespace Umbraco.Web.Trees
         {
             var systemIds = new[]
             {
-                Constants.System.DefaultLabelDataTypeId
+                Constants.DataTypes.LabelBigint,
+                Constants.DataTypes.LabelDateTime,
+                Constants.DataTypes.LabelDecimal,
+                Constants.DataTypes.LabelInt,
+                Constants.DataTypes.LabelString,
+                Constants.DataTypes.LabelTime
             };
 
             return systemIds.Concat(GetNonDeletableSystemListViewDataTypeIds());
