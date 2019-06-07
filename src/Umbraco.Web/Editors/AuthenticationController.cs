@@ -42,10 +42,12 @@ namespace Umbraco.Web.Editors
     {
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
+        private readonly ISmtpService _smtpService;
 
-        public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, ISmtpService smtpService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+            _smtpService = smtpService;
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -309,6 +311,8 @@ namespace Umbraco.Web.Editors
                         // Ensure the culture of the found user is used for the email!
                         UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
+
+                    await _smtpService.SendAsync("*** mail content will go here ***");
 
                     await UserManager.SendEmailAsync(identityUser.Id,
                         Services.TextService.Localize("login/resetPasswordEmailCopySubject",

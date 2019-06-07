@@ -29,9 +29,10 @@ namespace Umbraco.Core.Services.Implement
         private readonly IGlobalSettings _globalSettings;
         private readonly IContentSection _contentSection;
         private readonly ILogger _logger;
+        private readonly ISmtpService _smtpService;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSection contentSection)
+            ILogger logger, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSection contentSection, ISmtpService smtpService)
         {
             _notificationsRepository = notificationsRepository;
             _globalSettings = globalSettings;
@@ -41,6 +42,7 @@ namespace Umbraco.Core.Services.Implement
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _localizationService = localizationService;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _smtpService = smtpService ?? throw new ArgumentNullException(nameof(smtpService));
         }
 
         /// <summary>
@@ -516,7 +518,13 @@ namespace Umbraco.Core.Services.Implement
                         {
                             try
                             {
-                                if (Sendmail != null) Sendmail(s, request.Mail, _logger); else s.Send(request.Mail);
+                                if (Sendmail != null)
+                                    Sendmail(s, request.Mail, _logger);
+                                else
+                                    s.Send(request.Mail);
+
+                                _smtpService.SendAsync("*** mail content will go here ***");
+
                                 _logger.Debug<NotificationService>("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                             }
                             catch (Exception ex)
