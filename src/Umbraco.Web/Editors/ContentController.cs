@@ -741,7 +741,7 @@ namespace Umbraco.Web.Editors
                         //global notifications
                         AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
                         //variant specific notifications
-                        foreach (var c in successfulCultures)
+                        foreach (var c in successfulCultures ?? Array.Empty<string>())
                             AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
                     }
                     break;
@@ -762,7 +762,7 @@ namespace Umbraco.Web.Editors
                         //global notifications
                         AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
                         //variant specific notifications
-                        foreach (var c in successfulCultures)
+                        foreach (var c in successfulCultures ?? Array.Empty<string>())
                             AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
                     }
                     break;
@@ -1143,7 +1143,7 @@ namespace Umbraco.Web.Editors
                 var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: Security.CurrentUser.Id);
                 // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
-                successfulCultures = Array.Empty<string>();
+                successfulCultures = null; //must be null! this implies invariant
                 return publishStatus;
             }
 
