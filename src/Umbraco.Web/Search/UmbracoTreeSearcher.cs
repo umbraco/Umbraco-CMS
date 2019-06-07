@@ -16,6 +16,31 @@ namespace Umbraco.Web.Search
     internal class UmbracoTreeSearcher
     {
         /// <summary>
+        /// This method is obsolete, use the overload with ignoreUserStartNodes instead
+        /// Searches for results based on the entity type
+        /// </summary>
+        /// <param name="umbracoHelper"></param>
+        /// <param name="query"></param>
+        /// <param name="entityType"></param>
+        /// <param name="totalFound"></param>
+        /// <param name="searchFrom">
+        /// A starting point for the search, generally a node id, but for members this is a member type alias
+        /// </param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
+        public IEnumerable<SearchResultItem> ExamineSearch(
+            UmbracoHelper umbracoHelper,
+            string query,
+            UmbracoEntityTypes entityType,
+            int pageSize,
+            long pageIndex, out long totalFound, string searchFrom = null)
+        {
+            return ExamineSearch(umbracoHelper, query, entityType, pageSize, pageIndex, out totalFound, false, searchFrom);
+        }
+
+        /// <summary>
         /// Searches for results based on the entity type
         /// </summary>
         /// <param name="umbracoHelper"></param>
@@ -30,11 +55,11 @@ namespace Umbraco.Web.Search
         /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         public IEnumerable<SearchResultItem> ExamineSearch(
-            UmbracoHelper umbracoHelper,
-            string query,
-            UmbracoEntityTypes entityType,
-            int pageSize,
-            long pageIndex, out long totalFound, string searchFrom = null, bool ignoreUserStartNodes = false)
+        UmbracoHelper umbracoHelper,
+        string query,
+        UmbracoEntityTypes entityType,
+        int pageSize,
+        long pageIndex, out long totalFound, bool ignoreUserStartNodes, string searchFrom = null)
         {
             var sb = new StringBuilder();
 
@@ -62,7 +87,7 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Media:
                     type = "media";
                     var allMediaStartNodes = umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(appContext.Services.EntityService);
-                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, ignoreUserStartNodes, appContext.Services.EntityService);
+                    AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, appContext.Services.EntityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";

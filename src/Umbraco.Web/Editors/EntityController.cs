@@ -82,10 +82,26 @@ namespace Umbraco.Web.Editors
         /// <param name="searchFrom">
         /// A starting point for the search, generally a node id, but for members this is a member type alias
         /// </param>
+        /// <returns></returns>
+        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
+        [HttpGet]
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
+        {
+            return Search(query, type, false, searchFrom);
+        }
+        
+        /// <summary>
+        /// Searches for results based on the entity type
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="type"></param>
+        /// <param name="searchFrom">
+        /// A starting point for the search, generally a node id, but for members this is a member type alias
+        /// </param>
         /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, bool? ignoreUserStartNodes = false)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, bool? ignoreUserStartNodes, string searchFrom = null)
         {
             //TODO: Should we restrict search results based on what app the user has access to?
             // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
@@ -528,6 +544,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
         public PagedResult<EntityBasic> GetPagedDescendants(
             int id,
             UmbracoEntityTypes type,
@@ -535,8 +552,21 @@ namespace Umbraco.Web.Editors
             int pageSize,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
-            string filter = "",
-            bool ignoreUserStartNodes = false)
+            string filter = "")
+        {
+            return GetPagedDescendants(id, type, pageNumber, pageSize,
+                false, orderBy, orderDirection, filter);
+        }
+
+        public PagedResult<EntityBasic> GetPagedDescendants(
+            int id,
+            UmbracoEntityTypes type,
+            int pageNumber,
+            int pageSize,
+            bool ignoreUserStartNodes,
+            string orderBy = "SortOrder",
+            Direction orderDirection = Direction.Ascending,
+            string filter = "")
         {
             if (pageNumber <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -600,7 +630,13 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, bool ignoreUserStartNodes = false)
+        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
+        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type)
+        {
+            return GetResultForAncestors(id, type, false);
+        }
+
+        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, bool ignoreUserStartNodes)
         {
             return GetResultForAncestors(id, type, ignoreUserStartNodes);
         }
@@ -621,7 +657,7 @@ namespace Umbraco.Web.Editors
         private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             long total;
-            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom, ignoreUserStartNodes);
+            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, ignoreUserStartNodes, searchFrom);
         }
         
 
