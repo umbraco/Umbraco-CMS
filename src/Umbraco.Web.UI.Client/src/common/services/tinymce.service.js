@@ -836,7 +836,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				}
 			}
 
-			if (!href) {
+            if (!href && !target.anchor) {
 				editor.execCommand('unlink');
 				return;
 			}
@@ -849,6 +849,10 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				insertLink();
 				return;
 			}
+
+		    if (!href) {
+		        href = "";
+            }
 
 		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
 		    if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
