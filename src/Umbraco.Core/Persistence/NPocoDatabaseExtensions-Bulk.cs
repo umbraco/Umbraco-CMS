@@ -232,6 +232,11 @@ namespace Umbraco.Core.Persistence
                 using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction) { BulkCopyTimeout = 10000, DestinationTableName = tableName })
                 using (var bulkReader = new PocoDataDataReader<T, SqlServerSyntaxProvider>(records, pocoData, syntax))
                 {
+                    foreach(var col in bulkReader.ColumnMappings)
+                    {
+                        copy.ColumnMappings.Add(col.DestinationColumn, col.DestinationColumn);
+                    }
+
                     copy.WriteToServer(bulkReader);
                     return bulkReader.RecordsAffected;
                 }
