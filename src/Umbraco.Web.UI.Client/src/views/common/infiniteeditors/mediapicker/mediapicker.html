@@ -116,50 +116,7 @@
                     <localize key="general_searchNoResult"></localize>
                 </umb-empty-state>
 
-            </div>
-
-            <umb-overlay ng-if="mediaPickerDetailsOverlay.show" model="mediaPickerDetailsOverlay" position="right">
-
-                <div class="umb-control-group">
-
-                    <div ng-if="target.url">
-                        <umb-image-gravity
-                            src="target.url"
-                            center="target.focalPoint">
-                        </umb-image-gravity>
-                    </div>
-
-                    <div ng-if="cropSize">
-
-                        <h5>
-                            <localize key="general_preview">Preview</localize>
-                        </h5>
-
-                        <umb-image-thumbnail center="target.focalPoint" src="target.url" height="{{cropSize.height}}" width="{{cropSize.width}}"
-                            max-size="400">
-                        </umb-image-thumbnail>
-
-                    </div>
-
-                </div>
-
-                <div class="umb-control-group">
-                    <label>
-                        <localize key="@general_url"></localize>
-                    </label>
-                    <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url"
-                        ng-disabled="target.id" />
-                </div>
-
-                <div class="umb-control-group">
-                    <label>
-                        <localize key="@content_altTextOptional"></localize>
-                    </label>
-                    <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
-                </div>
-
-
-            </umb-overlay>
+            </div>       
 
         </form>
 
