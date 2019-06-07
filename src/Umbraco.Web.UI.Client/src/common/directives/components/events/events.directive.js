@@ -101,14 +101,14 @@ angular.module('umbraco.directives')
         var eventBindings = [];
 
         function oneTimeClick(event) {
-                var el = event.target.nodeName;
-
-                //ignore link and button clicks
-                var els = ["INPUT","A","BUTTON"];
-                if(els.indexOf(el) >= 0){return;}
+                // ignore clicks on button groups toggles (i.e. the save and publish button)
+                var parents = $(event.target).closest("[data-element='button-group-toggle']");
+                if (parents.length > 0) {
+                    return;
+                }
 
                 // ignore clicks on new overlay
-                var parents = $(event.target).parents("a,button,.umb-overlay,.umb-tour");
+                parents = $(event.target).parents(".umb-overlay,.umb-tour");
                 if(parents.length > 0){
                     return;
                 }
