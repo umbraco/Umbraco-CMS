@@ -6,11 +6,21 @@
 	</div>
 
 	<div ng-if="thumbnailUrl !== null">
-		<img
-			ng-click="setImage()"
-			ng-src="{{thumbnailUrl}}"
-			class="fullSizeImage" />
-        <input type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
- 	</div>
+		<img ng-src="{{thumbnailUrl}}"
+			class="fullSizeImage" /> 
+        
+        <div class="flex justify-end p5">
+            <div class="umb-button">            
+                <button type="button" 
+                    ng-click="setImage()" 
+                    class="btn btn-info control-active--show">Select new</button>
+            </div>
+            <div class="umb-button">
+                <button type="button" 
+                        ng-click="editImage()" 
+                        class="btn btn-info control-active--show">Edit</button>
+            </div>
 
+        </div>
+ 	</div>
 </div>
