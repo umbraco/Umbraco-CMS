@@ -53,11 +53,11 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, "icon-autofill", false);
+                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, Constants.Icons.DataType, false);
                         node.Path = dt.Path;
                         if (systemListViewDataTypeIds.Contains(dt.Id))
                         {
-                            node.Icon = "icon-thumbnail-list";
+                            node.Icon = Constants.Icons.ListView;
                         }
                         return node;
                     }));

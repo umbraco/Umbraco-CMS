@@ -385,9 +385,9 @@ namespace Umbraco.Web.Search
                 var m = _mapper.Map<SearchResultEntity>(result);
 
                 //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
+                if (m.Icon == Constants.Icons.DefaultIcon)
                 {
-                    m.Icon = "icon-user";
+                    m.Icon = Constants.Icons.Member;
                 }
 
                 if (result.Values.ContainsKey("email") && result.Values["email"] != null)
@@ -418,9 +418,9 @@ namespace Umbraco.Web.Search
             {
                 var m = _mapper.Map<SearchResultEntity>(result);
                 //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
+                if (m.Icon == Constants.Icons.DefaultIcon)
                 {
-                    m.Icon = "icon-picture";
+                    m.Icon = Constants.Icons.MediaImage;
                 }
                 yield return m;
             }

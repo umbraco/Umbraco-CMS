@@ -17,7 +17,7 @@ namespace Umbraco.Web.Trees
         {
             return Services.MemberGroupService.GetAll()
                 .OrderBy(x => x.Name)
-                .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", false));
+                .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.MemberGroup, false));
         }
 
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)

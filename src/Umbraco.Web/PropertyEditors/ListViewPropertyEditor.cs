@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a list-view editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.ListView, "List view", "listview", HideLabel = true, Group = "lists", Icon = "icon-item-arrangement")]
+    [DataEditor(Constants.PropertyEditors.Aliases.ListView, "List view", "listview", HideLabel = true, Group = "lists", Icon = Constants.Icons.ListView)]
     public class ListViewPropertyEditor : DataEditor
     {
         /// <summary>

@@ -4,7 +4,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [DataEditor(Constants.PropertyEditors.Aliases.MemberPicker, "Member Picker", "memberpicker", ValueType = ValueTypes.String, Group = "People", Icon = "icon-user")]
+    [DataEditor(Constants.PropertyEditors.Aliases.MemberPicker, "Member Picker", "memberpicker", ValueType = ValueTypes.String, Group = "People", Icon = Constants.Icons.Member)]
     public class MemberPickerPropertyEditor : DataEditor
     {
         public MemberPickerPropertyEditor(ILogger logger)
