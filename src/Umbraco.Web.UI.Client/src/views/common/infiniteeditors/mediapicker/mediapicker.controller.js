@@ -11,7 +11,7 @@ angular.module("umbraco")
                             includeSubFolders: data[1]
                         }
                     });
-            }
+            } 
 
             var dialogOptions = $scope.model;
 
@@ -292,26 +292,29 @@ angular.module("umbraco")
             }
 
             $scope.openDetailsDialog = function() {
-
-                $scope.mediaPickerDetailsOverlay = {};
-                $scope.mediaPickerDetailsOverlay.show = true;
-
-                $scope.mediaPickerDetailsOverlay.submit = function(model) {
-                    $scope.model.selection.push($scope.target);
-                    $scope.model.submit($scope.model);
-
-                    $scope.mediaPickerDetailsOverlay.show = false;
-                    $scope.mediaPickerDetailsOverlay = null;
+                
+                var mediaPickerDetails = {
+                    itemDetails: $scope.target,
+                    imageUrl: $scope.target.url,  
+                    cropSize: $scope.cropSize, 
+                    submit: function (model) {
+                        debugger; 
+                        $scope.model.selection.push(model.itemDetails);
+                        $scope.model.submit($scope.model);    
+                        editorService.close();
+                    },
+                    close: function (model) {
+                        $scope.model.selection.push(model.itemDetails);
+                        $scope.model.submit($scope.model); 
+                        editorService.close();
+                    } 
                 };
-
-                $scope.mediaPickerDetailsOverlay.close = function(oldModel) {
-                    $scope.mediaPickerDetailsOverlay.show = false;
-                    $scope.mediaPickerDetailsOverlay = null;
-                };
+                
+                editorService.mediaPickerDetails(mediaPickerDetails);
             };
 
             var debounceSearchMedia = _.debounce(function() {
-                    $scope.$apply(function() {
+                    $scope.$apply(function() { 
                         if ($scope.searchOptions.filter) {
                             searchMedia();
                         } else {
