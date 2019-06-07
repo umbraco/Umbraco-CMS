@@ -518,7 +518,6 @@ When building a custom infinite editor view you can use the same components as a
          * @param {Object} editor.itemDetails the media item details - focalPoint, altText, caption etc
          * @param {String} editor.imageUrl the url of the media item
          * @param {String} editor.cropSize the selected crop size for the item
-         * @param {Boolean} ediotr.fromRte set to true when the dialog is triggered from a media picker in the rte toolbar - hides the caption field
          * @param {Callback} editor.submit Submits the editor
          * @param {Callback} editor.close Closes the editor
          * @returns {Object} editor object

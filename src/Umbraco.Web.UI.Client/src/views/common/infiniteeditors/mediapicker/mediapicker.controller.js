@@ -296,7 +296,6 @@ angular.module("umbraco")
                     itemDetails: $scope.target,
                     imageUrl: $scope.target.url,  
                     cropSize: $scope.cropSize, 
-                    fromRte: $scope.model.fromRte,
                     submit: function (model) {
                         $scope.model.selection.push(model.itemDetails);
                         $scope.model.submit($scope.model);    
