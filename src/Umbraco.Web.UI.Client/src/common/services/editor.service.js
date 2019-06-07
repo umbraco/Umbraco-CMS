@@ -506,6 +506,27 @@ When building a custom infinite editor view you can use the same components as a
             editor.updatedMediaNodes = [];
             open(editor);
         }
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#mediaPickerDetails
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a media picker detail in infinite editing, the submit callback returns the media item
+         * @param {Object} editor rendering options
+         * @param {Object} editor.itemDetails the media item details - focalPoint, altText, caption etc
+         * @param {String} editor.imageUrl the url of the media item
+         * @param {String} editor.cropSize the selected crop size for the item
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function mediaPickerDetails(editor) {
+            editor.view = "views/common/infiniteeditors/mediapicker/mediapickerdetails.html";
+            editor.size = "small";
+            open(editor);
+        }        
 
         /**
          * @ngdoc method
@@ -887,6 +908,7 @@ When building a custom infinite editor view you can use the same components as a
             rollback: rollback,
             linkPicker: linkPicker,
             mediaPicker: mediaPicker,
+            mediaPickerDetails: mediaPickerDetails,
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
             mediaTypeEditor: mediaTypeEditor,
