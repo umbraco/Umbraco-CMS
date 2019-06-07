@@ -155,10 +155,10 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateContentTypeData()
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 532, NodeId = 1031, Alias = Constants.Conventions.MediaTypes.Folder, Icon = "icon-folder", Thumbnail = "icon-folder", IsContainer = false, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = Constants.Conventions.MediaTypes.Image, Icon = "icon-picture", Thumbnail = "icon-picture", AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = Constants.Conventions.MediaTypes.File, Icon = "icon-document", Thumbnail = "icon-document", AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
-            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 531, NodeId = 1044, Alias = Constants.Conventions.MemberTypes.DefaultAlias, Icon = "icon-user", Thumbnail = "icon-user", Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 532, NodeId = 1031, Alias = Constants.Conventions.MediaTypes.Folder, Icon = Constants.Icons.MediaFolder, Thumbnail = Constants.Icons.MediaFolder, IsContainer = false, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = Constants.Conventions.MediaTypes.Image, Icon = Constants.Icons.MediaImage, Thumbnail = Constants.Icons.MediaImage, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = Constants.Conventions.MediaTypes.File, Icon = Constants.Icons.MediaFile, Thumbnail = Constants.Icons.MediaFile, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 531, NodeId = 1044, Alias = Constants.Conventions.MemberTypes.DefaultAlias, Icon = Constants.Icons.Member, Thumbnail = Constants.Icons.Member, Variations = (byte) ContentVariation.Nothing });
         }
 
         private void CreateUserData()

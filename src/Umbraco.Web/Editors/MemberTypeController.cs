@@ -102,7 +102,7 @@ namespace Umbraco.Web.Editors
         public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
-            ct.Icon = "icon-user";
+            ct.Icon = Constants.Icons.Member;
 
             var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;

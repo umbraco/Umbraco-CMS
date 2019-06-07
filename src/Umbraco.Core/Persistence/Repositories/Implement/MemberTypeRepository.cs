@@ -136,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //set a default icon if one is not specified
             if (entity.Icon.IsNullOrWhiteSpace())
             {
-                entity.Icon = "icon-user";
+                entity.Icon = Constants.Icons.Member;
             }
 
             //By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
