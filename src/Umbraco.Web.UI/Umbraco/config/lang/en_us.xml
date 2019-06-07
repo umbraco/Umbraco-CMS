@@ -260,6 +260,7 @@
     <key alias="statistics">Statistics</key>
     <key alias="titleOptional">Title (optional)</key>
     <key alias="altTextOptional">Alternative text (optional)</key>
+    <key alias="captionOptional">Caption (optional)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Unpublish</key>
     <key alias="unpublished">Draft</key>

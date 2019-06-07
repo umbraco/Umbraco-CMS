@@ -150,6 +150,7 @@
     <key alias="statistics">istatistik</key>
     <key alias="titleOptional">Başlık (isteğe bağlı)</key>
     <key alias="altTextOptional">Alternatif metin (isteğe bağlı)</key>
+    <key alias="captionOptional">Altyazı (isteğe bağlı)</key>
     <key alias="type">tip</key>
     <key alias="unpublish">Yayından</key>
     <key alias="updateDate">Son düzenleme</key>

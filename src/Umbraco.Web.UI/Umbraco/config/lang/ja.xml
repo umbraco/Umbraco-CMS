@@ -151,6 +151,7 @@
     <key alias="statistics">統計</key>
     <key alias="titleOptional">タイトル (オプション)</key>
     <key alias="altTextOptional">代替テキスト (オプション)</key>
+    <key alias="captionOptional">キャプション (オプション)</key>
     <key alias="type">型</key>
     <key alias="unpublish">非公開</key>
     <key alias="updateDate">最終更新日時</key>

@@ -196,7 +196,8 @@
     <key alias="alternativeTextHelp">(как бы Вы описали изображение по телефону)</key>
     <key alias="alternativeUrls">Альтернативные ссылки</key>
     <key alias="altTextOptional">Альтернативный текст (необязательно)</key>
-    <key alias="childItems" version="7.0">Элементы списка</key>
+    <key alias="captionOptional">подпись (необязательно)</key>
+     <key alias="childItems" version="7.0">Элементы списка</key>
     <key alias="clickToEdit">Нажмите для правки этого элемента</key>
     <key alias="contentRoot">Начальный узел содержимого</key>
     <key alias="createBy">Создано пользователем</key>

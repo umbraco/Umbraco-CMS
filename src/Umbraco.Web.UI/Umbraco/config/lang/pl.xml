@@ -194,6 +194,7 @@
     <key alias="statistics">Statystyki</key>
     <key alias="titleOptional">Tytuł (opcjonalny)</key>
     <key alias="altTextOptional">Alternatywny tekst (opcjonalny)</key>
+    <key alias="captionOptional">Podpis (optioneel)</key>
     <key alias="type">Typ</key>
     <key alias="unpublish">Cofnij publikację</key>
     <key alias="updateDate">Ostatnio edytowany</key>

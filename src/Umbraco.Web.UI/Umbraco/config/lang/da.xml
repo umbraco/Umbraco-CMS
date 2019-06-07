@@ -247,6 +247,7 @@
     <key alias="statistics">Statistik</key>
     <key alias="titleOptional">Titel (valgfri)</key>
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
+    <key alias="captionOptional">Billedtekst (valgfri)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Afpublicér</key>
     <key alias="unpublished">Afpubliceret</key>

@@ -157,7 +157,8 @@
     <key alias="sortHelp">拖拽项目或单击列头即可排序，可以按住Shift多选。</key>
     <key alias="statistics">统计</key>
     <key alias="titleOptional">标题（可选）</key>
-    <key alias="altTextOptional">Alternative text (optional)</key>
+    <key alias="altTextOptional">替代文字 (可选的)</key>
+    <key alias="captionOptional">字幕 (可选的)</key>
     <key alias="type">类型</key>
     <key alias="unpublish">取消发布</key>
     <key alias="updateDate">最近编辑</key>

@@ -159,6 +159,7 @@
     <key alias="statistics">Statistieken</key>
     <key alias="titleOptional">Titel (optioneel)</key>
     <key alias="altTextOptional">Alternatieve tekst (optioneel)</key>
+    <key alias="captionOptional">Onderschrift (optioneel)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Depubliceren</key>
     <key alias="updateDate">Laatst gewijzigd</key>

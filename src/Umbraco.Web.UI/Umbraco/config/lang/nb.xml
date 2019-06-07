@@ -148,6 +148,7 @@
     <key alias="statistics">Statistikk</key>
     <key alias="titleOptional">Tittel (valgfri)</key>
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
+    <key alias="altTextOptional">Bildetekst (valgfri)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Avpubliser</key>
     <key alias="updateDate">Sist endret</key>

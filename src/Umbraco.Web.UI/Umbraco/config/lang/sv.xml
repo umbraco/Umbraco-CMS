@@ -120,6 +120,7 @@
     <key alias="alternativeTextHelp">(hur skulle du beskriva denna bild för någon över telefon)</key>
     <key alias="alternativeUrls">Alternativa länkar</key>
     <key alias="altTextOptional">Alternativ text (optionell)</key>
+    <key alias="captionOptional">Rubrik (optionell)</key>
     <key alias="childItems">Underliggande noder</key>
     <key alias="clickToEdit">Klicka för att redigera detta objekt</key>
     <key alias="createBy">Skapad av</key>

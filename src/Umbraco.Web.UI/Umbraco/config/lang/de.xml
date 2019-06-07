@@ -150,6 +150,7 @@
     <key alias="statistics">Statistiken</key>
     <key alias="titleOptional">Titel (optional)</key>
     <key alias="altTextOptional">Alternativtext (optional)</key>
+    <key alias="captionOptional">Bildbeschriftung (optional)</key>
     <key alias="type">Typ</key>
     <key alias="unpublish">Veröffentlichung widerrufen</key>
     <key alias="updateDate">Zuletzt bearbeitet am</key>

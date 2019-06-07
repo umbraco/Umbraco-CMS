@@ -155,6 +155,7 @@
     <key alias="statistics">統計</key>
     <key alias="titleOptional">標題（可選）</key>
     <key alias="altTextOptional">其他說明文字（可選）</key>
+    <key alias="captionOptional">標題（可選）</key>
     <key alias="type">類型</key>
     <key alias="unpublish">取消發佈</key>
     <key alias="updateDate">最近編輯</key>
