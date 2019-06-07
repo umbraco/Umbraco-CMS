@@ -40,7 +40,7 @@
                        ng-disabled="model.itemDetails.id" />
             </div>
 
-            <div class="umb-control-group">
+            <div class="umb-control-group" ng-if="!model.fromRte">
                 <label>
                     <localize key="@content_captionOptional"></localize>
                 </label>

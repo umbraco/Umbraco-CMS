@@ -1185,7 +1185,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             //Create the insert media plugin
             self.createMediaPicker(args.editor, function (currentTarget, userData) {
-
                 var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
                 var startNodeIsVirtual = userData.startMediaIds.length !== 1;
 
@@ -1200,6 +1199,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     currentTarget: currentTarget,
                     onlyImages: true,
                     showDetails: true,
+                    fromRte: true,
                     disableFolderSelect: true,
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,

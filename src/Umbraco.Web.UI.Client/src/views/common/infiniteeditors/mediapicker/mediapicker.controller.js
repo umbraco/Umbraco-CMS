@@ -292,11 +292,11 @@ angular.module("umbraco")
             }
 
             $scope.openDetailsDialog = function() {
-                
                 var mediaPickerDetails = {
                     itemDetails: $scope.target,
                     imageUrl: $scope.target.url,  
                     cropSize: $scope.cropSize, 
+                    fromRte: $scope.model.fromRte,
                     submit: function (model) {
                         $scope.model.selection.push(model.itemDetails);
                         $scope.model.submit($scope.model);    
