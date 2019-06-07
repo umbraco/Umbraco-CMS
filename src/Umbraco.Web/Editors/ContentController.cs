@@ -2128,7 +2128,7 @@ namespace Umbraco.Web.Editors
                             {
                                 foreach (var c in successfulCultures)
                                 {
-                                    var names = string.Join(", ", status.Select(x => $"'{x.Content.GetCultureName(c)}'"));
+                                    var names = string.Join(", ", status.Select(x => $"'{(x.Content.ContentType.VariesByCulture() ? x.Content.GetCultureName(c) : x.Content.Name)}'"));
                                     display.AddWarningNotification(
                                         Services.TextService.Localize("publish"),
                                         Services.TextService.Localize("publish/contentPublishedFailedInvalid",
