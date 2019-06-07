@@ -1185,34 +1185,55 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             //Create the insert media plugin
             self.createMediaPicker(args.editor, function (currentTarget, userData) {
-                var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                var startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                
+                // when editing, go straight to the details dialog
+                if (currentTarget) {
+                    var mediaPickerDetails = {
+                        itemDetails: currentTarget,
+                        imageUrl: currentTarget.url,  
+                        fromRte: true,
+                        submit: function (model) {
+                            self.insertMediaInEditor(args.editor, model.itemDetails);
+                            editorService.close();
+                        },
+                        close: function (model) {
+                            self.insertMediaInEditor(args.editor, model.itemDetails);
+                            editorService.close();
+                        }
+                    };
 
-                var ignoreUserStartNodes = getIgnoreUserStartNodes(args);
-                if (ignoreUserStartNodes) {
-                    ignoreUserStartNodes = true;
-                    startNodeId = -1;
-                    startNodeIsVirtual = true;
+                    editorService.mediaPickerDetails(mediaPickerDetails);
                 }
+                else {
+                    var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                    var startNodeIsVirtual = userData.startMediaIds.length !== 1;
 
-                var mediaPicker = {
-                    currentTarget: currentTarget,
-                    onlyImages: true,
-                    showDetails: true,
-                    fromRte: true,
-                    disableFolderSelect: true,
-                    startNodeId: startNodeId,
-                    startNodeIsVirtual: startNodeIsVirtual,
-                    ignoreUserStartNodes: ignoreUserStartNodes,
-                    submit: function (model) {
-                        self.insertMediaInEditor(args.editor, model.selection[0]);
-                        editorService.close();
-                    },
-                    close: function () {
-                        editorService.close();
+                    var ignoreUserStartNodes = getIgnoreUserStartNodes(args);
+                    if (ignoreUserStartNodes) {
+                        ignoreUserStartNodes = true;
+                        startNodeId = -1;
+                        startNodeIsVirtual = true;
                     }
-                };
-                editorService.mediaPicker(mediaPicker);
+
+                    var mediaPicker = {
+                        currentTarget: currentTarget,
+                        onlyImages: true,
+                        showDetails: true,
+                        disableFolderSelect: true,
+                        fromRte: true,
+                        startNodeId: startNodeId,                        
+                        startNodeIsVirtual: startNodeIsVirtual,
+                        ignoreUserStartNodes: ignoreUserStartNodes,
+                        submit: function (model) {
+                            self.insertMediaInEditor(args.editor, model.selection[0]);
+                            editorService.close();
+                        },
+                        close: function () {
+                            editorService.close();
+                        }
+                    };
+                    editorService.mediaPicker(mediaPicker);
+                }
             });
 
             //Create the embedded plugin

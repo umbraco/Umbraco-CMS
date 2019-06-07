@@ -37,7 +37,7 @@
                        placeholder="@general_url" 
                        class="umb-property-editor umb-textstring" 
                        ng-model="model.imageUrl" 
-                       ng-disabled="model.itemDetails.id" />
+                       ng-disabled="model.itemDetails.id || model.itemDetails.udi" />
             </div>
 
             <div class="umb-control-group" ng-if="!model.fromRte">
