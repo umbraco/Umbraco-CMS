@@ -387,7 +387,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 stateSelector: 'img',
                 onclick: function () {
 
-
                     var selectedElm = editor.selection.getNode(),
                         currentTarget;
 
@@ -395,11 +394,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         var img = $(selectedElm);
 
                         var hasUdi = img.attr("data-udi") ? true : false;
-
+                        
                         currentTarget = {
                             altText: img.attr("alt"),
                             url: img.attr("src")
                         };
+
+                        if (selectedElm.parentElement.nodeName === 'FIGURE') {
+                            currentTarget.caption = selectedElm.parentElement.innerText;
+                        }
 
                         if (hasUdi) {
                             currentTarget["udi"] = img.attr("data-udi");
@@ -440,7 +443,33 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     data["data-id"] = img.id;
                 }
                 
-                editor.selection.setContent(editor.dom.createHTML('img', data));
+                var image = editor.dom.createHTML('img', data);
+                var parentElement = editor.selection.getNode().parentElement;
+
+                // if a caption exists, render as <figure />
+                if (img.caption) {
+                    var figCaption = editor.dom.createHTML('figcaption', {}, img.caption);
+                    var fragment = editor.dom.createHTML('figure', {}, image + figCaption);
+                     
+                    // if the parent node is not a figure, insert the full fragment
+                    if (parentElement.nodeName !== 'FIGURE') {
+                        editor.selection.setContent(fragment);
+                    } else {
+                        // if it is a figure, replace the inner content of the parent
+                        // otherwise we append the full figure inside itself
+                        parentElement.innerHTML = image + figCaption;
+                    }
+                } else {
+                    
+                    // if the parent node is not a figure, insert the full fragment
+                    if (parentElement.nodeName !== 'FIGURE') {
+                        editor.selection.setContent(image);
+                    } else {
+                        // if it is a figure, replace the parentElement with the image
+                        // by updating the innerHTML of its parent
+                        parentElement.parentElement.innerHTML = image;
+                    }
+                }
 
                 $timeout(function () {
                     var imgElm = editor.dom.get('__mcenew');
@@ -453,7 +482,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         editor.dom.setAttrib(imgElm, 'style', s);
 
                         if (img.url) {
-                            var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
+                            var src = img.url.substring(0, img.url.indexOf('?')) + "?width=" + newSize.width + "&height=" + newSize.height;
                             editor.dom.setAttrib(imgElm, 'data-mce-src', src);
                         }
                     }
@@ -1191,7 +1220,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     var mediaPickerDetails = {
                         itemDetails: currentTarget,
                         imageUrl: currentTarget.url,  
-                        fromRte: true,
                         submit: function (model) {
                             self.insertMediaInEditor(args.editor, model.itemDetails);
                             editorService.close();
@@ -1220,7 +1248,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         onlyImages: true,
                         showDetails: true,
                         disableFolderSelect: true,
-                        fromRte: true,
                         startNodeId: startNodeId,                        
                         startNodeIsVirtual: startNodeIsVirtual,
                         ignoreUserStartNodes: ignoreUserStartNodes,
