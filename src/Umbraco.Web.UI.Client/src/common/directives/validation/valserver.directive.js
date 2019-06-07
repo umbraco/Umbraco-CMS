@@ -7,7 +7,7 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '^^umbProperty', '?^^umbVariantContent'],
+        require: ['ngModel', '?^^umbProperty', '?^^umbVariantContent'],
         restrict: "A",
         scope: {},
         link: function (scope, element, attr, ctrls) {
