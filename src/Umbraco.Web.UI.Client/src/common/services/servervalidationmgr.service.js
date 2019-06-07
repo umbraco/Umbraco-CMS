@@ -80,8 +80,9 @@ function serverValidationManager($timeout) {
                 if (propErrors.length > 0) {
                     executeCallback(self, propErrors, callbacks[cb].callback, callbacks[cb].culture);
                 }
-            } else {
-                //its a property error
+            }
+            else {
+                //its a culture error
                 var cultureErrors = getCultureErrors(self, callbacks[cb].culture);
                 if (cultureErrors.length > 0) {
                     executeCallback(self, cultureErrors, callbacks[cb].callback, callbacks[cb].culture);
@@ -277,8 +278,8 @@ function serverValidationManager($timeout) {
          */
         getCultureCallbacks: function (culture) {
             var found = _.filter(callbacks, function (item) {
-                //returns any callback that have been registered directly against the field
-                return (item.culture === culture);
+                //returns any callback that have been registered directly/ONLY against the culture
+                return (item.culture === culture && item.propertyAlias === null && item.fieldName === null);
             });
             return found;
         },
@@ -353,6 +354,13 @@ function serverValidationManager($timeout) {
             //call each callback for this error
             for (var cb in cbs) {
                 executeCallback(this, errorsForCallback, cbs[cb].callback, culture);
+            }
+
+            //execute culture specific callbacks here too when a propery error is added
+            var cultureCbs = this.getCultureCallbacks(culture);
+            //call each callback for this error
+            for (var cb in cultureCbs) {
+                executeCallback(this, errorsForCallback, cultureCbs[cb].callback, culture);
             }
         },      
         
