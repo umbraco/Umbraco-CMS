@@ -184,8 +184,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                         serverValidationManager.addPropertyError(propertyAlias, culture, "", modelState[e][0]);
                     }
 
-                }
-                else {
+                } else {
 
                     //Everthing else is just a 'Field'... the field name could contain any level of 'parts' though, for example:
                     // Groups[0].Properties[2].Alias

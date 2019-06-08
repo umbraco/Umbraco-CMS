@@ -140,10 +140,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 while (templateDtoIx < templateDtos.Count && templateDtos[templateDtoIx].ContentTypeNodeId == contentType.Id)
                 {
                     var allowedDto = templateDtos[templateDtoIx];
+                    templateDtoIx++;
                     if (!templates.TryGetValue(allowedDto.TemplateNodeId, out var template)) continue;
                     allowedTemplates.Add(template);
-                    templateDtoIx++;
-
+                    
                     if (allowedDto.IsDefault)
                         defaultTemplateId = template.Id;
                 }
