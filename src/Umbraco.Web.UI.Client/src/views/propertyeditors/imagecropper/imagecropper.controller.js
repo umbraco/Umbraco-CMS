@@ -13,7 +13,7 @@ angular.module('umbraco')
         $scope.clear = clear;
         $scope.reset = reset;
         $scope.close = close;
-        $scope.focalPointChanged = focalPointChanged;
+        $scope.isCustomCrop = isCustomCrop;
         //declare a special method which will be called whenever the value has changed from the server
         $scope.model.onValueChanged = onValueChanged;
 
@@ -201,6 +201,10 @@ angular.module('umbraco')
             $scope.imageCropperForm.$setDirty();
         };
         
+        function isCustomCrop(crop) {
+            return !!crop.coordinates;
+        }
+
         var unsubscribe = $scope.$on("formSubmitting", function () {
             $scope.currentCrop = null;
             $scope.currentPoint = null;

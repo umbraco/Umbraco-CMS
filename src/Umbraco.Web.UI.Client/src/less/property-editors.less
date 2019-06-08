@@ -710,7 +710,8 @@
     }
 
     .imagecropper .umb-sortable-thumbnails li .crop-name,
-    .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li .crop-size,
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
         display: block;
         text-align: left;
         font-size: 13px;
@@ -722,10 +723,15 @@
         margin: 10px 0 5px;
     }
 
-    .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li .crop-size,
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
         font-size: 10px;
         font-style: italic;
         margin: 0 0 5px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
+        color: @gray-6;
     }
 
     .btn-crop-delete {
@@ -733,6 +739,12 @@
         text-align: left;
     }
 
+    .imagecropper .cropList-container {
+        h5 {
+            margin-left: 10px;
+            margin-top: 0;
+        }
+    }
 //
 // folder-browser
 // --------------------------------------------------

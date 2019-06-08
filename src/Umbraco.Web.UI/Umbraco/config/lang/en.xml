@@ -1273,6 +1273,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addCrop">Add new crop</key>
     <key alias="updateEditCrop">Done</key>
     <key alias="undoEditCrop">Undo edits</key>
+    <key alias="automaticCrop">Automatic</key>
+    <key alias="customCrop">User defined</key>
   </area>
   <area alias="rollback">
     <key alias="headline">Select a version to compare with the current version</key>

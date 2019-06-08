@@ -58,6 +58,8 @@
                         <div class="crop-information">
                             <span class="crop-name crop-text">{{value.alias}}</span>
                             <span class="crop-size crop-text">{{value.width}}px x {{value.height}}px</span>
+                            <span class="crop-annotation crop-text" ng-show="isCustomCrop(value)"><localize key="imagecropper_customCrop">User defined</localize></span>
+                            <span class="crop-annotation crop-text" ng-hide="isCustomCrop(value)"><localize key="imagecropper_automaticCrop">Automatic</localize></span>
                         </div>
                     </li>
                 </ul>
