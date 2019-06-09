@@ -205,7 +205,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.AccessRule + " WHERE accessId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id OR loginNodeId = @id OR noAccessNodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE loginNodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE noAccessNodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
             };
             return list;
