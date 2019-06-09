@@ -14,6 +14,7 @@ angular.module('umbraco')
         $scope.reset = reset;
         $scope.close = close;
         $scope.isCustomCrop = isCustomCrop;
+        $scope.focalPointChanged = focalPointChanged;
         //declare a special method which will be called whenever the value has changed from the server
         $scope.model.onValueChanged = onValueChanged;
 
