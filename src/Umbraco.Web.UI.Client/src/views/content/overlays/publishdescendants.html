@@ -6,12 +6,12 @@
         </div>
 
         <div style="margin-bottom: 15px;">
-            <label>
-                <input type="checkbox"
-                       ng-model="model.includeUnpublished"
-                       style="margin-right: 8px;" />
-                <localize key="content_includeUnpublished"></localize>
-            </label>
+            
+            <umb-checkbox
+                model="model.includeUnpublished"
+                text="Include drafts: also publish unpublished content items."
+                localize="content_includeUnpublished"
+            />
         </div>
 
     </div>
