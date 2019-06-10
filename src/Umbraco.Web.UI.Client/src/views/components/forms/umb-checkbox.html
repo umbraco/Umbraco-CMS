@@ -15,5 +15,12 @@
             <i class="umb-form-check__icon icon-check"></i>
         </span>
     </span>
-    <span class="umb-form-check__text">{{vm.text}}</span>
+
+    <!-- If there is no localize attribute set then render the vm.text -->
+    <span class="umb-form-check__text" ng-if="vm.localize === undefined">{{vm.text}}</span>
+
+    <!-- If there is a localize attribute set then render the vm.localize with a fallback to vm.text -->
+    <span class="umb-form-check__text" ng-if="vm.localize.length > 0">
+        <localize key="{{::vm.localize}}">{{vm.text}}</localize>
+    </span>
 </label>
