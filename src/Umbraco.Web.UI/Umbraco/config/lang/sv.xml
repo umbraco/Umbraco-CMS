@@ -221,6 +221,14 @@
     <key alias="welcome">Välkommen</key>
     <key alias="visit">Besök</key>
   </area>
+  <area alias="dashboardTabs">
+    <key alias="contentIntro">Komma igång</key>
+    <key alias="contentRedirectManager">URL-omdirigeringshantering</key>
+    <key alias="mediaFolderBrowser">Innehåll</key>
+    <key alias="settingsWelcome">Välkommen</key>
+    <key alias="memberIntro">Komma igång</key>
+    <key alias="formsInstall">Installera Umbraco Forms</key>
+  </area>
   <area alias="prompt">
     <key alias="stay">Stay</key>
     <key alias="discardChanges">Discard changes</key>
@@ -358,6 +366,7 @@
     <key alias="comment">Kommentar</key>
     <key alias="confirm">Bekräfta</key>
     <key alias="constrainProportions">Begränsa proportioner</key>
+    <key alias="content">Innehåll</key>
     <key alias="continue">Fortsätt</key>
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
@@ -378,8 +387,11 @@
     <key alias="error">Fel</key>
     <key alias="findDocument">Hitta</key>
     <key alias="folder">Mapp</key>
+    <key alias="general">Generella</key>
+    <key alias="groups">Grupper</key>
     <key alias="height">Höjd</key>
     <key alias="help">Hjälp</key>
+    <key alias="history">Historik</key>
     <key alias="icon">Ikon</key>
     <key alias="import">Importera</key>
     <key alias="innerMargin">Innermarginal</key>
@@ -388,6 +400,7 @@
     <key alias="justify">Justera</key>
     <key alias="language">Språk</key>
     <key alias="layout">Layout</key>
+    <key alias="links">Länkar</key>
     <key alias="loading">Laddar</key>
     <key alias="locked">Låst</key>
     <key alias="login">Logga in</key>
@@ -403,6 +416,7 @@
     <key alias="ok">OK</key>
     <key alias="open">Öppna</key>
     <key alias="or">eller</key>
+    <key alias="orderBy">Sortering</key>
     <key alias="password">Lösenord</key>
     <key alias="path">Sökväg</key>
     <key alias="pleasewait">Ett ögonblick...</key>
@@ -411,12 +425,15 @@
     <key alias="reciept">E-postadress för formulärsdata</key>
     <key alias="recycleBin">Papperskorg</key>
     <key alias="remaining">Återstående</key>
+    <key alias="remove">Ta bort</key>
     <key alias="rename">Döp om</key>
     <key alias="renew">Förnya</key>
     <key alias="required">Obligatorisk</key>
     <key alias="retry">Försök igen</key>
     <key alias="rights">Rättigheter</key>
+    <key alias="scheduledPublishing">Schemalagd publicering</key>
     <key alias="search">Sök</key>
+    <key alias="searchNoResult">Tyvärr kan vi inte hitta det du söker.</key>
     <key alias="searchResults">Sökresultat</key>
     <key alias="server">Server</key>
     <key alias="show">Visa</key>
