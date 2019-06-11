@@ -439,83 +439,6 @@
             });
         }
 
-        /** returns the save and publish dialog model */
-        function saveAndPublishDialog() {
-            var dialog = {
-                parentScope: $scope,
-                view: "views/content/overlays/publish.html",
-                variants: $scope.content.variants, //set a model property for the dialog
-                skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                submitButtonLabelKey: "buttons_saveAndPublish",
-                submit: function (model) {
-                    model.submitButtonState = "busy";
-                    clearNotifications($scope.content);
-                    //we need to return this promise so that the dialog can handle the result and wire up the validation response
-                    return performSave({
-                        saveMethod: contentResource.publish,
-                        action: "publish",
-                        showNotifications: false
-                    }).then(function (data) {
-                        //show all notifications manually here since we disabled showing them automatically in the save method
-                        formHelper.showNotifications(data);
-                        clearNotifications($scope.content);
-                        overlayService.close();
-                        return $q.when(data);
-                    },
-                        function (err) {
-                            clearDirtyState($scope.content.variants);
-                            model.submitButtonState = "error";
-                            //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = $scope.content.variants;
-                            //don't reject, we've handled the error
-                            return $q.when(err);
-                        });
-                },
-                close: function () {
-                    overlayService.close();
-                }
-            };
-            return dialog;
-        }
-
-        /** Returns the unpublish dialog model */
-        function unpublishDialog() {
-            var dialog = {
-                parentScope: $scope,
-                view: "views/content/overlays/unpublish.html",
-                variants: $scope.content.variants, //set a model property for the dialog
-                skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                submitButtonLabelKey: "content_unpublish",
-                submitButtonStyle: "warning",
-                submit: function (model) {
-
-                    model.submitButtonState = "busy";
-
-                    var selectedVariants = _.filter(model.variants, v => v.save && v.language); //ignore invariant
-                    var culturesForUnpublishing = _.map(selectedVariants, v => v.language.culture);
-
-                    contentResource.unpublish($scope.content.id, culturesForUnpublishing)
-                        .then(function (data) {
-                            formHelper.resetForm({ scope: $scope });
-                            contentEditingHelper.reBindChangedProperties($scope.content, data);
-                            init();
-                            syncTreeNode($scope.content, data.path);
-                            $scope.page.buttonGroupState = "success";
-                            eventsService.emit("content.unpublished", { content: $scope.content });
-                            overlayService.close();
-                        }, function (err) {
-                            $scope.page.buttonGroupState = 'error';
-                        });
-
-
-                },
-                close: function () {
-                    overlayService.close();
-                }
-            };
-            return dialog;
-        }
-
         if ($scope.page.isNew) {
 
             $scope.page.loading = true;
@@ -550,7 +473,41 @@
         $scope.unpublish = function () {
             clearNotifications($scope.content);
             if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {                
-                overlayService.open(unpublishDialog());
+                var dialog = {
+                    parentScope: $scope,
+                    view: "views/content/overlays/unpublish.html",
+                    variants: $scope.content.variants, //set a model property for the dialog
+                    skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                    submitButtonLabelKey: "content_unpublish",
+                    submitButtonStyle: "warning",
+                    submit: function (model) {
+
+                        model.submitButtonState = "busy";
+
+                        var selectedVariants = _.filter(model.variants, v => v.save && v.language); //ignore invariant
+                        var culturesForUnpublishing = _.map(selectedVariants, v => v.language.culture);
+
+                        contentResource.unpublish($scope.content.id, culturesForUnpublishing)
+                            .then(function (data) {
+                                formHelper.resetForm({ scope: $scope });
+                                contentEditingHelper.reBindChangedProperties($scope.content, data);
+                                init();
+                                syncTreeNode($scope.content, data.path);
+                                $scope.page.buttonGroupState = "success";
+                                eventsService.emit("content.unpublished", { content: $scope.content });
+                                overlayService.close();
+                            }, function (err) {
+                                $scope.page.buttonGroupState = 'error';
+                            });
+
+
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+
+                overlayService.open(dialog);
             }
         };
 
@@ -619,7 +576,41 @@
             if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
-                    overlayService.open(saveAndPublishDialog());
+                    var dialog = {
+                        parentScope: $scope,
+                        view: "views/content/overlays/publish.html",
+                        variants: $scope.content.variants, //set a model property for the dialog
+                        skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                        submitButtonLabelKey: "buttons_saveAndPublish",
+                        submit: function (model) {
+                            model.submitButtonState = "busy";
+                            clearNotifications($scope.content);
+                            //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                            return performSave({
+                                saveMethod: contentResource.publish,
+                                action: "publish",
+                                showNotifications: false
+                            }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
+                                overlayService.close();
+                                return $q.when(data);
+                            },
+                                function (err) {
+                                    clearDirtyState($scope.content.variants);
+                                    model.submitButtonState = "error";
+                                    //re-map the dialog model since we've re-bound the properties
+                                    dialog.variants = $scope.content.variants;
+                                    //don't reject, we've handled the error
+                                    return $q.when(err);
+                                });
+                        },
+                        close: function () {
+                            overlayService.close();
+                        }
+                    };
+                    overlayService.open(dialog);
                 }
                 else {
                     showValidationNotification();
