@@ -59,6 +59,7 @@
      på befintlig nod.]]></key>
   </area>
   <area alias="auditTrails">
+    <key alias="atViewingFor">Visar för</key>
     <key alias="delete">Innehållet raderat</key>
     <key alias="unpublish">Innehållet avpublicerat</key>
     <key alias="unpublishvariant">Innehållet avpublicerat för språk: %0% </key>
