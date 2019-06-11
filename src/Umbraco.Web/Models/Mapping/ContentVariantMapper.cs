@@ -59,7 +59,7 @@ namespace Umbraco.Web.Models.Mapping
                 variants.Remove(defaultLang);
 
                 //Sort the remaining languages a-z
-                variants = variants.OrderBy(x => x.Language.IsoCode).ToList();
+                variants = variants.OrderBy(x => x.Language.Name).ToList();
 
                 //Insert the default language as the first item
                 variants.Insert(0, defaultLang);
