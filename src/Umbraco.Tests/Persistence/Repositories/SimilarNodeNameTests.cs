@@ -75,6 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [TestCase(0, "Alpha", "Alpha (3)")]
         [TestCase(0, "Kilo (1)", "Kilo (1) (1)")] // though... we might consider "Kilo (2)"
         [TestCase(6, "Kilo (1)", "Kilo (1)")] // because of the id
+        [TestCase(0, "alpha", "alpha (3)")]
         [TestCase(0, "", " (1)")]
         [TestCase(0, null, " (1)")]
         public void Test(int nodeId, string nodeName, string expected)
