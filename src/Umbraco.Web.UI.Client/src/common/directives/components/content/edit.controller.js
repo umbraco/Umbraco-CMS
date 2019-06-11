@@ -26,26 +26,26 @@
         $scope.allowOpen = true;
         $scope.app = null;
 
-        function init() {
-            
+        function init(firstLoad) {
+
             var content = $scope.content;
-            
+
             // we need to check wether an app is present in the current data, if not we will present the default app.
             var isAppPresent = false;
-            
+
             // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
             if ($scope.app) {
-                
+
                 // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
-                _.forEach(content.apps, function(app) {
+                _.forEach(content.apps, function (app) {
                     if (app === $scope.app) {
                         isAppPresent = true;
                     }
                 });
-                
+
                 // if we did reload our DocType, but still have the same app we will try to find it by the alias.
                 if (isAppPresent === false) {
-                    _.forEach(content.apps, function(app) {
+                    _.forEach(content.apps, function (app) {
                         if (app.alias === $scope.app.alias) {
                             isAppPresent = true;
                             app.active = true;
@@ -53,7 +53,7 @@
                         }
                     });
                 }
-                
+
             }
 
             // if we still dont have a app, lets show the first one:
@@ -61,7 +61,23 @@
                 content.apps[0].active = true;
                 $scope.appChanged(content.apps[0]);
             }
-            
+
+            if (firstLoad) {
+
+                //Check if the editor state is holding a reference to a new item and merge it's notifications.
+                //We need to do this when creating new content because when it's created, we redirect to a new route and re-load the content from the server
+                //but we need to maintain it's 'notifications' data so we can re-bind it in the UI.
+                //The only time that editorState will contain something here is if it was preserved and that is only explicitly done when creating new content and redirecting.
+
+                var currState = editorState.getCurrent();
+                if (currState && currState.udi === content.udi) {
+                    content.notifications = currState.notifications;
+                    for (var i = 0; i < content.variants.length; i++) {
+                        content.variants[i].notifications = currState.variants[i].notifications;
+                    }
+                }
+            }
+
             editorState.set(content);
 
             //We fetch all ancestors of the node to generate the footer breadcrumb navigation
@@ -118,10 +134,10 @@
         function isContentCultureVariant() {
             return $scope.content.variants.length > 1;
         }
-        
+
         function reload() {
             $scope.page.loading = true;
-            loadContent().then(function() {
+            loadContent().then(function () {
                 $scope.page.loading = false;
             });
         }
@@ -134,7 +150,7 @@
 
             evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
                 // if this content item uses the updated doc type we need to reload the content item
-                if(args && args.documentType && $scope.content.documentType.id === args.documentType.id) {
+                if (args && args.documentType && $scope.content.documentType.id === args.documentType.id) {
                     reload();
                 }
             }));
@@ -144,7 +160,7 @@
         /**
          *  This does the content loading and initializes everything, called on first load
          */
-        function loadContent() {
+        function loadContent(firstLoad) {
 
             //we are editing so get the content item from the server
             return $scope.getMethod()($scope.contentId)
@@ -158,7 +174,7 @@
                             "/content/content/edit/" + data.parentId;
                     }
 
-                    init();
+                    init(firstLoad);
 
                     syncTreeNode($scope.content, $scope.content.path, true);
 
@@ -219,7 +235,7 @@
             $scope.page.showPreviewButton = true;
 
         }
-        
+
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(content, path, initialLoad) {
 
@@ -328,7 +344,7 @@
             $scope.contentForm.$dirty = false;
 
             for (var i = 0; i < $scope.content.variants.length; i++) {
-                if($scope.content.variants[i].isDirty){
+                if ($scope.content.variants[i].isDirty) {
                     $scope.contentForm.$dirty = true;
                     return;
                 }
@@ -337,7 +353,7 @@
 
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
-            
+
             //Used to check validility of nested form - coming from Content Apps mostly
             //Set them all to be invalid
             var fieldsToRollback = checkValidility();
@@ -363,11 +379,6 @@
             },
                 function (err) {
                     syncTreeNode($scope.content, $scope.content.path);
-
-                    //error
-                    if (err) {
-                        editorState.set($scope.content);
-                    }
 
                     resetNestedFieldValiation(fieldsToRollback);
 
@@ -421,9 +432,9 @@
 
             //need to show a notification else it's not clear there was an error.
             localizationService.localizeMany([
-                    "speechBubbles_validationFailedHeader",
-                    "speechBubbles_validationFailedMessage"
-                ]
+                "speechBubbles_validationFailedHeader",
+                "speechBubbles_validationFailedMessage"
+            ]
             ).then(function (data) {
                 notificationsService.error(data[0], data[1]);
             });
@@ -453,7 +464,7 @@
 
             $scope.page.loading = true;
 
-            loadContent().then(function () {
+            loadContent(true).then(function () {
                 $scope.page.loading = false;
             });
         }
@@ -510,7 +521,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_saveToPublish",
-                        submit: function(model) {
+                        submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -518,14 +529,14 @@
                                 saveMethod: contentResource.sendToPublish,
                                 action: "sendToPublish",
                                 showNotifications: false
-                            }).then(function(data) {
-                                    //show all notifications manually here since we disabled showing them automatically in the save method
-                                    formHelper.showNotifications(data);
-                                    clearNotifications($scope.content);
-                                    overlayService.close();
-                                    return $q.when(data);
-                                },
-                                function(err) {
+                            }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
+                                overlayService.close();
+                                return $q.when(data);
+                            },
+                                function (err) {
                                     clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
@@ -534,7 +545,7 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function() {
+                        close: function () {
                             overlayService.close();
                         }
                     };
@@ -570,7 +581,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_saveAndPublish",
-                        submit: function(model) {
+                        submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -578,14 +589,14 @@
                                 saveMethod: contentResource.publish,
                                 action: "publish",
                                 showNotifications: false
-                            }).then(function(data) {
-                                    //show all notifications manually here since we disabled showing them automatically in the save method
-                                    formHelper.showNotifications(data);
-                                    clearNotifications($scope.content);
-                                    overlayService.close();
-                                    return $q.when(data);
-                                },
-                                function(err) {
+                            }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
+                                overlayService.close();
+                                return $q.when(data);
+                            },
+                                function (err) {
                                     clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
@@ -594,7 +605,7 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function() {
+                        close: function () {
                             overlayService.close();
                         }
                     };
@@ -634,7 +645,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_save",
-                        submit: function(model) {
+                        submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -642,14 +653,14 @@
                                 saveMethod: $scope.saveMethod(),
                                 action: "save",
                                 showNotifications: false
-                            }).then(function(data) {
-                                    //show all notifications manually here since we disabled showing them automatically in the save method
-                                    formHelper.showNotifications(data);
-                                    clearNotifications($scope.content);
-                                    overlayService.close();
-                                    return $q.when(data);
-                                },
-                                function(err) {
+                            }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
+                                overlayService.close();
+                                return $q.when(data);
+                            },
+                                function (err) {
                                     clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
@@ -658,7 +669,7 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function(oldModel) {
+                        close: function (oldModel) {
                             overlayService.close();
                         }
                     };
@@ -685,7 +696,7 @@
 
         };
 
-        $scope.schedule = function() {
+        $scope.schedule = function () {
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
@@ -755,7 +766,7 @@
             }
         };
 
-        $scope.publishDescendants = function() {
+        $scope.publishDescendants = function () {
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "publishDescendants" })) {
@@ -883,13 +894,13 @@
          * @param {any} app
          */
         $scope.appChanged = function (app) {
-            
+
             $scope.app = app;
-            
+
             $scope.$broadcast("editors.apps.appChanged", { app: app });
-            
+
             createButtons($scope.content);
-            
+
         };
 
         /**
@@ -907,11 +918,11 @@
                 $scope.infiniteModel.close($scope.infiniteModel);
             }
         };
-        
+
         /**
          * Call back when user click the back-icon
          */
-        $scope.onBack = function() {
+        $scope.onBack = function () {
             if ($scope.infiniteModel && $scope.infiniteModel.close) {
                 $scope.infiniteModel.close($scope.infiniteModel);
             } else {

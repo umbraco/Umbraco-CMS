@@ -5,7 +5,7 @@
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, navigationService, localizationService, serverValidationManager, formHelper) {
+function contentEditingHelper(fileManager, $q, $location, $routeParams, editorState, notificationsService, navigationService, localizationService, serverValidationManager, formHelper) {
 
     function isValidIdentifier(id) {
 
@@ -35,8 +35,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
     return {
 
         /** Used by the content editor and mini content editor to perform saving operations */
-        // TODO: Make this a more helpful/reusable method for other form operations! we can simplify this form most forms
-        //         = this is already done in the formhelper service
         contentEditorPerformSave: function (args) {
             if (!angular.isObject(args)) {
                 throw "args must be an object";
@@ -62,9 +60,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             //we will use the default one for content if not specified
             var rebindCallback = args.rebindCallback === undefined ? self.reBindChangedProperties : args.rebindCallback;
 
-            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, action: args.action })) {
-
-                args.scope.busy = true;
+            if (formHelper.submitForm({ scope: args.scope, action: args.action })) {
 
                 return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles(), args.showNotifications)
                     .then(function (data) {
@@ -80,7 +76,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             }
                         });
 
-                        args.scope.busy = false;
+                        //update editor state to what is current
+                        editorState.set(args.content);
+
                         return $q.resolve(data);
 
                     }, function (err) {
@@ -93,7 +91,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             }
                         });
 
-                        args.scope.busy = false;
+                        //update editor state to what is current
+                        editorState.set(args.content);
+
                         return $q.reject(err);
                     });
             }
@@ -265,7 +265,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // if publishing is allowed also allow schedule publish
                 // we add this manually becuase it doesn't have a permission so it wont 
                 // get picked up by the loop through permissions
-                if( _.contains(args.content.allowedActions, "U")) {
+                if (_.contains(args.content.allowedActions, "U")) {
                     buttons.subButtons.push(createButtonDefinition("SCHEDULE"));
                     buttons.subButtons.push(createButtonDefinition("PUBLISH_DESCENDANTS"));
                 }
@@ -274,7 +274,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // so long as it's already published and if the user has access to publish
                 // and the user has access to unpublish (may have been removed via Event)
                 if (!args.create) {
-                    var hasPublishedVariant = args.content.variants.filter(function(variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
+                    var hasPublishedVariant = args.content.variants.filter(function (variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
                     if (hasPublishedVariant && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
@@ -444,7 +444,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             var shouldIgnore = function (propName) {
                 return _.some([
                     "variants",
-                    
+
                     "tabs",
                     "properties",
                     "apps",
@@ -600,16 +600,14 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         }
                     }
 
+                    // we need to detect what properties have changed and re-bind them with the server data.                     
+                    if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                        args.rebindCallback();
+                    }
+
                     if (!args.redirectOnFailure || !this.redirectToCreatedContent(args.err.data.id, args.err.data.ModelState)) {
-                        //we are not redirecting because this is not new content, it is existing content. In this case
-                        // we need to detect what properties have changed and re-bind them with the server data. Then we need
-                        // to re-bind any server validation errors after the digest takes place.
-
-                        if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
-                            args.rebindCallback();
-                        }
-
-                        //notify all validators (don't clear the server validations though since we need to maintain their state because of
+                        // we are not redirecting because this is not new content, it is existing content. In this case                    
+                        // notify all validators (don't clear the server validations though since we need to maintain their state because of
                         // how the variant switcher works in content). server validation state is always cleared when an editor first loads
                         // and in theory when an editor is destroyed.
                         serverValidationManager.notify();
@@ -679,6 +677,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 //clear the query strings
                 navigationService.clearSearch(["cculture"]);
+
+                //preserve the editor state when we are redirecting to new content
+                editorState.preserve();
 
                 //change to new path
                 $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);
