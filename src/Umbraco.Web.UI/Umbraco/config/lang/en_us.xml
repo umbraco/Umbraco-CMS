@@ -308,7 +308,7 @@
     <key alias="createdBlueprintHeading">Content Template created</key>
     <key alias="createdBlueprintMessage">A Content Template was created from '%0%'</key>
     <key alias="duplicateBlueprintMessage">Another Content Template with the same name already exists</key>
-    <key alias="blueprintDescription">A Content Template is pre-defined content that an editor can select to use as the basis for creating new content</key>
+    <key alias="blueprintDescription">A Content Template is predefined content that an editor can select to use as the basis for creating new content</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
