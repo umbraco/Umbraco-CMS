@@ -505,6 +505,7 @@
               property.showOnMemberProfile = propertyModel.showOnMemberProfile;
               property.memberCanEdit = propertyModel.memberCanEdit;
               property.isSensitiveValue = propertyModel.isSensitiveValue;
+              property.allowCultureVariant = propertyModel.allowCultureVariant;
 
               // update existing data types
               if(model.updateSameDataTypes) {
