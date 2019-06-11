@@ -12,6 +12,18 @@
 
         var currentOverlay = null;
 
+        function getCurrent() {
+            return currentOverlay;
+        }
+
+        function refresh(overlay) {
+            //extend the passed overlay on top of the current overlay and then re-assign to currentOverlay
+            var merged = angular.extend({}, currentOverlay, overlay);
+            currentOverlay = merged;
+
+            eventsService.emit("appState.overlay", currentOverlay);
+        }
+
         function open(newOverlay) {
 
             // prevent two open overlays at the same time
@@ -45,7 +57,7 @@
             overlay.show = true;
             backdropService.open(backdropOptions);
             currentOverlay = overlay;
-            eventsService.emit("appState.overlay", overlay);
+            eventsService.emit("appState.overlay", currentOverlay);
         }
 
         function close() {
@@ -68,7 +80,9 @@
         var service = {
             open: open,
             close: close,
-            ysod: ysod
+            ysod: ysod,
+            refresh: refresh,
+            getCurrent: getCurrent
         };
 
         return service;
@@ -76,5 +90,6 @@
     }
 
     angular.module("umbraco.services").factory("overlayService", overlayService);
+
 
 })();
