@@ -71,7 +71,7 @@
     <key alias="copy">Innehåll kopierat</key>
     <key alias="rollback">Innehållet rullades tillbaka</key>
     <key alias="sendtopublish">Innehåll skickat för publicering</key>
-    <key alias="sendtopublishvariant">CInnehåll skickat för publicering för språk: %0%</key>
+    <key alias="sendtopublishvariant">Innehåll skickat för publicering för språk: %0%</key>
     <key alias="sort">Sortering av underliggande objekt utfört av användaren</key>
     <key alias="smallCopy">Kopiera</key>
     <key alias="smallPublish">Publicera</key>
@@ -89,7 +89,7 @@
     <key alias="historyIncludingVariants">Historik (alla varianter)</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Skapa en ny innehållmall för '%0%'</key>
+    <key alias="createBlueprintFrom">Skapa en ny innehållsmall för '%0%'</key>
     <key alias="blankBlueprint">Tom</key>
     <key alias="selectBlueprint">Välj en innehållsmall</key>
     <key alias="createdBlueprintHeading">Innehållsmall skapad</key>
