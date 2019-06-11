@@ -161,7 +161,6 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
             }, function (err) {
 
                     contentEditingHelper.handleSaveError({
-                        redirectOnFailure: false,
                         err: err,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });

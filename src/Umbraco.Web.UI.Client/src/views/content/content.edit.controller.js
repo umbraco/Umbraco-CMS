@@ -24,13 +24,15 @@ function ContentEditController($scope, $rootScope, $routeParams, contentResource
     $scope.page = $routeParams.page;
     $scope.isNew = infiniteMode ? $scope.model.create : $routeParams.create;
     //load the default culture selected in the main tree if any
-    $scope.culture = $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
+    $scope.culture = $routeParams.cculture ? $routeParams.cculture : ($routeParams.mculture === "true");
 
     //Bind to $routeUpdate which will execute anytime a location changes but the route is not triggered.
     //This is so we can listen to changes on the cculture parameter since that will not cause a route change
     // and then we can pass in the updated culture to the editor
     $scope.$on('$routeUpdate', function (event, next) {
         $scope.culture = next.params.cculture ? next.params.cculture : $routeParams.mculture;
+        $scope.isNew = next.params.create === "true";
+        $scope.contentId = infiniteMode ? $scope.model.id : $routeParams.id;
     });
 }
 

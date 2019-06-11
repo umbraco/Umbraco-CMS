@@ -105,6 +105,11 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          * @param {object} err The error object returned from the http promise
          */
         handleError: function (err) {            
+
+            //TODO: Potentially add in the logic to showNotifications like the contentEditingHelper.handleSaveError does so that
+            // non content editors can just use this method instead of contentEditingHelper.handleSaveError which they should not use
+            // and they won't need to manually do it.
+
             //When the status is a 400 status with a custom header: X-Status-Reason: Validation failed, we have validation errors.
             //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
             //Or, some strange server error

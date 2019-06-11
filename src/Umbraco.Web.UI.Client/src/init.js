@@ -115,7 +115,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
         });
 
         //Bind to $routeUpdate which will execute anytime a location changes but the route is not triggered.
-        //This is the case when a route uses reloadOnSearch: false which is the case for many or our routes so that we are able to maintain
+        //This is the case when a route uses "reloadOnSearch: false" or "reloadOnUrl: false" which is the case for many or our routes so that we are able to maintain
         //global state query strings without force re-loading views.
         //We can then detect if it's a location change that should force a route or not programatically.
         $rootScope.$on('$routeUpdate', function (event, next) {

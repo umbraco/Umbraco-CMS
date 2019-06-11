@@ -13,7 +13,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($routeParams, $location, $q, $timeout, $injector, eventsService, umbModelMapper, treeService, appState) {
+function navigationService($routeParams, $location, $route, $q, $timeout, $injector, eventsService, umbModelMapper, treeService, appState) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();
@@ -31,7 +31,8 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
     //A list of query strings defined that when changed will not cause a reload of the route
     var nonRoutingQueryStrings = ["mculture", "cculture", "lq"];
     var retainedQueryStrings = ["mculture"];
-
+    //A list of trees that don't cause a route when creating new items (TODO: eventually all trees should do this!)
+    var nonRoutingTreesOnCreate = ["content"];
         
     function setMode(mode) {
         switch (mode) {
@@ -115,16 +116,17 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
     }
 
     var service = {
-
+        
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#isRouteChangingNavigation
          * @methodOf umbraco.services.navigationService
          *
          * @description
-         * Detects if the route param differences will cause a navigation change or if the route param differences are
+         * Detects if the route param differences will cause a navigation/route change or if the route param differences are
          * only tracking state changes.
-         * This is used for routing operations where reloadOnSearch is false and when detecting form dirty changes when navigating to a different page.
+         * This is used for routing operations where "reloadOnSearch: false" or "reloadOnUrl: false", when detecting form dirty changes when navigating to a different page,
+         * and when we are creating new entities and moving from a route with the ?create=true parameter to an ID based parameter once it's created.
          * @param {object} currUrlParams Either a string path or a dictionary of route parameters
          * @param {object} nextUrlParams Either a string path or a dictionary of route parameters
          */
@@ -136,6 +138,14 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
 
             if (angular.isString(nextUrlParams)) {
                 nextUrlParams = pathToRouteParts(nextUrlParams);
+            }
+
+            //first check if this is a ?create=true url being redirected to it's true url
+            if (currUrlParams.create === "true" && currUrlParams.id && currUrlParams.section && currUrlParams.tree && currUrlParams.method === "edit" && 
+                !nextUrlParams.create && nextUrlParams.id && nextUrlParams.section === currUrlParams.section && nextUrlParams.tree === currUrlParams.tree && nextUrlParams.method === currUrlParams.method &&
+                nonRoutingTreesOnCreate.indexOf(nextUrlParams.tree.toLowerCase()) >= 0) {
+                //this means we're coming from a path like /content/content/edit/1234?create=true to the created path like /content/content/edit/9999
+                return false;
             }
 
             var allowRoute = true;

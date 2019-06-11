@@ -169,7 +169,6 @@
                     }, function (err) {
 
                         contentEditingHelper.handleSaveError({
-                            redirectOnFailure: false,
                             err: err,
                             showNotifications: true
                         });

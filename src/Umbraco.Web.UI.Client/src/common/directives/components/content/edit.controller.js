@@ -8,6 +8,7 @@
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
+        var watchingCulture = false;
 
         //setup scope vars
         $scope.defaultButton = null;
@@ -26,39 +27,41 @@
         $scope.allowOpen = true;
         $scope.app = null;
 
-        //called only one time when the editor first loads
-        function firstLoad(content) {
-            //Check if the editor state is holding a reference to a new item and merge it's notifications.
-            //We need to do this when creating new content because when it's created, we redirect to a new route and re-load the content from the server
-            //but we need to maintain it's 'notifications' data so we can re-bind it in the UI.
-            //The only time that editorState will contain something here is if it was preserved and that is only explicitly done when creating new content and redirecting.
+        //initializes any watches
+        function startWatches(content) {
 
-            var currState = editorState.getCurrent();
-            if (currState && currState.udi === content.udi) {
-                content.notifications = currState.notifications;
-                for (var i = 0; i < content.variants.length; i++) {
-                    content.variants[i].notifications = currState.variants[i].notifications;
-                }
+            //watch for changes to isNew & the content.id, set the page.isNew accordingly and load the breadcrumb if we can
+            $scope.$watchGroup(['isNew', 'content.id'], function (newVal, oldVal) {
+                
+                var contentId = newVal[1];
+                $scope.page.isNew = Object.toBoolean(newVal[0]);
 
-                //Now check if the overlay service has an active overlay open that was owned by this editor prior to redirecting. 
-                //This will occur if new variant content is created and there were notifications/errors for variants, the variant dialog will remain open
-                //but it will need to be refreshed with the new editor data since it will be holding a reference to stale scopes.
-                var currOverlay = overlayService.getCurrent();
-                if (currOverlay && currOverlay.view.startsWith("views/content/overlays")) {
-                    switch (currOverlay.view) {
-                        case "views/content/overlays/publish.html":
-                            overlayService.refresh(saveAndPublishDialog());
-                            break;
+                //We fetch all ancestors of the node to generate the footer breadcrumb navigation
+                if (!$scope.page.isNew && contentId && content.parentId && content.parentId !== -1) {
+                    loadBreadcrumb();
+                    if (!watchingCulture) {
+                        $scope.$watch('culture',
+                            function (value, oldValue) {
+                                if (value !== oldValue) {
+                                    loadBreadcrumb();
+                                }
+                            });
                     }
                 }
+            });
 
-            }
         }
 
         //this initializes the editor with the data which will be called more than once if the data is re-loaded
-        function init(isFirstLoad) {
+        function init() {
 
             var content = $scope.content;
+
+            if (content.id && content.isChildOfListView && content.trashed === false) {
+                $scope.page.listViewPath = ($routeParams.page) ?
+                    "/content/content/edit/" + content.parentId + "?page=" + $routeParams.page :
+                    "/content/content/edit/" + content.parentId;
+            }
 
             // we need to check wether an app is present in the current data, if not we will present the default app.
             var isAppPresent = false;
@@ -92,24 +95,7 @@
                 $scope.appChanged(content.apps[0]);
             }
 
-            if (isFirstLoad) {
-                firstLoad(content);                
-            }
-
             editorState.set(content);
-
-            //We fetch all ancestors of the node to generate the footer breadcrumb navigation
-            if (!$scope.page.isNew) {
-                if (content.parentId && content.parentId !== -1) {
-                    loadBreadcrumb();
-                    $scope.$watch('culture',
-                        function (value, oldValue) {
-                            if (value !== oldValue) {
-                                loadBreadcrumb();
-                            }
-                        });
-                }
-            }
 
             bindEvents();
 
@@ -178,7 +164,7 @@
         /**
          *  This does the content loading and initializes everything, called on first load
          */
-        function loadContent(isFirstLoad) {
+        function loadContent() {
 
             //we are editing so get the content item from the server
             return $scope.getMethod()($scope.contentId)
@@ -186,13 +172,7 @@
 
                     $scope.content = data;
 
-                    if (data.isChildOfListView && data.trashed === false) {
-                        $scope.page.listViewPath = ($routeParams.page) ?
-                            "/content/content/edit/" + data.parentId + "?page=" + $routeParams.page :
-                            "/content/content/edit/" + data.parentId;
-                    }
-
-                    init(isFirstLoad);
+                    init();
 
                     syncTreeNode($scope.content, $scope.content.path, true);
 
@@ -382,7 +362,8 @@
                 scope: $scope,
                 content: $scope.content,
                 action: args.action,
-                showNotifications: args.showNotifications
+                showNotifications: args.showNotifications,
+                softRedirect: true
             }).then(function (data) {
                 //success
                 init();
@@ -546,6 +527,7 @@
                     $scope.content = data;
 
                     init();
+                    startWatches($scope.content);
 
                     resetLastListPageNumber($scope.content);
 
@@ -559,7 +541,8 @@
 
             $scope.page.loading = true;
 
-            loadContent(true).then(function () {
+            loadContent().then(function () {
+                startWatches($scope.content);
                 $scope.page.loading = false;
             });
         }
@@ -964,9 +947,7 @@
             }
             //since we are not notifying and clearing server validation messages when they are received due to how the variant
             //switching works, we need to ensure they are cleared when this editor is destroyed
-            if (!$scope.page.isNew) {
-                serverValidationManager.clear();
-            }
+            serverValidationManager.clear();
         });
 
     }
