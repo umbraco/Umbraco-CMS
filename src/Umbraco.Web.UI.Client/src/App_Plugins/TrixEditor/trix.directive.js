@@ -17,7 +17,7 @@
                 trixAttachmentRemove: '&'
                 */
             },
-            link: function($scope, element, ngModel, notificationsService, localizationService) {
+            link: function($scope, element, attr, ngModel, notificationsService, localizationService) {
                 
                 
                 // TODO: retrive from configuration:
