@@ -12,6 +12,7 @@
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
     <key alias="createPackage">Skapa paket</key>
+    <key alias="createblueprint">Skapa innehållsmall</key>
     <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
@@ -58,7 +59,42 @@
      på befintlig nod.]]></key>
   </area>
   <area alias="auditTrails">
-    <key alias="atViewingFor">Visar för</key>
+    <key alias="delete">Innehållet raderat</key>
+    <key alias="unpublish">Innehållet avpublicerat</key>
+    <key alias="unpublishvariant">Innehållet avpublicerat för språk: %0% </key>
+    <key alias="publish">Spara och publicera utförd av användaren</key>
+    <key alias="publishvariant">Innehåll publicerat för språk: %0% </key>
+    <key alias="save">Innehåll sparat</key>
+    <key alias="savevariant">Innehåll sparat för språk: %0%</key>
+    <key alias="move">Innehåll flyttat</key>
+    <key alias="copy">Innehåll kopierat</key>
+    <key alias="rollback">Innehållet rullades tillbaka</key>
+    <key alias="sendtopublish">Innehåll skickat för publicering</key>
+    <key alias="sendtopublishvariant">CInnehåll skickat för publicering för språk: %0%</key>
+    <key alias="sort">Sortering av underliggande objekt utfört av användaren</key>
+    <key alias="smallCopy">Kopiera</key>
+    <key alias="smallPublish">Publicera</key>
+    <key alias="smallPublishVariant">Publicera</key>
+    <key alias="smallMove">Flytta</key>
+    <key alias="smallSave">Spara</key>
+    <key alias="smallSaveVariant">Spara</key>
+    <key alias="smallDelete">Ta bort</key>
+    <key alias="smallUnpublish">Avpublicera</key>
+    <key alias="smallUnpublishVariant">Avpublicera</key>
+    <key alias="smallRollBack">Rulla tillbaka</key>
+    <key alias="smallSendToPublish">Skicka till publicering</key>
+    <key alias="smallSendToPublishVariant">Skicka till publicering</key>
+    <key alias="smallSort">Sortera</key>
+    <key alias="historyIncludingVariants">Historik (alla varianter)</key>
+  </area>
+  <area alias="blueprints">
+    <key alias="createBlueprintFrom">Skapa en ny innehållmall för '%0%'</key>
+    <key alias="blankBlueprint">Tom</key>
+    <key alias="selectBlueprint">Välj en innehållsmall</key>
+    <key alias="createdBlueprintHeading">Innehållsmall skapad</key>
+    <key alias="createdBlueprintMessage">En innehållsmall skapades från '%0%'</key>
+    <key alias="duplicateBlueprintMessage">En annan innehållsmall med samma namn finns redan</key>
+    <key alias="blueprintDescription">En innehållsmall är fördefinierat innehåll som en redaktör kan välja att använda som grund för att skapa nytt innehåll</key>
   </area>
   <area alias="buttons">
     <key alias="bold">Fetstil</key>
@@ -77,6 +113,7 @@
     <key alias="listNumeric">Numrerad lista</key>
     <key alias="macroInsert">Infoga macro</key>
     <key alias="pictureInsert">Infoga bild</key>
+    <key alias="publishAndClose">Publicera och stäng</key>
     <key alias="relations">Ändra relation</key>
     <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
@@ -142,14 +179,18 @@
     <key alias="membertype">Medlemstyp</key>
     <key alias="noDate">Inget datum valt</key>
     <key alias="nodeName">Sidnamn</key>
+    <key alias="noProperties">Inget innehåll kan läggas till för det här objektet</key>
     <key alias="notmemberof">Ej medlem av grupp(er)</key>
     <key alias="otherElements">Egenskaper</key>
     <key alias="parentNotPublished">Detta dokument är publicerat men syns inte eftersom den överordnade sidan %0% inte är publicerad</key>
     <key alias="parentNotPublishedAnomaly">Oops: detta dokument är publicerat men finns inte i cacheminnet (internt fel)</key>
     <key alias="publish">Publicera</key>
+    <key alias="published">Publicerad</key>
     <key alias="publishStatus">Publiceringsstatus</key>
     <key alias="releaseDate">Publiceringsdatum</key>
     <key alias="removeDate">Rensa datum</key>
+    <key alias="schedulePublishHelp">Välj datum och tid för att publicera och / eller avpublicera innehållsobjektet.</key>
+    <key alias="setDate">Välj datum</key>
     <key alias="sortDone">Sorteringsordningen har uppdaterats</key>
     <key alias="sortHelp">För att sortera noderna, dra i dem eller klicka på någon av kolumnrubrikerna. Du kan markera flera noder samtidigt genom att hålla nere SHIFT eller CONTROL medan du klickar</key>
     <key alias="statistics">Statistik</key>
@@ -508,6 +549,7 @@
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klicka för att ladda upp</key>
+    <key alias="orClickHereToUpload">eller klicka här för att välja filer</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
@@ -714,6 +756,7 @@
     <key alias="styles">Stilar</key>
   </area>
   <area alias="template">
+    <key alias="createdDate">Skapad</key>
     <key alias="edittemplate">Redigera sidmall</key>
     <key alias="insertContentArea">Lägg in innehållsyta</key>
     <key alias="insertContentAreaPlaceHolder">Lägg in platshållare för innehållsyta</key>
@@ -847,6 +890,7 @@
     <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
     <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
     <key alias="contentChannel">Innehållskanal</key>
+    <key alias="createUser">Skapa användare</key>
     <key alias="descriptionField">Fält för beskrivning</key>
     <key alias="disabled">Avaktivera användare</key>
     <key alias="documentType">Dokumenttyp</key>
@@ -873,6 +917,8 @@
     <key alias="resetPassword">Återställ lösenord</key>
     <key alias="searchAllChildren">Sök igenom alla undernoder</key>
     <key alias="sessionExpires">Sessionen går ut</key>
+    <key alias="sortNameAscending">Namn (A-Z)</key>
+    <key alias="sortNameDescending">Namn (Z-A)</key>
     <key alias="startnode">Startnod i innehåll</key>
     <key alias="username">Användarens namn</key>
     <key alias="userPermissions">Användarrättigheter</key>
