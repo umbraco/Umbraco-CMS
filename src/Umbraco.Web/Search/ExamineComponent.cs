@@ -737,7 +737,7 @@ namespace Umbraco.Web.Search
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    .Where(x => (keepIfUnpublished && !x.PublishedValuesOnly) || !keepIfUnpublished)
+                    .Where(x => x.PublishedValuesOnly || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
                     index.DeleteFromIndex(strId);
