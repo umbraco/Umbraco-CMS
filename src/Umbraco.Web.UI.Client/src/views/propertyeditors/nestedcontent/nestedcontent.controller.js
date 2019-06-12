@@ -84,6 +84,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.editIconTitle = '';
         $scope.moveIconTitle = '';
         $scope.deleteIconTitle = '';
+        $scope.copyIconTitle = '';
 
         // localize the edit icon title
         localizationService.localize('general_edit').then(function (value) {
@@ -98,6 +99,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         // localize the move icon title
         localizationService.localize('actions_move').then(function (value) {
             $scope.moveIconTitle = value;
+        });
+
+        // localize the copy icon title
+        localizationService.localize('actions_copy').then(function (value) {
+            $scope.copyIconTitle = value;
         });
 
         $scope.nodes = [];
@@ -203,6 +209,19 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     $scope.setDirty();
                     updateModel();
                 }
+            }
+        };
+
+        $scope.copyNode = function (idx) {
+            if ($scope.nodes.length > $scope.model.config.minItems) {
+                var nodeToCopy = $scope.nodes[idx];
+
+                var clonedNode = angular.copy(nodeToCopy);
+                clonedNode.key = UUID.generate();
+
+                $scope.nodes.push(clonedNode);
+                $scope.setDirty();
+                updateModel();
             }
         };
 
