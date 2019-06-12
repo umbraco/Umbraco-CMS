@@ -576,8 +576,13 @@ namespace Umbraco.Web.Editors
                     Services.ContentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
                     //we need to reuse the underlying logic so return the result that it wants
                     return OperationResult.Succeed(new EventMessages());
+                },
+                content =>
+                {
+                    var display = MapToDisplay(content);
+                    SetupBlueprint(display, content);
+                    return display;
                 });
-            SetupBlueprint(contentItemDisplay, contentItemDisplay.PersistedContent);
 
             return contentItemDisplay;
         }
@@ -591,11 +596,15 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
-            var contentItemDisplay = PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
+            var contentItemDisplay = PostSaveInternal(
+                contentItem,
+                content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id),
+                MapToDisplay);
+
             return contentItemDisplay;
         }
 
-        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
+        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
         {
             //Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
             //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
@@ -626,7 +635,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the model state to the outgoing object and throw a validation message
-                    var forDisplay = MapToDisplay(contentItem.PersistedContent);
+                    var forDisplay = mapToDisplay(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
                 }
@@ -757,7 +766,7 @@ namespace Umbraco.Web.Editors
             }
 
             //get the updated model
-            var display = MapToDisplay(contentItem.PersistedContent);
+            var display = mapToDisplay(contentItem.PersistedContent);
 
             //merge the tracked success messages with the outgoing model
             display.Notifications.AddRange(globalNotifications.Notifications);

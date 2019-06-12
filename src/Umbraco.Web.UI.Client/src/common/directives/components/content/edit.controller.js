@@ -242,9 +242,13 @@
             }
 
             if (!$scope.content.isChildOfListView) {
-                navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
-                    $scope.page.menu.currentNode = syncArgs.node;
-                });
+                navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true })
+                    .then(function (syncArgs) {
+                        $scope.page.menu.currentNode = syncArgs.node;
+                    }, function () {
+                        //handle the rejection
+                        console.log("A problem occurred syncing the tree! A path is probably incorrect.")
+                    });
             }
             else if (initialLoad === true) {
 
