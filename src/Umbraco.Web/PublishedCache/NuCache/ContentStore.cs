@@ -642,11 +642,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var id = content.FirstChildContentId;
             while (id > 0)
             {
-                if (!_contentNodes.TryGetValue(id, out var link) || link.Value == null)
-                    throw new Exception("panic: failed to get child " + id);
+                var link = GetLinkedNode(id, "child");
                 ClearBranchLocked(link.Value);
                 id = link.Value.NextSiblingContentId;
             }
+        }
+
+        // gets the link node
+        // throws (panic) if not found, or no value
+        private LinkedNode<ContentNode> GetLinkedNode(int id, string description)
+        {
+            if (_contentNodes.TryGetValue(id, out var link) && link.Value != null)
+                return link;
+
+            throw new Exception($"panic: failed to get {description} with id={id}");
         }
 
         private LinkedNode<ContentNode> GetParentLink(ContentNode content)
@@ -659,16 +668,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void RemoveNodeLocked(ContentNode content)
         {
-            LinkedNode<ContentNode> parentLink;
-            if (content.ParentContentId < 0)
-            {
-                parentLink = _root;
-            }
-            else
-            {
-                if (!_contentNodes.TryGetValue(content.ParentContentId, out parentLink) || parentLink.Value == null)
-                    throw new Exception("panic: failed to get parent " + content.ParentContentId);
-            }
+            var parentLink = content.ParentContentId < 0
+                ? _root
+                : GetLinkedNode(content.ParentContentId, "parent");
 
             var parent = parentLink.Value;
 
@@ -679,12 +681,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             else
             {
-                if (!_contentNodes.TryGetValue(parent.FirstChildContentId, out var link) || link.Value == null)
-                    throw new Exception("panic: failed to get first child " + parent.FirstChildContentId);
+                var link = GetLinkedNode(parent.FirstChildContentId, "first child");
 
                 while (link.Value.NextSiblingContentId != content.Id)
-                    if (!_contentNodes.TryGetValue(parent.NextSiblingContentId, out link) || link.Value == null)
-                        throw new Exception("panic: failed to get next sibling " + parent.NextSiblingContentId);
+                    link = GetLinkedNode(parent.NextSiblingContentId, "next child");
 
                 var prevChild = GenCloneLocked(link);
                 prevChild.NextSiblingContentId = content.NextSiblingContentId;
@@ -726,17 +726,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void AddNodeLocked(ContentNode content)
         {
-            LinkedNode<ContentNode> parentLink;
-
-            if (content.ParentContentId < 0)
-            {
-                parentLink = _root;
-            }
-            else
-            {
-                if (!_contentNodes.TryGetValue(content.ParentContentId, out parentLink) || parentLink.Value == null)
-                    throw new Exception("panic: failed to get parent " + content.ParentContentId);
-            }
+            var parentLink = content.ParentContentId < 0
+                ? _root
+                : GetLinkedNode(content.ParentContentId, "parent");
 
             var parent = parentLink.Value;
 
@@ -747,9 +739,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
             }
 
-            if (!_contentNodes.TryGetValue(parent.FirstChildContentId, out var prevChildLink) || prevChildLink.Value == null)
-                throw new Exception("panic: failed to get first child " + parent.FirstChildContentId);
-
+            var prevChildLink = GetLinkedNode(parent.FirstChildContentId, "first child");
             var prevChild = prevChildLink.Value;
 
             if (prevChild.SortOrder > content.SortOrder)
@@ -763,8 +753,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             while (prevChild.NextSiblingContentId > 0)
             {
-                if (!_contentNodes.TryGetValue(prevChild.NextSiblingContentId, out var link) || link.Value == null)
-                    throw new Exception("panic: failed to get next child " + prevChild.NextSiblingContentId);
+                var link = GetLinkedNode(prevChild.NextSiblingContentId, "next child");
                 var nextChild = link.Value;
 
                 if (nextChild.SortOrder > content.SortOrder)
@@ -872,8 +861,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             while (id > 0)
             {
-                if (!_contentNodes.TryGetValue(id, out var link) || link == null)
-                    throw new Exception("panic: failed to get sibling " + id);
+                var link = GetLinkedNode(id, "sibling");
                 yield return link.Value;
                 id = link.Value.NextSiblingContentId;
             }

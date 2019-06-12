@@ -278,7 +278,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     var content = getById(publishedSnapshot, IsPreviewing, id);
                     if (content == null)
-                        throw new Exception("panic: failed to get content");
+                        throw new Exception($"panic: failed to get content with id={id}");
 
                     yield return content;
 
