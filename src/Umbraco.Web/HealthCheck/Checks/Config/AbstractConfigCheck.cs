@@ -90,7 +90,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get
             {
                 return TextService.Localize("healthcheck/checkSuccessMessage",
-                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath  });
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath });
             }
         }
 
@@ -108,6 +108,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                         new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath });
             }
         }
+
+        /// <summary>
+        /// Gets the message for when the config is missing.
+        /// </summary>
+        public virtual string MissingErrorMessage => string.Empty;
 
         /// <summary>
         /// Gets the rectify success message.
@@ -153,7 +158,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     return new[] { new HealthCheckStatus(successMessage) { ResultType = StatusResultType.Success } };
                 }
 
-                var errorMessage = configValue.Result;
+                var errorMessage = string.IsNullOrWhiteSpace(MissingErrorMessage) ? configValue.Result : MissingErrorMessage;
                 return new[] { new HealthCheckStatus(errorMessage) { ResultType = StatusResultType.Error } };
             }
 
