@@ -664,6 +664,89 @@ namespace Umbraco.Tests.PublishedContent
             AssertDocuments(documents, "N1-fr-FR", "N4-fr-FR", null /*11*/, "N12-fr-FR", null /*5*/, "N6-fr-FR");
         }
 
+        [Test]
+        public void RemoveTest()
+        {
+            Init(GetInvariantKits());
+
+            var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
+            _snapshotAccessor.PublishedSnapshot = snapshot;
+
+            var documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1", "N2", "N3");
+
+            documents = snapshot.Content.GetById(1).Children().ToArray();
+            AssertDocuments(documents, "N4", "N5", "N6");
+
+            documents = snapshot.Content.GetById(2).Children().ToArray();
+            AssertDocuments(documents, "N9", "N8", "N7");
+
+            // notify
+            _snapshotService.Notify(new[]
+            {
+                new ContentCacheRefresher.JsonPayload(3, TreeChangeTypes.Remove), // remove last
+                new ContentCacheRefresher.JsonPayload(5, TreeChangeTypes.Remove), // remove middle
+                new ContentCacheRefresher.JsonPayload(9, TreeChangeTypes.Remove), // remove first
+            }, out _, out _);
+
+            documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1", "N2");
+
+            documents = snapshot.Content.GetById(1).Children().ToArray();
+            AssertDocuments(documents, "N4", "N6");
+
+            documents = snapshot.Content.GetById(2).Children().ToArray();
+            AssertDocuments(documents, "N8", "N7");
+
+            // notify
+            _snapshotService.Notify(new[]
+            {
+                new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.Remove), // remove first
+                new ContentCacheRefresher.JsonPayload(8, TreeChangeTypes.Remove), // remove
+                new ContentCacheRefresher.JsonPayload(7, TreeChangeTypes.Remove), // remove
+            }, out _, out _);
+
+            documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N2");
+
+            documents = snapshot.Content.GetById(2).Children().ToArray();
+            AssertDocuments(documents);
+        }
+
+        [Test]
+        public void UpdateTest()
+        {
+            Init(GetInvariantKits());
+
+            var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
+            _snapshotAccessor.PublishedSnapshot = snapshot;
+
+            var documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1", "N2", "N3");
+
+            documents = snapshot.Content.GetById(1).Children().ToArray();
+            AssertDocuments(documents, "N4", "N5", "N6");
+
+            documents = snapshot.Content.GetById(2).Children().ToArray();
+            AssertDocuments(documents, "N9", "N8", "N7");
+
+            // notify
+            _snapshotService.Notify(new[]
+            {
+                new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.RefreshBranch),
+                new ContentCacheRefresher.JsonPayload(2, TreeChangeTypes.RefreshNode),
+            }, out _, out _);
+
+            documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1", "N2", "N3");
+
+            documents = snapshot.Content.GetById(1).Children().ToArray();
+            AssertDocuments(documents, "N4", "N5", "N6");
+
+            documents = snapshot.Content.GetById(2).Children().ToArray();
+            AssertDocuments(documents, "N9", "N8", "N7");
+        }
+
         private void AssertDocuments(IPublishedContent[] documents, params string[] names)
         {
             Assert.AreEqual(names.Length, documents.Length);
