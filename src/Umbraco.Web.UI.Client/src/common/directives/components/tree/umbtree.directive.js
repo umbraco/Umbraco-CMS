@@ -229,11 +229,9 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             }
 
             /** Method to load in the tree data */
-
             function loadTree() {
-                if (!$scope.loading && $scope.section) {
-                    $scope.loading = true;
-                    
+                if ($scope.section) {
+
                     //default args
                     var args = { section: $scope.section, tree: $scope.treealias, cacheKey: $scope.cachekey, isDialog: $scope.isdialog ? $scope.isdialog : false };
 
@@ -244,20 +242,22 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
                     return treeService.getTree(args)
                         .then(function (data) {
-
+                            //Only use the tree data, if we are still on the correct section
+                            if(data.alias !==  $scope.section){
+                                return $q.reject();
+                            }
+                            
                             //set the data once we have it
                             $scope.tree = data;
-
-                            $scope.loading = false;
 
                             //set the root as the current active tree
                             $scope.activeTree = $scope.tree.root;
 
                             emitEvent("treeLoaded", { tree: $scope.tree });
                             emitEvent("treeNodeExpanded", { tree: $scope.tree, node: $scope.tree.root, children: $scope.tree.root.children });
+                         
                             return $q.when(data);
                         }, function (reason) {
-                            $scope.loading = false;
                             notificationsService.error("Tree Error", reason);
                             return $q.reject(reason);
                         });
