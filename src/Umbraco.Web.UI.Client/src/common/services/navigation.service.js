@@ -13,7 +13,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($routeParams, $location, $route, $q, $timeout, $injector, eventsService, umbModelMapper, treeService, appState) {
+function navigationService($routeParams, $location, $q, $injector, eventsService, umbModelMapper, treeService, appState) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();

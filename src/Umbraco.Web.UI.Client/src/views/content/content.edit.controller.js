@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $rootScope, $routeParams, contentResource) {
+function ContentEditController($scope, $routeParams, contentResource) {
 
     var infiniteMode = $scope.model && $scope.model.infiniteMode;
 
