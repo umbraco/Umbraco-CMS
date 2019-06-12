@@ -18,6 +18,9 @@
                         <a class="umb-nested-content__icon umb-nested-content__icon--move" title="{{moveIconTitle}}" ng-click="$event.stopPropagation();" ng-show="$parent.nodes.length > 1" prevent-default>
                             <i class="icon icon-navigation"></i>
                         </a>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" title="{{copyIconTitle}}" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.copyNode($index); $event.stopPropagation();" prevent-default>
+                            <i class="icon icon-split"></i>
+                        </a>
                         <a class="umb-nested-content__icon umb-nested-content__icon--delete" title="{{deleteIconTitle}}" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
                             <i class="icon icon-trash"></i>
                         </a>
