@@ -1930,7 +1930,7 @@ namespace Umbraco.Core.Services.Implement
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+                var descendants = GetPagedDescendantsLocked(originalPath, page, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
                 foreach (var descendant in descendants)
                 {
                     moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
