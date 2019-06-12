@@ -628,7 +628,7 @@
                     $scope.page.buttonGroupState = "success";
                 }, function () {
                     $scope.page.buttonGroupState = "error";
-                });;
+                });
             }
         };
 

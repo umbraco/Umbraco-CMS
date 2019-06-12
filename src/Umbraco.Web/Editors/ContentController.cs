@@ -717,11 +717,7 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.PublishNew:
                     {
                         var publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
-                        //global notifications
-                        AddMessageForPublishStatus(new[] { publishStatus }, globalNotifications, successfulCultures);
-                        //variant specific notifications
-                        foreach (var c in successfulCultures)
-                            AddMessageForPublishStatus(new[] { publishStatus }, notifications.GetOrCreate(c), successfulCultures);
+                        AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
                     }
                     break;
                 case ContentSaveAction.PublishWithDescendants:
@@ -737,12 +733,7 @@ namespace Umbraco.Web.Editors
                         }
 
                         var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
-
-                        //global notifications
-                        AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
-                        //variant specific notifications
-                        foreach (var c in successfulCultures ?? Array.Empty<string>())
-                            AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                        AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                     }
                     break;
                 case ContentSaveAction.PublishWithDescendantsForce:
@@ -758,12 +749,7 @@ namespace Umbraco.Web.Editors
                         }
 
                         var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
-
-                        //global notifications
-                        AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
-                        //variant specific notifications
-                        foreach (var c in successfulCultures ?? Array.Empty<string>())
-                            AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                        AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                     }
                     break;
                 default:
@@ -799,6 +785,15 @@ namespace Umbraco.Web.Editors
             display.PersistedContent = contentItem.PersistedContent;
 
             return display;
+        }
+
+        private void AddPublishStatusNotifications(IReadOnlyCollection<PublishResult> publishStatus, SimpleNotificationModel globalNotifications, Dictionary<string, SimpleNotificationModel> variantNotifications, string[] successfulCultures)
+        {
+            //global notifications
+            AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
+            //variant specific notifications
+            foreach (var c in successfulCultures ?? Array.Empty<string>())
+                AddMessageForPublishStatus(publishStatus, variantNotifications.GetOrCreate(c), successfulCultures);
         }
 
         /// <summary>
@@ -1215,7 +1210,7 @@ namespace Umbraco.Web.Editors
                 //its invariant, proceed normally
                 var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
-                successfulCultures = Array.Empty<string>();
+                successfulCultures = null; //must be null! this implies invariant
                 return publishStatus;
             }
 
