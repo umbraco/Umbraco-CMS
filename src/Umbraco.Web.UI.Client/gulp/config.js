@@ -46,7 +46,6 @@ module.exports = {
         js: "Umbraco/js/",
         lib: "Umbraco/lib/",
         views: "Umbraco/views/",
-        plugins: "App_Plugins/",
         css: "Umbraco/assets/css/",
         assets: "Umbraco/assets/"
     }
