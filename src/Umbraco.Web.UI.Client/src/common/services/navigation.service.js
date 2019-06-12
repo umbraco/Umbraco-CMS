@@ -32,7 +32,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
     var nonRoutingQueryStrings = ["mculture", "cculture", "lq"];
     var retainedQueryStrings = ["mculture"];
     //A list of trees that don't cause a route when creating new items (TODO: eventually all trees should do this!)
-    var nonRoutingTreesOnCreate = ["content"];
+    var nonRoutingTreesOnCreate = ["content", "contentblueprints"];
         
     function setMode(mode) {
         switch (mode) {
