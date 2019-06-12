@@ -1,11 +1,14 @@
-(function() {
+(function () {
     "use strict";
 
     function HealthCheckController(healthCheckResource) {
-        var SUCCESS = 0;
-        var WARNING = 1;
-        var ERROR = 2;
-        var INFO = 3;
+        const SUCCESS = 0,
+            WARNING = 1,
+            ERROR = 2,
+            INFO = 3;
+
+        // property types
+        const CONTENT_PICKER = 'contentpicker';
 
         var vm = this;
 
@@ -21,30 +24,9 @@
         vm.setViewState = setViewState;
         vm.parseRegex = parseRegex;
 
-        var contentPickerConfig = // used to assign to property pickers of type contentpicker
-        {
-            view: 'contentpicker',
-            config: {
-                multiPicker: "1",
-                entityType: "Document",
-                idType: "udi",
-                startNode: {
-                    query: "",
-                    type: "content",
-                    id: -1
-                },
-                filter: "",
-                minNumber: 1,
-                maxNumber: 1
-            },
-            value: "",
-            alias: "contentPicker"
-        };
-
-
         // Get a (grouped) list of all health checks
         healthCheckResource.getAllChecks()
-            .then(function(response) {
+            .then(function (response) {
                 vm.groups = response;
             });
 
@@ -56,22 +38,22 @@
 
             // count total number of statusses
             angular.forEach(group.checks,
-                function(check) {
+                function (check) {
                     angular.forEach(check.status,
-                        function(status) {
+                        function (status) {
                             switch (status.resultType) {
-                            case SUCCESS:
-                                totalSuccess = totalSuccess + 1;
-                                break;
-                            case WARNING:
-                                totalWarning = totalWarning + 1;
-                                break;
-                            case ERROR:
-                                totalError = totalError + 1;
-                                break;
-                            case INFO:
-                                totalInfo = totalInfo + 1;
-                                break;
+                                case SUCCESS:
+                                    totalSuccess = totalSuccess + 1;
+                                    break;
+                                case WARNING:
+                                    totalWarning = totalWarning + 1;
+                                    break;
+                                case ERROR:
+                                    totalError = totalError + 1;
+                                    break;
+                                case INFO:
+                                    totalInfo = totalInfo + 1;
+                                    break;
                             }
                         });
                 });
@@ -88,7 +70,7 @@
             check.loading = true;
             check.status = null;
             healthCheckResource.getStatus(check.id)
-                .then(function(response) {
+                .then(function (response) {
                     check.loading = false;
                     check.status = response;
                 });
@@ -96,13 +78,13 @@
 
         function executeAction(check, index, action) {
 
-            if (action.providedValuePropertyType === 'contentpicker') {
+            if (action.providedValuePropertyType === CONTENT_PICKER) {
                 action.providedValue = action.picker.value;
             }
 
             check.loading = true;
             healthCheckResource.executeAction(action)
-                .then(function(response) {
+                .then(function (response) {
                     check.status[index] = response;
                     check.loading = false;
                 });
@@ -122,21 +104,22 @@
             group.loading = true;
 
             angular.forEach(checks,
-                function(check) {
+                function (check) {
 
                     check.loading = true;
 
                     healthCheckResource.getStatus(check.id)
-                        .then(function(response) {
+                        .then(function (response) {
                             check.status = response;
-                            
+
                             if (response.length > 0) {
 
                                 angular.forEach(response[0].actions,
                                     function (action) {
-                                        if (action.providedValuePropertyType === 'contentpicker') { // check if the property type is a content picker and assign a content picker config
+                                        if (action.providedValuePropertyType === CONTENT_PICKER) { // check if the property type is a content picker and assign a content picker config
                                             action.picker = {}; // assign empty object
-                                            angular.extend(action.picker, contentPickerConfig);
+                                            let contentPicker = initContentPicker();
+                                            angular.extend(action.picker, contentPicker);
                                         }
                                     });
 
@@ -173,6 +156,28 @@
 
         function parseRegex(regexAsString) {
             return new RegExp(regexAsString);
+        }
+
+        function initContentPicker(minNumber, maxNumber) {
+            // used to assign to property pickers of type contentpicker        
+            return {
+                view: CONTENT_PICKER,
+                config: {
+                    multiPicker: "1",
+                    entityType: "Document",
+                    idType: "udi",
+                    startNode: {
+                        query: "",
+                        type: "content",
+                        id: -1
+                    },
+                    filter: "",
+                    minNumber: minNumber || 1,
+                    maxNumber: maxNumber || 1
+                },
+                value: "",
+                alias: "contentPicker"
+            };
         }
     }
 
