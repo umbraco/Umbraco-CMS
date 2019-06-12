@@ -643,7 +643,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (id > 0)
             {
                 if (!_contentNodes.TryGetValue(id, out var link) || link.Value == null)
-                    throw new Exception("panic: failed to get child");
+                    throw new Exception("panic: failed to get child " + id);
                 ClearBranchLocked(link.Value);
                 id = link.Value.NextSiblingContentId;
             }
@@ -667,7 +667,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             else
             {
                 if (!_contentNodes.TryGetValue(content.ParentContentId, out parentLink) || parentLink.Value == null)
-                    throw new Exception("panic: failed to get parent");
+                    throw new Exception("panic: failed to get parent " + content.ParentContentId);
             }
 
             var parent = parentLink.Value;
@@ -680,11 +680,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             else
             {
                 if (!_contentNodes.TryGetValue(parent.FirstChildContentId, out var link) || link.Value == null)
-                    throw new Exception("panic: failed to get first child");
+                    throw new Exception("panic: failed to get first child " + parent.FirstChildContentId);
 
                 while (link.Value.NextSiblingContentId != content.Id)
                     if (!_contentNodes.TryGetValue(parent.NextSiblingContentId, out link) || link.Value == null)
-                        throw new Exception("panic: failed to get next sibling");
+                        throw new Exception("panic: failed to get next sibling " + parent.NextSiblingContentId);
 
                 var prevChild = GenCloneLocked(link);
                 prevChild.NextSiblingContentId = content.NextSiblingContentId;
@@ -735,7 +735,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             else
             {
                 if (!_contentNodes.TryGetValue(content.ParentContentId, out parentLink) || parentLink.Value == null)
-                    throw new Exception("panic: failed to get parent");
+                    throw new Exception("panic: failed to get parent " + content.ParentContentId);
             }
 
             var parent = parentLink.Value;
@@ -748,7 +748,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             if (!_contentNodes.TryGetValue(parent.FirstChildContentId, out var prevChildLink) || prevChildLink.Value == null)
-                throw new Exception("panic: failed to get first child");
+                throw new Exception("panic: failed to get first child " + parent.FirstChildContentId);
 
             var prevChild = prevChildLink.Value;
 
@@ -764,7 +764,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (prevChild.NextSiblingContentId > 0)
             {
                 if (!_contentNodes.TryGetValue(prevChild.NextSiblingContentId, out var link) || link.Value == null)
-                    throw new Exception("panic: failed to get next child");
+                    throw new Exception("panic: failed to get next child " + prevChild.NextSiblingContentId);
                 var nextChild = link.Value;
 
                 if (nextChild.SortOrder > content.SortOrder)
@@ -873,7 +873,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (id > 0)
             {
                 if (!_contentNodes.TryGetValue(id, out var link) || link == null)
-                    throw new Exception("panic: failed to get sibling");
+                    throw new Exception("panic: failed to get sibling " + id);
                 yield return link.Value;
                 id = link.Value.NextSiblingContentId;
             }
