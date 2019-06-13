@@ -201,9 +201,6 @@ namespace Umbraco.Web.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
-        //internal override IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
-        //    => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
-
         protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
         {
             var result = base.GetChildEntities(id, queryStrings);
@@ -327,7 +324,7 @@ namespace Umbraco.Web.Trees
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, false, searchFrom);
+            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }

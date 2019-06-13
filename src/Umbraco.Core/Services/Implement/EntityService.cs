@@ -7,11 +7,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement
@@ -275,22 +273,6 @@ namespace Umbraco.Core.Services.Implement
                 return _entityRepository.GetByQuery(query, objectType.GetGuid());
             }
         }
-
-        ///// <summary>
-        ///// Gets a collection of children by the parent's Id and UmbracoObjectType without adding property data
-        ///// </summary>
-        ///// <param name="parentId">Id of the parent to retrieve children for</param>
-        ///// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        //internal IEnumerable<IEntitySlim> GetMediaChildrenWithoutPropertyData(int parentId)
-        //{
-        //    using (ScopeProvider.CreateScope(autoComplete: true))
-        //    {
-        //        var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
-
-        //        // TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
-        //        return ((EntityRepository)_entityRepository).GetMediaByQueryWithoutPropertyData(query);
-        //    }
-        //}
 
         /// <inheritdoc />
         public virtual IEnumerable<IEntitySlim> GetDescendants(int id)

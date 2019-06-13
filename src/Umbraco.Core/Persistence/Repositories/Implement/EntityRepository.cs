@@ -240,21 +240,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return GetEntities(sql, isContent, isMedia);
         }
 
-        //// TODO: See https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
-        //internal IEnumerable<IEntitySlim> GetMediaByQueryWithoutPropertyData(IQuery<IUmbracoEntity> query)
-        //{
-        //    var isContent = false;
-        //    var isMedia = true;
-
-        //    var sql = GetBaseWhere(isContent, isMedia, false, null, Constants.ObjectTypes.Media);
-
-        //    var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
-        //    sql = translator.Translate();
-        //    sql = AddGroupBy(isContent, isMedia, sql, true);
-
-        //    return GetEntities(sql, isContent, isMedia, false);
-        //}
-
         public UmbracoObjectTypes GetObjectType(int id)
         {
             var sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
@@ -278,41 +263,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
             return Database.ExecuteScalar<int>(sql) > 0;
         }
-
-        //// TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
-        //private void BuildProperties(EntitySlim entity, BaseDto dto)
-        //{
-        //    var pdtos = Database.Fetch<PropertyDataDto>(GetPropertyData(dto.VersionId));
-        //    foreach (var pdto in pdtos)
-        //        BuildProperty(entity, pdto);
-        //}
-
-        //// TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
-        //private void BuildProperties(EntitySlim[] entities, List<BaseDto> dtos)
-        //{
-        //    var versionIds = dtos.Select(x => x.VersionId).Distinct().ToList();
-        //    var pdtos = Database.FetchByGroups<PropertyDataDto, int>(versionIds, 2000, GetPropertyData);
-
-        //    var xentity = entities.ToDictionary(x => x.Id, x => x); // nodeId -> entity
-        //    var xdto = dtos.ToDictionary(x => x.VersionId, x => x.NodeId); // versionId -> nodeId
-        //    foreach (var pdto in pdtos)
-        //    {
-        //        var nodeId = xdto[pdto.VersionId];
-        //        var entity = xentity[nodeId];
-        //        BuildProperty(entity, pdto);
-        //    }
-        //}
-
-        //// TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
-        //private void BuildProperty(EntitySlim entity, PropertyDataDto pdto)
-        //{
-        //    // explain ?!
-        //    var value = string.IsNullOrWhiteSpace(pdto.TextValue)
-        //        ? pdto.VarcharValue
-        //        : pdto.TextValue.ConvertToJsonIfPossible();
-
-        //    entity.AdditionalData[pdto.PropertyTypeDto.Alias] = new EntitySlim.PropertySlim(pdto.PropertyTypeDto.DataTypeDto.EditorAlias, value);
-        //}
 
         private DocumentEntitySlim BuildVariants(DocumentEntitySlim entity)
             => BuildVariants(new[] { entity }).First();
@@ -398,27 +348,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sql = GetBaseWhere(isContent, isMedia, false, filter, objectType);
             return AddGroupBy(isContent, isMedia, sql, true);
         }
-
-        //private Sql<ISqlContext> GetPropertyData(int versionId)
-        //{
-        //    return Sql()
-        //        .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
-        //        .From<PropertyDataDto>()
-        //        .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
-        //        .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
-        //        .Where<PropertyDataDto>(x => x.VersionId == versionId);
-        //}
-
-        //private Sql<ISqlContext> GetPropertyData(IEnumerable<int> versionIds)
-        //{
-        //    return Sql()
-        //        .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
-        //        .From<PropertyDataDto>()
-        //        .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
-        //        .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
-        //        .WhereIn<PropertyDataDto>(x => x.VersionId, versionIds)
-        //        .OrderBy<PropertyDataDto>(x => x.VersionId);
-        //}
 
         // gets the base SELECT + FROM [+ filter] sql
         // always from the 'current' content version
@@ -582,23 +511,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #endregion
 
         #region Classes
-
-        //[ExplicitColumns]
-        //internal class UmbracoPropertyDto
-        //{
-        //    [Column("propertyEditorAlias")]
-        //    public string PropertyEditorAlias { get; set; }
-
-        //    [Column("propertyTypeAlias")]
-        //    public string PropertyAlias { get; set; }
-
-        //    [Column("varcharValue")]
-        //    public string VarcharValue { get; set; }
-
-        //    [Column("textValue")]
-        //    public string TextValue { get; set; }
-        //}
-
 
         /// <summary>
         /// The DTO used to fetch results for a content item with its variation info
