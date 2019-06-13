@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Composing;
@@ -70,6 +69,163 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="urlHelper"></param>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <param name="htmlEncode">
+        /// Whether to HTML encode this URL - default is true - w3c standards require HTML attributes to be HTML encoded but this can be
+        /// set to false if using the result of this method for CSS.
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string culture, string cropAlias, bool htmlEncode = true)
+        {
+            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, culture: culture, cropAlias: cropAlias, useCropDimensions: true);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="urlHelper"></param>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="fallback">
+        /// The property's optional fallback strategy.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <param name="htmlEncode">
+        /// Whether to HTML encode this URL - default is true - w3c standards require HTML attributes to be HTML encoded but this can be
+        /// set to false if using the result of this method for CSS.
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, Fallback fallback, string cropAlias, bool htmlEncode = true)
+        {
+            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, fallback: fallback, cropAlias: cropAlias, useCropDimensions: true);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="urlHelper"></param>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="segment">
+        /// The property's variation segment.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <param name="htmlEncode">
+        /// Whether to HTML encode this URL - default is true - w3c standards require HTML attributes to be HTML encoded but this can be
+        /// set to false if using the result of this method for CSS.
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string culture, string segment, string cropAlias, bool htmlEncode = true)
+        {
+            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, culture: culture, segment: segment, cropAlias: cropAlias, useCropDimensions: true);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="urlHelper"></param>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="fallback">
+        /// The property's optional fallback strategy.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <param name="htmlEncode">
+        /// Whether to HTML encode this URL - default is true - w3c standards require HTML attributes to be HTML encoded but this can be
+        /// set to false if using the result of this method for CSS.
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string culture, Fallback fallback, string cropAlias, bool htmlEncode = true)
+        {
+            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, culture: culture, fallback: fallback, cropAlias: cropAlias, useCropDimensions: true);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="urlHelper"></param>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="segment">
+        /// The property's variation segment.
+        /// </param>
+        /// <param name="fallback">
+        /// The property's optional fallback strategy.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <param name="htmlEncode">
+        /// Whether to HTML encode this URL - default is true - w3c standards require HTML attributes to be HTML encoded but this can be
+        /// set to false if using the result of this method for CSS.
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string culture, string segment, Fallback fallback, string cropAlias, bool htmlEncode = true)
+        {
+            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, culture: culture, segment: segment, fallback: fallback, cropAlias: cropAlias, useCropDimensions: true);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+        }
+
+        /// <summary>
         /// Gets the ImageProcessor Url from the image path.
         /// </summary>
         /// <param name="mediaItem">
@@ -83,6 +239,15 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="propertyAlias">
         /// Property alias of the property containing the Json data.
+        /// </param>
+        /// <param name="culture">
+        /// The property's variation language.
+        /// </param>
+        /// <param name="segment">
+        /// The property's variation segment.
+        /// </param>
+        /// <param name="fallback">
+        /// The property's optional fallback strategy.
         /// </param>
         /// <param name="cropAlias">
         /// The crop alias.
@@ -132,6 +297,9 @@ namespace Umbraco.Web
             int? width = null,
             int? height = null,
             string propertyAlias = Umbraco.Core.Constants.Conventions.Media.File,
+            string culture = null,
+            string segment = null,
+            Fallback fallback = default,
             string cropAlias = null,
             int? quality = null,
             ImageCropMode? imageCropMode = null,
@@ -144,7 +312,7 @@ namespace Umbraco.Web
             bool upScale = true,
             bool htmlEncode = true)
         {
-            var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
+            var url = mediaItem.GetCropUrl(width, height, propertyAlias, culture, segment, fallback, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
                 upScale);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
