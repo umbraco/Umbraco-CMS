@@ -229,21 +229,21 @@
                                 
                                 
                                 console.log("File uploaded, data: ", data);
-                                
-                                var file = data.uploadedfiles[0];
-                                if(file) {
+                                /*
+                                var media = data.medias[0];
+                                if(media) {
                                     
                                     // set UDI.. so far it has only been posible for me to set this attribute, which becomes part of the data-trix-attachment attribute on the figure element.
-                                    attachment.setAttributes({"udi": file.Id});
+                                    attachment.setAttributes({"udi": media.Id});
                                     
                                     // set the url, Trix will parse on this variable to the img element as src attribute.
-                                    attachment.setAttributes({"url": file.TempFilePath});
+                                    attachment.setAttributes({"url": media.Url});
                                     
                                 } else {
                                     // something failed, so we will remove the file again.
                                     attachment.remove();
                                 }
-                                
+                                */
                             }
                             
                             //after processing, test if everthing is done
