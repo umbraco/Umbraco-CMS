@@ -155,6 +155,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
+            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
+
             // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
 
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
@@ -183,7 +185,7 @@ namespace Umbraco.Web.Editors
                 //this is only possible when using a membership provider if the membership provider supports AllowManuallyChangingPassword
                 if (passwordModel.NewPassword.IsNullOrWhiteSpace() == false)
                 {
-                    if (membershipProvider is MembershipProviderBase umbracoBaseProvider && umbracoBaseProvider.AllowManuallyChangingPassword)
+                    if (umbracoBaseProvider !=null && umbracoBaseProvider.AllowManuallyChangingPassword)
                     {
                         //this provider allows manually changing the password without the old password, so we can just do it
                         try
