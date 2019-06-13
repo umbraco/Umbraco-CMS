@@ -249,6 +249,8 @@
     <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
     <Compile Include="Models\CultureImpact.cs" />
+    <Compile Include="Models\Entities\IMediaEntitySlim.cs" />
+    <Compile Include="Models\Entities\MediaEntitySlim.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />

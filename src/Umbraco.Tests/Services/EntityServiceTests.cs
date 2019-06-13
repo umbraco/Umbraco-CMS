@@ -675,15 +675,10 @@ namespace Umbraco.Tests.Services
 
             foreach (var entity in entities)
             {
-                Console.WriteLine();
-                foreach (var data in entity.AdditionalData)
-                {
-                    Console.WriteLine($"{entity.Id} {data.Key} {data.Value} {(data.Value is EntitySlim.PropertySlim p ? p.PropertyEditorAlias : "")}");
-                }
+                Assert.IsTrue(entity.GetType().Implements<IMediaEntitySlim>());
+                Console.WriteLine(((IMediaEntitySlim)entity).MediaPath);
+                Assert.IsNotEmpty(((IMediaEntitySlim)entity).MediaPath);
             }
-
-            Assert.That(entities.Any(x =>
-                x.AdditionalData.Any(y => y.Value is EntitySlim.PropertySlim && ((EntitySlim.PropertySlim)y.Value).PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)), Is.True);
         }
 
         [Test]

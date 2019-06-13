@@ -75,6 +75,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 dtos = page.Items;
                 totalRecords = page.TotalItems;
             }
+            else if (isMedia)
+            {
+                var page = Database.Page<MediaEntityDto>(pageIndexToFetch, pageSize, sql);
+                dtos = page.Items;
+                totalRecords = page.TotalItems;
+            }
             else
             {
                 var page = Database.Page<BaseDto>(pageIndexToFetch, pageSize, sql);
@@ -86,10 +92,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (isContent)
                 BuildVariants(entities.Cast<DocumentEntitySlim>());
-
-            //// TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
-            //if (isMedia)
-            //    BuildProperties(entities, dtos.ToList());
 
             return entities;
         }
@@ -112,13 +114,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 return cdtos.Count == 0 ? null : BuildVariants(BuildDocumentEntity(cdtos[0]));
             }
 
-            var dto = Database.FirstOrDefault<BaseDto>(sql);
+            var dto = isMedia
+                    ? Database.FirstOrDefault<MediaEntityDto>(sql)
+                    : Database.FirstOrDefault<BaseDto>(sql);
+
             if (dto == null) return null;
 
             var entity = BuildEntity(false, isMedia, dto);
-
-            //if (isMedia)
-            //    BuildProperties(entity, dto);
 
             return entity;
         }
@@ -174,14 +176,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     : BuildVariants(cdtos.Select(BuildDocumentEntity)).ToList();
             }
 
-            var dtos = Database.Fetch<BaseDto>(sql);
-            if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
+            var dtos = isMedia
+                    ? (IEnumerable<BaseDto>)Database.Fetch<MediaEntityDto>(sql)
+                    : Database.Fetch<BaseDto>(sql);
 
             var entities = dtos.Select(x => BuildEntity(false, isMedia, x)).ToArray();
-
-            //// TODO: See https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
-            //if (isMedia && loadMediaProperties)
-            //    BuildProperties(entities, dtos);
 
             return entities;
         }
@@ -424,7 +423,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // gets the base SELECT + FROM [+ filter] sql
         // always from the 'current' content version
         protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, Action<Sql<ISqlContext>> filter, bool isCount = false)
-        {
+         {
             var sql = Sql();
 
             if (isCount)
@@ -448,6 +447,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     sql
                         .AndSelect<DocumentDto>(x => x.Published, x => x.Edited);
                 }
+
+                if (isMedia)
+                {
+                    sql
+                        .AndSelect<MediaVersionDto>(x => Alias(x.Path, "MediaPath"));
+                }
             }
 
             sql
@@ -465,6 +470,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 sql
                     .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId);
+            }
+
+            if (isMedia)
+            {
+                sql
+                    .InnerJoin<MediaVersionDto>().On<ContentVersionDto, MediaVersionDto>((left, right) => left.Id == right.Id);
             }
 
             //Any LeftJoin statements need to come last
@@ -536,6 +547,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .AndBy<DocumentDto>(x => x.Published, x => x.Edited);
             }
 
+            if (isMedia)
+            {
+                sql
+                    .AndBy<MediaVersionDto>(x => Alias(x.Path, "MediaPath"));
+            }
+
 
             if (isContent || isMedia)
                 sql
@@ -594,6 +611,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public bool Edited { get; set; }
         }
 
+        private class MediaEntityDto : BaseDto
+        {
+            public string MediaPath { get; set; }
+        }
+
         public class VariantInfoDto
         {
             public int NodeId { get; set; }
@@ -645,7 +667,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (isContent)
                 return BuildDocumentEntity(dto);
             if (isMedia)
-                return BuildContentEntity(dto);
+                return BuildMediaEntity(dto);
 
             // EntitySlim does not track changes
             var entity = new EntitySlim();
@@ -678,11 +700,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ContentTypeThumbnail = dto.Thumbnail;
         }
 
-        private static EntitySlim BuildContentEntity(BaseDto dto)
+        private MediaEntitySlim BuildMediaEntity(BaseDto dto)
         {
             // EntitySlim does not track changes
-            var entity = new ContentEntitySlim();
+            var entity = new MediaEntitySlim();
             BuildContentEntity(entity, dto);
+
+            if (dto is MediaEntityDto contentDto)
+            {
+                // fill in the media info
+                entity.MediaPath = contentDto.MediaPath;
+            }
+
             return entity;
         }
 

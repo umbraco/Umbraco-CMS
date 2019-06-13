@@ -111,52 +111,6 @@ namespace Umbraco.Core.Models.Entities
         public virtual bool IsContainer { get; set; }
 
 
-        /// <summary>
-        /// Represents a lightweight property.
-        /// </summary>
-        public class PropertySlim
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="PropertySlim"/> class.
-            /// </summary>
-            public PropertySlim(string editorAlias, object value)
-            {
-                PropertyEditorAlias = editorAlias;
-                Value = value;
-            }
-
-            /// <summary>
-            /// Gets the property editor alias.
-            /// </summary>
-            public string PropertyEditorAlias { get; }
-
-            /// <summary>
-            /// Gets the property value.
-            /// </summary>
-            public object Value { get; }
-
-            protected bool Equals(PropertySlim other)
-            {
-                return PropertyEditorAlias.Equals(other.PropertyEditorAlias) && Equals(Value, other.Value);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != GetType()) return false;
-                return Equals((PropertySlim) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (PropertyEditorAlias.GetHashCode() * 397) ^ (Value != null ? Value.GetHashCode() : 0);
-                }
-            }
-        }
-
         #region IDeepCloneable
 
         /// <inheritdoc />
