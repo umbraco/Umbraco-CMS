@@ -373,20 +373,32 @@ angular.module("umbraco")
                 mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
                 mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
                 // set properties to match a media object
-                if (mediaItem.metaData &&
-                    mediaItem.metaData.umbracoWidth &&
-                    mediaItem.metaData.umbracoHeight) {
-
-                    mediaItem.properties = [
-                        {
-                            alias: "umbracoWidth",
-                            value: mediaItem.metaData.umbracoWidth.Value
-                        },
-                        {
-                            alias: "umbracoHeight",
-                            value: mediaItem.metaData.umbracoHeight.Value
-                        }
-                    ];
+                if (mediaItem.metaData) {
+                    mediaItem.properties = [];
+                    if (mediaItem.metaData.umbracoWidth && mediaItem.metaData.umbracoHeight) {
+                        mediaItem.properties.push(
+                            {
+                                alias: "umbracoWidth",
+                                editor: mediaItem.metaData.umbracoWidth.PropertyEditorAlias,
+                                value: mediaItem.metaData.umbracoWidth.Value
+                            },
+                            {
+                                alias: "umbracoHeight",
+                                editor: mediaItem.metaData.umbracoHeight.PropertyEditorAlias,
+                                value: mediaItem.metaData.umbracoHeight.Value
+                            }
+                        );
+                    }
+                    if (mediaItem.metaData.umbracoFile) {
+                        // this is required for resolving files through the mediahelper
+                        mediaItem.properties.push(
+                            {
+                                alias: "umbracoFile",
+                                editor: mediaItem.metaData.umbracoFile.PropertyEditorAlias,
+                                value: mediaItem.metaData.umbracoFile.Value
+                            }
+                        );
+                    }
                 }
             }
 
