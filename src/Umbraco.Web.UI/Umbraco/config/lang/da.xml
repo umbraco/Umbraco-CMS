@@ -446,7 +446,8 @@
     <key alias="linkYour">Link dit</key>
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
-    <key alias="selectEditor">Vælg editor</key>
+    <key alias="selectEditor">Vælg input type</key>
+    <key alias="selectEditorConfiguration">Vælg konfiguration</key>
     <key alias="selectSnippet">Vælg snippet</key>
     <key alias="variantdeletewarning">Dette vil slette noden og alle dets sprog. Hvis du kun vil slette et sprog, så afpublicér det i stedet.</key>
   </area>
@@ -1295,9 +1296,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.</key>
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
     <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
-    <key alias="availableEditors">Tilgængelige editors</key>
+    <key alias="availableEditors">Opret ny indstilling</key>
     <key alias="reuse">Genbrug</key>
-    <key alias="editorSettings">Editor indstillinger</key>
+    <key alias="editorSettings">Input indstillinger</key>
+    <key alias="searchResultSettings">Tilgængelige indstillinger</key>
+    <key alias="searchResultEditors">Opret ny indstilling</key>
     <key alias="configuration">Konfiguration</key>
     <key alias="yesDelete">Ja, slet</key>
     <key alias="movedUnderneath">blev flyttet til</key>

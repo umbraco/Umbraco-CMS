@@ -468,6 +468,7 @@
     <key alias="unLinkYour">Un-link your</key>
     <key alias="account">account</key>
     <key alias="selectEditor">Select editor</key>
+    <key alias="selectEditorConfiguration">Select configuration</key>
     <key alias="selectSnippet">Select snippet</key>
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</key>
   </area>
@@ -1576,6 +1577,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
+    <key alias="searchResultSettings">Available configurations</key>
+    <key alias="searchResultEditors">Create a new configuration</key>
     <key alias="configuration">Configuration</key>
     <key alias="yesDelete">Yes, delete</key>
     <key alias="movedUnderneath">was moved underneath</key>
