@@ -1106,6 +1106,17 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 
+        /// <summary>
+        /// Returns true or false depending on whether content nodes have been created based on the provided content type id.
+        /// </summary>
+        public bool HasContentNodes(int id)
+        {
+            var sql = new Sql(
+                $"SELECT CASE WHEN EXISTS (SELECT * FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = @id) THEN 1 ELSE 0 END",
+                new { id });
+            return Database.ExecuteScalar<int>(sql) == 1;
+        }
+
         protected override IEnumerable<string> GetDeleteClauses()
         {
             // in theory, services should have ensured that content items of the given content type

@@ -962,6 +962,32 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Can_Verify_Content_Type_Has_Content_Nodes()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                ContentTypeRepository repository;
+                var contentRepository = CreateRepository((IScopeAccessor)provider, out repository);
+                var contentTypeId = NodeDto.NodeIdSeed + 1;
+                var contentType = repository.Get(contentTypeId);
+
+                // Act
+                var result = repository.HasContentNodes(contentTypeId);
+
+                var subpage = MockedContent.CreateTextpageContent(contentType, "Test Page 1", contentType.Id);
+                contentRepository.Save(subpage);
+
+                var result2 = repository.HasContentNodes(contentTypeId);
+
+                // Assert
+                Assert.That(result, Is.False);
+                Assert.That(result2, Is.True);
+            }
+        }
+
         public void CreateTestData()
         {
             //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)

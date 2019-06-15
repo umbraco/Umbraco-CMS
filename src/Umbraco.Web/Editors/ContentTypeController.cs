@@ -65,6 +65,13 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.Count();
         }
 
+        [HttpGet]
+        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        public bool HasContentNodes(int id)
+        {
+            return Services.ContentTypeService.HasContentNodes(id);
+        }
+
         public DocumentTypeDisplay GetById(int id)
         {
             var ct = Services.ContentTypeService.Get(id);

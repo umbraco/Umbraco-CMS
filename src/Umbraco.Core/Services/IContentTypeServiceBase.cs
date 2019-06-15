@@ -39,6 +39,11 @@ namespace Umbraco.Core.Services
 
         int Count();
 
+        /// <summary>
+        /// Returns true or false depending on whether content nodes have been created based on the provided content type id.
+        /// </summary>
+        bool HasContentNodes(int id);
+
         IEnumerable<TItem> GetAll(params int[] ids);
 
         IEnumerable<TItem> GetDescendants(int id, bool andSelf); // parent-child axis

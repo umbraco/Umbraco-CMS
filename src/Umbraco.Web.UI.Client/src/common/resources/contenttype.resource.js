@@ -350,6 +350,16 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateDefaultTemplate", { id: id })),
                 'Failed to create default template for content type with id ' + id);
+        },
+
+        hasContentNodes: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentTypeApiBaseUrl",
+                        "HasContentNodes",
+                        [{ id: id }])),
+                'Failed to retrieve indication for whether content type with id ' + id + ' has associated content nodes');
         }
     };
 }

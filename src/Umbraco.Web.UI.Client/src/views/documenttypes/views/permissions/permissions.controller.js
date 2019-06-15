@@ -25,6 +25,7 @@
         vm.removeChild = removeChild;
         vm.toggleAllowAsRoot = toggleAllowAsRoot;
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.canToggleIsElement = false;
         vm.toggleIsElement = toggleIsElement;
 
         /* ---------- INIT ---------- */
@@ -48,9 +49,16 @@
                 if($scope.model.id === 0) {
                    contentTypeHelper.insertChildNodePlaceholder(vm.contentTypes, $scope.model.name, $scope.model.icon, $scope.model.id);
                 }
-
             });
 
+            // Can only switch to an element type if there are no content nodes already created from the type.
+            if ($scope.model.id > 0 && !$scope.model.isElement ) {
+                contentTypeResource.hasContentNodes($scope.model.id).then(function (result) {
+                    vm.canToggleIsElement = !result;
+                });
+            } else {
+                vm.canToggleIsElement = true;
+            }
         }
 
         function addChild($event) {
