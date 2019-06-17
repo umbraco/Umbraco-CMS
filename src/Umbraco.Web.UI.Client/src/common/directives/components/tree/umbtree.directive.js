@@ -243,7 +243,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                     return treeService.getTree(args)
                         .then(function (data) {
                             //Only use the tree data, if we are still on the correct section
-                            if(data.alias !==  $scope.section){
+                            if(data.alias !== $scope.section){
                                 return $q.reject();
                             }
                             
