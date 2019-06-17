@@ -329,6 +329,7 @@
                         loadAuditTrail();
                         loadRedirectUrls();
                         setNodePublishStatus();
+                        formatDatesToLocal();
                     } else {
                         isInfoTab = false;
                     }
@@ -345,6 +346,7 @@
                     loadAuditTrail(true);
                     loadRedirectUrls();
                     setNodePublishStatus();
+                    formatDatesToLocal();
                 }
                 updateCurrentUrls();
             });
