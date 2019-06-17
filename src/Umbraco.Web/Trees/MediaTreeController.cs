@@ -167,11 +167,5 @@ namespace Umbraco.Web.Trees
             return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
         }
 
-        internal override IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
-            // Not pretty having to cast the service, but it is the only way to get to use an internal method that we
-            // do not want to make public on the interface. Unfortunately also prevents this from being unit tested.
-            // See this issue for details on why we need this:
-            // https://github.com/umbraco/Umbraco-CMS/issues/3457
-            => ((EntityService)Services.EntityService).GetMediaChildrenWithoutPropertyData(entityId).ToList();        
     }
 }
