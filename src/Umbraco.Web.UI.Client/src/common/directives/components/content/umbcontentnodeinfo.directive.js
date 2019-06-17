@@ -328,6 +328,7 @@
                         isInfoTab = true;
                         loadAuditTrail();
                         loadRedirectUrls();
+                        setNodePublishStatus();
                     } else {
                         isInfoTab = false;
                     }
