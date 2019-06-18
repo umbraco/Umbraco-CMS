@@ -14,7 +14,8 @@
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
             <!-- Warning message (if unable to view log files) -->
-            <div ng-show="!vm.loading && !vm.canLoadLogs">
+            <div class="umb-logviewer" ng-show="!vm.loading && !vm.canLoadLogs">
+                <div class="umb-logviewer__main-content">
                 <umb-box>
                     <umb-box-header title="Unable to view logs"/>
                     <umb-box-content>
@@ -22,6 +23,20 @@
                         <p>If you need to view the log files, try opening them manually</p>
                     </umb-box-content>
                 </umb-box>
+                </div>
+                <div class="umb-logviewer__sidebar">
+                    <!-- Time period -->
+                    <umb-box>
+                        <umb-box-header title="Time Period"></umb-box-header>
+
+                        <umb-flatpickr
+                            class="datepicker"
+                            ng-model="vm.period"
+                            options="vm.config"
+                            on-close="vm.dateRangeChange(selectedDates, dateStr, instance)">
+                        </umb-flatpickr>
+                    </umb-box>
+                </div>
             </div>
 
             <div class="umb-logviewer" ng-show="!vm.loading && vm.canLoadLogs">

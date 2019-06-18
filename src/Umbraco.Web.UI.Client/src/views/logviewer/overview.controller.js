@@ -134,7 +134,7 @@
 
         
         
-        preFlightCheck();
+        
 
         
         /////////////////////
@@ -154,7 +154,13 @@
                 vm.startDate = selectedDates[0].toIsoDateString();
                 vm.endDate = selectedDates[selectedDates.length-1].toIsoDateString(); // Take the last date as end
 
-                init();  
+                if(vm.startDate === vm.endDate){
+                    vm.period = [vm.startDate];
+                }else{
+                    vm.period = [vm.startDate, vm.endDate];
+                }
+                
+                preFlightCheck();
             }
 
         }
