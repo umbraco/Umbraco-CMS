@@ -411,18 +411,7 @@ namespace Umbraco.Web.Trees
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            // TODO: inject
-            var actions = Current.Actions.FromEntityPermission(permission)
-                .ToList();
-
-            var actionDelete = Current.Actions.GetAction<ActionDelete>();
-
-            // A user is allowed to delete their own stuff
-            var tryGetCurrentUserId = Security.GetUserId();
-            if (tryGetCurrentUserId && dd.CreatorId == tryGetCurrentUserId.Result && actions.Contains(actionDelete) == false)
-                actions.Add(actionDelete);
-
-            return actions.Select(x => new MenuItem(x));
+            return Current.Actions.FromEntityPermission(permission).Select(x => new MenuItem(x));
         }
 
         /// <summary>
