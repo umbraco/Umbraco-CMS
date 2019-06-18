@@ -647,9 +647,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var id = content.FirstChildContentId;
             while (id > 0)
             {
-                var link = GetLinkedNode(id, "child");
-                ClearBranchLocked(link.Value);
-                id = link.Value.NextSiblingContentId;
+                if (TryGetLinkedNode(id, out var link))
+                {
+                    ClearBranchLocked(link.Value);
+                    id = link.Value.NextSiblingContentId;
+                }
+                else
+                {
+                    // break i guess?
+                    id = 0;
+                }
             }
         }
 
@@ -661,6 +668,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return link;
 
             throw new Exception($"panic: failed to get {description} with id={id}");
+        }
+
+        private bool TryGetLinkedNode(int id, out LinkedNode<ContentNode> node)
+        {
+            if (_contentNodes.TryGetValue(id, out var link) && link.Value != null)
+            {
+                node = link;
+                return true;
+            }
+
+            node = null;
+            return false;
         }
 
         private LinkedNode<ContentNode> GetParentLink(ContentNode content)
