@@ -61,9 +61,9 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @name umbraco.services.clipboardService#copy
     * @methodOf umbraco.services.clipboardService
     *
-    * @param type {string} umbraco A string defining the type of data to storing, example: 'elementType', 'contentNode'
-    * @param alias {string} umbraco A string defining the alias of the data to store, example: 'product'
-    * @param data {object} umbraco A object containing the properties to be saved.
+    * @param {string} type A string defining the type of data to storing, example: 'elementType', 'contentNode'
+    * @param {string} alias A string defining the alias of the data to store, example: 'product'
+    * @param {object} data A object containing the properties to be saved.
     *
     * @description
     * Saves a single JS-object with a type and alias to the clipboard.
@@ -114,8 +114,8 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @name umbraco.services.supportsCopy#hasEntriesOfType
     * @methodOf umbraco.services.clipboardService
     *
-    * @param type {string} umbraco A string defining the type of data test for.
-    * @param aliases {string} umbraco A array of strings providing the alias of the data you want to test for.
+    * @param {string} type A string defining the type of data test for.
+    * @param {string} aliases A array of strings providing the alias of the data you want to test for.
     *
     * @description
     * Determines whether the current clipboard has entries that match a given type and one of the aliases.
@@ -134,8 +134,8 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @name umbraco.services.supportsCopy#retriveEntriesOfType
     * @methodOf umbraco.services.clipboardService
     *
-    * @param type {string} umbraco A string defining the type of data to recive.
-    * @param aliases {string} umbraco A array of strings providing the alias of the data you want to recive.
+    * @param {string} type A string defining the type of data to recive.
+    * @param {string} aliases A array of strings providing the alias of the data you want to recive.
     * 
     * @description
     * Returns an array of entries matching the given type and one of the provided aliases.
@@ -159,8 +159,8 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @name umbraco.services.supportsCopy#retriveEntriesOfType
     * @methodOf umbraco.services.clipboardService
     *
-    * @param type {string} umbraco A string defining the type of data to recive.
-    * @param aliases {string} umbraco A array of strings providing the alias of the data you want to recive.
+    * @param {string} type A string defining the type of data to recive.
+    * @param {string} aliases A array of strings providing the alias of the data you want to recive.
     * 
     * @description
     * Returns an array of data of entries matching the given type and one of the provided aliases.
@@ -174,8 +174,8 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @name umbraco.services.supportsCopy#retriveEntriesOfType
     * @methodOf umbraco.services.clipboardService
     *
-    * @param type {string} umbraco A string defining the type of data to remove.
-    * @param aliases {string} umbraco A array of strings providing the alias of the data you want to remove.
+    * @param {string} type A string defining the type of data to remove.
+    * @param {string} aliases A array of strings providing the alias of the data you want to remove.
     * 
     * @description
     * Removes entries matching the given type and one of the provided aliases.

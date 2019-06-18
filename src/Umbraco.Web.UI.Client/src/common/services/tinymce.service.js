@@ -360,7 +360,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 icon: "code",
                 tooltip: "View Source Code",
                 onclick: function(){
-                    callback();
+                    if (callback) {
+                        angularHelper.safeApply($rootScope, function() {
+                            callback();
+                        });
+                    }
                 }
             });
 

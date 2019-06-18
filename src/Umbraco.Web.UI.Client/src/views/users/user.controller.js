@@ -170,7 +170,8 @@
 
                         contentEditingHelper.handleSaveError({
                             redirectOnFailure: false,
-                            err: err
+                            err: err,
+                            showNotifications: true
                         });
                         
                         vm.page.saveButtonState = "error";

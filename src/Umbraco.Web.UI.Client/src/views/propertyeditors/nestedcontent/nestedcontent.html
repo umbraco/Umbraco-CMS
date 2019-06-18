@@ -1,7 +1,10 @@
 ﻿<div id="umb-nested-content--{{model.id}}" class="umb-nested-content"
      ng-controller="Umbraco.PropertyEditors.NestedContent.PropertyEditorController"
      ng-class="{'umb-nested-content--narrow':!wideMode, 'umb-nested-content--wide':wideMode}">
-    <ng-form>
+
+    <umb-load-indicator ng-if="!inited"></umb-load-indicator>
+
+    <ng-form ng-if="inited">
 
         <div class="umb-nested-content__items" ng-hide="nodes.length === 0" ui-sortable="sortableOptions" ng-model="nodes">
 

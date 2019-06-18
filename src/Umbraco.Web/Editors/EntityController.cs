@@ -153,22 +153,20 @@ namespace Umbraco.Web.Editors
 
             var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
 
-            foreach (var searchableTree in _searchableTreeCollection.SearchableApplicationTrees)
+            foreach (var searchableTree in _searchableTreeCollection.SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
             {
                 if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {
                     var tree = _treeService.GetByAlias(searchableTree.Key);
                     if (tree == null) continue; //shouldn't occur
 
-                    var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
-
                     result[Tree.GetRootNodeDisplayName(tree, Services.TextService)] = new TreeSearchResult
                     {
                         Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out var total),
                         TreeAlias = searchableTree.Key,
                         AppAlias = searchableTree.Value.AppAlias,
-                        JsFormatterService = searchableTreeAttribute == null ? "" : searchableTreeAttribute.ServiceName,
-                        JsFormatterMethod = searchableTreeAttribute == null ? "" : searchableTreeAttribute.MethodName
+                        JsFormatterService = searchableTree.Value.FormatterService,
+                        JsFormatterMethod = searchableTree.Value.FormatterMethod
                     };
                 }
             }
@@ -893,7 +891,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     return UmbracoObjectTypes.Media;
                 case UmbracoEntityTypes.MemberType:
-                    return UmbracoObjectTypes.MediaType;
+                    return UmbracoObjectTypes.MemberType;
                 case UmbracoEntityTypes.MemberGroup:
                     return UmbracoObjectTypes.MemberGroup;
                 case UmbracoEntityTypes.MediaType:

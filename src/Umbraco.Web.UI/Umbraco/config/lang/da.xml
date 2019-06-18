@@ -1319,6 +1319,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="elementHeading">Er en Element-type</key>
     <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet</key>
     <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>
+    <key alias="propertyHasChanges">Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Tilføj sprog</key>

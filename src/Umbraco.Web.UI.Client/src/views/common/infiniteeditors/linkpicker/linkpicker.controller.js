@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
-    function ($scope, eventsService, entityResource, contentResource, mediaResource, mediaHelper, udiParser, userService, localizationService, tinyMceService, editorService) {
+    function ($scope, eventsService, entityResource, contentResource, mediaResource, mediaHelper, udiParser, userService, localizationService, tinyMceService, editorService, contentEditingHelper) {
         
         var vm = this;
         var dialogOptions = $scope.model;
@@ -94,8 +94,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     options.ignoreUserStartNodes = dialogOptions.ignoreUserStartNodes;
 
                     contentResource.getById(id, options).then(function (resp) {
-                        $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-                        $scope.model.target.url = resp.urls[0].text;
+                        handleContentTarget(resp);
                     });
                 }
             } else if ($scope.model.target.url.length) {
@@ -148,14 +147,18 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                 options.ignoreUserStartNodes = dialogOptions.ignoreUserStartNodes;
 
                 contentResource.getById(args.node.id, options).then(function (resp) {
-                    $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-                    $scope.model.target.url = resp.urls[0].text;
+                    handleContentTarget(resp);
                 });
             }
 
             if (!angular.isUndefined($scope.model.target.isMedia)) {
                 delete $scope.model.target.isMedia;
             }
+        }
+
+        function handleContentTarget(content) {
+            $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(contentEditingHelper.getAllProps(content.variants[0])));
+            $scope.model.target.url = content.urls.filter(item => item.culture === $scope.currentNode.metaData.culture)[0].text;
         }
 
         function nodeExpandedHandler(args) {

@@ -34,7 +34,7 @@ angular.module("umbraco")
             // Sortable options
             // *********************************************
 
-            var draggedRteSettings;
+            var draggedRteSettings;// holds a dictionary of RTE settings to remember when dragging things around.
 
             $scope.sortableOptionsRow = {
                 distance: 10,
@@ -92,7 +92,7 @@ angular.module("umbraco")
                 }
             };
 
-            var notIncludedRte = [];
+            var notIncludedRte = [];// used for RTEs that has been affected by the sorting
             var cancelMove = false;
             var startingArea;
             $scope.sortableOptionsCell = {
@@ -134,17 +134,17 @@ angular.module("umbraco")
                         (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                         $scope.$apply(function () {
-                            event.target.getScope_HackForSortable().area.dropNotAllowed = true;
+                            area.dropNotAllowed = true;
                         });
 
                         ui.placeholder.hide();
                         cancelMove = true;
                     }
                     else {
-                        if (event.target.getScope_HackForSortable().area.controls.length == 0) {
+                        if (area.controls.length == 0) {
 
                             $scope.$apply(function () {
-                                event.target.getScope_HackForSortable().area.dropOnEmpty = true;
+                                area.dropOnEmpty = true;
                             });
                             ui.placeholder.hide();
                         } else {
@@ -169,16 +169,32 @@ angular.module("umbraco")
                             ui.item.sortable.cancel();
                         }
                         ui.item.parents(".umb-cell-content").find(".umb-rte").each(function (key, value) {
-                            var v1 = value.id;
+                            var rteId = value.id;
 
-                            if ($.inArray(v1, notIncludedRte) < 0) {
-                                notIncludedRte.splice(0, 0, v1);
+                            if ($.inArray(rteId, notIncludedRte) < 0) {
+                                
+                                // remember this RTEs settings, cause we need to update it later.
+                                var editor = _.findWhere(tinyMCE.editors, { id: rteId })
+                                if (editor) {
+                                    draggedRteSettings[rteId] = editor.settings;
+                                }
+                                notIncludedRte.splice(0, 0, rteId);
                             }
                         });
                     }
                     else {
                         $(event.target).find(".umb-rte").each(function () {
-                            if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
+                            
+                            var rteId = $(this).attr("id");
+                            
+                            if ($.inArray(rteId, notIncludedRte) < 0) {
+                                
+                                // remember this RTEs settings, cause we need to update it later.
+                                var editor = _.findWhere(tinyMCE.editors, { id: rteId })
+                                if (editor) {
+                                    draggedRteSettings[rteId] = editor.settings;
+                                }
+                                
                                 notIncludedRte.splice(0, 0, $(this).attr("id"));
                             }
                         });
@@ -196,17 +212,20 @@ angular.module("umbraco")
                     ui.item[0].style.opacity = "0.5";
 
                     // reset dragged RTE settings in case a RTE isn't dragged
-                    draggedRteSettings = undefined;
+                    draggedRteSettings = {};
+                    notIncludedRte = [];
+                    
                     ui.item[0].style.display = "block";
                     ui.item.find(".umb-rte").each(function (key, value) {
-                        notIncludedRte = [];
+                        
                         var rteId = value.id;
-
-                        var editors = _.findWhere(tinyMCE.editors, { id: rteId });
+                        
+                        // remember this RTEs settings, cause we need to update it later.
+                        var editor = _.findWhere(tinyMCE.editors, { id: rteId });
 
                         // save the dragged RTE settings
-                        if (editors) {
-                            draggedRteSettings = editors.settings;
+                        if (editor) {
+                            draggedRteSettings[rteId] = editor.settings;
 
                             // remove the dragged RTE
                             tinyMCE.execCommand("mceRemoveEditor", false, rteId);
@@ -223,22 +242,29 @@ angular.module("umbraco")
                     ui.item.offsetParent().find(".umb-rte").each(function (key, value) {
                         var rteId = value.id;
                         if ($.inArray(rteId, notIncludedRte) < 0) {
+                            
+                            var editor = _.findWhere(tinyMCE.editors, { id: rteId });
+                            if (editor) {
+                                draggedRteSettings[rteId] = editor.settings;
+                            }
+                            
                             // add all dragged's neighbouring RTEs in the new cell
                             notIncludedRte.splice(0, 0, rteId);
                         }
                     });
-
+                    
                     // reconstruct the dragged RTE (could be undefined when dragging something else than RTE)
                     if (draggedRteSettings !== undefined) {
                         tinyMCE.init(draggedRteSettings);
                     }
 
-                    _.forEach(notIncludedRte, function (id) {
+                    _.forEach(notIncludedRte, function (rteId) {
                         // reset all the other RTEs
-                        if (draggedRteSettings === undefined || id !== draggedRteSettings.id) {
-                            var rteSettings = _.findWhere(tinyMCE.editors, { id: id }).settings;
-                            tinyMCE.execCommand("mceRemoveEditor", false, id);
-                            tinyMCE.init(rteSettings);
+                        if (draggedRteSettings === undefined || rteId !== draggedRteSettings.id) {
+                            tinyMCE.execCommand("mceRemoveEditor", false, rteId);
+                            if (draggedRteSettings[rteId]) {
+                                tinyMCE.init(draggedRteSettings[rteId]);
+                            }
                         }
                     });
 

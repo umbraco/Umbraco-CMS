@@ -12,7 +12,7 @@
                     <ins class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !page.languageSelectorIsOpen, 'icon-navigation-up': page.languageSelectorIsOpen}" class="icon-navigation-right">&nbsp;</ins>
                 </div>
                 <div class="umb-language-picker__dropdown" ng-if="page.languageSelectorIsOpen">
-                    <a class="umb-language-picker__dropdown-item" ng-class="{'umb-language-picker__dropdown-item--current': language.active, 'bold': language.isDefault}" ng-click="selectLanguage(language)" ng-repeat="language in languages" href="">{{language.name}}</a>
+                    <a class="umb-language-picker__dropdown-item" ng-class="{'umb-language-picker__dropdown-item--current': language.active}" ng-click="selectLanguage(language)" ng-repeat="language in languages" href="">{{language.name}}</a>
                 </div>
             </div>
 
