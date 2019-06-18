@@ -132,10 +132,10 @@
             searchLogQuery(logQuery);
         }
 
-        
-        
-        
 
+
+
+        preFlightCheck();
         
         /////////////////////
 
