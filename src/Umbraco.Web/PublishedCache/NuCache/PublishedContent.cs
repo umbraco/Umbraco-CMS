@@ -121,7 +121,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 default:
                     throw new Exception("panic: invalid item type");
             }
-
         }
 
         #endregion
@@ -276,6 +275,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 while (id > 0)
                 {
+                    // is IsPreviewing is false, then this can return null
                     var content = getById(publishedSnapshot, IsPreviewing, id);
 
                     if (content != null)
@@ -284,35 +284,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     }
                     else
                     {
-                        //Why were we throwing here? It is perfectly legitimate that a child is not published and when IsPreviewing == false
-                        //this will return null even if the item is in nucache but only with an unpublished flag.
-                        //If we want to be very clear about something being wrong, then perhaps the exception should be thrown from within
-                        //the Func that gets the child where it can validate if there really is nothing there when something is expected?
-
-                        //In the meantime, we cannot continue so we should break?... BUT doesn't that mean that if there was a sibling next to this that was published
-                        //that it will now be excluded?
-
-                        //Well, in that case this is annoying, so the only thing i can think of is to get the preview version of it to get the
-                        //next child and continue that way?
-
+                        // but if IsPreviewing is true, we should have a child
                         if (IsPreviewing)
-                        {
-                            //if we're in preview mode and nothing is returned then something is wrong
                             throw new Exception($"panic: failed to get content with id={id}");
-                        }
-                        else
-                        {
-                            //get the preview version since this item might not be published
-                            content = getById(publishedSnapshot, true, id);
-                            if (content == null)
-                            {
-                                //if we're in preview mode and nothing is returned then something is wrong
-                                throw new Exception($"panic: failed to get content with id={id}");
-                            }
 
-                            //now we can continue with the next sibling id, but we aren't going to return this content item because it's not published
-                            //and we're not previewing.
-                        }   
+                        // if IsPreviewing is false, get the unpublished child nevertheless
+                        // we need it to keep enumerating children! but we don't return it
+                        content = getById(publishedSnapshot, true, id);
+                        if (content == null)
+                            throw new Exception($"panic: failed to get content with id={id}");
                     }
 
                     id = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
