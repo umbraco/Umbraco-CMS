@@ -83,25 +83,8 @@ namespace Umbraco.Web.Editors
         /// A starting point for the search, generally a node id, but for members this is a member type alias
         /// </param>
         /// <returns></returns>
-        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
         [HttpGet]
         public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
-        {
-            return Search(query, type, false, searchFrom);
-        }
-        
-        /// <summary>
-        /// Searches for results based on the entity type
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="type"></param>
-        /// <param name="searchFrom">
-        /// A starting point for the search, generally a node id, but for members this is a member type alias
-        /// </param>
-        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
-        /// <returns></returns>
-        [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, bool? ignoreUserStartNodes, string searchFrom = null)
         {
             //TODO: Should we restrict search results based on what app the user has access to?
             // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
@@ -109,7 +92,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
-            return ExamineSearch(query, type, searchFrom, ignoreUserStartNodes != null && ignoreUserStartNodes.Value);
+            return ExamineSearch(query, type, searchFrom);
         }
 
         /// <summary>
@@ -544,26 +527,11 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
         public PagedResult<EntityBasic> GetPagedDescendants(
             int id,
             UmbracoEntityTypes type,
             int pageNumber,
             int pageSize,
-            string orderBy = "SortOrder",
-            Direction orderDirection = Direction.Ascending,
-            string filter = "")
-        {
-            return GetPagedDescendants(id, type, pageNumber, pageSize,
-                false, orderBy, orderDirection, filter);
-        }
-
-        public PagedResult<EntityBasic> GetPagedDescendants(
-            int id,
-            UmbracoEntityTypes type,
-            int pageNumber,
-            int pageSize,
-            bool ignoreUserStartNodes,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
             string filter = "")
@@ -594,7 +562,7 @@ namespace Umbraco.Web.Editors
                             break;
                     }
 
-                    entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
+                    entities = aids == null || aids.Contains(Constants.System.Root)
                         ? Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false)
                         : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
                 }
@@ -630,15 +598,9 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type)
         {
-            return GetResultForAncestors(id, type, false);
-        }
-
-        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, bool ignoreUserStartNodes)
-        {
-            return GetResultForAncestors(id, type, ignoreUserStartNodes);
+            return GetResultForAncestors(id, type);
         }
 
         public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter, [FromUri]IDictionary<string, object> postFilterParams)
@@ -652,12 +614,11 @@ namespace Umbraco.Web.Editors
         /// <param name="query"></param>
         /// <param name="entityType"></param>
         /// <param name="searchFrom"></param>
-        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool ignoreUserStartNodes = false)
+        private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
             long total;
-            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, ignoreUserStartNodes, searchFrom);
+            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom);
         }
         
 
@@ -684,7 +645,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType, bool ignoreUserStartNodes = false)
+        private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType)
         {
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
@@ -693,38 +654,35 @@ namespace Umbraco.Web.Editors
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
 
-                if (ignoreUserStartNodes == false)
+                int[] aids = null;
+                switch (entityType)
                 {
-                    int[] aids = null;
-                    switch (entityType)
-                    {
-                        case UmbracoEntityTypes.Document:
-                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                            break;
-                        case UmbracoEntityTypes.Media:
-                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                            break;
-                    }
+                    case UmbracoEntityTypes.Document:
+                        aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                        break;
+                    case UmbracoEntityTypes.Media:
+                        aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                        break;
+                }
 
-                    if (aids != null)
+                if (aids != null)
+                {
+                    var lids = new List<int>();
+                    var ok = false;
+                    foreach (var i in ids)
                     {
-                        var lids = new List<int>();
-                        var ok = false;
-                        foreach (var i in ids)
+                        if (ok)
                         {
-                            if (ok)
-                            {
-                                lids.Add(i);
-                                continue;
-                            }
-                            if (aids.Contains(i))
-                            {
-                                lids.Add(i);
-                                ok = true;
-                            }
+                            lids.Add(i);
+                            continue;
                         }
-                        ids = lids.ToArray();
+                        if (aids.Contains(i))
+                        {
+                            lids.Add(i);
+                            ok = true;
+                        }
                     }
+                    ids = lids.ToArray();
                 }
 
                 return ids.Length == 0

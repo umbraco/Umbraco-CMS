@@ -7,19 +7,12 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
-        var ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === "1" ? true : false;
 
         if (!$scope.model.config.startNodeId) {
-            if (ignoreUserStartNodes === true) {
-                $scope.model.config.startNodeId = -1;
-                $scope.model.config.startNodeIsVirtual = true;
-
-            } else {
-                userService.getCurrentUser().then(function (userData) {
-                    $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                    $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-                });
-            }          
+            userService.getCurrentUser().then(function(userData) {
+                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+            });
         }
 
         function setupViewModel() {
@@ -112,7 +105,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                title: "Select media",
                startNodeId: $scope.model.config.startNodeId,
                startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
-               ignoreUserStartNodes: ignoreUserStartNodes,
                multiPicker: multiPicker,
                onlyImages: onlyImages,
                disableFolderSelect: disableFolderSelect,

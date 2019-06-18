@@ -15,11 +15,10 @@ namespace Umbraco.Web.PropertyEditors
         {
             InternalPreValues = new Dictionary<string, object>
             {
-                {"startNodeId", "-1"},                
+                {"startNodeId", "-1"},
                 {"showOpenButton", "0"},
                 {"showEditButton", "0"},
                 {"showPathOnHover", "0"},
-                {"ignoreUserStartNodes", "0"},
                 {"idType", "udi"}
             };
         }
@@ -40,20 +39,13 @@ namespace Umbraco.Web.PropertyEditors
         {
             public ContentPickerPreValueEditor()
             {
-                //create the fields                
+                //create the fields
                 Fields.Add(new PreValueField()
                 {                    
                     Key = "showOpenButton",
                     View = "boolean",
                     Name = "Show open button (this feature is in preview!)",
                     Description = "Opens the node in a dialog"
-                });
-                Fields.Add(new PreValueField()
-                {
-                    Key = "ignoreUserStartNodes",
-                    View = "boolean",
-                    Name = "Ignore user start nodes",
-                    Description = "Selecting this option allows a user to choose nodes that they normally don't have access to."
                 });
                 Fields.Add(new PreValueField()
                 {

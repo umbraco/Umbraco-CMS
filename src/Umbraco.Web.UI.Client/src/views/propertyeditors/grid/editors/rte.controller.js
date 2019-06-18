@@ -16,7 +16,6 @@
                 view: "linkpicker",
                 currentTarget: currentTarget,
 				anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
-                ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === "1",
                 show: true,
                 submit: function(model) {
                     tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
@@ -27,23 +26,11 @@
         }
 
         function openMediaPicker(editor, currentTarget, userData) {
-            var ignoreUserStartNodes = false;
-            var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-            var startNodeIsVirtual = userData.startMediaIds.length !== 1;
-
-            if ($scope.model.config.ignoreUserStartNodes === "1") {
-                ignoreUserStartNodes = true;
-                startNodeId = -1;
-                startNodeIsVirtual = true;
-            }
-
             vm.mediaPickerOverlay = {
                 currentTarget: currentTarget,
                 onlyImages: true,
-                showDetails: true,                
-                startNodeId: startNodeId,
-                startNodeIsVirtual: startNodeIsVirtual,
-                ignoreUserStartNodes: ignoreUserStartNodes,
+                showDetails: true,
+                startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
                 view: "mediapicker",
                 show: true,
                 submit: function(model) {

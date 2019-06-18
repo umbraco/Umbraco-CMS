@@ -25,7 +25,6 @@
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === "1" ? true:  false;
                $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
@@ -51,7 +50,6 @@
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === "1" ? true : false;
                $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
