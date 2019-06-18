@@ -240,7 +240,8 @@ namespace Umbraco.Core.Migrations
                 if (finalState == null)
                     finalState = kvp.Key;
                 else
-                    throw new Exception("Multiple final states have been detected.");
+                    throw new InvalidOperationException($"Multiple final states have been detected in the plan (\"{finalState}\", \"{kvp.Key}\")."
+                                                            + " Make sure the plan contains only one final state.");
             }
 
             // now check for loops
@@ -254,7 +255,8 @@ namespace Umbraco.Core.Migrations
                 while (nextTransition != null && !verified.Contains(nextTransition.SourceState))
                 {
                     if (visited.Contains(nextTransition.SourceState))
-                        throw new Exception("A loop has been detected.");
+                        throw new InvalidOperationException($"A loop has been detected in the plan around state \"{nextTransition.SourceState}\"."
+                                                                + " Make sure the plan does not contain circular transition paths.");
                     visited.Add(nextTransition.SourceState);
                     nextTransition = _transitions[nextTransition.TargetState];
                 }
@@ -262,6 +264,14 @@ namespace Umbraco.Core.Migrations
             }
 
             _finalState = finalState;
+        }
+
+        /// <summary>
+        /// Throws an exception when the initial state is unknown.
+        /// </summary>
+        protected virtual void ThrowOnUnknownInitialState(string state)
+        {
+            throw new InvalidOperationException($"The migration plan does not support migrating from state \"{state}\".");
         }
 
         /// <summary>
@@ -287,13 +297,15 @@ namespace Umbraco.Core.Migrations
             logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
 
             if (!_transitions.TryGetValue(origState, out var transition))
-                throw new Exception($"Unknown state \"{origState}\".");
+                ThrowOnUnknownInitialState(origState);
 
             var context = new MigrationContext(scope.Database, logger);
             context.PostMigrations.AddRange(_postMigrationTypes);
 
             while (transition != null)
             {
+                logger.Info<MigrationPlan>("Execute {MigrationType}", transition.MigrationType.Name);
+
                 var migration = migrationBuilder.Build(transition.MigrationType, context);
                 migration.Migrate();
 
@@ -302,6 +314,8 @@ namespace Umbraco.Core.Migrations
 
                 logger.Info<MigrationPlan>("At {OrigState}", origState);
 
+                // throw a raw exception here: this should never happen as the plan has
+                // been validated - this is just a paranoid safety test
                 if (!_transitions.TryGetValue(origState, out transition))
                     throw new Exception($"Unknown state \"{origState}\".");
             }
@@ -322,7 +336,8 @@ namespace Umbraco.Core.Migrations
 
             logger.Info<MigrationPlan>("Done (pending scope completion).");
 
-            // safety check
+            // safety check - again, this should never happen as the plan has been validated,
+            // and this is just a paranoid safety test
             if (origState != _finalState)
                 throw new Exception($"Internal error, reached state {origState} which is not final state {_finalState}");
 

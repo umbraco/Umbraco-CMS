@@ -30,6 +30,10 @@ namespace Umbraco.Web.Editors
             if (Current.Configs.Settings().BackOffice.Tours.EnableTours == false)
                 return result;
 
+            var user = Composing.Current.UmbracoContext.Security.CurrentUser;
+            if (user == null)
+                return result;
+
             //get all filters that will be applied to all tour aliases
             var aliasOnlyFilters = _filters.Where(x => x.PluginName == null && x.TourFileName == null).ToList();
 
@@ -71,7 +75,7 @@ namespace Umbraco.Web.Editors
                 }
             }
             //Get all allowed sections for the current user
-            var allowedSections = Composing.Current.UmbracoContext.Security.CurrentUser.AllowedSections.ToList();
+            var allowedSections = user.AllowedSections.ToList();
 
             var toursToBeRemoved = new List<BackOfficeTourFile>();
 

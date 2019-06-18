@@ -360,7 +360,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 icon: "code",
                 tooltip: "View Source Code",
                 onclick: function(){
-                    callback();
+                    if (callback) {
+                        angularHelper.safeApply($rootScope, function() {
+                            callback();
+                        });
+                    }
                 }
             });
 
@@ -418,22 +422,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         insertMediaInEditor: function (editor, img) {
             if (img) {
 
-                var hasUdi = img.udi ? true : false;
-
                 var data = {
                     alt: img.altText || "",
                     src: (img.url) ? img.url : "nothing.jpg",
-                    id: '__mcenew'
+                    id: '__mcenew',
+                    'data-udi': img.udi
                 };
-
-                if (hasUdi) {
-                    data["data-udi"] = img.udi;
-                } else {
-                    //Considering these fixed because UDI will now be used and thus
-                    // we have no need for rel http://issues.umbraco.org/issue/U4-6228, http://issues.umbraco.org/issue/U4-6595
-                    data["rel"] = img.id;
-                    data["data-id"] = img.id;
-                }
                 
                 editor.selection.setContent(editor.dom.createHTML('img', data));
 
@@ -964,12 +958,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     rel: target.rel ? target.rel : null
                 };
 
-                if (hasUdi) {
-                    a["data-udi"] = target.udi;
-                } else if (target.id) {
-                    a["data-id"] = target.id;
-                }
-
                 if (target.anchor) {
                     a["data-anchor"] = target.anchor;
                     a.href = a.href + target.anchor;
@@ -991,18 +979,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 }
             }
 
-            if (!href) {
+            if (!href && !target.anchor) {
                 editor.execCommand('unlink');
                 return;
             }
 
-            //if we have an id, it must be a locallink:id, aslong as the isMedia flag is not set
-            if (id && (angular.isUndefined(target.isMedia) || !target.isMedia)) {
+            //if we have an id, it must be a locallink:id
+            if (id) {
 
                 href = "/{localLink:" + id + "}";
 
                 insertLink();
                 return;
+            }
+
+		    if (!href) {
+		        href = "";
             }
 
 		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified

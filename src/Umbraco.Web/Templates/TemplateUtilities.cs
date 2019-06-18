@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Templates
@@ -32,9 +33,14 @@ namespace Umbraco.Web.Templates
         /// <param name="text"></param>
         /// <param name="urlProvider"></param>
         /// <returns></returns>
-        public static string ParseInternalLinks(string text, UrlProvider urlProvider)
+        public static string ParseInternalLinks(string text, UrlProvider urlProvider) =>
+            ParseInternalLinks(text, urlProvider, Current.UmbracoContext.MediaCache);
+
+        // TODO: Replace mediaCache with media url provider
+        internal static string ParseInternalLinks(string text, UrlProvider urlProvider, IPublishedMediaCache mediaCache)
         {
-            if (urlProvider == null) throw new ArgumentNullException("urlProvider");
+            if (urlProvider == null) throw new ArgumentNullException(nameof(urlProvider));
+            if (mediaCache == null) throw new ArgumentNullException(nameof(mediaCache));
 
             // Parse internal links
             var tags = LocalLinkPattern.Matches(text);
@@ -45,18 +51,25 @@ namespace Umbraco.Web.Templates
                     var id = tag.Groups[1].Value; //.Remove(tag.Groups[1].Value.Length - 1, 1);
 
                     //The id could be an int or a UDI
-                    Udi udi;
-                    if (Udi.TryParse(id, out udi))
+                    if (Udi.TryParse(id, out var udi))
                     {
                         var guidUdi = udi as GuidUdi;
                         if (guidUdi != null)
                         {
-                            var newLink = urlProvider.GetUrl(guidUdi.Guid);
+                            var newLink = "#";
+                            if (guidUdi.EntityType == Constants.UdiEntityType.Document)
+                                newLink = urlProvider.GetUrl(guidUdi.Guid);
+                            else if (guidUdi.EntityType == Constants.UdiEntityType.Media)
+                                newLink = mediaCache.GetById(guidUdi.Guid)?.Url;
+
+                            if (newLink == null)
+                                newLink = "#";
+
                             text = text.Replace(tag.Value, "href=\"" + newLink);
                         }
                     }
-                    int intId;
-                    if (int.TryParse(id, out intId))
+
+                    if (int.TryParse(id, out var intId))
                     {
                         var newLink = urlProvider.GetUrl(intId);
                         text = text.Replace(tag.Value, "href=\"" + newLink);
@@ -144,9 +157,8 @@ namespace Umbraco.Web.Templates
                 // - 3 = anything after group 2 and before the data-udi attribute value begins
                 // - 4 = the data-udi attribute value
                 // - 5 = anything after group 4 until the image tag is closed
-                var src = match.Groups[2].Value;
                 var udi = match.Groups[4].Value;
-                if(src.IsNullOrWhiteSpace() || udi.IsNullOrWhiteSpace() || GuidUdi.TryParse(udi, out var guidUdi) == false)
+                if(udi.IsNullOrWhiteSpace() || GuidUdi.TryParse(udi, out var guidUdi) == false)
                 {
                     return match.Value;
                 }
@@ -162,5 +174,14 @@ namespace Umbraco.Web.Templates
                 return $"{match.Groups[1].Value}{url}{match.Groups[3].Value}{udi}{match.Groups[5].Value}";
             });
         }
+
+        /// <summary>
+        /// Removes media urls from &lt;img&gt; tags where a data-udi attribute is present
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static string RemoveMediaUrlsFromTextString(string text)
+            // see comment in ResolveMediaFromTextString for group reference
+            => ResolveImgPattern.Replace(text, "$1$3$4$5");
     }
 }
