@@ -20,7 +20,7 @@ namespace Umbraco.Web.Editors
         {
             var updChkCookie = Request.Headers.GetCookies("UMB_UPDCHK").FirstOrDefault();
             var updateCheckCookie = updChkCookie != null ? updChkCookie["UMB_UPDCHK"].Value : "";
-            if (GlobalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && Security.CurrentUser.IsAdmin())
+            if (GlobalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && Security.CurrentUser.IsSuper())
             {
                 try
                 {
@@ -35,6 +35,11 @@ namespace Umbraco.Web.Editors
                 catch (System.Net.WebException)
                 {
                     //this occurs if the server is down or cannot be reached
+                    return null;
+                }
+                catch (System.Web.Services.Protocols.SoapException)
+                {
+                    //this occurs if the server has a timeout
                     return null;
                 }
             }
