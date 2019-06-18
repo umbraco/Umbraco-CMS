@@ -20,7 +20,7 @@ namespace Umbraco.Web.Editors
         {
             var updChkCookie = Request.Headers.GetCookies("UMB_UPDCHK").FirstOrDefault();
             var updateCheckCookie = updChkCookie != null ? updChkCookie["UMB_UPDCHK"].Value : "";
-            if (GlobalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && Security.CurrentUser.IsSuper())
+            if (GlobalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && Security.CurrentUser.IsAdmin())
             {
                 try
                 {
