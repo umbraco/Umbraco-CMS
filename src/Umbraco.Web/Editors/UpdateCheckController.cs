@@ -24,7 +24,8 @@ namespace Umbraco.Web.Editors
             {
                 try
                 {
-                    var check = new org.umbraco.update.CheckForUpgrade();
+                    var check = new org.umbraco.update.CheckForUpgrade { Timeout = 2000 };
+
                     var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
                                                     UmbracoVersion.Current.Minor,
                                                     UmbracoVersion.Current.Build,
