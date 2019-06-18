@@ -223,6 +223,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public abstract IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
 
+        public abstract bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
+
         public virtual bool DoesTableExist(IDatabase db, string tableName)
         {
             return false;
@@ -552,6 +554,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string CreateConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})";
         public virtual string DeleteConstraint => "ALTER TABLE {0} DROP CONSTRAINT {1}";
         public virtual string CreateForeignKeyConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
+        public virtual string CreateDefaultConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} DEFAULT ({2}) FOR {3}";
 
         public virtual string ConvertIntegerToOrderableString => "REPLACE(STR({0}, 8), SPACE(1), '0')";
         public virtual string ConvertDateToOrderableString => "CONVERT(nvarchar, {0}, 102)";

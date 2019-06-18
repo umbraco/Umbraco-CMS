@@ -389,7 +389,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private DatabaseSchemaResult ValidateSchema(IScope scope)
         {
-            if (_databaseFactory.Configured == false)
+            if (_databaseFactory.Initialized == false)
                 return new DatabaseSchemaResult(_databaseFactory.SqlContext.SqlSyntax);
 
             if (_databaseSchemaValidationResult != null)
@@ -513,7 +513,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private Attempt<Result> CheckReadyForInstall()
         {
-            if (_databaseFactory.Configured == false)
+            if (_databaseFactory.CanConnect == false)
             {
                 return Attempt.Fail(new Result
                 {
@@ -539,7 +539,7 @@ namespace Umbraco.Core.Migrations.Install
             {
                 Message =
                     "The database configuration failed with the following message: " + ex.Message +
-                    "\n Please check log file for additional information (can be found in '/App_Data/Logs/UmbracoTraceLog.txt')",
+                    "\n Please check log file for additional information (can be found in '/App_Data/Logs/')",
                 Success = false,
                 Percentage = "90"
             };

@@ -136,7 +136,10 @@
 
                 //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
                 if (vm.user.changePassword) {
-                    vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+                    //NOTE: the check for allowManuallyChangingPassword is due to this legacy user membership provider setting, if that is true, then the current user
+                    //can change their own password without entering their current one (this is a legacy setting since that is a security issue but we need to maintain compat).
+                    //if allowManuallyChangingPassword=false, then we are using default settings and the user will need to enter their old password to change their own password.
+                    vm.user.changePassword.reset = (!vm.user.changePassword.oldPassword && !vm.user.isCurrentUser) || vm.changePasswordModel.config.allowManuallyChangingPassword;
                 }
 
                 vm.page.saveButtonState = "busy";

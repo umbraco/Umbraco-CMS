@@ -261,7 +261,8 @@
                         </umb-button>
                     </div>
                     <div>
-                        <umb-button type="button" ng-if="model.changePasswordModel.isChanging === false && model.user.userDisplayState.key !== 'Invited'"
+
+                        <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited' && model.changePasswordModel.isChanging === false"
                                     button-style="[info,block]"
                                     action="model.toggleChangePassword()"
                                     label="Change password"

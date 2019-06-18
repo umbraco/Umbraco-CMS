@@ -214,12 +214,8 @@ namespace Umbraco.Web.Trees
             return result;
         }
 
-        /// <summary>
-        /// Abstract method to fetch the entities from the entity service
-        /// </summary>
-        /// <param name="entityId"></param>
-        /// <returns></returns>
-        internal abstract IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId);
+        internal virtual IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
+            => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
