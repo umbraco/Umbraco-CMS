@@ -274,6 +274,7 @@ angular.module("umbraco")
                             view: "linkpicker",
                             currentTarget: currentTarget,
 							              anchors: editorState.current ? tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
+                            ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === "1",
                             show: true,
                             submit: function(model) {
                                 tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
@@ -285,14 +286,24 @@ angular.module("umbraco")
 
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
+                        var ignoreUserStartNodes = false;
+                        var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                        var startNodeIsVirtual = userData.startMediaIds.length !== 1;
+
+                        if ($scope.model.config.ignoreUserStartNodes === "1") {
+                            ignoreUserStartNodes = true;
+                            startNodeId = -1;
+                            startNodeIsVirtual = true;
+                        }
 
                         $scope.mediaPickerOverlay = {
                             currentTarget: currentTarget,
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
-                            startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-                            startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                            startNodeId: startNodeId,
+                            startNodeIsVirtual: startNodeIsVirtual,
+                            ignoreUserStartNodes: ignoreUserStartNodes,
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {

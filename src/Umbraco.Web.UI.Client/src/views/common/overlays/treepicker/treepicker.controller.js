@@ -16,6 +16,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             searchFromId: dialogOptions.startNodeId,
             searchFromName: null,
             showSearch: false,
+            ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes,
             results: [],
             selectedSearchResults: []
         }
@@ -29,7 +30,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         var node = dialogOptions.currentNode;
 
         //This is called from ng-init
-        //it turns out it is called from the angular html : / Have a look at views/common / overlays / contentpicker / contentpicker.html you'll see ng-init. 
+        //it turns out it is called from the angular html : / Have a look at views/common / overlays / contentpicker / contentpicker.html you'll see ng-init.
         //this is probably an anti pattern IMO and shouldn't be used
         $scope.init = function (contentType) {
 
@@ -132,8 +133,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         function initTree() {
             //create the custom query string param for this tree
-            $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
-            $scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";
+            var params = [];
+
+            if (dialogOptions.startNodeId)
+                params.push("startNodeId=" + dialogOptions.startNodeId);
+
+            if (dialogOptions.ignoreUserStartNodes)
+                params.push("ignoreUserStartNodes=" + dialogOptions.ignoreUserStartNodes);
+
+            if (dialogOptions.customTreeParams)
+                params.push(dialogOptions.customTreeParams);
+
+            $scope.customTreeParams = params.join('&');
+
             $scope.treeReady = true;
         }
 
@@ -176,6 +188,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             if (startNodeNotDefined && nodeHasPath) {
                 $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
             }
+
         }
 
         //wires up selection
@@ -348,7 +361,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 });
             }
         }
-        
+
         $scope.multiSubmit = function (result) {
             entityResource.getByIds(result, $scope.entityType).then(function (ents) {
                 $scope.submit(ents);
