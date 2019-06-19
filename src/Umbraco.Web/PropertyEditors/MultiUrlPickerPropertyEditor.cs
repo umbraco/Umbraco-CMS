@@ -32,13 +32,6 @@ namespace Umbraco.Web.PropertyEditors
         {
             public MultiUrlPickerPreValueEditor()
             {
-                Fields.Add(new PreValueField()
-                {
-                    Key = "ignoreUserStartNodes",
-                    View = "boolean",
-                    Name = "Ignore user start nodes",
-                    Description = "Selecting this option allows a user to choose nodes that they normally don't have access to."
-                });
                 Fields.Add(new PreValueField
                 {
                     Key = "minNumber",

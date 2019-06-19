@@ -350,16 +350,6 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// If the request should allows a user to choose nodes that they normally don't have access to
-        /// </summary>
-        /// <param name="queryStrings"></param>
-        /// <returns></returns>
-        protected bool IgnoreUserStartNodes(FormDataCollection queryStrings)
-        {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IgnoreUserStartNodes);
-        }
-
-        /// <summary>
         /// An event that allows developers to modify the tree node collection that is being rendered
         /// </summary>
         /// <remarks>

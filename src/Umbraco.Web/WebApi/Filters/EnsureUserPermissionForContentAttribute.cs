@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -72,9 +72,6 @@ namespace Umbraco.Web.WebApi.Filters
                 //not logged in
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
-            
-            var ignoreUserStartNodes = actionContext.ActionArguments.ContainsKey("ignoreUserStartNodes") &&
-                                       bool.Parse(actionContext.ActionArguments.GetValueAsString("ignoreUserStartNodes"));
 
             int nodeId;
             if (_nodeId.HasValue == false)
@@ -129,9 +126,7 @@ namespace Umbraco.Web.WebApi.Filters
                 ApplicationContext.Current.Services.UserService,
                 ApplicationContext.Current.Services.ContentService, 
                 ApplicationContext.Current.Services.EntityService, 
-                nodeId,
-                _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null,
-                ignoreUserStartNodes: ignoreUserStartNodes))
+                nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
             {
                 base.OnActionExecuting(actionContext);
             }
