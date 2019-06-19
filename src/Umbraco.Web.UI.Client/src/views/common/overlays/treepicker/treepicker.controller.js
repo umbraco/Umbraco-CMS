@@ -349,15 +349,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             }
         }
         
-        function performFilteringRecursively(nodes) {
-            performFiltering(nodes);
-            _.each(nodes, function (node){
-                if (node.children && node.children.length) {
-                    performFilteringRecursively(node.children);
-                }
-            });
-        }
-
         $scope.multiSubmit = function (result) {
             entityResource.getByIds(result, $scope.entityType).then(function (ents) {
                 $scope.submit(ents);
