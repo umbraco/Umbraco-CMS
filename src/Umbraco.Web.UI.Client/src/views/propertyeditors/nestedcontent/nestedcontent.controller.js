@@ -87,14 +87,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "$scope",
     "$interpolate",
     "$filter",
-    "$timeout",
     "contentResource",
     "localizationService",
     "iconHelper",
     "clipboardService",
     "eventsService",
     
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService) {
+    function ($scope, $interpolate, $filter, contentResource, localizationService, iconHelper, clipboardService, eventsService) {
         
         var contentTypeAliases = [];
         _.each($scope.model.config.contentTypes, function (contentType) {
