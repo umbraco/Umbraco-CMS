@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentRightsController($scope, $timeout, contentResource, localizationService, angularHelper, navigationService) {
+    function ContentRightsController($scope, $timeout, contentResource, localizationService, angularHelper, navigationService, overlayService) {
 
         var vm = this;
         var currentForm;
@@ -11,7 +11,6 @@
         vm.removedUserGroups = [];
         vm.viewState = "manageGroups";
         vm.labels = {};
-        vm.showNotification = false;
         
         vm.setViewSate = setViewSate;
         vm.editPermissions = editPermissions;
@@ -20,7 +19,6 @@
         vm.removePermissions = removePermissions;
         vm.cancelManagePermissions = cancelManagePermissions;
         vm.closeDialog = closeDialog;
-        vm.stay = stay;
         vm.discardChanges = discardChanges;
 
         function onInit() {
@@ -164,14 +162,31 @@
             });
         }
 
-        function stay() {
-          vm.showNotification = false;
-        }
-
         function closeDialog() {
           // check if form has been changed. If it has show discard changes notification
           if (currentForm && currentForm.$dirty) {
-            vm.showNotification = true;
+              localizationService.localizeMany(["prompt_unsavedChanges", "prompt_unsavedChangesWarning", "prompt_discardChanges", "prompt_stay"]).then(
+                  function(values) {
+                      var overlay = {
+                          "view": "default",
+                          "title": values[0],
+                          "content": values[1],
+                          "disableBackdropClick": true,
+                          "disableEscKey": true,
+                          "submitButtonLabel": values[2],
+                          "closeButtonLabel": values[3],
+                          submit: function () {
+                              overlayService.close();
+                              navigationService.hideDialog();
+                          },
+                          close: function () {
+                              overlayService.close();
+                          }
+                      };
+
+                      overlayService.open(overlay);
+                  }
+              );
           } else {
             navigationService.hideDialog();
           }
