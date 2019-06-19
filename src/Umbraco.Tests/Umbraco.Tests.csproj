@@ -147,7 +147,7 @@
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
-    <Compile Include="Security\ContentSecurityPolicyTests.cs" />
+    <Compile Include="Security\NonceProviderTests.cs" />
     <Compile Include="Services\AmbiguousEventTests.cs" />
     <Compile Include="Services\ContentServiceEventTests.cs" />
     <Compile Include="Services\ContentServicePublishBranchTests.cs" />

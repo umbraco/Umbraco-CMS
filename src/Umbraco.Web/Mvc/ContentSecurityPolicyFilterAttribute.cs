@@ -45,11 +45,12 @@ namespace Umbraco.Web.Mvc
             sb.Append(GetCspElementContent("frame-src", _securitySection.ContentSecurityPolicy.FrameSrc));
             sb.Append(GetCspElementContent("img-src", _securitySection.ContentSecurityPolicy.ImgSrc));
             sb.Append(GetCspElementContent("manifest-src", _securitySection.ContentSecurityPolicy.ManifestSrc));
+            sb.Append(GetCspElementContent("media-src", _securitySection.ContentSecurityPolicy.MediaSrc));
             sb.Append(GetCspElementContent("object-src", _securitySection.ContentSecurityPolicy.ObjectSrc));
             sb.Append(GetCspElementContent("prefetch-src", _securitySection.ContentSecurityPolicy.PrefetchSrc));
-            sb.Append(GetCspElementContent("worker-src", _securitySection.ContentSecurityPolicy.PrefetchSrc));
+            sb.Append(GetCspElementContent("worker-src", _securitySection.ContentSecurityPolicy.WorkerSrc));
 
-            if (!string.IsNullOrEmpty(_securitySection.ContentSecurityPolicy.ReportUri))
+            if (!string.IsNullOrEmpty(_securitySection.ContentSecurityPolicy.ReportTo))
             {
                 sb.Append($"report-to: {_securitySection.ContentSecurityPolicy.ReportTo};");
             }
