@@ -22,12 +22,12 @@ namespace Umbraco.Core.Security
         {
             get
             {
-                if (string.IsNullOrEmpty(_scriptNonce))
+                if (string.IsNullOrEmpty(_styleNonce))
                 {
                     lock (_lock)
                     {
 
-                        if (string.IsNullOrEmpty(_scriptNonce))
+                        if (string.IsNullOrEmpty(_styleNonce))
                         {
                             _styleNonce = GenerateRandomBase64String();
                         }
