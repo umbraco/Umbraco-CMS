@@ -249,6 +249,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             }
         };
 
+        $scope.isVisible = function (idx) {
+
+            var umbNaviHide = "umbracoNaviHide";
+            var item = $scope.model.value[idx];
+
+            return item && item.hasOwnProperty(umbNaviHide) && item[umbNaviHide] === "1";
+        };
+
         $scope.getName = function (idx) {
 
             var name = "";
@@ -301,7 +309,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.getIcon = function (idx) {
             var scaffold = $scope.getScaffold($scope.model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
-        }
+        };
+
         $scope.sortableOptions = {
             axis: "y",
             cursor: "move",
@@ -340,13 +349,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             return _.find($scope.scaffolds, function (scaffold) {
                 return scaffold.contentTypeAlias === alias;
             });
-        }
+        };
 
         $scope.getContentTypeConfig = function (alias) {
             return _.find($scope.model.config.contentTypes, function (contentType) {
                 return contentType.ncAlias === alias;
             });
-        }
+        };
         
         $scope.showCopy = clipboardService.isSupported();
         
@@ -360,21 +369,21 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $event.stopPropagation();
         }
         
-        $scope.pasteFromClipboard = function(newNode) {
-            
+        $scope.pasteFromClipboard = function (newNode) {
+
             if (newNode === undefined) {
                 return;
             }
-            
+
             // generate a new key.
             newNode.key = String.CreateGuid();
-            
+
             $scope.nodes.push(newNode);
             $scope.setDirty();
             //updateModel();// done by setting current node...
-            
+
             $scope.currentNode = newNode;
-        }
+        };
         
         function checkAbilityToPasteContent() {
             $scope.showPaste = clipboardService.hasEntriesOfType("elementType", contentTypeAliases);

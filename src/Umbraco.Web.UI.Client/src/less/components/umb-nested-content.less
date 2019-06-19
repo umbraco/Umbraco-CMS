@@ -109,6 +109,15 @@
     }
 }
 
+.umb-nested-content__item--disabled:not(.umb-nested-content__item--active) {
+    & > .umb-nested-content__header-bar {
+        .umb-nested-content__heading {
+            &, &:hover {
+                color: @grayLight;
+            }
+        }
+    }
+}
 
 
 .umb-nested-content__header-bar:hover .umb-nested-content__icons,
