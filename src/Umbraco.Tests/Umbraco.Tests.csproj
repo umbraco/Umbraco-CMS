@@ -120,6 +120,7 @@
     <Compile Include="Composing\CompositionTests.cs" />
     <Compile Include="Composing\LightInjectValidation.cs" />
     <Compile Include="Composing\ContainerConformingTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\ContentSecurityPolicyTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreThings\EnumExtensionsTests.cs" />
@@ -146,6 +147,7 @@
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
+    <Compile Include="Security\ContentSecurityPolicyTests.cs" />
     <Compile Include="Services\AmbiguousEventTests.cs" />
     <Compile Include="Services\ContentServiceEventTests.cs" />
     <Compile Include="Services\ContentServicePublishBranchTests.cs" />
