@@ -188,7 +188,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             if (startNodeNotDefined && nodeHasPath) {
                 $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
             }
-
         }
 
         //wires up selection
@@ -360,6 +359,15 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     }
                 });
             }
+        }
+        
+        function performFilteringRecursively(nodes) {
+            performFiltering(nodes);
+            _.each(nodes, function (node){
+                if (node.children && node.children.length) {
+                    performFilteringRecursively(node.children);
+                }
+            });
         }
 
         $scope.multiSubmit = function (result) {
