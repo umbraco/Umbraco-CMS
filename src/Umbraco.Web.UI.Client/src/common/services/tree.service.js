@@ -759,7 +759,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 }
                 else {
                     //couldn't find it in the 
-                    self.loadNodeChildren({ node: node, section: node.section }).then(function () {
+                    self.loadNodeChildren({ node: node, section: node.section }).then(function (children) {
+
+                        //we've reloaded a portion of the tree, call the callback if one is specified.
+                        //TODO: In v8, we can just use deferred.notify
+                        if (args.treeNodeExpanded && angular.isFunction(args.treeNodeExpanded)) {
+                            args.treeNodeExpanded({ node: node, children: children });
+                        }
+
                         //ok, got the children, let's find it
                         var found = self.getChildNode(node, args.path[currPathIndex]);
                         if (found) {

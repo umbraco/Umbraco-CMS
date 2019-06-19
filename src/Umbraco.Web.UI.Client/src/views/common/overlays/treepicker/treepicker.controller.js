@@ -186,17 +186,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             var nodeHasPath = typeof node !== "undefined" && typeof node.path !== "undefined";
             var startNodeNotDefined = typeof dialogOptions.startNodeId === "undefined" || dialogOptions.startNodeId === "" || dialogOptions.startNodeId === "-1";
             if (startNodeNotDefined && nodeHasPath) {
-                // since the node expanded event isn't fired while syncing the tree, we need to do some post filtering
-                // down the entire tree after it's expanded, to make sure all non-selectable nodes are setup correctly
-                $scope.nodesToFilterAfterSync = args.tree.root.children;
                 $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
-            }
-        }
-
-        //called when the tree is synced to the currently opened content item (if any)
-        function treeSyncedHandler(ev, args) {
-            if ($scope.nodesToFilterAfterSync) {
-                performFilteringRecursively($scope.nodesToFilterAfterSync);
             }
         }
 
@@ -524,13 +514,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
         $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
         $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-        $scope.dialogTreeEventHandler.bind("treeSynced", treeSyncedHandler);
 
         $scope.$on('$destroy', function () {
             $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
             $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
             $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-            $scope.dialogTreeEventHandler.unbind("treeSynced", treeSyncedHandler);
         });
 
         $scope.selectListViewNode = function (node) {
