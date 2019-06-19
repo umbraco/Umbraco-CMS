@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
-    function ($scope, eventsService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService, editorService) {
-        
+    function ($routeParams, $scope, eventsService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService, editorService) {
+        var currentCulture = $routeParams.cculture ? $routeParams.cculture : null;
         var vm = this;
         var dialogOptions = $scope.model;
 
@@ -81,7 +81,18 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
                     contentResource.getById(id, options).then(function (resp) {
                         $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-                        $scope.model.target.url = resp.urls.filter(item => item.culture === $scope.$parent.selectedLanguage.culture)[0].text;
+                        if (currentCulture != null) {
+                            if (resp.urls.filter(item => item.culture === currentCulture).length != 0) {
+                                $scope.model.target.url = resp.urls.filter(item => item.culture === currentCulture)[0].text;
+                            }
+                            else {
+                                // this node does not exist in the current language - should be handled in the search box
+                                $scope.model.target.url = "#";
+                            }
+                        }
+                        else {
+                            $scope.model.target.url = resp.urls[0].text;
+                        }
                     });
                 }
             } else if ($scope.model.target.url.length) {
@@ -135,7 +146,18 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
                 contentResource.getById(args.node.id, options).then(function (resp) {
                     $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-                    $scope.model.target.url = resp.urls.filter(item => item.culture === $scope.$parent.selectedLanguage.culture)[0].text;
+                    if (currentCulture != null) {
+                        if (resp.urls.filter(item => item.culture === currentCulture).length != 0) {
+                            $scope.model.target.url = resp.urls.filter(item => item.culture === currentCulture)[0].text;
+                        }
+                        else {
+                            // this node does not exist in the current language - should be handled in the search box
+                            $scope.model.target.url = "#";
+                        }
+                    }
+                    else {
+                        $scope.model.target.url = resp.urls[0].text;
+                    }
                 });
             }
 
