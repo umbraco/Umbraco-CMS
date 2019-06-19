@@ -19,8 +19,5 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("startNodeId", "Start node", "mediapicker")]
         public Udi StartNodeId { get; set; }
-
-        [ConfigurationField("ignoreUserStartNodes", "Ignore user start nodes", "boolean", Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
-        public bool IgnoreUserStartNodes { get; set; }
     }
 }
