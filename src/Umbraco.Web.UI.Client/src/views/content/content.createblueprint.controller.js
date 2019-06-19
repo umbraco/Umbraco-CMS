@@ -36,7 +36,6 @@
             function(err) {
 
               contentEditingHelper.handleSaveError({
-                redirectOnFailure: false,
                 err: err
               });
 
