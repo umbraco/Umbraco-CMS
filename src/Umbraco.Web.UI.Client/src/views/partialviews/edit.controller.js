@@ -83,10 +83,6 @@
                 saveMethod: codefileResource.save,
                 scope: $scope,
                 content: vm.partialView,
-                //We do not redirect on failure for partialviews - this is because it is not possible to actually save the partialviews
-                // type when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 

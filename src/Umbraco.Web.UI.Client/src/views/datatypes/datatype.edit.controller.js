@@ -174,7 +174,6 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                     //NOTE: in the case of data type values we are setting the orig/new props
                     // to be the same thing since that only really matters for content/media.
                     contentEditingHelper.handleSaveError({
-                        redirectOnFailure: false,
                         err: err
                     });
 

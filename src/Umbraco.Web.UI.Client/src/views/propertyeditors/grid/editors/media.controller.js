@@ -1,32 +1,25 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
     function ($scope, $timeout, userService, editorService) {
-        var ignoreUserStartNodes = Object.toBoolean($scope.model.config.ignoreUserStartNodes);
         
         
         $scope.thumbnailUrl = getThumbnailUrl();
         
         
         if (!$scope.model.config.startNodeId) {
-            if (ignoreUserStartNodes === true) {
-                $scope.model.config.startNodeId = -1;
-                $scope.model.config.startNodeIsVirtual = true;
-
-            } else {
-                userService.getCurrentUser().then(function (userData) {
-                    $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                    $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-                });
-            }
+            userService.getCurrentUser().then(function (userData) {
+                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+            });
         }
         
         $scope.setImage = function(){
             var startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
             var startNodeIsVirtual = startNodeId ? $scope.model.config.startNodeIsVirtual : undefined;
+
             var mediaPicker = {
                 startNodeId: startNodeId,
                 startNodeIsVirtual: startNodeIsVirtual,
-                ignoreUserStartNodes: ignoreUserStartNodes,
                 cropSize: $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined,
                 showDetails: true,
                 disableFolderSelect: true,
