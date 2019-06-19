@@ -59,6 +59,8 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.submit = submit;
         vm.close = close;
 
+        var currentNode = $scope.model.currentNode;
+
         function initDialogTree() {
             vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
             // TODO: Also deal with unexpanding!!
@@ -160,6 +162,12 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     }
                 }
             }
+
+            vm.filter = {
+                filterAdvanced: $scope.model.filterAdvanced,
+                filterExclude: $scope.model.filterExclude,
+                filter: $scope.model.filter
+            };
         }
 
         /**
@@ -256,6 +264,12 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             vm.hasItems = args.tree.root.children.length > 0;
 
             tree = args.tree;
+
+            var nodeHasPath = currentNode && currentNode.path;
+            var startNodeNotDefined = !vm.startNodeId;
+            if (startNodeNotDefined && nodeHasPath) {
+                vm.dialogTreeApi.syncTree({ path: currentNode.path, activate: false });
+            }
         }
 
         //wires up selection
