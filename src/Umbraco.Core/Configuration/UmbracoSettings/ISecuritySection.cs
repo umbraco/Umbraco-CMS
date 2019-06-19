@@ -23,5 +23,7 @@
         /// When this is false, the username and email fields will be shown in the user section.
         /// </remarks>
         bool UsernameIsEmail { get; }
+
+        IContentSecurityPolicySection ContentSecurityPolicy { get; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ClientDependency.Core.CompositeFiles.Providers;
+using ClientDependency.Core.Config;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -8,16 +10,15 @@ using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
-using ClientDependency.Core.CompositeFiles.Providers;
-using ClientDependency.Core.Config;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Security;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
@@ -25,10 +26,16 @@ namespace Umbraco.Web.Runtime
     public sealed class WebInitialComponent : IComponent
     {
         private readonly IGlobalSettings _globalSettings;
+        private readonly ISecuritySection _securitySection;
+        private readonly INonceProvider _nonceProvider;
 
-        public WebInitialComponent(IGlobalSettings globalSettings)
+        public WebInitialComponent(IGlobalSettings globalSettings,
+            INonceProvider nonceProvider,
+            ISecuritySection securitySection)
         {
             _globalSettings = globalSettings;
+            _securitySection = securitySection;
+            _nonceProvider = nonceProvider;
         }
 
         public void Initialize()
@@ -56,9 +63,10 @@ namespace Umbraco.Web.Runtime
         public void Terminate()
         { }
 
-        private static void ConfigureGlobalFilters()
+        private void ConfigureGlobalFilters()
         {
             GlobalFilters.Filters.Add(new EnsurePartialViewMacroViewContextFilterAttribute());
+            GlobalFilters.Filters.Add(new ContentSecurityPolicyFilterAttribute(_nonceProvider, _securitySection));
         }
 
         // internal for tests

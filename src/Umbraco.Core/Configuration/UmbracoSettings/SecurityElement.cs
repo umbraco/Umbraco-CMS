@@ -4,6 +4,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class SecurityElement : UmbracoConfigurationElement, ISecuritySection
     {
+        [ConfigurationProperty("contentSecurityPolicy")]
+        internal ContentSecurityPolicyElement ContentSecurityPolicy => (ContentSecurityPolicyElement)this["contentSecurityPolicy"];
+
         [ConfigurationProperty("keepUserLoggedIn")]
         internal InnerTextConfigurationElement<bool> KeepUserLoggedIn => GetOptionalTextElement("keepUserLoggedIn", true);
 
@@ -53,5 +56,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string ISecuritySection.AuthCookieName => AuthCookieName;
 
         string ISecuritySection.AuthCookieDomain => AuthCookieDomain;
+
+        IContentSecurityPolicySection ISecuritySection.ContentSecurityPolicy => ContentSecurityPolicy;
     }
 }

@@ -199,6 +199,10 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
+    <Compile Include="Configuration\UmbracoSettings\ContentSecurityPolicySrcElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IContentSecurityPolicySrc.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IContentSecurityPolicySection.cs" />
+    <Compile Include="Configuration\UmbracoSettings\ContentSecurityPolicyElement.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -259,6 +263,8 @@
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedModelFactoryExtensions.cs" />
+    <Compile Include="Security\INonceProvider.cs" />
+    <Compile Include="Security\NonceProvider.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />

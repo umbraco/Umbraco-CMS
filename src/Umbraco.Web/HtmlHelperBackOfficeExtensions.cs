@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Owin.Security;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.Owin.Security;
-using Newtonsoft.Json;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
@@ -13,6 +13,8 @@ using Umbraco.Web.Models;
 namespace Umbraco.Web
 {
     using Core.Configuration;
+    using Umbraco.Core;
+    using Umbraco.Core.Security;
 
     /// <summary>
     /// HtmlHelper extensions for the back office
@@ -39,11 +41,16 @@ namespace Umbraco.Web
         {
             var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings);
             var minVars = serverVars.BareMinimumServerVariables();
-
-            var str = @"<script type=""text/javascript"">
-                var Umbraco = {};
-                Umbraco.Sys = {};
-                Umbraco.Sys.ServerVariables = " + JsonConvert.SerializeObject(minVars) + @";
+            var nonce = "";
+            if (Current.Configs.Settings().Security.ContentSecurityPolicy != null)
+            {
+                var nonceProvider = Current.Factory.GetInstance<INonceProvider>();
+                nonce = $"nonce = \"{nonceProvider.ScriptNonce}\" ";
+            }
+            var str = $@"<script type=""text/javascript"" {nonce}>
+                var Umbraco = {{}};
+                Umbraco.Sys = {{}};
+                Umbraco.Sys.ServerVariables = {JsonConvert.SerializeObject(minVars)};
             </script>";
 
             return html.Raw(str);

@@ -8,11 +8,9 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
-using Umbraco.Web.Models;
+using Umbraco.Core.Security;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
@@ -172,7 +170,7 @@ namespace Umbraco.Web
             if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
             if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
 
-            var routeVals = new RouteValueDictionary(new {area = ""});
+            var routeVals = new RouteValueDictionary(new { area = "" });
 
             var surfaceController = Current.SurfaceControllerTypes.SingleOrDefault(x => x == surfaceType);
             if (surfaceController == null)
@@ -221,7 +219,7 @@ namespace Umbraco.Web
             {
                 _viewContext = viewContext;
                 _method = method;
-			    _controllerName = controllerName;
+                _controllerName = controllerName;
                 _encryptedString = UrlHelperRenderExtensions.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
             }
 
@@ -229,7 +227,7 @@ namespace Umbraco.Web
             private readonly FormMethod _method;
             private bool _disposed;
             private readonly string _encryptedString;
-		    private readonly string _controllerName;
+            private readonly string _controllerName;
 
             protected override void Dispose(bool disposing)
             {
@@ -243,9 +241,9 @@ namespace Umbraco.Web
                     || _controllerName == "UmbProfile"
                     || _controllerName == "UmbLoginStatus"
                     || _controllerName == "UmbLogin")
-			    {
-			        _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
-			    }
+                {
+                    _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
+                }
 
                 //write out the hidden surface form routes
                 _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
@@ -1010,6 +1008,38 @@ namespace Umbraco.Web
 
         #endregion
 
+        #endregion
+
+        #region ContentSecurityPolicy
+        /// <summary>
+        /// Generates the script nonce used by Content Security Policy
+        /// </summary>
+        /// <param name="helper"></param>
+        /// <returns></returns>
+        public static IHtmlString ScriptNonce(this HtmlHelper helper)
+        {
+            if (Current.Configs.Settings().Security.ContentSecurityPolicy != null)
+            {
+                var nonceProvider = Current.Factory.GetInstance<INonceProvider>();
+                return new MvcHtmlString($"nonce = \"{nonceProvider.ScriptNonce}\" ");
+            }
+            return new MvcHtmlString("");
+        }
+
+        /// <summary>
+        /// Generates the style nonce used by Content Security Policy
+        /// </summary>
+        /// <param name="helper"></param>
+        /// <returns></returns>
+        public static IHtmlString StyleNonce(this HtmlHelper helper)
+        {
+            if (Current.Configs.Settings().Security.ContentSecurityPolicy != null)
+            {
+                var nonceProvider = Current.Factory.GetInstance<INonceProvider>();
+                return new MvcHtmlString($"nonce = \"{nonceProvider.StyleNonce}\" ");
+            }
+            return new MvcHtmlString("");
+        }
         #endregion
     }
 }

@@ -114,7 +114,7 @@
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Current.Configs.Global())
 
-    <script>
+    <script type="text/javascript" @Html.ScriptNonce()>
 
         document.angularReady = function(app) {
             @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())

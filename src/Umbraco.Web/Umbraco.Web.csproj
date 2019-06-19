@@ -210,6 +210,7 @@
     <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
+    <Compile Include="Mvc\ContentSecurityPolicyFilterAttribute.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />

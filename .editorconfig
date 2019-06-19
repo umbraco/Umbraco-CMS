@@ -38,3 +38,6 @@ csharp_prefer_braces = false : none
 
 [*.{js,less}]
 trim_trailing_whitespace = false
+
+[*.config]
+indent_size = 2
