@@ -40,7 +40,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             else {
                 currentForm = args.formCtrl;
             }
-            
+
             //the first thing any form must do is broadcast the formSubmitting event
             args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
@@ -53,10 +53,10 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
 
             //reset the server validations
             serverValidationManager.reset();
-            
+
             return true;
         },
-        
+
         /**
          * @ngdoc function
          * @name umbraco.services.formHelper#submitForm
@@ -75,21 +75,21 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             if (!args.scope) {
                 throw "args.scope cannot be null";
             }
-            
+
             args.scope.$broadcast("formSubmitted", { scope: args.scope });
         },
 
         showNotifications: function (args) {
-          if (!args || !args.notifications) {
-            return false;
-          }
-          if (angular.isArray(args.notifications)) {
-            for (var i = 0; i < args.notifications.length; i++) {
-              notificationsService.showNotification(args.notifications[i]);
+            if (!args || !args.notifications) {
+                return false;
             }
-            return true;
-          }
-          return false;
+            if (angular.isArray(args.notifications)) {
+                for (var i = 0; i < args.notifications.length; i++) {
+                    notificationsService.showNotification(args.notifications[i]);
+                }
+                return true;
+            }
+            return false;
         },
 
         /**
@@ -104,7 +104,12 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          * 
          * @param {object} err The error object returned from the http promise
          */
-        handleError: function (err) {            
+        handleError: function (err) {
+
+            //TODO: Potentially add in the logic to showNotifications like the contentEditingHelper.handleSaveError does so that
+            // non content editors can just use this method instead of contentEditingHelper.handleSaveError which they should not use
+            // and they won't need to manually do it.
+
             //When the status is a 400 status with a custom header: X-Status-Reason: Validation failed, we have validation errors.
             //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
             //Or, some strange server error
@@ -116,7 +121,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                     this.handleServerValidation(err.data.ModelState);
 
                     //execute all server validation events and subscribers
-                    serverValidationManager.notifyAndClearAllSubscriptions();                    
+                    serverValidationManager.notifyAndClearAllSubscriptions();
                 }
             }
             else {
@@ -124,7 +129,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                 // TODO: All YSOD handling should be done with an interceptor
                 overlayService.ysod(err);
             }
-            
+
         },
 
         /**
@@ -184,8 +189,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                         serverValidationManager.addPropertyError(propertyAlias, culture, "", modelState[e][0]);
                     }
 
-                }
-                else {
+                } else {
 
                     //Everthing else is just a 'Field'... the field name could contain any level of 'parts' though, for example:
                     // Groups[0].Properties[2].Alias

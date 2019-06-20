@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -26,8 +26,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                 RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             var sqlPropertyData = Sql()
-                .Select<PropertyDataDto>(x => x.Id, x => x.TextValue)
-                    .AndSelect<DataTypeDto>(x => x.EditorAlias)
+                .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
                 .From<PropertyDataDto>()
                     .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
                     .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
@@ -63,7 +62,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                     property.TextValue = UpdateMediaUrls(mediaLinkPattern, value);
                 }
 
-                Database.Update(property, x => x.TextValue);
+                Database.Update(property);
             }
 
             Context.AddPostMigration<RebuildPublishedSnapshot>();

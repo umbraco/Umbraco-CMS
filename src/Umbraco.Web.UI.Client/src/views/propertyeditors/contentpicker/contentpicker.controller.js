@@ -80,7 +80,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
-        ignoreUserStartNodes: false,
         maxNumber: 1,
         minNumber: 0,
         startNode: {
@@ -118,8 +117,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = Object.toBoolean($scope.model.config.showOpenButton);
     $scope.model.config.showEditButton = Object.toBoolean($scope.model.config.showEditButton);
     $scope.model.config.showPathOnHover = Object.toBoolean($scope.model.config.showPathOnHover);
-    $scope.model.config.ignoreUserStartNodes = Object.toBoolean($scope.model.config.ignoreUserStartNodes);    
-    
+
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
@@ -135,7 +133,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
         startNodeId: null,
-        ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes,
         currentNode: editorState ? editorState.current : null,
         callback: function (data) {
             if (angular.isArray(data)) {
@@ -156,6 +153,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
+
+    // if we can't pick more than one item, explicitly disable multiPicker in the dialog options
+    if ($scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) === 1) {
+        dialogOptions.multiPicker = false;
+    }
 
     // add the current filter (if any) as title for the filtered out nodes
     if ($scope.model.config.filter) {

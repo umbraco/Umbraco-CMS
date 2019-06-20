@@ -30,7 +30,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    [SearchableTree("searchResultFormatter", "configureContentResult")]
+    [SearchableTree("searchResultFormatter", "configureContentResult", 10)]
     public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
@@ -201,9 +201,6 @@ namespace Umbraco.Web.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
-        internal override IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
-            => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
-
         protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
         {
             var result = base.GetChildEntities(id, queryStrings);
@@ -248,8 +245,11 @@ namespace Umbraco.Web.Trees
 	                OpensDialog = true
 	            });
             }
-			
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
+
+            if((item is DocumentEntitySlim documentEntity && documentEntity.IsContainer) == false)
+            {
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+            }
 
             return menu;
         }

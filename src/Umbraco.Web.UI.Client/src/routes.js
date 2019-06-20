@@ -39,10 +39,14 @@ app.config(function ($routeProvider) {
                                         $route.current.params.section = "content";
                                     }
 
+                                    var found = _.find(user.allowedSections, function (s) {
+                                        return s.localeCompare($route.current.params.section, undefined, { sensitivity: 'accent' }) === 0;
+                                    })
+
                                     // U4-5430, Benjamin Howarth
                                     // We need to change the current route params if the user only has access to a single section
                                     // To do this we need to grab the current user's allowed sections, then reject the promise with the correct path.
-                                    if (user.allowedSections.indexOf($route.current.params.section) > -1) {
+                                    if (found) {
                                         //this will resolve successfully so the route will continue
                                         return $q.when(true);
                                     } else {
@@ -119,7 +123,7 @@ app.config(function ($routeProvider) {
                 sectionService.getSectionsForUser().then(function(sections) {
                     //find the one we're requesting
                     var found = _.find(sections, function(s) {
-                        return s.alias === $routeParams.section;
+                        return s.alias.localeCompare($routeParams.section, undefined, { sensitivity: 'accent' }) === 0;
                     })
                     if (found && found.routePath) {
                         //there's a custom route path so redirect
@@ -224,6 +228,7 @@ app.config(function ($routeProvider) {
 
             },
             reloadOnSearch: false,
+            reloadOnUrl: false,
             resolve: canRoute(true)
         })
         .otherwise({ redirectTo: '/login' });

@@ -360,7 +360,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 icon: "code",
                 tooltip: "View Source Code",
                 onclick: function(){
-                    callback();
+                    if (callback) {
+                        angularHelper.safeApply($rootScope, function() {
+                            callback();
+                        });
+                    }
                 }
             });
 
@@ -418,23 +422,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         insertMediaInEditor: function (editor, img) {
             if (img) {
 
-                var hasUdi = img.udi ? true : false;
-
                 var data = {
                     alt: img.altText || "",
                     src: (img.url) ? img.url : "nothing.jpg",
-                    id: '__mcenew'
+                    id: '__mcenew',
+                    'data-udi': img.udi
                 };
-
-                if (hasUdi) {
-                    data["data-udi"] = img.udi;
-                } else {
-                    //Considering these fixed because UDI will now be used and thus
-                    // we have no need for rel http://issues.umbraco.org/issue/U4-6228, http://issues.umbraco.org/issue/U4-6595
-                    //TODO: Kill rel attribute
-                    data["rel"] = img.id;
-                    data["data-id"] = img.id;
-                }
                 
                 editor.selection.setContent(editor.dom.createHTML('img', data));
 
@@ -986,7 +979,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 }
             }
 
-            if (!href) {
+            if (!href && !target.anchor) {
                 editor.execCommand('unlink');
                 return;
             }
@@ -998,6 +991,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 insertLink();
                 return;
+            }
+
+		    if (!href) {
+		        href = "";
             }
 
 		    // Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
@@ -1149,25 +1146,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             let self = this;
 
-            function getIgnoreUserStartNodes(args) {
-                var ignoreUserStartNodes = false;
-                // Most property editors have a "config" property with ignoreUserStartNodes on then
-                if (args.model.config) {
-                    ignoreUserStartNodes = Object.toBoolean(args.model.config.ignoreUserStartNodes);
-                }
-                // EXCEPT for the grid's TinyMCE editor, that one wants to be special and the config is called "configuration" instead
-                else if (args.model.configuration) {
-                    ignoreUserStartNodes = Object.toBoolean(args.model.configuration.ignoreUserStartNodes);
-                }
-                return ignoreUserStartNodes;
-            }
-
             //create link picker
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
                 var linkPicker = {
                     currentTarget: currentTarget,
                     anchors: editorState.current ? self.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
-                    ignoreUserStartNodes: getIgnoreUserStartNodes(args),
                     submit: function (model) {
                         self.insertLinkInEditor(args.editor, model.target, anchorElement);
                         editorService.close();
@@ -1181,25 +1164,13 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             //Create the insert media plugin
             self.createMediaPicker(args.editor, function (currentTarget, userData) {
-
-                var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                var startNodeIsVirtual = userData.startMediaIds.length !== 1;
-
-                var ignoreUserStartNodes = getIgnoreUserStartNodes(args);
-                if (ignoreUserStartNodes) {
-                    ignoreUserStartNodes = true;
-                    startNodeId = -1;
-                    startNodeIsVirtual = true;
-                }
-
                 var mediaPicker = {
                     currentTarget: currentTarget,
                     onlyImages: true,
                     showDetails: true,
                     disableFolderSelect: true,
-                    startNodeId: startNodeId,
-                    startNodeIsVirtual: startNodeIsVirtual,
-                    ignoreUserStartNodes: ignoreUserStartNodes,
+                    startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
+                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
                     submit: function (model) {
                         self.insertMediaInEditor(args.editor, model.selection[0]);
                         editorService.close();
