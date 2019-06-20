@@ -596,7 +596,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             updateModel();
         }));
         unsubscribe.push($scope.$on("propertyCopy", function (ev, args) {
-            console.log("NC: I be the copy function by broadcast", $scope.model.alias);
+            $scope.clickCopyAll();
         }));
 
         $scope.$on("$destroy", function () {
