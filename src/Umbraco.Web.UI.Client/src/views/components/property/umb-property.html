@@ -18,7 +18,7 @@
                         <strong class="umb-control-required">*</strong>
                     </span>
 
-                    <i class="icon-documents" ng-show="!showInherit && property.canCopy" ng-click="onCopy()" prevent-default></i>
+                    <a class="icon-documents umb-property__copy" ng-show="!showInherit && property.canCopy" ng-click="onCopy()" prevent-default></a>
 
                     <small ng-bind-html="property.description | preserveNewLineInHtml"></small>
                 </label>
