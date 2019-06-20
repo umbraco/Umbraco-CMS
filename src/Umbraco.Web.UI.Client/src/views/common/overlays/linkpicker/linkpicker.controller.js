@@ -18,11 +18,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             searchFromId: null,
             searchFromName: null,
             showSearch: false,
-            ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes,
+            dataTypeId: dialogOptions.dataTypeId,
             results: [],
             selectedSearchResults: []
         };
-        $scope.customTreeParams = dialogOptions.ignoreUserStartNodes ? "ignoreUserStartNodes=" + dialogOptions.ignoreUserStartNodes : "";
+        $scope.customTreeParams = dialogOptions.dataTypeId ? "dataTypeId=" + dialogOptions.dataTypeId : "";
         $scope.showTarget = $scope.model.hideTarget !== true;
 
         if (dialogOptions.currentTarget) {
@@ -46,7 +46,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                     });
 
                     // if a link exists, get the properties to build the anchor name list
-                    contentResource.getById(id, { ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes }).then(function (resp) {
+                    contentResource.getById(id, { dataTypeId: dialogOptions.dataTypeId }).then(function (resp) {
                         $scope.model.target.url = resp.urls[0];
                         $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
                     });
@@ -88,7 +88,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             if (args.node.id < 0) {
                 $scope.model.target.url = "/";
             } else {
-                contentResource.getById(args.node.id, { ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes }).then(function (resp) {
+                contentResource.getById(args.node.id, { dataTypeId: dialogOptions.dataTypeId }).then(function (resp) {
                     $scope.model.target.url = resp.urls[0];
                     $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
                 });
@@ -120,7 +120,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
                     show: true,
-                    ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes,
+                    dataTypeId: dialogOptions.dataTypeId,
                     submit: function (model) {
                         var media = model.selectedImages[0];
 
@@ -133,7 +133,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                         $scope.mediaPickerOverlay.show = false;
                         $scope.mediaPickerOverlay = null;
 
-                        // make sure the content tree has nothing highlighted 
+                        // make sure the content tree has nothing highlighted
                         $scope.dialogTreeEventHandler.syncTree({
                             path: "-1",
                             tree: "content"

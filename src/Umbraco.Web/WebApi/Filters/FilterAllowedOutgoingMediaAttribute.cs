@@ -8,13 +8,12 @@ using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// This inspects the result of the action that returns a collection of content and removes 
+    /// This inspects the result of the action that returns a collection of content and removes
     /// any item that the current user doesn't have access to
     /// </summary>
     internal class FilterAllowedOutgoingMediaAttribute : ActionFilterAttribute
@@ -79,12 +78,18 @@ namespace Umbraco.Web.WebApi.Filters
 
         protected virtual void FilterItems(IUser user, IList items)
         {
-            bool.TryParse(HttpContext.Current.Request.QueryString.Get(TreeQueryStringParameters.IgnoreUserStartNodes), out var ignoreUserStartNodes);
+
+            Guid? dataTypeId = Guid.TryParse(HttpContext.Current.Request.QueryString.Get(TreeQueryStringParameters.DataTypeId), out var temp) ? (Guid?)temp : null;
+
+            if (dataTypeId.HasValue == false) return;
+
+            var ignoreUserStartNodes = ApplicationContext.Current.Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value);
 
             if (ignoreUserStartNodes == false)
             {
                 FilterBasedOnStartNode(items, user);
             }
+
         }
 
         internal void FilterBasedOnStartNode(IList items, IUser user)

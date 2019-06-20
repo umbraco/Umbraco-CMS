@@ -85,7 +85,7 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add("searchable", "true");
             }
 
-            //now update all data based on some of the query strings, like if we are running in dialog mode           
+            //now update all data based on some of the query strings, like if we are running in dialog mode
             if (IsDialog(queryStrings))
             {
                 node.RoutePath = "#";
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings">
         /// All of the query string parameters passed from jsTree
         /// </param>
-        /// <returns>JSON markup for jsTree</returns>        
+        /// <returns>JSON markup for jsTree</returns>
         /// <remarks>
         /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
@@ -118,7 +118,7 @@ namespace Umbraco.Web.Trees
                 AddQueryStringsToAdditionalData(node, queryStrings);
             }
 
-            //now update all data based on some of the query strings, like if we are running in dialog mode            
+            //now update all data based on some of the query strings, like if we are running in dialog mode
             if (IsDialog((queryStrings)))
             {
                 foreach (var node in nodes)
@@ -204,7 +204,7 @@ namespace Umbraco.Web.Trees
             var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
             var node = new TreeNode(id, parentId, jsonUrl, menuUrl)
             {
-                Name = title, 
+                Name = title,
                 Icon = icon,
                 NodeType = TreeAlias
             };
@@ -356,7 +356,13 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected bool IgnoreUserStartNodes(FormDataCollection queryStrings)
         {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IgnoreUserStartNodes);
+            var dataTypeId = queryStrings.GetValue<Guid?>(TreeQueryStringParameters.DataTypeId);
+            if (dataTypeId.HasValue)
+            {
+                return Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value);
+            }
+
+            return false;
         }
 
         /// <summary>

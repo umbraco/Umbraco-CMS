@@ -28,11 +28,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.$watch(function () {
             //return the joined Ids as a string to watch
             return _.map($scope.renderModel, function (i) {
-                return $scope.model.config.idType === "udi" ? i.udi : i.id;                 
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;
             }).join();
         }, function (newVal) {
             var currIds = _.map($scope.renderModel, function (i) {
-                return $scope.model.config.idType === "udi" ? i.udi : i.id;                
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;
             });
             $scope.model.value = trim(currIds.join(), ",");
 
@@ -57,8 +57,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     $scope.renderModel = [];
-	    
-    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;    
+
+    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
 
     //the default pre-values
     var defaultConfig = {
@@ -66,7 +66,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
-        ignoreUserStartNodes: false,
+        dataTypeId: null,
         maxNumber: 1,
         minNumber : 0,
         startNode: {
@@ -100,8 +100,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = ($scope.model.config.showOpenButton === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
     $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
-    $scope.model.config.ignoreUserStartNodes = ($scope.model.config.ignoreUserStartNodes === "1" ? true : false);
-  
+
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
@@ -134,7 +133,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         idType: "int"
     };
 
-    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
+    dialogOptions.dataTypeId = $scope.model.dataTypeId;
+    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
 
@@ -153,7 +153,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             if (!currFilter) {
                 return false;
             }
-            //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller, 
+            //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller,
             // but not much we can do about that since members require special filtering.
             var filterItem = currFilter.toLowerCase().split(',');
             var found = filterItem.indexOf(i.metaData.contentType.toLowerCase()) >= 0;
@@ -260,7 +260,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             unsubscribe();
         }
     });
-    
+
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
     //load current data if anything selected
@@ -296,7 +296,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         // get url for content and media items
         if(entityType !== "Member") {
             entityResource.getUrl(entity.id, entityType).then(function(data){
-                // update url                
+                // update url
                 angular.forEach($scope.renderModel, function(item){
                     if (item.id === entity.id) {
                         if (entity.trashed) {
@@ -310,7 +310,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
 
         // add the selected item to the renderModel
-        // if it needs to show a url the item will get 
+        // if it needs to show a url the item will get
         // updated when the url comes back from server
         addSelectedItem(entity);
 
@@ -338,7 +338,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             }
         }
 
-        $scope.renderModel.push({ 
+        $scope.renderModel.push({
             "name": item.name,
             "id": item.id,
             "udi": item.udi,
@@ -347,7 +347,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             "url": item.url,
             "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
-            // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
+            // only content supports published/unpublished content so we set everything else to published so the UI looks correct
         });
 
     }

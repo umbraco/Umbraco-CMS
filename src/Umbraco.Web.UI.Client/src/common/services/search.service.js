@@ -2,7 +2,7 @@
  * @ngdoc service
  * @name umbraco.services.searchService
  *
- *  
+ *
  * @description
  * Service for handling the main application search, can currently search content, media and members
  *
@@ -15,10 +15,10 @@
  *          angular.forEach(results, function(result){
  *                  //returns:
  *                  {name: "name", id: 1234, menuUrl: "url", editorPath: "url", metaData: {}, subtitle: "/path/etc" }
- *           })          
- *           var result = 
- *       }) 
- * </pre> 
+ *           })
+ *           var result =
+ *       })
+ * </pre>
  */
 angular.module('umbraco.services')
     .factory('searchService', function ($q, $log, entityResource, contentResource, umbRequestHelper, $injector, searchResultFormatter) {
@@ -43,7 +43,7 @@ angular.module('umbraco.services')
                 }
 
                 var options = {
-                    searchFrom: args.searchFrom                    
+                    searchFrom: args.searchFrom
                 }
 
                 return entityResource.search(args.term, "Member", options).then(function (data) {
@@ -73,7 +73,7 @@ angular.module('umbraco.services')
 
                 var options = {
                     searchFrom: args.searchFrom,
-                    ignoreUserStartNodes: args.ignoreUserStartNodes
+                    dataTypeId: args.dataTypeId
                 }
 
                 return entityResource.search(args.term, "Document", options, args.canceler).then(function (data) {
@@ -103,7 +103,7 @@ angular.module('umbraco.services')
 
                 var options = {
                     searchFrom: args.searchFrom,
-                    ignoreUserStartNodes: args.ignoreUserStartNodes
+                    dataTypeId: args.dataTypeId
                 }
 
                 return entityResource.search(args.term, "Media", options).then(function (data) {
@@ -136,7 +136,7 @@ angular.module('umbraco.services')
                     _.each(data, function (resultByType) {
 
                         //we need to format the search result data to include things like the subtitle, urls, etc...
-                        // this is done with registered angular services as part of the SearchableTreeAttribute, if that 
+                        // this is done with registered angular services as part of the SearchableTreeAttribute, if that
                         // is not found, than we format with the default formatter
                         var formatterMethod = searchResultFormatter.configureDefaultResult;
                         //check if a custom formatter is specified...
@@ -157,7 +157,7 @@ angular.module('umbraco.services')
                         _.each(resultByType.results, function (item) {
                             formatterMethod.apply(this, [item, resultByType.treeAlias, resultByType.appAlias]);
                         });
-                        
+
                     });
 
                     return data;

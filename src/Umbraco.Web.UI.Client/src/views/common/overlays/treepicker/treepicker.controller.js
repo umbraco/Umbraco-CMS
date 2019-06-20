@@ -16,7 +16,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             searchFromId: dialogOptions.startNodeId,
             searchFromName: null,
             showSearch: false,
-            ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes,
+            dataTypeId: dialogOptions.dataTypeId,
             results: [],
             selectedSearchResults: []
         }
@@ -138,8 +138,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             if (dialogOptions.startNodeId)
                 params.push("startNodeId=" + dialogOptions.startNodeId);
 
-            if (dialogOptions.ignoreUserStartNodes)
-                params.push("ignoreUserStartNodes=" + dialogOptions.ignoreUserStartNodes);
+            if (dialogOptions.dataTypeId)
+                params.push("dataTypeId=" + dialogOptions.dataTypeId);
 
             if (dialogOptions.customTreeParams)
                 params.push(dialogOptions.customTreeParams);

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core.PropertyEditors;
 
@@ -19,6 +20,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
         public int Id { get; set; }
+
+        [DataMember(Name = "dataTypeId", IsRequired = true)]
+        [Required]
+        public Guid DataTypeId { get; set; }
 
         [DataMember(Name = "value")]
         public object Value { get; set; }

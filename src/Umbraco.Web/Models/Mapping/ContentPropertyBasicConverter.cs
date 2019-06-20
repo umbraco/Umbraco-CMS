@@ -48,9 +48,12 @@ namespace Umbraco.Web.Models.Mapping
                 editor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias);
             }
 
+            var dataTypeDefinition = DataTypeService.GetDataTypeDefinitionById(property.PropertyType.DataTypeDefinitionId);
+
             var result = new T
             {
                 Id = property.Id,
+                DataTypeId = dataTypeDefinition.Key,
                 Alias = property.Alias,
                 PropertyEditor = editor,
                 Editor = editor.Alias

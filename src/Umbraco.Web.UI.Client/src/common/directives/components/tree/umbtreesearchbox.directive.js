@@ -12,7 +12,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             searchFromName: "@",
             showSearch: "@",
             section: "@",
-            ignoreUserStartNodes: "@",
+            datatypeId: "@",
             hideSearchCallback: "=",
             searchCallback: "="
         },
@@ -62,10 +62,10 @@ function treeSearchBox(localizationService, searchService, $q) {
                         searchArgs["searchFrom"] = scope.searchFromId;
                     }
 
-                    //append ignoreUserStartNodes value if there is one
-                    if (scope.ignoreUserStartNodes) {                        
-                        searchArgs["ignoreUserStartNodes"] = scope.ignoreUserStartNodes;
-                    }                   
+                    //append dataTypeId value if there is one
+                    if (scope.datatypeId) {
+                        searchArgs["dataTypeId"] = scope.datatypeId;
+                    }
 
                     searcher(searchArgs).then(function (data) {
                         scope.searchCallback(data);

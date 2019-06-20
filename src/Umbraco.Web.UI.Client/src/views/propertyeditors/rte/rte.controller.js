@@ -134,7 +134,7 @@ angular.module("umbraco")
 
             //wait for queue to end
             $q.all(await).then(function () {
-                
+
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
                     mode: "exact",
@@ -268,13 +268,14 @@ angular.module("umbraco")
 
                         syncContent(editor);
                     });
-					
+
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
                         $scope.linkPickerOverlay = {
                             view: "linkpicker",
                             currentTarget: currentTarget,
 							              anchors: editorState.current ? tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
-                            ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes === "1",
+                            dataTypeId: $scope.model.dataTypeId,
+                            ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes,
                             show: true,
                             submit: function(model) {
                                 tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
@@ -286,12 +287,10 @@ angular.module("umbraco")
 
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
-                        var ignoreUserStartNodes = false;
                         var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
                         var startNodeIsVirtual = userData.startMediaIds.length !== 1;
 
                         if ($scope.model.config.ignoreUserStartNodes === "1") {
-                            ignoreUserStartNodes = true;
                             startNodeId = -1;
                             startNodeIsVirtual = true;
                         }
@@ -303,7 +302,7 @@ angular.module("umbraco")
                             disableFolderSelect: true,
                             startNodeId: startNodeId,
                             startNodeIsVirtual: startNodeIsVirtual,
-                            ignoreUserStartNodes: ignoreUserStartNodes,
+                            dataTypeId: $scope.model.dataTypeId,
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {
@@ -314,7 +313,7 @@ angular.module("umbraco")
                         };
 
                     });
-                    
+
                     //Create the embedded plugin
                     tinyMceService.createInsertEmbeddedMedia(editor, $scope, function() {
 
@@ -348,7 +347,7 @@ angular.module("umbraco")
 
                     });
                 };
-                
+
                 /** Loads in the editor */
                 function loadTinyMce() {
 

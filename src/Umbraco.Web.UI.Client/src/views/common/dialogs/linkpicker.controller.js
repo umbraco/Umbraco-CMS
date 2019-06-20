@@ -8,12 +8,14 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			searchText = value + "...";
 		});
 
+		debugger;
 		$scope.dialogTreeEventHandler = $({});
 		$scope.target = {};
 		$scope.searchInfo = {
 			searchFromId: null,
 			searchFromName: null,
 			showSearch: false,
+            dataTypeId: $scope.model.dataTypeId,
 			results: [],
 			selectedSearchResults: []
 		}
@@ -103,7 +105,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 
 				//iterate children
 				_.each(args.children, function (child) {
-					//check if any of the items are list views, if so we need to add a custom 
+					//check if any of the items are list views, if so we need to add a custom
 					// child: A node to activate the search
 					if (child.metaData.isContainer) {
 						child.hasChildren = true;
@@ -145,7 +147,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			$scope.searchInfo.results = [];
 		}
 
-		// method to select a search result 
+		// method to select a search result
 		$scope.selectResult = function (evt, result) {
 			result.selected = result.selected === true ? false : true;
 			nodeSelectHandler(evt, {
@@ -154,7 +156,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			});
 		};
 
-		//callback when there are search results 
+		//callback when there are search results
 		$scope.onSearchResults = function (results) {
 			$scope.searchInfo.results = results;
 			$scope.searchInfo.showSearch = true;

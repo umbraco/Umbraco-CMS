@@ -7,7 +7,7 @@
             }
 
             $scope.model.config.max = isNumeric($scope.model.config.max) && $scope.model.config.max !== 0 ? $scope.model.config.max : Number.MAX_VALUE;
-            
+
             $scope.newCaption = '';
             $scope.newLink = 'http://';
             $scope.newNewWindow = false;
@@ -25,7 +25,7 @@
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === "1" ? true:  false;
+               $scope.contentPickerOverlay.dataTypeId = $scope.model.dataTypeId;
                $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
@@ -51,7 +51,7 @@
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.ignoreUserStartNodes = $scope.model.config.ignoreUserStartNodes === "1" ? true : false;
+               $scope.contentPickerOverlay.dataTypeId = $scope.model.dataTypeId;
                $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
@@ -83,15 +83,15 @@
                 $scope.model.value[idx].edit = false;
             };
 
-            $scope.delete = function (idx) {               
-                $scope.model.value.splice(idx, 1);               
+            $scope.delete = function (idx) {
+                $scope.model.value.splice(idx, 1);
             };
 
             $scope.add = function ($event) {
 				if (!angular.isArray($scope.model.value)) {
                   $scope.model.value = [];
 				}
-				
+
                 if ($scope.newCaption == "") {
                     $scope.hasError = true;
                 } else {
@@ -135,9 +135,9 @@
                 $scope.addExternal = !$scope.addExternal;
                 $event.preventDefault();
             };
-            
+
             $scope.switchLinkType = function ($event, link) {
-                link.isInternal = !link.isInternal;                
+                link.isInternal = !link.isInternal;
                 link.type = link.isInternal ? "internal" : "external";
                 if (!link.isInternal)
                     link.link = $scope.newLink;
@@ -147,7 +147,7 @@
             $scope.move = function (index, direction) {
                 var temp = $scope.model.value[index];
                 $scope.model.value[index] = $scope.model.value[index + direction];
-                $scope.model.value[index + direction] = temp;                
+                $scope.model.value[index + direction] = temp;
             };
 
             //helper for determining if a user can add items

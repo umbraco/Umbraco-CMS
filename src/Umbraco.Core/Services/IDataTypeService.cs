@@ -6,7 +6,7 @@ using umbraco.interfaces;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/> 
+    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/>
     /// </summary>
     public interface IDataTypeService : IService
     {
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataType"/> object</returns>
         [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
         IDataType GetDataTypeById(Guid id);
-        
+
         /// <summary>
         /// Gets a complete list of all registered <see cref="IDataType"/>'s
         /// </summary>
@@ -162,6 +162,7 @@ namespace Umbraco.Core.Services
         string GetPreValueAsString(int id);
 
         Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
-        
+
+        bool IsDataTypeIgnoringUserStartNodes(Guid dataTypeId);
     }
 }

@@ -18,7 +18,7 @@ angular.module("umbraco")
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
 
-            var userStartNodes = []; 
+            var userStartNodes = [];
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
@@ -50,7 +50,7 @@ angular.module("umbraco")
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
-                ignoreUserStartNodes: $scope.model.ignoreUserStartNodes
+                dataTypeId: $scope.model.dataTypeId
             };
 
             //preload selected item
@@ -157,8 +157,8 @@ angular.module("umbraco")
                 }
 
                 if (folder.id > 0) {
-                    entityResource.getAncestors(folder.id, "media", { ignoreUserStartNodes: $scope.model.ignoreUserStartNodes })
-                        .then(function(anc) {              
+                    entityResource.getAncestors(folder.id, "media", { dataTypeId: $scope.model.dataTypeId })
+                        .then(function(anc) {
                             $scope.path = _.filter(anc,
                                 function(f) {
                                     return f.path.indexOf($scope.startNodeId) !== -1;
@@ -168,12 +168,12 @@ angular.module("umbraco")
                 } else {
                     $scope.path = [];
                 }
-              
+
                 mediaTypeHelper.getAllowedImagetypes(folder.id)
                     .then(function (types) {
                         $scope.acceptedMediatypes = types;
                     });
-              
+
                 $scope.lockedFolder = (folder.id === -1 && $scope.model.startNodeIsVirtual) || hasFolderAccess(folder) === false;
 
                 $scope.currentFolder = folder;
@@ -277,7 +277,7 @@ angular.module("umbraco")
                     if (userStartNodes.indexOf(parseInt(nodePath[i])) !== -1)
                         return true;
                 }
-                
+
                 return false;
             }
 
@@ -316,7 +316,7 @@ angular.module("umbraco")
                                 totalItems: 0,
                                 totalPages: 0,
                                 filter: '',
-                                ignoreUserStartNodes: $scope.model.ignoreUserStartNodes
+                                dataTypeId: $scope.model.dataTypeId
                             };
                             getChildren($scope.currentFolder.id);
                         }
@@ -388,7 +388,7 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 $scope.loading = true;
-                return mediaResource.getChildren(id, { ignoreUserStartNodes: $scope.model.ignoreUserStartNodes })
+                return mediaResource.getChildren(id, { dataTypeId: $scope.model.dataTypeId })
                     .then(function(data) {
                         $scope.searchOptions.filter = "";
                         $scope.images = data.items ? data.items : [];

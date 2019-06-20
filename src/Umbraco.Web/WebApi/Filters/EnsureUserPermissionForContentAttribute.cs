@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,12 +17,12 @@ using umbraco.BusinessLogic.Actions;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// Auth filter to check if the current user has access to the content item (by id). 
+    /// Auth filter to check if the current user has access to the content item (by id).
     /// </summary>
     /// <remarks>
-    /// 
+    ///
     /// This first checks if the user can access this based on their start node, and then checks node permissions
-    /// 
+    ///
     /// By default the permission that is checked is browse but this can be specified in the ctor.
     /// NOTE: This cannot be an auth filter because that happens too soon and we don't have access to the action params.
     /// </remarks>
@@ -59,7 +59,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             _permissionToCheck = permissionToCheck;
         }
-        
+
         public override bool AllowMultiple
         {
             get { return true; }
@@ -72,9 +72,15 @@ namespace Umbraco.Web.WebApi.Filters
                 //not logged in
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
-            
-            var ignoreUserStartNodes = actionContext.ActionArguments.ContainsKey("ignoreUserStartNodes") &&
-                                       bool.Parse(actionContext.ActionArguments.GetValueAsString("ignoreUserStartNodes"));
+
+            var ignoreUserStartNodes = false;
+
+            if (actionContext.ActionArguments.ContainsKey("dataTypeId") &&
+                Guid.TryParse(actionContext.ActionArguments.GetValueAsString("dataTypeId"), out var dataTypeId))
+            {
+                ignoreUserStartNodes =
+                    ApplicationContext.Current.Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId);
+            }
 
             int nodeId;
             if (_nodeId.HasValue == false)
@@ -97,7 +103,7 @@ namespace Umbraco.Web.WebApi.Filters
                         nodeId = parsedId;
                     }
                     else if (Udi.TryParse(argument, true, out Udi udi))
-                    { 
+                    {
                         nodeId = ApplicationContext.Current.Services.EntityService.GetIdForUdi(udi).Result;
                     }
                     else
@@ -115,7 +121,7 @@ namespace Umbraco.Web.WebApi.Filters
                     {
                         throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                     }
-                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);                    
+                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);
                 }
             }
             else
@@ -127,8 +133,8 @@ namespace Umbraco.Web.WebApi.Filters
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser,
                 ApplicationContext.Current.Services.UserService,
-                ApplicationContext.Current.Services.ContentService, 
-                ApplicationContext.Current.Services.EntityService, 
+                ApplicationContext.Current.Services.ContentService,
+                ApplicationContext.Current.Services.EntityService,
                 nodeId,
                 _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null,
                 ignoreUserStartNodes: ignoreUserStartNodes))
@@ -139,10 +145,10 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
             }
-            
+
         }
 
-        
+
 
     }
 }
