@@ -591,12 +591,19 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.realCurrentNode = newVal;
         });
 
-        var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        var unsubscribe = [];
+        unsubscribe.push($scope.$on("formSubmitting", function (ev, args) {
             updateModel();
-        });
+        }));
+        unsubscribe.push($scope.$on("propertyCopy", function (ev, args) {
+            console.log("NC: I be the copy function by broadcast", $scope.model.alias);
+        }));
 
         $scope.$on("$destroy", function () {
-            unsubscribe();
+            console.log("Unsubscribing", unsubscribe.length)
+            for (var u in unsubscribe) {
+                unsubscribe[u]();
+            }
         });
         
     }
