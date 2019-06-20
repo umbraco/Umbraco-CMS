@@ -20,8 +20,8 @@ angular.module("umbraco")
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
 
-            var width = parseInt(editorConfig.dimensions.width, 10) || null;
-            var height = parseInt(editorConfig.dimensions.height, 10) || null;
+            var width = editorConfig.dimensions ? parseInt(editorConfig.dimensions.width, 10) || null : null;
+            var height = editorConfig.dimensions ? parseInt(editorConfig.dimensions.height, 10) || null : null;
 
             $scope.containerWidth = editorConfig.mode === "distraction-free" ? (width ? width : "auto") : "auto";
             $scope.containerHeight = editorConfig.mode === "distraction-free" ? (height ? height : "auto") : "auto";

@@ -148,11 +148,33 @@ namespace Umbraco.Web
             var delimitedParts = string.Join(".", parts);
             foreach (var memberName in result.MemberNames)
             {
-                modelState.AddModelError($"{delimitedParts}.{memberName}", result.ErrorMessage);
+                modelState.TryAddModelError($"{delimitedParts}.{memberName}", result.ErrorMessage);
                 withNames = true;
             }
             if (!withNames)
-                modelState.AddModelError($"{delimitedParts}", result.ErrorMessage);
+            {
+                modelState.TryAddModelError($"{delimitedParts}", result.ErrorMessage);
+            }
+                
+        }
+
+        /// <summary>
+        /// Will add an error to model state for a key if that key and error don't already exist
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <param name="key"></param>
+        /// <param name="errorMsg"></param>
+        /// <returns></returns>
+        private static bool TryAddModelError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState, string key, string errorMsg)
+        {
+            if (modelState.TryGetValue(key, out var errs))
+            {
+                foreach(var e in errs.Errors)
+                    if (e.ErrorMessage == errorMsg) return false; //if this same error message exists for the same key, just exit
+            }
+
+            modelState.AddModelError(key, errorMsg);
+            return true;
         }
 
         public static IDictionary<string, object> ToErrorDictionary(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)
