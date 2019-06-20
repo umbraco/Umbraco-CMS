@@ -64,7 +64,7 @@ namespace Umbraco.Web
         public UmbracoContextReference EnsureUmbracoContext(HttpContextBase httpContext = null)
         {
             var currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
-            if (currentUmbracoContext != null && !currentUmbracoContext.Disposed)
+            if (currentUmbracoContext != null)
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
 
 
