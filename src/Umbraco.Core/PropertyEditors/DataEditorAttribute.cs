@@ -112,6 +112,11 @@ namespace Umbraco.Core.PropertyEditors
         public bool HideLabel { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the editor value can be copied
+        /// </summary>
+        public bool CanCopy { get; set; }
+
+        /// <summary>
         /// Gets or sets an optional icon.
         /// </summary>
         /// <remarks>The icon can be used for example when presenting datatypes based upon the editor.</remarks>

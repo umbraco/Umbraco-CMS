@@ -57,6 +57,7 @@ namespace Umbraco.Core.PropertyEditors
             View = view;
             ValueType = attribute.ValueType;
             HideLabel = attribute.HideLabel;
+            CanCopy = attribute.CanCopy;
         }
 
         /// <summary>
@@ -132,6 +133,12 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         [JsonProperty("hideLabel")]
         public bool HideLabel { get; set; }
+
+        /// <summary>
+        /// If this is true then the editor value can be copied
+        /// </summary>
+        [JsonProperty("canCopy")]
+        public bool CanCopy { get; set; }
 
         /// <summary>
         /// Set this to true if the property editor is for display purposes only
