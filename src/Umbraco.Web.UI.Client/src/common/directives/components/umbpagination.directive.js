@@ -96,13 +96,13 @@ Use this directive to generate a pagination.
                 scope.pageNumber = parseInt(scope.pageNumber);
             }
 
-            scope.pagination = [];
+            let tempPagination = [];
              
             var i = 0;
 
             if (scope.totalPages <= 10) {
                 for (i = 0; i < scope.totalPages; i++) {
-                    scope.pagination.push({
+                    tempPagination.push({
                         val: (i + 1),
                         isActive: scope.pageNumber === (i + 1)
                     });
@@ -119,7 +119,7 @@ Use this directive to generate a pagination.
                 start = Math.min(maxIndex, start);
 
                 for (i = start; i < (10 + start) ; i++) {
-                    scope.pagination.push({
+                    tempPagination.push({
                         val: (i + 1),
                         isActive: scope.pageNumber === (i + 1)
                     });
@@ -129,7 +129,7 @@ Use this directive to generate a pagination.
                 if (start > 0) {
                     localizationService.localize("general_first").then(function(value){
                         var firstLabel = value;
-                        scope.pagination.unshift({ name: firstLabel, val: 1, isActive: false }, {val: "...",isActive: false});
+                        tempPagination.unshift({ name: firstLabel, val: 1, isActive: false }, {val: "...",isActive: false});
                     });
                 }
 
@@ -137,9 +137,11 @@ Use this directive to generate a pagination.
                 if (start < maxIndex) {
                     localizationService.localize("general_last").then(function(value){
                         var lastLabel = value;
-                        scope.pagination.push({ val: "...", isActive: false }, { name: lastLabel, val: scope.totalPages, isActive: false });
+                        tempPagination.push({ val: "...", isActive: false }, { name: lastLabel, val: scope.totalPages, isActive: false });
                     });
                 }
+
+                scope.pagination = tempPagination;
             }
 
          }

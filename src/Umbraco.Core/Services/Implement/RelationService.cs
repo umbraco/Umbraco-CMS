@@ -285,39 +285,36 @@ namespace Umbraco.Core.Services.Implement
         /// Gets the Child object from a Relation as an <see cref="IUmbracoEntity"/>
         /// </summary>
         /// <param name="relation">Relation to retrieve child object from</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c></param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        public IUmbracoEntity GetChildEntityFromRelation(IRelation relation, bool loadBaseType = false)
+        public IUmbracoEntity GetChildEntityFromRelation(IRelation relation)
         {
             var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
-            return _entityService.Get(relation.ChildId, objectType, loadBaseType);
+            return _entityService.Get(relation.ChildId, objectType);
         }
 
         /// <summary>
         /// Gets the Parent object from a Relation as an <see cref="IUmbracoEntity"/>
         /// </summary>
         /// <param name="relation">Relation to retrieve parent object from</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c></param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        public IUmbracoEntity GetParentEntityFromRelation(IRelation relation, bool loadBaseType = false)
+        public IUmbracoEntity GetParentEntityFromRelation(IRelation relation)
         {
             var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
-            return _entityService.Get(relation.ParentId, objectType, loadBaseType);
+            return _entityService.Get(relation.ParentId, objectType);
         }
 
         /// <summary>
         /// Gets the Parent and Child objects from a Relation as a <see cref="Tuple"/>"/> with <see cref="IUmbracoEntity"/>.
         /// </summary>
         /// <param name="relation">Relation to retrieve parent and child object from</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c></param>
         /// <returns>Returns a Tuple with Parent (item1) and Child (item2)</returns>
-        public Tuple<IUmbracoEntity, IUmbracoEntity> GetEntitiesFromRelation(IRelation relation, bool loadBaseType = false)
+        public Tuple<IUmbracoEntity, IUmbracoEntity> GetEntitiesFromRelation(IRelation relation)
         {
             var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
             var parentObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
 
-            var child = _entityService.Get(relation.ChildId, childObjectType, loadBaseType);
-            var parent = _entityService.Get(relation.ParentId, parentObjectType, loadBaseType);
+            var child = _entityService.Get(relation.ChildId, childObjectType);
+            var parent = _entityService.Get(relation.ParentId, parentObjectType);
 
             return new Tuple<IUmbracoEntity, IUmbracoEntity>(parent, child);
         }
@@ -326,14 +323,13 @@ namespace Umbraco.Core.Services.Implement
         /// Gets the Child objects from a list of Relations as a list of <see cref="IUmbracoEntity"/> objects.
         /// </summary>
         /// <param name="relations">List of relations to retrieve child objects from</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c></param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/></returns>
-        public IEnumerable<IUmbracoEntity> GetChildEntitiesFromRelations(IEnumerable<IRelation> relations, bool loadBaseType = false)
+        public IEnumerable<IUmbracoEntity> GetChildEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
             foreach (var relation in relations)
             {
                 var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
-                yield return _entityService.Get(relation.ChildId, objectType, loadBaseType);
+                yield return _entityService.Get(relation.ChildId, objectType);
             }
         }
 
@@ -341,14 +337,13 @@ namespace Umbraco.Core.Services.Implement
         /// Gets the Parent objects from a list of Relations as a list of <see cref="IUmbracoEntity"/> objects.
         /// </summary>
         /// <param name="relations">List of relations to retrieve parent objects from</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c></param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/></returns>
-        public IEnumerable<IUmbracoEntity> GetParentEntitiesFromRelations(IEnumerable<IRelation> relations, bool loadBaseType = false)
+        public IEnumerable<IUmbracoEntity> GetParentEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
             foreach (var relation in relations)
             {
                 var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
-                yield return _entityService.Get(relation.ParentId, objectType, loadBaseType);
+                yield return _entityService.Get(relation.ParentId, objectType);
             }
         }
 
@@ -356,17 +351,16 @@ namespace Umbraco.Core.Services.Implement
         /// Gets the Parent and Child objects from a list of Relations as a list of <see cref="IUmbracoEntity"/> objects.
         /// </summary>
         /// <param name="relations">List of relations to retrieve parent and child objects from</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c></param>
         /// <returns>An enumerable list of <see cref="Tuple"/> with <see cref="IUmbracoEntity"/></returns>
-        public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations, bool loadBaseType = false)
+        public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
             foreach (var relation in relations)
             {
                 var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
                 var parentObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
 
-                var child = _entityService.Get(relation.ChildId, childObjectType, loadBaseType);
-                var parent = _entityService.Get(relation.ParentId, parentObjectType, loadBaseType);
+                var child = _entityService.Get(relation.ChildId, childObjectType);
+                var parent = _entityService.Get(relation.ParentId, parentObjectType);
 
                 yield return new Tuple<IUmbracoEntity, IUmbracoEntity>(parent, child);
             }

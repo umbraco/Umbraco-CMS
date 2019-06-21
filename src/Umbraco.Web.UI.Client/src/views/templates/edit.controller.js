@@ -83,10 +83,6 @@
                 saveMethod: templateResource.save,
                 scope: $scope,
                 content: vm.template,
-                // We do not redirect on failure for templates - this is because it is not possible to actually save the template
-                // type when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
