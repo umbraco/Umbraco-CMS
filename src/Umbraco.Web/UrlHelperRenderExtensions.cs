@@ -20,6 +20,8 @@ namespace Umbraco.Web
     public static class UrlHelperRenderExtensions
     {
 
+        private static readonly IHtmlString EmptyHtmlString = new HtmlString(string.Empty);
+
         #region GetCropUrl
 
         /// <summary>
@@ -39,6 +41,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string cropAlias, bool htmlEncode = true)
         {
+            if (mediaItem == null) return EmptyHtmlString;
+
             var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
@@ -65,6 +69,8 @@ namespace Umbraco.Web
         /// </returns>
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true)
         {
+            if (mediaItem == null) return EmptyHtmlString;
+
             var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
@@ -144,6 +150,8 @@ namespace Umbraco.Web
             bool upScale = true,
             bool htmlEncode = true)
         {
+            if (mediaItem == null) return EmptyHtmlString;
+
             var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
                 upScale);
@@ -247,6 +255,8 @@ namespace Umbraco.Web
             bool upScale = true,
             bool htmlEncode = true)
         {
+            if (imageCropperValue == null) return EmptyHtmlString;
+
             var imageUrl = imageCropperValue.Src;
             var url = imageUrl.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
