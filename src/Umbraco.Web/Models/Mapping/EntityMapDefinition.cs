@@ -45,6 +45,12 @@ namespace Umbraco.Web.Models.Mapping
             if (source.NodeObjectType == Constants.ObjectTypes.Member && target.Icon.IsNullOrWhiteSpace())
                 target.Icon = "icon-user";
 
+            if (source.NodeObjectType == Constants.ObjectTypes.Media && source is IContentEntitySlim contentSlim)
+                source.AdditionalData["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
+
+            if (source.NodeObjectType == Constants.ObjectTypes.Media && source is IMediaEntitySlim mediaSlim)
+                source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
+
             // NOTE: we're mapping the objects in AdditionalData by object reference here.
             // it works fine for now, but it's something to keep in mind in the future
             foreach(var kvp in source.AdditionalData)

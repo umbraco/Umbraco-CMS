@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Umbraco.Core.Models.Entities
 {
+
     /// <summary>
     /// Implements <see cref="IDocumentEntitySlim"/>.
     /// </summary>

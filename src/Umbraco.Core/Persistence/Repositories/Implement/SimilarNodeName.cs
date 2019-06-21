@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 if (uniqueing)
                 {
-                    if (name.NumPos > 0 && name.Name.StartsWith(nodeName) && name.NumVal == uniqueNumber)
+                    if (name.NumPos > 0 && name.Name.InvariantStartsWith(nodeName) && name.NumVal == uniqueNumber)
                         uniqueNumber++;
                     else
                         break;

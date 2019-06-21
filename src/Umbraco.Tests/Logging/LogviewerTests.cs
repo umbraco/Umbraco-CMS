@@ -23,9 +23,10 @@ namespace Umbraco.Tests.Logging
         private string _newSearchfilePath;
         private string _newSearchfileDirPath;
 
-        private DateTimeOffset _startDate = new DateTime(year: 2018, month: 11, day: 12, hour:0, minute:0, second:0);
-        private DateTimeOffset _endDate = new DateTime(year: 2018, month: 11, day: 13, hour: 0, minute: 0, second: 0);
-
+        private LogTimePeriod _logTimePeriod = new LogTimePeriod(
+            new DateTime(year: 2018, month: 11, day: 12, hour:0, minute:0, second:0),
+            new DateTime(year: 2018, month: 11, day: 13, hour: 0, minute: 0, second: 0)
+            );
         [OneTimeSetUp]
         public void Setup()
         {
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.Logging
         [Test]
         public void Logs_Contain_Correct_Error_Count()
         {
-            var numberOfErrors = _logViewer.GetNumberOfErrors(startDate: _startDate, endDate: _endDate);
+            var numberOfErrors = _logViewer.GetNumberOfErrors(_logTimePeriod);
 
             //Our dummy log should contain 2 errors
             Assert.AreEqual(2, numberOfErrors);
@@ -76,8 +77,8 @@ namespace Umbraco.Tests.Logging
         [Test]
         public void Logs_Contain_Correct_Log_Level_Counts()
         {
-            var logCounts = _logViewer.GetLogLevelCounts(startDate: _startDate, endDate: _endDate);
-            
+            var logCounts = _logViewer.GetLogLevelCounts(_logTimePeriod);
+
             Assert.AreEqual(1954, logCounts.Debug);
             Assert.AreEqual(2, logCounts.Error);
             Assert.AreEqual(0, logCounts.Fatal);
@@ -88,7 +89,7 @@ namespace Umbraco.Tests.Logging
         [Test]
         public void Logs_Contains_Correct_Message_Templates()
         {
-            var templates = _logViewer.GetMessageTemplates(startDate: _startDate, endDate: _endDate);
+            var templates = _logViewer.GetMessageTemplates(_logTimePeriod);
 
             //Count no of templates
             Assert.AreEqual(43, templates.Count());
@@ -112,7 +113,7 @@ namespace Umbraco.Tests.Logging
         {
             //We are just testing a return value (as we know the example file is less than 200MB)
             //But this test method does not test/check that
-            var canOpenLogs = _logViewer.CheckCanOpenLogs(startDate: _startDate, endDate: _endDate);
+            var canOpenLogs = _logViewer.CheckCanOpenLogs(_logTimePeriod);
             Assert.IsTrue(canOpenLogs);
         }
 
@@ -120,7 +121,7 @@ namespace Umbraco.Tests.Logging
         public void Logs_Can_Be_Queried()
         {
             //Should get me the most 100 recent log entries & using default overloads for remaining params
-            var allLogs = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1);
+            var allLogs = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1);
 
             //Check we get 100 results back for a page & total items all good :)
             Assert.AreEqual(100, allLogs.Items.Count());
@@ -138,7 +139,7 @@ namespace Umbraco.Tests.Logging
 
 
             //Check we call method again with a smaller set of results & in ascending
-            var smallQuery = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, pageSize: 10, orderDirection: Direction.Ascending);
+            var smallQuery = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, pageSize: 10, orderDirection: Direction.Ascending);
             Assert.AreEqual(10, smallQuery.Items.Count());
             Assert.AreEqual(241, smallQuery.TotalPages);
 
@@ -152,17 +153,17 @@ namespace Umbraco.Tests.Logging
             //Check invalid log levels
             //Rather than expect 0 items - get all items back & ignore the invalid levels
             string[] invalidLogLevels = { "Invalid", "NotALevel" };
-            var queryWithInvalidLevels = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, logLevels: invalidLogLevels);
+            var queryWithInvalidLevels = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, logLevels: invalidLogLevels);
             Assert.AreEqual(2410, queryWithInvalidLevels.TotalItems);
 
             //Check we can call method with an array of logLevel (error & warning)
             string [] logLevels = { "Warning", "Error" };
-            var queryWithLevels = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, logLevels: logLevels);
+            var queryWithLevels = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, logLevels: logLevels);
             Assert.AreEqual(9, queryWithLevels.TotalItems);
-            
+
             //Query @Level='Warning' BUT we pass in array of LogLevels for Debug & Info (Expect to get 0 results)
             string[] logLevelMismatch = { "Debug", "Information" };
-            var filterLevelQuery = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, filterExpression: "@Level='Warning'", logLevels: logLevelMismatch); ;
+            var filterLevelQuery = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, filterExpression: "@Level='Warning'", logLevels: logLevelMismatch); ;
             Assert.AreEqual(0, filterLevelQuery.TotalItems);
         }
 
@@ -177,10 +178,10 @@ namespace Umbraco.Tests.Logging
         [Test]
         public void Logs_Can_Query_With_Expressions(string queryToVerify, int expectedCount)
         {
-            var testQuery = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, filterExpression: queryToVerify);
+            var testQuery = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, filterExpression: queryToVerify);
             Assert.AreEqual(expectedCount, testQuery.TotalItems);
         }
-        
+
         [Test]
         public void Log_Search_Can_Persist()
         {

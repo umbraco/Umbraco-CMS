@@ -232,6 +232,14 @@ namespace Umbraco.Core.Persistence
                 using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction) { BulkCopyTimeout = 10000, DestinationTableName = tableName })
                 using (var bulkReader = new PocoDataDataReader<T, SqlServerSyntaxProvider>(records, pocoData, syntax))
                 {
+                    //we need to add column mappings here because otherwise columns will be matched by their order and if the order of them are different in the DB compared
+                    //to the order in which they are declared in the model then this will not work, so instead we will add column mappings by name so that this explicitly uses
+                    //the names instead of their ordering.
+                    foreach(var col in bulkReader.ColumnMappings)
+                    {
+                        copy.ColumnMappings.Add(col.DestinationColumn, col.DestinationColumn);
+                    }
+
                     copy.WriteToServer(bulkReader);
                     return bulkReader.RecordsAffected;
                 }

@@ -22,69 +22,97 @@ namespace Umbraco.Web.Editors
             _logViewer = logViewer;
         }
 
-        private bool CanViewLogs()
+        private bool CanViewLogs(LogTimePeriod logTimePeriod)
         {
             //Can the interface deal with Large Files
             if (_logViewer.CanHandleLargeLogs)
                 return true;
 
             //Interface CheckCanOpenLogs
-            return _logViewer.CheckCanOpenLogs(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
+            return _logViewer.CheckCanOpenLogs(logTimePeriod);
         }
 
         [HttpGet]
-        public bool GetCanViewLogs()
+        public bool GetCanViewLogs([FromUri] DateTime? startDate = null,[FromUri] DateTime? endDate = null)
         {
-            return CanViewLogs();
+            var logTimePeriod = GetTimePeriod(startDate, endDate);
+            return CanViewLogs(logTimePeriod);
         }
 
         [HttpGet]
-        public int GetNumberOfErrors()
+        public int GetNumberOfErrors([FromUri] DateTime? startDate = null,[FromUri] DateTime? endDate = null)
         {
+            var logTimePeriod = GetTimePeriod(startDate, endDate);
             //We will need to stop the request if trying to do this on a 1GB file
-            if (CanViewLogs() == false)
+            if (CanViewLogs(logTimePeriod) == false)
             {
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Unable to view logs, due to size"));
             }
 
-            return _logViewer.GetNumberOfErrors(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
+            return _logViewer.GetNumberOfErrors(logTimePeriod);
         }
 
         [HttpGet]
-        public LogLevelCounts GetLogLevelCounts()
+        public LogLevelCounts GetLogLevelCounts([FromUri] DateTime? startDate = null,[FromUri] DateTime? endDate = null)
         {
+            var logTimePeriod = GetTimePeriod(startDate, endDate);
             //We will need to stop the request if trying to do this on a 1GB file
-            if (CanViewLogs() == false)
+            if (CanViewLogs(logTimePeriod) == false)
             {
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Unable to view logs, due to size"));
             }
 
-            return _logViewer.GetLogLevelCounts(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
+            return _logViewer.GetLogLevelCounts(logTimePeriod);
         }
 
         [HttpGet]
-        public IEnumerable<LogTemplate> GetMessageTemplates()
+        public IEnumerable<LogTemplate> GetMessageTemplates([FromUri] DateTime? startDate = null,[FromUri] DateTime? endDate = null)
         {
+            var logTimePeriod = GetTimePeriod(startDate, endDate);
             //We will need to stop the request if trying to do this on a 1GB file
-            if (CanViewLogs() == false)
+            if (CanViewLogs(logTimePeriod) == false)
             {
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Unable to view logs, due to size"));
             }
 
-            return _logViewer.GetMessageTemplates(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
+            return _logViewer.GetMessageTemplates(logTimePeriod);
         }
 
         [HttpGet]
-        public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromUri]string[] logLevels = null)
+        public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromUri]string[] logLevels = null, [FromUri] DateTime? startDate = null,[FromUri] DateTime? endDate = null)
         {
+            var logTimePeriod = GetTimePeriod(startDate, endDate);
+
             //We will need to stop the request if trying to do this on a 1GB file
-            if (CanViewLogs() == false)
+            if (CanViewLogs(logTimePeriod) == false)
             {
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Unable to view logs, due to size"));
             }
 
             var direction = orderDirection == "Descending" ? Direction.Descending : Direction.Ascending;
-            return _logViewer.GetLogs(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now, filterExpression: filterExpression, pageNumber: pageNumber, orderDirection: direction, logLevels: logLevels);
+
+
+
+            return _logViewer.GetLogs(logTimePeriod, filterExpression: filterExpression, pageNumber: pageNumber, orderDirection: direction, logLevels: logLevels);
+        }
+
+        private static LogTimePeriod GetTimePeriod(DateTime? startDate, DateTime? endDate)
+        {
+            if (startDate == null || endDate == null)
+            {
+                var now = DateTime.Now;
+                if (startDate == null)
+                {
+                    startDate = now.AddDays(-1);
+                }
+
+                if (endDate == null)
+                {
+                    endDate = now;
+                }
+            }
+
+            return new LogTimePeriod(startDate.Value, endDate.Value);
         }
 
         [HttpGet]

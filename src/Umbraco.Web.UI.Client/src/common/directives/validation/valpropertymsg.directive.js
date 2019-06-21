@@ -12,27 +12,50 @@
 function valPropertyMsg(serverValidationManager) {
 
     return {
-        require: ['^^form', '^^valFormManager', '^^umbProperty'],
+        require: ['^^form', '^^valFormManager', '^^umbProperty', '?^^umbVariantContent'],
         replace: true,
         restrict: "E",
         template: "<div ng-show=\"errorMsg != ''\" class='alert alert-error property-error' >{{errorMsg}}</div>",
         scope: {},
         link: function (scope, element, attrs, ctrl) {
+            
+            var unsubscribe = [];
+            var watcher = null;
+            var hasError = false;
 
+            //create properties on our custom scope so we can use it in our template
+            scope.errorMsg = "";
+            
+            
             //the property form controller api
             var formCtrl = ctrl[0];
             //the valFormManager controller api
             var valFormManager = ctrl[1];
             //the property controller api
             var umbPropCtrl = ctrl[2];
+            //the variants controller api
+            var umbVariantCtrl = ctrl[3];
             
-            scope.currentProperty = umbPropCtrl.property;
+            var currentProperty = umbPropCtrl.property;
+            scope.currentProperty = currentProperty;
+            var currentCulture = currentProperty.culture;         
 
-            //if the property is invariant (no culture), then we will explicitly set it to the string 'invariant'
-            //since this matches the value that the server will return for an invariant property.
-            var currentCulture = scope.currentProperty.culture || "invariant";
+            if (umbVariantCtrl) {
+                //if we are inside of an umbVariantContent directive
 
-            var watcher = null;
+                var currentVariant = umbVariantCtrl.editor.content;
+
+                // Lets check if we have variants and we are on the default language then ...
+                if (umbVariantCtrl.content.variants.length > 1 && !currentVariant.language.isDefault && !currentCulture && !currentProperty.unlockInvariantValue) {
+                    //This property is locked cause its a invariant property shown on a non-default language.
+                    //Therefor do not validate this field.
+                    return;
+                }
+            }
+            
+            // if we have reached this part, and there is no culture, then lets fallback to invariant. To get the validation feedback for invariant language.
+            currentCulture = currentCulture || "invariant";
+            
 
             // Gets the error message to display
             function getErrorMsg() {
@@ -137,13 +160,6 @@ function valPropertyMsg(serverValidationManager) {
                 showValidation = element.closest(".show-validation").length > 0;
             }
 
-
-            var hasError = false;
-
-            //create properties on our custom scope so we can use it in our template
-            scope.errorMsg = "";
-
-            var unsubscribe = [];
 
             //listen for form validation changes.
             //The alternative is to add a watch to formCtrl.$invalid but that would lead to many more watches then

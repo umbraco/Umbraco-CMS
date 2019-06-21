@@ -36,7 +36,6 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             selectedSearchResults: []
         }
         vm.startNodeId = $scope.model.startNodeId;
-        vm.ignoreUserStartNodes = $scope.model.ignoreUserStartNodes;
         //Used for toggling an empty-state message
         //Some trees can have no items (dictionary & forms email templates)
         vm.hasItems = true;
@@ -171,9 +170,6 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             var queryParams = {};
             if (vm.startNodeId) {
                 queryParams["startNodeId"] = $scope.model.startNodeId;
-            }
-            if (vm.ignoreUserStartNodes) {
-                queryParams["ignoreUserStartNodes"] = $scope.model.ignoreUserStartNodes;
             }
             if (vm.selectedLanguage && vm.selectedLanguage.id) {
                 queryParams["culture"] = vm.selectedLanguage.culture;
