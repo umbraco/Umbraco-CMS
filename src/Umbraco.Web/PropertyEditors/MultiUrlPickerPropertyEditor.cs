@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 Fields.Add(new PreValueField()
                 {
-                    Key = "ignoreUserStartNodes",
+                    Key = Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
                     View = "boolean",
                     Name = "Ignore user start nodes",
                     Description = "Selecting this option allows a user to choose nodes that they normally don't have access to."

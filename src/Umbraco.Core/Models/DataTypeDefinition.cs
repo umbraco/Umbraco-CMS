@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     /// Definition of a DataType/PropertyEditor
     /// </summary>
     /// <remarks>
-    /// The definition exists as a database reference between an actual DataType/PropertyEditor 
+    /// The definition exists as a database reference between an actual DataType/PropertyEditor
     /// (identified by its control id), its prevalues (configuration) and the named DataType in the backoffice UI.
     /// </remarks>
     [Serializable]
@@ -31,6 +31,35 @@ namespace Umbraco.Core.Models
         private bool _trashed;
         private string _propertyEditorAlias;
         private DataTypeDatabaseType _databaseType;
+
+        private static readonly ISet<Guid> IdsOfBuildInDataTypes = new HashSet<Guid>()
+            {
+                Constants.DataTypes.ContentPickerGuid,
+                Constants.DataTypes.MemberPickerGuid,
+                Constants.DataTypes.MediaPickerGuid,
+                Constants.DataTypes.MultipleMediaPickerGuid,
+                Constants.DataTypes.RelatedLinksGuid,
+                Constants.DataTypes.MemberGuid,
+                Constants.DataTypes.ImageCropperGuid,
+                Constants.DataTypes.TagsGuid,
+                Constants.DataTypes.ListViewContentGuid,
+                Constants.DataTypes.ListViewMediaGuid,
+                Constants.DataTypes.ListViewMembersGuid,
+                Constants.DataTypes.DatePickerWithTimeGuid,
+                Constants.DataTypes.ApprovedColorGuid,
+                Constants.DataTypes.DropdownMultipleGuid,
+                Constants.DataTypes.RadioboxGuid,
+                Constants.DataTypes.DatePickerGuid,
+                Constants.DataTypes.DropdownGuid,
+                Constants.DataTypes.CheckboxListGuid,
+                Constants.DataTypes.CheckboxGuid,
+                Constants.DataTypes.NumericGuid,
+                Constants.DataTypes.RichtextEditorGuid,
+                Constants.DataTypes.TextstringGuid,
+                Constants.DataTypes.TextareaGuid,
+                Constants.DataTypes.UploadGuid,
+                Constants.DataTypes.LabelGuid,
+            };
 
         [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the alternative contructor that specifies an alias")]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -63,6 +92,15 @@ namespace Umbraco.Core.Models
             _propertyEditorAlias = propertyEditorAlias;
 
             _additionalData = new Dictionary<string, object>();
+        }
+
+        public DataTypeDefinition(string propertyEditorAlias, Guid uniqueId)
+        {
+            _parentId = -1;
+            _propertyEditorAlias = propertyEditorAlias;
+
+            _additionalData = new Dictionary<string, object>();
+            IsBuildInDataType = IdsOfBuildInDataTypes.Contains(uniqueId);
         }
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
@@ -157,7 +195,7 @@ namespace Umbraco.Core.Models
                 _additionalData["Trashed"] = value;
             }
         }
-               
+
         [DataMember]
         public string PropertyEditorAlias
         {
@@ -198,9 +236,9 @@ namespace Umbraco.Core.Models
         public DataTypeDatabaseType DatabaseType
         {
             get { return _databaseType; }
-            set 
+            set
             {
-                SetPropertyValueAndDetectChanges(value, ref _databaseType, Ps.Value.DatabaseTypeSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _databaseType, Ps.Value.DatabaseTypeSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 _additionalData["DatabaseType"] = value;
             }
@@ -215,5 +253,8 @@ namespace Umbraco.Core.Models
         {
             get { return _additionalData; }
         }
+
+        public bool IsBuildInDataType { get;}
     }
+
 }

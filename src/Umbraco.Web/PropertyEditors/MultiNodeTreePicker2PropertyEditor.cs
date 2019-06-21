@@ -16,11 +16,11 @@ namespace Umbraco.Web.PropertyEditors
                 {"showOpenButton", "0"},
                 {"showEditButton", "0"},
                 {"showPathOnHover", "0"},
-                {"ignoreUserStartNodes", "0"},
+                {Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, "0"},
                 {"idType", "udi"}
             };
         }
-        
+
         protected override PreValueEditor CreatePreValueEditor()
         {
             return new MultiNodePickerPreValueEditor();
@@ -40,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors
                 //create the fields
                 Fields.Add(new PreValueField()
                 {
-                    Key = "ignoreUserStartNodes",
+                    Key = Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
                     View = "boolean",
                     Name = "Ignore user start nodes",
                     Description = "Selecting this option allows a user to choose nodes that they normally don't have access to."
@@ -81,7 +81,7 @@ namespace Umbraco.Web.PropertyEditors
                     Name = "Show open button (this feature is in preview!)",
                     Description = "Opens the node in a dialog"
                 });
-            }            
+            }
 
             /// <summary>
             /// This ensures the multiPicker pre-val is set based on the maxNumber of nodes set
@@ -117,9 +117,9 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             result["multiPicker"] = "1";
                         }
-                    }    
+                    }
                 }
-                
+
 
                 return result;
             }

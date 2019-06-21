@@ -356,7 +356,7 @@ namespace Umbraco.Core.Services
             if (dataType != null)
             {
                 var preValues = GetPreValuesCollectionByDataTypeId(dataType.Id);
-                if (preValues.PreValuesAsDictionary.TryGetValue("ignoreUserStartNodes", out var preValue))
+                if (preValues.PreValuesAsDictionary.TryGetValue(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, out var preValue))
                 {
                     return string.Equals(preValue.Value, "1", StringComparison.InvariantCulture);
                 }

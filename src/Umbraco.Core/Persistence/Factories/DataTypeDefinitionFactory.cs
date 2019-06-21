@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IDataTypeDefinition BuildEntity(DataTypeDto dto)
         {
-            var dataTypeDefinition = new DataTypeDefinition(dto.PropertyEditorAlias);
+            var dataTypeDefinition = new DataTypeDefinition(dto.PropertyEditorAlias,dto.NodeDto.UniqueId);
 
 
             try

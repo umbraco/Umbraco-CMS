@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             InternalPreValues = new Dictionary<string, object>
             {
-                {"ignoreUserStartNodes", "0"},
+                {Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, "0"},
                 {"idType", "udi"}
             };
         }
@@ -33,11 +33,11 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class RelatedLinksPreValueEditor : PreValueEditor
         {
-            [PreValueField("ignoreUserStartNodes", "Ignore user start nodes", "boolean", Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
+            [PreValueField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, "Ignore user start nodes", "boolean", Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
             public bool IgnoreUserStartNodes { get; set; }
 
             [PreValueField("max", "Maximum number of links", "number", Description = "Enter the maximum amount of links to be added, enter 0 for unlimited")]
-            public int Maximum { get; set; }            
+            public int Maximum { get; set; }
         }
     }
 }

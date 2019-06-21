@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -25,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
 
             Fields.Add(new PreValueField()
             {
-                Key = "ignoreUserStartNodes",
+                Key = Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
                 View = "boolean",
                 Name = "Ignore user start nodes",
                 Description = "Selecting this option allows a user to choose nodes that they normally don't have access to."
@@ -57,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors
         //
         // [PreValueField(typeof(EditorPreValueField))]
         // public string Editor { get; set; }
-           
+
         // [PreValueField("", "views/propertyeditors/rte/rte.prevalues.html", HideLabel = true)]
         // public class EditorPreValueField : PreValueField
         // {

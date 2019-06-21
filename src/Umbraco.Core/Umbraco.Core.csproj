@@ -324,6 +324,9 @@
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Attempt.cs" />
+    <Compile Include="Constants-DataTypes.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
     <Compile Include="Constants-DeploySelector.cs" />
     <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
