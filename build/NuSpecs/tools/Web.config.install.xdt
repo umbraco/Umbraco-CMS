@@ -324,7 +324,6 @@
         <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
             <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='HtmlAgilityPack')" xdt:Transform="Remove" />
             <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='AutoMapper')" xdt:Transform="Remove" />
-            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="Remove" />
             <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="Remove" />
             <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Mvc')" xdt:Transform="Remove" />
             <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.WebPages.Razor')" xdt:Transform="Remove" />
@@ -337,6 +336,9 @@
             <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.CodeAnalysis.CSharp')" xdt:Transform="Remove" />
             <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='log4net')" xdt:Transform="Remove" />
             <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Data.SqlServerCe')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.CodeDom.Providers.DotNetCompilerPlatform')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.AspNet.SignalR.Core')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Http.WebHost')" xdt:Transform="Remove" />
         </assemblyBinding>
     </runtime>
 
@@ -369,7 +371,7 @@
             <dependentAssembly xdt:Transform="Insert">
                 <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
                 <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
-            </dependentAssembly>
+            </dependentAssembly> 
             <dependentAssembly xdt:Transform="Insert">
                 <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
                 <bindingRedirect oldVersion="0.0.0.0-3.1.0.0" newVersion="3.1.0.0" />
@@ -397,6 +399,18 @@
             <dependentAssembly xdt:Transform="Insert">
                 <assemblyIdentity name="System.Data.SqlServerCe" publicKeyToken="89845DCD8080CC91" culture="neutral"/>
                 <bindingRedirect oldVersion="0.0.0.0-4.0.0.1" newVersion="4.0.0.1"/>
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-2.0.1.0" newVersion="2.0.1.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="Microsoft.AspNet.SignalR.Core" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-2.4.1.0" newVersion="2.4.1.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Web.Http.WebHost" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-5.2.7.0" newVersion="5.2.7.0" />
             </dependentAssembly>
         </assemblyBinding>
     </runtime>
