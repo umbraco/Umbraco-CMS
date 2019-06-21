@@ -305,6 +305,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void UpdateContentTypes(IEnumerable<int> removedIds, IEnumerable<IPublishedContentType> refreshedTypes, IEnumerable<ContentNodeKit> kits)
         {
+            var isRebuilding = removedIds == null && kits == null;
+
             var removedIdsA = removedIds?.ToArray() ?? Array.Empty<int>();
             var refreshedTypesA = refreshedTypes?.ToArray() ?? Array.Empty<IPublishedContentType>();
             var refreshedIdsA = refreshedTypesA.Select(x => x.Id).ToArray();
@@ -314,6 +316,34 @@ namespace Umbraco.Web.PublishedCache.NuCache
             try
             {
                 Lock(lockInfo);
+
+
+                if (isRebuilding)
+                {
+                    //All calls to this method when these are null means that we are regenerating the cache and first only setting content types
+                    //TODO: A different method should be used for this operation - there are 4 places where this is called with these two args as null
+
+                    //In this case we know we are regenerating everything, so clear it all
+                    //TODO: From my understanding, we can't 'just' clear things like _contentNodes or _xmap, etc... since the cache can be in use on a diff generation? something like that.
+
+                    //TODO: Follow-up: Actually, in all cases where this is called with the 2 null params, a call is made to _contentStore.SetAll which performs this reset anyways so
+                    // we don't really need to do much in this case at all.
+
+                    //ClearLocked(_contentNodes);
+                    //ClearRootLocked();
+
+                    //TODO: I'm unsure how this is handled behind the scenes - or maybe it simply doesn't need to be handled since it will never have a variying UDI -> ID map
+                    // since the this mapping in the DB would never change? 
+                    //_xmap.Clear(); 
+
+                    // At this point, all we need to do is perform update of refreshed content types
+                    foreach (var type in refreshedTypesA)
+                    {
+                        SetValueLocked(_contentTypesById, type.Id, type);
+                        SetValueLocked(_contentTypesByAlias, type.Alias, type);
+                    }
+                    return;
+                }
 
                 var removedContentTypeNodes = new List<int>();
                 var refreshedContentTypeNodes = new List<int>();
@@ -552,6 +582,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 foreach (var kit in kits.Where(x => ParentExistsLocked(x) && BuildKit(x)))
                 {
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
+
+                    //TODO: When this is called from LoadContentFromLocalDbLocked we are populating the cache from the localDB,
+                    // so we shouldn't then need to spend the effort to tell it to update itself based on itself?
                     if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                     AddNodeLocked(kit.Node);
 
