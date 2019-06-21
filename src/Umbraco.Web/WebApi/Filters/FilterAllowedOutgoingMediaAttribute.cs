@@ -89,7 +89,41 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 FilterBasedOnStartNode(items, user);
             }
+            else
+            {
+                FilterOutPossibleSensitiveData(items);
+            }
 
+        }
+
+        /// <summary>
+        /// Removes all properties of the items except the umbracoFile.
+        /// </summary>
+        /// <param name="items"></param>
+        private void FilterOutPossibleSensitiveData(IList items)
+        {
+            foreach (dynamic item in items)
+            {
+
+                if (item.Properties != null)
+                {
+                    if (item.Properties is IList properties)
+                        // Iterate reverse, because we removed from the same list, such that the ordering of indexes not
+                        // changes doing the iteration
+                        for (var i = properties.Count - 1; i >= 0; i--)
+                        {
+                            dynamic property = properties[i];
+                            if (property.Alias != null && property.Alias is string)
+                            {
+                                var alias = property.Alias as string;
+                                if (string.Equals(alias, Constants.Conventions.Media.File) == false)
+                                {
+                                    properties.RemoveAt(i);
+                                }
+                            }
+                        }
+                }
+            }
         }
 
         internal void FilterBasedOnStartNode(IList items, IUser user)

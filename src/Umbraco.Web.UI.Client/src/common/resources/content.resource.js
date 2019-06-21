@@ -331,12 +331,16 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             //now copy back to the options we will use
             options = defaults;
 
+            var args = [{ id: id }];
+            if(options.dataTypeId){
+                args.push({ dataTypeId: options.dataTypeId });
+            }
             return umbRequestHelper.resourcePromise(
                   $http.get(
                         umbRequestHelper.getApiUrl(
                               "contentApiBaseUrl",
                               "GetById",
-                              [{ id: id }, { dataTypeId: options.dataTypeId }])),
+                                args)),
                   'Failed to retrieve data for content id ' + id);
         },
 

@@ -304,16 +304,21 @@ function entityResource($q, $http, umbRequestHelper) {
             //now copy back to the options we will use
             options = defaults;
 
+
+            var args = [
+                { id: id },
+                { type: type },
+            ];
+            if(options.dataTypeId){
+                args.push({dataTypeId: options.dataTypeId});
+            }
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetAncestors",
-                       [
-                           { id: id },
-                           { type: type },
-                           { dataTypeId: options.dataTypeId }
-                       ])),
+                       args)),
                        'Failed to retrieve ancestor data for id ' + id);
         },
 

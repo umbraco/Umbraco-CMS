@@ -75,11 +75,20 @@ namespace Umbraco.Web.WebApi.Filters
 
             var ignoreUserStartNodes = false;
 
-            if (actionContext.ActionArguments.ContainsKey("dataTypeId") &&
-                Guid.TryParse(actionContext.ActionArguments.GetValueAsString("dataTypeId"), out var dataTypeId))
+            if (actionContext.ActionArguments.ContainsKey("dataTypeId"))
             {
-                ignoreUserStartNodes =
-                    ApplicationContext.Current.Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId);
+                if (actionContext.ActionArguments.TryGetValue("dataTypeId", out var dataTypeIdValue))
+                {
+                    var dataTypeIdString = dataTypeIdValue?.ToString();
+                    if (string.IsNullOrEmpty(dataTypeIdString) == false &&
+                        Guid.TryParse(dataTypeIdString, out var dataTypeId))
+                    {
+                        ignoreUserStartNodes =
+                            ApplicationContext.Current.Services.DataTypeService
+                                .IsDataTypeIgnoringUserStartNodes(dataTypeId);
+                    }
+                }
+
             }
 
             int nodeId;

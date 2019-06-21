@@ -133,7 +133,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         idType: "int"
     };
 
-    dialogOptions.dataTypeId = $scope.model.dataTypeId;
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
@@ -184,6 +183,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
       $scope.contentPickerOverlay = dialogOptions;
       $scope.contentPickerOverlay.view = "treepicker";
       $scope.contentPickerOverlay.show = true;
+      $scope.contentPickerOverlay.dataTypeId = $scope.model.dataTypeId;
 
       $scope.contentPickerOverlay.submit = function(model) {
 
