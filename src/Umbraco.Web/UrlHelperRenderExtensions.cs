@@ -372,25 +372,6 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Generates a Absolute Media Item URL based on the current context
-        /// </summary>
-        /// <param name="urlHelper"></param>
-        /// <param name="mediaItem"></param>
-        /// <returns></returns>
-        public static string GetAbsoluteMediaUrl(this UrlHelper urlHelper, IPublishedContent mediaItem)
-        {
-            if (urlHelper == null) throw new ArgumentNullException("urlHelper");
-            if (mediaItem == null) throw new ArgumentNullException("mediaItem");
-
-            if (urlHelper.RequestContext.HttpContext.Request.Url != null)
-            {
-                var requestUrl = urlHelper.RequestContext.HttpContext.Request.Url.GetLeftPart(UriPartial.Authority);
-                return string.Format("{0}{1}", requestUrl, mediaItem.Url());
-            }
-            return null;
-        }
-
-        /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
         /// </summary>
