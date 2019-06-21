@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models
     /// </summary>
     /// <remarks>This base class does which (a) consistently resolves and caches the Url, (b) provides an implementation
     /// for this[alias], and (c) provides basic content set management.</remarks>
-    [DebuggerDisplay("{Content Id: {Id}}")]
+    [DebuggerDisplay("Content Id: {Id}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
         #region ContentType
