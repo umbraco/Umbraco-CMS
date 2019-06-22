@@ -165,10 +165,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     if (item.alias === "nc_pasteAllItems") {
                         _.each(item.data, function (node) {
                             delete node.$$hashKey;
-                            $scope.pasteFromClipboard(node);
+                            $scope.pasteFromClipboard(node, false);
                         });
                     } else {
-                        $scope.pasteFromClipboard(item.data);
+                        $scope.pasteFromClipboard(item.data, true);
                     }
 
                     $scope.overlayMenu.show = false;
@@ -404,7 +404,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             });
         }
 
-        $scope.pasteFromClipboard = function(newNode) {
+        $scope.pasteFromClipboard = function(newNode, setCurrentNode) {
             
             if (newNode === undefined) {
                 return;
@@ -415,9 +415,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             
             $scope.nodes.push(newNode);
             $scope.setDirty();
-            //updateModel();// done by setting current node...
+
+            if (setCurrentNode) {
+                $scope.currentNode = newNode;
+            }
+            else {
+                updateModel();
+            }
             
-            $scope.currentNode = newNode;
         }
         
         function checkAbilityToPasteContent() {
