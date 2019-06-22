@@ -605,7 +605,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }));
 
         $scope.$on("$destroy", function () {
-            console.log("Unsubscribing", unsubscribe.length)
             for (var u in unsubscribe) {
                 unsubscribe[u]();
             }
