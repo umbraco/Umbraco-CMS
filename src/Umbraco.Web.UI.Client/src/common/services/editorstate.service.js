@@ -63,7 +63,7 @@ angular.module('umbraco.services').factory("editorState", function ($rootScope) 
          */
         getCurrent: function () {
             return current;
-        },
+        }
 
     };
 
