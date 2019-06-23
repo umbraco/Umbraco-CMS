@@ -14,6 +14,7 @@
         <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
         <language>en-US</language>
         <tags>umbraco</tags>
+        <repository type="git" url="https://github.com/umbraco/umbraco-cms" />
         <dependencies>
 
             <group targetFramework="net472">
