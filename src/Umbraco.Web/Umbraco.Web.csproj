@@ -129,6 +129,7 @@
     <Compile Include="Dashboards\DashboardCollectionBuilder.cs" />
     <Compile Include="Dashboards\ExamineDashboard.cs" />
     <Compile Include="Dashboards\FormsDashboard.cs" />
+    <Compile Include="Dashboards\ProfilerDashboard.cs" />
     <Compile Include="Dashboards\HealthCheckDashboard.cs" />
     <Compile Include="Dashboards\MediaDashboard.cs" />
     <Compile Include="Dashboards\MembersDashboard.cs" />
@@ -211,6 +212,7 @@
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
+    <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />

@@ -1606,6 +1606,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="settingsPublishedStatus">Published Cache</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Kom godt i gang</key>
     <key alias="formsInstall">Installer Umbraco Forms</key>
   </area>
