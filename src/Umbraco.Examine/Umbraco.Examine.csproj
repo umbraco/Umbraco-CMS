@@ -49,6 +49,11 @@
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="Examine" Version="1.0.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <Version>1.0.0-beta2-19270-01</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="NPoco" Version="3.9.4" />
   </ItemGroup>

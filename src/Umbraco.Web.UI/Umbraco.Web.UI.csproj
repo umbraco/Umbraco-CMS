@@ -101,6 +101,11 @@
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <Version>1.0.0-beta2-19270-01</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
