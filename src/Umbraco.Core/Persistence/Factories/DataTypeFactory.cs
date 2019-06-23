@@ -15,7 +15,8 @@ namespace Umbraco.Core.Persistence.Factories
         {
             if (!editors.TryGet(dto.EditorAlias, out var editor))
             {
-                logger.Warn(typeof(DataTypeFactory), "Could not find an editor with alias {EditorAlias}, converting to label", dto.EditorAlias);
+                logger.Warn(typeof(DataType), "Could not find an editor with alias {EditorAlias}, treating as Label."
+                                                     +" The site may fail to boot and / or load data types and run.", dto.EditorAlias);
                 //convert to label
                 editor = new LabelPropertyEditor(logger);
             }

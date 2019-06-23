@@ -34,16 +34,30 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            //During a new install we'll log the default user in (which is id = 0).
-            // During an upgrade, the user will already need to be logged in order to run the installer.
-
             var security = new WebSecurity(_httpContext, _userService, _globalSettings);
-            //we do this check here because for upgrades the user will already be logged in, for brand new installs,
-            // they will not be logged in, however we cannot check the current installation status because it will tell
-            // us that it is in 'upgrade' because we already have a database conn configured and a database.
+
             if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             {
                 security.PerformLogin(-1);
+            }
+
+            if (security.IsAuthenticated())
+            {
+                // when a user is already logged in, we need to check whether it's user 'zero'
+                // which is the legacy super user from v7 - and then we need to actually log the
+                // true super user in - but before that we need to log off, else audit events
+                // will try to reference user zero and fail
+                var userIdAttempt = security.GetUserId();
+                if (userIdAttempt && userIdAttempt.Result == 0)
+                {
+                    security.ClearCurrentLogin();
+                    security.PerformLogin(Constants.Security.SuperUserId);
+                }
+            }
+            else if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
+            {
+                // for installs, we need to log the super user in
+                security.PerformLogin(Constants.Security.SuperUserId);
             }
 
             // Update configurationStatus

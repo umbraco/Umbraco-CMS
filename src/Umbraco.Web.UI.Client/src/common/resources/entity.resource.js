@@ -284,31 +284,15 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getAncestors: function (id, type, culture, options) {        
-            var defaults = {
-                ignoreUserStartNodes: false
-            };
-            if (options === undefined) {
-                options = {};
-            }
-            //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
-            //now copy back to the options we will use
-            options = defaults;
+        getAncestors: function (id, type, culture) {
             if (culture === undefined) culture = "";
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetAncestors",
-                       [
-                           { id: id },
-                           { type: type },
-                           { culture: culture },
-                           { ignoreUserStartNodes: options.ignoreUserStartNodes }
-                       ])),
-
-                       'Failed to retrieve ancestor data for id ' + id);
+                        [{ id: id }, { type: type }, { culture: culture }])),
+               'Failed to retrieve ancestor data for id ' + id);
         },
         
         /**
@@ -440,8 +424,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 pageNumber: 1,
                 filter: '',
                 orderDirection: "Ascending",
-                orderBy: "SortOrder",
-                ignoreUserStartNodes: false
+                orderBy: "SortOrder"
             };
             if (options === undefined) {
                 options = {};
@@ -470,8 +453,7 @@ function entityResource($q, $http, umbRequestHelper) {
                             pageSize: options.pageSize,
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
-                            filter: encodeURIComponent(options.filter),
-                            ignoreUserStartNodes: options.ignoreUserStartNodes
+                            filter: encodeURIComponent(options.filter)
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);
@@ -499,19 +481,12 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        search: function (query, type, options, canceler) {
+        search: function (query, type, searchFrom, canceler) {
 
             var args = [{ query: query }, { type: type }];
-
-            if(options !== undefined) {
-                if (options.searchFrom) {
-                    args.push({ searchFrom: options.searchFrom });
-                } 
-                if (options.ignoreUserStartNodes) {
-                    args.push({ ignoreUserStartNodes: options.ignoreUserStartNodes });
-                }                 
+            if (searchFrom) {
+                args.push({ searchFrom: searchFrom });
             }
-            
 
             var httpConfig = {};
             if (canceler) {

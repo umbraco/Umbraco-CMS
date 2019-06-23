@@ -27,9 +27,9 @@ namespace Umbraco.Core.Logging.Viewer
         /// <summary>
         /// Get all logs from your chosen data source back as Serilog LogEvents
         /// </summary>
-        protected abstract IReadOnlyList<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take);
+        protected abstract IReadOnlyList<LogEvent> GetLogs(LogTimePeriod logTimePeriod, ILogFilter filter, int skip, int take);
 
-        public abstract bool CheckCanOpenLogs(DateTimeOffset startDate, DateTimeOffset endDate);
+        public abstract bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
 
         public virtual IReadOnlyList<SavedLogSearch> GetSavedSearches()
         {
@@ -82,24 +82,24 @@ namespace Umbraco.Core.Logging.Viewer
             return searches;
         }
 
-        public int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate)
+        public int GetNumberOfErrors(LogTimePeriod logTimePeriod)
         {
             var errorCounter = new ErrorCounterFilter();
-            GetLogs(startDate, endDate, errorCounter, 0, int.MaxValue);
+            GetLogs(logTimePeriod, errorCounter, 0, int.MaxValue);
             return errorCounter.Count;
         }
 
-        public LogLevelCounts GetLogLevelCounts(DateTimeOffset startDate, DateTimeOffset endDate)
+        public LogLevelCounts GetLogLevelCounts(LogTimePeriod logTimePeriod)
         {
             var counter = new CountingFilter();
-            GetLogs(startDate, endDate, counter, 0, int.MaxValue);
+            GetLogs(logTimePeriod, counter, 0, int.MaxValue);
             return counter.Counts;
         }
 
-        public IEnumerable<LogTemplate> GetMessageTemplates(DateTimeOffset startDate, DateTimeOffset endDate)
+        public IEnumerable<LogTemplate> GetMessageTemplates(LogTimePeriod logTimePeriod)
         {
             var messageTemplates = new MessageTemplateFilter();
-            GetLogs(startDate, endDate, messageTemplates, 0, int.MaxValue);
+            GetLogs(logTimePeriod, messageTemplates, 0, int.MaxValue);
 
             var templates = messageTemplates.Counts.
                 Select(x => new LogTemplate { MessageTemplate = x.Key, Count = x.Value })
@@ -108,14 +108,14 @@ namespace Umbraco.Core.Logging.Viewer
             return templates;
         }
 
-        public PagedResult<LogMessage> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate,
+        public PagedResult<LogMessage> GetLogs(LogTimePeriod logTimePeriod,
             int pageNumber = 1, int pageSize = 100,
             Direction orderDirection = Direction.Descending,
             string filterExpression = null,
             string[] logLevels = null)
         {
             var expression = new ExpressionFilter(filterExpression);
-            var filteredLogs = GetLogs(startDate, endDate, expression, 0, int.MaxValue);
+            var filteredLogs = GetLogs(logTimePeriod, expression, 0, int.MaxValue);
 
             //This is user used the checkbox UI to toggle which log levels they wish to see
             //If an empty array or null - its implied all levels to be viewed

@@ -185,7 +185,7 @@ namespace Umbraco.Web.Editors
                         {
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))
-                        },                        
+                        },
                         {
                             "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
                                 controller => controller.GetById(0, UmbracoEntityTypes.Media))
@@ -308,7 +308,7 @@ namespace Umbraco.Web.Editors
                         },
 						{
                             "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
-                                controller => controller.GetNumberOfErrors())
+                                controller => controller.GetNumberOfErrors(null, null))
                         },
                         {
                             "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(

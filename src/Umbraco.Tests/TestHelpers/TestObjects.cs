@@ -164,11 +164,7 @@ namespace Umbraco.Tests.TestHelpers
             var fileService = GetLazyService<IFileService>(factory, c => new FileService(scopeProvider, logger, eventMessagesFactory, GetRepo<IStylesheetRepository>(c), GetRepo<IScriptRepository>(c), GetRepo<ITemplateRepository>(c), GetRepo<IPartialViewRepository>(c), GetRepo<IPartialViewMacroRepository>(c), GetRepo<IAuditRepository>(c)));
 
             var memberTypeService = GetLazyService<IMemberTypeService>(factory, c => new MemberTypeService(scopeProvider, logger, eventMessagesFactory, memberService.Value, GetRepo<IMemberTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c)));
-            var entityService = GetLazyService<IEntityService>(factory, c => new EntityService(
-                scopeProvider, logger, eventMessagesFactory,
-                    contentService.Value, contentTypeService.Value, mediaService.Value, mediaTypeService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
-                    idkMap,
-                    GetRepo<IEntityRepository>(c)));
+            var entityService = GetLazyService<IEntityService>(factory, c => new EntityService(scopeProvider, logger, eventMessagesFactory, idkMap, GetRepo<IEntityRepository>(c)));
 
             var macroService = GetLazyService<IMacroService>(factory, c => new MacroService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMacroRepository>(c), GetRepo<IAuditRepository>(c)));
             var packagingService = GetLazyService<IPackagingService>(factory, c =>

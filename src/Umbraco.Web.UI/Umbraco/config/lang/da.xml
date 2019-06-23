@@ -434,6 +434,7 @@
     <key alias="selectLink">Vælg link</key>
     <key alias="selectMacro">Vælg makro</key>
     <key alias="selectContent">Vælg indhold</key>
+    <key alias="selectContentType">Vælg indholdstype</key>
     <key alias="selectMediaStartNode">Vælg medie startnode</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>

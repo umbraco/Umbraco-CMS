@@ -24,7 +24,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Delete.Column("releaseDate").FromTable("umbracoDocument").Do();
             Delete.Column("expireDate").FromTable("umbracoDocument").Do();
             //add new table
-            Create.Table<ContentScheduleDto>().Do();
+            Create.Table<ContentScheduleDto>(true).Do();
 
             //migrate the schedule
             foreach(var s in schedules)

@@ -1,0 +1,23 @@
+<div ng-controller="Umbraco.PrevalueEditors.ContentTypePickerController as vm" class="umb-property-editor umb-contenttypepicker">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <div ng-show="!vm.loading">
+        <umb-node-preview ng-repeat="contentType in vm.contentTypes"
+                          class="mt1"
+                          icon="contentType.icon"
+                          name="contentType.name"
+                          allow-remove="true"
+                          allow-edit="false"
+                          on-remove="vm.remove(contentType)">
+        </umb-node-preview>
+
+        <a class="umb-node-preview-add"
+           href=""
+           ng-click="vm.add()"
+           prevent-default>
+            <localize key="general_add">Add</localize>
+        </a>
+    </div>
+
+</div>

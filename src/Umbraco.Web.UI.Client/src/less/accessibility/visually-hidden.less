@@ -1,0 +1,11 @@
+
+// Visually Hidden - used to remove an element from the view, whilst retaining accessibily for screen readers. More info available at https://a11yproject.com/posts/how-to-hide-content/
+// --------------------------------------------------
+
+.visually-hidden {
+    position: absolute !important;
+    height: 1px; 
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+}
