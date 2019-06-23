@@ -12,7 +12,7 @@
 
                 <div class="umb-nested-content__header-bar" ng-click="$parent.editNode($index)" ng-hide="$parent.singleMode">
 
-                    <div class="umb-nested-content__heading"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-bind="$parent.getName($index)"></span></div>
+                    <div class="umb-nested-content__heading"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-class="{'--has-icon': showIcons}" ng-bind="$parent.getName($index)"></span></div>
 
                     <div class="umb-nested-content__icons">
                         <a class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{copyIconTitle}}" ng-click="clickCopy($event, node);" ng-if="showCopy" prevent-default>
