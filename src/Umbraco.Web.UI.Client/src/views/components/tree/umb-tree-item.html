@@ -5,6 +5,7 @@
              ng-class="{'icon-navigation-right': !node.expanded || node.metaData.isContainer, 'icon-navigation-down': node.expanded && !node.metaData.isContainer}"
              ng-style="{'visibility': (scope.enablelistviewexpand === 'true' || node.hasChildren && (!node.metaData.isContainer || isDialog)) ? 'visible' : 'hidden'}"
              ng-click="load(node)">&nbsp;
+             <!-- TODO: Use localization for this text -->
             <span class="sr-only">Expand child items for {{node.name}}</span>
         </button>
 
