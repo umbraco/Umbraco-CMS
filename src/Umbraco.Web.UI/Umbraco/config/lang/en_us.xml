@@ -308,7 +308,7 @@
     <key alias="createdBlueprintHeading">Content Template created</key>
     <key alias="createdBlueprintMessage">A Content Template was created from '%0%'</key>
     <key alias="duplicateBlueprintMessage">Another Content Template with the same name already exists</key>
-    <key alias="blueprintDescription">A Content Template is pre-defined content that an editor can select to use as the basis for creating new content</key>
+    <key alias="blueprintDescription">A Content Template is predefined content that an editor can select to use as the basis for creating new content</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
@@ -334,9 +334,12 @@
     <key alias="createContentBlueprint">Select the document type you want to make a content template for</key>
     <key alias="enterFolderName">Enter a folder name</key>
     <key alias="updateData">Choose a type and a title</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
-    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
+    <key alias="noDocumentTypesWithNoSettingsAccess">The selected page in the content tree doesn't allow for any pages to be created below it.</key>
+    <key alias="noDocumentTypesEditPermissions">Edit permissions for this document type</key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
+    <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
+    <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
     <key alias="newJavascriptFile">New JavaScript file</key>
@@ -451,6 +454,7 @@
     <key alias="selectLink">Select link</key>
     <key alias="selectMacro">Select macro</key>
     <key alias="selectContent">Select content</key>
+    <key alias="selectContentType">Select content type</key>
     <key alias="selectMediaStartNode">Select media start node</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
@@ -2131,6 +2135,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="settingsPublishedStatus">Published Status</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
   </area>

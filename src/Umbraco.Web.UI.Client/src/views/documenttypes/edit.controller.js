@@ -56,7 +56,7 @@
 
         function onInit() {
             // get init values from model when in infinite mode
-            if(infiniteMode) {
+            if (infiniteMode) {
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
                 noTemplate = $scope.model.notemplate;
@@ -89,8 +89,7 @@
                     "name": vm.labels.design,
                     "alias": "design",
                     "icon": "icon-document-dashed-line",
-                    "view": "views/documenttypes/views/design/design.html",
-                    "active": true
+                    "view": "views/documenttypes/views/design/design.html"
                 },
                 {
                     "name": vm.labels.listview,
@@ -291,6 +290,28 @@
                 });
 
             vm.page.navigation = buttons;
+            initializeActiveNavigationPanel();
+        }
+
+        function initializeActiveNavigationPanel() {
+            // Initialise first loaded panel based on page route paramater
+            // i.e. ?view=design|listview|permissions
+            var initialViewSetFromRouteParams = false;
+            var view = $routeParams.view;
+            if (view) {
+                var viewPath = "views/documenttypes/views/" + view + "/" + view + ".html";
+                for (var i = 0; i < vm.page.navigation.length; i++) {
+                    if (vm.page.navigation[i].view === viewPath) {
+                        vm.page.navigation[i].active = true;
+                        initialViewSetFromRouteParams = true;
+                        break;
+                    }
+                }
+            }
+
+            if (initialViewSetFromRouteParams === false) {
+                vm.page.navigation[0].active = true;
+            }
         }
 
         /* ---------- SAVE ---------- */
