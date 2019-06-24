@@ -140,10 +140,9 @@ Use this directive to generate a pagination.
                         tempPagination.push({ val: "...", isActive: false }, { name: lastLabel, val: scope.totalPages, isActive: false });
                     });
                 }
-
-                scope.pagination = tempPagination;
             }
 
+            scope.pagination = tempPagination;
          }
 
          scope.next = function () {
