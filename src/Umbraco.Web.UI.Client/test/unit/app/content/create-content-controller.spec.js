@@ -33,7 +33,10 @@
 
             }
 
-            beforeEach(inject(function ($controller, $rootScope, $q, $location) {
+            beforeEach(inject(function ($controller, $rootScope, $q, $location, authMocks) {
+
+                authMocks.register();
+
                 contentTypeResource = {
                     getAllowedTypes: function () {
                         var def = $q.defer();
