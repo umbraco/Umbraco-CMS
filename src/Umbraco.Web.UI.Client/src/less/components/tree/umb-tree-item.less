@@ -8,9 +8,25 @@
         user-select: none;
     }
     
-    &:hover ins {
+    &:hover .umb-tree-item__arrow {
         visibility: visible;
         cursor: pointer
+    }
+}
+
+.umb-tree-item__arrow {
+    position: relative;
+    margin-left: -16px;
+    width: 16px;
+    height: 16px;
+    visibility: hidden;
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 12px;
+    transition: color 120ms;
+
+    &:hover {
+        color: @ui-option-type-hover;
     }
 }
 
@@ -95,7 +111,7 @@
 
     a,
     .umb-tree-icon,
-    ins {
+    .umb-tree-item__arrow {
         color: @ui-active-type !important;
     }
 }

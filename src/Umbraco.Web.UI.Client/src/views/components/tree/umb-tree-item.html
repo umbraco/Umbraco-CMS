@@ -1,9 +1,12 @@
 <li class="umb-tree-item" data-element="tree-item-{{::node.dataElement}}" ng-class="getNodeCssClass(node)" on-right-click="altSelect(node, $event)">
     <div class="umb-tree-item__inner" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >
-        <ins data-element="tree-item-expand"
+        <button data-element="tree-item-expand"
+             class="umb-tree-item__arrow umb-outline btn-reset"
              ng-class="{'icon-navigation-right': !node.expanded || node.metaData.isContainer, 'icon-navigation-down': node.expanded && !node.metaData.isContainer}"
              ng-style="{'visibility': (scope.enablelistviewexpand === 'true' || node.hasChildren && (!node.metaData.isContainer || isDialog)) ? 'visible' : 'hidden'}"
-             ng-click="load(node)">&nbsp;</ins>
+             ng-click="load(node)">&nbsp;
+            <span class="sr-only">Expand child items for {{node.name}}</span>
+        </button>
 
         <i class="icon umb-tree-icon sprTree" ng-class="::node.cssClass" title="{{::node.title}}" ng-click="select(node, $event)" ng-style="::node.style"></i>
         <span class="umb-tree-item__annotation"></span>
