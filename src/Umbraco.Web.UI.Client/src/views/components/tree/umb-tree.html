@@ -8,9 +8,9 @@
                     {{tree.name}}
                 </a>
             </h5>
-            <a data-element="tree-item-options" class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)">
+            <button data-element="tree-item-options" class="umb-options btn-reset sr-only sr-only--focusable sr-only--hoverable" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)">
                 <i></i><i></i><i></i>
-            </a>
+            </button>
         </div>
         <umb-tree-item class="umb-animated"
                        ng-repeat="child in tree.root.children"
@@ -34,9 +34,9 @@
                     {{group.name}}
                 </a>
             </h5>
-            <a data-element="tree-item-options" class="umb-options umb-outline" ng-hide="group.isContainer || !group.menuUrl" ng-click="options(group, $event)" ng-swipe-right="options(group, $event)">
+            <button data-element="tree-item-options" class="umb-options umb-outline btn-reset sr-only sr-only--focusable sr-only--hoverable" ng-hide="group.isContainer || !group.menuUrl" ng-click="options(group, $event)" ng-swipe-right="options(group, $event)">
                 <i></i><i></i><i></i>
-            </a>
+            </button>
         </div>
 
         <umb-tree-item class="umb-animated"

@@ -90,7 +90,13 @@ body.touch .umb-tree {
         }
         
         > .umb-options {
-            visibility: visible;
+            position: relative;
+            width: auto;
+            height: auto;
+            margin: 0 10px 0 auto;
+            padding: 9px 5px;
+            overflow: visible;
+            clip: auto;
         }
         
         .umb-tree-icon {
@@ -164,7 +170,7 @@ body.touch .umb-tree {
 }
 
 .umb-options {
-    visibility: hidden;
+    position: relative;
     display: flex;
     flex: 0 0 auto;
     justify-content: flex-end;
@@ -176,6 +182,20 @@ body.touch .umb-tree {
 
     &:hover {
         background: @btnBackgroundHighlight;
+    }
+
+    // NOTE - We're having to repeat ourselves here due to an .sr-only class appearing in umbraco/lib/font-awesome/css/font-awesome.min.css
+    &.sr-only--hoverable:hover,
+    &.sr-only--focusable:focus {
+        position: relative;
+        display: flex;
+        flex: 0 0 auto;
+        justify-content: flex-end;
+        padding: 9px 5px;
+        text-align: center;
+        margin: 0 10px 0 auto;
+        cursor: pointer;
+        border-radius: 3px;
     }
 
     i {

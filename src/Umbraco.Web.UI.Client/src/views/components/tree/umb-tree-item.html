@@ -14,7 +14,7 @@
         <a class="umb-tree-item__label umb-outline" ng-href="#/{{::node.routePath}}" ng-click="select(node, $event)" title="{{::node.title}}">{{node.name}}</a>
 
         <!-- NOTE: These are the 'option' elipses -->
-        <a data-element="tree-item-options" class="umb-options" ng-click="options(node, $event)" ng-if="::node.menuUrl"><i></i><i></i><i></i></a>
+        <button data-element="tree-item-options" class="umb-options btn-reset sr-only sr-only--focusable sr-only--hoverable" ng-click="options(node, $event)" ng-if="::node.menuUrl"><i></i><i></i><i></i></button>
         <div ng-show="node.loading" class="l"><div></div></div>
     </div>
 
