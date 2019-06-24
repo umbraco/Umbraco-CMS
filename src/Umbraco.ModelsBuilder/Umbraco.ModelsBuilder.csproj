@@ -32,7 +32,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,7 +44,57 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
+    <Compile Include="Api\ApiVersion.cs" />
+    <Compile Include="Building\Builder.cs" />
+    <Compile Include="Building\PropertyModel.cs" />
+    <Compile Include="Building\TextBuilder.cs" />
+    <Compile Include="Building\TextHeaderWriter.cs" />
+    <Compile Include="Building\TypeModel.cs" />
+    <Compile Include="ConfigsExtensions.cs" />
+    <Compile Include="Configuration\ClrNameSource.cs" />
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\ModelsMode.cs" />
+    <Compile Include="Configuration\ModelsModeExtensions.cs" />
+    <Compile Include="Dashboard\BuilderDashboardHelper.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="ImplementPropertyTypeAttribute.cs" />
+    <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PublishedElementExtensions.cs" />
+    <Compile Include="PureLiveAssemblyAttribute.cs" />
+    <Compile Include="ReferencedAssemblies.cs" />
+    <Compile Include="TypeExtensions.cs" />
+    <Compile Include="Umbraco\HashCombiner.cs" />
+    <Compile Include="Umbraco\HashHelper.cs" />
+    <Compile Include="Umbraco\LiveModelsProvider.cs" />
+    <Compile Include="Umbraco\ModelsBuilderBackOfficeController.cs" />
+    <Compile Include="Umbraco\ModelsBuilderComponent.cs" />
+    <Compile Include="Umbraco\ModelsBuilderComposer.cs" />
+    <Compile Include="Umbraco\ModelsBuilderInitializer.cs" />
+    <Compile Include="Umbraco\ModelsGenerationError.cs" />
+    <Compile Include="Umbraco\OutOfDateModelsStatus.cs" />
+    <Compile Include="Umbraco\PublishedModelUtility.cs" />
+    <Compile Include="Umbraco\PureLiveModelFactory.cs" />
+    <Compile Include="Umbraco\UmbracoServices.cs" />
+    <Compile Include="Validation\ContentTypeModelValidator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
+      <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
+      <Name>Umbraco.Web</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.Mvc">
+      <Version>5.2.7</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
