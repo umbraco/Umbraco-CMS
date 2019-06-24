@@ -307,7 +307,7 @@ function entityResource($q, $http, umbRequestHelper) {
 
             var args = [
                 { id: id },
-                { type: type },
+                { type: type }
             ];
             if(options.dataTypeId){
                 args.push({dataTypeId: options.dataTypeId});
