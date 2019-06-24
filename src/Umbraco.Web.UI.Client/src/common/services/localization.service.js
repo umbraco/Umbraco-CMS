@@ -29,35 +29,48 @@ angular.module('umbraco.services')
     var resourceFileLoadStatus = "none";
     var resourceLoadingPromise = [];
 
-    function _lookup(value, tokens, dictionary) {
+    // array to hold the localized resource string entries
+    var innerDictionary = [];
+
+    function _lookup(alias, tokens, dictionary, fallbackValue) {
 
         //strip the key identifier if its there
-        if (value && value[0] === "@") {
-            value = value.substring(1);
+        if (alias && alias[0] === "@") {
+            alias = alias.substring(1);
         }
 
+        var underscoreIndex = alias.indexOf("_");
         //if no area specified, add general_
-        if (value && value.indexOf("_") < 0) {
-            value = "general_" + value;
+        if (alias && underscoreIndex < 0) {
+            alias = "general_" + alias;
+            underscoreIndex = alias.indexOf("_");
         }
 
-        var entry = dictionary[value];
-        if (entry) {
-            return service.tokenReplace(entry, tokens);
+        var areaAlias = alias.substring(0, underscoreIndex);
+        var valueAlias = alias.substring(underscoreIndex + 1);
+
+        var areaEntry = dictionary[areaAlias];
+        if (areaEntry) {
+            var valueEntry = areaEntry[valueAlias];
+            if (valueEntry) {
+                return service.tokenReplace(valueEntry, tokens);
+            }
         }
-        return "[" + value + "]";
+
+        if (fallbackValue) return fallbackValue;
+
+        return "[" + alias + "]";
     }
     
     var service = {
-        // array to hold the localized resource string entries
-        dictionary: [],
+        
 
         // loads the language resource file from the server
         initLocalizedResources: function () {
             var deferred = $q.defer();
 
             if (resourceFileLoadStatus === "loaded") {
-                deferred.resolve(service.dictionary);
+                deferred.resolve(innerDictionary);
                 return deferred.promise;
             }
 
@@ -77,7 +90,7 @@ angular.module('umbraco.services')
             $http({ method: "GET", url: url, cache: false })
                 .then(function (response) {
                     resourceFileLoadStatus = "loaded";
-                    service.dictionary = response.data;
+                    innerDictionary = response.data;
 
                     eventsService.emit("localizationService.updated", response.data);
 
@@ -159,11 +172,14 @@ angular.module('umbraco.services')
          * @param {Array} tokens if specified this array will be sent as parameter values
          * This replaces %0% and %1% etc in the dictionary key value with the passed in strings
          * 
+         * @param {String} fallbackValue if specified this string will be returned if no matching 
+         * entry was found in the dictionary
+         * 
          * @returns {String} localized resource string
          */
-        localize: function (value, tokens) {
+        localize: function (value, tokens, fallbackValue) {
             return service.initLocalizedResources().then(function (dic) {
-                return _lookup(value, tokens, dic);
+                return _lookup(value, tokens, dic, fallbackValue);
             });
         },
 
@@ -244,8 +260,8 @@ angular.module('umbraco.services')
                     //Build a concat string by looping over the array of resolved promises/translations
                     var returnValue = "";
 
-                    for(var i = 0; i < localizedValues.length; i++){
-                        returnValue += localizedValues[i];
+                    for(var j = 0; j < localizedValues.length; j++){
+                        returnValue += localizedValues[j];
                     }
 
                     return returnValue;
@@ -292,11 +308,11 @@ angular.module('umbraco.services')
                 return $q.all(promises).then(function(localizedValues){
 
                     //Replace {0} and {1} etc in message with the localized values
-                    for(var i = 0; i < localizedValues.length; i++){
-                        var token = "%" + i + "%";
+                    for(var j = 0; j < localizedValues.length; j++){
+                        var token = "%" + j + "%";
                         var regex = new RegExp(token, "g");
 
-                        message = message.replace(regex, localizedValues[i]);
+                        message = message.replace(regex, localizedValues[j]);
                     }
 
                     return message;

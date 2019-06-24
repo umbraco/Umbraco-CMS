@@ -920,11 +920,9 @@ angular.module("umbraco")
                 //Localize the grid editor names
                 angular.forEach($scope.availableEditors, function (value, key) {
                     //If no translation is provided, keep using the editor name from the manifest
-                    if (localizationService.dictionary.hasOwnProperty("grid_" + value.alias)) {
-                        localizationService.localize("grid_" + value.alias).then(function (v) {
-                            value.name = v;
-                        });
-                    }
+                    localizationService.localize("grid_" + value.alias, undefined, value.name).then(function (v) {
+                        value.name = v;
+                    });
                 });
 
                 $scope.contentReady = true;
