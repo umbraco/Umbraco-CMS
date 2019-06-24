@@ -52,9 +52,8 @@ namespace Umbraco.Core.Services
         /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
         /// </returns>
         /// <param name="key">Unique Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true);
+        IUmbracoEntity GetByKey(Guid key);
 
         /// <summary>
         /// Gets an UmbracoEntity by its Id, and optionally loads the complete object graph.
@@ -63,9 +62,8 @@ namespace Umbraco.Core.Services
         /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
         /// </returns>
         /// <param name="id">Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
-        /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        IUmbracoEntity Get(int id, bool loadBaseType = true);
+       /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity Get(int id);
 
         /// <summary>
         /// Gets an UmbracoEntity by its Id and UmbracoObjectType, and optionally loads the complete object graph.
@@ -75,9 +73,8 @@ namespace Umbraco.Core.Services
         /// </returns>
         /// <param name="key">Unique Id of the object to retrieve</param>
         /// <param name="umbracoObjectType">UmbracoObjectType of the entity to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true);
+        IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType);
 
         /// <summary>
         /// Gets an UmbracoEntity by its Id and UmbracoObjectType, and optionally loads the complete object graph.
@@ -87,21 +84,9 @@ namespace Umbraco.Core.Services
         /// </returns>
         /// <param name="id">Id of the object to retrieve</param>
         /// <param name="umbracoObjectType">UmbracoObjectType of the entity to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        IUmbracoEntity Get(int id, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true);
+        IUmbracoEntity Get(int id, UmbracoObjectTypes umbracoObjectType);
 
-        /// <summary>
-        /// Gets an UmbracoEntity by its Id and specified Type. Optionally loads the complete object graph.
-        /// </summary>
-        /// <returns>
-        /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
-        /// </returns>
-        /// <typeparam name="T">Type of the model to retrieve. Must be based on an <see cref="IUmbracoEntity"/></typeparam>
-        /// <param name="key">Unique Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
-        /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        IUmbracoEntity GetByKey<T>(Guid key, bool loadBaseType = true) where T : IUmbracoEntity;
 
         /// <summary>
         /// Gets an UmbracoEntity by its Id and specified Type. Optionally loads the complete object graph.
@@ -111,9 +96,8 @@ namespace Umbraco.Core.Services
         /// </returns>
         /// <typeparam name="T">Type of the model to retrieve. Must be based on an <see cref="IUmbracoEntity"/></typeparam>
         /// <param name="id">Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        IUmbracoEntity Get<T>(int id, bool loadBaseType = true) where T : IUmbracoEntity;
+        IUmbracoEntity Get<T>(int id) where T : IUmbracoEntity;
 
         /// <summary>
         /// Gets the parent of entity by its id

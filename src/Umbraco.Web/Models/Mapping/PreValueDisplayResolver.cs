@@ -75,6 +75,7 @@ namespace Umbraco.Web.Models.Mapping
                 dictionaryVals = propEd.PreValueEditor.ConvertDbToEditor(propEd.DefaultPreValues, preVals);
             }
 
+            result = result.ToArray();
             MapPreValueValuesToPreValueFields(result, dictionaryVals, source.PropertyEditorAlias);
 
             return result;

@@ -91,7 +91,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
             else
             {
-                FilterOutPossibleSensitiveData(items);
+               // FilterOutPossibleSensitiveData(items);
             }
 
         }

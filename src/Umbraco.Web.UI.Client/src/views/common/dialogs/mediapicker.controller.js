@@ -64,7 +64,7 @@ angular.module("umbraco")
                 if (folder.id > 0) {
                     entityResource.getAncestors(folder.id, "media")
                         .then(function(anc) {
-                            // anc.splice(0,1);  
+                            // anc.splice(0,1);
                             $scope.path = _.filter(anc,
                                 function(f) {
                                     return f.path.indexOf($scope.startNodeId) !== -1;
@@ -80,10 +80,16 @@ angular.module("umbraco")
                 }
 
                 //mediaResource.rootMedia()
-                mediaResource.getChildren(folder.id)
+                entityResource.getChildren(folder.id, "Media")
                     .then(function(data) {
+                        for (i=0;i<data.length;i++){
+                            if(data[i].metaData.MediaPath !== null){
+                                data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
+                                data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
+                            }
+                        }
                         $scope.searchTerm = "";
-                        $scope.images = data.items ? data.items : [];
+                        $scope.images = data ? data : [];
                     });
 
                 $scope.currentFolder = folder;

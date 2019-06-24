@@ -90,7 +90,7 @@ angular.module("umbraco")
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
                     var altText = $scope.target.altText;
                     if (id) {
-                        mediaResource.getById(id)
+                        entityResource.getById(id, "Media")
                             .then(function (node) {
                                 $scope.target = node;
                                 if (ensureWithinStartNode(node)) {
@@ -388,10 +388,17 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 $scope.loading = true;
-                return mediaResource.getChildren(id, { dataTypeId: $scope.model.dataTypeId })
+                return entityResource.getChildren(id, "Media")
                     .then(function(data) {
+
+                        for (i=0;i<data.length;i++){
+                            if(data[i].metaData.MediaPath !== null){
+                                data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
+                                data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
+                            }
+                        }
                         $scope.searchOptions.filter = "";
-                        $scope.images = data.items ? data.items : [];
+                        $scope.images = data ? data : [];
                         // set already selected images to selected
                         preSelectImages();
                         $scope.loading = false;
