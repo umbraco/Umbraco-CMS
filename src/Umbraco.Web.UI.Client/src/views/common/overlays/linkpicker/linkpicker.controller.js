@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
-    function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
+    function ($scope, eventsService, dialogService, entityResource, mediaHelper, userService, localizationService, tinyMceService) {
         var dialogOptions = $scope.model;
 
         var searchText = "Search...";
@@ -45,10 +45,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                         });
                     });
 
-                    // if a link exists, get the properties to build the anchor name list
-                    contentResource.getById(id, { dataTypeId: dialogOptions.dataTypeId }).then(function (resp) {
-                        $scope.model.target.url = resp.urls[0];
-                        $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+
+                    entityResource.getUrlAndAnchors(id).then(function(resp){
+                        $scope.anchorValues = resp.anchorValues;
+                        $scope.model.target.url = resp.url;
                     });
                 }
             } else if ($scope.model.target.url.length) {
@@ -88,9 +88,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             if (args.node.id < 0) {
                 $scope.model.target.url = "/";
             } else {
-                contentResource.getById(args.node.id, { dataTypeId: dialogOptions.dataTypeId }).then(function (resp) {
-                    $scope.model.target.url = resp.urls[0];
-                    $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+                entityResource.getUrlAndAnchors(args.node.id).then(function(resp){
+                    $scope.anchorValues = resp.anchorValues;
+                    $scope.model.target.url = resp.url;
                 });
             }
 

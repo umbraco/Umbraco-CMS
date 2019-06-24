@@ -12,19 +12,22 @@
 
         function openLinkPicker(editor, currentTarget, anchorElement) {
 
-            vm.linkPickerOverlay = {
-                view: "linkpicker",
-                currentTarget: currentTarget,
-				anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
-                dataTypeId: $scope.model.dataTypeId,
-                ignoreUserStartNodes : $scope.model.config.ignoreUserStartNodes,
-                show: true,
-                submit: function(model) {
-                    tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
-                    vm.linkPickerOverlay.show = false;
-                    vm.linkPickerOverlay = null;
-                }
-            };
+            entityResource.getAnchors($scope.model.value).then(function(anchorValues) {
+                vm.linkPickerOverlay = {
+                    view: "linkpicker",
+                    currentTarget: currentTarget,
+                    anchors: anchorValues,
+                    dataTypeId: $scope.model.dataTypeId,
+                    ignoreUserStartNodes : $scope.model.config.ignoreUserStartNodes,
+                    show: true,
+                    submit: function(model) {
+                        tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
+                        vm.linkPickerOverlay.show = false;
+                        vm.linkPickerOverlay = null;
+                    }
+                };
+            });
+
         }
 
         function openMediaPicker(editor, currentTarget, userData) {

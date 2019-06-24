@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState) {
+    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState, entityResource) {
 
         $scope.isLoading = true;
 
@@ -270,19 +270,25 @@ angular.module("umbraco")
                     });
 
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
-                        $scope.linkPickerOverlay = {
-                            view: "linkpicker",
-                            currentTarget: currentTarget,
-							              anchors: editorState.current ? tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
-                            dataTypeId: $scope.model.dataTypeId,
-                            ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes,
-                            show: true,
-                            submit: function(model) {
-                                tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
-                                $scope.linkPickerOverlay.show = false;
-                                $scope.linkPickerOverlay = null;
-                            }
-                        };
+
+                        entityResource.getAnchors($scope.model.value).then(function(anchorValues){
+                            $scope.linkPickerOverlay = {
+                                view: "linkpicker",
+                                currentTarget: currentTarget,
+                                anchors: anchorValues,
+                                dataTypeId: $scope.model.dataTypeId,
+                                ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes,
+                                show: true,
+                                submit: function(model) {
+                                    tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
+                                    $scope.linkPickerOverlay.show = false;
+                                    $scope.linkPickerOverlay = null;
+                                }
+                            };
+                        });
+
+
+
                     });
 
                     //Create the insert media plugin

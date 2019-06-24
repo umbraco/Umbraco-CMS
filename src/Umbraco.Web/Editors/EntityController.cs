@@ -289,6 +289,26 @@ namespace Umbraco.Web.Editors
                 publishedContentExists: i => Umbraco.TypedContent(i) != null);
         }
 
+
+        [HttpGet]
+        public UrlAndAnchors GetUrlAndAnchors(int id)
+        {
+            var x = GetResultForId(id, UmbracoEntityTypes.Document);
+
+            var url = Umbraco.Url(id);
+            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id);
+            return new UrlAndAnchors(url, anchorValues);
+        }
+
+        [HttpPost]
+        public IList<string> GetAnchors(string rteContent)
+        {
+
+            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEContent(rteContent);
+            return anchorValues;
+        }
+
+
         #region GetById
 
         /// <summary>

@@ -333,6 +333,7 @@
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
     <Compile Include="Models\ContentEditing\NotifySetting.cs" />
+    <Compile Include="Models\ContentEditing\UrlAndAnchors.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />

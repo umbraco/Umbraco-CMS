@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
     {
         //TODO: Remove this class in v8
 
-        //TODO: There's probably more that needs to be added like the EmptyRecycleBin, etc...        
+        //TODO: There's probably more that needs to be added like the EmptyRecycleBin, etc...
 
         /// <summary>
         /// Saves a single <see cref="IContent"/> object
@@ -31,10 +31,10 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Saves a collection of <see cref="IContent"/> objects.
-        /// </summary>        
+        /// </summary>
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>        
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         Attempt<OperationStatus> Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
@@ -382,7 +382,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Saves a collection of <see cref="IContent"/> objects.
-        /// </summary>        
+        /// </summary>
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
@@ -447,7 +447,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
-        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
         void EmptyRecycleBin(int userId = 0);
 
         /// <summary>
@@ -595,11 +595,11 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
-        /// <param name="userId">Optional Id of the User deleting the Content</param>        
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
         void Delete(IContent content, int userId = 0);
 
         /// <summary>
-        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current
         /// to the new copy, which is returned. Recursively copies all children.
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to copy</param>
@@ -610,7 +610,7 @@ namespace Umbraco.Core.Services
         IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0);
 
         /// <summary>
-        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current
         /// to the new copy which is returned.
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to copy</param>
@@ -713,5 +713,8 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
         IContent CreateContentWithIdentity(string name, int parentId, string contentTypeAlias, int userId = 0);
+
+        IList<string> GetAnchorValuesFromRTEs(int id);
+        IList<string> GetAnchorValuesFromRTEContent(string rteContent);
     }
 }

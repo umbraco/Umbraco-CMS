@@ -160,6 +160,38 @@ function entityResource($q, $http, umbRequestHelper) {
                 'Failed to retrieve entity data for id ' + id);
         },
 
+
+        getUrlAndAnchors: function (id) {
+
+            if (id === -1 || id === "-1") {
+                return null;
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "entityApiBaseUrl",
+                        "GetUrlAndAnchors",
+                        [{ id: id }])),
+                'Failed to retrieve url and anchors data for id ' + id);
+        },
+
+
+        getAnchors: function (rteContent) {
+
+            if (rteContent == null || rteContent.length === 0) {
+                return [];
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "entityApiBaseUrl",
+                        "GetAnchors",
+                        [{ rteContent: rteContent }])),
+                'Failed to anchors data for rte content ' + rteContent);
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getByIds
@@ -488,6 +520,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 'Failed to retrieve child data for id ' + parentId);
         },
 
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#search
@@ -582,6 +615,8 @@ function entityResource($q, $http, umbRequestHelper) {
                     httpConfig),
                 'Failed to retrieve entity data for query ' + query);
         }
+
+
 
     };
 }
