@@ -21,23 +21,23 @@
     background-color: @inputBorder;
     position: relative;
     transition: background-color 120ms;
-    
-    .umb-toggle:hover &, 
+
+    .umb-toggle:hover &,
     .umb-toggle:focus & {
         border-color: @inputBorderFocus;
     }
-    
+
     .umb-toggle.umb-toggle--checked & {
         border-color: @ui-btn;
         background-color: @ui-btn;
-        
+
         &:hover {
             background-color: @ui-btn-hover;
         }
     }
-    
-    .umb-toggle.umb-toggle--checked:focus & {
-        border-color: black;
+
+    .tabbing-active .umb-toggle:focus & {
+        box-shadow: 0 0 0 2px highlight;
     }
 }
 
@@ -54,12 +54,12 @@
     background-color: @white;
     border-radius: 8px;
     transition: transform 120ms ease-in-out, background-color 120ms;
-    
+
     .umb-toggle.umb-toggle--checked & {
         transform: translateX(20px);
         background-color: white;
     }
-    
+
 }
 
 
