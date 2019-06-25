@@ -10,7 +10,7 @@ var processJs = require('../util/processJs');
 
 var watch = require('gulp-watch');
 
-gulp.task('watch', function () {
+function watch() {
 
     var stream = new MergeStream();
     var watchInterval = 500;
@@ -55,4 +55,6 @@ gulp.task('watch', function () {
     );
 
     return stream;
-});
+};
+
+module.exports = { watch: watch };

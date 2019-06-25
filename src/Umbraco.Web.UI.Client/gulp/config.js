@@ -3,8 +3,8 @@
 module.exports = {
     sources: {
 
-        //less files used by backoffice and preview
-        //processed in the less task
+        // less files used by backoffice and preview
+        // processed in the less task
         less: {
             installer: { files: ["./src/less/installer.less"], out: "installer.css" },
             nonodes: { files: ["./src/less/pages/nonodes.less"], out: "nonodes.style.min.css"},
@@ -12,8 +12,8 @@ module.exports = {
             umbraco: { files: ["./src/less/belle.less"], out: "umbraco.css" }
         },
 
-        //js files for backoffie
-        //processed in the js task
+        // js files for backoffice
+        // processed in the js task
         js: {
             preview: { files: ["./src/preview/**/*.js"], out: "umbraco.preview.js" },
             installer: { files: ["./src/installer/**/*.js"], out: "umbraco.installer.js" },
@@ -22,7 +22,7 @@ module.exports = {
             filters: { files: ["./src/common/filters/**/*.js"], out: "umbraco.filters.js" },
             resources: { files: ["./src/common/resources/**/*.js"], out: "umbraco.resources.js" },
             services: { files: ["./src/common/services/**/*.js"], out: "umbraco.services.js" },
-            security: { files: ["./src/common/interceptors/**/*.js"], out: "umbraco.interceptors.js" }
+            interceptors: { files: ["./src/common/interceptors/**/*.js"], out: "umbraco.interceptors.js" }
         },
 
         //selectors for copying all views into the build

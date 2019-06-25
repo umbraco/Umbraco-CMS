@@ -9,9 +9,9 @@ var MergeStream = require('merge-stream');
 var processJs = require('../util/processJs');
 
 /**************************
- * Copies all angular JS files into their seperate umbraco.*.js file
+ * Copies all angular JS files into their separate umbraco.*.js file
  **************************/
-gulp.task('js', function () {
+function js() {
 
     //we run multiple streams, so merge them all together
     var stream = new MergeStream();
@@ -26,4 +26,6 @@ gulp.task('js', function () {
      });
 
      return stream;
-});
+};
+
+module.exports = { js: js };
