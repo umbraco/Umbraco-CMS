@@ -303,10 +303,35 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        public void SetAllContentTypes(IEnumerable<IPublishedContentType> types)
+        {
+            var lockInfo = new WriteLockInfo();
+            try
+            {
+                Lock(lockInfo);
+
+                // clear all existing content types
+                ClearLocked(_contentTypesById);
+                ClearLocked(_contentTypesByAlias);
+
+                // set all new content types
+                foreach (var type in types)
+                {
+                    SetValueLocked(_contentTypesById, type.Id, type);
+                    SetValueLocked(_contentTypesByAlias, type.Alias, type);
+                }
+
+                // beware! at that point the cache is inconsistent,
+                // assuming we are going to SetAll content items!
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
+        }
+
         public void UpdateContentTypes(IEnumerable<int> removedIds, IEnumerable<IPublishedContentType> refreshedTypes, IEnumerable<ContentNodeKit> kits)
         {
-            var isRebuilding = removedIds == null && kits == null;
-
             var removedIdsA = removedIds?.ToArray() ?? Array.Empty<int>();
             var refreshedTypesA = refreshedTypes?.ToArray() ?? Array.Empty<IPublishedContentType>();
             var refreshedIdsA = refreshedTypesA.Select(x => x.Id).ToArray();
@@ -316,34 +341,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             try
             {
                 Lock(lockInfo);
-
-
-                if (isRebuilding)
-                {
-                    //All calls to this method when these are null means that we are regenerating the cache and first only setting content types
-                    //TODO: A different method should be used for this operation - there are 4 places where this is called with these two args as null
-
-                    //In this case we know we are regenerating everything, so clear it all
-                    //TODO: From my understanding, we can't 'just' clear things like _contentNodes or _xmap, etc... since the cache can be in use on a diff generation? something like that.
-
-                    //TODO: Follow-up: Actually, in all cases where this is called with the 2 null params, a call is made to _contentStore.SetAll which performs this reset anyways so
-                    // we don't really need to do much in this case at all.
-
-                    //ClearLocked(_contentNodes);
-                    //ClearRootLocked();
-
-                    //TODO: I'm unsure how this is handled behind the scenes - or maybe it simply doesn't need to be handled since it will never have a variying UDI -> ID map
-                    // since the this mapping in the DB would never change? 
-                    //_xmap.Clear(); 
-
-                    // At this point, all we need to do is perform update of refreshed content types
-                    foreach (var type in refreshedTypesA)
-                    {
-                        SetValueLocked(_contentTypesById, type.Id, type);
-                        SetValueLocked(_contentTypesByAlias, type.Alias, type);
-                    }
-                    return;
-                }
 
                 var removedContentTypeNodes = new List<int>();
                 var refreshedContentTypeNodes = new List<int>();
@@ -383,11 +380,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 // perform update of content with refreshed content type - from the kits
                 // skip missing type, skip missing parents & un-buildable kits - what else could we do?
-                // kits are ordered by level, so ParentExits is ok here
+                // kits are ordered by level, so ParentExists is ok here
                 var visited = new List<int>();
                 foreach (var kit in kits.Where(x =>
                     refreshedIdsA.Contains(x.ContentTypeId) &&
-                    ParentExistsLocked(x) &&
                     BuildKit(x)))
                 {
                     // replacing the node: must preserve the parents
@@ -464,13 +460,26 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private bool BuildKit(ContentNodeKit kit)
         {
+            // make sure parent exists
+            if (!ParentExistsLocked(kit))
+            {
+                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.");
+                return false;
+            }
+
             // make sure the kit is valid
             if (kit.DraftData == null && kit.PublishedData == null)
+            {
+                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, both draft and published data are null.");
                 return false;
+            }
 
             // unknown = bad
             if (_contentTypesById.TryGetValue(kit.ContentTypeId, out var link) == false || link.Value == null)
+            {
+                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, could not find content type id={kit.ContentTypeId}.");
                 return false;
+            }
 
             // check whether parent is published
             var canBePublished = ParentPublishedLocked(kit);
@@ -494,7 +503,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return link;
         }
 
-        public void Set(ContentNodeKit kit)
+        public bool Set(ContentNodeKit kit)
         {
             // ReSharper disable LocalizableElement
             if (kit.IsEmpty)
@@ -514,9 +523,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _contentNodes.TryGetValue(kit.Node.Id, out var link);
                 var existing = link?.Value;
 
-                // else ignore, what else could we do?
-                if (ParentExistsLocked(kit) == false || BuildKit(kit) == false)
-                    return;
+                if (!BuildKit(kit))
+                    return false;
 
                 // moving?
                 var moving = existing != null && existing.ParentContentId != kit.Node.ParentContentId;
@@ -553,6 +561,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 Release(lockInfo);
             }
+
+            return true;
         }
 
         private void ClearRootLocked()
@@ -564,9 +574,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // IMPORTANT kits must be sorted out by LEVEL
-        public void SetAll(IEnumerable<ContentNodeKit> kits)
+        public bool SetAll(IEnumerable<ContentNodeKit> kits, bool fromLocalDb = false)
         {
             var lockInfo = new WriteLockInfo();
+            var ok = true;
             try
             {
                 Lock(lockInfo);
@@ -578,14 +589,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //ClearLocked(_contentTypesById);
                 //ClearLocked(_contentTypesByAlias);
 
-                // skip missing parents & un-buildable kits - what else could we do?
-                foreach (var kit in kits.Where(x => ParentExistsLocked(x) && BuildKit(x)))
+                foreach (var kit in kits)
                 {
+                    if (!BuildKit(kit))
+                    {
+                        ok = false;
+                        continue; // skip that one
+                    }
+                    _logger.Debug<ContentStore>($"set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
-                    //TODO: When this is called from LoadContentFromLocalDbLocked we are populating the cache from the localDB,
-                    // so we shouldn't then need to spend the effort to tell it to update itself based on itself?
-                    if (_localDb != null) RegisterChange(kit.Node.Id, kit);
+                    // don't refresh _localDb if we are reading from _localDb
+                    if (!fromLocalDb && _localDb != null) RegisterChange(kit.Node.Id, kit);
                     AddNodeLocked(kit.Node);
 
                     _xmap[kit.Node.Uid] = kit.Node.Id;
@@ -595,12 +610,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 Release(lockInfo);
             }
+
+            return ok;
         }
 
         // IMPORTANT kits must be sorted out by LEVEL and by SORT ORDER
-        public void SetBranch(int rootContentId, IEnumerable<ContentNodeKit> kits)
+        public bool SetBranch(int rootContentId, IEnumerable<ContentNodeKit> kits)
         {
             var lockInfo = new WriteLockInfo();
+            var ok = true;
             try
             {
                 Lock(lockInfo);
@@ -617,9 +635,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
 
                 // now add them all back
-                // skip missing parents & un-buildable kits - what else could we do?
-                foreach (var kit in kits.Where(x => ParentExistsLocked(x) && BuildKit(x)))
+                foreach (var kit in kits)
                 {
+                    if (!BuildKit(kit))
+                    {
+                        ok = false;
+                        continue; // skip that one
+                    }
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
                     if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                     AddNodeLocked(kit.Node);
@@ -631,6 +653,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 Release(lockInfo);
             }
+
+            return ok;
         }
 
         public bool Clear(int id)

@@ -331,7 +331,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
-            _contentStore.UpdateContentTypes(null, contentTypes, null);
+            _contentStore.SetAllContentTypes(contentTypes);
+
+            // beware! at that point the cache is inconsistent,
+            // assuming we are going to SetAll content items!
 
             _localContentDb?.Clear();
 
@@ -348,13 +351,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
-            _contentStore.UpdateContentTypes(null, contentTypes, null);
+            _contentStore.SetAllContentTypes(contentTypes);
+
+            // beware! at that point the cache is inconsistent,
+            // assuming we are going to SetAll content items!
 
             _logger.Debug<PublishedSnapshotService>("Loading content from local db...");
             var sw = Stopwatch.StartNew();
             var kits = _localContentDb.Select(x => x.Value)
                 .OrderBy(x => x.Node.Level); // IMPORTANT sort by level
-            _contentStore.SetAll(kits);
+            _contentStore.SetAll(kits, true);
             sw.Stop();
             _logger.Debug<PublishedSnapshotService>("Loaded content from local db ({Duration}ms)", sw.ElapsedMilliseconds);
         }
@@ -399,7 +405,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
-            _mediaStore.UpdateContentTypes(null, mediaTypes, null);
+            _mediaStore.SetAllContentTypes(mediaTypes);
+
+            // beware! at that point the cache is inconsistent,
+            // assuming we are going to SetAll content items!
 
             _localMediaDb?.Clear();
 
@@ -416,13 +425,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
-            _mediaStore.UpdateContentTypes(null, mediaTypes, null);
+            _mediaStore.SetAllContentTypes(mediaTypes);
+
+            // beware! at that point the cache is inconsistent,
+            // assuming we are going to SetAll content items!
 
             _logger.Debug<PublishedSnapshotService>("Loading media from local db...");
             var sw = Stopwatch.StartNew();
             var kits = _localMediaDb.Select(x => x.Value)
                 .OrderBy(x => x.Node.Level); // IMPORTANT sort by level
-            _mediaStore.SetAll(kits);
+            _mediaStore.SetAll(kits, true);
             sw.Stop();
             _logger.Debug<PublishedSnapshotService>("Loaded media from local db ({Duration}ms)", sw.ElapsedMilliseconds);
         }
