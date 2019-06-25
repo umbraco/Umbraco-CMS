@@ -112,9 +112,12 @@ Use this directive to render an umbraco button. The directive can be used to gen
 
         function onInit() {
 
+            vm.generalActions = false;
             vm.blockElement = false;
             vm.style = null;
             vm.innerState = "init";
+
+            vm.generalActions = vm.labelKey === "general_actions";
 
             vm.buttonLabel = vm.label;
             // is this a primary button style (i.e. anything but an 'info' button)?
