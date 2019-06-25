@@ -108,7 +108,7 @@ namespace Umbraco.Web.Editors
 
             //if it isn't supposed to be rendered in the editor then return an empty string
             //currently we cannot render a macro if the page doesn't yet exist
-            if (pageId == -1 || publishedContent == null || !m.UseInEditor)
+            if (pageId == -1 || publishedContent == null || m.DontRender)
             {
                 var response = Request.CreateResponse();
                 //need to create a specific content result formatted as HTML since this controller has been configured
