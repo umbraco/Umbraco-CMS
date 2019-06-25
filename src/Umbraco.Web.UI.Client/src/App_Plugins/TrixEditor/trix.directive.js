@@ -20,12 +20,14 @@
             link: function($scope, element, attr, ngModel) {
                 
                 
+                
                 // TODO: retrive from configuration:
                 var acceptedFileTypes = ["image/jpeg", "image/png"];
                 var maxFileSize = 37000000;
                 
                 
                 var editorElement = element[0];
+                
                 
                 
                 function init() {
@@ -35,18 +37,22 @@
                         editorElement.editor.loadHTML(ngModel.$modelValue);
                     }
                     
+                    editorElement.addEventListener('trix-change', update);
+                    
                     addUploadFeature();
                     
+                }
+                
+                function update() {
+                    var html = editorElement.value;
+                    ngModel.$setViewValue(html);
                 }
                 
                 
                 editorElement.addEventListener('trix-initialize', init);
                 
-                // maintenance of ng-model
                 
-                editorElement.addEventListener('trix-change', function() {
-                    ngModel.$setViewValue(element.html());
-                });
+                // maintenance of ng-model
                 
                 ngModel.$render = function() {
                     if (editorElement.editor) {
@@ -130,8 +136,6 @@
                     var attachment = event.attachment;
                     
                     if (attachment.file) {
-                        
-                        console.log('trix-attachment-add', attachment.file.name);
                         
                         /*
                         // set caption
@@ -228,7 +232,7 @@
                                 
                                 
                                 
-                                console.log("File uploaded, data: ", data);
+                                console.log("File uploaded, data: ", data, attachment);
                                 /*
                                 var media = data.medias[0];
                                 if(media) {
@@ -244,12 +248,25 @@
                                     attachment.remove();
                                 }
                                 */
+                                
+                                // TODO: Get the URL and UDI from upload response.. missing in response..
+                                attachment.setAttributes(
+                                    {
+                                        "udi": "1234567890",
+                                        "url": "/media/uxsduzyq/umbraco_cloudportal_login.png"
+                                    }
+                                );
+                                
+                                
                             }
                             
                             //after processing, test if everthing is done
                             uploadNextAttachment();
                         })
                         .error(function(evt, status, headers, config) {
+                            
+                            console.log("Attachment error...");
+                            
                             // set status done
                             file.uploadStatus = "error";
                             //if the service returns a detailed error
