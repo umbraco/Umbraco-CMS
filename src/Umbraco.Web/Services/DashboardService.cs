@@ -104,8 +104,9 @@ namespace Umbraco.Web.Services
                 }
             }
 
-            if (hasAccess || denyRules.Length == 0)
-                return true;
+            // No need to check denyRules if there aren't any, just return current state
+            if (denyRules.Length == 0)
+                return hasAccess;
 
             // check if this item has any deny arguments, if so check if the user is in one of the denied user groups, if so they will
             // be denied to see it no matter what
