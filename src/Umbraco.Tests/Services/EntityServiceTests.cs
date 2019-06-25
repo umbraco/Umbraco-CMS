@@ -515,12 +515,6 @@ namespace Umbraco.Tests.Services
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(5));
-
-            Assert.That(
-                entities.Any(
-                    x =>
-                    x.AdditionalData.Any(y => y.Value is UmbracoEntity.EntityProperty
-                        && ((UmbracoEntity.EntityProperty)y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
         }
 
         [Test]
