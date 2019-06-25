@@ -13,8 +13,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly ILocalizedTextService _textService;
 
-        public ContentPropertyDisplayConverter(IDataTypeService dataTypeService, ILocalizedTextService textService)
-            : base(dataTypeService)
+        public ContentPropertyDisplayConverter(IDataTypeService dataTypeService, ILocalizedTextService textService, IEntityService entityService)
+            : base(dataTypeService, entityService)
         {
             _textService = textService;
         }

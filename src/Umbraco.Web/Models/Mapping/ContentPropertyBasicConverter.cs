@@ -18,13 +18,15 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentPropertyBasicConverter<T> : ITypeConverter<Property, T>
         where T : ContentPropertyBasic, new()
     {
-        protected IDataTypeService DataTypeService { get; private set; }
+        protected IDataTypeService DataTypeService { get; }
+        protected IEntityService EntityService { get; }
 
         private static readonly List<string> ComplexPropertyTypeAliases = new List<string> {"Umbraco.NestedContent"};
 
-        public ContentPropertyBasicConverter(IDataTypeService dataTypeService)
+        public ContentPropertyBasicConverter(IDataTypeService dataTypeService, IEntityService entityService)
         {
             DataTypeService = dataTypeService;
+            EntityService = entityService;
         }
 
         /// <summary>
@@ -48,12 +50,18 @@ namespace Umbraco.Web.Models.Mapping
                 editor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias);
             }
 
-            var dataTypeDefinition = DataTypeService.GetDataTypeDefinitionById(property.PropertyType.DataTypeDefinitionId);
+            var dataTypeDefinitionKey = EntityService.GetKeyForId(property.PropertyType.DataTypeDefinitionId, UmbracoObjectTypes.DataType);
+
+            if (dataTypeDefinitionKey.Success == false)
+            {
+                throw new InvalidOperationException("Can't get the unique key from the id: " + property.PropertyType.DataTypeDefinitionId);
+            }
+
 
             var result = new T
             {
                 Id = property.Id,
-                DataTypeId = dataTypeDefinition.Key,
+                DataTypeId = dataTypeDefinitionKey.Result,
                 Alias = property.Alias,
                 PropertyEditor = editor,
                 Editor = editor.Alias

@@ -8,7 +8,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			searchText = value + "...";
 		});
 
-		debugger;
 		$scope.dialogTreeEventHandler = $({});
 		$scope.target = {};
 		$scope.searchInfo = {
@@ -134,7 +133,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 						$scope.target.id = media.id;
 						$scope.target.isMedia = true;
 						$scope.target.name = media.name;
-						$scope.target.url = mediaHelper.resolveFile(media);
+						$scope.target.url = media.image;
 					}
 				});
 			});

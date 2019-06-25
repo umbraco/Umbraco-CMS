@@ -35,6 +35,7 @@ namespace Umbraco.Core.Services
         //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private static readonly Regex AnchorRegex = new Regex("<a id=\"(.*?)\">", RegexOptions.Compiled);
 
         public ContentService(
             IDatabaseUnitOfWorkProvider provider,
@@ -300,7 +301,7 @@ namespace Umbraco.Core.Services
             return content;
         }
 
-        public IList<string> GetAnchorValuesFromRTEs(int id)
+        public IEnumerable<string> GetAnchorValuesFromRTEs(int id)
         {
             var result = new List<string>();
 
@@ -308,7 +309,7 @@ namespace Umbraco.Core.Services
 
             foreach (var contentProperty in content.Properties)
             {
-                if (string.Equals(contentProperty.PropertyType.PropertyEditorAlias, Constants.PropertyEditors.TinyMCEAlias))
+                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.TinyMCEAlias))
                 {
                     var value = contentProperty.Value?.ToString();
 
@@ -324,11 +325,12 @@ namespace Umbraco.Core.Services
             return result;
         }
 
-        public IList<string> GetAnchorValuesFromRTEContent(string rteContent)
+
+        public IEnumerable<string> GetAnchorValuesFromRTEContent(string rteContent)
         {
             var result = new List<string>();
-            var regex = new Regex("<a id=\"(.*?)\">");
-            var matches = regex.Matches(rteContent);
+
+            var matches = AnchorRegex.Matches(rteContent);
 
             foreach (Match match in matches)
             {

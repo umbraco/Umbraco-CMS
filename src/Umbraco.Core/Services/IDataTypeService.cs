@@ -163,6 +163,5 @@ namespace Umbraco.Core.Services
 
         Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
 
-        bool IsDataTypeIgnoringUserStartNodes(Guid dataTypeId);
     }
 }

@@ -6,7 +6,7 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "urlAndAnchors", Namespace = "")]
     public class UrlAndAnchors
     {
-        public UrlAndAnchors(string url, IList<string> anchorValues)
+        public UrlAndAnchors(string url, IEnumerable<string> anchorValues)
         {
             Url = url;
             AnchorValues = anchorValues;
@@ -16,6 +16,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Url { get; }
 
         [DataMember(Name = "anchorValues")]
-        public IList<string> AnchorValues { get;  }
+        public IEnumerable<string> AnchorValues { get;  }
     }
 }

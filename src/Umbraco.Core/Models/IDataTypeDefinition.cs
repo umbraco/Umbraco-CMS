@@ -20,10 +20,5 @@ namespace Umbraco.Core.Models
         /// Gets or Sets the DatabaseType for which the DataType's value is saved as
         /// </summary>
         DataTypeDatabaseType DatabaseType { get; set; }
-
-        /// <summary>
-        /// Gets information about whether this data type is build in or not.
-        /// </summary>
-        bool IsBuildInDataType { get;}
     }
 }

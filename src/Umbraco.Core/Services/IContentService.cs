@@ -714,7 +714,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         IContent CreateContentWithIdentity(string name, int parentId, string contentTypeAlias, int userId = 0);
 
-        IList<string> GetAnchorValuesFromRTEs(int id);
-        IList<string> GetAnchorValuesFromRTEContent(string rteContent);
+        IEnumerable<string> GetAnchorValuesFromRTEs(int id);
+        IEnumerable<string> GetAnchorValuesFromRTEContent(string rteContent);
     }
 }

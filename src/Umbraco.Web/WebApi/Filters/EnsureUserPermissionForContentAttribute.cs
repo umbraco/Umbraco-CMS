@@ -73,24 +73,6 @@ namespace Umbraco.Web.WebApi.Filters
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
 
-            var ignoreUserStartNodes = false;
-
-            if (actionContext.ActionArguments.ContainsKey("dataTypeId"))
-            {
-                if (actionContext.ActionArguments.TryGetValue("dataTypeId", out var dataTypeIdValue))
-                {
-                    var dataTypeIdString = dataTypeIdValue?.ToString();
-                    if (string.IsNullOrEmpty(dataTypeIdString) == false &&
-                        Guid.TryParse(dataTypeIdString, out var dataTypeId))
-                    {
-                        ignoreUserStartNodes =
-                            ApplicationContext.Current.Services.DataTypeService
-                                .IsDataTypeIgnoringUserStartNodes(dataTypeId);
-                    }
-                }
-
-            }
-
             int nodeId;
             if (_nodeId.HasValue == false)
             {
@@ -144,9 +126,7 @@ namespace Umbraco.Web.WebApi.Filters
                 ApplicationContext.Current.Services.UserService,
                 ApplicationContext.Current.Services.ContentService,
                 ApplicationContext.Current.Services.EntityService,
-                nodeId,
-                _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null,
-                ignoreUserStartNodes: ignoreUserStartNodes))
+                nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
             {
                 base.OnActionExecuting(actionContext);
             }

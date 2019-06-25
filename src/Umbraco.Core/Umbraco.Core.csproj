@@ -377,6 +377,7 @@
     <Compile Include="Models\Consent.cs" />
     <Compile Include="Models\ConsentExtensions.cs" />
     <Compile Include="Models\ConsentState.cs" />
+    <Compile Include="Models\DataTypeDefinitionExtensions.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
     <Compile Include="Models\IAuditEntry.cs" />
@@ -767,6 +768,7 @@
     <Compile Include="Services\ConsentService.cs" />
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
     <Compile Include="Models\RedirectUrl.cs" />
+    <Compile Include="Services\DateTypeServiceExtensions.cs" />
     <Compile Include="Services\IConsentService.cs" />
     <Compile Include="Services\IContentServiceBase.cs" />
     <Compile Include="Services\IdkMap.cs" />

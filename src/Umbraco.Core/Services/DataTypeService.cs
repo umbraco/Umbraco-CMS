@@ -349,22 +349,6 @@ namespace Umbraco.Core.Services
                 new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
         }
 
-        public bool IsDataTypeIgnoringUserStartNodes(Guid key)
-        {
-            var dataType = GetDataTypeDefinitionById(key);
-
-            if (dataType != null)
-            {
-                var preValues = GetPreValuesCollectionByDataTypeId(dataType.Id);
-                if (preValues.PreValuesAsDictionary.TryGetValue(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, out var preValue))
-                {
-                    return string.Equals(preValue.Value, "1", StringComparison.InvariantCulture);
-                }
-            }
-
-            return false;
-        }
-
         /// <summary>
         /// Saves an <see cref="IDataTypeDefinition"/>
         /// </summary>

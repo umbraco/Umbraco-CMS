@@ -20,6 +20,7 @@ using System.Text.RegularExpressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Search;
 using Umbraco.Web.Trees;
@@ -82,26 +83,10 @@ namespace Umbraco.Web.Editors
         /// <param name="searchFrom">
         /// A starting point for the search, generally a node id, but for members this is a member type alias
         /// </param>
-        /// <returns></returns>
-        [Obsolete("This method is obsolete, use the overload with dataTypeId instead", false)]
-        [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
-        {
-            return Search(query, type, null, searchFrom);
-        }
-
-        /// <summary>
-        /// Searches for results based on the entity type
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="type"></param>
-        /// <param name="searchFrom">
-        /// A starting point for the search, generally a node id, but for members this is a member type alias
-        /// </param>
         /// <param name="dataTypeId">If set used to look up whether user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, Guid? dataTypeId, string searchFrom = null)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, Guid? dataTypeId = null)
         {
             //TODO: Should we restrict search results based on what app the user has access to?
             // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
@@ -301,7 +286,7 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpPost]
-        public IList<string> GetAnchors(string rteContent)
+        public IEnumerable<string> GetAnchors(string rteContent)
         {
 
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEContent(rteContent);
@@ -565,29 +550,16 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        [Obsolete("This method is obsolete, use the overload with dataTypeId instead", false)]
-        public PagedResult<EntityBasic> GetPagedDescendants(
-            int id,
-            UmbracoEntityTypes type,
-            int pageNumber,
-            int pageSize,
-            string orderBy = "SortOrder",
-            Direction orderDirection = Direction.Ascending,
-            string filter = "")
-        {
-            return GetPagedDescendants(id, type, pageNumber, pageSize,
-                null, orderBy, orderDirection, filter);
-        }
 
         public PagedResult<EntityBasic> GetPagedDescendants(
             int id,
             UmbracoEntityTypes type,
             int pageNumber,
             int pageSize,
-            Guid? dataTypeId,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
-            string filter = "")
+            string filter = "",
+            Guid? dataTypeId = null)
         {
             if (pageNumber <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -654,13 +626,7 @@ namespace Umbraco.Web.Editors
 
         private bool IsDataTypeIgnoringUserStartNodes(Guid? dataTypeId) => dataTypeId.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value);
 
-        [Obsolete("This method is obsolete, use the overload with dataTypeId instead", false)]
-        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type)
-        {
-            return GetResultForAncestors(id, type, null);
-        }
-
-        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, Guid? dataTypeId)
+        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, Guid? dataTypeId = null)
         {
             return GetResultForAncestors(id, type, dataTypeId);
         }
@@ -681,7 +647,7 @@ namespace Umbraco.Web.Editors
         private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             long total;
-            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, ignoreUserStartNodes, searchFrom);
+            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom, ignoreUserStartNodes);
         }
 
 

@@ -172,14 +172,14 @@ function entityResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "entityApiBaseUrl",
                         "GetUrlAndAnchors",
-                        [{ id: id }])),
+                        { id: id })),
                 'Failed to retrieve url and anchors data for id ' + id);
         },
 
 
         getAnchors: function (rteContent) {
 
-            if (rteContent == null || rteContent.length === 0) {
+            if (!rteContent || rteContent.length === 0) {
                 return [];
             }
 
@@ -188,7 +188,7 @@ function entityResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "entityApiBaseUrl",
                         "GetAnchors",
-                        [{ rteContent: rteContent }])),
+                        { rteContent: rteContent })),
                 'Failed to anchors data for rte content ' + rteContent);
         },
 
@@ -543,19 +543,16 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        search: function (query, type, options, canceler) {
+        search: function (query, type, searchFrom, canceler, dataTypeId) {
 
-            var defaults = {
-                searchFrom: null,
-                dataTypeId: null
-            };
-            if (options === undefined) {
-                options = {};
+            var args = [{ query: query }, { type: type }];
+            if (searchFrom) {
+                args.push({ searchFrom: searchFrom });
             }
-            //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
-            //now copy back to the options we will use
-            options = defaults;
+
+            if (dataTypeId) {
+                args.push({ dataTypeId: dataTypeId });
+            }
 
             var httpConfig = {};
             if (canceler) {
@@ -567,12 +564,7 @@ function entityResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "entityApiBaseUrl",
                         "Search",
-                        {
-                            query: query,
-                            type: type,
-                            searchFrom: options.searchFrom,
-                            dataTypeId: options.dataTypeId
-                        }),
+                        args),
                     httpConfig),
                 'Failed to retrieve entity data for query ' + query);
         },

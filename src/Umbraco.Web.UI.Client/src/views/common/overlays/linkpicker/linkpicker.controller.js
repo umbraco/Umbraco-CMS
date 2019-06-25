@@ -128,7 +128,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                         $scope.model.target.udi = media.udi;
                         $scope.model.target.isMedia = true;
                         $scope.model.target.name = media.name;
-                        $scope.model.target.url = mediaHelper.resolveFile(media);
+                        $scope.model.target.url = media.image;
 
                         $scope.mediaPickerOverlay.show = false;
                         $scope.mediaPickerOverlay = null;

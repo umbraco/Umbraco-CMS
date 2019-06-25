@@ -264,28 +264,23 @@ namespace Umbraco.Web.Editors
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
             bool orderBySystemField = true,
-            string filter = "",
-            Guid? dataTypeId = null)
+            string filter = "")
         {
             //if a request is made for the root node data but the user's start node is not the default, then
             // we need to return their start nodes
             if (id == Constants.System.Root && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
             {
-                var ignoreUserStartNodes = dataTypeId.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value);
-                if (ignoreUserStartNodes == false)
+                if (pageNumber > 0)
+                    return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
+                var nodes = Services.MediaService.GetByIds(UserStartNodes).ToArray();
+                if (nodes.Length == 0)
+                    return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
+                if (pageSize < nodes.Length) pageSize = nodes.Length; // bah
+                var pr = new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(nodes.Length, pageNumber, pageSize)
                 {
-                    if (pageNumber > 0)
-                        return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
-                    var nodes = Services.MediaService.GetByIds(UserStartNodes).ToArray();
-                    if (nodes.Length == 0)
-                        return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
-                    if (pageSize < nodes.Length) pageSize = nodes.Length; // bah
-                    var pr = new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(nodes.Length, pageNumber, pageSize)
-                    {
-                        Items = nodes.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>)
-                    };
-                    return pr;
-                }
+                    Items = nodes.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>)
+                };
+                return pr;
             }
 
             // else proceed as usual
@@ -317,7 +312,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// This method is obsolete, use the overload with dataTypeId instead
+        /// This method is obsolete, use the overload with ignoreUserStartNodes instead
         /// Returns the child media objects - using the entity GUID id
         /// </summary>
         /// <param name="id"></param>
@@ -328,7 +323,7 @@ namespace Umbraco.Web.Editors
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        [Obsolete("This method is obsolete, use the overload with dataTypeId instead", false)]
+        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Guid id,
            int pageNumber = 0,
@@ -338,7 +333,7 @@ namespace Umbraco.Web.Editors
            bool orderBySystemField = true,
            string filter = "")
         {
-            return GetChildren(id, null, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+            return GetChildren(id, false, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
         }
 
         /// <summary>
@@ -351,11 +346,10 @@ namespace Umbraco.Web.Editors
         /// <param name="orderDirection"></param>
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
-        /// <param name="dataTypeId">If set used to lookup whether user and group start node permissions should be ignored.</param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Guid id,
-           Guid? dataTypeId,
+           bool ignoreUserStartNodes,
            int pageNumber = 0,
            int pageSize = 0,
            string orderBy = "SortOrder",
@@ -366,13 +360,13 @@ namespace Umbraco.Web.Editors
             var entity = Services.EntityService.GetByKey(id);
             if (entity != null)
             {
-                return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter, dataTypeId);
+                return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
             }
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         /// <summary>
-        /// This method is obsolete, use the overload with dataTypeId instead
+        /// This method is obsolete, use the overload with ignoreUserStartNodes instead
         /// Returns the child media objects - using the entity UDI id
         /// </summary>
         /// <param name="id"></param>
@@ -383,7 +377,7 @@ namespace Umbraco.Web.Editors
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        [Obsolete("This method is obsolete, use the overload with dataTypeId instead", false)]
+        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Udi id,
            int pageNumber = 0,
@@ -393,7 +387,7 @@ namespace Umbraco.Web.Editors
            bool orderBySystemField = true,
            string filter = "")
         {
-            return GetChildren(id, null, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+            return GetChildren(id, false, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
         }
 
         /// <summary>
@@ -406,11 +400,10 @@ namespace Umbraco.Web.Editors
         /// <param name="orderDirection"></param>
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
-        /// <param name="dataTypeId">If set used to lookup whether the user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Udi id,
-           Guid? dataTypeId,
+           bool ignoreUserStartNodes,
            int pageNumber = 0,
            int pageSize = 0,
            string orderBy = "SortOrder",
@@ -424,7 +417,7 @@ namespace Umbraco.Web.Editors
                 var entity = Services.EntityService.GetByKey(guidUdi.Guid);
                 if (entity != null)
                 {
-                    return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter, dataTypeId);
+                    return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
                 }
             }
 

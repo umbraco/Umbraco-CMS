@@ -67,8 +67,8 @@ namespace Umbraco.Web.Models.Mapping
             // If we have a prop editor, then format the pre-values based on it and create it's fields
             if (propEd != null)
             {
-                result = propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>).AsEnumerable();
-                if (source.IsBuildInDataType)
+                result = propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>);
+                if (source.IsBuildInDataType())
                 {
                     result = RemovePreValuesNotSupportedOnBuildInTypes(result);
                 }
