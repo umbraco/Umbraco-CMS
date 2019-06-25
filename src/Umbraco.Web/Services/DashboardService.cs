@@ -104,7 +104,7 @@ namespace Umbraco.Web.Services
                 }
             }
 
-            if (!hasAccess || denyRules.Length == 0)
+            if (hasAccess || denyRules.Length == 0)
                 return true;
 
             // check if this item has any deny arguments, if so check if the user is in one of the denied user groups, if so they will
