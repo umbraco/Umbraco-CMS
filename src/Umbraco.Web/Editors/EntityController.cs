@@ -276,20 +276,23 @@ namespace Umbraco.Web.Editors
 
 
         [HttpGet]
-        public UrlAndAnchors GetUrlAndAnchors(int id)
+        public UrlAndAnchors GetUrlAndAnchors([FromUri]int id)
         {
-            var x = GetResultForId(id, UmbracoEntityTypes.Document);
-
             var url = Umbraco.Url(id);
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id);
             return new UrlAndAnchors(url, anchorValues);
         }
 
-        [HttpPost]
-        public IEnumerable<string> GetAnchors(string rteContent)
+        public class AnchorsModel
         {
+            public string RteContent { get; set; }
+        }
 
-            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEContent(rteContent);
+        [HttpGet]
+        [HttpPost]
+        public IEnumerable<string> GetAnchors(AnchorsModel model)
+        {
+            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEContent(model.RteContent);
             return anchorValues;
         }
 

@@ -12,7 +12,7 @@
 
         function openLinkPicker(editor, currentTarget, anchorElement) {
 
-            entityResource.getAnchors($scope.model.value).then(function(anchorValues) {
+            entityResource.getAnchors(JSON.stringify($scope.model.value)).then(function(anchorValues) {
                 vm.linkPickerOverlay = {
                     view: "linkpicker",
                     currentTarget: currentTarget,

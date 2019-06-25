@@ -187,8 +187,10 @@ function entityResource($q, $http, umbRequestHelper) {
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "entityApiBaseUrl",
-                        "GetAnchors",
-                        { rteContent: rteContent })),
+                        'GetAnchors'),
+                    {
+                        rteContent: rteContent
+                    }),
                 'Failed to anchors data for rte content ' + rteContent);
         },
 
