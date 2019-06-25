@@ -1,7 +1,7 @@
 (function() {
     "use strict";
 
-    function GridRichTextEditorController($scope, tinyMceService, macroService, editorState) {
+    function GridRichTextEditorController($scope, tinyMceService, macroService, editorState, entityResource) {
 
         var vm = this;
 
