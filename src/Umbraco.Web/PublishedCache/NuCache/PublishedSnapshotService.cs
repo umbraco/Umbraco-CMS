@@ -170,16 +170,24 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 try
                 {
+                    var okContent = false;
+                    var okMedia = false;
+
                     if (_localDbExists)
                     {
-                        LockAndLoadContent(LoadContentFromLocalDbLocked);
-                        LockAndLoadMedia(LoadMediaFromLocalDbLocked);
+                        okContent = LockAndLoadContent(LoadContentFromLocalDbLocked);
+                        if (!okContent)
+                            _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
+                        okMedia = LockAndLoadMedia(LoadMediaFromLocalDbLocked);
+                        if (!okMedia)
+                            _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
                     }
-                    else
-                    {
+
+                    if (!okContent)
                         LockAndLoadContent(LoadContentFromDatabaseLocked);
+
+                    if (!okMedia)
                         LockAndLoadMedia(LoadMediaFromDatabaseLocked);
-                    }
 
                     LockAndLoadDomains();
                 }
@@ -323,6 +331,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        private bool LockAndLoadContent(Func<IScope, bool> action)
+        {
+            // first get a writer, then a scope
+            // if there already is a scope, the writer will attach to it
+            // otherwise, it will only exist here - cheap
+            using (_contentStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var ok = action(scope);
+                scope.Complete();
+                return ok;
+            }
+        }
+
         private void LoadContentFromDatabaseLocked(IScope scope)
         {
             // locks:
@@ -347,7 +370,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _logger.Debug<PublishedSnapshotService>("Loaded content from database ({Duration}ms)", sw.ElapsedMilliseconds);
         }
 
-        private void LoadContentFromLocalDbLocked(IScope scope)
+        private bool LoadContentFromLocalDbLocked(IScope scope)
         {
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
@@ -360,9 +383,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var sw = Stopwatch.StartNew();
             var kits = _localContentDb.Select(x => x.Value)
                 .OrderBy(x => x.Node.Level); // IMPORTANT sort by level
-            _contentStore.SetAll(kits, true);
+            var ok = _contentStore.SetAll(kits, true);
             sw.Stop();
             _logger.Debug<PublishedSnapshotService>("Loaded content from local db ({Duration}ms)", sw.ElapsedMilliseconds);
+            return ok;
         }
 
         // keep these around - might be useful
@@ -399,6 +423,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        private bool LockAndLoadMedia(Func<IScope, bool> action)
+        {
+            // see note in LockAndLoadContent
+            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                var ok = action(scope);
+                scope.Complete();
+                return ok;
+            }
+        }
+
         private void LoadMediaFromDatabaseLocked(IScope scope)
         {
             // locks & notes: see content
@@ -421,7 +458,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _logger.Debug<PublishedSnapshotService>("Loaded media from database ({Duration}ms)", sw.ElapsedMilliseconds);
         }
 
-        private void LoadMediaFromLocalDbLocked(IScope scope)
+        private bool LoadMediaFromLocalDbLocked(IScope scope)
         {
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
@@ -434,9 +471,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var sw = Stopwatch.StartNew();
             var kits = _localMediaDb.Select(x => x.Value)
                 .OrderBy(x => x.Node.Level); // IMPORTANT sort by level
-            _mediaStore.SetAll(kits, true);
+            var ok = _mediaStore.SetAll(kits, true);
             sw.Stop();
             _logger.Debug<PublishedSnapshotService>("Loaded media from local db ({Duration}ms)", sw.ElapsedMilliseconds);
+            return ok;
         }
 
         // keep these around - might be useful

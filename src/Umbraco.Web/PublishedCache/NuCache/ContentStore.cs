@@ -596,7 +596,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         ok = false;
                         continue; // skip that one
                     }
-                    _logger.Debug<ContentStore>($"set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
+                    _logger.Debug<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
                     // don't refresh _localDb if we are reading from _localDb
