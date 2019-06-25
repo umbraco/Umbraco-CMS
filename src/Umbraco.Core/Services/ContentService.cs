@@ -312,7 +312,7 @@ namespace Umbraco.Core.Services
                 {
                     var value = contentProperty.Value?.ToString();
 
-                    if (!string.IsNullOrEmpty(value))
+                    if (string.IsNullOrEmpty(value))
                     {
                         result.AddRange(GetAnchorValuesFromRTEContent(value));
                     }
