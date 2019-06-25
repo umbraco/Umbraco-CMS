@@ -24,7 +24,8 @@ namespace Umbraco.Web.Editors
             {
                 try
                 {
-                    var check = new org.umbraco.update.CheckForUpgrade();
+                    var check = new org.umbraco.update.CheckForUpgrade { Timeout = 2000 };
+
                     var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
                                                     UmbracoVersion.Current.Minor,
                                                     UmbracoVersion.Current.Build,
@@ -35,6 +36,11 @@ namespace Umbraco.Web.Editors
                 catch (System.Net.WebException)
                 {
                     //this occurs if the server is down or cannot be reached
+                    return null;
+                }
+                catch (System.Web.Services.Protocols.SoapException)
+                {
+                    //this occurs if the server has a timeout
                     return null;
                 }
             }
