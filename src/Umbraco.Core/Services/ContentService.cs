@@ -310,9 +310,13 @@ namespace Umbraco.Core.Services
             {
                 if (string.Equals(contentProperty.PropertyType.PropertyEditorAlias, Constants.PropertyEditors.TinyMCEAlias))
                 {
-                    var value = contentProperty.Value.ToString();
+                    var value = contentProperty.Value?.ToString();
 
-                    result.AddRange(GetAnchorValuesFromRTEContent(value));
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        result.AddRange(GetAnchorValuesFromRTEContent(value));
+                    }
+
                 }
             }
 
