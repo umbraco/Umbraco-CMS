@@ -10,9 +10,11 @@ using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
@@ -1647,6 +1649,43 @@ namespace Umbraco.Web
 
         #endregion
 
+        internal static bool DecryptAndValidateEncryptedRouteString(string ufprt, out IDictionary<string, string> parts)
+        {
+            string decryptedString;
+            try
+            {
+                decryptedString = ufprt.DecryptWithMachineKey();
+            }
+            catch (FormatException)
+            {
+                LogHelper.Warn<UmbracoHelper>("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
+                parts = null;
+                return false;
+            }
+
+            var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
+            parts = new Dictionary<string, string>();
+
+            foreach (var key in parsedQueryString.AllKeys)
+            {
+                parts[key] = parsedQueryString[key];
+            }
+
+            //validate all required keys exist
+
+            //the controller
+            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Controller))
+                return false;
+            //the action
+            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Action))
+                return false;
+            //the area
+            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Area))
+                return false;
+
+            return true;
+        }
+
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
@@ -1663,10 +1702,7 @@ namespace Umbraco.Web
             Mandate.ParameterNotNull(area, "area");
 
             //need to create a params string as Base64 to put into our hidden field to use during the routes
-            var surfaceRouteParams = string.Format("c={0}&a={1}&ar={2}",
-                                                      HttpUtility.UrlEncode(controllerName),
-                                                      HttpUtility.UrlEncode(controllerAction),
-                                                      area);
+            var surfaceRouteParams = $"{RenderRouteHandler.ReservedAdditionalKeys.Controller}={HttpUtility.UrlEncode(controllerName)}&{RenderRouteHandler.ReservedAdditionalKeys.Action}={HttpUtility.UrlEncode(controllerAction)}&{RenderRouteHandler.ReservedAdditionalKeys.Area}={area}";
 
             //checking if the additional route values is already a dictionary and convert to querystring
             string additionalRouteValsAsQuery;
