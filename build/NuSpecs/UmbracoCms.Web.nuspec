@@ -51,14 +51,17 @@
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.dll" target="lib\net472\Umbraco.Web.dll" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.dll" target="lib\net472\Umbraco.Web.UI.dll" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.dll" target="lib\net472\Umbraco.Examine.dll" />
+        <file src="$BuildTmp$\WebApp\bin\Umbraco.ModelsBuilder.dll" target="lib\net472\Umbraco.ModelsBuilder.dll" />
 
         <!-- docs -->
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.xml" target="lib\net472\Umbraco.Web.xml" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.xml" target="lib\net472\Umbraco.Web.UI.xml" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\net472\Umbraco.Examine.xml" />
+        <file src="$BuildTmp$\WebApp\bin\Umbraco.ModelsBuilder.xml" target="lib\net472\Umbraco.ModelsBuilder.xml" />
 
         <!-- symbols -->
         <file src="$BuildTmp$\bin\Umbraco.Web.pdb" target="lib" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.pdb" target="lib" />
+        <file src="$BuildTmp$\bin\Umbraco.ModelsBuilder.pdb" target="lib" />
     </files>
 </package>
