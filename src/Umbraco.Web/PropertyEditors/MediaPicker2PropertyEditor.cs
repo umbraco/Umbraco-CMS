@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         internal IDictionary<string, object> InternalPreValues;
-        
+
         public override IDictionary<string, object> DefaultPreValues
         {
             get { return InternalPreValues; }
@@ -55,6 +55,13 @@ namespace Umbraco.Web.PropertyEditors
                     View = "boolean",
                     Name = "Disable folder select",
                     Description = "Do not allow folders to be picked."
+                });
+                Fields.Add(new PreValueField()
+                {
+                    Key = Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
+                    View = "boolean",
+                    Name = "Ignore user start nodes",
+                    Description = "Selecting this option allows a user to choose nodes that they normally don't have access to."
                 });
                 Fields.Add(new PreValueField()
                 {

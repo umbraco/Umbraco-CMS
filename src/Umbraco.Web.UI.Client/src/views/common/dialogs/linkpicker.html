@@ -21,13 +21,13 @@
 		<datalist id="anchors">
 					<option value="{{a}}" ng-repeat="a in anchorValues"></option>
 				</datalist>
-	</umb-control-group>			
+	</umb-control-group>
 
 			<umb-control-group label="@defaultdialogs_nodeNameLinkPicker">
 				<input type="text"
-					localize="placeholder" 
-					placeholder="@placeholders_entername" 
-					class="umb-editor umb-textstring" 
+					localize="placeholder"
+					placeholder="@placeholders_entername"
+					class="umb-editor umb-textstring"
 					ng-model="target.name" />
 			</umb-control-group>
 
@@ -43,17 +43,18 @@
                              search-callback="onSearchResults"
                              search-from-id="{{searchInfo.searchFromId}}"
                              search-from-name="{{searchInfo.searchFromName}}"
+                             datatype-id="{{searchInfo.dataTypeId}}"
                              show-search="{{searchInfo.showSearch}}"
                              section="{{section}}">
         </umb-tree-search-box>
-        
+
         <br/>
 
         <umb-tree-search-results ng-if="searchInfo.showSearch"
                                  results="searchInfo.results"
                                  select-result-callback="selectResult">
         </umb-tree-search-results>
-        
+
 	    <div ng-hide="searchInfo.showSearch">
             <umb-tree section="content"
                       hideheader="true"
@@ -61,9 +62,9 @@
                       eventhandler="dialogTreeEventHandler"
                       isdialog="true"
                       enablecheckboxes="true">
-            </umb-tree>    
+            </umb-tree>
 	    </div>
-        
+
 	</div>
 
 	<div class="umb-panel-footer">

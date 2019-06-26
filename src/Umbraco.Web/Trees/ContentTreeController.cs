@@ -207,9 +207,6 @@ namespace Umbraco.Web.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
-        internal override IEnumerable<IUmbracoEntity> GetChildrenFromEntityService(int entityId)
-            => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
-
         /// <summary>
         /// Returns a collection of all menu items that can be on a content node
         /// </summary>
