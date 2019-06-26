@@ -327,12 +327,12 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          */
         getAncestors: function (id, type, options) {
-           
+
             var args = [
                 { id: id },
                 { type: type }
             ];
-            if (options.dataTypeId) {
+            if (options && options.dataTypeId) {
                 args.push({ dataTypeId: options.dataTypeId });
             }
 
@@ -361,7 +361,7 @@ function entityResource($q, $http, umbRequestHelper) {
         getChildren: function (id, type, options) {
 
             var args = [{ id: id }, { type: type }];
-            if (options.dataTypeId) {
+            if (options && options.dataTypeId) {
                 args.push({ dataTypeId: options.dataTypeId });
             }
 
