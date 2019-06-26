@@ -7,7 +7,7 @@ namespace Umbraco.Core
         /// <summary>
         ///     Defines the identifiers for Umbraco data types as constants for easy centralized access/management.
         /// </summary>
-        public static class DataTypes
+        internal static class DataTypes
         {
 
             public static class ReservedPreValueKeys

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Models
 {
-    public static class DataTypeDefinitionExtensions
+    internal static class DataTypeExtensions
     {
         private static readonly ISet<Guid> IdsOfBuildInDataTypes = new HashSet<Guid>()
         {
@@ -37,11 +37,19 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns true if this date type is build-in/default.
         /// </summary>
-        /// <param name="dataTypeDefinition">The data type definition.</param>
+        /// <param name="dataType">The data type definition.</param>
         /// <returns></returns>
-        public static bool IsBuildInDataType(this IDataTypeDefinition dataTypeDefinition)
+        public static bool IsBuildInDataType(this IDataTypeDefinition dataType)
         {
-            return IdsOfBuildInDataTypes.Contains(dataTypeDefinition.Key);
+            return IsBuildInDataType(dataType.Key);
+        }
+
+        /// <summary>
+        /// Returns true if this date type is build-in/default.
+        /// </summary>
+        public static bool IsBuildInDataType(Guid key)
+        {
+            return IdsOfBuildInDataTypes.Contains(key);
         }
     }
 }
