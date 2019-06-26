@@ -133,7 +133,7 @@ namespace Umbraco.Core.Services
             var editor = _propertyEditors[propertyType.PropertyEditorAlias];
             var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).Configuration;
             var valueEditor = editor.GetValueEditor(configuration);
-            return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp).Any();
+            return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.MandatoryMessage, propertyType.ValidationRegExp, propertyType.ValidationRegExpMessage).Any();
         }
     }
 }

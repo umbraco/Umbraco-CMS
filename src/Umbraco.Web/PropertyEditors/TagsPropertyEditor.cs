@@ -57,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors
             private class RequiredJsonValueValidator : IValueRequiredValidator
             {
                 /// <inheritdoc />
-                public IEnumerable<ValidationResult> ValidateRequired(object value, string valueType)
+                public IEnumerable<ValidationResult> ValidateRequired(object value, string valueType, string requiredMessage)
                 {
                     if (value == null)
                     {

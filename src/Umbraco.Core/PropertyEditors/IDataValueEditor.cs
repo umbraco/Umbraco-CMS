@@ -35,12 +35,14 @@ namespace Umbraco.Core.PropertyEditors
         bool HideLabel { get; }
 
         /// <summary>
-        /// Validates a property value.
+        /// Validates a property value using custom messages.
         /// </summary>
         /// <param name="value">The property value.</param>
         /// <param name="required">A value indicating whether the property value is required.</param>
+        /// <param name="requiredMessage">A custom validation message to use when the property value is required.</param>
         /// <param name="format">A specific format (regex) that the property value must respect.</param>
-        IEnumerable<ValidationResult> Validate(object value, bool required, string format);
+        /// <param name="formatMessage">A custom validation message to use when the property value is does not match the specific format (regex).</param>
+        IEnumerable<ValidationResult> Validate(object value, bool required, string requiredMessage, string format, string formatMessage);
 
         /// <summary>
         /// Gets the validators to use to validate the edited value.

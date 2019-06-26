@@ -7,9 +7,9 @@
                ng-trim="false"
                ng-keyup="model.change()" />
 
-        <span ng-messages="textboxFieldForm.textbox.$error" show-validation-on-submit >
+        <span ng-messages="textboxFieldForm.textbox.$error" show-validation-on-submit>
             <span class="help-inline" ng-message="valServer">{{textboxFieldForm.textbox.errorMsg}}</span>
-            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+            <span class="help-inline" ng-message="required">{{mandatoryMessage}}</span>
         </span>
 
         <div class="help" ng-if="model.count >= (model.config.maxChars*.8) && model.count <= model.config.maxChars">

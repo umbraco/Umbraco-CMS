@@ -167,7 +167,7 @@ namespace Umbraco.Web.Editors.Filters
         {
             // validate
             var valueEditor = editor.GetValueEditor(property.DataType.Configuration);
-            foreach (var r in valueEditor.Validate(postedValue, property.IsRequired, property.ValidationRegExp))
+            foreach (var r in valueEditor.Validate(postedValue, property.IsRequired, property.IsRequiredMessage, property.ValidationRegExp, property.ValidationRegExpMessage))
             {
                 modelState.AddPropertyError(r, property.Alias, property.Culture);
             }

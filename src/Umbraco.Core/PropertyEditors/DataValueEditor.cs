@@ -85,7 +85,7 @@ namespace Umbraco.Core.PropertyEditors
         public string ValueType { get; set; }
 
         /// <inheritdoc />
-        public IEnumerable<ValidationResult> Validate(object value, bool required, string format)
+        public IEnumerable<ValidationResult> Validate(object value, bool required, string requiredMessage, string format, string formatMessage)
         {
             List<ValidationResult> results = null;
             var r = Validators.SelectMany(v => v.Validate(value, ValueType, Configuration)).ToList();
@@ -97,14 +97,14 @@ namespace Umbraco.Core.PropertyEditors
 
             if (required)
             {
-                r = RequiredValidator.ValidateRequired(value, ValueType).ToList();
+                r = RequiredValidator.ValidateRequired(value, ValueType, requiredMessage).ToList();
                 if (r.Any()) { if (results == null) results = r; else results.AddRange(r); }
             }
 
             var stringValue = value?.ToString();
             if (!string.IsNullOrWhiteSpace(format) && !string.IsNullOrWhiteSpace(stringValue))
             {
-                r = FormatValidator.ValidateFormat(value, ValueType, format).ToList();
+                r = FormatValidator.ValidateFormat(value, ValueType, format, formatMessage).ToList();
                 if (r.Any()) { if (results == null) results = r; else results.AddRange(r); }
             }
 

@@ -1,4 +1,4 @@
-function textboxController($scope) {
+function textboxController($scope, localizationService) {
     // macro parameter editor doesn't contains a config object,
     // so we create a new one to hold any properties
     if (!$scope.model.config) {
@@ -18,6 +18,15 @@ function textboxController($scope) {
         }
     }
     $scope.model.change();
+
+    $scope.mandatoryMessage = "";
+    if ($scope.model.validation.mandatoryMessage) {
+        $scope.mandatoryMessage = $scope.model.validation.mandatoryMessage;
+    } else {
+        localizationService.localize("general_required").then(function (value) {
+            $scope.mandatoryMessage = value;
+        });
+    }
     
 }
 angular.module('umbraco').controller("Umbraco.PropertyEditors.textboxController", textboxController);
