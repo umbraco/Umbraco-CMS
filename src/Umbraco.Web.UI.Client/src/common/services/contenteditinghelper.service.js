@@ -5,7 +5,7 @@
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, navigationService, localizationService, serverValidationManager, formHelper) {
+function contentEditingHelper(fileManager, $q, $location, $routeParams, editorState, notificationsService, navigationService, localizationService, serverValidationManager, formHelper) {
 
     function isValidIdentifier(id) {
 
@@ -34,9 +34,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
     return {
 
+        //TODO: We need to move some of this to formHelper for saving, too many editors use this method for saving when this entire
+        //service should only be used for content/media/members
+
         /** Used by the content editor and mini content editor to perform saving operations */
-        // TODO: Make this a more helpful/reusable method for other form operations! we can simplify this form most forms
-        //         = this is already done in the formhelper service
         contentEditorPerformSave: function (args) {
             if (!angular.isObject(args)) {
                 throw "args must be an object";
@@ -53,18 +54,19 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (args.showNotifications === undefined) {
                 args.showNotifications = true;
             }
-
-            var redirectOnSuccess = args.redirectOnSuccess !== undefined ? args.redirectOnSuccess : true;
-            var redirectOnFailure = args.redirectOnFailure !== undefined ? args.redirectOnFailure : true;
+            if (args.softRedirect === undefined) {
+                //when true, the url will change but it won't actually re-route
+                //this is merely here for compatibility, if only the content/media/members used this service we'd prob be ok but tons of editors
+                //use this service unfortunately and probably packages too.
+                args.softRedirect = false; 
+            }
 
             var self = this;
 
             //we will use the default one for content if not specified
             var rebindCallback = args.rebindCallback === undefined ? self.reBindChangedProperties : args.rebindCallback;
 
-            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, action: args.action })) {
-
-                args.scope.busy = true;
+            if (formHelper.submitForm({ scope: args.scope, action: args.action })) {
 
                 return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles(), args.showNotifications)
                     .then(function (data) {
@@ -74,26 +76,30 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         self.handleSuccessfulSave({
                             scope: args.scope,
                             savedContent: data,
-                            redirectOnSuccess: redirectOnSuccess,
+                            softRedirect: args.softRedirect,
                             rebindCallback: function () {
                                 rebindCallback.apply(self, [args.content, data]);
                             }
                         });
 
-                        args.scope.busy = false;
+                        //update editor state to what is current
+                        editorState.set(args.content);
+
                         return $q.resolve(data);
 
                     }, function (err) {
                         self.handleSaveError({
                             showNotifications: args.showNotifications,
-                            redirectOnFailure: redirectOnFailure,
+                            softRedirect: args.softRedirect,
                             err: err,
                             rebindCallback: function () {
                                 rebindCallback.apply(self, [args.content, err.data]);
                             }
                         });
 
-                        args.scope.busy = false;
+                        //update editor state to what is current
+                        editorState.set(args.content);
+
                         return $q.reject(err);
                     });
             }
@@ -265,7 +271,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // if publishing is allowed also allow schedule publish
                 // we add this manually becuase it doesn't have a permission so it wont 
                 // get picked up by the loop through permissions
-                if( _.contains(args.content.allowedActions, "U")) {
+                if (_.contains(args.content.allowedActions, "U")) {
                     buttons.subButtons.push(createButtonDefinition("SCHEDULE"));
                     buttons.subButtons.push(createButtonDefinition("PUBLISH_DESCENDANTS"));
                 }
@@ -274,7 +280,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // so long as it's already published and if the user has access to publish
                 // and the user has access to unpublish (may have been removed via Event)
                 if (!args.create) {
-                    var hasPublishedVariant = args.content.variants.filter(function(variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
+                    var hasPublishedVariant = args.content.variants.filter(function (variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
                     if (hasPublishedVariant && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
@@ -444,7 +450,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             var shouldIgnore = function (propName) {
                 return _.some([
                     "variants",
-                    
+
                     "tabs",
                     "properties",
                     "apps",
@@ -574,15 +580,16 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * A function to handle what happens when we have validation issues from the server side
          *
          */
+
+        //TODO: Too many editors use this method for saving when this entire service should only be used for content/media/members,
+        // there is formHelper.handleError for other editors which should be used!
+
         handleSaveError: function (args) {
 
             if (!args.err) {
                 throw "args.err cannot be null";
             }
-            if (args.redirectOnFailure === undefined || args.redirectOnFailure === null) {
-                throw "args.redirectOnFailure must be set to true or false";
-            }
-
+            
             //When the status is a 400 status with a custom header: X-Status-Reason: Validation failed, we have validation errors.
             //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
             //Or, some strange server error
@@ -600,16 +607,16 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         }
                     }
 
-                    if (!args.redirectOnFailure || !this.redirectToCreatedContent(args.err.data.id, args.err.data.ModelState)) {
-                        //we are not redirecting because this is not new content, it is existing content. In this case
-                        // we need to detect what properties have changed and re-bind them with the server data. Then we need
-                        // to re-bind any server validation errors after the digest takes place.
+                    if (!this.redirectToCreatedContent(args.err.data.id) || args.softRedirect) {
+                        // If we are not redirecting it's because this is not newly created content, else in some cases we are
+                        // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
 
+                        // In this case we need to detect what properties have changed and re-bind them with the server data.
                         if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
                             args.rebindCallback();
                         }
 
-                        //notify all validators (don't clear the server validations though since we need to maintain their state because of
+                        // In this case notify all validators (don't clear the server validations though since we need to maintain their state because of
                         // how the variant switcher works in content). server validation state is always cleared when an editor first loads
                         // and in theory when an editor is destroyed.
                         serverValidationManager.notify();
@@ -633,6 +640,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * ensure the notifications are displayed and that the appropriate events are fired. This will also check if we need to redirect
          * when we're creating new content.
          */
+
+        //TODO: We need to move some of this to formHelper for saving, too many editors use this method for saving when this entire
+        //service should only be used for content/media/members
+
         handleSuccessfulSave: function (args) {
 
             if (!args) {
@@ -642,14 +653,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 throw "args.savedContent cannot be null";
             }
 
-            // the default behaviour is to redirect on success. This adds option to prevent when false
-            args.redirectOnSuccess = args.redirectOnSuccess !== undefined ? args.redirectOnSuccess : true;
+            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id) || args.softRedirect) {
 
-            if (!args.redirectOnSuccess || !this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id)) {
+                // If we are not redirecting it's because this is not newly created content, else in some cases we are
+                // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
 
-                //we are not redirecting because this is not new content, it is existing content. In this case
-                // we need to detect what properties have changed and re-bind them with the server data.
-                //call the callback
+                // In this case we need to detect what properties have changed and re-bind them with the server data.
                 if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
                     args.rebindCallback();
                 }
@@ -667,7 +676,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * We need to decide if we need to redirect to edito mode or if we will remain in create mode.
          * We will only need to maintain create mode if we have not fulfilled the basic requirements for creating an entity which is at least having a name and ID
          */
-        redirectToCreatedContent: function (id, modelState) {
+        redirectToCreatedContent: function (id) {
 
             //only continue if we are currently in create mode and not in infinite mode and if the resulting ID is valid
             if ($routeParams.create && (isValidIdentifier(id))) {
@@ -679,7 +688,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 //clear the query strings
                 navigationService.clearSearch(["cculture"]);
-
+                
                 //change to new path
                 $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);
                 //don't add a browser history for this
@@ -699,6 +708,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * For some editors like scripts or entites that have names as ids, these names can change and we need to redirect
          * to their new paths, this is helper method to do that.
          */
+
+        //TODO: We need to move some of this to formHelper for saving, too many editors use this method for saving when this entire
+        //service should only be used for content/media/members
+
         redirectToRenamedContent: function (id) {
             //clear the query strings
             navigationService.clearSearch();

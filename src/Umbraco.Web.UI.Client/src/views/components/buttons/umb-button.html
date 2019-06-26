@@ -1,4 +1,4 @@
-<div class="umb-button" ng-class="{'umb-button--block': vm.blockElement}" data-element="{{ vm.alias ? 'button-' + vm.alias : '' }}">
+<div class="umb-button" ng-class="{'ml0': vm.generalActions, 'umb-button--block': vm.blockElement}" data-element="{{ vm.alias ? 'button-' + vm.alias : '' }}">
 
     <div ng-if="vm.innerState">
         <div class="icon-check umb-button__success" ng-class="{'-hidden': vm.innerState !== 'success', '-white': vm.isPrimaryButtonStyle}"></div>

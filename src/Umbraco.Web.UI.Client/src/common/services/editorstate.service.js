@@ -5,13 +5,15 @@
  *
  * @description
  * Tracks the parent object for complex editors by exposing it as 
- * an object reference via editorState.current.entity
+ * an object reference via editorState.current.getCurrent(). 
+ * The state is cleared on each successful route.
  *
  * it is possible to modify this object, so should be used with care
  */
-angular.module('umbraco.services').factory("editorState", function() {
+angular.module('umbraco.services').factory("editorState", function ($rootScope) {
 
     var current = null;
+
     var state = {
 
         /**
@@ -40,7 +42,7 @@ angular.module('umbraco.services').factory("editorState", function() {
          * Since the editorstate entity is read-only, you cannot set it to null
          * only through the reset() method
          */
-        reset: function() {
+        reset: function () {
             current = null;
         },
 
@@ -59,9 +61,10 @@ angular.module('umbraco.services').factory("editorState", function() {
          * editorState.current can not be overwritten, you should only read values from it
          * since modifying individual properties should be handled by the property editors
          */
-        getCurrent: function() {
+        getCurrent: function () {
             return current;
         }
+
     };
 
     // TODO: This shouldn't be removed! use getCurrent() method instead of a hacked readonly property which is confusing.
@@ -74,6 +77,14 @@ angular.module('umbraco.services').factory("editorState", function() {
         set: function (value) {
             throw "Use editorState.set to set the value of the current entity";
         }
+    });
+
+    //execute on each successful route (this is only bound once per application since a service is a singleton)
+    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+
+        //reset the editorState on each successful route chage
+        state.reset();
+
     });
 
     return state;

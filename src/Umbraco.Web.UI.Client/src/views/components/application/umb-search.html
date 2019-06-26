@@ -1,5 +1,5 @@
 
-<div class="umb-search" on-outside-click="vm.closeSearch()" ng-keyup="vm.handleKeyUp($event)">
+<div class="umb-search" on-outside-click="vm.closeSearch()" ng-keydown="vm.handleKeyDown($event)">
 
     <div class="flex items-center">
         <i class="umb-search-input-icon icon-search" ng-click="vm.focusSearch()"></i>
@@ -18,7 +18,7 @@
         <div class="umb-search-group" ng-repeat="(key, group) in vm.searchResults">
             <div class="umb-search-group__title">{{key}}</div>
             <ul class="umb-search-items">
-                <li class="umb-search-item" ng-repeat="result in group.results">
+                <li class="umb-search-item" ng-repeat="result in group.results" active-result="{{result === vm.activeResult}}">
                     <a class="umb-search-result__link" ng-href="#/{{result.editorPath}}" ng-click="vm.clickItem(result)">
                         <i class="umb-search-result__icon {{result.icon}}"></i>
                         <span class="umb-search-result__meta">
