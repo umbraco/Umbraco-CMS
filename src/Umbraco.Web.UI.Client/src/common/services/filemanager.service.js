@@ -8,11 +8,12 @@
  * that need to attach files.
  * When a route changes successfully, we ensure that the collection is cleared.
  */
-function fileManager() {
+function fileManager($rootScope) {
 
     var fileCollection = [];
 
-    return {
+
+    var mgr = {
         /**
          * @ngdoc function
          * @name umbraco.services.fileManager#addFiles
@@ -24,7 +25,7 @@ function fileManager() {
          *   for the files collection that effectively clears the files for the specified editor.
          */
         setFiles: function (args) {
-            
+
             //propertyAlias, files
             if (!angular.isString(args.propertyAlias)) {
                 throw "args.propertyAlias must be a non empty string";
@@ -52,7 +53,7 @@ function fileManager() {
                 fileCollection.push({ alias: args.propertyAlias, file: args.files[i], culture: args.culture, metaData: metaData });
             }
         },
-        
+
         /**
          * @ngdoc function
          * @name umbraco.services.fileManager#getFiles
@@ -62,10 +63,10 @@ function fileManager() {
          * @description
          *  Returns all of the files attached to the file manager
          */
-        getFiles: function() {
+        getFiles: function () {
             return fileCollection;
         },
-        
+
         /**
          * @ngdoc function
          * @name umbraco.services.fileManager#clearFiles
@@ -78,7 +79,17 @@ function fileManager() {
         clearFiles: function () {
             fileCollection = [];
         }
-};
+    };
+
+    //execute on each successful route (this is only bound once per application since a service is a singleton)
+    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+        //reset the file manager on each route change, the file collection is only relavent
+        // when working in an editor and submitting data to the server.
+        //This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
+        mgr.clearFiles();
+    });
+
+    return mgr;
 }
 
 angular.module('umbraco.services').factory('fileManager', fileManager);

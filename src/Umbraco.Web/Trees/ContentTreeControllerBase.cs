@@ -69,7 +69,7 @@ namespace Umbraco.Web.Trees
         {
             var node = base.CreateRootNode(queryStrings);
 
-            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false && IgnoreUserStartNodes(queryStrings) == false)
+            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 node.AdditionalData["noAccess"] = true;
             }
@@ -90,11 +90,11 @@ namespace Umbraco.Web.Trees
         internal TreeNode GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormDataCollection queryStrings)
         {
             var entityIsAncestorOfStartNodes = Security.CurrentUser.IsInBranchOfStartNode(e, Services.EntityService, RecycleBinId, out var hasPathAccess);
-            if (IgnoreUserStartNodes(queryStrings) == false && entityIsAncestorOfStartNodes == false)
+            if (entityIsAncestorOfStartNodes == false)
                 return null;
 
             var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
-            if (IgnoreUserStartNodes(queryStrings) == false && hasPathAccess == false)
+            if (hasPathAccess == false)
             {
                 treeNode.AdditionalData["noAccess"] = true;
             }
@@ -134,7 +134,7 @@ namespace Umbraco.Web.Trees
 
                 // ensure that the user has access to that node, otherwise return the empty tree nodes collection
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
-                if (IgnoreUserStartNodes(queryStrings) == false && HasPathAccess(id, queryStrings) == false)
+                if (HasPathAccess(id, queryStrings) == false)
                 {
                     Logger.Warn<ContentTreeControllerBase>("User {Username} does not have access to node with id {Id}", Security.CurrentUser.Username, id);
                     return nodes;
@@ -214,12 +214,8 @@ namespace Umbraco.Web.Trees
             return result;
         }
 
-        /// <summary>
-        /// Abstract method to fetch the entities from the entity service
-        /// </summary>
-        /// <param name="entityId"></param>
-        /// <returns></returns>
-        internal abstract IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId);
+        internal virtual IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
+            => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
@@ -255,9 +251,8 @@ namespace Umbraco.Web.Trees
         /// </remarks>
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var ignoreUserStartNodes = queryStrings.GetValue<bool>(TreeQueryStringParameters.IgnoreUserStartNodes);
             //check if we're rendering the root
-            if (id == Constants.System.RootString && UserStartNodes.Contains(Constants.System.Root) || ignoreUserStartNodes)
+            if (id == Constants.System.RootString && UserStartNodes.Contains(Constants.System.Root))
             {
                 var altStartId = string.Empty;
 

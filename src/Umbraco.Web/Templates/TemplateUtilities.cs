@@ -157,9 +157,8 @@ namespace Umbraco.Web.Templates
                 // - 3 = anything after group 2 and before the data-udi attribute value begins
                 // - 4 = the data-udi attribute value
                 // - 5 = anything after group 4 until the image tag is closed
-                var src = match.Groups[2].Value;
                 var udi = match.Groups[4].Value;
-                if(src.IsNullOrWhiteSpace() || udi.IsNullOrWhiteSpace() || GuidUdi.TryParse(udi, out var guidUdi) == false)
+                if(udi.IsNullOrWhiteSpace() || GuidUdi.TryParse(udi, out var guidUdi) == false)
                 {
                     return match.Value;
                 }
@@ -175,5 +174,14 @@ namespace Umbraco.Web.Templates
                 return $"{match.Groups[1].Value}{url}{match.Groups[3].Value}{udi}{match.Groups[5].Value}";
             });
         }
+
+        /// <summary>
+        /// Removes media urls from &lt;img&gt; tags where a data-udi attribute is present
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static string RemoveMediaUrlsFromTextString(string text)
+            // see comment in ResolveMediaFromTextString for group reference
+            => ResolveImgPattern.Replace(text, "$1$3$4$5");
     }
 }

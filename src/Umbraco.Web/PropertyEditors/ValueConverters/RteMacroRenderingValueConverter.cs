@@ -89,31 +89,34 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 // Find all images with rel attribute
                 var imgNodes = doc.DocumentNode.SelectNodes("//img[@rel]");
 
+                var modified = false;
                 if (imgNodes != null)
                 {
-                    var modified = false;
-
                     foreach (var img in imgNodes)
                     {
-                        var firstOrDefault = img.Attributes.FirstOrDefault(x => x.Name == "rel");
-                        if (firstOrDefault != null)
+                        var nodeId = img.GetAttributeValue("rel", string.Empty);
+                        if (int.TryParse(nodeId, out _))
                         {
-                            var rel = firstOrDefault.Value;
-
-                            // Check that the rel attribute is a integer before removing
-                            int nodeId;
-                            if (int.TryParse(rel, out nodeId))
-                            {
-                                img.Attributes.Remove("rel");
-                                modified = true;
-                            }
+                            img.Attributes.Remove("rel");
+                            modified = true;
                         }
                     }
+                }
 
-                    if (modified)
+                // Find all a and img tags with a data-udi attribute
+                var dataUdiNodes = doc.DocumentNode.SelectNodes("(//a|//img)[@data-udi]");
+                if (dataUdiNodes != null)
+                {
+                    foreach (var node in dataUdiNodes)
                     {
-                        return doc.DocumentNode.OuterHtml;
+                        node.Attributes.Remove("data-udi");
+                        modified = true;
                     }
+                }
+
+                if (modified)
+                {
+                    return doc.DocumentNode.OuterHtml;
                 }
             }
 

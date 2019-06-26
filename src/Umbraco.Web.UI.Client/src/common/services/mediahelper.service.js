@@ -143,27 +143,21 @@ function mediaHelper(umbRequestHelper) {
          */
         resolveFileFromEntity: function (mediaEntity, thumbnail) {
 
-            if (!angular.isObject(mediaEntity.metaData)) {
+            if (!angular.isObject(mediaEntity.metaData) || !mediaEntity.metaData.MediaPath) {
                 throw "Cannot resolve the file url from the mediaEntity, it does not contain the required metaData";
             }
 
-            var values = _.values(mediaEntity.metaData);
-            for (var i = 0; i < values.length; i++) {
-                var val = values[i];
-                if (angular.isObject(val) && val.PropertyEditorAlias) {
-                    for (var resolver in _mediaFileResolvers) {
-                        if (val.PropertyEditorAlias === resolver) {
-                            //we need to format a property variable that coincides with how the property would be structured
-                            // if it came from the mediaResource just to keep things slightly easier for the file resolvers.
-                            var property = { value: val.Value };
-
-                            return _mediaFileResolvers[resolver](property, mediaEntity, thumbnail);
-                        }
-                    }
+            if (thumbnail) {
+                if (this.detectIfImageByExtension(mediaEntity.metaData.MediaPath)) {
+                    return this.getThumbnailFromPath(mediaEntity.metaData.MediaPath);
+                }
+                else {
+                    return null;
                 }
             }
-
-            return "";
+            else {
+                return mediaEntity.metaData.MediaPath;
+            }            
         },
 
         /**

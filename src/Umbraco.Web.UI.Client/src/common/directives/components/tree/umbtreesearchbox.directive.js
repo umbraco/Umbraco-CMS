@@ -12,7 +12,6 @@ function treeSearchBox(localizationService, searchService, $q) {
             searchFromName: "@",
             showSearch: "@",
             section: "@",
-            ignoreUserStartNodes: "@",
             hideSearchCallback: "=",
             searchCallback: "="
         },
@@ -34,7 +33,6 @@ function treeSearchBox(localizationService, searchService, $q) {
             if (!scope.showSearch) {
                 scope.showSearch = "false";
             }
-
 
             //used to cancel any request in progress if another one needs to take it's place
             var canceler = null;
@@ -61,11 +59,6 @@ function treeSearchBox(localizationService, searchService, $q) {
                     if (scope.searchFromId) {
                         searchArgs["searchFrom"] = scope.searchFromId;
                     }
-
-                    //append ignoreUserStartNodes value if there is one
-                    if (scope.ignoreUserStartNodes) {                        
-                        searchArgs["ignoreUserStartNodes"] = scope.ignoreUserStartNodes;
-                    }                   
 
                     searcher(searchArgs).then(function (data) {
                         scope.searchCallback(data);

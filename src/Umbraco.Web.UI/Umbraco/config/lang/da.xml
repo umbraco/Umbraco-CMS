@@ -434,6 +434,7 @@
     <key alias="selectLink">Vælg link</key>
     <key alias="selectMacro">Vælg makro</key>
     <key alias="selectContent">Vælg indhold</key>
+    <key alias="selectContentType">Vælg indholdstype</key>
     <key alias="selectMediaStartNode">Vælg medie startnode</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
@@ -1605,6 +1606,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="settingsPublishedStatus">Published Cache</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Kom godt i gang</key>
     <key alias="formsInstall">Installer Umbraco Forms</key>
   </area>

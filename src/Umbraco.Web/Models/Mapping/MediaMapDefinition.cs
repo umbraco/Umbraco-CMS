@@ -50,6 +50,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentType = _commonMapper.GetContentType(source, context);
+            target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = source.ContentType.Name;
             target.CreateDate = source.CreateDate;
@@ -75,6 +76,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Edited -Updater -Alias
         private void Map(IMedia source, ContentItemBasic<ContentPropertyBasic> target, MapperContext context)
         {
+            target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.CreateDate = source.CreateDate;
             target.Icon = source.ContentType.Icon;

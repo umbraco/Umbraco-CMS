@@ -174,7 +174,8 @@ namespace Umbraco.Web
                 return GlobalSettings.DebugMode
                     && request != null
                     && (string.IsNullOrEmpty(request["umbdebugshowtrace"]) == false
-                        || string.IsNullOrEmpty(request["umbdebug"]) == false);
+                        || string.IsNullOrEmpty(request["umbdebug"]) == false
+                        || string.IsNullOrEmpty(request.Cookies["UMB-DEBUG"]?.Value) == false);
             }
         }
 

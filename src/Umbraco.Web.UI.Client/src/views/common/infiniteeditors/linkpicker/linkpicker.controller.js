@@ -28,11 +28,9 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
             searchFromName: null,
             showSearch: false,
             results: [],
-            selectedSearchResults: [],
-            ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes
+            selectedSearchResults: []
         };
 
-        $scope.customTreeParams = dialogOptions.ignoreUserStartNodes ? "ignoreUserStartNodes=" + dialogOptions.ignoreUserStartNodes : "";
         $scope.showTarget = $scope.model.hideTarget !== true;
 
         // this ensures that we only sync the tree once and only when it's ready
@@ -89,11 +87,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     });
 
                     // get the content properties to build the anchor name list
-
-                    var options = {};
-                    options.ignoreUserStartNodes = dialogOptions.ignoreUserStartNodes;
-
-                    contentResource.getById(id, options).then(function (resp) {
+                    contentResource.getById(id).then(function (resp) {
                         handleContentTarget(resp);
                     });
                 }
@@ -143,11 +137,9 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
             if (args.node.id < 0) {
                 $scope.model.target.url = "/";
             } else {
-                var options = {};
-                options.ignoreUserStartNodes = dialogOptions.ignoreUserStartNodes;
-
-                contentResource.getById(args.node.id, options).then(function (resp) {
+                contentResource.getById(args.node.id).then(function (resp) {
                     handleContentTarget(resp);
+
                 });
             }
 
@@ -170,17 +162,9 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
         $scope.switchToMediaPicker = function () {
             userService.getCurrentUser().then(function (userData) {
-                var startNodeId =  userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                var startNodeIsVirtual = userData.startMediaIds.length !== 1;
-                if (dialogOptions.ignoreUserStartNodes) {
-                    startNodeId = -1;
-                    startNodeIsVirtual = true;
-                }
-
                 var mediaPicker = {
-                    startNodeId: startNodeId,
-                    startNodeIsVirtual: startNodeIsVirtual,
-                    ignoreUserStartNodes: dialogOptions.ignoreUserStartNodes,
+                    startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
+                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
                     submit: function (model) {
                         var media = model.selection[0];
 
