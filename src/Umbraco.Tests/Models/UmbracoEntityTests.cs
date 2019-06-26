@@ -177,18 +177,7 @@ namespace Umbraco.Tests.Models
             };
             item.AdditionalData.Add("test1", 3);
             item.AdditionalData.Add("test2", "valuie");
-
-            item.AdditionalData.Add("test3", new UmbracoEntity.EntityProperty()
-            {
-                Value = "test",
-                PropertyEditorAlias = "TestPropertyEditor"
-            });
-            item.AdditionalData.Add("test4", new UmbracoEntity.EntityProperty()
-            {
-                Value = "test2",
-                PropertyEditorAlias = "TestPropertyEditor2"
-            });
-
+            
             var clone = (UmbracoEntity)item.DeepClone();
 
             Assert.AreNotSame(clone, item);
@@ -250,17 +239,7 @@ namespace Umbraco.Tests.Models
             };
             item.AdditionalData.Add("test1", 3);
             item.AdditionalData.Add("test2", "valuie");
-            item.AdditionalData.Add("test3", new UmbracoEntity.EntityProperty()
-            {
-                Value = "test",
-                PropertyEditorAlias = "TestPropertyEditor"
-            });
-            item.AdditionalData.Add("test4", new UmbracoEntity.EntityProperty()
-            {
-                Value = "test2",
-                PropertyEditorAlias = "TestPropertyEditor2"
-            });
-
+           
             var result = ss.ToStream(item);
             var json = result.ResultStream.ToJsonString();
             Debug.Print(json);

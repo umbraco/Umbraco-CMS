@@ -235,27 +235,6 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a collection of children by the parent's Id and UmbracoObjectType without adding property data
-        /// </summary>
-        /// <param name="parentId">Id of the parent to retrieve children for</param>
-        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        internal IEnumerable<IUmbracoEntity> GetMediaChildrenWithoutPropertyData(int parentId)
-        {
-            var objectTypeId = UmbracoObjectTypes.Media.GetGuid();
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateEntityRepository(uow);
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
-
-                // Not pretty having to cast the repository, but it is the only way to get to use an internal method that we
-                // do not want to make public on the interface. Unfortunately also prevents this from being unit tested.
-                // See this issue for details on why we need this:
-                // https://github.com/umbraco/Umbraco-CMS/issues/3457
-                return ((EntityRepository)repository).GetMediaByQueryWithoutPropertyData(query);
-            }
-        }
-
-        /// <summary>
         /// Returns a paged collection of children
         /// </summary>
         /// <param name="parentId">The parent id to return children for</param>
