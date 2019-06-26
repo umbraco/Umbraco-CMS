@@ -327,24 +327,13 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          */
         getAncestors: function (id, type, options) {
-            var defaults = {
-                dataTypeId: null
-            };
-            if (options === undefined) {
-                options = {};
-            }
-            //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
-            //now copy back to the options we will use
-            options = defaults;
-
-
+           
             var args = [
                 { id: id },
                 { type: type }
             ];
-            if(options.dataTypeId){
-                args.push({dataTypeId: options.dataTypeId});
+            if (options.dataTypeId) {
+                args.push({ dataTypeId: options.dataTypeId });
             }
 
             return umbRequestHelper.resourcePromise(
