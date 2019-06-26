@@ -358,14 +358,19 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getChildren: function (id, type) {
+        getChildren: function (id, type, options) {
+
+            var args = [{ id: id }, { type: type }];
+            if (options.dataTypeId) {
+                args.push({ dataTypeId: options.dataTypeId });
+            }
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetChildren",
-                       [{ id: id }, { type: type }])),
+                       args)),
                'Failed to retrieve child data for id ' + id);
         },
 
@@ -433,7 +438,8 @@ function entityResource($q, $http, umbRequestHelper) {
                             pageSize: options.pageSize,
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
-                            filter: encodeURIComponent(options.filter)
+                            filter: encodeURIComponent(options.filter),
+                            dataTypeId: options.dataTypeId
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);

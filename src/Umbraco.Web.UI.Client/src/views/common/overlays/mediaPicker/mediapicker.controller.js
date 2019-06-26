@@ -388,7 +388,7 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 $scope.loading = true;
-                return entityResource.getChildren(id, "Media")
+                return entityResource.getChildren(id, "Media", $scope.searchOptions)
                     .then(function(data) {
 
                         for (i=0;i<data.length;i++){
