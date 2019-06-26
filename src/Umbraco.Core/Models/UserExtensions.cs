@@ -195,19 +195,6 @@ namespace Umbraco.Core.Models
             return startNodeIds.Any(x => formattedPath.Contains(string.Concat(",", x, ",")));
         }
 
-        internal static bool IsInBranchOfStartNode(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId, out bool hasPathAccess)
-        {
-            switch (recycleBinId)
-            {
-                case Constants.System.RecycleBinMedia:
-                    return IsInBranchOfStartNode(entity.Path, user.CalculateMediaStartNodeIds(entityService), user.GetMediaStartNodePaths(entityService), out hasPathAccess);
-                case Constants.System.RecycleBinContent:
-                    return IsInBranchOfStartNode(entity.Path, user.CalculateContentStartNodeIds(entityService), user.GetContentStartNodePaths(entityService), out hasPathAccess);
-                default:
-                    throw new NotSupportedException("Path access is only determined on content or media");
-            }
-        }
-
         internal static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
