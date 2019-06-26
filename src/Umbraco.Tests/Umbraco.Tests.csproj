@@ -197,6 +197,7 @@
     <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Home.cs" />
+    <Compile Include="Security\UmbracoAntiForgeryAdditionalDataProviderTests.cs" />
     <Compile Include="Services\AuditServiceTests.cs" />
     <Compile Include="Services\ConsentServiceTests.cs" />
     <Compile Include="Services\MemberGroupServiceTests.cs" />

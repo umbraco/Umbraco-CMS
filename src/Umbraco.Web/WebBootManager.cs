@@ -47,10 +47,12 @@ using Umbraco.Web.Profiling;
 using Umbraco.Web.Search;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
-
+using System.Web.Helpers;
+using Umbraco.Web.Controllers;
 
 namespace Umbraco.Web
 {
+
     /// <summary>
     /// A bootstrapper for the Umbraco application which initializes all objects including the Web portion of the application
     /// </summary>
@@ -188,6 +190,8 @@ namespace Umbraco.Web
 
             base.Complete(afterComplete);
 
+            AntiForgeryConfig.AdditionalDataProvider = new UmbracoAntiForgeryAdditionalDataProvider(AntiForgeryConfig.AdditionalDataProvider);
+
             //Now, startup all of our legacy startup handler
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
 
@@ -281,7 +285,7 @@ namespace Umbraco.Web
                     // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
                     // utilizing an old path
                     appDomainHash);
-                
+
                 //set the file map and composite file default location to the %temp% location
                 BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder
                     = XmlFileMapper.FileMapDefaultFolder
