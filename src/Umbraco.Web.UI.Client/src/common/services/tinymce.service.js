@@ -2,7 +2,7 @@
  * @ngdoc service
  * @name umbraco.services.tinyMceService
  *
- *  
+ *
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
@@ -57,7 +57,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 		 * @description
 		 * Creates the umbrco insert embedded media tinymce plugin
 		 *
-		 * @param {Object} editor the TinyMCE editor instance        
+		 * @param {Object} editor the TinyMCE editor instance
 		 * @param {Object} $scope the current controller scope
 		 */
 		createInsertEmbeddedMedia: function (editor, scope, callback) {
@@ -84,7 +84,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 		 * @description
 		 * Creates the umbrco insert media tinymce plugin
 		 *
-		 * @param {Object} editor the TinyMCE editor instance        
+		 * @param {Object} editor the TinyMCE editor instance
 		 * @param {Object} $scope the current controller scope
 		 */
 		createMediaPicker: function (editor, scope, callback) {
@@ -175,7 +175,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 		 * @description
 		 * Creates the insert umbrco macro tinymce plugin
 		 *
-		 * @param {Object} editor the TinyMCE editor instance      
+		 * @param {Object} editor the TinyMCE editor instance
 		 * @param {Object} $scope the current controller scope
 		 */
 		createInsertMacro: function (editor, $scope, callback) {
@@ -199,7 +199,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 			});
 
 			/**
-			 * Because the macro gets wrapped in a P tag because of the way 'enter' works, this 
+			 * Because the macro gets wrapped in a P tag because of the way 'enter' works, this
 			 * method will return the macro element if not wrapped in a p, or the p if the macro
 			 * element is the only one inside of it even if we are deep inside an element inside the macro
 			 */
@@ -207,7 +207,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				var e = $(element).closest(".umb-macro-holder");
 				if (e.length > 0) {
 					if (e.get(0).parentNode.nodeName === "P") {
-						//now check if we're the only element                    
+						//now check if we're the only element
 						if (element.parentNode.childNodes.length === 1) {
 							return e.get(0).parentNode;
 						}
@@ -241,7 +241,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 
 								//if the end selection is a macro then move the cursor
 								//NOTE: we don't have to handle when the selection comes from a previous parent because
-								// that is automatically taken care of with the normal onNodeChanged logic since the 
+								// that is automatically taken care of with the normal onNodeChanged logic since the
 								// evt.element will be the macro once it becomes part of the selection.
 								var $testForMacro = $(endSelection).closest(".umb-macro-holder");
 								if ($testForMacro.length > 0) {
@@ -351,7 +351,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					//set onNodeChanged event listener
 					editor.on('NodeChange', onNodeChanged);
 
-					/** 
+					/**
 					 * Listen for the keydown in the editor, we'll check if we are currently on a macro element, if so
 					 * we'll check if the key down is a supported key which requires an action, otherwise we ignore the request
 					 * so the macro cannot be edited.
@@ -749,35 +749,6 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 
 		},
 
-		/**
-		 * @ngdoc method
-		 * @name umbraco.services.tinyMceService#getAnchorNames
-		 * @methodOf umbraco.services.tinyMceService
-		 *
-		 * @description
-		 * From the given string, generates a string array where each item is the id attribute value from a named anchor
-		 * 'some string <a id="anchor"></a>with a named anchor' returns ['anchor']
-		 *
-		 * @param {string} input the string to parse      
-		 */
-		getAnchorNames: function (input) {
-      if (!input) return [];
-        
-			var anchorPattern = /<a id=\\"(.*?)\\">/gi;
-			var matches = input.match(anchorPattern);
-			var anchors = [];
-
-			if (matches) {
-				anchors = matches.map(function (v) {
-					return v.substring(v.indexOf('"') + 1, v.lastIndexOf('\\'));
-				});
-			}
-
-			return anchors.filter(function(val, i, self) {
-          return self.indexOf(val) === i;
-      });
-		},
-
 		insertLinkInEditor: function (editor, target, anchorElm) {
 
 			var href = target.url;
@@ -789,7 +760,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 			if (target.anchor && target.anchor[0] !== '?' && target.anchor[0] !== '#') {
 				target.anchor = (target.anchor.indexOf('=') === -1 ? '#' : '?') + target.anchor;
 			}
- 
+
 			// the href might be an external url, so check the value for an anchor/qs
 			// href has the anchor re-appended later, hence the reset here to avoid duplicating the anchor
 			if (!target.anchor) {
@@ -799,7 +770,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					target.anchor = urlParts[1] + urlParts[2];
 				}
 			}
-			
+
 			//Create a json obj used to create the attributes for the tag
 			function createElemAttributes() {
 				var a = {

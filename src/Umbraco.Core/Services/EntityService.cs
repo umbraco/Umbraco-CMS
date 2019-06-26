@@ -75,28 +75,15 @@ namespace Umbraco.Core.Services
             return _idkMap.GetKeyForId(id, umbracoObjectType);
         }
 
-        public IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true)
+        public IUmbracoEntity GetByKey(Guid key)
         {
-            if (loadBaseType)
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                using (var uow = UowProvider.GetUnitOfWork())
-                {
-                    var repository = RepositoryFactory.CreateEntityRepository(uow);
-                    var ret = repository.GetByKey(key);
-                    uow.Commit();
-                    return ret;
-                }
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                var ret = repository.GetByKey(key);
+                uow.Commit();
+                return ret;
             }
-
-            //SD: TODO: Need to enable this at some stage ... just need to ask Morten what the deal is with what this does.
-            throw new NotSupportedException();
-
-            //var objectType = GetObjectType(key);
-            //var entityType = GetEntityType(objectType);
-            //var typeFullName = entityType.FullName;
-            //var entity = _supportedObjectTypes[typeFullName].Item2(id);
-
-            //return entity;
         }
 
         /// <summary>
@@ -106,49 +93,26 @@ namespace Umbraco.Core.Services
         /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
         /// </returns>
         /// <param name="id">Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        public virtual IUmbracoEntity Get(int id, bool loadBaseType = true)
+        public virtual IUmbracoEntity Get(int id)
         {
-            if (loadBaseType)
+            using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
             {
-                using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
-                {
-                    var repository = RepositoryFactory.CreateEntityRepository(uow);
-                    var ret = repository.Get(id);
-                    return ret;
-                }
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                var ret = repository.Get(id);
+                return ret;
             }
-
-            var objectType = GetObjectType(id);
-            var entityType = GetEntityType(objectType);
-            var typeFullName = entityType.FullName;
-            var entity = _supportedObjectTypes[typeFullName].Item2(id);
-
-            return entity;
         }
 
-        public IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true)
+        public IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType)
         {
-            if (loadBaseType)
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
             {
-                var objectTypeId = umbracoObjectType.GetGuid();
-                using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
-                {
-                    var repository = RepositoryFactory.CreateEntityRepository(uow);
-                    var ret = repository.GetByKey(key, objectTypeId);
-                    return ret;
-                }
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                var ret = repository.GetByKey(key, objectTypeId);
+                return ret;
             }
-
-            //SD: TODO: Need to enable this at some stage ... just need to ask Morten what the deal is with what this does.
-            throw new NotSupportedException();
-
-            //var entityType = GetEntityType(umbracoObjectType);
-            //var typeFullName = entityType.FullName;
-            //var entity = _supportedObjectTypes[typeFullName].Item2(id);
-
-            //return entity;
         }
 
         /// <summary>
@@ -159,29 +123,19 @@ namespace Umbraco.Core.Services
         /// </returns>
         /// <param name="id">Id of the object to retrieve</param>
         /// <param name="umbracoObjectType">UmbracoObjectType of the entity to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
-        /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        public virtual IUmbracoEntity Get(int id, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true)
+        // <returns>An <see cref="IUmbracoEntity"/></returns>
+        public virtual IUmbracoEntity Get(int id, UmbracoObjectTypes umbracoObjectType)
         {
-            if (loadBaseType)
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
             {
-                var objectTypeId = umbracoObjectType.GetGuid();
-                using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
-                {
-                    var repository = RepositoryFactory.CreateEntityRepository(uow);
-                    var ret = repository.Get(id, objectTypeId);
-                    return ret;
-                }
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                var ret = repository.Get(id, objectTypeId);
+                return ret;
             }
-
-            var entityType = GetEntityType(umbracoObjectType);
-            var typeFullName = entityType.FullName;
-            var entity = _supportedObjectTypes[typeFullName].Item2(id);
-
-            return entity;
         }
 
-        public IUmbracoEntity GetByKey<T>(Guid key, bool loadBaseType = true) where T : IUmbracoEntity
+        public IUmbracoEntity GetByKey<T>(Guid key) where T : IUmbracoEntity
         {
             throw new NotImplementedException();
         }
@@ -194,29 +148,15 @@ namespace Umbraco.Core.Services
         /// </returns>
         /// <typeparam name="T">Type of the model to retrieve. Must be based on an <see cref="IUmbracoEntity"/></typeparam>
         /// <param name="id">Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        public virtual IUmbracoEntity Get<T>(int id, bool loadBaseType = true) where T : IUmbracoEntity
+        public virtual IUmbracoEntity Get<T>(int id) where T : IUmbracoEntity
         {
-            if (loadBaseType)
+            using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
             {
-                using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
-                {
-                    var repository = RepositoryFactory.CreateEntityRepository(uow);
-                    var ret = repository.Get(id);
-                    return ret;
-                }
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                var ret = repository.Get(id);
+                return ret;
             }
-
-            var typeFullName = typeof(T).FullName;
-            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
-            {
-                throw new NotSupportedException
-                    ("The passed in type is not supported");
-            });
-            var entity = _supportedObjectTypes[typeFullName].Item2(id);
-
-            return entity;
         }
 
         /// <summary>
@@ -295,27 +235,6 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a collection of children by the parent's Id and UmbracoObjectType without adding property data
-        /// </summary>
-        /// <param name="parentId">Id of the parent to retrieve children for</param>
-        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        internal IEnumerable<IUmbracoEntity> GetMediaChildrenWithoutPropertyData(int parentId)
-        {
-            var objectTypeId = UmbracoObjectTypes.Media.GetGuid();
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateEntityRepository(uow);
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
-
-                // Not pretty having to cast the repository, but it is the only way to get to use an internal method that we
-                // do not want to make public on the interface. Unfortunately also prevents this from being unit tested.
-                // See this issue for details on why we need this:
-                // https://github.com/umbraco/Umbraco-CMS/issues/3457
-                return ((EntityRepository)repository).GetMediaByQueryWithoutPropertyData(query);
-            }
-        }
-        
-        /// <summary>
         /// Returns a paged collection of children
         /// </summary>
         /// <param name="parentId">The parent id to return children for</param>
@@ -366,7 +285,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
             {
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
-                
+
                 var query = Query<IUmbracoEntity>.Builder;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
@@ -410,7 +329,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
-                
+
                 var query = Query<IUmbracoEntity>.Builder;
                 if (idsA.All(x => x != Constants.System.Root))
                 {
@@ -433,7 +352,7 @@ namespace Umbraco.Core.Services
                             var path = itemPath.Path;
                             var qid = id;
                             clauses.Add(x => x.Path.SqlStartsWith(string.Format("{0},", path), TextColumnType.NVarchar) || x.Path.SqlEndsWith(string.Format(",{0}", qid), TextColumnType.NVarchar));
-                        }                        
+                        }
                     }
                     query.WhereAny(clauses);
                 }
@@ -486,7 +405,7 @@ namespace Umbraco.Core.Services
                 return contents;
             }
         }
-        
+
         /// <summary>
         /// Gets a collection of descendents by the parents Id
         /// </summary>
@@ -645,7 +564,7 @@ namespace Umbraco.Core.Services
                 return repository.GetAllPaths(objectTypeId, keys);
             }
         }
-        
+
         /// <summary>
         /// Gets a collection of <see cref="T:Umbraco.Core.Models.EntityBase.IUmbracoEntity" />
         /// </summary>

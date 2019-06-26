@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
@@ -34,6 +35,7 @@ namespace Umbraco.Core.Services
         //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private static readonly Regex AnchorRegex = new Regex("<a id=\"(.*?)\">", RegexOptions.Compiled);
 
         public ContentService(
             IDatabaseUnitOfWorkProvider provider,
@@ -297,6 +299,45 @@ namespace Umbraco.Core.Services
             }
 
             return content;
+        }
+
+        public IEnumerable<string> GetAnchorValuesFromRTEs(int id)
+        {
+            var result = new List<string>();
+
+            var content = GetById(id);
+
+            foreach (var contentProperty in content.Properties)
+            {
+                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.TinyMCEAlias))
+                {
+                    var value = contentProperty.Value?.ToString();
+
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        result.AddRange(GetAnchorValuesFromRTEContent(value));
+                    }
+
+                }
+            }
+
+
+            return result;
+        }
+
+
+        public IEnumerable<string> GetAnchorValuesFromRTEContent(string rteContent)
+        {
+            var result = new List<string>();
+
+            var matches = AnchorRegex.Matches(rteContent);
+
+            foreach (Match match in matches)
+            {
+                result.Add(match.Value.Split('\"')[1]);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -694,7 +735,7 @@ namespace Umbraco.Core.Services
                     }
                     query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0].Path), TextColumnType.NVarchar));
                 }
-                    
+
 
                 // get filter
                 IQuery<IContent> filterQuery = null;
@@ -987,11 +1028,11 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var sql = new Sql(@"
-                    SELECT id 
+                    SELECT id
                     FROM umbracoNode
                     JOIN cmsDocument ON umbracoNode.id=cmsDocument.nodeId AND cmsDocument.published=@0
                     WHERE umbracoNode.trashed=@1 AND umbracoNode.id IN (@2)",
-                    true, false, ids);                    
+                    true, false, ids);
                 var x = uow.Database.Fetch<int>(sql);
                 return ids.Length == x.Count;
             }
@@ -1748,7 +1789,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
-        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
         public void EmptyRecycleBin(int userId = 0)
         {
             using (new WriteLock(Locker))

@@ -12,7 +12,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// This inspects the result of the action that returns a collection of content and removes 
+    /// This inspects the result of the action that returns a collection of content and removes
     /// any item that the current user doesn't have access to
     /// </summary>
     internal class FilterAllowedOutgoingMediaAttribute : ActionFilterAttribute
