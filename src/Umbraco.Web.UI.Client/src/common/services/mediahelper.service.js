@@ -3,7 +3,7 @@
 * @name umbraco.services.mediaHelper
 * @description A helper object used for dealing with media items
 **/
-function mediaHelper(umbRequestHelper) {
+function mediaHelper(umbRequestHelper, $log) {
 
     //container of fileresolvers
     var _mediaFileResolvers = {};
@@ -144,7 +144,9 @@ function mediaHelper(umbRequestHelper) {
         resolveFileFromEntity: function (mediaEntity, thumbnail) {
 
             if (!angular.isObject(mediaEntity.metaData) || !mediaEntity.metaData.MediaPath) {
-                throw "Cannot resolve the file url from the mediaEntity, it does not contain the required metaData";
+                //don't throw since this image legitimately might not contain a media path, but output a warning
+                $log.warn("Cannot resolve the file url from the mediaEntity, it does not contain the required metaData");
+                return null;
             }
 
             if (thumbnail) {
