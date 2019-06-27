@@ -72,7 +72,15 @@ namespace Umbraco.Web.Trees
         {
             var systemIds = new[]
             {
-                Constants.System.DefaultLabelDataTypeId
+                Constants.DataTypes.Boolean, // Used by the Member Type: "Member"
+                Constants.DataTypes.Textarea, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelBigint, // Used by the Media Type: "Image"; Used by the Media Type: "File"
+                Constants.DataTypes.LabelDateTime, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelDecimal, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelInt, // Used by the Media Type: "Image"; Used by the Member Type: "Member"
+                Constants.DataTypes.LabelString, // Used by the Media Type: "Image"; Used by the Media Type: "File"
+                Constants.DataTypes.ImageCropper, // Used by the Media Type: "Image"
+                Constants.DataTypes.Upload, // Used by the Media Type: "File"
             };
 
             return systemIds.Concat(GetNonDeletableSystemListViewDataTypeIds());
