@@ -105,7 +105,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return GetUmbracoMedia(contentId) != null;
         }
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
         {
             var searchProvider = GetSearchProviderSafe();
 
@@ -612,17 +612,17 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #region Content types
 
-        public override PublishedContentType GetContentType(int id)
+        public override IPublishedContentType GetContentType(int id)
         {
             return _contentTypeCache.Get(PublishedItemType.Media, id);
         }
 
-        public override PublishedContentType GetContentType(string alias)
+        public override IPublishedContentType GetContentType(string alias)
         {
             return _contentTypeCache.Get(PublishedItemType.Media, alias);
         }
 
-        public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
+        public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {
             throw new NotSupportedException();
         }
@@ -674,8 +674,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 _appCache,
                 _contentTypeCache,
                 cacheValues.XPath, // though, outside of tests, that should be null
-                cacheValues.FromExamine,
-                _umbracoContextAccessor
+                cacheValues.FromExamine
             );
             return content.CreateModel();
         }

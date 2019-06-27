@@ -812,8 +812,6 @@ namespace Umbraco.Web
         }
 
         #endregion
-
-
         internal static bool DecryptAndValidateEncryptedRouteString(string ufprt, out IDictionary<string, string> parts)
         {
             string decryptedString;
@@ -827,17 +825,13 @@ namespace Umbraco.Web
                 parts = null;
                 return false;
             }
-
             var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
             parts = new Dictionary<string, string>();
-
             foreach (var key in parsedQueryString.AllKeys)
             {
                 parts[key] = parsedQueryString[key];
             }
-
             //validate all required keys exist
-
             //the controller
             if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Controller))
                 return false;

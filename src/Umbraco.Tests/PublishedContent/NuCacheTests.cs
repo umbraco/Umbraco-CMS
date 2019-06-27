@@ -24,7 +24,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -39,10 +38,18 @@ namespace Umbraco.Tests.PublishedContent
         private void Init()
         {
             Current.Reset();
-            Current.UnlockConfigs();
-            Current.Configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
-            Current.Configs.Add<IGlobalSettings>(() => new GlobalSettings());
-            var globalSettings = Current.Configs.Global();
+
+            var factory = Mock.Of<IFactory>();
+            Current.Factory = factory;
+
+            var configs = new Configs();
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
+            var globalSettings = new GlobalSettings();
+            configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            configs.Add<IGlobalSettings>(() => globalSettings);
+
+            var publishedModelFactory = new NoopPublishedModelFactory();
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
 
             // create a content node kit
             var kit = new ContentNodeKit
@@ -171,7 +178,6 @@ namespace Umbraco.Tests.PublishedContent
                 null,
                 new TestPublishedSnapshotAccessor(),
                 _variationAccesor,
-                Mock.Of<IUmbracoContextAccessor>(),
                 Mock.Of<ILogger>(),
                 scopeProvider,
                 Mock.Of<IDocumentRepository>(),
@@ -180,13 +186,14 @@ namespace Umbraco.Tests.PublishedContent
                 new TestDefaultCultureAccessor(),
                 dataSource,
                 globalSettings,
-                new SiteDomainHelper(),
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
+
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
 
         [Test]
@@ -202,36 +209,34 @@ namespace Umbraco.Tests.PublishedContent
             var publishedContent = snapshot.Content.GetById(1);
 
             Assert.IsNotNull(publishedContent);
-            Assert.AreEqual("It Works1!", publishedContent.Name);
             Assert.AreEqual("val1", publishedContent.Value<string>("prop"));
             Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop", "fr-FR"));
             Assert.AreEqual("val-uk1", publishedContent.Value<string>("prop", "en-UK"));
 
-            Assert.AreEqual("name-fr1", publishedContent.GetCulture("fr-FR").Name);
-            Assert.AreEqual("name-uk1", publishedContent.GetCulture("en-UK").Name);
+            Assert.IsNull(publishedContent.Name()); // no invariant name for varying content
+            Assert.AreEqual("name-fr1", publishedContent.Name("fr-FR"));
+            Assert.AreEqual("name-uk1", publishedContent.Name("en-UK"));
 
             var draftContent = snapshot.Content.GetById(true, 1);
-            Assert.AreEqual("It Works2!", draftContent.Name);
             Assert.AreEqual("val2", draftContent.Value<string>("prop"));
             Assert.AreEqual("val-fr2", draftContent.Value<string>("prop", "fr-FR"));
             Assert.AreEqual("val-uk2", draftContent.Value<string>("prop", "en-UK"));
 
-            Assert.AreEqual("name-fr2", draftContent.GetCulture("fr-FR").Name);
-            Assert.AreEqual("name-uk2", draftContent.GetCulture("en-UK").Name);
+            Assert.IsNull(draftContent.Name()); // no invariant name for varying content
+            Assert.AreEqual("name-fr2", draftContent.Name("fr-FR"));
+            Assert.AreEqual("name-uk2", draftContent.Name("en-UK"));
 
             // now french is default
             _variationAccesor.VariationContext = new VariationContext("fr-FR");
             Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop"));
-            Assert.AreEqual("name-fr1", publishedContent.GetCulture().Name);
-            Assert.AreEqual("name-fr1", publishedContent.Name);
-            Assert.AreEqual(new DateTime(2018, 01, 01, 01, 00, 00), publishedContent.GetCulture().Date);
+            Assert.AreEqual("name-fr1", publishedContent.Name());
+            Assert.AreEqual(new DateTime(2018, 01, 01, 01, 00, 00), publishedContent.CultureDate());
 
             // now uk is default
             _variationAccesor.VariationContext = new VariationContext("en-UK");
             Assert.AreEqual("val-uk1", publishedContent.Value<string>("prop"));
-            Assert.AreEqual("name-uk1", publishedContent.GetCulture().Name);
-            Assert.AreEqual("name-uk1", publishedContent.Name);
-            Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.GetCulture().Date);
+            Assert.AreEqual("name-uk1", publishedContent.Name());
+            Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.CultureDate());
 
             // invariant needs to be retrieved explicitly, when it's not default
             Assert.AreEqual("val1", publishedContent.Value<string>("prop", culture: ""));
@@ -251,7 +256,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(ContentVariation.Nothing, againContent.ContentType.GetPropertyType("prop").Variations);
 
             // now, "no culture" means "invariant"
-            Assert.AreEqual("It Works1!", againContent.Name);
+            Assert.AreEqual("It Works1!", againContent.Name());
             Assert.AreEqual("val1", againContent.Value<string>("prop"));
         }
 
