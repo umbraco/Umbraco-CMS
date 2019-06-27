@@ -8,10 +8,10 @@
                ng-required="model.config.IsRequired || model.validation.mandatory"
                val-server="value" />
 
-        <span ng-messages="emailFieldForm.textbox.$error" show-validation-on-submit >
-            <span class="help-inline" ng-message="required">{{mandatoryMessage}}</span>
-            <span class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></span>
-            <span class="help-inline" ng-message="valServer">{{emailFieldForm.textbox.errorMsg}}</span>
-        </span>
+        <div ng-messages="emailFieldForm.textbox.$error" show-validation-on-submit >
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
+            <p class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></p>
+            <p class="help-inline" ng-message="valServer">{{emailFieldForm.textbox.errorMsg}}</p>
+        </div>
     </ng-form>
 </div>

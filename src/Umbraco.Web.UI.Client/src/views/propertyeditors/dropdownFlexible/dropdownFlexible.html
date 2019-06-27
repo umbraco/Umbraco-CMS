@@ -21,9 +21,9 @@
                 ng-options="item.value as item.value for item in model.config.items"
                 ng-required="model.validation.mandatory"></select>
 
-        <span ng-messages="dropDownListForm.dropDownList.$error" show-validation-on-submit>
-            <span class="help-inline" ng-message="required">{{mandatoryMessage}}</span>
-        </span>
+        <div ng-messages="dropDownListForm.dropDownList.$error" show-validation-on-submit>
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
+        </div>
 
     </ng-form>
 </div>
