@@ -264,6 +264,74 @@ namespace Umbraco.Tests.PublishedContent
             yield return CreateKit(12, 4, 2);
         }
 
+        private IEnumerable<ContentNodeKit> GetVariantWithDraftKits()
+        {
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+            Dictionary<string, CultureVariation> GetCultureInfos(int id, DateTime now)
+            {
+                var en = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+                var fr = new[] { 1, 3, 4, 6, 7, 9, 10, 12 };
+
+                var infos = new Dictionary<string, CultureVariation>();
+                if (en.Contains(id))
+                    infos["en-US"] = new CultureVariation { Name = "N" + id + "-" + "en-US", Date = now, IsDraft = false };
+                if (fr.Contains(id))
+                    infos["fr-FR"] = new CultureVariation { Name = "N" + id + "-" + "fr-FR", Date = now, IsDraft = false };
+                return infos;
+            }
+
+            ContentNodeKit CreateKit(int id, int parentId, int sortOrder)
+            {
+                if (!paths.TryGetValue(parentId, out var parentPath))
+                    throw new Exception("Unknown parent.");
+
+                var path = paths[id] = parentPath + "," + id;
+                var level = path.Count(x => x == ',');
+                var now = DateTime.Now;
+
+                ContentData CreateContentData(bool published) => new ContentData
+                {
+                    Name = "N" + id,
+                    Published = published,
+                    TemplateId = 0,
+                    VersionId = 1,
+                    VersionDate = now,
+                    WriterId = 0,
+                    Properties = new Dictionary<string, PropertyData[]>(),
+                    CultureInfos = GetCultureInfos(id, now)
+                };
+
+                var withDraft = id%2==0;
+                var withPublished = !withDraft;
+
+                return new ContentNodeKit
+                {
+                    ContentTypeId = _contentTypeVariant.Id,
+                    Node = new ContentNode(id, Guid.NewGuid(), level, path, sortOrder, parentId, DateTime.Now, 0),
+                    DraftData = withDraft ? CreateContentData(false) : null,
+                    PublishedData = withPublished ? CreateContentData(true) : null
+                };
+            }
+
+            yield return CreateKit(1, -1, 1);
+            yield return CreateKit(2, -1, 2);
+            yield return CreateKit(3, -1, 3);
+
+            yield return CreateKit(4, 1, 1);
+            yield return CreateKit(5, 1, 2);
+            yield return CreateKit(6, 1, 3);
+
+            yield return CreateKit(7, 2, 3);
+            yield return CreateKit(8, 2, 2);
+            yield return CreateKit(9, 2, 1);
+
+            yield return CreateKit(10, 3, 1);
+
+            yield return CreateKit(11, 4, 1);
+            yield return CreateKit(12, 4, 2);
+        }
+
         [Test]
         public void EmptyTest()
         {
@@ -745,6 +813,25 @@ namespace Umbraco.Tests.PublishedContent
 
             documents = snapshot.Content.GetById(2).Children().ToArray();
             AssertDocuments(documents, "N9", "N8", "N7");
+        }
+
+        [Test]
+        public void AtRootTest()
+        {
+            Init(GetVariantWithDraftKits());
+
+            var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
+            _snapshotAccessor.PublishedSnapshot = snapshot;
+
+            _variationAccesor.VariationContext = new VariationContext("en-US");
+
+            // N2 is draft only
+
+            var documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1-en-US", /*"N2-en-US",*/ "N3-en-US");
+
+            documents = snapshot.Content.GetAtRoot(true).ToArray();
+            AssertDocuments(documents, "N1-en-US", "N2-en-US", "N3-en-US");
         }
 
         private void AssertDocuments(IPublishedContent[] documents, params string[] names)
