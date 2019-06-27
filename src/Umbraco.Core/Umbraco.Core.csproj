@@ -254,6 +254,10 @@
     <Compile Include="Models\Entities\IMediaEntitySlim.cs" />
     <Compile Include="Models\Entities\MediaEntitySlim.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
+    <Compile Include="PublishedContentExtensions.cs" />
+    <Compile Include="Models\PublishedContent\UrlMode.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />

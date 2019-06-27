@@ -16,6 +16,7 @@
                         id="{{model.alias}}"
                         type="text"
                         ng-model="model.datetimePickerValue"
+                        ng-blur="inputChanged()"
                         ng-required="model.validation.mandatory"
                         val-server="value"
                         class="datepickerinput">

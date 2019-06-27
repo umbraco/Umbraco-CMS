@@ -82,6 +82,11 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationH
         setDate(date);
         setDatePickerVal();
     };
+
+    $scope.inputChanged = function() {
+        setDate($scope.model.datetimePickerValue);
+        setDatePickerVal();
+    }
     
     //here we declare a special method which will be called whenever the value has changed from the server
     //this is instead of doing a watch on the model.value = faster

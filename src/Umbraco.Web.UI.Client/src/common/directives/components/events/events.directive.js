@@ -136,7 +136,8 @@ angular.module('umbraco.directives')
                     return;
                 }
 
-                angularHelper.safeApply(scope, attrs.onOutsideClick);
+                // please to not use angularHelper.safeApply here, it won't work
+                scope.$apply(attrs.onOutsideClick);
             }
 
 
