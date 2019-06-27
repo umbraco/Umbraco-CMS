@@ -324,7 +324,7 @@ namespace Umbraco.Web.PropertyEditors
                                     var message = string.IsNullOrWhiteSpace(propType.MandatoryMessage)
                                                       ? $"'{propType.Name}' cannot be empty"
                                                       : propType.MandatoryMessage;
-                                    yield return new ValidationResult($"Item{(i + 1)}: {message}", new[] { propKey });
+                                    yield return new ValidationResult($"Item {(i + 1)}: {message}", new[] { propKey });
                                 }
                             }
 
