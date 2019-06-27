@@ -14,24 +14,24 @@ namespace Umbraco.ModelsBuilder.Validation
    /// Used to validate the aliases for the content type when MB is enabled to ensure that
    /// no illegal aliases are used
    /// </summary>
-    internal class ContentTypeModelValidator : ContentTypeModelValidatorBase<DocumentTypeSave, PropertyTypeBasic>
+    public class ContentTypeModelValidator : ContentTypeModelValidatorBase<DocumentTypeSave, PropertyTypeBasic>
     { }
 
     /// <summary>
     /// Used to validate the aliases for the content type when MB is enabled to ensure that
     /// no illegal aliases are used
     /// </summary>
-    internal class MediaTypeModelValidator : ContentTypeModelValidatorBase<MediaTypeSave, PropertyTypeBasic>
+    public class MediaTypeModelValidator : ContentTypeModelValidatorBase<MediaTypeSave, PropertyTypeBasic>
     { }
 
     /// <summary>
     /// Used to validate the aliases for the content type when MB is enabled to ensure that
     /// no illegal aliases are used
     /// </summary>
-    internal class MemberTypeModelValidator : ContentTypeModelValidatorBase<MemberTypeSave, MemberPropertyTypeBasic>
+    public class MemberTypeModelValidator : ContentTypeModelValidatorBase<MemberTypeSave, MemberPropertyTypeBasic>
     { }
 
-    internal abstract class ContentTypeModelValidatorBase<TModel, TProperty> : EditorValidator<TModel>
+    public abstract class ContentTypeModelValidatorBase<TModel, TProperty> : EditorValidator<TModel>
         where TModel: ContentTypeSave<TProperty>
         where TProperty: PropertyTypeBasic
     {
