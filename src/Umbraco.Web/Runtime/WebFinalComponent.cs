@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Web.Helpers;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -8,6 +9,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Install;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Runtime
@@ -34,6 +36,8 @@ namespace Umbraco.Web.Runtime
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
+
+            AntiForgeryConfig.AdditionalDataProvider = new UmbracoAntiForgeryAdditionalDataProvider(AntiForgeryConfig.AdditionalDataProvider);
         }
 
         public void Terminate()

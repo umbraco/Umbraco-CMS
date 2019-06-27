@@ -1,5 +1,11 @@
 function multiUrlPickerController($scope, angularHelper, localizationService, entityResource, iconHelper, editorService) {
 
+    var vm = {
+        labels: {
+            general_recycleBin: ""
+        }
+    };
+
     $scope.renderModel = [];
 
     if ($scope.preview) {
@@ -68,10 +74,9 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             url: link.url,
             target: link.target
         } : null;
-        
+
         var linkPicker = {
             currentTarget: target,
-            ignoreUserStartNodes: Object.toBoolean($scope.model.config.ignoreUserStartNodes),
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed
@@ -103,7 +108,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                             link.published = (data.metaData && data.metaData.IsPublished === false && entityType === "Document") ? false : true;
                             link.trashed = data.trashed;
                             if (link.trashed) {
-                                item.url = localizationService.dictionary.general_recycleBin;
+                                item.url = vm.labels.general_recycleBin;
                             }
                         });
                     } else {
@@ -121,6 +126,15 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         };
         editorService.linkPicker(linkPicker);
     };
+
+    function init() {
+        localizationService.localizeMany(["general_recycleBin"])
+            .then(function (data) {
+                vm.labels.general_recycleBin = data[0];
+            });
+    }
+
+    init();
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.MultiUrlPickerController", multiUrlPickerController);
