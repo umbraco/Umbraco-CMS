@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.Models
 {
@@ -12,19 +11,12 @@ namespace Umbraco.Web.Models
     /// </summary>
     /// <remarks>This base class does which (a) consistently resolves and caches the Url, (b) provides an implementation
     /// for this[alias], and (c) provides basic content set management.</remarks>
-    [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
+    [DebuggerDisplay("Content Id: {Id}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        protected PublishedContentBase(IUmbracoContextAccessor umbracoContextAccessor)
-        {
-            UmbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-        }
-
-        protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
-
         #region ContentType
 
-        public abstract PublishedContentType ContentType { get; }
+        public abstract IPublishedContentType ContentType { get; }
 
         #endregion
 
@@ -41,10 +33,10 @@ namespace Umbraco.Web.Models
         public abstract int Id { get; }
 
         /// <inheritdoc />
-        public abstract string Name { get; }
+        public virtual string Name => this.Name();
 
         /// <inheritdoc />
-        public abstract string UrlSegment { get; }
+        public virtual string UrlSegment => this.UrlSegment();
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }
@@ -77,34 +69,7 @@ namespace Umbraco.Web.Models
         public abstract DateTime UpdateDate { get; }
 
         /// <inheritdoc />
-        public virtual string Url => GetUrl();
-
-        /// <inheritdoc />
-        /// <remarks>
-        /// The url of documents are computed by the document url providers. The url of medias are computed by the media url providers
-        /// </remarks>
-        public virtual string GetUrl(string culture = null) // TODO: consider .GetCulture("fr-FR").Url
-        {
-            var umbracoContext = UmbracoContextAccessor.UmbracoContext;
-
-            if (umbracoContext == null)
-                throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext is null.");
-            if (umbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.UrlProvider is null.");
-
-            switch (ItemType)
-            {
-                case PublishedItemType.Content:
-                    return umbracoContext.UrlProvider.GetUrl(this, culture);
-                case PublishedItemType.Media:
-                    return umbracoContext.UrlProvider.GetMediaUrl(this, Constants.Conventions.Media.File, culture);
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        /// <inheritdoc />
-        public abstract PublishedCultureInfo GetCulture(string culture = null);
+        public virtual string Url => this.Url();
 
         /// <inheritdoc />
         public abstract IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
@@ -126,7 +91,10 @@ namespace Umbraco.Web.Models
         public abstract IPublishedContent Parent { get; }
 
         /// <inheritdoc />
-        public abstract IEnumerable<IPublishedContent> Children { get; }
+        public virtual IEnumerable<IPublishedContent> Children => this.Children();
+
+        /// <inheritdoc />
+        public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 
         #endregion
 

@@ -104,7 +104,7 @@ namespace Umbraco.Web.Editors
             if (m == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var publishedContent = UmbracoContext.ContentCache.GetById(true, pageId);
+            var publishedContent = UmbracoContext.Content.GetById(true, pageId);
 
             //if it isn't supposed to be rendered in the editor then return an empty string
             //currently we cannot render a macro if the page doesn't yet exist
@@ -123,13 +123,17 @@ namespace Umbraco.Web.Editors
             // Since a Macro might contain thing thats related to the culture of the "IPublishedContent" (ie Dictionary keys) we want
             // to set the current culture to the culture related to the content item. This is hacky but it works.
 
-            var culture = publishedContent.GetCulture();
-            _variationContextAccessor.VariationContext = new VariationContext(); //must have an active variation context!
+            // fixme
+            // in a 1:1 situation we do not handle the language being edited
+            // so the macro renders in the wrong language
+
+            var culture = publishedContent.GetCultureFromDomains();
+
             if (culture != null)
-            {
-                Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(culture.Culture);
-                _variationContextAccessor.VariationContext = new VariationContext(Thread.CurrentThread.CurrentCulture.Name);
-            }
+                Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(culture);
+
+            // must have an active variation context!
+            _variationContextAccessor.VariationContext = new VariationContext(culture);
 
             var result = Request.CreateResponse();
             //need to create a specific content result formatted as HTML since this controller has been configured
