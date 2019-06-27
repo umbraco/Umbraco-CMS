@@ -9,8 +9,10 @@ angular.module("umbraco.directives")
                 }
             };
 
-            $timeout(function() {
-                update();
-            });
+            if (attr.umbAutoFocus !== "false") {
+                $timeout(function() {
+                    update();
+                });
+            }
     };
 });

@@ -195,7 +195,24 @@ namespace Umbraco.Tests.Mapping
             Assert.AreEqual(Thing6Enum.Banana, thing6.Fruit2);
             Assert.AreEqual(Thing6Enum.Cherry, thing6.Fruit3);
         }
-        
+
+        [Test]
+        public void NullPropertyMap()
+        {
+            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            {
+                new MapperDefinition5(),
+            });
+            var mapper = new UmbracoMapper(definitions);
+
+            var thing7 = new Thing7();
+
+            var thing8 = mapper.Map<Thing7, Thing8>(thing7);
+
+            Assert.IsNotNull(thing8);
+            Assert.IsNull(thing8.Things);
+        }
+
 
         private class Thing1
         {
@@ -239,6 +256,16 @@ namespace Umbraco.Tests.Mapping
             Apple = 0,
             Banana = 1,
             Cherry = 2
+        }
+
+        private class Thing7
+        {
+            public IEnumerable<Thing1> Things { get; set; }
+        }
+
+        private class Thing8
+        {
+            public IEnumerable<Thing2> Things { get; set; }
         }
 
         private class MapperDefinition1 : IMapDefinition
@@ -292,6 +319,25 @@ namespace Umbraco.Tests.Mapping
                 target.Fruit1 = context.Map<Thing6Enum>(source.Fruit1);
                 target.Fruit2 = context.Map<Thing6Enum>(source.Fruit2);
                 target.Fruit3 = context.Map<Thing6Enum>(source.Fruit3);
+            }
+        }
+
+        private class MapperDefinition5 : IMapDefinition
+        {
+            public void DefineMaps(UmbracoMapper mapper)
+            {
+                mapper.Define<Thing1, Thing2>((source, context) => new Thing2(), Map1);
+                mapper.Define<Thing7, Thing8>((source, context) => new Thing8(), Map2);
+            }
+
+            private void Map1(Thing1 source, Thing2 target, MapperContext context)
+            {
+                target.Value = source.Value;
+            }
+
+            private void Map2(Thing7 source, Thing8 target, MapperContext context)
+            {
+                target.Things = context.Map<IEnumerable<Thing2>>(source.Things);
             }
         }
     }
