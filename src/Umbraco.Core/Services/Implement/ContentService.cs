@@ -757,6 +757,11 @@ namespace Umbraco.Core.Services.Implement
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException("Cannot save (un)publishing content, use the dedicated SavePublished method.");
 
+            if (content.Name != null && content.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
             var evtMsgs = EventMessagesFactory.Get();
 
             using (var scope = ScopeProvider.CreateScope())
@@ -870,6 +875,11 @@ namespace Umbraco.Core.Services.Implement
                     throw new NotSupportedException($"Culture \"{culture}\" is not supported by invariant content types.");
             }
 
+            if(content.Name != null && content.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
@@ -899,6 +909,11 @@ namespace Umbraco.Core.Services.Implement
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (cultures == null) throw new ArgumentNullException(nameof(cultures));
+
+            if (content.Name != null && content.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1680,12 +1695,11 @@ namespace Umbraco.Core.Services.Implement
             }
 
             const int pageSize = 500;
-            var page = 0;
             var total = long.MaxValue;
-            while (page * pageSize < total)
+            while (total > 0)
             {
                 //get descendants - ordered from deepest to shallowest
-                var descendants = GetPagedDescendants(content.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
+                var descendants = GetPagedDescendants(content.Id, 0, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
                 foreach (var c in descendants)
                     DoDelete(c);
             }
@@ -1911,11 +1925,10 @@ namespace Umbraco.Core.Services.Implement
             paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString) : parent.Path) + "," + content.Id;
 
             const int pageSize = 500;
-            var page = 0;
             var total = long.MaxValue;
-            while (page * pageSize < total)
+            while (total > 0)
             {
-                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+                var descendants = GetPagedDescendantsLocked(originalPath, 0, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
                 foreach (var descendant in descendants)
                 {
                     moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path

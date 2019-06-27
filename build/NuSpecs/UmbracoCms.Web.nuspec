@@ -53,9 +53,9 @@
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.dll" target="lib\net472\Umbraco.Examine.dll" />
 
         <!-- docs -->
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.xml" target="lib\Umbraco.Web.xml" />
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.xml" target="lib\Umbraco.Web.UI.xml" />
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\Umbraco.Examine.xml" />
+        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.xml" target="lib\net472\Umbraco.Web.xml" />
+        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.xml" target="lib\net472\Umbraco.Web.UI.xml" />
+        <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\net472\Umbraco.Examine.xml" />
 
         <!-- symbols -->
         <file src="$BuildTmp$\bin\Umbraco.Web.pdb" target="lib" />

@@ -28,7 +28,8 @@ namespace Umbraco.Core.Persistence
     {
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly ILogger _logger;
-        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+
+        private object _lock = new object();
 
         private DatabaseFactory _npocoDatabaseFactory;
         private IPocoDataFactory _pocoDataFactory;
@@ -36,12 +37,13 @@ namespace Umbraco.Core.Persistence
         private string _providerName;
         private DbProviderFactory _dbProviderFactory;
         private DatabaseType _databaseType;
-        private bool _serverVersionDetected;
         private ISqlSyntaxProvider _sqlSyntax;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
         private NPoco.MapperCollection _pocoMappers;
+        private SqlContext _sqlContext;
         private bool _upgrading;
+        private bool _initialized;
 
         #region Constructors
 
@@ -106,36 +108,30 @@ namespace Umbraco.Core.Persistence
         #endregion
 
         /// <inheritdoc />
-        public bool Configured { get; private set; }
-
-        /// <inheritdoc />
-        public string ConnectionString
+        public bool Configured
         {
             get
             {
-                EnsureConfigured();
-                return _connectionString;
+                lock (_lock)
+                {
+                    return !_connectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace();
+                }
             }
         }
 
         /// <inheritdoc />
-        public bool CanConnect
-        {
-            get
-            {
-                if (!Configured || !DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName)) return false;
+        public bool Initialized => Volatile.Read(ref _initialized);
 
-                if (_serverVersionDetected) return true;
+        /// <inheritdoc />
+        public string ConnectionString => _connectionString;
 
-                if (_databaseType.IsSqlServer())
-                    DetectSqlServerVersion();
-                _serverVersionDetected = true;
+        /// <inheritdoc />
+        public bool CanConnect =>
+            // actually tries to connect to the database (regardless of configured/initialized)
+            !_connectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace() &&
+            DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
 
-                return true;
-            }
-        }
-
-        private void DetectSqlServerVersion()
+        private void UpdateSqlServerDatabaseType()
         {
             // replace NPoco database type by a more efficient one
 
@@ -171,7 +167,15 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <inheritdoc />
-        public ISqlContext SqlContext { get; private set; }
+        public ISqlContext SqlContext
+        {
+            get
+            {
+                // must be initialized to have a context
+                EnsureInitialized();
+                return _sqlContext;
+            }
+        }
 
         /// <inheritdoc />
         public void ConfigureForUpgrade()
@@ -182,63 +186,79 @@ namespace Umbraco.Core.Persistence
         /// <inheritdoc />
         public void Configure(string connectionString, string providerName)
         {
-            try
+            if (connectionString.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(connectionString));
+            if (providerName.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(providerName));
+
+            lock (_lock)
             {
-                _lock.EnterWriteLock();
-
-                _logger.Debug<UmbracoDatabaseFactory>("Configuring.");
-
-                if (Configured) throw new InvalidOperationException("Already configured.");
-
-                if (connectionString.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(connectionString));
-                if (providerName.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(providerName));
+                if (Volatile.Read(ref _initialized))
+                    throw new InvalidOperationException("Already initialized.");
 
                 _connectionString = connectionString;
                 _providerName = providerName;
-
-                _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionString);
-                _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionString);
-
-                _dbProviderFactory = DbProviderFactories.GetFactory(_providerName);
-                if (_dbProviderFactory == null)
-                    throw new Exception($"Can't find a provider factory for provider name \"{_providerName}\".");
-                _databaseType = DatabaseType.Resolve(_dbProviderFactory.GetType().Name, _providerName);
-                if (_databaseType == null)
-                    throw new Exception($"Can't find an NPoco database type for provider name \"{_providerName}\".");
-
-                _sqlSyntax = GetSqlSyntaxProvider(_providerName);
-                if (_sqlSyntax == null)
-                    throw new Exception($"Can't find a sql syntax provider for provider name \"{_providerName}\".");
-
-                // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
-                // so that everything NPoco is properly cached for the lifetime of the application
-                _pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
-                var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver);
-                _pocoDataFactory = factory;
-                var config = new FluentConfig(xmappers => factory);
-
-                // create the database factory
-                _npocoDatabaseFactory = DatabaseFactory.Config(x => x
-                    .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
-                    .WithFluentConfig(config)); // with proper configuration
-
-                if (_npocoDatabaseFactory == null) throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
-
-                SqlContext = new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
-
-                _logger.Debug<UmbracoDatabaseFactory>("Configured.");
-                Configured = true;
             }
-            finally
-            {
-                if (_lock.IsWriteLockHeld)
-                    _lock.ExitWriteLock();
-            }
+
+            // rest to be lazy-initialized
+        }
+
+        private void EnsureInitialized()
+        {
+            LazyInitializer.EnsureInitialized(ref _sqlContext, ref _initialized, ref _lock, Initialize);
+        }
+
+        private SqlContext Initialize()
+        {
+            _logger.Debug<UmbracoDatabaseFactory>("Initializing.");
+
+            if (_connectionString.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper connection string.");
+            if (_providerName.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper provider name.");
+
+            // cannot initialize without being able to talk to the database
+            if (!DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName))
+                throw new Exception("Cannot connect to the database.");
+
+            _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionString);
+            _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionString);
+
+            _dbProviderFactory = DbProviderFactories.GetFactory(_providerName);
+            if (_dbProviderFactory == null)
+                throw new Exception($"Can't find a provider factory for provider name \"{_providerName}\".");
+            _databaseType = DatabaseType.Resolve(_dbProviderFactory.GetType().Name, _providerName);
+            if (_databaseType == null)
+                throw new Exception($"Can't find an NPoco database type for provider name \"{_providerName}\".");
+
+            _sqlSyntax = GetSqlSyntaxProvider(_providerName);
+            if (_sqlSyntax == null)
+                throw new Exception($"Can't find a sql syntax provider for provider name \"{_providerName}\".");
+
+            if (_databaseType.IsSqlServer())
+                UpdateSqlServerDatabaseType();
+
+            // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
+            // so that everything NPoco is properly cached for the lifetime of the application
+            _pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
+            var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver);
+            _pocoDataFactory = factory;
+            var config = new FluentConfig(xmappers => factory);
+
+            // create the database factory
+            _npocoDatabaseFactory = DatabaseFactory.Config(x => x
+                .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
+                .WithFluentConfig(config)); // with proper configuration
+
+            if (_npocoDatabaseFactory == null)
+                throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
+
+            _logger.Debug<UmbracoDatabaseFactory>("Initialized.");
+
+            return new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
         }
 
         /// <inheritdoc />
         public IUmbracoDatabase CreateDatabase()
         {
+            // must be initialized to create a database
+            EnsureInitialized();
             return (IUmbracoDatabase) _npocoDatabaseFactory.GetDatabase();
         }
 
@@ -260,22 +280,6 @@ namespace Umbraco.Core.Persistence
             }
         }
 
-        // ensures that the database is configured, else throws
-        private void EnsureConfigured()
-        {
-            _lock.EnterReadLock();
-            try
-            {
-                if (Configured == false)
-                    throw new InvalidOperationException("Not configured.");
-            }
-            finally
-            {
-                if (_lock.IsReadLockHeld)
-                    _lock.ExitReadLock();
-            }
-        }
-
         // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
         {
@@ -292,7 +296,7 @@ namespace Umbraco.Core.Persistence
             //var db = _umbracoDatabaseAccessor.UmbracoDatabase;
             //_umbracoDatabaseAccessor.UmbracoDatabase = null;
             //db?.Dispose();
-            Configured = false;
+            Volatile.Write(ref _initialized, false);
         }
 
         // during tests, the thread static var can leak between tests
