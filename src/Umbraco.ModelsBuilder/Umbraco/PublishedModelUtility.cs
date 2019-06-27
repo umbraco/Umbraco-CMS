@@ -24,7 +24,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         //    // etc...
         //}
 
-        public static PublishedContentType GetModelContentType(PublishedItemType itemType, string alias)
+        public static IPublishedContentType GetModelContentType(PublishedItemType itemType, string alias)
         {
             var facade = Current.UmbracoContext.PublishedSnapshot; // fixme inject!
             switch (itemType)
@@ -40,7 +40,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        public static PublishedPropertyType GetModelPropertyType<TModel, TValue>(PublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
+        public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(PublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
             //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
         {
             // fixme therefore, missing a check on TModel here
