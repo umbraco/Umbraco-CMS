@@ -129,7 +129,6 @@
     <Compile Include="Dashboards\DashboardCollectionBuilder.cs" />
     <Compile Include="Dashboards\ExamineDashboard.cs" />
     <Compile Include="Dashboards\FormsDashboard.cs" />
-    <Compile Include="Dashboards\ProfilerDashboard.cs" />
     <Compile Include="Dashboards\HealthCheckDashboard.cs" />
     <Compile Include="Dashboards\MediaDashboard.cs" />
     <Compile Include="Dashboards\MembersDashboard.cs" />
@@ -782,7 +781,6 @@
     <Compile Include="Models\IContentModel.cs" />
     <Compile Include="Models\PartialViewMacroModelExtensions.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
-    <Compile Include="Models\PublishedProperty.cs" />
     <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
     <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
@@ -1024,7 +1022,6 @@
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
-    <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexModel.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
@@ -1145,7 +1142,7 @@
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Routing\DomainHelper.cs" />
+    <Compile Include="Routing\DomainUtilities.cs" />
     <Compile Include="Routing\PublishedRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
