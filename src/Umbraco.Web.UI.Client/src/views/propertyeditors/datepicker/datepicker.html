@@ -32,7 +32,7 @@
         </div>
 
         <span ng-messages="datePickerForm.datepicker.$error" show-validation-on-submit >
-            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+            <span class="help-inline" ng-message="required">{{mandatoryMessage}}</span>
             <span class="help-inline" ng-message="valServer">{{datePickerForm.datepicker.errorMsg}}</span>
             <span class="help-inline" ng-message="pickerError"><localize key="validation_invalidDate">Invalid date</localize></span>
         </span>

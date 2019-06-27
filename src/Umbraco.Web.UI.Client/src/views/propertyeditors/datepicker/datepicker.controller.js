@@ -1,4 +1,4 @@
-function dateTimePickerController($scope, notificationsService, assetsService, angularHelper, userService, $element, dateHelper) {
+function dateTimePickerController($scope, angularHelper, dateHelper, validationHelper) {
 
     let flatPickr = null;
 
@@ -56,6 +56,11 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             
         setDatePickerVal();
 
+        // Set the message to use for when a mandatory field isn't completed.
+        // Will either use the one provided on the property type or a localised default.
+        validationHelper.getMandatoryMessage($scope.model.validation).then(function (value) {
+            $scope.mandatoryMessage = value;
+        });
     }
 
     $scope.clearDate = function() {
