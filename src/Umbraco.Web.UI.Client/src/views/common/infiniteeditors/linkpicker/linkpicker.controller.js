@@ -150,7 +150,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
         function handleContentTarget(content) {
             $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(contentEditingHelper.getAllProps(content.variants[0])));
-            $scope.model.target.url = content.urls.filter(item => item.culture === $scope.currentNode.metaData.culture)[0].text;
+            $scope.model.target.url = content.urls[0].text;
         }
 
         function nodeExpandedHandler(args) {

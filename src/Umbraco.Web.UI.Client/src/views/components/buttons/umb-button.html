@@ -15,7 +15,7 @@
         </span>
     </a>
 
-    <button ng-if="vm.type === 'button'" type="button" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" ng-click="vm.clickButton($event)" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}" ng-disabled="vm.disabled">
+    <button ng-if="vm.type === 'button'" type="button" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" ng-click="vm.clickButton($event)" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}" ng-disabled="vm.disabled" umb-auto-focus="{{vm.autoFocus && !vm.disabled ? 'true' : 'false'}}">
         <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
             <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon"></i>
             {{vm.buttonLabel}}
@@ -23,7 +23,7 @@
         </span>
     </button>
 
-    <button ng-if="vm.type === 'submit'" type="submit" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}" ng-disabled="vm.disabled">
+    <button ng-if="vm.type === 'submit'" type="submit" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}" ng-disabled="vm.disabled" umb-auto-focus="{{vm.autoFocus && !vm.disabled ? 'true' : 'false'}}">
         <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
             <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon"></i>
             {{vm.buttonLabel}}

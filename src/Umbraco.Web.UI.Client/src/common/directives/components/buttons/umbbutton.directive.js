@@ -95,7 +95,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
                 size: "@?",
                 alias: "@?",
                 addEllipsis: "@?",
-                showCaret: "@?"
+                showCaret: "@?",
+                autoFocus: "@?"
             }
         });
 
