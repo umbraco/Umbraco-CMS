@@ -26,6 +26,8 @@
                             umb-auto-focus
                             val-server-field="{{serverValidationNameField}}"
                             required
+                            aria-required="true"
+                            aria-invalid="{{contentForm.headerNameForm.headerName.$invalid ? true : false}}"
                             autocomplete="off" maxlength="255" />
                     </ng-form>
 
