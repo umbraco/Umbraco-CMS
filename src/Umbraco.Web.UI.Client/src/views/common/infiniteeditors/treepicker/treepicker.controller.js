@@ -276,7 +276,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             var nodeHasPath = currentNode && currentNode.path;
             var startNodeNotDefined = !vm.startNodeId;
             if (startNodeNotDefined && nodeHasPath) {
-                vm.dialogTreeApi.syncTree({ path: currentNode.path, activate: false });
+                vm.dialogTreeApi.syncTree({ path: currentNode.path, activate: true });
             }
         }
 
