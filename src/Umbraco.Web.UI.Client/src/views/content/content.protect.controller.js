@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentProtectController($scope, $q, contentResource, memberResource, memberGroupResource, navigationService, localizationService, editorService) {
+    function ContentProtectController($scope, $q, contentResource, memberResource, memberGroupResource, navigationService, localizationService, editorService, overlayService) {
 
         var vm = this;
         var id = $scope.currentNode.id;
@@ -25,6 +25,8 @@
 
         vm.type = null;
         vm.step = null;
+
+        var dirty = false;
 
         function onInit() {
             vm.loading = true;
@@ -102,6 +104,7 @@
                         };
                     });
                     navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true });
+                    dirty = false;
                 }, function (error) {
                     vm.error = error;
                     vm.buttonState = "error";
@@ -112,11 +115,38 @@
         function close() {
             // ensure that we haven't set a locked state on the dialog before closing it
             navigationService.allowHideDialog(true);
-            navigationService.hideDialog();
+            if (dirty) {
+                localizationService.localizeMany(["prompt_unsavedChanges", "prompt_unsavedChangesWarning", "prompt_discardChanges", "prompt_stay"]).then(
+                    function (values) {
+                        var overlay = {
+                            "view": "default",
+                            "title": values[0],
+                            "content": values[1],
+                            "disableBackdropClick": true,
+                            "disableEscKey": true,
+                            "submitButtonLabel": values[2],
+                            "closeButtonLabel": values[3],
+                            submit: function () {
+                                overlayService.close();
+                                navigationService.hideDialog();
+                            },
+                            close: function () {
+                                overlayService.close();
+                            }
+                        };
+
+                        overlayService.open(overlay);
+                    }
+                );
+            }
+            else {
+                navigationService.hideDialog();
+            }            
         }
 
         function toggle(group) {
             group.selected = !group.selected;
+            dirty = true;
         }
 
         function pickGroup() {
@@ -137,6 +167,7 @@
                         });
                     editorService.close();
                     navigationService.allowHideDialog(true);
+                    dirty = true;
                 },
                 close: function() {
                     editorService.close();
@@ -147,6 +178,7 @@
 
         function removeGroup(group) {
             vm.groups = _.reject(vm.groups, function(g) { return g.id === group.id });
+            dirty = true;
         }
 
         function pickMember() {
@@ -186,6 +218,7 @@
                         $q.all(promises).then(function() {
                             vm.loading = false;
                         });
+                        dirty = true;
                     }
                 },
                 close: function () {
@@ -197,6 +230,7 @@
 
         function removeMember(member) {
             vm.members = _.without(vm.members, member);
+            dirty = true;
         }
 
         function pickLoginPage() {
@@ -219,6 +253,7 @@
                     }
                     editorService.close();
                     navigationService.allowHideDialog(true);
+                    dirty = true;
                 },
                 close: function () {
                     editorService.close();
