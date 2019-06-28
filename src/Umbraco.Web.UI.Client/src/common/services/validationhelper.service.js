@@ -7,6 +7,10 @@
         // Will either use the one provided on the property type's validation object
         // or a localised default.
         function getMandatoryMessage(validation) {
+            if (!validation) {
+                return $q.when("");
+            }
+
             if (validation.mandatoryMessage) {
                 return $q.when(validation.mandatoryMessage);
             } else {
