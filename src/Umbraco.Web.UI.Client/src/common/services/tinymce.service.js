@@ -895,38 +895,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         },
 
-		/**
-		 * @ngdoc method
-		 * @name umbraco.services.tinyMceService#getAnchorNames
-		 * @methodOf umbraco.services.tinyMceService
-		 *
-		 * @description
-		 * From the given string, generates a string array where each item is the id attribute value from a named anchor
-		 * 'some string <a id="anchor"></a>with a named anchor' returns ['anchor']
-		 *
-		 * @param {string} input the string to parse
-		 */
-        getAnchorNames: function (input) {
-        var anchors = [];
-        if (!input) {
-            return anchors;
-        }
-
-            var anchorPattern = /<a id=\\"(.*?)\\">/gi;
-            var matches = input.match(anchorPattern);
-
-
-            if (matches) {
-                anchors = matches.map(function (v) {
-                    return v.substring(v.indexOf('"') + 1, v.lastIndexOf('\\'));
-                });
-            }
-
-	    return anchors.filter(function(val, i, self) {
-              return self.indexOf(val) === i;
-            });
-        },
-
         insertLinkInEditor: function (editor, target, anchorElm) {
 
             var href = target.url;

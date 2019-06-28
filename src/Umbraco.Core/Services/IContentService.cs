@@ -526,5 +526,8 @@ namespace Umbraco.Core.Services
         OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
 
         #endregion
+        
+        IEnumerable<string> GetAnchorValuesFromRTEs(int id);
+        IEnumerable<string> GetAnchorValuesFromRTEContent(string rteContent);  
     }
 }
