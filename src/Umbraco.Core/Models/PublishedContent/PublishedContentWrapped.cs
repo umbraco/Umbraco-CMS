@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models.PublishedContent
         #region ContentType
 
         /// <inheritdoc />
-        public virtual PublishedContentType ContentType => _content.ContentType;
+        public virtual IPublishedContentType ContentType => _content.ContentType;
 
         #endregion
 
@@ -97,12 +97,6 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual string Url => _content.Url;
 
         /// <inheritdoc />
-        public virtual string GetUrl(string culture = null) => _content.GetUrl(culture);
-
-        /// <inheritdoc />
-        public PublishedCultureInfo GetCulture(string culture = null) => _content.GetCulture(culture);
-
-        /// <inheritdoc />
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
 
         /// <inheritdoc />
@@ -123,6 +117,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
         /// <inheritdoc />
         public virtual IEnumerable<IPublishedContent> Children => _content.Children;
+
+        /// <inheritdoc />
+        public virtual IEnumerable<IPublishedContent> ChildrenForAllCultures => _content.ChildrenForAllCultures;
 
         #endregion
 

@@ -14,6 +14,12 @@
  */
 function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, localizationService, editorService, $q) {
 
+    var vm = {
+        labels: {
+            general_recycleBin: ""
+        }
+    };
+
     var unsubscribe;
 
     function subscribe() {
@@ -405,7 +411,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 angular.forEach($scope.renderModel, function (item) {
                     if (item.id === entity.id) {
                         if (entity.trashed) {
-                            item.url = localizationService.dictionary.general_recycleBin;
+                            item.url = vm.labels.general_recycleBin;
                         } else {
                             item.url = data;
                         }
@@ -463,12 +469,17 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     function init() {
-        syncRenderModel(false).then(function () {
-            //everything is loaded, start the watch on the model
-            startWatch();
-            subscribe();
-            validate();
-        });
+        localizationService.localizeMany(["general_recycleBin"])
+            .then(function(data) {
+                vm.labels.general_recycleBin = data[0];
+
+                syncRenderModel(false).then(function () {
+                    //everything is loaded, start the watch on the model
+                    startWatch();
+                    subscribe();
+                    validate();
+                });
+            });
     }
 
     init();

@@ -26,6 +26,8 @@
 
         vm.buttonLabel = "";
 
+        vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;
+
         const packageId = $routeParams.id;
         const create = $routeParams.create;
 

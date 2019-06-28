@@ -130,7 +130,7 @@ namespace Umbraco.Web
             if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
                 return string.Empty;
 
-            var mediaItemUrl = mediaItem.MediaUrl(propertyAlias);
+            var mediaItemUrl = mediaItem.MediaUrl(propertyAlias: propertyAlias);
 
             //get the default obj from the value converter
             var cropperValue = mediaItem.Value(propertyAlias);
