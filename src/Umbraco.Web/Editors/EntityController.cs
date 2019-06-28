@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
@@ -137,22 +136,20 @@ namespace Umbraco.Web.Editors
 
             var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
 
-            foreach (var searchableTree in _searchableTreeCollection.SearchableApplicationTrees)
+            foreach (var searchableTree in _searchableTreeCollection.SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
             {
                 if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {
                     var tree = _treeService.GetByAlias(searchableTree.Key);
                     if (tree == null) continue; //shouldn't occur
 
-                    var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
-
                     result[Tree.GetRootNodeDisplayName(tree, Services.TextService)] = new TreeSearchResult
                     {
                         Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out var total),
                         TreeAlias = searchableTree.Key,
                         AppAlias = searchableTree.Value.AppAlias,
-                        JsFormatterService = searchableTreeAttribute == null ? "" : searchableTreeAttribute.ServiceName,
-                        JsFormatterMethod = searchableTreeAttribute == null ? "" : searchableTreeAttribute.MethodName
+                        JsFormatterService = searchableTree.Value.FormatterService,
+                        JsFormatterMethod = searchableTree.Value.FormatterMethod
                     };
                 }
             }
@@ -507,13 +504,15 @@ namespace Umbraco.Web.Editors
                 var culture = ClientCulture();
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
-                    Items = entities.Select(entity => Mapper.Map<IEntitySlim, EntityBasic>(entity, options =>
-                            {
-                                options.SetCulture(culture);
-                                options.AfterMap((src, dest) => { dest.AdditionalData["hasChildren"] = src.HasChildren; });
-                            }
-                        )
-                    )
+                    Items = entities.Select(source =>
+                    {
+                        var target = Mapper.Map<IEntitySlim, EntityBasic>(source, context =>
+                        {
+                            context.SetCulture(culture);
+                        });
+                        target.AdditionalData["hasChildren"] = source.HasChildren;
+                        return target;
+                    })
                 };
 
                 return pagedResult;
@@ -850,7 +849,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     return UmbracoObjectTypes.Media;
                 case UmbracoEntityTypes.MemberType:
-                    return UmbracoObjectTypes.MediaType;
+                    return UmbracoObjectTypes.MemberType;
                 case UmbracoEntityTypes.MemberGroup:
                     return UmbracoObjectTypes.MemberGroup;
                 case UmbracoEntityTypes.MediaType:
@@ -916,7 +915,7 @@ namespace Umbraco.Web.Editors
                                                 .SelectMany(x => x.PropertyTypes)
                                                 .DistinctBy(composition => composition.Alias);
                     var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter);
-                    return Mapper.Map<IEnumerable<PropertyType>, IEnumerable<EntityBasic>>(filteredPropertyTypes);
+                    return Mapper.MapEnumerable<PropertyType, EntityBasic>(filteredPropertyTypes);
 
                 case UmbracoEntityTypes.PropertyGroup:
 
@@ -927,13 +926,13 @@ namespace Umbraco.Web.Editors
                                                 .SelectMany(x => x.PropertyGroups)
                                                 .DistinctBy(composition => composition.Name);
                     var filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter);
-                    return Mapper.Map<IEnumerable<PropertyGroup>, IEnumerable<EntityBasic>>(filteredpropertyGroups);
+                    return Mapper.MapEnumerable<PropertyGroup, EntityBasic>(filteredpropertyGroups);
 
                 case UmbracoEntityTypes.User:
 
                     var users = Services.UserService.GetAll(0, int.MaxValue, out _);
                     var filteredUsers = ExecutePostFilter(users, postFilter);
-                    return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
+                    return Mapper.MapEnumerable<IUser, EntityBasic>(filteredUsers);
 
                 case UmbracoEntityTypes.Stylesheet:
 
@@ -1052,7 +1051,7 @@ namespace Umbraco.Web.Editors
         private EntityBasic MapEntity(object entity, string culture = null)
         {
             culture = culture ?? ClientCulture();
-            return Mapper.Map<EntityBasic>(entity, opts => { opts.SetCulture(culture); });
+            return Mapper.Map<EntityBasic>(entity, context => { context.SetCulture(culture); });
         }
 
         private string ClientCulture() => Request.ClientCulture();

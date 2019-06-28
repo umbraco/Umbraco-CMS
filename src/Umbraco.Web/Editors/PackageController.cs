@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Web;
 using System.Web.Http;
 using Semver;
 using Umbraco.Core.IO;
@@ -94,6 +96,8 @@ namespace Umbraco.Web.Editors
 
             var fileName = Path.GetFileName(package.PackagePath);
 
+            var encoding = Encoding.UTF8;
+
             var response = new HttpResponseMessage
             {
                 Content = new StreamContent(File.OpenRead(fullPath))
@@ -102,15 +106,18 @@ namespace Umbraco.Web.Editors
                     {
                         ContentDisposition = new ContentDispositionHeaderValue("attachment")
                         {
-                            FileName = fileName
+                            FileName = HttpUtility.UrlEncode(fileName, encoding)
                         },
-                        ContentType = new MediaTypeHeaderValue( "application/octet-stream")
+                        ContentType = new MediaTypeHeaderValue("application/octet-stream")
+                        {
+                            CharSet = encoding.WebName
+                        }
                     }
                 }
             };
 
             // Set custom header so umbRequestHelper.downloadFile can save the correct filename
-            response.Headers.Add("x-filename", fileName);
+            response.Headers.Add("x-filename", HttpUtility.UrlEncode(fileName, encoding));
 
             return response;
         }

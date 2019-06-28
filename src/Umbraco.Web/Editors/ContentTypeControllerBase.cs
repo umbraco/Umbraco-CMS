@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -15,7 +14,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -306,9 +304,12 @@ namespace Umbraco.Web.Editors
                 //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
                 //always filter these 0 types out
                 var allowItselfAsChild = false;
+                var allowIfselfAsChildSortOrder = -1;
                 if (contentTypeSave.AllowedContentTypes != null)
                 {
+                    allowIfselfAsChildSortOrder = contentTypeSave.AllowedContentTypes.IndexOf(0);
                     allowItselfAsChild = contentTypeSave.AllowedContentTypes.Any(x => x == 0);
+
                     contentTypeSave.AllowedContentTypes = contentTypeSave.AllowedContentTypes.Where(x => x > 0).ToList();
                 }
 
@@ -337,10 +338,12 @@ namespace Umbraco.Web.Editors
                 saveContentType(newCt);
 
                 //we need to save it twice to allow itself under itself.
-                if (allowItselfAsChild)
+                if (allowItselfAsChild && newCt != null)
                 {
-                    //NOTE: This will throw if the composition isn't right... but it shouldn't be at this stage
-                    newCt.AddContentType(newCt);
+                    newCt.AllowedContentTypes =
+                        newCt.AllowedContentTypes.Union(
+                            new []{ new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder) }
+                        );
                     saveContentType(newCt);
                 }
                 return newCt;
@@ -502,13 +505,13 @@ namespace Umbraco.Web.Editors
             where TPropertyType : PropertyTypeBasic
         {
             InvalidCompositionException invalidCompositionException = null;
-            if (ex is AutoMapperMappingException && ex.InnerException is InvalidCompositionException)
+            if (ex is InvalidCompositionException)
             {
-                invalidCompositionException = (InvalidCompositionException)ex.InnerException;
+                invalidCompositionException = (InvalidCompositionException)ex;
             }
             else if (ex.InnerException is InvalidCompositionException)
             {
-                invalidCompositionException = (InvalidCompositionException)ex;
+                invalidCompositionException = (InvalidCompositionException)ex.InnerException;
             }
             if (invalidCompositionException != null)
             {

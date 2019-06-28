@@ -99,7 +99,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             // process the file
             // no file, invalid file, reject change
-            if (UploadFileTypeValidator.ValidateFileExtension(file.FileName) == false)
+            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName) == false)
                 return null;
 
             // get the filepath

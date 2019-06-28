@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -8,17 +9,17 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IAuditItem))]
     public sealed class AuditItemMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public AuditItemMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        protected override void DefineMaps()
         {
-            CacheMap<AuditItem, LogDto>(src => src.Id, dto => dto.NodeId);
-            CacheMap<AuditItem, LogDto>(src => src.CreateDate, dto => dto.Datestamp);
-            CacheMap<AuditItem, LogDto>(src => src.UserId, dto => dto.UserId);
-            CacheMap<AuditItem, LogDto>(src => src.AuditType, dto => dto.Header);
-            CacheMap<AuditItem, LogDto>(src => src.Comment, dto => dto.Comment);
+            DefineMap<AuditItem, LogDto>(nameof(AuditItem.Id), nameof(LogDto.NodeId));
+            DefineMap<AuditItem, LogDto>(nameof(AuditItem.CreateDate), nameof(LogDto.Datestamp));
+            DefineMap<AuditItem, LogDto>(nameof(AuditItem.UserId), nameof(LogDto.UserId));
+            DefineMap<AuditItem, LogDto>(nameof(AuditItem.AuditType), nameof(LogDto.Header));
+            DefineMap<AuditItem, LogDto>(nameof(AuditItem.Comment), nameof(LogDto.Comment));
         }
     }
 }

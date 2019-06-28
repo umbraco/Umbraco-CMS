@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Globalization;
 using System.IO;
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Templates
             // terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
             var contentRequest = _publishedRouter.CreateRequest(_umbracoContextAccessor.UmbracoContext);
 
-            var doc = contentRequest.UmbracoContext.ContentCache.GetById(pageId);
+            var doc = contentRequest.UmbracoContext.Content.GetById(pageId);
 
             if (doc == null)
             {
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Templates
                 return;
             }
 
-            //in some cases the UmbracoContext will not have a PublishedContentRequest assigned to it if we are not in the
+            //in some cases the UmbracoContext will not have a PublishedRequest assigned to it if we are not in the
             //execution of a front-end rendered page. In this case set the culture to the default.
             //set the culture to the same as is currently rendering
             if (_umbracoContextAccessor.UmbracoContext.PublishedRequest == null)

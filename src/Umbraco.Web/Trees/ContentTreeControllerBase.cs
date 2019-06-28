@@ -120,7 +120,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            var rootIdString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+            var rootIdString = Constants.System.RootString;
             var hasAccessToRoot = UserStartNodes.Contains(Constants.System.Root);
 
             var startNodeId = queryStrings.HasKey(TreeQueryStringParameters.StartNodeId)
@@ -214,12 +214,8 @@ namespace Umbraco.Web.Trees
             return result;
         }
 
-        /// <summary>
-        /// Abstract method to fetch the entities from the entity service
-        /// </summary>
-        /// <param name="entityId"></param>
-        /// <returns></returns>
-        internal abstract IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId);
+        internal virtual IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
+            => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
@@ -256,7 +252,7 @@ namespace Umbraco.Web.Trees
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             //check if we're rendering the root
-            if (id == Constants.System.Root.ToInvariantString() && UserStartNodes.Contains(Constants.System.Root))
+            if (id == Constants.System.RootString && UserStartNodes.Contains(Constants.System.Root))
             {
                 var altStartId = string.Empty;
 
@@ -264,7 +260,7 @@ namespace Umbraco.Web.Trees
                     altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
                 //check if a request has been made to render from a specific start node
-                if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
+                if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.RootString)
                 {
                     id = altStartId;
                 }
@@ -272,7 +268,7 @@ namespace Umbraco.Web.Trees
                 var nodes = GetTreeNodesInternal(id, queryStrings);
 
                 //only render the recycle bin if we are not in dialog and the start id id still the root
-                if (IsDialog(queryStrings) == false && id == Constants.System.Root.ToInvariantString())
+                if (IsDialog(queryStrings) == false && id == Constants.System.RootString)
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
@@ -414,18 +410,7 @@ namespace Umbraco.Web.Trees
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            // TODO: inject
-            var actions = Current.Actions.FromEntityPermission(permission)
-                .ToList();
-
-            var actionDelete = Current.Actions.GetAction<ActionDelete>();
-
-            // A user is allowed to delete their own stuff
-            var tryGetCurrentUserId = Security.GetUserId();
-            if (tryGetCurrentUserId && dd.CreatorId == tryGetCurrentUserId.Result && actions.Contains(actionDelete) == false)
-                actions.Add(actionDelete);
-
-            return actions.Select(x => new MenuItem(x));
+            return Current.Actions.FromEntityPermission(permission).Select(x => new MenuItem(x));
         }
 
         /// <summary>

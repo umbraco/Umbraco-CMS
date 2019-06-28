@@ -15,13 +15,8 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null; //the editors affiliated node
     $scope.page.nameLocked = false;
-    $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
     $scope.page.exportButton = "init";
-
-    $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
-        ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
-        : null;
 
     //build a path to sync the tree with
     function buildTreePath(data) {
@@ -44,11 +39,6 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
                     editorState.set($scope.content);
 
-                    // set all groups to open
-                    angular.forEach($scope.content.tabs, function(group){
-                        group.open = true;
-                    });
-
                     $scope.page.loading = false;
 
                 });
@@ -62,11 +52,6 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
                     setHeaderNameState($scope.content);
 
                     editorState.set($scope.content);
-
-                    // set all groups to open
-                    angular.forEach($scope.content.tabs, function(group){
-                        group.open = true;
-                    });
 
                     $scope.page.loading = false;
 
@@ -152,6 +137,13 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
             $scope.page.saveButtonState = "busy";
 
+            //anytime a user is changing a member's password without the oldPassword, we are in effect resetting it so we need to set that flag here
+            var passwordProp = _.find(contentEditingHelper.getAllProps($scope.content), function (e) { return e.alias === '_umb_password' });
+            if (!passwordProp.value.reset) {
+                //so if the admin is not explicitly resetting the password, flag it for resetting if a new password is being entered
+                passwordProp.value.reset = !passwordProp.value.oldPassword && passwordProp.config.allowManuallyChangingPassword;
+            }
+
             memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
                 .then(function(data) {
 
@@ -176,7 +168,6 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
             }, function (err) {
 
                     contentEditingHelper.handleSaveError({
-                        redirectOnFailure: false,
                         err: err,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
@@ -190,6 +181,19 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
             showValidationNotification();
         }
 
+    };
+
+    $scope.showBack = function () {
+        return !!$routeParams.listName;
+    }
+
+    /** Callback for when user clicks the back-icon */
+    $scope.onBack = function () {
+        $location.path("/member/member/list/" + $routeParams.listName);
+        $location.search("listName", null);
+        if ($routeParams.page) {
+            $location.search("page", $routeParams.page);
+        }
     };
 
     $scope.export = function() {

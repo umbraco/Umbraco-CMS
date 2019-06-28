@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models.Identity
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
 
-            var user = new BackOfficeIdentityUser();
+            var user = new BackOfficeIdentityUser(Array.Empty<IReadOnlyUserGroup>());
             user.DisableChangeTracking();
             user._userName = username;
             user._email = email;
@@ -54,16 +54,19 @@ namespace Umbraco.Core.Models.Identity
             return user;
         }
 
-        private BackOfficeIdentityUser()
+        private BackOfficeIdentityUser(IReadOnlyUserGroup[] groups)
         {
-            _startMediaIds = new int[] { };
-            _startContentIds = new int[] { };
-            _groups = new IReadOnlyUserGroup[] { };
-            _allowedSections = new string[] { };
+            _startMediaIds = Array.Empty<int>();
+            _startContentIds = Array.Empty<int>();
+            _allowedSections = Array.Empty<string>();
             _culture = Current.Configs.Global().DefaultUILanguage; // TODO: inject
-            _groups = new IReadOnlyUserGroup[0];
+
+            // must initialize before setting groups
             _roles = new ObservableCollection<IdentityUserRole<string>>();
             _roles.CollectionChanged += _roles_CollectionChanged;
+
+            // use the property setters - they do more than just setting a field
+            Groups = groups;
         }
 
         /// <summary>
@@ -72,19 +75,10 @@ namespace Umbraco.Core.Models.Identity
         /// <param name="userId"></param>
         /// <param name="groups"></param>
         public BackOfficeIdentityUser(int userId, IEnumerable<IReadOnlyUserGroup> groups)
+            : this(groups.ToArray())
         {
-            _startMediaIds = new int[] { };
-            _startContentIds = new int[] { };
-            _groups = new IReadOnlyUserGroup[] { };
-            _allowedSections = new string[] { };
-            _culture = Current.Configs.Global().DefaultUILanguage; // TODO: inject
-            _groups = groups.ToArray();
-            _roles = new ObservableCollection<IdentityUserRole<string>>(_groups.Select(x => new IdentityUserRole<string>
-            {
-                RoleId = x.Alias,
-                UserId = userId.ToString()
-            }));
-            _roles.CollectionChanged += _roles_CollectionChanged;
+            // use the property setters - they do more than just setting a field
+            Id = userId;
         }
 
         /// <summary>
@@ -225,6 +219,8 @@ namespace Umbraco.Core.Models.Identity
             {
                 //so they recalculate
                 _allowedSections = null;
+
+                _groups = value;
 
                 //now clear all roles and re-add them
                 _roles.CollectionChanged -= _roles_CollectionChanged;

@@ -28,38 +28,38 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         /// <inheritdoc />
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(IPublishedPropertyType propertyType)
             => IsNestedMany(propertyType);
 
         /// <inheritdoc />
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         {
             var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>().ContentTypes;
-            return contentTypes.Length > 1
-                ? typeof (IEnumerable<IPublishedElement>)
-                : typeof (IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0].Alias));
+            return contentTypes.Length == 1
+                ? typeof (IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0].Alias))
+                : typeof (IEnumerable<IPublishedElement>);
         }
 
         /// <inheritdoc />
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
         /// <inheritdoc />
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             return source?.ToString();
         }
 
         /// <inheritdoc />
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            using (_proflog.DebugDuration<PublishedPropertyType>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
+            using (_proflog.DebugDuration<NestedContentManyValueConverter>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
             {
                 var configuration = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>();
                 var contentTypes = configuration.ContentTypes;
-                var elements = contentTypes.Length > 1
-                    ? new List<IPublishedElement>()
-                    : PublishedModelFactory.CreateModelList(contentTypes[0].Alias);
+                var elements = contentTypes.Length == 1
+                    ? PublishedModelFactory.CreateModelList(contentTypes[0].Alias)
+                    : new List<IPublishedElement>();
 
                 var value = (string)inter;
                 if (string.IsNullOrWhiteSpace(value)) return elements;

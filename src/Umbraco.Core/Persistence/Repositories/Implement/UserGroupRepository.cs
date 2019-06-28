@@ -411,8 +411,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     return;
 
                 //now the user association
-                RemoveAllUsersFromGroup(entity.UserGroup.Id);
-                AddUsersToGroup(entity.UserGroup.Id, entity.UserIds);
+                RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
             }
 
             protected override void PersistUpdatedItem(UserGroupWithUsers entity)
@@ -424,8 +423,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     return;
 
                 //now the user association
-                RemoveAllUsersFromGroup(entity.UserGroup.Id);
-                AddUsersToGroup(entity.UserGroup.Id, entity.UserIds);
+                RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
+            }
+
+            /// <summary>
+            /// Adds a set of users to a group, first removing any that exist
+            /// </summary>
+            /// <param name="groupId">Id of group</param>
+            /// <param name="userIds">Ids of users</param>
+            private void RefreshUsersInGroup(int groupId, int[] userIds)
+            {
+                RemoveAllUsersFromGroup(groupId);
+                AddUsersToGroup(groupId, userIds);
             }
 
             /// <summary>
@@ -444,7 +453,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             /// <param name="userIds">Ids of users</param>
             private void AddUsersToGroup(int groupId, int[] userIds)
             {
-                // TODO: Check if the user exists?
                 foreach (var userId in userIds)
                 {
                     var dto = new User2UserGroupDto

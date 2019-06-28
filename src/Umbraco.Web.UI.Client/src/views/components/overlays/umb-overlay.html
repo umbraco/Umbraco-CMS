@@ -1,4 +1,4 @@
-<div data-element="overlay" class="umb-overlay umb-overlay-{{position}}" on-outside-click="outSideClick()">
+<div data-element="overlay" class="umb-overlay umb-overlay-{{position}} umb-overlay--{{size}}" on-outside-click="outSideClick()">
     <ng-form class="umb-overlay__form" name="overlayForm" novalidate val-form-manager>
 
         <div data-element="overlay-header" class="umb-overlay-header">
@@ -50,7 +50,8 @@
                         label="Confirm"
                         type="button"
                         disabled="!directive.enableConfirmButton"
-                        action="submitForm(model)">
+                        action="submitForm(model)"
+                        auto-focus="true">
                     </umb-button>
                 </div>
             </div>
@@ -74,7 +75,8 @@
                     type="button"
                     disabled="model.disableSubmitButton"
                     action="submitForm(model)"
-                    state="model.submitButtonState">
+                    state="model.submitButtonState"
+                    auto-focus="true">
                 </umb-button>
             </div>
 

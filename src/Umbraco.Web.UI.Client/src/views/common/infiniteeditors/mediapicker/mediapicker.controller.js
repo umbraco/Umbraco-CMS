@@ -87,7 +87,7 @@ angular.module("umbraco")
                 } else {
                     //if a target is specified, go look it up - generally this target will just contain ids not the actual full
                     //media object so we need to look it up
-                    var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
+                    var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
                     mediaResource.getById(id)
                         .then(function (node) {
@@ -117,7 +117,7 @@ angular.module("umbraco")
 
             $scope.submitFolder = function() {
                 if ($scope.model.newFolderName) {
-                    $scope.creatingFolder = true;
+                    $scope.model.creatingFolder = true;
                     mediaResource
                         .addFolder($scope.model.newFolderName, $scope.currentFolder.id)
                         .then(function(data) {
@@ -126,13 +126,13 @@ angular.module("umbraco")
                                 cacheKey: "__media", //this is the main media tree cache key
                                 childrenOf: data.parentId //clear the children of the parent
                             });
-                            $scope.creatingFolder = false;
+                            $scope.model.creatingFolder = false;
                             $scope.gotoFolder(data);
-                            $scope.showFolderInput = false;
+                            $scope.model.showFolderInput = false;
                             $scope.model.newFolderName = "";
                         });
                 } else {
-                    $scope.showFolderInput = false;
+                    $scope.model.showFolderInput = false;
                 }
             };
 
@@ -350,20 +350,32 @@ angular.module("umbraco")
                 mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
                 mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
                 // set properties to match a media object
-                if (mediaItem.metaData &&
-                    mediaItem.metaData.umbracoWidth &&
-                    mediaItem.metaData.umbracoHeight) {
-
-                    mediaItem.properties = [
-                        {
-                            alias: "umbracoWidth",
-                            value: mediaItem.metaData.umbracoWidth.Value
-                        },
-                        {
-                            alias: "umbracoHeight",
-                            value: mediaItem.metaData.umbracoHeight.Value
-                        }
-                    ];
+                if (mediaItem.metaData) {
+                    mediaItem.properties = [];
+                    if (mediaItem.metaData.umbracoWidth && mediaItem.metaData.umbracoHeight) {
+                        mediaItem.properties.push(
+                            {
+                                alias: "umbracoWidth",
+                                editor: mediaItem.metaData.umbracoWidth.PropertyEditorAlias,
+                                value: mediaItem.metaData.umbracoWidth.Value
+                            },
+                            {
+                                alias: "umbracoHeight",
+                                editor: mediaItem.metaData.umbracoHeight.PropertyEditorAlias,
+                                value: mediaItem.metaData.umbracoHeight.Value
+                            }
+                        );
+                    }
+                    if (mediaItem.metaData.umbracoFile) {
+                        // this is required for resolving files through the mediahelper
+                        mediaItem.properties.push(
+                            {
+                                alias: "umbracoFile",
+                                editor: mediaItem.metaData.umbracoFile.PropertyEditorAlias,
+                                value: mediaItem.metaData.umbracoFile.Value
+                            }
+                        );
+                    }
                 }
             }
 

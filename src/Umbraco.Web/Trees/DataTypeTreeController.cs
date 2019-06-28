@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -54,11 +53,11 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, "icon-autofill", false);
+                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, Constants.Icons.DataType, false);
                         node.Path = dt.Path;
                         if (systemListViewDataTypeIds.Contains(dt.Id))
                         {
-                            node.Icon = "icon-thumbnail-list";
+                            node.Icon = Constants.Icons.ListView;
                         }
                         return node;
                     }));
@@ -73,7 +72,15 @@ namespace Umbraco.Web.Trees
         {
             var systemIds = new[]
             {
-                Constants.System.DefaultLabelDataTypeId
+                Constants.DataTypes.Boolean, // Used by the Member Type: "Member"
+                Constants.DataTypes.Textarea, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelBigint, // Used by the Media Type: "Image"; Used by the Media Type: "File"
+                Constants.DataTypes.LabelDateTime, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelDecimal, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelInt, // Used by the Media Type: "Image"; Used by the Member Type: "Member"
+                Constants.DataTypes.LabelString, // Used by the Media Type: "Image"; Used by the Media Type: "File"
+                Constants.DataTypes.ImageCropper, // Used by the Media Type: "Image"
+                Constants.DataTypes.Upload, // Used by the Media Type: "File"
             };
 
             return systemIds.Concat(GetNonDeletableSystemListViewDataTypeIds());
@@ -96,7 +103,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
@@ -144,7 +151,7 @@ namespace Umbraco.Web.Trees
         {
             var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DataType, pageIndex, pageSize, out totalFound,
                 filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
-            return Mapper.Map<IEnumerable<SearchResultEntity>>(results);
+            return Mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
     }
 }

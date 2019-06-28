@@ -147,7 +147,7 @@
                     id: documentType.id,
                     submit: function (model) {
                         const args = { node: scope.node };
-                        eventsService.emit('editors.content.reload', args);
+                        eventsService.emit("editors.content.reload", args);
                         editorService.close();
                     },
                     close: function () {
@@ -328,6 +328,8 @@
                         isInfoTab = true;
                         loadAuditTrail();
                         loadRedirectUrls();
+                        setNodePublishStatus();
+                        formatDatesToLocal();
                     } else {
                         isInfoTab = false;
                     }
@@ -344,6 +346,7 @@
                     loadAuditTrail(true);
                     loadRedirectUrls();
                     setNodePublishStatus();
+                    formatDatesToLocal();
                 }
                 updateCurrentUrls();
             });

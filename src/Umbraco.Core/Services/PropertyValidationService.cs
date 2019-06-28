@@ -31,30 +31,34 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Validates the content item's properties pass validation rules
         /// </summary>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
-        public bool IsPropertyDataValid(IContentBase content, out Property[] invalidProperties, string culture = "*")
+        public bool IsPropertyDataValid(IContent content, out Property[] invalidProperties, CultureImpact impact)
         {
             // select invalid properties
             invalidProperties = content.Properties.Where(x =>
             {
-                // if culture is null, we validate invariant properties only
-                // if culture is '*' we validate both variant and invariant properties, automatically
-                // if culture is specific eg 'en-US' we both too, but explicitly
+                var propertyTypeVaries = x.PropertyType.VariesByCulture();
 
-                var varies = x.PropertyType.VariesByCulture();
+                // impacts invariant = validate invariant property, invariant culture
+                if (impact.ImpactsOnlyInvariantCulture)
+                    return !(propertyTypeVaries || IsPropertyValid(x, null));
 
-                if (culture == null)
-                    return !(varies || IsPropertyValid(x, null)); // validate invariant property, invariant culture
+                // impacts all = validate property, all cultures (incl. invariant)
+                if (impact.ImpactsAllCultures)
+                    return !IsPropertyValid(x);
 
-                if (culture == "*")
-                    return !IsPropertyValid(x, culture); // validate property, all cultures
+                // impacts explicit culture = validate variant property, explicit culture
+                if (propertyTypeVaries)
+                    return !IsPropertyValid(x, impact.Culture);
 
-                return varies
-                    ? !IsPropertyValid(x, culture) // validate variant property, explicit culture
-                    : !IsPropertyValid(x, null); // validate invariant property, explicit culture
-            })
-                .ToArray();
+                // and, for explicit culture, we may also have to validate invariant property, invariant culture
+                // if either
+                // - it is impacted (default culture), or
+                // - there is no published version of the content - maybe non-default culture, but no published version
+
+                var alsoInvariant = impact.ImpactsAlsoInvariantProperties || !content.Published;
+                return alsoInvariant && !IsPropertyValid(x, null);
+
+            }).ToArray();
 
             return invalidProperties.Length == 0;
         }

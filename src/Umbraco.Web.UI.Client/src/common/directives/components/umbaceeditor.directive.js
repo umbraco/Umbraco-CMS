@@ -281,6 +281,10 @@
                         opts.callbacks.unshift(options.onLoad);
                     }
 
+                    if (opts.autoFocus === true) {
+                        acee.focus();
+                    }
+
                     // EVENTS
 
                     // unbind old change listener

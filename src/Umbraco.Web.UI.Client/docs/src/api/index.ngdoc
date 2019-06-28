@@ -6,46 +6,6 @@
 
 This documentation relates to the angular, js, css and less APIs for developing back office components
 
-##Running the site with mocked data
-
-This won't require any database or setup, as everything is running through node. All you have to do is install 
-node and grunt on either windows or OSX and the entire setup is ready for you.
-
-
-###Install node.js
-We need node to run tests and automated less compiling and other automated tasks. go to http://nodejs.org. Node.js is a powerfull javascript engine, which allows us to run all our tests and tasks written in javascript locally.
-
-*note:* On windows you might need to restart explorer.exe to register node.
-
-
-###Install dependencies
-Next we need to install all the required packages. This is done with the package tool, included with node.js, open /Umbraco.Belle.Client in cmd.exe or osx terminal and run the command:
-
-	npm install
-
-this will fetch all needed packages to your local machine.
-
-
-###Install grunt globally
-Grunt is a task runner for node.js, and we use it for all automated tasks in the build process. For convenience we need to install it globally on your machine, so it can be used directly in cmd.exe or the terminal.
-
-So run the command:
-
-	npm install grunt-cli -g
-
-*note:* On windows you might need to restart explorer.exe to register the grunt cmd.
-
-*note:* On OSX you might need to run:
-	
-	sudo npm install grunt-cli -g
-
-Now that you have node and grunt installed, you can open `/Umbraco.Web.UI.Client` in either `cmd.exe` or terminal and run: 
-
-	grunt dev
-
-This will build the site, merge less files, run tests and create the /Build folder, and finally open the site in your
-browser.
-
 ##Getting started
 The current app is built, following conventions from angularJs and bootstrap. To get started with the applicaton you will need to atleast know the basics of these frameworks 
 

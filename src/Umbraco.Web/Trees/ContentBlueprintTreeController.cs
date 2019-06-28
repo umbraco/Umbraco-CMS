@@ -44,7 +44,7 @@ namespace Umbraco.Web.Trees
             var entities = Services.EntityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint).ToArray();
 
             //check if we're rendering the root in which case we'll render the content types that have blueprints
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 //get all blueprint content types
                 var contentTypeAliases = entities.Select(x => ((ContentEntitySlim) x).ContentTypeAlias).Distinct();
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Trees
                 nodes.AddRange(docTypeEntities
                     .Select(entity =>
                     {
-                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-item-arrangement", true);
+                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, Constants.Icons.ContentType, true);
                         treeNode.Path = $"-1,{entity.Id}";
                         treeNode.NodeType = "document-type-blueprints";
                         // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
@@ -91,7 +91,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 // root actions
                 menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);

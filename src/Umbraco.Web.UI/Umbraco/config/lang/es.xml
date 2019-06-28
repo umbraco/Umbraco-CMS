@@ -86,8 +86,6 @@
     <key alias="domainExists">El dominio'%0%' ya ha sido asignado</key>
     <key alias="domainUpdated">El dominio %0% ha sido actualizado</key>
     <key alias="orEdit">Editar dominios actuales</key>
-    <key alias="domainHelp"><![CDATA[p.ej.: "tudominio.com", "www.tudominio.com", "tudominio.com:8080" o
-        "https://www.tudominio.com/".<br /><br />Los dominios de un nivel están soportados, por ej. "example.com/en". De todas formas deberían de evitarse. Mejor usar la configuración cultural especificada arriba.]]></key>
     <key alias="inherit">Heredar</key>
         <key alias="setLanguage">Idioma</key>
         <key alias="setLanguageHelp">
@@ -368,7 +366,7 @@
     <key alias="selectSnippet">Selecciona snippet</key>
   </area>
   <area alias="dictionaryItem">
-        <key alias="description">Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo añadir otros idiomas en el menú de 'idiomas' en el menú de la izquierda</key>
+        <key alias="description">Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo</key>
     <key alias="displayName"><![CDATA[nombre de la cultura
 ]]></key>
     <key alias="changeKeyError"><![CDATA[
@@ -393,13 +391,6 @@
     <key alias="usernameHint">Tu nombre de usuario normalmente es tu e-mail</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Tipos de nodos hijos permitidos</key>
-    <key alias="create">Crear</key>
-    <key alias="deletetab">Borrar pestaña</key>
-    <key alias="description">Descripción</key>
-    <key alias="newtab">Nueva pestaña</key>
-    <key alias="tab">Pestaña</key>
-    <key alias="thumbnail">Miniatura</key>
     <key alias="createListView" version="7.2">Crear un tipo de listado personalizado</key>
     <key alias="removeListView" version="7.2">Quitar el tipo de listado personalizado</key>
   </area>

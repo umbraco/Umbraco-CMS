@@ -85,17 +85,17 @@ angular.module('umbraco.services')
 				nArray.push(item);
 
 				if(!item.sticky) {
-					$timeout(function() {
-						var found = _.find(nArray, function(i) {
-						return i.id === item.id;
-					});
-
-					if (found) {
-						var index = nArray.indexOf(found);
-						nArray.splice(index, 1);
-					}
-
-					}, 7000);
+					$timeout(
+                        function() {
+    						var found = _.find(nArray, function(i) {
+        						return i.id === item.id;
+        					});
+        					if (found) {
+        						var index = nArray.indexOf(found);
+        						nArray.splice(index, 1);
+        					}
+    					}
+                    , 10000);
 				}
 
 				return item;

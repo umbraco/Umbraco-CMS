@@ -204,6 +204,28 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Sets the database server messenger options.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        /// <param name="factory">A function creating the options.</param>
+        /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
+        public static void SetDatabaseServerMessengerOptions(this Composition composition, Func<IFactory, DatabaseServerMessengerOptions> factory)
+        {
+            composition.RegisterUnique(factory);
+        }
+
+        /// <summary>
+        /// Sets the database server messenger options.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        /// <param name="options">Options.</param>
+        /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
+        public static void SetDatabaseServerMessengerOptions(this Composition composition, DatabaseServerMessengerOptions options)
+        {
+            composition.RegisterUnique(_ => options);
+        }
+
+        /// <summary>
         /// Sets the short string helper.
         /// </summary>
         /// <typeparam name="T">The type of the short string helper.</typeparam>

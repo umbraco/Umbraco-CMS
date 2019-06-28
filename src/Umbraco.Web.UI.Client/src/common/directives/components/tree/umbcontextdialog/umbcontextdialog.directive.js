@@ -1,16 +1,20 @@
 (function() {
     'use strict';
 
-    function UmbContextDialog(navigationService, keyboardService) {
+    function UmbContextDialog(navigationService, keyboardService, localizationService, overlayService) {
 
         function link($scope) {
-            
-            $scope.outSideClick = function() {
-                navigationService.hideDialog();
-            }
 
-            keyboardService.bind("esc", function() {
-                navigationService.hideDialog();
+            $scope.dialog = {
+                confirmDiscardChanges: false
+            };
+
+            $scope.outSideClick = function() {
+                hide();
+            };
+
+            keyboardService.bind("esc", function () {
+                hide();
             });
 
             //ensure to unregister from all events!
@@ -18,6 +22,35 @@
                 keyboardService.unbind("esc");
             });
 
+            function hide() {
+                if ($scope.dialog.confirmDiscardChanges) {
+                    localizationService.localizeMany(["prompt_unsavedChanges", "prompt_unsavedChangesWarning", "prompt_discardChanges", "prompt_stay"]).then(
+                        function (values) {
+                            var overlay = {
+                                "view": "default",
+                                "title": values[0],
+                                "content": values[1],
+                                "disableBackdropClick": true,
+                                "disableEscKey": true,
+                                "submitButtonLabel": values[2],
+                                "closeButtonLabel": values[3],
+                                submit: function () {
+                                    overlayService.close();
+                                    navigationService.hideDialog();
+                                },
+                                close: function () {
+                                    overlayService.close();
+                                }
+                            };
+
+                            overlayService.open(overlay);
+                        }
+                    );
+                }
+                else {
+                    navigationService.hideDialog();
+                }
+            }
         }
 
         var directive = {

@@ -289,9 +289,29 @@ namespace Umbraco.Web.Security
             return MemberCache.GetByProviderKey(key);
         }
 
+        public virtual IEnumerable<IPublishedContent> GetByProviderKeys(IEnumerable<object> keys)
+        {
+            return keys?.Select(GetByProviderKey).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
+        }
+
         public virtual IPublishedContent GetById(int memberId)
         {
             return MemberCache.GetById(memberId);
+        }
+
+        public virtual IEnumerable<IPublishedContent> GetByIds(IEnumerable<int> memberIds)
+        {
+            return memberIds?.Select(GetById).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
+        }
+
+        public virtual IPublishedContent GetById(Guid memberId)
+        {
+            return GetByProviderKey(memberId);
+        }
+
+        public virtual IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> memberIds)
+        {
+            return GetByProviderKeys(memberIds.OfType<object>());
         }
 
         public virtual IPublishedContent GetByUsername(string username)

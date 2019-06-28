@@ -46,6 +46,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IPartialViewRepository, PartialViewRepository>();
             composition.RegisterUnique<IScriptRepository, ScriptRepository>();
             composition.RegisterUnique<IStylesheetRepository, StylesheetRepository>();
+            composition.RegisterUnique<IContentTypeCommonRepository, ContentTypeCommonRepository>();
 
             return composition;
         }

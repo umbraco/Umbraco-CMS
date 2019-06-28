@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override IIdentityUserLogin PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.Where(GetBaseWhereClause(), new { id = id });
 
             var dto = Database.Fetch<ExternalLoginDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (dto == null)

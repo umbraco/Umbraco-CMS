@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
