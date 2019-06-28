@@ -287,10 +287,11 @@ namespace Umbraco.Web.Editors
         }
 
 
+        //fixme - culture?
         [HttpGet]
         public UrlAndAnchors GetUrlAndAnchors([FromUri]int id)
         {
-            var url = Umbraco.Url(id);
+            var url = UmbracoContext.UrlProvider.GetUrl(id);
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id);
             return new UrlAndAnchors(url, anchorValues);
         }
@@ -300,6 +301,7 @@ namespace Umbraco.Web.Editors
             public string RteContent { get; set; }
         }
 
+        //fixme - culture?
         [HttpGet]
         [HttpPost]
         public IEnumerable<string> GetAnchors(AnchorsModel model)
@@ -567,7 +569,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
             {
-                IEnumerable<IUmbracoEntity> entities;
+                IEnumerable<IEntitySlim> entities;
                 long totalRecords;
 
                 int[] startNodes = null;
@@ -600,8 +602,7 @@ namespace Umbraco.Web.Editors
                 }
 
                 // else proceed as usual
-                //entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
-                entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out var totalRecords,
+                entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords,
                     filter.IsNullOrWhiteSpace()
                         ? null
                         : SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
@@ -776,7 +777,7 @@ namespace Umbraco.Web.Editors
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
 
-                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
+                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
                 if (ignoreUserStartNodes == false)
                 {
                     int[] aids = null;

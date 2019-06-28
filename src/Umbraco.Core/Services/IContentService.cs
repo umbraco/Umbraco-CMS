@@ -527,7 +527,7 @@ namespace Umbraco.Core.Services
 
         #endregion
         
-        IEnumerable<string> GetAnchorValuesFromRTEs(int id);
-        IEnumerable<string> GetAnchorValuesFromRTEContent(string rteContent);  
+        IEnumerable<string> GetAnchorValuesFromRTEs(int id, string culture = "*");
+        IEnumerable<string> GetAnchorValuesFromRTEContent(string rteContent, string culture = "*");  
     }
 }

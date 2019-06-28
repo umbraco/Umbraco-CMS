@@ -6,6 +6,10 @@ namespace Umbraco.Core
     {
         public static class DataTypes
         {
+            //NOTE: unfortunately due to backwards compat we can't move/rename these, with the addition of the GUID
+            //constants, it would make more sense to have these suffixed with "ID" or in a Subclass called "INT", for
+            //now all we can do is make a subclass called Guids to put the GUID IDs.
+
             public const int LabelString = -92;
             public const int LabelInt = -91;
             public const int LabelBigint = -93;
@@ -25,16 +29,16 @@ namespace Umbraco.Core
 
             public const int Tags = 1041;
 
+            public static class ReservedPreValueKeys
+            {
+                public const string IgnoreUserStartNodes = "ignoreUserStartNodes";
+            }
+
             /// <summary>
             /// Defines the identifiers for Umbraco data types as constants for easy centralized access/management.
             /// </summary>
-            internal static class BuiltInDataTypes
-            {
-
-                public static class ReservedPreValueKeys
-                {
-                    public const string IgnoreUserStartNodes = "ignoreUserStartNodes";
-                }
+            public static class Guids
+            {   
 
                 /// <summary>
                 /// Guid for Content Picker as string

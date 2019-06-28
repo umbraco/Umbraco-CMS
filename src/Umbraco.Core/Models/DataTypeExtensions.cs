@@ -38,31 +38,31 @@ namespace Umbraco.Core.Models
         
         private static readonly ISet<Guid> IdsOfBuildInDataTypes = new HashSet<Guid>()
         {
-            Constants.DataTypes.ContentPickerGuid,
-            Constants.DataTypes.MemberPickerGuid,
-            Constants.DataTypes.MediaPickerGuid,
-            Constants.DataTypes.MultipleMediaPickerGuid,
-            Constants.DataTypes.RelatedLinksGuid,
-            Constants.DataTypes.MemberGuid,
-            Constants.DataTypes.ImageCropperGuid,
-            Constants.DataTypes.TagsGuid,
-            Constants.DataTypes.ListViewContentGuid,
-            Constants.DataTypes.ListViewMediaGuid,
-            Constants.DataTypes.ListViewMembersGuid,
-            Constants.DataTypes.DatePickerWithTimeGuid,
-            Constants.DataTypes.ApprovedColorGuid,
-            Constants.DataTypes.DropdownMultipleGuid,
-            Constants.DataTypes.RadioboxGuid,
-            Constants.DataTypes.DatePickerGuid,
-            Constants.DataTypes.DropdownGuid,
-            Constants.DataTypes.CheckboxListGuid,
-            Constants.DataTypes.CheckboxGuid,
-            Constants.DataTypes.NumericGuid,
-            Constants.DataTypes.RichtextEditorGuid,
-            Constants.DataTypes.TextstringGuid,
-            Constants.DataTypes.TextareaGuid,
-            Constants.DataTypes.UploadGuid,
-            Constants.DataTypes.LabelGuid,
+            Constants.DataTypes.Guids.ContentPickerGuid,
+            Constants.DataTypes.Guids.MemberPickerGuid,
+            Constants.DataTypes.Guids.MediaPickerGuid,
+            Constants.DataTypes.Guids.MultipleMediaPickerGuid,
+            Constants.DataTypes.Guids.RelatedLinksGuid,
+            Constants.DataTypes.Guids.MemberGuid,
+            Constants.DataTypes.Guids.ImageCropperGuid,
+            Constants.DataTypes.Guids.TagsGuid,
+            Constants.DataTypes.Guids.ListViewContentGuid,
+            Constants.DataTypes.Guids.ListViewMediaGuid,
+            Constants.DataTypes.Guids.ListViewMembersGuid,
+            Constants.DataTypes.Guids.DatePickerWithTimeGuid,
+            Constants.DataTypes.Guids.ApprovedColorGuid,
+            Constants.DataTypes.Guids.DropdownMultipleGuid,
+            Constants.DataTypes.Guids.RadioboxGuid,
+            Constants.DataTypes.Guids.DatePickerGuid,
+            Constants.DataTypes.Guids.DropdownGuid,
+            Constants.DataTypes.Guids.CheckboxListGuid,
+            Constants.DataTypes.Guids.CheckboxGuid,
+            Constants.DataTypes.Guids.NumericGuid,
+            Constants.DataTypes.Guids.RichtextEditorGuid,
+            Constants.DataTypes.Guids.TextstringGuid,
+            Constants.DataTypes.Guids.TextareaGuid,
+            Constants.DataTypes.Guids.UploadGuid,
+            Constants.DataTypes.Guids.LabelGuid,
         };
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="dataType">The data type definition.</param>
         /// <returns></returns>
-        internal static bool IsBuildInDataType(this IDataTypeDefinition dataType)
+        internal static bool IsBuildInDataType(this IDataType dataType)
         {
             return IsBuildInDataType(dataType.Key);
         }

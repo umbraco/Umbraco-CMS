@@ -17,7 +17,7 @@ using Umbraco.Core.Models.Entities;
 using System.Web.Http.ModelBinding;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
-
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Trees
 {
@@ -90,12 +90,18 @@ namespace Umbraco.Web.Trees
         internal TreeNode GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormDataCollection queryStrings,
             int[] startNodeIds, string[] startNodePaths, bool ignoreUserStartNodes)
         {
-            var entityIsAncestorOfStartNodes = Security.CurrentUser.IsInBranchOfStartNode(e, Services.EntityService, RecycleBinId, out var hasPathAccess);
-            if (entityIsAncestorOfStartNodes == false)
+            var entityIsAncestorOfStartNodes = ContentPermissionsHelper.IsInBranchOfStartNode(e.Path, startNodeIds, startNodePaths, out var hasPathAccess);
+            if (ignoreUserStartNodes == false && entityIsAncestorOfStartNodes == false)
                 return null;
 
             var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
-            if (hasPathAccess == false)
+            if (treeNode == null)
+            {
+                //this means that the user has NO access to this node via permissions! They at least need to have browse permissions to see
+                //the node so we need to return null;
+                return null;
+            }
+            if (ignoreUserStartNodes == false && hasPathAccess == false)
             {
                 treeNode.AdditionalData["noAccess"] = true;
             }

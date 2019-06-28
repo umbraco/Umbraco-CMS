@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -31,6 +32,7 @@ namespace Umbraco.Core.Services.Implement
         private IQuery<IContent> _queryNotTrashed;
         //TODO: The non-lazy object should be injected
         private readonly Lazy<PropertyValidationService> _propertyValidationService = new Lazy<PropertyValidationService>(() => new PropertyValidationService());
+        private static readonly Regex AnchorRegex = new Regex("<a id=\"(.*?)\">", RegexOptions.Compiled);
 
         #region Constructors
 
@@ -3023,6 +3025,39 @@ namespace Umbraco.Core.Services.Implement
             return rollbackSaveResult;
         }
 
+        #endregion
+
+
+        #region RTE Anchor values
+        public IEnumerable<string> GetAnchorValuesFromRTEs(int id, string culture = "*")
+        {
+            var result = new List<string>();
+            var content = GetById(id);
+            foreach (var contentProperty in content.Properties)
+            {
+                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.TinyMce))
+                {
+                    var value = contentProperty.GetValue(culture)?.ToString();
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        result.AddRange(GetAnchorValuesFromRTEContent(value));
+                    }
+                }
+            }
+            return result;
+        }
+
+
+        public IEnumerable<string> GetAnchorValuesFromRTEContent(string rteContent, string culture = "*")
+        {
+            var result = new List<string>();
+            var matches = AnchorRegex.Matches(rteContent);
+            foreach (Match match in matches)
+            {
+                result.Add(match.Value.Split('\"')[1]);
+            }
+            return result;
+        } 
         #endregion
     }
 }

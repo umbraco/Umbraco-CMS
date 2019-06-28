@@ -255,6 +255,7 @@
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
+    <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Models\PublishedContent\UrlMode.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
@@ -264,6 +265,7 @@
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedModelFactoryExtensions.cs" />
+    <Compile Include="Services\DateTypeServiceExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />

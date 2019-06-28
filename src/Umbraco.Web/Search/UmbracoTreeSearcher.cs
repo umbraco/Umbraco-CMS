@@ -55,7 +55,7 @@ namespace Umbraco.Web.Search
             string query,
             UmbracoEntityTypes entityType,
             int pageSize,
-            long pageIndex, out long totalFound, string searchFrom = null)
+            long pageIndex, out long totalFound, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             var sb = new StringBuilder();
 
