@@ -6,7 +6,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents the configuration for the media picker value editor.
     /// </summary>
-    public class MediaPickerConfiguration
+    public class MediaPickerConfiguration : IIgnoreUserStartNodesConfig
     {
         [ConfigurationField("multiPicker", "Pick multiple items", "boolean")]
         public bool Multiple { get; set; }
@@ -19,5 +19,8 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("startNodeId", "Start node", "mediapicker")]
         public Udi StartNodeId { get; set; }
+
+        [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, "Selecting this option allows a user to choose nodes that they normally don't have access to.", "boolean")]
+        public bool IgnoreUserStartNodes { get; set; }
     }
 }

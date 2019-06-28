@@ -244,7 +244,7 @@ namespace Umbraco.Web.Trees
             return result;
         }
 
-        internal virtual IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
+        private IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
             => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
 
         /// <summary>

@@ -6,7 +6,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents the configuration for the multinode picker value editor.
     /// </summary>
-    public class MultiNodePickerConfiguration
+    public class MultiNodePickerConfiguration : IIgnoreUserStartNodesConfig
     {
         [ConfigurationField("startNode", "Node type", "treesource")]
         public MultiNodePickerConfigurationTreeSource TreeSource { get; set; }
@@ -22,5 +22,8 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("showOpenButton", "Show open button (this feature is in preview!)", "boolean", Description = "Opens the node in a dialog")]
         public bool ShowOpen { get; set; }
+
+        [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, "Selecting this option allows a user to choose nodes that they normally don't have access to.", "boolean")]
+        public bool IgnoreUserStartNodes { get; set; }
     }
 }

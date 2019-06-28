@@ -62,7 +62,12 @@ namespace Umbraco.Core.Models
             Constants.DataTypes.Guids.TextstringGuid,
             Constants.DataTypes.Guids.TextareaGuid,
             Constants.DataTypes.Guids.UploadGuid,
-            Constants.DataTypes.Guids.LabelGuid,
+            Constants.DataTypes.Guids.LabelStringGuid,
+            Constants.DataTypes.Guids.LabelDecimalGuid,
+            Constants.DataTypes.Guids.LabelDateTimeGuid,
+            Constants.DataTypes.Guids.LabelBigIntGuid,
+            Constants.DataTypes.Guids.LabelTimeGuid,
+            Constants.DataTypes.Guids.LabelDateTimeGuid,
         };
 
         /// <summary>

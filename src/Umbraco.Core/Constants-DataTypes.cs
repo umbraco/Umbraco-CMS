@@ -307,14 +307,64 @@ namespace Umbraco.Core
                 /// <summary>
                 /// Guid for Label as string
                 /// </summary>
-                public const string Label = "f0bc4bfb-b499-40d6-ba86-058885a5178c";
+                public const string LabelString = "f0bc4bfb-b499-40d6-ba86-058885a5178c";
 
                 /// <summary>
-                /// Guid for Label
+                /// Guid for Label string
                 /// </summary>
-                public static readonly Guid LabelGuid = new Guid(Label);
+                public static readonly Guid LabelStringGuid = new Guid(LabelString);
 
+                /// <summary>
+                /// Guid for Label as int
+                /// </summary>
+                public const string LabelInt = "8e7f995c-bd81-4627-9932-c40e568ec788";
 
+                /// <summary>
+                /// Guid for Label int
+                /// </summary>
+                public static readonly Guid LabelIntGuid = new Guid(LabelInt);
+
+                /// <summary>
+                /// Guid for Label as big int
+                /// </summary>
+                public const string LabelBigInt = "930861bf-e262-4ead-a704-f99453565708";
+
+                /// <summary>
+                /// Guid for Label big int
+                /// </summary>
+                public static readonly Guid LabelBigIntGuid = new Guid(LabelBigInt);
+
+                /// <summary>
+                /// Guid for Label as date time
+                /// </summary>
+                public const string LabelDateTime = "0e9794eb-f9b5-4f20-a788-93acd233a7e4";
+
+                /// <summary>
+                /// Guid for Label date time
+                /// </summary>
+                public static readonly Guid LabelDateTimeGuid = new Guid(LabelDateTime);
+
+                /// <summary>
+                /// Guid for Label as time
+                /// </summary>
+                public const string LabelTime = "a97cec69-9b71-4c30-8b12-ec398860d7e8";
+
+                /// <summary>
+                /// Guid for Label time
+                /// </summary>
+                public static readonly Guid LabelTimeGuid = new Guid(LabelTime);
+
+                /// <summary>
+                /// Guid for Label as decimal
+                /// </summary>
+                public const string LabelDecimal = "8f1ef1e1-9de4-40d3-a072-6673f631ca64";
+
+                /// <summary>
+                /// Guid for Label decimal
+                /// </summary>
+                public static readonly Guid LabelDecimalGuid = new Guid(LabelDecimal);
+                
+                
             }
         }
     }
