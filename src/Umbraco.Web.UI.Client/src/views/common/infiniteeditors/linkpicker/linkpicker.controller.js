@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
-    function ($scope, eventsService, entityResource, contentResource, mediaResource, mediaHelper, udiParser, userService, localizationService, tinyMceService, editorService, contentEditingHelper) {
+    function ($scope, eventsService, entityResource, mediaResource, mediaHelper, udiParser, userService, localizationService, tinyMceService, editorService, contentEditingHelper) {
         
         var vm = this;
         var dialogOptions = $scope.model;
@@ -20,13 +20,14 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     $scope.model.title = value;
                 });
         }
-
+        $scope.customTreeParams = dialogOptions.dataTypeId ? "dataTypeId=" + dialogOptions.dataTypeId : "";
         $scope.dialogTreeApi = {};
         $scope.model.target = {};
         $scope.searchInfo = {
             searchFromId: null,
             searchFromName: null,
             showSearch: false,
+            dataTypeId: dialogOptions.dataTypeId,
             results: [],
             selectedSearchResults: []
         };
@@ -86,10 +87,11 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                         oneTimeTreeSync.sync();
                     });
 
-                    // get the content properties to build the anchor name list
-                    contentResource.getById(id).then(function (resp) {
-                        handleContentTarget(resp);
+                    entityResource.getUrlAndAnchors(id).then(function (resp) {
+                        $scope.anchorValues = resp.anchorValues;
+                        $scope.model.target.url = resp.url;
                     });
+
                 }
             } else if ($scope.model.target.url.length) {
                 // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
@@ -136,10 +138,11 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
             if (args.node.id < 0) {
                 $scope.model.target.url = "/";
-            } else {
-                contentResource.getById(args.node.id).then(function (resp) {
-                    handleContentTarget(resp);
-
+            }
+            else {
+                entityResource.getUrlAndAnchors(args.node.id).then(function (resp) {
+                    $scope.anchorValues = resp.anchorValues;
+                    $scope.model.target.url = resp.url;
                 });
             }
 
@@ -148,10 +151,6 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
             }
         }
 
-        function handleContentTarget(content) {
-            $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(contentEditingHelper.getAllProps(content.variants[0])));
-            $scope.model.target.url = content.urls.filter(item => item.culture === $scope.currentNode.metaData.culture)[0].text;
-        }
 
         function nodeExpandedHandler(args) {
             // open mini list view for list views

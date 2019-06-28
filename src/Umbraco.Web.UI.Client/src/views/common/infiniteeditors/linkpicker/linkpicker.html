@@ -65,6 +65,7 @@
                                 search-callback="onSearchResults"
                                 search-from-id="{{searchInfo.searchFromId}}"
                                 search-from-name="{{searchInfo.searchFromName}}"
+                                datatype-id="{{searchInfo.dataTypeId}}"
                                 show-search="{{searchInfo.showSearch}}"
                                 section="{{section}}">
                             </umb-tree-search-box>
@@ -86,7 +87,8 @@
                                     on-init="onTreeInit()"
                                     enablelistviewexpand="true"
                                     isdialog="true"
-                                    enablecheckboxes="true">
+                                    enablecheckboxes="true"
+                                    customtreeparams="{{customTreeParams}}">
                                 </umb-tree>
                             </div>
                         </div>
