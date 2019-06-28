@@ -129,7 +129,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureName.IsNullOrWhiteSpace())
                 throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
 
-            ((EntityBase) entity).AddingEntity();
+            entity.AddingEntity();
 
             // deal with entity becoming the new default entity
             if (entity.IsDefault)
@@ -156,7 +156,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureName.IsNullOrWhiteSpace())
                 throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
 
-            ((EntityBase) entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             if (entity.IsDefault)
             {
