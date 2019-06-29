@@ -60,6 +60,7 @@
                                                   * its own image insertion dialog, this hook should return true, and the callback should be called with the chosen
                                                   * image url (or null if the user cancelled). If this hook returns false, the default dialog will be used.
                                                   */
+        hooks.addFalse("insertLinkDialog");
 
         this.getConverter = function () { return markdownConverter; }
 
@@ -1678,7 +1679,8 @@
                     ui.prompt('Insert Image', imageDialogText, imageDefaultText, linkEnteredCallback);
             }
             else {
-                ui.prompt('Insert Link', linkDialogText, linkDefaultText, linkEnteredCallback);
+                if (!this.hooks.insertLinkDialog(linkEnteredCallback))
+                    ui.prompt('Insert Link', linkDialogText, linkDefaultText, linkEnteredCallback);
             }
             return true;
         }
