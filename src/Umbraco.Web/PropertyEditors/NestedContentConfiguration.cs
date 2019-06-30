@@ -23,6 +23,9 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("showIcons", "Show Icons", "boolean", Description = "Set whether to show the items doc type icon in the list.")]
         public bool ShowIcons { get; set; } = true;
 
+        [ConfigurationField("showTypeNames", "Show Type Names", "boolean", Description = "Set whether to show the items type name in the list.")]
+        public bool ShowTypeIcons { get; set; }
+
         [ConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
         public bool HideLabel { get; set; }
 

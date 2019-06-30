@@ -123,6 +123,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.singleMode = $scope.minItems === 1 && $scope.maxItems === 1;
         $scope.showIcons = Object.toBoolean($scope.model.config.showIcons);
+        $scope.showTypeNames = Object.toBoolean($scope.model.config.showTypeNames);
         $scope.wideMode = Object.toBoolean($scope.model.config.hideLabel);
         $scope.hasContentTypes = $scope.model.config.contentTypes.length > 0;
 
@@ -312,6 +313,16 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             return name;
         };
         
+        $scope.getTypeName = function (idx) {
+            if ($scope.model.value[idx]) {
+                var scaffold = $scope.getScaffold($scope.model.value[idx].ncContentTypeAlias);
+                if (scaffold) {
+                    return scaffold.contentTypeName;
+                }
+            }
+            return null;
+        };
+
         $scope.getIcon = function (idx) {
             var scaffold = $scope.getScaffold($scope.model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
