@@ -131,6 +131,12 @@ angular.module('umbraco.directives')
                     return;
                 }
 
+                // ignore clicks on dialog actions
+                var actions = $(event.target).parents(".umb-action");
+                if (actions.length === 1) {
+                    return;
+                }
+
                 //ignore clicks inside this element
                 if ($(element).has($(event.target)).length > 0) {
                     return;
