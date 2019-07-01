@@ -4,7 +4,8 @@
     <name>The Umbraco community</name>
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
-  <!--??? = unklar-->
+  <!--???--><!-- = unklar-->
+  <!--!!!--><!-- = ToDo-->
   <area alias="actions">
     <key alias="assignDomain">Hostnamen verwalten</key>
     <key alias="auditTrail">Protokoll</key>
@@ -399,7 +400,7 @@
     <key alias="anchorInsert">Name</key>
     <key alias="assignDomain">Hostnamen verwalten</key>
     <key alias="closeThisWindow">Fenster schließen</key>
-    <key alias="confirmdelete">Wollen Sie folgendes wirklich löschen</key>
+    <key alias="confirmdelete">Wollen Sie dies wirklich entfernen</key>
     <key alias="confirmdisable">Wollen Sie folgendes wirklich deaktivieren</key>
     <key alias="confirmlogout">Sind Sie sich wirklich abmelden?</key>
     <key alias="confirmSure">Sind Sie sicher?</key>
@@ -1468,5 +1469,184 @@ Ihr freundlicher Umbraco-Robot
     <key alias="yourProfile" version="7.0">Ihr Profil</key>
     <key alias="yourHistory" version="7.0">Ihr Verlauf</key>
     <key alias="sessionExpires" version="7.0">Sitzung läuft ab in</key>
+  </area>
+  <area alias="validation">
+    <key alias="validation">Validierung</key>
+    <key alias="validateAsEmail">Prüfe auf gültiges E-Mail-Format</key>
+    <key alias="validateAsNumber">Prüfe auf gültiges Zahlen-Format</key>
+    <key alias="validateAsUrl">Prüfe auf gültiges URL-Format</key>
+    <key alias="enterCustomValidation">...oder verwende eigene Validierung</key>
+    <key alias="fieldIsMandatory">Pflichtfeld</key>
+    <key alias="validationRegExp">Regulären Ausdruck eingeben</key>
+    <key alias="minCount">Fügen Sie mindestens</key>
+    <key alias="maxCount">Fügen Sie maximal</key>
+    <key alias="items">Element(e) hinzu</key>
+    <key alias="itemsSelected">Element(e) ausgewählt</key>
+    <key alias="invalidDate">Ungültiges Datum</key>
+    <key alias="invalidNumber">Keine Zahl</key>
+    <key alias="invalidEmail">Ungültiges E-Mail-Format</key>
+    <key alias="invalidNull">Der Wert darf nicht ungesetzt bleiben</key>
+    <key alias="invalidEmpty">Der Wert darf nicht leer bleiben</key>
+    <key alias="invalidPattern">Der Wert ist ungültig</key>
+    <key alias="customValidation">Eigene Validierung</key>
+  </area>
+  <area alias="healthcheck"><!--!!!-->
+    <key alias="checkSuccessMessage">Value is set to the recommended value: '%0%'.</key>
+    <key alias="rectifySuccessMessage">Value was set to '%1%' for XPath '%2%' in configuration file '%3%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.</key>
+    <key alias="checkErrorMessageUnexpectedValue">Found unexpected value '%0%' for '%2%' in configuration file '%3%'.</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+	  -->
+    <key alias="customErrorsCheckSuccessMessage">Custom errors are set to '%0%'.</key>
+    <key alias="customErrorsCheckErrorMessage">Custom errors are currently set to '%0%'. It is recommended to set this to '%1%' before go live.</key>
+    <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
+    <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
+    <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.</key>
+    <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: Server version
+	  -->
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%1%'.</key>
+    <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
+    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
+    <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
+    <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
+    <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
+    <key alias="databaseSchemaValidationCheckDatabaseOk">Database - The database schema is correct for this version of Umbraco</key>
+    <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problems were detected with your database schema (Check the log for details)</key>
+    <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Some errors were detected while validating the database schema against the current version of Umbraco.</key>
+    <key alias="httpsCheckValidCertificate">Your website's certificate is valid.</key>
+    <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
+    <key alias="httpsCheckExpiredCertificate">Your website's SSL certificate has expired.</key>
+    <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
+    <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+    <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco.Core.UseHttps' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco.Core.UseHttps' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
+    <key alias="httpsCheckEnableHttpsError">Could not update the 'Umbraco.Core.UseHttps' setting in your web.config file. Error: %0%</key>
+    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
+    <key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'Umbraco.Core.UseHttps' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
+    <key alias="rectifyButton">Fix</key>
+    <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
+    <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
+    <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
+    <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
+    <key alias="compilationDebugCheckRectifySuccessMessage">Debug compilation mode successfully disabled.</key>
+    <key alias="traceModeCheckSuccessMessage">Trace mode is disabled.</key>
+    <key alias="traceModeCheckErrorMessage">Trace mode is currently enabled. It is recommended to disable this setting before go live.</key>
+    <key alias="traceModeCheckRectifySuccessMessage">Trace mode successfully disabled.</key>
+    <key alias="folderPermissionsCheckMessage">All folders have the correct permissions set.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
+    <key alias="filePermissionsCheckMessage">All files have the correct permissions set.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFilePermissionFailed"><![CDATA[The following files must be set up with write permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFilePermissionFailed"><![CDATA[The following files must be set up with write permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was not found.]]></key>
+    <key alias="setHeaderInConfig">Set Header in Config</key>
+    <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMEd by other websites.</key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMEing of the site by other websites has been added to your web.config file.</key>
+    <key alias="setHeaderInConfigError">Could not update web.config file. Error: %0%</key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Content-Type-Options</strong> used to protect against MIME sniffing vulnerabilities was found.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Content-Type-Options</strong> used to protect against MIME sniffing vulnerabilities was not found.]]></key>
+    <key alias="noSniffSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to protect against MIME sniffing vulnerabilities.</key>
+    <key alias="noSniffSetHeaderInConfigSuccess">A setting to create a header protecting against MIME sniffing vulnerabilities has been added to your web.config file.</key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[The header <strong>Strict-Transport-Security</strong> was not found.]]></key>
+    <key alias="hSTSSetHeaderInConfigDescription">Adds the header 'Strict-Transport-Security' with the value 'max-age=10886400; preload' to the httpProtocol/customHeaders section of web.config. Use this fix only if you will have your domains running with https for the next 18 weeks (minimum).</key>
+    <key alias="hSTSSetHeaderInConfigSuccess">The HSTS header has been added to your web.config file.</key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
+    <key alias="xssProtectionSetHeaderInConfigDescription">Adds the header 'X-XSS-Protection' with the value '1; mode=block' to the httpProtocol/customHeaders section of web.config. </key>
+    <key alias="xssProtectionSetHeaderInConfigSuccess">The X-XSS-Protection header has been added to your web.config file.</key>
+    <!-- The following key get these tokens passed in:
+	    0: Comma delimitted list of headers found
+  	-->
+    <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
+    <key alias="smtpMailSettingsNotFound">In the Web.config file, system.net/mailsettings could not be found.</key>
+    <key alias="smtpMailSettingsHostNotConfigured">In the Web.config file system.net/mailsettings section, the host is not configured.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
+    <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.</key>
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
+    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
+    <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">URL-Änderungsaufzeichnung abschalten</key>
+    <key alias="enableUrlTracker">URL-Änderungsaufzeichnung einschalten</key>
+    <key alias="culture">Kultur</key>
+    <key alias="originalUrl">Original URL</key>
+    <key alias="redirectedTo">Weiterleiten zu</key>
+    <key alias="redirectUrlManagement">Url-Weiterleitungen verwalten</key>
+    <key alias="panelInformation">Die folgenden URLs leiten auf diesen Inhalt:</key>
+    <key alias="noRedirects">Es wurden keine Weiterleitungen angelegt</key>
+    <key alias="noRedirectsDescription">Wenn eine veröffentlichte Seite umbenannt oder verschoben wird, 
+    erzeugt dieses CMS automatisch eine entsprechende Weiterleitung.</key>
+    <key alias="confirmRemove">Wollen Sie wirklich die Weiterleitung von '%0%' nach '%1%' entfernen?</key>
+    <key alias="redirectRemoved">URL-Weiterleitung wurde entfernt.</key>
+    <key alias="redirectRemoveError">Beim Entfernen der URL-Weiterleitung ist ein Fehler aufgetreten.</key>
+    <key alias="redirectRemoveWarning">Dies entfernt die Weiterleitung</key>
+    <key alias="confirmDisable">Wollen Sie die URL-Änderungsaufzeichnung wirklich abschalten?</key>
+    <key alias="disabledConfirm">Die URL-Änderungsaufzeichnung wurde abgeschaltet.</key>
+    <key alias="disableError">Fehler während der Abschaltung der URL-Änderungsaufzeichnung, weitere Information finden Sie in den Log-Dateien.</key>
+    <key alias="enabledConfirm">Die URL-Änderungsaufzeichnung wurde eingeschaltet.</key>
+    <key alias="enableError">Fehler während der Aktivierung der URL-Änderungsaufzeichnung, weitere Information finden Sie in den Log-Dateien.</key>
+  </area>
+  <area alias="emptyStates">
+    <key alias="emptyDictionaryTree">Das Wörterbuch ist leer</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">Buchstaben verbleiben</key>
+  </area>
+  <area alias="recycleBin">
+    <key alias="contentTrashed">Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
+    <key alias="mediaTrashed">Medienelement mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
+    <key alias="itemCannotBeRestored">Dieses Element kann nicht automatisch wiederhergestellt werden</key>
+    <key alias="itemCannotBeRestoredHelpText">Es gibt keine Position für das automatische Wiederherstellen dieses Elementes. 
+    Sie können es manuell mit Hilfe des untenstehenden Strukturbaums verschieben.</key>
+    <key alias="wasRestored">wurde wiederhergestellt unterhalb von</key>
+  </area>
+  <area alias="relationType">
+    <key alias="direction">Richtung</key>
+    <key alias="parentToChild">Ober- zu Unterknoten</key>
+    <key alias="bidirectional">Bidirektional</key>
+    <key alias="parent">Oberknoten</key>
+    <key alias="child">Unterknoten</key>
+    <key alias="count">Anzahl</key><!--???-->
+    <key alias="relations">Relationen</key>
+    <key alias="created">Angelegt</key>
+    <key alias="comment">Kommentar</key>
+    <key alias="name">Name</key>
+    <key alias="noRelations">Es gibt keine Relationen für diesen Typ.</key>
+    <key alias="tabRelationType">Relationentyp</key>
+    <key alias="tabRelations">Relationen</key>
+  </area>
+  <area alias="dashboardTabs">
+    <key alias="contentIntro">Lassen Sie uns beginnen</key>
+    <key alias="contentRedirectManager">URL-Weiterleitungen verwalten</key>
+    <key alias="mediaFolderBrowser">Inhalt</key>
+    <key alias="settingsWelcome">Begrüßung</key>
+    <key alias="settingsExamine">Examine Management</key>
+    <key alias="settingsPublishedStatus">Status der Veröffentlichungen</key>
+    <key alias="settingsModelsBuilder">Models Builder</key>
+    <key alias="settingsHealthCheck">Systemzustand prüfen</key>
+    <key alias="memberIntro">Lassen Sie uns beginnen</key>
+    <key alias="formsInstall">Umbraco Forms installieren</key>
   </area>
 </language>
