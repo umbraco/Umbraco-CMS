@@ -4,10 +4,12 @@
     <name>The Umbraco community</name>
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
-  <!--???--><!-- = unklar-->
-  <!--!!!--><!-- = ToDo-->
+  <!--???-->
+  <!-- = unklar-->
+  <!--!!!-->
+  <!-- = ToDo-->
   <area alias="actions">
-    <key alias="assignDomain">Hostnamen verwalten</key>
+    <key alias="assignDomain">Kulturen und Hostnamen</key>
     <key alias="auditTrail">Protokoll</key>
     <key alias="browse">Durchsuchen</key>
     <key alias="changeDocType">Dokumenttyp ändern</key>
@@ -98,9 +100,11 @@
     <key alias="domainExists">Die Domain '%0%' ist bereits zugeordnet</key>
     <key alias="domainUpdated">Domain '%0%' aktualisiert</key>
     <key alias="orEdit">Domains bearbeiten</key>
-    <key alias="domainHelp"><![CDATA[
+    <key alias="domainHelp">
+      <![CDATA[
     	Beispiel: example.com, www.example.com
-    ]]></key>
+    ]]>
+    </key>
     <key alias="inherit">Vererben</key>
     <key alias="setLanguage">Kultur</key>
     <key alias="setLanguageHelp">Definiert die Kultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>
@@ -152,7 +156,8 @@
     <key alias="confirmActionConfirm">Bestätigen</key>
   </area>
   <area alias="auditTrails">
-    <key alias="atViewingFor">Anzeigen als</key><!--???-->
+    <key alias="atViewingFor">Anzeigen als</key>
+    <!--???-->
     <key alias="delete">Inhalt gelöscht</key>
     <key alias="unpublish">Inhalt unveröffentlicht</key>
     <key alias="unpublishvariant">Inhalt unveröffentlicht für Sprache: %0% </key>
@@ -250,12 +255,16 @@
     <key alias="published">Veröffentlicht</key>
     <key alias="publishedPendingChanges">Veröffentlicht (Änderungen bereit)</key>
     <key alias="publishStatus">Publikationsstatus</key>
-    <key alias="publishDescendantsHelp"><![CDATA[
+    <key alias="publishDescendantsHelp">
+      <![CDATA[
     Wähle <em>Veröffentlichen mit Unterknoten</em> zum Veröffentlichen <strong>der gewählten Sprache</strong>
-    samt aller Unterknoten der selben Sprache, um ihren Inhalt öffentlich verfügbar zu machen.]]></key>
-    <key alias="publishDescendantsWithVariantsHelp"><![CDATA[
+    samt aller Unterknoten der selben Sprache, um ihren Inhalt öffentlich verfügbar zu machen.]]>
+    </key>
+    <key alias="publishDescendantsWithVariantsHelp">
+      <![CDATA[
     Wähle <em>Veröffentlichen mit Unterknoten</em> zum Veröffentlichen <strong>der gewählten Sprache</strong>
-    samt aller Unterknoten der selben Sprache, um ihren Inhalt öffentlich verfügbar zu machen.]]></key>
+    samt aller Unterknoten der selben Sprache, um ihren Inhalt öffentlich verfügbar zu machen.]]>
+    </key>
     <key alias="releaseDate">Veröffentlichen am</key>
     <key alias="unpublishDate">Veröffentlichung widerrufen am</key>
     <key alias="removeDate">Datum entfernen</key>
@@ -278,9 +287,11 @@
     <key alias="childItems" version="7.0">Untergeordnete Elemente</key>
     <key alias="target" version="7.0">Ziel</key>
     <key alias="scheduledPublishServerTime">Dies führt zur folgenden Zeit auf dem Server:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[
+    <key alias="scheduledPublishDocumentation">
+      <![CDATA[
     	<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Was bedeutet dies?</a>
-    ]]></key>
+    ]]>
+    </key>
     <key alias="nestedContentDeleteItem">Wollen Sie dieses Element wirklich entfernen?</key>
     <key alias="nestedContentEditorNotSupported">Eigenschaft %0% verwendet Editor %1%, welcher nicht von Nested Content unterstützt wird.</key>
     <key alias="addTextBox">Füge ein weiteres Textfeld hinzu</key>
@@ -316,7 +327,7 @@
   <area alias="media">
     <key alias="clickToUpload">Für Upload klicken</key>
     <key alias="orClickHereToUpload">oder klicken Sie hier um eine Datei zu wählen</key>
-        <key alias="dragFilesHereToUpload">Sie können Dateien hierher ziehen, um sie hochzuladen.</key>
+    <key alias="dragFilesHereToUpload">Sie können Dateien hierher ziehen, um sie hochzuladen.</key>
     <key alias="disallowedFileType">Dieser Dateityp darf nicht hochgeladen werden</key>
     <key alias="maxFileSize">Max. Dateigröße ist</key>
     <key alias="mediaRoot">Media-Basis</key>
@@ -473,28 +484,36 @@
     <key alias="account">Konto</key>
     <key alias="selectEditor">Editor wählen</key>
     <key alias="selectSnippet">Kode-Vorlage wählen</key>
-    <key alias="variantdeletewarning">Dies wird den Knoten und all seine Sprachen entfernen.
-    Wenn Sie nur eine Sprache entfernen wollen, wählen Sie diese und setzen sie auf unveröffentlicht.</key>
+    <key alias="variantdeletewarning">
+      Dies wird den Knoten und all seine Sprachen entfernen.
+      Wenn Sie nur eine Sprache entfernen wollen, wählen Sie diese und setzen sie auf unveröffentlicht.
+    </key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">Es gibt keine Einträge im Wörterbuch.</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description"><![CDATA[
+    <key alias="description">
+      <![CDATA[
     Bearbeiten Sie nachfolgend die verschiedenen Sprachversionen für den Wörterbucheintrag '<em>%0%</em>'.
     <br/>Unter dem links angezeigten Menüpunkt 'Sprachen' können Sie weitere hinzufügen.
-   ]]></key>
+   ]]>
+    </key>
     <key alias="displayName">Name der Kultur</key>
-    <key alias="changeKeyError"><![CDATA[
+    <key alias="changeKeyError">
+      <![CDATA[
       Der Wert '%0%' ist bereits vorhanden.
-   ]]></key>
+   ]]>
+    </key>
     <key alias="overviewTitle">Wörterbuch Übersicht</key>
   </area>
   <area alias="examineManagement">
     <key alias="configuredSearchers"><![CDATA[<em>Sucher</em> einrichten ]]></key>
-    <key alias="configuredSearchersDescription"><![CDATA[
+    <key alias="configuredSearchersDescription">
+      <![CDATA[
     Zeigt die Eigenschaften und Werkzeuge für eingerichtete <em>Sucher</em> (z.B.: multi-index searcher)
-     ]]></key>
+     ]]>
+    </key>
     <key alias="fieldValues">Feldwerte</key>
     <key alias="healthStatus">Gesundheitsstatus</key>
     <key alias="healthStatusDescription">Der Gesundheitsstatus und Lesbarkeit des Indizes.</key>
@@ -503,10 +522,11 @@
     <key alias="indexInfoDescription">Zeigt die Eigenschaften des Indizes</key>
     <key alias="manageIndexes">Examine Index-Verwaltung</key>
     <key alias="manageIndexesDescription">
-    Index Detailanzeige und Verwaltungswerkzeuge
+      Index Detailanzeige und Verwaltungswerkzeuge
     </key>
     <key alias="rebuildIndex">Index erneuern</key>
-    <key alias="rebuildIndexWarning"><![CDATA[
+    <key alias="rebuildIndexWarning">
+      <![CDATA[
       Dies erzeugt den Index neu.<br />
       Abhängig von der Inhaltsmenge Ihrer <em>Website</em> kann das eingie Zeit dauern.<br />
       Es wird davon abgeraten, einen Index einer <em>Website</em> während hoher Auslastung- oder Inhaltbearbeitungszeiten zu erneuern.
@@ -560,8 +580,9 @@
     <key alias="rteShowLabel">Beschriftung anzeigen</key>
     <key alias="rteWidthAndHeight">Breite und Höhe</key>
     <key alias="allPropTypes">Alle Eigenschaftstypen und -daten</key>
-    <key alias="willBeDeleted">die auf diesem Datentyp basierenden werden endgültig entfernt,
-    bitte bestätigen Sie, dass Sie diese ebenfalls entfernen wollen
+    <key alias="willBeDeleted">
+      die auf diesem Datentyp basierenden werden endgültig entfernt,
+      bitte bestätigen Sie, dass Sie diese ebenfalls entfernen wollen
     </key>
     <key alias="yesDelete">Ja, entferne</key>
     <key alias="andAllRelated">und alle Eigenschaftstypen und -daten die auf diesem Datentyp basierenden!</key>
@@ -618,7 +639,8 @@
     <key alias="closewindow">Fenster schließen</key>
     <key alias="comment">Kommentar</key>
     <key alias="confirm">bestätigen</key>
-    <key alias="constrain">Beschneiden</key><!--???-->
+    <key alias="constrain">Beschneiden</key>
+    <!--???-->
     <key alias="constrainProportions">Seitenverhältnis beibehalten</key>
     <key alias="content">Inhalt</key>
     <key alias="continue">Weiter</key>
@@ -681,7 +703,8 @@
     <key alias="off">Aus</key>
     <key alias="ok">Ok</key>
     <key alias="open">Öffnen</key>
-    <key alias="on">An</key><!--???-->
+    <key alias="on">An</key>
+    <!--???-->
     <key alias="or">oder</key>
     <key alias="orderBy">Sortieren nach</key>
     <key alias="password">Kennwort</key>
@@ -735,7 +758,8 @@
     <key alias="reorderDone">Sortierung abschließen</key>
     <key alias="preview">Vorschau</key>
     <key alias="changePassword">Kennwort ändern</key>
-    <key alias="to">nach</key><!--???-->
+    <key alias="to">nach</key>
+    <!--???-->
     <key alias="listView">Listenansicht</key>
     <key alias="saving">Sichern läuft...</key>
     <key alias="current">Aktuelle(s)</key>
@@ -783,23 +807,28 @@
     <key alias="databaseErrorWebConfig">Die "web.config"-Datei konnte nicht angepasst werden (Zugriffsrechte?). Bitte passen Sie die Verbindungszeichenfolge manuell an.</key>
     <key alias="databaseFound">Die Datenbank ist erreichbar und wurde identifiziert als</key>
     <key alias="databaseHeader">Datenbank</key>
-    <key alias="databaseInstall"><![CDATA[
+    <key alias="databaseInstall">
+      <![CDATA[
     Klicken Sie auf <strong>Installieren</strong>, um die Datenbank für Umbraco %0% einzurichten.
-    ]]></key>
+    ]]>
+    </key>
     <key alias="databaseInstallDone">Die Datenbank wurde für Umbraco %0% konfiguriert. Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
-    <key alias="databaseNotFound">&lt;p&gt;Die angegebene Datenbank ist leider nicht erreichbar. Bitte prüfen Sie die Verbindungszeichenfolge ("Connection String") in der "web.config"-Datei.&lt;/p&gt;
-&lt;p&gt;Um fortzufahren, passen Sie bitte die "web.config"-Datei mit einem beliebigen Text-Editor an. Scrollen Sie dazu nach unten, fügen Sie die Verbindungszeichenfolge für die zuverbindende Datenbank als Eintrag "UmbracoDbDSN" hinzu und speichern Sie die Datei.&lt;/p&gt;
-&lt;p&gt;Klicken Sie nach erfolgter Anpassung auf &lt;strong&gt;Wiederholen&lt;/strong&gt;.&lt;br /&gt;Wenn Sie weitere technische Informationen benötigen, besuchen Sie &lt;a href="https://our.umbraco.com/wiki" target="_blank"&gt;The Umbraco documentation wiki&lt;/a&gt;.&lt;/p&gt;
-</key>
+    <key alias="databaseNotFound">
+      &lt;p&gt;Die angegebene Datenbank ist leider nicht erreichbar. Bitte prüfen Sie die Verbindungszeichenfolge ("Connection String") in der "web.config"-Datei.&lt;/p&gt;
+      &lt;p&gt;Um fortzufahren, passen Sie bitte die "web.config"-Datei mit einem beliebigen Text-Editor an. Scrollen Sie dazu nach unten, fügen Sie die Verbindungszeichenfolge für die zuverbindende Datenbank als Eintrag "UmbracoDbDSN" hinzu und speichern Sie die Datei.&lt;/p&gt;
+      &lt;p&gt;Klicken Sie nach erfolgter Anpassung auf &lt;strong&gt;Wiederholen&lt;/strong&gt;.&lt;br /&gt;Wenn Sie weitere technische Informationen benötigen, besuchen Sie &lt;a href="https://our.umbraco.com/wiki" target="_blank"&gt;The Umbraco documentation wiki&lt;/a&gt;.&lt;/p&gt;
+    </key>
     <key alias="databaseText">Um diesen Schritt abzuschließen, müssen Sie die notwendigen Informationen zur Datenbankverbindung angeben.&lt;br /&gt;Bitte kontaktieren Sie Ihren Provider bzw. Server-Administrator für weitere Informationen.</key>
-    <key alias="databaseUpgrade"><![CDATA[
+    <key alias="databaseUpgrade">
+      <![CDATA[
 	  <p>
 	  Bitte bestätigen Sie mit einem Klick auf <strong>Update</strong>, dass die Datenbank auf Umbraco %0% aktualisiert werden soll.
 	  </p>
 	  <p>
 	  Keine Sorge - Dabei werden keine Inhalte gelöscht und alles wird weiterhin funktionieren!
 	  </p>
-    ]]></key>
+    ]]>
+    </key>
     <key alias="databaseUpgradeDone">Die Datenbank wurde auf die Version %0% aktualisiert. Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
     <key alias="databaseUpToDate">Die Datenbank ist fertig eingerichtet. Klicken Sie auf &lt;strong&gt;"weiter"&lt;/strong&gt;, um mit der Einrichtung fortzufahren.</key>
     <key alias="defaultUserChangePass">&lt;strong&gt;Das Kennwort des Standard-Benutzers muss geändert werden!&lt;/strong&gt;</key>
@@ -817,7 +846,10 @@
     <key alias="permissionsHowtoResolveLink">Klicken Sie hier, um den technischen Artikel zu lesen</key>
     <key alias="permissionsHowtoResolveText">Schauen Sie sich die &lt;strong&gt;Video-Lehrgänge&lt;/strong&gt; zum Thema Verzeichnisberechtigungen für Umbraco an oder lesen Sie den technischen Artikel.</key>
     <key alias="permissionsMaybeAnIssue">&lt;strong&gt;Die Dateiberechtigungen sind möglicherweise fehlerhaft!&lt;/strong&gt;Sie können Umbraco vermutlich ohne Probleme verwenden, werden aber viele Erweiterungspakete können nicht installiert werden.</key>
-    <key alias="permissionsNotReady">&lt;strong&gt;Die Dateiberechtigungen sind nicht geeignet!&lt;/strong&gt;&lt;br /&gt;&lt;br /&gt;Die Dateiberechtigungen müssen angepasst werden.</key>
+    <key alias="permissionsNotReady">
+    &lt;strong&gt;Die Dateiberechtigungen sind nicht geeignet!&lt;/strong&gt;&lt;br /&gt;&lt;br /&gt;
+    Die Dateiberechtigungen müssen angepasst werden.
+    </key>
     <key alias="permissionsPerfect">&lt;strong&gt;Die Dateiberechtigungen sind perfekt eingestellt!&lt;/strong&gt;&lt;br /&gt;&lt;br /&gt; Damit ist Umbraco komplett eingerichtet und es können problemlos Erweiterungspakete installiert werden.</key>
     <key alias="permissionsResolveFolderIssues">Verzeichnisprobleme lösen</key>
     <key alias="permissionsResolveFolderIssuesLink">Folgen Sie diesem Link für weitere Informationen zum Thema ASP.NET und der Erstellung von Verzeichnissen.</key>
@@ -825,30 +857,30 @@
     <key alias="permissionsText">Umbraco benötigt Schreibrechte auf verschiedene Verzeichnisse, um Dateien wie Bilder oder PDF-Dokumente speichern zu können. Außerdem werden temporäre Daten zur Leistungssteigerung der Website angelegt.</key>
     <key alias="runwayFromScratch">Ich möchte mit einem leeren System ohne Inhalte und Vorgaben starten</key>
     <key alias="runwayFromScratchText">
-	Die Website ist zur Zeit komplett leer und ohne Inhalte und Vorgaben zu Erstellung eigener Dokumenttypen und Vorlagen bereit.
-	(&lt;a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types"&gt;So geht's&lt;/a&gt;)
-	Sie können "Runway" auch jederzeit später installieren. Verwenden Sie hierzu den Punkt "Pakete" im Entwickler-Bereich.
-  </key>
+      Die Website ist zur Zeit komplett leer und ohne Inhalte und Vorgaben zu Erstellung eigener Dokumenttypen und Vorlagen bereit.
+      (&lt;a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types"&gt;So geht's&lt;/a&gt;)
+      Sie können "Runway" auch jederzeit später installieren. Verwenden Sie hierzu den Punkt "Pakete" im Entwickler-Bereich.
+    </key>
     <key alias="runwayHeader">Die Einrichtung von Umbraco ist abgeschlossen und das Content-Management-System steht bereit. Wie soll es weitergehen?</key>
     <key alias="runwayInstalled">'Runway' wurde installiert</key>
     <key alias="runwayInstalledText">
-Die Basis ist eingerichtet. Wählen Sie die Module aus, die Sie nun installieren möchten.&lt;br /&gt;
-Dies sind unsere empfohlenen Module. Schauen Sie sich die an, die Sie installieren möchten oder Sie sich die &lt;a href="#" onclick="toggleModules(); return false;" id="toggleModuleList"&gt;komplette Liste der Module an.&lt;/a&gt;
-</key>
+      Die Basis ist eingerichtet. Wählen Sie die Module aus, die Sie nun installieren möchten.&lt;br /&gt;
+      Dies sind unsere empfohlenen Module. Schauen Sie sich die an, die Sie installieren möchten oder Sie sich die &lt;a href="#" onclick="toggleModules(); return false;" id="toggleModuleList"&gt;komplette Liste der Module an.&lt;/a&gt;
+    </key>
     <key alias="runwayOnlyProUsers">Nur für erfahrene Benutzer empfohlen</key>
     <key alias="runwaySimpleSite">Ich möchte mit einer einfache Website starten</key>
     <key alias="runwaySimpleSiteText">
-&lt;p&gt;
-"Runway" ist eine einfache Website mit einfachen Dokumententypen und Vorlagen. Der Installer kann Runway automatisch einrichten,
-aber es kann einfach verändert, erweitert oder entfernt werden. Es ist nicht zwingend notwendig und Umbraco kann auch ohne Runway verwendet werden.
-Runway bietet eine einfache Basis zum schnellen Start mit Umbraco.
-Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die "Runway Modules" und Ihre Runway-Seite erweitern.
-&lt;/p&gt;
-&lt;small&gt;
-&lt;em&gt;Runway umfasst:&lt;/em&gt; Home page, Getting Started page, Installing Modules page.&lt;br /&gt;
-&lt;em&gt;Optionale Module:&lt;/em&gt; Top Navigation, Sitemap, Contact, Gallery.
-&lt;/small&gt;
-</key>
+      &lt;p&gt;
+      "Runway" ist eine einfache Website mit einfachen Dokumententypen und Vorlagen. Der Installer kann Runway automatisch einrichten,
+      aber es kann einfach verändert, erweitert oder entfernt werden. Es ist nicht zwingend notwendig und Umbraco kann auch ohne Runway verwendet werden.
+      Runway bietet eine einfache Basis zum schnellen Start mit Umbraco.
+      Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die "Runway Modules" und Ihre Runway-Seite erweitern.
+      &lt;/p&gt;
+      &lt;small&gt;
+      &lt;em&gt;Runway umfasst:&lt;/em&gt; Home page, Getting Started page, Installing Modules page.&lt;br /&gt;
+      &lt;em&gt;Optionale Module:&lt;/em&gt; Top Navigation, Sitemap, Contact, Gallery.
+      &lt;/small&gt;
+    </key>
     <key alias="runwayWhatIsRunway">Was ist 'Runway'?</key>
     <key alias="step1">Schritt 1/5 Lizenz</key>
     <key alias="step2">Schritt 2/5: Datenbank</key>
@@ -898,7 +930,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="setPasswordConfirmation">Ihr Kennwort wurde aktualisiert</key>
     <key alias="resetCodeExpired">Der aufgerufene Link ist ungültig oder abgelaufen</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Kennwort zurücksetzen</key>
-    <key alias="resetPasswordEmailCopyFormat"><![CDATA[
+    <key alias="resetPasswordEmailCopyFormat">
+      <![CDATA[
 <html>
 	<head>
 		<meta name='viewport' content='width=device-width'>
@@ -978,7 +1011,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
 		</table>
 	</body>
 </html>
-	]]></key>
+	]]>
+    </key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -1013,7 +1047,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
       Ihr freundlicher Umbraco-Robot
     </key>
     <key alias="mailBodyVariantSummary">Die folgenden Sprachen wurden geändert %0%</key>
-    <key alias="mailBodyHtml"><![CDATA[
+    <key alias="mailBodyHtml">
+      <![CDATA[
     <html>
 	<head>
 		<meta name='viewport' content='width=device-width'>
@@ -1089,36 +1124,95 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
 		</table>
 	</body>
 </html>
-]]></key>
-    <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p>Folgende Sprachen wurden geändert:</p>
+]]>
+    </key>
+    <key alias="mailBodyVariantHtmlSummary">
+      <![CDATA[<p>Folgende Sprachen wurden geändert:</p>
         %0%
-    ]]></key>
+    ]]>
+    </key>
     <key alias="mailSubject">[%0%] Benachrichtigung: %1% ausgeführt an Seite '%2%' </key>
     <key alias="notifications">Benachrichtigungen</key>
   </area>
   <area alias="packager">
     <key alias="actions">Aktionen</key>
     <key alias="created">Angelegt</key>
-    <key alias="createPackage">Neues Packet</key>
-    <key alias="chooseLocalPackageText"><![CDATA[
-    Wählen Sie ein Packet uf Ihrer Maschine durch Klick auf <em>Durchsuchen</em>.<br>
-    Umbraco-Packet haben normalerweise die Dateierweiterung ".umb" oder ".zip".
-      ]]></key>
-    <key alias="deletewarning">Diese Aktion entfernt das Packet</key>
+    <key alias="createPackage">Neues Paket</key>
+    <key alias="chooseLocalPackageText">
+      <![CDATA[
+        Wählen Sie ein Paket auf Ihrem lokalen Computer über "Datei auswählen" aus. <br />
+    Umbraco-Pakete besitzen üblicherweise die Dateiendungen ".umb" oder ".zip".
+      ]]>
+    </key>
+    <key alias="deletewarning">Diese Aktion entfernt das Paket</key>
     <key alias="dropHere">Hierher ziehen zum Hochladen</key>
     <key alias="includeAllChildNodes">Alle Unterknoten einschließen</key>
-    <key alias="orClickHereToUpload">oder hier klicken, um die Packet-Datei auszuwählen</key>
-    <key alias="uploadPackage">Packet hochladen</key>
-    <key alias="chooseLocalPackageText"><![CDATA[
-    Wählen Sie ein Paket auf Ihrem lokalen Computer über "Datei auswählen" aus. <br />
-    Umbraco-Pakete besitzen üblicherweise die Dateiendungen ".umb" oder ".zip".
-    ]]></key>
+    <key alias="orClickHereToUpload">oder hier klicken, um die Paket-Datei auszuwählen</key>
+    <key alias="uploadPackage">Paket hochladen</key>
+    <key alias="localPackageDescription">
+      Wählen Sie ein Paket auf Ihrem lokalen Computer über "Datei auswählen" aus. <br />
+      Installieren Sie nur Pakete von Quellen, denen Sie vertrauen.
+    </key>
+    <key alias="uploadAnother">Ein weiteres Paket hochladen</key>
+    <key alias="cancelAndUploadAnother">Abbrechen und anderes Paket hochladen</key>
+    <key alias="accept">Ich akzeptiere</key>
+    <key alias="termsOfUse">Benutzungsbedingungen</key>
+    <key alias="pathToFile">Dateipfad</key>
+    <key alias="pathToFileDescription">Absoluter Dateipfad (z. B.: /bin/umbraco.bin)</key>
+    <key alias="installed">Installiert</key>
+    <key alias="installedPackages">Installierte Pakete</key>
+    <key alias="installLocal">Lokale Installation</key>
+    <key alias="installFinish">Benenden</key>
+    <key alias="noConfigurationView">Diese Paket hat keine Einstellungen</key>
+    <key alias="noPackagesCreated">Es wurden noche keine Pakete angelegt</key>
+    <key alias="noPackages">Sie haben keine Pakete installiert</key>
+    <key alias="noPackagesDescription">
+      <![CDATA[
+    Sie haben keine Pakete installiert.
+    Sie können entweder ein Paket von Ihrem Computer wählen oder suchen in den vorhandenen Paketen (via Klick auf Bildsymbol
+    <strong>'Pakete'</strong> rechts, oben), um es zu installieren
+    ]]>
+    </key>
+    <key alias="packageActions">Packet Aktionen</key>
+    <key alias="packageAuthorUrl">Autor URL</key>
+    <key alias="packageContent">Paketinhalt</key>
+    <key alias="packageFiles">Paketdateien</key>
+    <key alias="packageIconUrl">Bildsymbol URL</key>
+    <key alias="packageInstall">Paket installieren</key>
+    <key alias="packageLicense">Lizenz</key>
+    <key alias="packageLicenseUrl">Lizenz URL</key>
+    <key alias="packageProperties">Paketeigenschaften</key>
+    <key alias="packageSearch">Paket suchen</key>
+    <key alias="packageSearchResults">Ergebnis(se) für</key>
+    <key alias="packageNoResults">Keine Ergebnisse für</key>
+    <key alias="packageNoResultsDescription">Bitte versuchen Sie einen anderen Begriff oder stöbern Sie in den Kategorien</key>
+    <key alias="packagesPopular">Beliebt</key>
+    <key alias="packagesNew">Neue Veröffentlichungen</key>
+    <key alias="packageHas">hat</key>
+    <key alias="packageKarmaPoints">Karma Punkte</key>
+    <key alias="packageInfo">Information</key>
+    <key alias="packageOwner">Besitzer</key>
+    <key alias="packageContrib">Beitragende</key>
+    <key alias="packageCreated">Angelegt</key>
+    <key alias="packageCurrentVersion">Aktuelle Version</key>
+    <key alias="packageNetVersion">.NET Version</key>
+    <key alias="packageDownloads">Heruntergeladenes</key>
+    <key alias="packageLikes">Likes</key>
+    <key alias="packageCompatibility">Kompatibilität</key>
+    <key alias="packageCompatibilityDescription">
+      Dieses Paket ist nach Berichten von Community-Mitgliedern mit folgenden Umbraco-Version kompatibel.
+      Es kann keine vollständige Kompatibilität garantiert werden für Versionen mit weniger als 100% Bewertungen.
+    </key>
+    <key alias="packageExternalSources">Externe Quellen</key>
     <key alias="packageAuthor">Autor</key>
     <key alias="packageDocumentation">Dokumentation</key>
     <key alias="packageMetaData">Paket-Meta-Daten</key>
     <key alias="packageName">Name des Pakets</key>
     <key alias="packageNoItemsHeader">Paket enthält keine Elemente</key>
-    <key alias="packageNoItemsText">Die Paket-Datei enthält keine Elemente die deinstalliert werden können.&lt;br/&gt;&lt;br/&gt;Sie können das Paket ohne Gefahr deinstallieren indem Sie "Paket deinstallieren" anklicken.</key>
+    <key alias="packageNoItemsText">
+      <![CDATA[Die Paket-Datei enthält keine Elemente die deinstalliert werden können.<br/><br/>
+    Sie können das Paket ohne Gefahr deinstallieren indem Sie "Paket deinstallieren" anklicken.]]>
+    </key>
     <key alias="packageOptions">Paket-Optionen</key>
     <key alias="packageReadme">Informationen zum Paket</key>
     <key alias="packageRepository">Paket-Repository</key>
@@ -1126,8 +1220,25 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="packageUninstalledHeader">Paket wurde deinstalliert</key>
     <key alias="packageUninstalledText">Das Paket wurde erfolgreich deinstalliert</key>
     <key alias="packageUninstallHeader">Paket deinstallieren</key>
-    <key alias="packageUninstallText">Sie können einzelne Elemente, die Sie nicht deinstallieren möchten, unten abwählen. Wenn Sie "Deinstallation bestätigen" klicken, werden alle markierten Elemente entfernt.&lt;br /&gt;&lt;span style="color: Red; font-weight: bold;"&gt;Achtung:&lt;/span&gt; alle Dokumente, Medien, etc, die von den zu entfernenden Elementen abhängen, werden nicht mehr funktionieren und im Zweifelsfall kann dass gesamte CMS instabil werden. Bitte deinstallieren Sie also mit Vorsicht. Falls Sie unsicher sind, kontaktieren Sie den Autor des Pakets.</key>
-    <key alias="packageVersion">Version des Pakets</key>
+    <key alias="packageUninstallText">
+      <![CDATA[Sie können einzelne Elemente, die Sie nicht deinstallieren möchten, unten abwählen. 
+    Wenn Sie "Deinstallation bestätigen" klicken, werden alle markierten Elemente entfernt.<br />
+    <span style="color: Red; font-weight: bold;">Achtung:</span> alle Dokumente, Medien, etc, die von den zu entfernenden Elementen abhängen, 
+    werden nicht mehr funktionieren und im Zweifelsfall kann dass gesamte CMS instabil werden. 
+    Bitte deinstallieren Sie also mit Vorsicht. Falls Sie unsicher sind, kontaktieren Sie den Autor des Pakets.]]>
+    </key>
+    <key alias="packageVersion">Paketversion</key>
+    <key alias="packageVersionUpgrade">"Upgrading" von Version</key>
+    <key alias="packageAlreadyInstalled">Packet bereits installiert</key>
+    <key alias="targetVersionMismatch">Diese Paket kann nicht installiert werden. Es benötigt mindestens die Umbracoversion</key>
+    <key alias="installStateUninstalling">Es wird deinstalliert...</key>
+    <key alias="installStateDownloading">Es wird heruntergeladen...</key>
+    <key alias="installStateImporting">Es wird importiert...</key>
+    <key alias="installStateInstalling">Es wird installiert...</key>
+    <key alias="installStateRestarting">Es wird neu gestartet, bitte warten...</key>
+    <key alias="installStateComplete">Fertig, Ihr Browser aktualisiert jetzt, bitte warten...</key>
+    <key alias="installStateCompleted">Bitte klicken Sie 'Beenden', um die Installation abzuschließen und die Seite neu zu laden.</key>
+    <key alias="installStateUploading">Paket wird hochgeladen...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Einfügen mit Formatierung (Nicht empfohlen)</key>
@@ -1136,9 +1247,9 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="removeSpecialFormattering">Einfügen, aber Formatierung bereinigen (Empfohlen)</key>
   </area>
   <area alias="publicAccess">
-    <key alias="paAdvanced">Rollenbasierter Zugriffschutz</key>
-    <key alias="paAdvancedHelp">Wenn Sie rollenbasierte Authentifikation mit Umbraco-Mitgliedsgruppen verwenden wollen.</key>
-    <key alias="paAdvancedNoGroups">Sie müssen zuerst eine Mitgliedsgruppe erstellen, bevor derrollenbasierte Zugriffschutz aktiviert werden kann.</key>
+    <key alias="paGroups">Rollenbasierter Zugriffschutz</key>
+    <key alias="paGroupsHelp">Wenn Sie rollenbasierte Authentifikation mit Umbraco-Mitgliedsgruppen verwenden wollen.</key>
+    <key alias="paGroupsNoGroups">Sie müssen zuerst eine Mitgliedsgruppe erstellen, bevor derrollenbasierte Zugriffschutz aktiviert werden kann.</key>
     <key alias="paErrorPage">Fehlerseite</key>
     <key alias="paErrorPageHelp">Seite mit Fehlermeldung (Benutzer-Login erfolgt, aber keinen Zugriff auf die aufgerufene Seite erlaubt)</key>
     <key alias="paHowWould">Bitte wählen Sie, auf welche Art der Zugriff auf diese Seite geschützt werden soll</key>
@@ -1147,27 +1258,70 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="paLoginPage">Login-Seite</key>
     <key alias="paLoginPageHelp">Seite mit Login-Formular</key>
     <key alias="paRemoveProtection">Zugriffsschutz entfernen</key>
+    <key alias="paRemoveProtectionConfirm">
+      <![CDATA[
+    Möchten Sie den Schutz der Seite <strong>%0%</strong> wirklich entfernen?
+    ]]>
+    </key>
     <key alias="paSelectPages">Auswahl der Seiten, die das Login-Formular und die Fehlermeldung enthalten</key>
-    <key alias="paSelectRoles">Auswahl der Benutzerrollen, die Zugriff haben sollen</key>
-    <key alias="paSetLogin">Kennwort und Login für diese Seite setzen</key>
-    <key alias="paSimple">Zugriffsschutz durch einzelnen Benutzerzugang</key>
-    <key alias="paSimpleHelp">Wenn Sie einen einfachen Zugriffsschutz unter Verwendung eines einzelnen Logins mit Kennwort aktivieren wollen</key>
+    <key alias="paSelectGroups">
+      Auswahl der Benutzergruppen, die Zugriff auf Seite <strong>%0%</strong> haben sollen
+    </key>
+    <key alias="paSelectMembers"><![CDATA[Wählen Sie die Mitglieder, die Zugriff auf Seite <strong>%0%</strong> haben sollen.]]></key>
+    <key alias="paMembers">Mitglieder basierte Zugriffsberechtigung</key>
+    <key alias="paMembersHelp">Falls Sie Mitglieder basierte Zugriffsberechtigung gewähren wollen</key>
   </area>
+
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease">%0% kann nicht veröffentlicht werden, da die Veröffentlichung zeitlich geplant ist.</key>
-    <key alias="contentPublishedFailedInvalid">%0% konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.</key>
-    <key alias="contentPublishedFailedByEvent">%0% konnte nicht veröffentlicht werden, da ein Plug-In die Aktion abgebrochen hat.</key>
-    <key alias="contentPublishedFailedByParent">%0% kann nicht veröffentlicht werden, da das übergeordnete Dokument nicht veröffentlicht ist.</key>
+    <key alias="invalidPublishBranchPermissions">Die Zugriffsrechte des Benutzers sind ungenügend, um alle Unterknoten zu veröffentlichen</key>
+    <key alias="contentPublishedFailedIsTrashed">
+      <![CDATA[
+      %0% konnte nicht veröffentlicht werden, weil das Element im Papierkorb ist.
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedAwaitingRelease">
+      %0% kann nicht veröffentlicht werden, da die Veröffentlichung zeitlich geplant ist.
+    </key>
+    <key alias="contentPublishedFailedExpired">
+      <![CDATA[      
+    %0% konnte nicht veröffentlicht werden, weil das Element abgelaufen ist.
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedInvalid">
+      <![CDATA[
+    %0% konnte nicht veröffentlicht werden, weil einige Eigenschaften ungültig sind.
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedByEvent">
+      %0% konnte nicht veröffentlicht werden, da ein Plug-In die Aktion abgebrochen hat.
+    </key>
+    <key alias="contentPublishedFailedByParent">
+      %0% kann nicht veröffentlicht werden, da das übergeordnete Dokument nicht veröffentlicht ist.
+    </key>
     <key alias="includeUnpublished">Unveröffentlichte Unterelemente einschließen</key>
     <key alias="inProgress">Bitte warten, Veröffentlichung läuft...</key>
     <key alias="inProgressCounter">%0% Elemente veröffentlicht, %1% Elemente ausstehend ...</key>
     <key alias="nodePublish">%0% wurde veröffentlicht</key>
     <key alias="nodePublishAll">%0% und die untergeordneten Elemente wurden veröffentlicht</key>
     <key alias="publishAll">%0% und alle untergeordneten Elemente veröffentlichen</key>
-    <key alias="publishHelp">Mit &lt;em&gt;Ok&lt;/em&gt; wird &lt;strong&gt;%0%&lt;/strong&gt; veröffentlicht und auf der Website sichtbar.&lt;br/&gt;&lt;br /&gt;Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie &lt;em&gt;Unveröffentlichte Unterelemente einschließen&lt;/em&gt; aktivieren.</key>
+    <key alias="publishHelp"><![CDATA[
+    Klicken Sie <em>Sichern und Veröffentlichen</em>, um <strong>%0%</strong> zu veröffentlicht und auf der Website sichtbar zu machen.<br><br>
+    Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie <em>Unveröffentlichte Unterelemente einschließen</em> markieren.
+    ]]>
+    </key>
   </area>
   <area alias="colorpicker">
     <key alias="noColors">Sie haben keine freigegeben Farben konfiguriert</key>
+
+  </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Sie haben ein entferntes oder im Papierkorb befindliches Inhaltselement ausgewählt</key>
+    <key alias="pickedTrashedItems">Sie haben entfernte oder im Papierkorb befindliche Inhaltselemente ausgewählt</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">Sie haben ein entferntes oder im Papierkorb befindliches Medienelement ausgewählt</key>
+    <key alias="pickedTrashedItems">Sie haben entfernte oder im Papierkorb befindliche medienelemente ausgewählt</key>
+    <key alias="trashed">Verworfen</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">Externen Link eingeben</key>
@@ -1180,8 +1334,13 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   </area>
   <area alias="imagecropper">
     <key alias="reset">Zurücksetzen</key>
+    <key alias="saveCrop">Ausschnitt sichern</key>
+    <key alias="addCrop">Neuen Ausschnitt hinzufügen</key>
+    <key alias="updateEditCrop">Fertig</key>
+    <key alias="undoEditCrop">Rückgängig machen</key>
   </area>
   <area alias="rollback">
+    <key alias="headline">Wählen Sie eine Version, um diese mit der aktuellen zu vergleichen</key>
     <key alias="currentVersion">Aktuelle Version</key>
     <key alias="diffHelp">Zeigt die Unterschiede zwischen der aktuellen und der ausgewählten Version an.&lt;br /&gt;Text in &lt;del&gt;rot&lt;/del&gt; fehlen in der ausgewählten Version, &lt;ins&gt;grün&lt;/ins&gt; markierter Text wurde hinzugefügt.</key>
     <key alias="documentRolledBack">Dokument wurde zurückgesetzt</key>
@@ -1194,20 +1353,14 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="editscript">Skript bearbeiten</key>
   </area>
   <area alias="sections">
-    <key alias="concierge">Umbraco Concierge</key>
     <key alias="content">Inhalte</key>
-    <key alias="courier">Umbraco Courier</key>
-    <key alias="developer">Entwickler</key>
-    <key alias="installer">Konfigurationsassistent</key>
+    <key alias="forms">Formulare</key>
     <key alias="media">Medien</key>
     <key alias="member">Mitglieder</key>
-    <key alias="newsletters">Newsletter</key>
+    <key alias="packages">Pakete</key>
     <key alias="settings">Einstellungen</key>
-    <key alias="statistics">Statistiken</key>
     <key alias="translation">Übersetzung</key>
     <key alias="users">Benutzer</key>
-    <key alias="help" version="7.0">Hilfe</key>
-    <key alias="forms">Formulare</key>
   </area>
   <area alias="help">
     <key alias="theBestUmbracoVideoTutorials">Die besten Umbraco-Video-Tutorials</key>
@@ -1227,6 +1380,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="contentTypeUses">Dieser Dokumenttyp verwendet</key>
     <key alias="asAContentMasterType">als Masterdokumenttyp. Register vom Masterdokumenttyp werden nicht angezeigt und können nur im Masterdokumenttyp selbst bearbeitet werden</key>
     <key alias="noPropertiesDefinedOnTab">Für dieses Register sind keine Eigenschaften definiert. Klicken Sie oben auf "neue Eigenschaft hinzufügen", um eine neue Eigenschaft hinzuzufügen.</key>
+    <key alias="createMatchingTemplate">Zugehörige Vorlage anlegen</key>
+    <key alias="addIcon">Bildsymbol hinzufügen</key>
   </area>
   <area alias="sort">
     <key alias="sortOrder">Sortierreihenfolge</key>
@@ -1234,13 +1389,16 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="sortDone">Sortierung abgeschlossen.</key>
     <key alias="sortHelp">Ziehen Sie die Elemente an ihre gewünschte neue Position.</key>
     <key alias="sortPleaseWait">Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern.</key>
+    <key alias="sortEmptyState">Dieser Knoten hat keine Unterknoten zum Sortieren</key>
   </area>
   <area alias="speechBubbles">
+    <key alias="validationFailedHeader">Validierung</key>
+    <key alias="validationFailedMessage">Validierungsfehler müssen behoben werden, bevor das Element gesichert werden kann</key>
     <key alias="operationFailedHeader">Fehlgeschlagen</key>
+    <key alias="operationSavedHeader">Gesichert</key>
     <key alias="invalidUserPermissionsText">Unzureichende Benutzerberechtigungen. Vorgang kann nicht abgeschlossen werden.</key>
     <key alias="operationCancelledHeader">Abgebrochen</key>
     <key alias="operationCancelledText">Vorgang wurde durch eine benutzerdefinierte Erweiterung abgebrochen</key>
-    <key alias="contentPublishedFailedByEvent">Das Veröffentlichen wurde von einem individuellen Ereignishandler abgebrochen</key>
     <key alias="contentTypeDublicatePropertyType">Eigenschaft existiert bereits</key>
     <key alias="contentTypePropertyTypeCreated">Eigenschaft erstellt</key>
     <key alias="contentTypePropertyTypeCreatedText">Name: %0%  Datentyp: %1%</key>
@@ -1254,63 +1412,190 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="cssSavedText">Stylesheet erfolgreich gespeichert</key>
     <key alias="dataTypeSaved">Datentyp gespeichert</key>
     <key alias="dictionaryItemSaved">Wörterbucheintrag gespeichert</key>
-    <key alias="editContentPublishedFailedByParent">Veröffentlichung nicht möglich, da das übergeordnete Dokument nicht veröffentlicht ist.</key>
-    <key alias="editContentPublishedHeader">Inhalte veröffentlicht</key>
-    <key alias="editContentPublishedText">Sichtbar auf der Webseite</key>
+    <key alias="editContentPublishedHeader">Inhalt veröffentlicht</key>
+    <key alias="editContentPublishedText">und ist auf der Website sichtbar</key>
+    <key alias="editMultiContentPublishedText">%0% Documente veröffentlicht und auf der Website sichtbar</key>
+    <key alias="editVariantPublishedText">%0% veröffentlicht und auf der Website sichtbar</key>
+    <key alias="editMultiVariantPublishedText">%0% Documente veröffentlicht in Sprache %1% und auf der Website sichtbar</key>
     <key alias="editContentSavedHeader">Inhalte gespeichert</key>
     <key alias="editContentSavedText">Denken Sie daran, die Inhalte zu veröffentlichen, um die Änderungen sichtbar zu machen</key>
+    <key alias="editContentScheduledSavedText">Der Termin für die Veröffentlichung wurde geändert</key>
+    <key alias="editVariantSavedText">%0% gesichert</key>
     <key alias="editContentSendToPublish">Zur Abnahme eingereicht</key>
     <key alias="editContentSendToPublishText">Die Änderungen wurden zur Abnahme eingereicht</key>
+    <key alias="editVariantSendToPublishText">%0% Änderungen wurden zur Abnahme eingereicht</key>
     <key alias="editMediaSaved">Medium gespeichert</key>
     <key alias="editMediaSavedText">Medium fehlerfrei gespeichert</key>
     <key alias="editMemberSaved">Mitglied gespeichert</key>
+    <key alias="editMemberGroupSaved">Mitgliedsgruppe gespeichert</key>
     <key alias="editStylesheetPropertySaved">Stylesheet-Regel gespeichert</key>
     <key alias="editStylesheetSaved">Stylesheet gespeichert</key>
     <key alias="editTemplateSaved">Vorlage gespeichert</key>
     <key alias="editUserError">Fehler beim Speichern des Benutzers.</key>
     <key alias="editUserSaved">Benutzer gespeichert</key>
     <key alias="editUserTypeSaved">Benutzertyp gepsichert</key>
+    <key alias="editUserGroupSaved">Benutzergruppe gepsichert</key>
     <key alias="fileErrorHeader">Datei wurde nicht gespeichert</key>
     <key alias="fileErrorText">Datei konnte nicht gespeichert werden. Bitte überprüfen Sie die Schreibrechte auf Dateiebene.</key>
     <key alias="fileSavedHeader">Datei gespeichert</key>
     <key alias="fileSavedText">Datei erfolgreich gespeichert</key>
     <key alias="languageSaved">Sprache gespeichert</key>
+    <key alias="mediaTypeSavedHeader">Medientyp gespeichert</key>
+    <key alias="memberTypeSavedHeader">Mitgliedertyp gespeichert</key>
+    <key alias="memberGroupSavedHeader">Mitgliedergruppe gespeichert</key>
     <key alias="templateErrorHeader">Vorlage wurde nicht gespeichert</key>
     <key alias="templateErrorText">Bitte prüfen Sie, ob möglicherweise zwei Vorlagen den gleichen Alias verwenden.</key>
     <key alias="templateSavedHeader">Vorlage gespeichert</key>
     <key alias="templateSavedText">Vorlage erfolgreich gespeichert!</key>
     <key alias="contentUnpublished">Veröffentlichung des Inhalts aufgehoben</key>
+    <key alias="contentCultureUnpublished">Inhaltsvariante %0% unveröffentlicht</key>
+    <key alias="contentMandatoryCultureUnpublished">Die Veröffentlichung der Pflichtsprache '%0%' wurde zurück genommen. Das gleiche gilt für alle Sprachen dieses Inhalts.</key>
     <key alias="partialViewSavedHeader">Partielle Ansicht gespeichert</key>
     <key alias="partialViewSavedText">Partielle Ansicht ohne Fehler gespeichert.</key>
     <key alias="partialViewErrorHeader">Partielle Ansicht nicht gespeichert</key>
     <key alias="partialViewErrorText">Fehler beim Speichern der Datei.</key>
+    <key alias="permissionsSavedFor">Berechtigungen gesichert für</key>
+    <key alias="deleteUserGroupsSuccess">%0% Benutzergruppen entfernt</key>
+    <key alias="deleteUserGroupSuccess">%0% wurde entfernt</key>
+    <key alias="enableUsersSuccess">%0% Benutzer aktiviert</key>
+    <key alias="disableUsersSuccess">%0% Benutzer deaktiviert</key>
+    <key alias="enableUserSuccess">%0% ist jetzt aktiviert</key>
+    <key alias="disableUserSuccess">%0% ist jetzt deaktiviert</key>
+    <key alias="setUserGroupOnUsersSuccess">Benutzergruppen wurden gesetzt</key>
+    <key alias="unlockUsersSuccess">%0% Benutzer freigegeben</key>
+    <key alias="unlockUserSuccess">%0% ist jetzt freigegeben</key>
+    <key alias="memberExportedSuccess">Mitglied wurde in Datei exportiert</key>
+    <key alias="memberExportedError">Beim Exportieren des Mitglieds trat ein Fehler auf</key>
+    <key alias="deleteUserSuccess">Benutzer %0% wurde entfernt</key>
+    <key alias="resendInviteHeader">Benutzer einladen</key>
+    <key alias="resendInviteSuccess">Einladung wurde erneut an %0% geschickt</key>
+    <key alias="contentReqCulturePublishError">Das Dokument kann nicht veröffentlicht werden, solange '%0%' nicht veröffentlicht wurde</key>
+    <key alias="contentCultureValidationError">Validierung fehlgeschlagen für Sprache '%0%'</key>
+    <key alias="documentTypeExportedSuccess">Dokumenttyp wurde in eine Datei exportiert</key>
+    <key alias="documentTypeExportedError">Beim Exportieren des Dokumenttyps trat ein Fehler auf</key>
+    <key alias="scheduleErrReleaseDate1">Das Veröffentlichungsdatum kann nicht in der Vergangenheit liegen</key>
+    <key alias="scheduleErrReleaseDate2">Die Veröffentlichung kann nicht eingeplant werden, solange '%0%' (benötigt) nicht veröffentlicht wurde</key>
+    <key alias="scheduleErrReleaseDate3">Die Veröffentlichung kann nicht eingeplant werden, solange '%0%' (benötigt) ein späteres Veröffentlichungsdatum hat als eine optionale Sprache</key>
+    <key alias="scheduleErrExpireDate1">Das Ablaufdatum darf nicht in der Vergangenheit liegen</key>
+    <key alias="scheduleErrExpireDate2">Das Ablaufdatum darf nicht vor dem Veröffentlichungsdatum liegen</key>
   </area>
   <area alias="stylesheet">
-    <key alias="aliasHelp">Gewünschter CSS-Selektor, zum Beispiel 'h1', '.bigHeader' oder 'p.infoText'</key>
+    <key alias="addRule">Stil hinzufügen</key>
+    <key alias="editRule">Stil bearbeiten</key>
+    <key alias="editorRules">Rich text editor Stile</key>
+    <key alias="editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</key>
+    
     <key alias="editstylesheet">Stylesheet bearbeiten</key>
     <key alias="editstylesheetproperty">Stylesheet-Regel bearbeiten</key>
     <key alias="nameHelp">Bezeichnung im Auswahlmenü des Rich-Text-Editors  </key>
     <key alias="preview">Vorschau</key>
+    <key alias="previewHelp">So wird der Text im Rich-Text-Editor aussehen.</key>
+    <key alias="selector">Selector</key>
+    <key alias="selectorHelp">Benutze CSS Syntax, z. B.: "h1" oder ".redHeader"</key>
     <key alias="styles">Stile</key>
+    <key alias="stylesHelp">Die CSS-Auszeichnungen, die im Rich-Text-Editor verwendet werden soll, z. B.: "color:red;"</key>
+    <key alias="tabCode">Kode</key>
+    <key alias="tabRules">Rich Text Editor</key>
   </area>
   <area alias="template">
+    <key alias="deleteByIdFailed">Beim Entfernen der Vorlage mit Id %0% trat ein Fehler auf</key>
     <key alias="edittemplate">Vorlage bearbeiten</key>
+    <key alias="insertSections">Bereich</key>
     <key alias="insertContentArea">Platzhalter-Bereich verwenden</key>
     <key alias="insertContentAreaPlaceHolder">Platzhalter einfügen</key>
+    <key alias="insert">Einfügen</key>
+    <key alias="insertDesc">Wählen Sie, was in die Vorlage eingefügt werden soll</key>
     <key alias="insertDictionaryItem">Wörterbucheintrag einfügen</key>
-    <key alias="insertMacro">Makro einfügen</key>
-    <key alias="insertPageField">Umbraco-Feld einfügen</key>
-    <key alias="mastertemplate">Mastervorlage</key>
-    <key alias="quickGuide">Schnellübersicht zu den verfügbaren Umbraco-Feldern</key>
+    <key alias="insertDictionaryItemDesc">Ein Wörterbuchelement ist ein Platzhalter für lokalisierbaren Text. 
+    Das macht es einfach mehrsprachige Websites zu gestalten.</key>
+    <key alias="insertMacro">Makro</key>
+    <key alias="insertMacroDesc">
+    Ein Makro ist eine konfigurierbare Komponente, die großartig für wiederverwendbare Teile Ihres Entwurfes sind,
+    für welche Sie optionale Parameter benötigen, wie z. B. Galerien, Formulare oder Listen.
+    </key>
+    <key alias="insertPageField">Umbraco-Feld</key>
+    <key alias="insertPageFieldDesc">
+    Zeigt den Wert eines benannten Feldes der aktuellen Seite an, mit der Möglichkeit den Wert zu verändern 
+    oder einen alternativen Ersatzwert zu wählen.</key>
+    <key alias="insertPartialView">Teilansicht (Partial View)</key>
+    <key alias="insertPartialViewDesc">
+    Eine Teilansicht ist eine eigenständige Vorlagen-Datei, die innerhalb einer anderen Vorlage verwendet werden kann.
+    Sie ist gut geeignet, um "Markup"-Kode wiederzuverwenden oder komplexe Vorlagen in mehrere Dateien aufzuteilen.
+    </key>
+    <key alias="mastertemplate">Basisvorlage</key>
+    <key alias="noMaster">Keine Basis</key>
+    <key alias="renderBody">Untergeordnete Vorlage einfügen</key>
+    <key alias="renderBodyDesc">
+      <![CDATA[
+      Verarbeitet den Inhalt einer untergeordnete Vorlage durch 
+      Einfügen eines <code>@RenderBody()</code> Platzhalters.
+      ]]>
+    </key>
+    <key alias="defineSection">Definiert einen benannten Bereich</key>
+    <key alias="defineSectionDesc">
+      <![CDATA[
+      Definiert einen Teil Ihrer Vorlage als benannten Bereich durch Umschließen mit <code>@section { ... }</code>.
+      Dieser benannte Bereich kann in der übergeordneten Vorlage 
+      durch Verwendung von <code>@RenderSection</code> eingefügt werden.
+      ]]>
+    </key>
+    <key alias="renderSection">Füge einen benannten Bereich ein</key>
+    <key alias="renderSectionDesc">
+      <![CDATA[
+      Fügt einen benannten Bereich einer untergeordneten Vorlage durch Verwendung des Platzhalters <code>@RenderSection(name)</code> ein.
+      Dies verarbeitet einen benannten Bereich einer untergeordneten Vorlage, der mit <code>@section [name]{ ... }</code> umschlossen definiert wurde.
+      ]]>
+    </key>
+    <key alias="sectionName">Bereichsname</key>
+    <key alias="sectionMandatory">Bereich ist notwendig</key>
+    <key alias="sectionMandatoryDesc">
+    Wenn notwendig, dann muss die untergeordnete Vorlage eine <code>@section</code> Definition gleichen Namens enthalten,
+    anderfalls tritt ein Fehler auf.
+    </key>
+    <key alias="queryBuilder">Abfrage-Generator</key>
+    <key alias="itemsReturned">zurückgegebene Elemente, in</key>
+    <key alias="iWant">Ich möchte</key>
+    <key alias="allContent">den ganzen Inhalt</key>
+    <key alias="contentOfType">Inhalt vom Typ "%0%"</key>
+    <key alias="from">von</key>
+    <key alias="websiteRoot">meiner website</key>
+    <key alias="where">wobei</key>
+    <key alias="and">und</key>
+    <key alias="is">ist</key>
+    <key alias="isNot">ist nicht</key>
+    <key alias="before">vor</key>
+    <key alias="beforeIncDate">vor (inkl. gewähltes Datum)</key>
+    <key alias="after">nach</key>
+    <key alias="afterIncDate">nach (inkl. gewähltes Datum)</key>
+    <key alias="equals">gleich</key>
+    <key alias="doesNotEqual">ungleich</key>
+    <key alias="contains">enthält</key>
+    <key alias="doesNotContain">ohne</key>
+    <key alias="greaterThan">größer als</key>
+    <key alias="greaterThanEqual">größer als oder gleich</key>
+    <key alias="lessThan">weniger als</key>
+    <key alias="lessThanEqual">weniger als oder gleich</key>
+    <key alias="id">Id</key>
+    <key alias="name">Name</key>
+    <key alias="createdDate">Datum der Erzeugung</key>
+    <key alias="lastUpdatedDate">Datum der letzten Aktualisierung</key>
+    <key alias="orderBy">sortiert nach</key>
+    <key alias="ascending">aufsteigend</key>
+    <key alias="descending">absteigend</key>
+
     <key alias="template">Vorlage</key>
   </area>
   <area alias="grid">
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
     <key alias="insertControl">Element hinzufügen</key>
-    <key alias="addRows">Zeilenlayout auswählen</key>
-    <key alias="addElement">Einfach auf &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; klicken, um das erste Element anzulegen</key>
-    <key alias="dropElement">Drop content</key>
+    <key alias="chooseLayout">Layout auswählen</key>
+    <key alias="addRows">Zeile hinzufügen</key>
+    <key alias="addElement">Inhalt hinzufügen</key>
+    <key alias="dropElement">Inhalt entfernen</key>
+    <key alias="settingsApplied">Einstellungen anwenden</key>
+    <key alias="contentNotAllowed"><![CDATA[Dieser Inhalt ist hier <strong>nicht</strong> zugelassen]]></key>
+    <key alias="contentAllowed">Dieser Inhalt ist hier zugelassen</key>
     <key alias="clickToEmbed">Klicken, um Inhalt einzubetten</key>
     <key alias="clickToInsertImage">Klicken, um Abbildung einzufügen</key>
     <key alias="placeholderImageCaption">Beschriftung ...</key>
@@ -1331,36 +1616,140 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="stylesDetails">Legen Sie fest, welche Stile die Autoren anpassen können.</key>
     <key alias="allowAllEditors">Alle Elemente erlauben</key>
     <key alias="allowAllRowConfigurations">Alle Zeilenlayouts erlauben</key>
+    <key alias="maxItems">Maximal erlaubte Elemente</key>
+    <key alias="maxItemsDescription">Leer lassen oder auf 0 setzen für unbegrenzt</key>
+    <key alias="setAsDefault">Als Standard setzen</key>
+    <key alias="chooseExtra">Extra wählen</key>
+    <key alias="chooseDefault">Standard wählen</key>
+    <key alias="areAdded">wurde hinzugefügt</key>
+  </area>
+  <area alias="contentTypeEditor">
+    <key alias="compositions">Kompositionen</key>
+    <key alias="noGroups">Sie haben keine Gruppen hinzugefügt</key>
+    <key alias="addGroup">Gruppe hinzufügen</key>
+    <key alias="inheritedFrom">Übernimm von</key>
+    <key alias="addProperty">Eigenschaft hinzufügen</key>
+    <key alias="requiredLabel">Notwendige Bezeichnung</key>
+    <key alias="enableListViewHeading">Listenansicht aktivieren</key>
+    <key alias="enableListViewDescription">
+    Konfiguriert die Verwendung einer sortier- und filterbaren Listenansicht der Unterknoten für diesen Dokumenttyp.
+    Die Unterknoten werden nicht in Baum-Struktur angezeigt.</key>
+    <key alias="allowedTemplatesHeading">Erlaubte Vorlagen</key>
+    <key alias="allowedTemplatesDescription">
+    Wählen Sie die Vorlagen, die Editoren für diesen Dokumenttyp wählen dürfen</key>
+    <key alias="allowAsRootHeading">Als Wurzelknoten zulassen</key>
+    <key alias="allowAsRootDescription">
+    Ermöglicht es Editoren diesen Dokumenttyp in der obersten Ebene der Inhalt-Baum-Strukur zu wählen</key>
+    <key alias="childNodesHeading">Erlaubte Dokumenttypen für Unterknoten</key>
+    <key alias="childNodesDescription">
+    Erlaubt es Inhalt der angegebenen Typen unterhalb Inhalten dieses Typs anzulegen</key>
+    <key alias="chooseChildNode">Wählen Sie einen Unterknoten</key><!--???-->
+    
+  <!--!!!-->
+    <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
+    <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
+    <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
+    <key alias="availableEditors">Create new</key>
+    <key alias="reuse">Use existing</key>
+    <key alias="editorSettings">Editor settings</key>
+    <key alias="configuration">Configuration</key>
+    <key alias="yesDelete">Yes, delete</key>
+    <key alias="movedUnderneath">was moved underneath</key>
+    <key alias="copiedUnderneath">was copied underneath</key>
+    <key alias="folderToMove">Select the folder to move</key>
+    <key alias="folderToCopy">Select the folder to copy</key>
+    <key alias="structureBelow">to in the tree structure below</key>
+    <key alias="allDocumentTypes">All Document types</key>
+    <key alias="allDocuments">All Documents</key>
+    <key alias="allMediaItems">All media items</key>
+    <key alias="usingThisDocument">using this document type will be deleted permanently, please confirm you want to delete these as well.</key>
+    <key alias="usingThisMedia">using this media type will be deleted permanently, please confirm you want to delete these as well.</key>
+    <key alias="usingThisMember">using this member type will be deleted permanently, please confirm you want to delete these as well</key>
+    <key alias="andAllDocuments">and all documents using this type</key>
+    <key alias="andAllMediaItems">and all media items using this type</key>
+    <key alias="andAllMembers">and all members using this type</key>
+    <key alias="memberCanEdit">Member can edit</key>
+    <key alias="memberCanEditDescription">Allow this property value to be edited by the member on their profile page</key>
+    <key alias="isSensitiveData">Is sensitive data</key>
+    <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
+    <key alias="showOnMemberProfile">Show on member profile</key>
+    <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
+    <key alias="tabHasNoSortOrder">tab has no sort order</key>
+    <key alias="compositionUsageHeading">Where is this composition used?</key>
+    <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
+    <key alias="variantsHeading">Allow varying by culture</key>
+    <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
+    <key alias="allowVaryByCulture">Allow varying by culture</key>
+    <key alias="elementHeading">Is an Element type</key>
+    <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
+    <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
+  </area>
+  <area alias="languages">
+    <key alias="addLanguage">Sparche hinzufügen</key>
+    <key alias="mandatoryLanguage">Notwendige Sprache</key>
+    <key alias="mandatoryLanguageHelp">Eigenschaften müssen für diese Sprache ausgefüllt sein bevor ein Knoten veröffentlicht werden kann.</key>
+    <key alias="defaultLanguage">Standardsprache</key>
+    <key alias="defaultLanguageHelp">Eine Umbraco site kann nur eine Standardsprache haben.</key>
+    <key alias="changingDefaultLanguageWarning">Ändern der Standardsprache kann zum Fehlen von Standard-Inhalt führen.</key>
+    <key alias="fallsbackToLabel">Wird ersetzt durch</key>
+    <key alias="noFallbackLanguageOption">Kein Ersatzsprache</key>
+    <key alias="fallbackLanguageDescription">
+    Um mehrsprachigem Inhalt zu ermöglichen durch eine andere Sprache ersetzt zu werden,
+    falls die angefragte Sprache nicht verfügbar ist, wählen Sie diese Option hier aus.</key>
+    <key alias="fallbackLanguage">Ersatzsprache</key>
+  </area>
+  <area alias="macro">
+    <key alias="addParameter">Parameter hinzufügen</key>
+    <key alias="editParameter">Parameter bearbeiten</key>
+    <key alias="enterMacroName">Makroname vergeben</key>
+    <key alias="parameters">Parameter</key>
+    <key alias="parametersDescription">Definiere die Parameter, die verfügbar sein sollen, wenn dieses Makro verwendet wird.</key>
+  </area>
+  <area alias="modelsBuilder">
+    <key alias="buildingModels">Datenmodel erzeugen</key>
+    <key alias="waitingMessage">Keine Sorge, das kann eine Weile dauern</key>
+    <key alias="modelsGenerated">Datenmodel erzeugt</key>
+    <key alias="modelsGeneratedError">Datenmodel konnte nicht erzeugt werden</key>
+    <key alias="modelsExceptionInUlog">Erzeugung des Datenmodels fehlgeschlagen, siehe Ausnahmen in den Log-Daten</key>
   </area>
   <area alias="templateEditor">
+    <key alias="addFallbackField">Ersatzfeld hinzufügen</key>
+    <key alias="fallbackField">Ersatzfeld</key>
+    <key alias="addDefaultValue">Standardwert hinzufügen</key>
+    <key alias="defaultValue">Standardwert</key>
     <key alias="alternativeField">Alternatives Feld</key>
     <key alias="alternativeText">Alternativer Text</key>
     <key alias="casing">Groß- und Kleinschreibung</key>
     <key alias="encoding">Kodierung</key>
     <key alias="chooseField">Feld auswählen</key>
     <key alias="convertLineBreaks">Zeilenumbrüche ersetzen</key>
+    <key alias="convertLineBreaksDescription">Ja, Zeilenumbrüche konvertieren</key>
     <key alias="convertLineBreaksHelp">Ersetzt Zeilenumbrüche durch das HTML-Tag &lt;br /&gt;</key>
     <key alias="customFields">Benutzerdefinierte Felder</key>
     <key alias="dateOnly">nur Datum</key>
+    <key alias="formatAndEncoding">Format und Kodierung</key>
     <key alias="formatAsDate">Als Datum formatieren</key>
+    <key alias="formatAsDateDescr">Formatire den Wert als Datum mit oder ohne Zeit entsprechend der aktiven Kultur</key>
     <key alias="htmlEncode">HTML kodieren</key>
     <key alias="htmlEncodeHelp">Wandelt Sonderzeichen in HTML-Zeichencodes um</key>
     <key alias="insertedAfter">Wird nach dem Feldinhalt eingefügt</key>
     <key alias="insertedBefore">Wird vor dem Feldinhalt eingefügt</key>
     <key alias="lowercase">Kleinbuchstaben</key>
+    <key alias="modifyOutput">Modifiziere Ausgabe</key>
     <key alias="none">Keine</key>
+    <key alias="outputSample">Beispiel-Ausgabe</key>
     <key alias="postContent">An den Feldinhalt anhängen</key>
     <key alias="preContent">Dem Feldinhalt voranstellen</key>
     <key alias="recursive">Rekursiv</key>
-    <key alias="removeParagraph">Textabsatz entfernen</key>
-    <key alias="removeParagraphHelp">Alle &lt;p&gt; am Anfang und am Ende des Feldinhalts werden entfernt</key>
+    <key alias="recursiveDescr">Ja, verwende es rekursiv</key>
+    <key alias="separator">Trenner</key>
     <key alias="standardFields">Standardfelder</key>
     <key alias="uppercase">Großbuchstaben</key>
     <key alias="urlEncode">URL kodieren</key>
     <key alias="urlEncodeHelp">Wandelt Sonderzeichen zur Verwendung in URLs um</key>
     <key alias="usedIfAllEmpty">Wird nur verwendet, wenn beide vorgenannten Felder leer sind</key>
     <key alias="usedIfEmpty">Dieses Feld wird nur verwendet, wenn das primäre Feld leer ist</key>
-    <key alias="withTime">Datum und Zeit mit Trennzeichen: </key>
+    <key alias="withTime">Datum und Zeit</key>
   </area>
   <area alias="translation">
     <key alias="details">Details zur Übersetzung</key>
@@ -1368,17 +1757,17 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="fields">Felder</key>
     <key alias="includeSubpages">Einschließlich der Unterseiten</key>
     <key alias="mailBody">
-Hallo %0%,
+      Hallo %0%,
 
-das Dokument '%1%' wurde von '%2%' zur Übersetzung in '%5%' freigegeben.
+      das Dokument '%1%' wurde von '%2%' zur Übersetzung in '%5%' freigegeben.
 
-Zum Bearbeiten verwenden Sie bitte diesen Link: http://%3%/translation/details.aspx?id=%4%.
+      Zum Bearbeiten verwenden Sie bitte diesen Link: http://%3%/translation/details.aspx?id=%4%.
 
-Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/umbraco
+      Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/umbraco
 
-Einen schönen Tag wünscht
-Ihr freundlicher Umbraco-Robot
-	</key>
+      Einen schönen Tag wünscht
+      Ihr freundlicher Umbraco-Robot
+    </key>
     <key alias="noTranslators">Bitte erstellen Sie zuerst mindestens einen Übersetzer.</key>
     <key alias="pageHasBeenSendToTranslation">Die Seite '%0%' wurde zur Übersetzung gesendet</key>
     <key alias="sendToTranslate">Sendet die Seite '%0%' zur Übersetzung</key>
@@ -1392,6 +1781,9 @@ Ihr freundlicher Umbraco-Robot
     <key alias="uploadTranslationXml">Hochladen der XML-Übersetzungsdatei</key>
   </area>
   <area alias="treeHeaders">
+    <key alias="content">Inhalt</key>
+    <key alias="contentBlueprints">Inhalt-Vorlage</key>
+    <key alias="media">Medien</key>
     <key alias="cacheBrowser">Zwischenspeicher</key>
     <key alias="contentRecycleBin">Papierkorb</key>
     <key alias="createdPackages">Erstellte Pakete</key>
@@ -1409,6 +1801,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="memberRoles">Mitgliederrollen</key>
     <key alias="memberTypes">Mitglieder-Typen</key>
     <key alias="documentTypes">Dokumententypen</key>
+    <key alias="relationTypes">Relationstypen</key>
     <key alias="packager">Pakete</key>
     <key alias="packages">Pakete</key>
     <key alias="repositories">Paket-Repositories</key>
@@ -1418,9 +1811,12 @@ Ihr freundlicher Umbraco-Robot
     <key alias="scripts">Client-Skripte</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Vorlagen</key>
-    <key alias="userPermissions">Berechtigungen</key>
-    <key alias="userTypes">Benutzertypen</key>
+    <key alias="logViewer">Log-Einträge anzeigen</key>
+
     <key alias="users">Benutzer</key>
+    <key alias="settingsGroup">Einstellungen</key>
+    <key alias="templatingGroup">Vorlagen</key>
+    <key alias="thirdPartyGroup">Drittanbieter</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Neues Update verfügbar</key>
@@ -1429,20 +1825,43 @@ Ihr freundlicher Umbraco-Robot
     <key alias="updateNoServerError">Fehler beim Überprüfen der Updates. Weitere Informationen finden Sie im Stacktrace.</key>
   </area>
   <area alias="user">
+    <key alias="access">Zugang</key>
+    <key alias="accessHelp">Basierend auf den zugewiesenen Gruppen und Startknoten, hat der Benutzer Zugang zu folgenden Knoten</key>
+    <key alias="assignAccess">Zugang zuweisen</key>
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Feld für Kategorie</key>
+    <key alias="createDate">Benutzer angelegt</key>
     <key alias="changePassword">Kennwort ändern</key>
+    <key alias="changePhoto">Foto ändern</key>
     <key alias="newPassword">Neues Kennwort</key>
+    <key alias="noLockouts">wurde nicht ausgeschlossen</key>
+    <key alias="noPasswordChange">Das Kennwort wurde nicht geändert</key>
     <key alias="confirmNewPassword">Neues Kennwort (Bestätigung)</key>
     <key alias="changePasswordDescription">Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf 'Kennwort ändern' klicken</key>
     <key alias="contentChannel">Schnittstelle für externe Editoren</key>
+    <key alias="createAnotherUser">Weiteren Benutzer anlegen</key>
+    <key alias="createUserHelp">
+    Lege neue Benutzer an, um ihnen Zugang zum Umbraco-Back-Office zu geben.
+    Während des Anlegens eines neuen Benutzer wird ein Kennwort erzeugt, das Sie dem Benutzer mitteilen können.
+    </key>
     <key alias="descriptionField">Feld für Beschreibung</key>
     <key alias="disabled">Benutzer endgültig deaktivieren</key>
     <key alias="documentType">Dokumenttyp</key>
     <key alias="editors">Editor</key>
     <key alias="excerptField">Feld für Textausschnitt</key>
+    <key alias="failedPasswordAttempts">Fehlgeschlagene Anmeldeversuche</key>
+    <key alias="goToProfile">Bneutzerprofil aufrufen</key>
+    <key alias="groupsHelp">Gruppen hinzufügen, um Zugang und Berechtigungen zuzuweisen</key>
+    <key alias="inviteAnotherUser">Weitere Benutzer einladen</key>
+    <key alias="inviteUserHelp">Laden Sie neue Benutzer ein, um ihnen Zugang zum Umbraco-Back-Office zu geben.
+    Eine Einladungs-E-Mail wird an dem Benutzer geschickt. Diese enthält Informationen, wie sich der Benutzer im Umbraco-Back-Office anmelden kann.
+    Einladungen sind 72 Stunden lang gültig.</key>
     <key alias="language">Sprache</key>
-    <key alias="loginname">Login</key>
+    <key alias="languageHelp">Bestimmen Sie die Sprache für Menüs und Dialoge</key>
+    <key alias="lastLockoutDate">Letztes Abmeldedatum</key>
+    <key alias="lastLogin">Letzte Anmeldung</key>
+    <key alias="lastPasswordChangeDate">letzte Änderung des Kennworts</key>
+    <key alias="loginname">Benutzername</key>
     <key alias="mediastartnode">Startelement in der Medienbibliothek</key>
     <key alias="modules">Freigegebene Bereiche</key>
     <key alias="noConsole">Zugang sperren</key>
@@ -1490,7 +1909,9 @@ Ihr freundlicher Umbraco-Robot
     <key alias="invalidPattern">Der Wert ist ungültig</key>
     <key alias="customValidation">Eigene Validierung</key>
   </area>
-  <area alias="healthcheck"><!--!!!-->
+  <!--!!!-->
+  <area alias="healthcheck">
+    <!--!!!-->
     <key alias="checkSuccessMessage">Value is set to the recommended value: '%0%'.</key>
     <key alias="rectifySuccessMessage">Value was set to '%1%' for XPath '%2%' in configuration file '%3%'.</key>
     <key alias="checkErrorMessageDifferentExpectedValue">Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.</key>
@@ -1596,8 +2017,10 @@ Ihr freundlicher Umbraco-Robot
     <key alias="redirectUrlManagement">Url-Weiterleitungen verwalten</key>
     <key alias="panelInformation">Die folgenden URLs leiten auf diesen Inhalt:</key>
     <key alias="noRedirects">Es wurden keine Weiterleitungen angelegt</key>
-    <key alias="noRedirectsDescription">Wenn eine veröffentlichte Seite umbenannt oder verschoben wird, 
-    erzeugt dieses CMS automatisch eine entsprechende Weiterleitung.</key>
+    <key alias="noRedirectsDescription">
+      Wenn eine veröffentlichte Seite umbenannt oder verschoben wird,
+      erzeugt dieses CMS automatisch eine entsprechende Weiterleitung.
+    </key>
     <key alias="confirmRemove">Wollen Sie wirklich die Weiterleitung von '%0%' nach '%1%' entfernen?</key>
     <key alias="redirectRemoved">URL-Weiterleitung wurde entfernt.</key>
     <key alias="redirectRemoveError">Beim Entfernen der URL-Weiterleitung ist ein Fehler aufgetreten.</key>
@@ -1618,8 +2041,10 @@ Ihr freundlicher Umbraco-Robot
     <key alias="contentTrashed">Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
     <key alias="mediaTrashed">Medienelement mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
     <key alias="itemCannotBeRestored">Dieses Element kann nicht automatisch wiederhergestellt werden</key>
-    <key alias="itemCannotBeRestoredHelpText">Es gibt keine Position für das automatische Wiederherstellen dieses Elementes. 
-    Sie können es manuell mit Hilfe des untenstehenden Strukturbaums verschieben.</key>
+    <key alias="itemCannotBeRestoredHelpText">
+      Es gibt keine Position für das automatische Wiederherstellen dieses Elementes.
+      Sie können es manuell mit Hilfe des untenstehenden Strukturbaums verschieben.
+    </key>
     <key alias="wasRestored">wurde wiederhergestellt unterhalb von</key>
   </area>
   <area alias="relationType">
@@ -1628,7 +2053,8 @@ Ihr freundlicher Umbraco-Robot
     <key alias="bidirectional">Bidirektional</key>
     <key alias="parent">Oberknoten</key>
     <key alias="child">Unterknoten</key>
-    <key alias="count">Anzahl</key><!--???-->
+    <key alias="count">Anzahl</key>
+    <!--???-->
     <key alias="relations">Relationen</key>
     <key alias="created">Angelegt</key>
     <key alias="comment">Kommentar</key>
