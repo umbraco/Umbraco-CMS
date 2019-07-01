@@ -607,6 +607,7 @@ namespace Umbraco.Web.Editors
                         {
                             context.SetCulture(culture);
                         });
+                        //TODO: Why is this here and not in the mapping?
                         target.AdditionalData["hasChildren"] = source.HasChildren;
                         return target;
                     })

@@ -88,9 +88,10 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <returns></returns>
         internal TreeNode GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormDataCollection queryStrings,
-            int[] startNodeIds, string[] startNodePaths, bool ignoreUserStartNodes)
+            int[] startNodeIds, string[] startNodePaths)
         {
             var entityIsAncestorOfStartNodes = ContentPermissionsHelper.IsInBranchOfStartNode(e.Path, startNodeIds, startNodePaths, out var hasPathAccess);
+            var ignoreUserStartNodes = IgnoreUserStartNodes(queryStrings);
             if (ignoreUserStartNodes == false && entityIsAncestorOfStartNodes == false)
                 return null;
 
@@ -101,7 +102,7 @@ namespace Umbraco.Web.Trees
                 //the node so we need to return null;
                 return null;
             }
-            if (ignoreUserStartNodes == false && hasPathAccess == false)
+            if (!ignoreUserStartNodes && !hasPathAccess)
             {
                 treeNode.AdditionalData["noAccess"] = true;
             }
@@ -182,7 +183,7 @@ namespace Umbraco.Web.Trees
             //get the current user start node/paths
             GetUserStartNodes(out var userStartNodes, out var userStartNodePaths);
 
-            nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths, ignoreUserStartNodes)).Where(x => x != null));
+            nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
 
             // if the user does not have access to the root node, what we have is the start nodes,
             // but to provide some context we also need to add their topmost nodes when they are not
@@ -193,7 +194,7 @@ namespace Umbraco.Web.Trees
                 if (topNodeIds.Length > 0)
                 {
                     var topNodes = Services.EntityService.GetAll(UmbracoObjectType, topNodeIds.ToArray());
-                    nodes.AddRange(topNodes.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths, ignoreUserStartNodes)).Where(x => x != null));
+                    nodes.AddRange(topNodes.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
                 }
             }
 
@@ -217,7 +218,7 @@ namespace Umbraco.Web.Trees
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
-            if (int.TryParse(id, out var entityId) == false)
+            if (!int.TryParse(id, out var entityId))
             {
                 var entity = GetEntityFromId(id);
                 if (entity == null)
@@ -226,11 +227,13 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
+            var ignoreUserStartNodes = IgnoreUserStartNodes(queryStrings);
+
             IEntitySlim[] result;
 
             // if a request is made for the root node but user has no access to
             // root node, return start nodes instead
-            if (entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
+            if (!ignoreUserStartNodes && entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 result = UserStartNodes.Length > 0
                     ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes).ToArray()
@@ -535,6 +538,8 @@ namespace Umbraco.Web.Trees
 
         private readonly ConcurrentDictionary<string, IEntitySlim> _entityCache = new ConcurrentDictionary<string, IEntitySlim>();
 
+        private bool? _ignoreUserStartNodes;
+
         /// <summary>
         /// If the request should allows a user to choose nodes that they normally don't have access to
         /// </summary>
@@ -542,13 +547,12 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         internal bool IgnoreUserStartNodes(FormDataCollection queryStrings)
         {
-            var dataTypeId = queryStrings.GetValue<Guid?>(TreeQueryStringParameters.DataTypeId);
-            if (dataTypeId.HasValue)
-            {
-                return Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value);
-            }
+            if (_ignoreUserStartNodes.HasValue) return _ignoreUserStartNodes.Value;
 
-            return false;
+            var dataTypeId = queryStrings.GetValue<Guid?>(TreeQueryStringParameters.DataTypeId);
+            _ignoreUserStartNodes = dataTypeId.HasValue ? Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value) : false;
+
+            return _ignoreUserStartNodes.Value;
         }
     }
 }
