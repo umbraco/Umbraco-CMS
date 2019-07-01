@@ -17,11 +17,11 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ContentPropertyDtoMapper _contentPropertyDtoConverter;
         private readonly ContentPropertyDisplayMapper _contentPropertyDisplayMapper;
 
-        public ContentPropertyMapDefinition(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyMapDefinition(IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
         {
-            _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(dataTypeService, logger, propertyEditors);
-            _contentPropertyDtoConverter = new ContentPropertyDtoMapper(dataTypeService, logger, propertyEditors);
-            _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(dataTypeService, textService, logger, propertyEditors);
+            _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(dataTypeService, entityService, logger, propertyEditors);
+            _contentPropertyDtoConverter = new ContentPropertyDtoMapper(dataTypeService, entityService, logger, propertyEditors);
+            _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(dataTypeService, entityService, textService, logger, propertyEditors);
         }
 
         public void DefineMaps(UmbracoMapper mapper)

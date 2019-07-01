@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
-    function ($scope, eventsService, entityResource, mediaResource, mediaHelper, udiParser, userService, localizationService, tinyMceService, editorService, contentEditingHelper) {
+    function ($scope, eventsService, entityResource, mediaResource, mediaHelper, udiParser, userService, localizationService, editorService) {
         
         var vm = this;
         var dialogOptions = $scope.model;
