@@ -1155,6 +1155,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var linkPicker = {
                     currentTarget: currentTarget,
                     dataTypeId: args.model.dataTypeId,
+                    ignoreUserStartNodes: args.model.config.ignoreUserStartNodes,
                     anchors: getCurrentAnchorNames(),
                     submit: function (model) {
                         self.insertLinkInEditor(args.editor, model.target, anchorElement);
