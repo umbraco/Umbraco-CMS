@@ -286,28 +286,12 @@ namespace Umbraco.Web.Editors
                 publishedContentExists: i => Umbraco.Content(i) != null);
         }
 
-
-        //fixme - culture?
         [HttpGet]
-        public UrlAndAnchors GetUrlAndAnchors([FromUri]int id)
+        public UrlAndAnchors GetUrlAndAnchors([FromUri]int id, [FromUri]string culture = "*")
         {
             var url = UmbracoContext.UrlProvider.GetUrl(id);
-            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id);
+            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id, culture);
             return new UrlAndAnchors(url, anchorValues);
-        }
-
-        public class AnchorsModel
-        {
-            public string RteContent { get; set; }
-        }
-
-        //fixme - culture?
-        [HttpGet]
-        [HttpPost]
-        public IEnumerable<string> GetAnchors(AnchorsModel model)
-        {
-            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEContent(model.RteContent);
-            return anchorValues;
         }
 
 
