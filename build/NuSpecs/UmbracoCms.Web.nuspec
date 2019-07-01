@@ -44,7 +44,7 @@
                 <dependency id="System.Threading.Tasks.Dataflow" version="[4.9.0,4.999999)" />
 
             </group>
-            
+
         </dependencies>
     </metadata>
     <files>
@@ -59,7 +59,7 @@
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\net472\Umbraco.Examine.xml" />
 
         <!-- symbols -->
-        <file src="$BuildTmp$\bin\Umbraco.Web.pdb" target="lib" />
-        <file src="$BuildTmp$\bin\Umbraco.Examine.pdb" target="lib" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.pdb" target="lib\net472\Umbraco.Web.pdb" />
+        <file src="$BuildTmp$\bin\Umbraco.Examine.pdb" target="lib\net472\Umbraco.Examine.pdb" />
     </files>
 </package>
