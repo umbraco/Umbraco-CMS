@@ -1154,6 +1154,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
                 var linkPicker = {
                     currentTarget: currentTarget,
+                    dataTypeId: args.model.dataTypeId,
                     anchors: getCurrentAnchorNames(),
                     submit: function (model) {
                         self.insertLinkInEditor(args.editor, model.target, anchorElement);
@@ -1168,13 +1169,26 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             //Create the insert media plugin
             self.createMediaPicker(args.editor, function (currentTarget, userData) {
+
+                if (!args.model.config.startNodeId) {
+                    if (args.model.config.ignoreUserStartNodes === true) {
+                        args.model.config.startNodeId = -1;
+                        args.model.config.startNodeIsVirtual = true;
+                    }
+                    else {
+                        args.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                        args.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                    }
+                }
+
                 var mediaPicker = {
                     currentTarget: currentTarget,
                     onlyImages: true,
                     showDetails: true,
                     disableFolderSelect: true,
-                    startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                    startNodeId: args.model.config.startNodeId,
+                    startNodeIsVirtual: args.model.config.startNodeIsVirtual,
+                    dataTypeId: args.model.dataTypeId,
                     submit: function (model) {
                         self.insertMediaInEditor(args.editor, model.selection[0]);
                         editorService.close();
