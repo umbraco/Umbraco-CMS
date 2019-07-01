@@ -1076,8 +1076,11 @@ namespace Umbraco.Core.Services.Implement
             var variesByCulture = content.ContentType.VariesByCulture();
 
             //track cultures that are being published, changed, unpublished
-            IReadOnlyList<string> culturesPublishing = null;
-            IReadOnlyList<string> culturesUnpublishing = null;
+            //determine cultures publishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
+            var culturesUnpublishing = content.GetCulturesUnpublishing();
+            var culturesPublishing = variesByCulture
+                ? content.PublishCultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+                : null;
             IReadOnlyList<string> culturesChanging = variesByCulture
                 ? content.CultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                 : null;
@@ -1088,12 +1091,6 @@ namespace Umbraco.Core.Services.Implement
 
             if (publishing)
             {
-                //determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
-                culturesUnpublishing = content.GetCulturesUnpublishing();
-                culturesPublishing = variesByCulture
-                        ? content.PublishCultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                        : null;
-
                 // ensure that the document can be published, and publish handling events, business rules, etc
                 publishResult = StrategyCanPublish(scope, content, /*checkPath:*/ (!branchOne || branchRoot), culturesPublishing, culturesUnpublishing, evtMsgs, saveEventArgs);
                 if (publishResult.Success)
