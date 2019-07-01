@@ -161,9 +161,21 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
         $scope.switchToMediaPicker = function () {
             userService.getCurrentUser().then(function (userData) {
+
+                var startNodeId, startNodeIsVirtual;
+                if (dialogOptions.ignoreUserStartNodes === true) {
+                    startNodeId = -1;
+                    startNodeIsVirtual = true;
+                }
+                else {
+                    startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                    startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                }
+
                 var mediaPicker = {
-                    startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                    startNodeId: startNodeId,
+                    startNodeIsVirtual: startNodeIsVirtual,
+                    dataTypeId: dialogOptions.dataTypeId,
                     submit: function (model) {
                         var media = model.selection[0];
 

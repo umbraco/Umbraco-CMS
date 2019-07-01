@@ -1170,14 +1170,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //Create the insert media plugin
             self.createMediaPicker(args.editor, function (currentTarget, userData) {
 
+                var startNodeId, startNodeIsVirtual;
                 if (!args.model.config.startNodeId) {
                     if (args.model.config.ignoreUserStartNodes === true) {
-                        args.model.config.startNodeId = -1;
-                        args.model.config.startNodeIsVirtual = true;
+                        startNodeId = -1;
+                        startNodeIsVirtual = true;
                     }
                     else {
-                        args.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                        args.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                        startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                        startNodeIsVirtual = userData.startMediaIds.length !== 1;
                     }
                 }
 
@@ -1186,8 +1187,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     onlyImages: true,
                     showDetails: true,
                     disableFolderSelect: true,
-                    startNodeId: args.model.config.startNodeId,
-                    startNodeIsVirtual: args.model.config.startNodeIsVirtual,
+                    startNodeId: startNodeId,
+                    startNodeIsVirtual: startNodeIsVirtual,
                     dataTypeId: args.model.dataTypeId,
                     submit: function (model) {
                         self.insertMediaInEditor(args.editor, model.selection[0]);
