@@ -301,7 +301,10 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          */
         getAncestors: function (id, type, culture, options) {
-            if (culture === undefined) culture = "";
+            if (!culture) {
+                culture = "";
+            }
+
             var args = [
                 { id: id },
                 { type: type },

@@ -160,7 +160,7 @@ angular.module("umbraco")
                 }
 
                 if (folder.id > 0) {
-                    entityResource.getAncestors(folder.id, "media", { dataTypeId: $scope.model.dataTypeId })
+                    entityResource.getAncestors(folder.id, "media", null, { dataTypeId: $scope.model.dataTypeId })
                         .then(function (anc) {
                             $scope.path = _.filter(anc,
                                 function (f) {

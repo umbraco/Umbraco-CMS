@@ -7,7 +7,7 @@ angular.module("umbraco")
         
         
         if (!$scope.model.config.startNodeId) {
-            if ($scope.model.config.ignoreUserStartNodes === "1" ) {
+            if ($scope.model.config.ignoreUserStartNodes === true) {
                 $scope.model.config.startNodeId = -1;
                 $scope.model.config.startNodeIsVirtual = true;
 
