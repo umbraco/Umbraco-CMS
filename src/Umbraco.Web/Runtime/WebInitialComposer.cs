@@ -264,7 +264,9 @@ namespace Umbraco.Web.Runtime
                 .Append<Ted>()
                 .Append<Soundcloud>()
                 .Append<Issuu>()
-                .Append<Hulu>();
+                .Append<Hulu>()
+                .Append<Giphy>();
+            
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();

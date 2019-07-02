@@ -10,23 +10,26 @@ namespace Umbraco.Core
             //constants, it would make more sense to have these suffixed with "ID" or in a Subclass called "INT", for
             //now all we can do is make a subclass called Guids to put the GUID IDs.
 
-            public const int LabelString = -92;
+            public const int LabelString = System.DefaultLabelDataTypeId;
             public const int LabelInt = -91;
             public const int LabelBigint = -93;
             public const int LabelDateTime = -94;
             public const int LabelTime = -98;
             public const int LabelDecimal = -99;
 
+            public const int Textarea = -89;
             public const int Textbox = -88;
             public const int Boolean = -49;
             public const int DateTime = -36;
             public const int DropDownSingle = -39;
             public const int DropDownMultiple = -42;
+            public const int Upload = -90;
 
             public const int DefaultContentListView = -95;
             public const int DefaultMediaListView = -96;
             public const int DefaultMembersListView = -97;
 
+            public const int ImageCropper = 1043;
             public const int Tags = 1041;
 
             public static class ReservedPreValueKeys

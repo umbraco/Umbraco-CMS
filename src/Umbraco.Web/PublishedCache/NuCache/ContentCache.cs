@@ -261,10 +261,22 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (culture == null)
                 culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
 
+            // _snapshot.GetAtRoot() returns all ContentNode at root
             // both .Draft and .Published cannot be null at the same time
             // root is already sorted by sortOrder, and does not contain nulls
-            var atRoot = _snapshot.GetAtRoot().Select(n => GetNodePublishedContent(n, preview));
-            return culture == "*" ? atRoot : atRoot.Where(x => x.IsInvariantOrHasCulture(culture));
+            //
+            // GetNodePublishedContent may return null if !preview and there is no
+            // published model, so we need to filter these nulls out
+
+            var atRoot = _snapshot.GetAtRoot()
+                .Select(n => GetNodePublishedContent(n, preview))
+                .WhereNotNull();
+
+            // if a culture is specified, we must ensure that it is avail/published
+            if (culture != "*")
+                atRoot = atRoot.Where(x => x.IsInvariantOrHasCulture(culture));
+
+            return atRoot;
         }
 
         private static IPublishedContent GetNodePublishedContent(ContentNode node, bool preview)

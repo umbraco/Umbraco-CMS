@@ -149,6 +149,7 @@
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Macros\IMacroRenderer.cs" />
+    <Compile Include="Media\EmbedProviders\Giphy.cs" />
     <Compile Include="Media\EmbedProviders\YouTube.cs" />
     <Compile Include="Media\EmbedProviders\EmbedProviderBase.cs" />
     <Compile Include="Media\EmbedProviders\EmbedProvidersCollection.cs" />
