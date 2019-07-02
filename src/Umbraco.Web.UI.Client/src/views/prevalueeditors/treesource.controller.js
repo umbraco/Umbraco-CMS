@@ -60,20 +60,6 @@ angular.module('umbraco')
 			$scope.model.value.query = undefined;
 		};
 		
-
-		//we always need to ensure we dont submit anything broken
-	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-	    	if($scope.model.value.type === "member"){
-	    		$scope.model.value.id = -1;
-	    		$scope.model.value.query = "";
-	    	}
-	    });
-
-	    //when the scope is destroyed we need to unsubscribe
-	    $scope.$on('$destroy', function () {
-	        unsubscribe();
-	    });
-
 		function populate(item){
 			$scope.clear();
 			item.icon = iconHelper.convertFromLegacyIcon(item.icon);
