@@ -1172,7 +1172,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\TagsController.cs" />
     <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">
