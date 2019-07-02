@@ -14,10 +14,10 @@
     <key alias="browse">Durchsuchen</key>
     <key alias="changeDocType">Dokumenttyp ändern</key>
     <key alias="copy">Kopieren</key>
-    <key alias="create">Erstellen</key>
+    <key alias="create">Neu</key>
     <key alias="export">Exportieren</key>
-    <key alias="createPackage">Paket erstellen</key>
-    <key alias="createGroup">Gruppe erstellen</key>
+    <key alias="createPackage">Neues Paket</key>
+    <key alias="createGroup">Neue Gruppe</key>
     <key alias="delete">Entfernen</key>
     <key alias="disable">Deaktivieren</key>
     <key alias="emptyRecycleBin">Papierkorb leeren</key>
@@ -108,7 +108,7 @@
     <key alias="inherit">Vererben</key>
     <key alias="setLanguage">Kultur</key>
     <key alias="setLanguageHelp">Definiert die Kultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>
-    <key alias="setDomains">Domains</key>
+    <key alias="setDomains">Domainen</key>
   </area>
   <area alias="buttons">
     <key alias="clearSelection">Auswahl aufheben</key>
@@ -343,7 +343,7 @@
   </area>
   <area alias="create">
     <key alias="chooseNode">An welcher Stellen wollen Sie das Element erstellen</key>
-    <key alias="createUnder">Erstellen unter</key>
+    <key alias="createUnder">Neues Element unterhalb von</key>
     <key alias="createContentBlueprint">Wählen Sie einen Dokumenttyp für eine Inhaltsvorlage</key>
     <key alias="enterFolderName">Geben Sie einen Verzeichnisnamen ein</key>
     <key alias="updateData">Wählen Sie einen Namen und einen Typ</key>
@@ -426,7 +426,7 @@
     <key alias="inserttable">Tabelle einfügen</key>
     <key alias="languagedeletewarning">Dies entfernt die Sprache</key>
     <key alias="lastEdited">Zuletzt bearbeitet</key>
-    <key alias="link">Link</key>
+    <key alias="link">Verknüpfung</key>
     <key alias="linkinternal">Anker:</key>
     <key alias="linklocaltip">Wenn lokale Links verwendet werden, füge ein "#" vor den Link ein</key>
     <key alias="linknewwindow">In einem neuen Fenster öffnen?</key>
@@ -567,7 +567,7 @@
     <key alias="folderWasRenamed">%0% wurde umbenannt in %1%</key>
   </area>
   <area alias="editdatatype">
-    <key alias="addPrevalue">Vorgabewert hinzufügen</key>
+    <key alias="addPrevalue">Neuer Vorgabewert</key>
     <key alias="dataBaseDatatype">Feldtyp in der Datenbank</key>
     <key alias="guid">Datentyp-GUID</key>
     <key alias="renderControl">Steuerelement zur Darstellung</key>
@@ -643,7 +643,7 @@
     <key alias="content">Inhalt</key>
     <key alias="continue">Weiter</key>
     <key alias="copy">Kopieren</key>
-    <key alias="create">Erstellen</key>
+    <key alias="create">Neu</key>
     <key alias="database">Datenbank</key>
     <key alias="date">Datum</key>
     <key alias="default">Standard</key>
@@ -663,7 +663,7 @@
     <key alias="field">Feld</key>
     <key alias="findDocument">Suche</key>
     <key alias="first">Erste(s)</key>
-    <key alias="general">Generel</key>
+    <key alias="general">Allgemein</key>
     <key alias="groups">Gruppen</key>
     <key alias="group">Gruppe</key>
     <key alias="height">Höhe</key>
@@ -684,6 +684,7 @@
     <key alias="language">Sprache</key>
     <key alias="last">Letzte(s)</key>
     <key alias="layout">Layout</key>
+    <key alias="links">Links</key>
     <key alias="loading">Laden</key>
     <key alias="locked">Gesperrt</key>
     <key alias="login">Anmelden</key>
@@ -701,6 +702,7 @@
     <key alias="off">Aus</key>
     <key alias="ok">Ok</key>
     <key alias="open">Öffnen</key>
+    <key alias="options">Optionen</key>
     <key alias="on">An</key><!--???-->
     <key alias="or">oder</key>
     <key alias="orderBy">Sortieren nach</key>
@@ -766,8 +768,8 @@
     <key alias="blue">Blau</key>
   </area>
   <area alias="shortcuts">
-    <key alias="addGroup">Gruppe hinzufügen</key>
-    <key alias="addProperty">Eigenschaft hinzufügen</key>
+    <key alias="addGroup">Neue Gruppe</key>
+    <key alias="addProperty">Neue Eigenschaft</key>
     <key alias="addEditor">Editor hinzufügen</key>
     <key alias="addTemplate">Vorlage hinzufügen</key>
     <key alias="addChildNode">Knoten unterhalb hinzufügen</key>
@@ -1331,7 +1333,7 @@
   <area alias="imagecropper">
     <key alias="reset">Zurücksetzen</key>
     <key alias="saveCrop">Ausschnitt sichern</key>
-    <key alias="addCrop">Neuen Ausschnitt hinzufügen</key>
+    <key alias="addCrop">Neuer Ausschnitt</key>
     <key alias="updateEditCrop">Fertig</key>
     <key alias="undoEditCrop">Rückgängig machen</key>
   </area>
@@ -1476,10 +1478,11 @@
     <key alias="scheduleErrExpireDate2">Das Ablaufdatum darf nicht vor dem Veröffentlichungsdatum liegen</key>
   </area>
   <area alias="stylesheet">
-    <key alias="addRule">Stil hinzufügen</key>
+    <key alias="addRule">Neuer Stil</key>
     <key alias="editRule">Stil bearbeiten</key>
     <key alias="editorRules">Rich text editor Stile</key>
-    <key alias="editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</key>
+    <key alias="editorRulesHelp">
+    Definiere die Stile, die im 'Rich-Text-Editor' verfügbar sein sollen.</key>
     
     <key alias="editstylesheet">Stylesheet bearbeiten</key>
     <key alias="editstylesheetproperty">Stylesheet-Regel bearbeiten</key>
@@ -1523,7 +1526,7 @@
     <key alias="renderBody">Untergeordnete Vorlage einfügen</key>
     <key alias="renderBodyDesc">
       <![CDATA[
-      Verarbeitet den Inhalt einer untergeordnete Vorlage durch 
+      Verarbeitet den Inhalt einer untergeordneten Vorlage durch 
       Einfügen eines <code>@RenderBody()</code> Platzhalters.
       ]]>
     </key>
@@ -1539,7 +1542,7 @@
     <key alias="renderSectionDesc">
       <![CDATA[
       Fügt einen benannten Bereich einer untergeordneten Vorlage durch Verwendung des Platzhalters <code>@RenderSection(name)</code> ein.
-      Dies verarbeitet einen benannten Bereich einer untergeordneten Vorlage, der mit <code>@section [name]{ ... }</code> umschlossen definiert wurde.
+      Dies verarbeitet einen benannten Bereich einer untergeordneten Vorlage, der mit <code>@section [name]{ ... }</code> umschlossen, definiert wurde.
       ]]>
     </key>
     <key alias="sectionName">Bereichsname</key>
@@ -1584,10 +1587,10 @@
   <area alias="grid">
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
-    <key alias="insertControl">Element hinzufügen</key>
+    <key alias="insertControl">Neues Element</key>
     <key alias="chooseLayout">Layout auswählen</key>
-    <key alias="addRows">Zeile hinzufügen</key>
-    <key alias="addElement">Inhalt hinzufügen</key>
+    <key alias="addRows">Neue Zeile</key>
+    <key alias="addElement">Neuer Inhalt</key>
     <key alias="dropElement">Inhalt entfernen</key>
     <key alias="settingsApplied">Einstellungen anwenden</key>
     <key alias="contentNotAllowed"><![CDATA[Dieser Inhalt ist hier <strong>nicht</strong> zugelassen]]></key>
@@ -1603,7 +1606,7 @@
     <key alias="rowConfigurations">Einstellungen für das Zeilenlayout</key>
     <key alias="rowConfigurationsDetail">Zeilen sind vordefinierte horizontale Zellenanordnungen</key>
     <key alias="addRowConfiguration">Zeilenlayout hinzufügen</key>
-    <key alias="addRowConfigurationDetail">Pasen Sie das Zeilenlayout an, indem Sie die Zellenbreite einstellen und Zellen hinzufügen.</key>
+    <key alias="addRowConfigurationDetail">Passen Sie das Zeilenlayout an, indem Sie die Zellenbreite einstellen und Zellen hinzufügen.</key>
     <key alias="columns">Spalten</key>
     <key alias="columnsDetails">Insgesamte Spaltenanzahl im Layout</key>
     <key alias="settings">Einstellungen</key>
