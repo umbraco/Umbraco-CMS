@@ -58,7 +58,6 @@ function ColorPickerController($scope, $timeout) {
         // this is required to re-validate
         $timeout(function () {
             var newColor = color ? color.value : null;
-            console.log("revalidate", newColor)
             $scope.propertyForm.selectedColor.$setViewValue(newColor);
         });
     }
