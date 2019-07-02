@@ -13,6 +13,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
+
         $scope.allowEditMedia = false;
         $scope.allowAddMedia = false;
 
@@ -117,10 +118,18 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     vm.labels.mediaPicker_deletedItem = data[0];
 
                     userService.getCurrentUser().then(function (userData) {
+
                         if (!$scope.model.config.startNodeId) {
-                            $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                            $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-                        }
+                    if ($scope.model.config.ignoreUserStartNodes === true) {
+                        $scope.model.config.startNodeId = -1;
+                        $scope.model.config.startNodeIsVirtual = true;
+                    }
+                    else {
+                        $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                        $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                    }  
+                }
+
                         // only allow users to add and edit media if they have access to the media section
                         var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;
                         $scope.allowEditMedia = hasAccessToMedia;
@@ -178,6 +187,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             var mediaPicker = {
                 startNodeId: $scope.model.config.startNodeId,
                 startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
+                dataTypeId: $scope.model.dataTypeId,
                 multiPicker: multiPicker,
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,
