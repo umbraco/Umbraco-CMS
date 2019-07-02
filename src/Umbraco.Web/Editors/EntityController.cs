@@ -442,16 +442,7 @@ namespace Umbraco.Web.Editors
             {
                 //TODO: Need to check for Object types that support hierarchy here, some might not.
 
-                int[] startNodes = null;
-                switch (type)
-                {
-                    case UmbracoEntityTypes.Document:
-                        startNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                        break;
-                    case UmbracoEntityTypes.Media:
-                        startNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                        break;
-                }
+                var startNodes = GetStartNodes(type);
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
 
@@ -578,16 +569,7 @@ namespace Umbraco.Web.Editors
                 IEnumerable<IUmbracoEntity> entities;
                 long totalRecords;
 
-                int[] startNodes = null;
-                switch (type)
-                {
-                    case UmbracoEntityTypes.Document:
-                        startNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                        break;
-                    case UmbracoEntityTypes.Media:
-                        startNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                        break;
-                }
+                var startNodes = GetStartNodes(type);
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
 
@@ -637,6 +619,20 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        private int[] GetStartNodes(UmbracoEntityTypes type)
+        {
+            switch (type)
+            {
+                case UmbracoEntityTypes.Document:
+                    return Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                case UmbracoEntityTypes.Media:
+                    return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                default:
+                    return new int[0];
+            }
+
+        }
+
 
         public PagedResult<EntityBasic> GetPagedDescendants(
             int id,
@@ -663,16 +659,7 @@ namespace Umbraco.Web.Editors
                 {
                     // root is special: we reduce it to start nodes
 
-                    int[] aids = null;
-                    switch (type)
-                    {
-                        case UmbracoEntityTypes.Document:
-                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                            break;
-                        case UmbracoEntityTypes.Media:
-                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                            break;
-                    }
+                    int[] aids = GetStartNodes(type);
 
                     var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
                     entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
