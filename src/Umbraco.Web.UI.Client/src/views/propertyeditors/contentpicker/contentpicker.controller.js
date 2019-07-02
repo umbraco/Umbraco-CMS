@@ -139,7 +139,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         multiPicker: $scope.model.config.multiPicker,
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
-        startNodeId: null,        
+        startNodeId: null,
+        dataTypeId: $scope.model.dataTypeId,
         currentNode: editorState ? editorState.current : null,
         callback: function (data) {
             if (angular.isArray(data)) {
