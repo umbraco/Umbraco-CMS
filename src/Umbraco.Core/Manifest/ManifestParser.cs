@@ -22,24 +22,26 @@ namespace Umbraco.Core.Manifest
         private readonly IAppPolicyCache _cache;
         private readonly ILogger _logger;
         private readonly ManifestValueValidatorCollection _validators;
+        private readonly ManifestFilterCollection _filters;
 
         private string _path;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ILogger logger)
-            : this(appCaches, validators, "~/App_Plugins", logger)
+        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger)
+            : this(appCaches, validators, filters, "~/App_Plugins", logger)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, string path, ILogger logger)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
+            _filters = filters ?? throw new ArgumentNullException(nameof(filters));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
             Path = path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -78,6 +80,7 @@ namespace Umbraco.Core.Manifest
                     if (string.IsNullOrWhiteSpace(text))
                         continue;
                     var manifest = ParseManifest(text);
+                    manifest.Source = path;
                     manifests.Add(manifest);
                 }
                 catch (Exception e)
@@ -85,6 +88,8 @@ namespace Umbraco.Core.Manifest
                     _logger.Error<ManifestParser>(e, "Failed to parse manifest at '{Path}', ignoring.", path);
                 }
             }
+
+            _filters.Filter(manifests);
 
             return manifests;
         }
