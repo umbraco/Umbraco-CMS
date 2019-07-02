@@ -204,6 +204,7 @@
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
+    <Compile Include="Models\AnchorsModel.cs" />
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />

@@ -21,6 +21,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Search;
@@ -294,6 +295,14 @@ namespace Umbraco.Web.Editors
             return new UrlAndAnchors(url, anchorValues);
         }
 
+        [HttpGet]
+        [HttpPost]
+        public IEnumerable<string> GetAnchors(AnchorsModel model)
+        {
+            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEContent(model.RteContent);
+            return anchorValues;
+        }
+
 
         #region GetById
 
@@ -422,16 +431,7 @@ namespace Umbraco.Web.Editors
             {
                 //TODO: Need to check for Object types that support hierarchy here, some might not.
 
-                int[] startNodes = null;
-                switch (type)
-                {
-                    case UmbracoEntityTypes.Document:
-                        startNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                        break;
-                    case UmbracoEntityTypes.Media:
-                        startNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                        break;
-                }
+                var startNodes = GetStartNodes(type);
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
 
@@ -556,16 +556,7 @@ namespace Umbraco.Web.Editors
                 IEnumerable<IEntitySlim> entities;
                 long totalRecords;
 
-                int[] startNodes = null;
-                switch (type)
-                {
-                    case UmbracoEntityTypes.Document:
-                        startNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                        break;
-                    case UmbracoEntityTypes.Media:
-                        startNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                        break;
-                }
+                var startNodes = GetStartNodes(type);
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
 
@@ -628,6 +619,25 @@ namespace Umbraco.Web.Editors
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + type);
             }
+        }
+
+        private int[] GetStartNodes(UmbracoEntityTypes type)
+        {
+            int[] startNodes = null;
+            switch (type)
+            {
+                case UmbracoEntityTypes.Document:
+                    startNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                    break;
+                case UmbracoEntityTypes.Media:
+                    startNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                    break;
+                default:
+                    startNodes = Array.Empty<int>();
+                    break;
+            }
+
+            return startNodes;
         }
 
 
