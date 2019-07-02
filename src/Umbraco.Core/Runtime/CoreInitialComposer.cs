@@ -58,13 +58,16 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<ManifestParser>();
 
             // register our predefined validators
-            composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
+            composition.ManifestValueValidators()
                 .Add<RequiredValidator>()
                 .Add<RegexValidator>()
                 .Add<DelimitedValueValidator>()
                 .Add<EmailValidator>()
                 .Add<IntegerValidator>()
                 .Add<DecimalValidator>();
+
+            // register the manifest filter collection builder (collection is empty by default)
+            composition.ManifestFilters();
 
             // properties and parameters derive from data editors
             composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
