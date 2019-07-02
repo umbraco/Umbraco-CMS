@@ -19,6 +19,7 @@ namespace Umbraco.Core
 
             public const int Textarea = -89;
             public const int Textbox = -88;
+            public const int RichtextEditor = -87;
             public const int Boolean = -49;
             public const int DateTime = -36;
             public const int DropDownSingle = -39;
