@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -17,15 +18,17 @@ namespace Umbraco.Web.Cache
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
+        private readonly IContentTypeService _contentTypeService;
         private readonly IdkMap _idkMap;
 
-        public ContentTypeCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
+        public ContentTypeCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository, IContentTypeService contentTypeService)
             : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _publishedModelFactory = publishedModelFactory;
             _idkMap = idkMap;
             _contentTypeCommonRepository = contentTypeCommonRepository;
+            _contentTypeService = contentTypeService;
         }
 
         #region Define
@@ -49,6 +52,16 @@ namespace Umbraco.Web.Cache
             // is managing the cache to please clear that cache properly
 
             _contentTypeCommonRepository.ClearCache(); // always
+
+            // We need to special handle the IContentType if modelsbuilder is in live mode, because all models are updated when a IContentType is changed, we need to clear all from cache also.
+            if (_publishedModelFactory is ILivePublishedModelFactory && payloads.Any(x => x.ItemType == typeof(IContentType).Name))
+            {
+                //This is super nasty, and we need to figure out a better way to to this
+                //Ensure all doc type ids is part of the payload
+                var missingPayloads = GetMissingContentTypePayloads(payloads);
+
+                payloads = payloads.Union(missingPayloads).ToArray();
+            }
 
             if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
             {
@@ -94,6 +107,20 @@ namespace Umbraco.Web.Cache
 
             // now we can trigger the event
             base.Refresh(payloads);
+        }
+
+        private IEnumerable<JsonPayload> GetMissingContentTypePayloads(JsonPayload[] payloads)
+        {
+            var existingPayloadIds = new HashSet<int>(payloads.Select(x => x.Id));
+            var contentTypeIds = _contentTypeService.GetAll().Select(x => x.Id).ToArray();
+
+            foreach (var contentTypeId in contentTypeIds)
+            {
+                if (!existingPayloadIds.Contains(contentTypeId))
+                {
+                    yield return new JsonPayload(typeof(IContentType).Name, contentTypeId, ContentTypeChangeTypes.RefreshOther);
+                }
+            }
         }
 
         public override void RefreshAll()
