@@ -5,6 +5,7 @@ using System.Web;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
