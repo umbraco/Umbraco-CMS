@@ -4,6 +4,11 @@ function ItemPickerOverlay($scope, localizationService) {
         $scope.model.title = localizationService.localize("defaultdialogs_selectItem");
     }
 
+    
+    if (!$scope.model.orderBy) {
+        $scope.model.orderBy = "name";
+    }
+
     $scope.model.hideSubmitButton = true;
 
     $scope.selectItem = function(item) {

@@ -12,7 +12,7 @@
     </div>
 
     <ul class="umb-card-grid">
-        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm"
+        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:searchTerm"
             ng-click="selectItem(availableItem)"
             class="-three-in-row">
             <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
