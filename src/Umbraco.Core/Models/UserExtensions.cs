@@ -193,19 +193,6 @@ namespace Umbraco.Core.Models
             return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
         }
 
-        internal static bool IsInBranchOfStartNode(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId, out bool hasPathAccess)
-        {
-            switch (recycleBinId)
-            {
-                case Constants.System.RecycleBinMedia:
-                    return ContentPermissionsHelper.IsInBranchOfStartNode(entity.Path, user.CalculateMediaStartNodeIds(entityService), user.GetMediaStartNodePaths(entityService), out hasPathAccess);
-                case Constants.System.RecycleBinContent:
-                    return ContentPermissionsHelper.IsInBranchOfStartNode(entity.Path, user.CalculateContentStartNodeIds(entityService), user.GetContentStartNodePaths(entityService), out hasPathAccess);
-                default:
-                    throw new NotSupportedException("Path access is only determined on content or media");
-            }
-        }
-
         /// <summary>
         /// Determines whether this user has access to view sensitive data
         /// </summary>

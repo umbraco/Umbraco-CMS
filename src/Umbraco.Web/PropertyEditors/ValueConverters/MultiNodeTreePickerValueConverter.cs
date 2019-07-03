@@ -34,20 +34,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(IPublishedPropertyType propertyType)
         {
             return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
         }
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => IsSingleNodePicker(propertyType)
                 ? typeof(IPublishedContent)
                 : typeof(IEnumerable<IPublishedContent>);
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
 
@@ -62,7 +62,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return null;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             if (source == null)
             {
@@ -102,7 +102,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                     break;
                             }
 
-                            if (multiNodeTreePickerItem != null && multiNodeTreePickerItem.ItemType != PublishedItemType.Element)
+                            if (multiNodeTreePickerItem != null && multiNodeTreePickerItem.ContentType.ItemType != PublishedItemType.Element)
                             {
                                 multiNodeTreePicker.Add(multiNodeTreePickerItem);
                                 if (isSingleNodePicker)
@@ -153,7 +153,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return content;
         }
 
-        private static bool IsSingleNodePicker(PublishedPropertyType propertyType)
+        private static bool IsSingleNodePicker(IPublishedPropertyType propertyType)
         {
             return propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>().MaxNumber == 1;
         }

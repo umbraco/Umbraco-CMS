@@ -92,13 +92,12 @@ namespace Umbraco.Tests.Scoping
                 null,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
-                Mock.Of<IUmbracoContextAccessor>(),
                 Logger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
@@ -149,11 +148,11 @@ namespace Umbraco.Tests.Scoping
             {
                 evented++;
 
-                var e = umbracoContext.ContentCache.GetById(item.Id);
+                var e = umbracoContext.Content.GetById(item.Id);
 
                 // during events, due to LiveSnapshot, we see the changes
                 Assert.IsNotNull(e);
-                Assert.AreEqual("changed", e.Name);
+                Assert.AreEqual("changed", e.Name());
             };
 
             using (var scope = ScopeProvider.CreateScope())
@@ -163,9 +162,9 @@ namespace Umbraco.Tests.Scoping
             }
 
             // been created
-            var x = umbracoContext.ContentCache.GetById(item.Id);
+            var x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual("name", x.Name);
+            Assert.AreEqual("name", x.Name());
 
             ContentService.Published += OnPublishedAssert;
 
@@ -185,9 +184,9 @@ namespace Umbraco.Tests.Scoping
             // after the scope,
             // if completed, we see the changes
             // else changes have been rolled back
-            x = umbracoContext.ContentCache.GetById(item.Id);
+            x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual(complete ? "changed" : "name", x.Name);
+            Assert.AreEqual(complete ? "changed" : "name", x.Name());
         }
     }
 }

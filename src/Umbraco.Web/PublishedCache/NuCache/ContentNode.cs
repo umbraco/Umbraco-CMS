@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -9,11 +8,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
     // internal, never exposed, to be accessed from ContentStore (only!)
     internal class ContentNode
     {
+        // special ctor for root pseudo node
+        public ContentNode()
+        {
+            FirstChildContentId = -1;
+            NextSiblingContentId = -1;
+        }
+
         // special ctor with no content data - for members
-        public ContentNode(int id, Guid uid, PublishedContentType contentType,
+        public ContentNode(int id, Guid uid, IPublishedContentType contentType,
             int level, string path, int sortOrder,
             int parentContentId,
             DateTime createDate, int creatorId)
+            : this()
         {
             Id = id;
             Uid = uid;
@@ -24,21 +31,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ParentContentId = parentContentId;
             CreateDate = createDate;
             CreatorId = creatorId;
-
-            ChildContentIds = new List<int>();
         }
 
-        public ContentNode(int id, Guid uid, PublishedContentType contentType,
+        public ContentNode(int id, Guid uid, IPublishedContentType contentType,
             int level, string path, int sortOrder,
             int parentContentId,
             DateTime createDate, int creatorId,
             ContentData draftData, ContentData publishedData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IVariationContextAccessor variationContextAccessor)
             : this(id, uid, level, path, sortOrder, parentContentId, createDate, creatorId)
         {
-            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor);
         }
 
         // 2-phases ctor, phase 1
@@ -53,14 +57,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Path = path;
             SortOrder = sortOrder;
             ParentContentId = parentContentId;
+            FirstChildContentId = -1;
+            NextSiblingContentId = -1;
             CreateDate = createDate;
             CreatorId = creatorId;
-
-            ChildContentIds = new List<int>();
         }
 
         // two-phase ctor, phase 2
-        public void SetContentTypeAndData(PublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor)
+        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
         {
             ContentType = contentType;
 
@@ -69,79 +73,53 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (draftData != null)
             {
-                DraftContent = new PublishedContent(this, draftData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+                DraftContent = new PublishedContent(this, draftData, publishedSnapshotAccessor, variationContextAccessor);
                 DraftModel = DraftContent.CreateModel();
             }
 
             if (publishedData != null)
             {
-                PublishedContent = new PublishedContent(this, publishedData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+                PublishedContent = new PublishedContent(this, publishedData, publishedSnapshotAccessor, variationContextAccessor);
                 PublishedModel = PublishedContent.CreateModel();
             }
         }
 
-        // clone parent
-        private ContentNode(ContentNode origin, IUmbracoContextAccessor umbracoContextAccessor)
+        // clone
+        public ContentNode(ContentNode origin, IPublishedContentType contentType = null)
         {
-            // everything is the same, except for the child items
-            // list which is a clone of the original list
-
             Id = origin.Id;
             Uid = origin.Uid;
-            ContentType = origin.ContentType;
+            ContentType = contentType ?? origin.ContentType;
             Level = origin.Level;
             Path = origin.Path;
             SortOrder = origin.SortOrder;
             ParentContentId = origin.ParentContentId;
+            FirstChildContentId = origin.FirstChildContentId;
+            NextSiblingContentId = origin.NextSiblingContentId;
             CreateDate = origin.CreateDate;
             CreatorId = origin.CreatorId;
 
             var originDraft = origin.DraftContent;
             var originPublished = origin.PublishedContent;
 
+            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft);
+            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished);
 
-            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft, umbracoContextAccessor);
-            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished, umbracoContextAccessor);
             DraftModel = DraftContent?.CreateModel();
             PublishedModel = PublishedContent?.CreateModel();
-
-            ChildContentIds = new List<int>(origin.ChildContentIds); // needs to be *another* list
-        }
-
-        // clone with new content type
-        public ContentNode(ContentNode origin, PublishedContentType contentType, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor)
-        {
-            Id = origin.Id;
-            Uid = origin.Uid;
-            ContentType = contentType; // change!
-            Level = origin.Level;
-            Path = origin.Path;
-            SortOrder = origin.SortOrder;
-            ParentContentId = origin.ParentContentId;
-            CreateDate = origin.CreateDate;
-            CreatorId = origin.CreatorId;
-
-            var originDraft = origin.DraftContent;
-            var originPublished = origin.PublishedContent;
-
-            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft.ContentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
-            DraftModel = DraftContent?.CreateModel();
-            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished.ContentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
-            PublishedModel = PublishedContent?.CreateModel();
-
-            ChildContentIds = origin.ChildContentIds; // can be the *same* list
         }
 
         // everything that is common to both draft and published versions
         // keep this as small as possible
         public readonly int Id;
         public readonly Guid Uid;
-        public PublishedContentType ContentType;
+        public IPublishedContentType ContentType;
         public readonly int Level;
         public readonly string Path;
         public readonly int SortOrder;
         public readonly int ParentContentId;
-        public List<int> ChildContentIds;
+        public int FirstChildContentId;
+        public int NextSiblingContentId;
         public readonly DateTime CreateDate;
         public readonly int CreatorId;
 
@@ -155,23 +133,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public IPublishedContent DraftModel;
         public IPublishedContent PublishedModel;
 
-        public ContentNode CloneParent(
-            IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor)
-        {
-            return new ContentNode(this, umbracoContextAccessor);
-        }
-
         public ContentNodeKit ToKit()
-        {
-            return new ContentNodeKit
-            {
-                Node = this,
-                ContentTypeId = ContentType.Id,
+            => new ContentNodeKit
+                {
+                    Node = this,
+                    ContentTypeId = ContentType.Id,
 
-                DraftData = DraftContent?.ContentData,
-                PublishedData = PublishedContent?.ContentData
-            };
-        }
+                    DraftData = DraftContent?.ContentData,
+                    PublishedData = PublishedContent?.ContentData
+                };
     }
 }
