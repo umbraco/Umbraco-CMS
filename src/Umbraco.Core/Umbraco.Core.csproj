@@ -13,7 +13,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
@@ -23,7 +23,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -55,6 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <Version>1.0.0-beta2-19324-01</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Serilog.Sinks.Async">
       <Version>1.3.0</Version>
     </PackageReference>
@@ -216,6 +221,9 @@
     <Compile Include="Composing\TypeLoader.cs" />
     <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
     <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
+    <Compile Include="Manifest\IManifestFilter.cs" />
+    <Compile Include="Manifest\ManifestFilterCollection.cs" />
+    <Compile Include="Manifest\ManifestFilterCollectionBuilder.cs" />
     <Compile Include="Mapping\MapperContext.cs" />
     <Compile Include="Migrations\Upgrade\Common\DeleteKeysAndIndexes.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ContentPickerPreValueMigrator.cs" />
@@ -231,6 +239,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RenamingPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RichTextPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
+    <Compile Include="Models\Entities\EntityExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorBase.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueDto.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigrationBase.cs" />
@@ -246,7 +255,6 @@
     <Compile Include="Mapping\UmbracoMapper.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
     <Compile Include="Models\ContentBaseExtensions.cs" />
-    <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\IContent.cs" />
     <Compile Include="Models\IContentBase.cs" />
     <Compile Include="Models\IContentType.cs" />
@@ -288,6 +296,11 @@
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\Template.cs" />
     <Compile Include="Models\TemplateOnDisk.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
+    <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
+    <Compile Include="PublishedContentExtensions.cs" />
+    <Compile Include="Models\PublishedContent\UrlMode.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
@@ -316,6 +329,7 @@
     <Compile Include="Services\IMacroService.cs" />
     <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
+    <Compile Include="Services\DateTypeServiceExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
     <Compile Include="StringExtensions.cs" />
@@ -447,12 +461,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdatePickerIntegerValuesToUdi.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Migrations\Upgrade\Common\CreateKeysAndIndexes.cs" />
-    <Compile Include="Models\AuditEntry.cs" />
-    <Compile Include="Models\Consent.cs" />
-    <Compile Include="Models\ConsentExtensions.cs" />
-    <Compile Include="Models\ConsentState.cs" />
-    <Compile Include="Models\ContentEditing\ContentApp.cs" />
-    <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
     <Compile Include="Models\ContentRepositoryExtensions.cs" />
     <Compile Include="Models\ContentSchedule.cs" />
     <Compile Include="Models\ContentScheduleAction.cs" />

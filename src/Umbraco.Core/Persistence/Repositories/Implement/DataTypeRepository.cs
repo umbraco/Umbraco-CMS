@@ -9,6 +9,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -106,7 +107,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IDataType entity)
         {
-            ((DataType)entity).AddingEntity();
+            entity.AddingEntity();
 
             //ensure a datatype has a unique name before creating it
             entity.Name = EnsureUniqueNodeName(entity.Name);
@@ -174,7 +175,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             //Updates Modified date
-            ((DataType)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))

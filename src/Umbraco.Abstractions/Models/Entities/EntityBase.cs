@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models.Entities
         /// <summary>
         /// Updates the entity when it is being saved for the first time.
         /// </summary>
-        public virtual void AddingEntity()
+        internal virtual void AddingEntity()
         {
             var now = DateTime.Now;
 
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Models.Entities
         /// <summary>
         /// Updates the entity when it is being saved.
         /// </summary>
-        public virtual void UpdatingEntity()
+        internal virtual void UpdatingEntity()
         {
             var now = DateTime.Now;
 

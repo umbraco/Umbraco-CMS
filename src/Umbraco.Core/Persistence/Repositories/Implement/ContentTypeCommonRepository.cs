@@ -143,7 +143,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     templateDtoIx++;
                     if (!templates.TryGetValue(allowedDto.TemplateNodeId, out var template)) continue;
                     allowedTemplates.Add(template);
-                    
+
                     if (allowedDto.IsDefault)
                         defaultTemplateId = template.Id;
                 }
@@ -188,10 +188,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var groupDtos = Database.Fetch<PropertyTypeGroupDto>(sql1);
 
             var sql2 = Sql()
-                .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto))
+                .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto, r1 => r1.Select(x => x.NodeDto)))
                 .AndSelect<MemberPropertyTypeDto>()
                 .From<PropertyTypeDto>()
                 .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((pt, dt) => pt.DataTypeId == dt.NodeId)
+                .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((dt, n) => dt.NodeId == n.NodeId)
                 .InnerJoin<ContentTypeDto>().On<PropertyTypeDto, ContentTypeDto>((pt, ct) => pt.ContentTypeId == ct.NodeId)
                 .LeftJoin<PropertyTypeGroupDto>().On<PropertyTypeDto, PropertyTypeGroupDto>((pt, ptg) => pt.PropertyTypeGroupId == ptg.Id)
                 .LeftJoin<MemberPropertyTypeDto>().On<PropertyTypeDto, MemberPropertyTypeDto>((pt, mpt) => pt.Id == mpt.PropertyTypeId)
@@ -290,6 +291,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 Description = dto.Description,
                 DataTypeId = dto.DataTypeId,
+                DataTypeKey = dto.DataTypeDto.NodeDto.UniqueId,
                 Id = dto.Id,
                 Key = dto.UniqueId,
                 Mandatory = dto.Mandatory,

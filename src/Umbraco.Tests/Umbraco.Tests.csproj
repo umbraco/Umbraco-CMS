@@ -138,6 +138,7 @@
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
+    <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
+    <Compile Include="Security\UmbracoAntiForgeryAdditionalDataProviderTests.cs" />
     <Compile Include="Services\AmbiguousEventTests.cs" />
     <Compile Include="Services\ContentServiceEventTests.cs" />
     <Compile Include="Services\ContentServicePublishBranchTests.cs" />
@@ -204,7 +206,6 @@
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
-    <Compile Include="TestHelpers\Stubs\TestPublishedContent.cs" />
     <Compile Include="Testing\Objects\Accessors\TestVariationContextAccessor.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
     <Compile Include="Testing\Objects\Accessors\TestDefaultCultureAccessor.cs" />

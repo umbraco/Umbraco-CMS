@@ -16,7 +16,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -26,7 +26,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -80,6 +80,11 @@
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <Version>1.0.0-beta2-19324-01</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="NPoco" Version="3.9.4" />
@@ -152,6 +157,7 @@
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Macros\IMacroRenderer.cs" />
+    <Compile Include="Media\EmbedProviders\Giphy.cs" />
     <Compile Include="Media\EmbedProviders\YouTube.cs" />
     <Compile Include="Media\EmbedProviders\EmbedProviderBase.cs" />
     <Compile Include="Media\EmbedProviders\EmbedProvidersCollection.cs" />
@@ -206,14 +212,18 @@
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
+    <Compile Include="Models\AnchorsModel.cs" />
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
+    <Compile Include="Models\ContentEditing\UrlAndAnchors.cs" />
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
+    <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
+    <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
@@ -222,6 +232,7 @@
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
+    <Compile Include="Security\UmbracoAntiForgeryAdditionalDataProvider.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
@@ -782,7 +793,6 @@
     <Compile Include="Models\IContentModel.cs" />
     <Compile Include="Models\PartialViewMacroModelExtensions.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
-    <Compile Include="Models\PublishedProperty.cs" />
     <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
     <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
@@ -1024,7 +1034,6 @@
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
-    <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexModel.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
@@ -1145,7 +1154,7 @@
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Routing\DomainHelper.cs" />
+    <Compile Include="Routing\DomainUtilities.cs" />
     <Compile Include="Routing\PublishedRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -1168,7 +1177,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\TagsController.cs" />
     <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">

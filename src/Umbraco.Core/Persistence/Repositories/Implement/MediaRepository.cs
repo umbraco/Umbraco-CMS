@@ -7,6 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -216,7 +217,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistNewItem(IMedia entity)
         {
             var media = (Models.Media) entity;
-            media.AddingEntity();
+            entity.AddingEntity();
 
             // ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
