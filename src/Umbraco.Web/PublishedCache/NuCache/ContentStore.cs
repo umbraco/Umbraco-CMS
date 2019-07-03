@@ -359,7 +359,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     var node = link.Value;
                     if (node == null) continue;
                     var contentTypeId = node.ContentType.Id;
-                    if (removedIds.Contains(contentTypeId)) removedContentTypeNodes.Add(node.Id);
+                    if (removedIdsA.Contains(contentTypeId)) removedContentTypeNodes.Add(node.Id);
                     if (refreshedIdsA.Contains(contentTypeId)) refreshedContentTypeNodes.Add(node.Id);
                 }
 
