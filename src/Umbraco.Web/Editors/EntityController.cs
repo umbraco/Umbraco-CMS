@@ -640,6 +640,20 @@ namespace Umbraco.Web.Editors
             return startNodes;
         }
 
+        private int[] GetStartNodes(UmbracoEntityTypes type)
+        {
+            switch (type)
+            {
+                case UmbracoEntityTypes.Document:
+                    return Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                case UmbracoEntityTypes.Media:
+                    return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                default:
+                    return new int[0];
+            }
+
+        }
+
 
         public PagedResult<EntityBasic> GetPagedDescendants(
             int id,
@@ -666,16 +680,7 @@ namespace Umbraco.Web.Editors
                 {
                     // root is special: we reduce it to start nodes
 
-                    int[] aids = null;
-                    switch (type)
-                    {
-                        case UmbracoEntityTypes.Document:
-                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                            break;
-                        case UmbracoEntityTypes.Media:
-                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                            break;
-                    }
+                    int[] aids = GetStartNodes(type);
 
                     var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
                     entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
