@@ -9,7 +9,7 @@ namespace Umbraco.Core
     public static class PublishedModelFactoryExtensions
     {
         /// <summary>
-        /// Executes an action with a safe live factory/
+        /// Executes an action with a safe live factory
         /// </summary>
         /// <remarks>
         /// <para>If the factory is a live factory, ensures it is refreshed and locked while executing the action.</para>
@@ -20,6 +20,7 @@ namespace Umbraco.Core
             {
                 lock (liveFactory.SyncRoot)
                 {
+                    //Call refresh on the live factory to re-compile the models
                     liveFactory.Refresh();
                     action();
                 }

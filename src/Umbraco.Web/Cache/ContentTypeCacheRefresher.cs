@@ -53,15 +53,15 @@ namespace Umbraco.Web.Cache
 
             _contentTypeCommonRepository.ClearCache(); // always
 
-            // We need to special handle the IContentType if modelsbuilder is in live mode, because all models are updated when a IContentType is changed, we need to clear all from cache also.
-            if (_publishedModelFactory is ILivePublishedModelFactory && payloads.Any(x => x.ItemType == typeof(IContentType).Name))
-            {
-                //This is super nasty, and we need to figure out a better way to to this
-                //Ensure all doc type ids is part of the payload
-                var missingPayloads = GetMissingContentTypePayloads(payloads);
+            //// We need to special handle the IContentType if modelsbuilder is in live mode, because all models are updated when a IContentType is changed, we need to clear all from cache also.
+            //if (_publishedModelFactory is ILivePublishedModelFactory && payloads.Any(x => x.ItemType == typeof(IContentType).Name))
+            //{
+            //    //This is super nasty, and we need to figure out a better way to to this
+            //    //Ensure all doc type ids is part of the payload
+            //    var missingPayloads = GetMissingContentTypePayloads(payloads);
 
-                payloads = payloads.Union(missingPayloads).ToArray();
-            }
+            //    payloads = payloads.Union(missingPayloads).ToArray();
+            //}
 
             if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
             {
@@ -109,19 +109,19 @@ namespace Umbraco.Web.Cache
             base.Refresh(payloads);
         }
 
-        private IEnumerable<JsonPayload> GetMissingContentTypePayloads(JsonPayload[] payloads)
-        {
-            var existingPayloadIds = new HashSet<int>(payloads.Select(x => x.Id));
-            var contentTypeIds = _contentTypeService.GetAll().Select(x => x.Id).ToArray();
+        //private IEnumerable<JsonPayload> GetMissingContentTypePayloads(JsonPayload[] payloads)
+        //{
+        //    var existingPayloadIds = new HashSet<int>(payloads.Select(x => x.Id));
+        //    var contentTypeIds = _contentTypeService.GetAll().Select(x => x.Id).ToArray();
 
-            foreach (var contentTypeId in contentTypeIds)
-            {
-                if (!existingPayloadIds.Contains(contentTypeId))
-                {
-                    yield return new JsonPayload(typeof(IContentType).Name, contentTypeId, ContentTypeChangeTypes.RefreshOther);
-                }
-            }
-        }
+        //    foreach (var contentTypeId in contentTypeIds)
+        //    {
+        //        if (!existingPayloadIds.Contains(contentTypeId))
+        //        {
+        //            yield return new JsonPayload(typeof(IContentType).Name, contentTypeId, ContentTypeChangeTypes.RefreshOther);
+        //        }
+        //    }
+        //}
 
         public override void RefreshAll()
         {
