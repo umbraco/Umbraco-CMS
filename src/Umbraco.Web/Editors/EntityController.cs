@@ -623,25 +623,6 @@ namespace Umbraco.Web.Editors
 
         private int[] GetStartNodes(UmbracoEntityTypes type)
         {
-            int[] startNodes = null;
-            switch (type)
-            {
-                case UmbracoEntityTypes.Document:
-                    startNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                    break;
-                case UmbracoEntityTypes.Media:
-                    startNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                    break;
-                default:
-                    startNodes = Array.Empty<int>();
-                    break;
-            }
-
-            return startNodes;
-        }
-
-        private int[] GetStartNodes(UmbracoEntityTypes type)
-        {
             switch (type)
             {
                 case UmbracoEntityTypes.Document:
@@ -649,11 +630,9 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
                 default:
-                    return new int[0];
+                    return  Array.Empty<int>();
             }
-
         }
-
 
         public PagedResult<EntityBasic> GetPagedDescendants(
             int id,
