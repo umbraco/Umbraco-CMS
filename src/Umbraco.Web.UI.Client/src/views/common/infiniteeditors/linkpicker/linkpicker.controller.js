@@ -20,14 +20,14 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     $scope.model.title = value;
                 });
         }
-        $scope.customTreeParams = dialogOptions.dataTypeId ? "dataTypeId=" + dialogOptions.dataTypeId : "";
+        $scope.customTreeParams = dialogOptions.dataTypeKey ? "dataTypeKey=" + dialogOptions.dataTypeKey : "";
         $scope.dialogTreeApi = {};
         $scope.model.target = {};
         $scope.searchInfo = {
             searchFromId: null,
             searchFromName: null,
             showSearch: false,
-            dataTypeId: dialogOptions.dataTypeId,
+            dataTypeKey: dialogOptions.dataTypeKey,
             results: [],
             selectedSearchResults: []
         };
@@ -175,7 +175,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                 var mediaPicker = {
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
-                    dataTypeId: dialogOptions.dataTypeId,
+                    dataTypeKey: dialogOptions.dataTypeKey,
                     submit: function (model) {
                         var media = model.selection[0];
 

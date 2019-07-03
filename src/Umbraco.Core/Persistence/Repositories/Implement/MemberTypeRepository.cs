@@ -225,6 +225,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     //this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
                     propertyType.DataTypeId = 0;
+                    propertyType.DataTypeKey = default;
                 }
             }
         }

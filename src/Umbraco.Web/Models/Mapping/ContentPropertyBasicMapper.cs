@@ -50,13 +50,7 @@ namespace Umbraco.Web.Models.Mapping
             dest.Alias = property.Alias;
             dest.PropertyEditor = editor;
             dest.Editor = editor.Alias;
-
-            //fixme: although this might get cached, if a content item has 100 properties of different data types, then this means this is going to be 100 extra DB queries :( :( :(
-            // - ideally, we'd just have the DataTypeKey alongside the DataTypeId which is loaded in the single sql statement which should be relatively easy.
-            var dataTypeKey = _entityService.GetKey(property.PropertyType.DataTypeId, UmbracoObjectTypes.DataType);
-            if (!dataTypeKey.Success)
-                throw new InvalidOperationException("Can't get the unique key from the id: " + property.PropertyType.DataTypeId);
-            dest.DataTypeId = dataTypeKey.Result;
+            dest.DataTypeKey = property.PropertyType.DataTypeKey;
 
             // if there's a set of property aliases specified, we will check if the current property's value should be mapped.
             // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.

@@ -28,12 +28,12 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.treeAlias = $scope.model.treeAlias;
         vm.multiPicker = $scope.model.multiPicker;
         vm.hideHeader = (typeof $scope.model.hideHeader) === "boolean" ? $scope.model.hideHeader : true;
-        vm.dataTypeId = $scope.model.dataTypeId;
+        vm.dataTypeKey = $scope.model.dataTypeKey;
         vm.searchInfo = {
             searchFromId: $scope.model.startNodeId,
             searchFromName: null,
             showSearch: false,
-            dataTypeId: vm.dataTypeId,
+            dataTypeKey: vm.dataTypeKey,
             results: [],
             selectedSearchResults: []
         }
@@ -192,8 +192,8 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if (vm.selectedLanguage && vm.selectedLanguage.id) {
                 queryParams["culture"] = vm.selectedLanguage.culture;
             }
-            if (vm.dataTypeId) {
-                queryParams["dataTypeId"] = vm.dataTypeId;
+            if (vm.dataTypeKey) {
+                queryParams["dataTypeKey"] = vm.dataTypeKey;
             }
                 
             var queryString = $.param(queryParams); //create the query string from the params object

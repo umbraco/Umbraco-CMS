@@ -22,8 +22,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public int Id { get; set; }
 
-        [DataMember(Name = "dataTypeId", IsRequired = false)]
-        public Guid? DataTypeId { get; set; }
+        [DataMember(Name = "dataTypeKey", IsRequired = false)]
+        [ReadOnly(true)]
+        public Guid DataTypeKey { get; set; }
 
         [DataMember(Name = "value")]
         public object Value { get; set; }

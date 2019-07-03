@@ -5,7 +5,7 @@ angular.module("umbraco.directives")
                 uniqueId: '=',
                 value: '=',
                 configuration: "=", //this is the RTE configuration
-                datatypeId: '@',
+                datatypeKey: '@',
                 ignoreUserStartNodes: '@'
             },
             templateUrl: 'views/components/grid/grid-rte.html',
@@ -43,7 +43,7 @@ angular.module("umbraco.directives")
                 scope.config = {
                     ignoreUserStartNodes: scope.ignoreUserStartNodes === "true"
                 }
-                scope.dataTypeId = scope.datatypeId; //Yes - this casing is rediculous, but it's because the var starts with `data` so it can't be `data-type-id` :/
+                scope.dataTypeKey = scope.datatypeKey; //Yes - this casing is rediculous, but it's because the var starts with `data` so it can't be `data-type-id` :/
 
                 //stores a reference to the editor
                 var tinyMceEditor = null;

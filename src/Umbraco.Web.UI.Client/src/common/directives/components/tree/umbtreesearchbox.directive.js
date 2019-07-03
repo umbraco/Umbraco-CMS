@@ -12,7 +12,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             searchFromName: "@",
             showSearch: "@",
             section: "@",
-            datatypeId: "@",
+            datatypeKey: "@",
             hideSearchCallback: "=",
             searchCallback: "="
         },
@@ -63,8 +63,8 @@ function treeSearchBox(localizationService, searchService, $q) {
                     }
 
                     //append dataTypeId value if there is one
-                    if (scope.datatypeId) {
-                        searchArgs["dataTypeId"] = scope.datatypeId;
+                    if (scope.datatypeKey) {
+                        searchArgs["dataTypeKey"] = scope.datatypeKey;
                     }
 
                     searcher(searchArgs).then(function (data) {

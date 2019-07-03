@@ -30,7 +30,7 @@ angular.module("umbraco")
                 showDetails: true,
                 disableFolderSelect: true,
                 onlyImages: true,
-                dataTypeId: $scope.model.dataTypeId,
+                dataTypeKey: $scope.model.dataTypeKey,
                 submit: function(model) {
                     var selectedImage = model.selection[0];
                    

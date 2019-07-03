@@ -57,7 +57,7 @@ angular.module("umbraco")
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
-                dataTypeId: $scope.model.dataTypeId
+                dataTypeKey: $scope.model.dataTypeKey
             };
 
             //preload selected item
@@ -160,7 +160,7 @@ angular.module("umbraco")
                 }
 
                 if (folder.id > 0) {
-                    entityResource.getAncestors(folder.id, "media", null, { dataTypeId: $scope.model.dataTypeId })
+                    entityResource.getAncestors(folder.id, "media", null, { dataTypeKey: $scope.model.dataTypeKey })
                         .then(function (anc) {
                             $scope.path = _.filter(anc,
                                 function (f) {
@@ -318,7 +318,7 @@ angular.module("umbraco")
                             totalItems: 0,
                             totalPages: 0,
                             filter: '',
-                            dataTypeId: $scope.model.dataTypeId
+                            dataTypeKey: $scope.model.dataTypeKey
                         };
                         getChildren($scope.currentFolder.id);
                     }
