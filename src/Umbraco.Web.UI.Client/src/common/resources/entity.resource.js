@@ -176,6 +176,23 @@ function entityResource($q, $http, umbRequestHelper) {
                 'Failed to retrieve url and anchors data for id ' + id);
         },
 
+        getAnchors: function (rteContent) {
+
+            if (!rteContent || rteContent.length === 0) {
+                return [];
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "entityApiBaseUrl",
+                        'GetAnchors'),
+                    {
+                        rteContent: rteContent
+                    }),
+                'Failed to anchors data for rte content ' + rteContent);
+        },
+        
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getByIds
