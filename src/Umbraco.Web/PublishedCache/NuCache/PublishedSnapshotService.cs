@@ -814,31 +814,34 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
         }
-
-        private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<IEnumerable<int>, IEnumerable<int>, IEnumerable<int>, IEnumerable<int>> action)
+        
+        private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<List<int>, List<int>, List<int>, List<int>> action)
+            where T: IContentTypeComposition
         {
+            if (payloads.Length == 0) return; //nothing to do
+
+            //TODO: In the case of Pure Live here - we actually need to refresh all of the content types
+            // AFAIK this is a call to SetValueLocked(_contentNodes... ) or is it a call to _contentStore.SetAll
+
             var nameOfT = typeof(T).Name;
 
-            var removedIds = new List<int>();
-            var refreshedIds = new List<int>();
-            var otherIds = new List<int>();
-            var newIds = new List<int>();
+            List<int> removedIds = null, refreshedIds = null, otherIds = null, newIds = null;
 
             foreach (var payload in payloads)
             {
                 if (payload.ItemType != nameOfT) continue;
 
                 if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
-                    removedIds.Add(payload.Id);
+                    AddToList(ref removedIds, payload.Id);
                 else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
-                    refreshedIds.Add(payload.Id);
+                    AddToList(ref refreshedIds, payload.Id);
                 else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther))
-                    otherIds.Add(payload.Id);
+                    AddToList(ref otherIds, payload.Id);
                 else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.Create))
-                    newIds.Add(payload.Id);
+                    AddToList(ref newIds, payload.Id);
             }
 
-            if (removedIds.Count == 0 && refreshedIds.Count == 0 && otherIds.Count == 0 && newIds.Count == 0) return;
+            if (removedIds.IsCollectionEmpty() && refreshedIds.IsCollectionEmpty() && otherIds.IsCollectionEmpty() && newIds.IsCollectionEmpty()) return;
 
             using (store.GetScopedWriteLock(_scopeProvider))
             {
@@ -925,15 +928,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        //Methods used to prevent allocations of lists        
+        private void AddToList(ref List<int> list, int val) => GetOrCreateList(ref list).Add(val);
+        private List<int> GetOrCreateList(ref List<int> list) => list ?? (list = new List<int>());
+
         #endregion
 
         #region Content Types
 
-        private IEnumerable<IPublishedContentType> CreateContentTypes(PublishedItemType itemType, int[] ids)
+        private IReadOnlyCollection<IPublishedContentType> CreateContentTypes(PublishedItemType itemType, int[] ids)
         {
             // XxxTypeService.GetAll(empty) returns everything!
             if (ids.Length == 0)
-                return Enumerable.Empty<IPublishedContentType>();
+                return Array.Empty<IPublishedContentType>();
 
             IEnumerable<IContentTypeComposition> contentTypes;
             switch (itemType)
@@ -953,7 +960,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // some may be missing - not checking here
 
-            return contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x));
+            return contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x)).ToList();
         }
 
         private IPublishedContentType CreateContentType(PublishedItemType itemType, int id)
@@ -977,44 +984,58 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return contentType == null ? null : _publishedContentTypeFactory.CreateContentType(contentType);
         }
 
-        private void RefreshContentTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds, IEnumerable<int> otherIds, IEnumerable<int> newIds)
+        private void RefreshContentTypesLocked(List<int> removedIds, List<int> refreshedIds, List<int> otherIds, List<int> newIds)
         {
+            if (removedIds.IsCollectionEmpty() && refreshedIds.IsCollectionEmpty() && otherIds.IsCollectionEmpty() && newIds.IsCollectionEmpty())
+                return;
+
             // locks:
             // content (and content types) are read-locked while reading content
             // contentStore is wlocked (so readable, only no new views)
             // and it can be wlocked by 1 thread only at a time
 
-            var refreshedIdsA = refreshedIds.ToArray();
-
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.ContentTypes);
 
-                var typesA = CreateContentTypes(PublishedItemType.Content, refreshedIdsA).ToArray();
-                var kits = _dataSource.GetTypeContentSources(scope, refreshedIdsA);
+                var typesA = refreshedIds.IsCollectionEmpty()
+                    ? Array.Empty<IPublishedContentType>()
+                    : CreateContentTypes(PublishedItemType.Content, refreshedIds.ToArray()).ToArray();
+
+                var kits = refreshedIds.IsCollectionEmpty()
+                    ? Array.Empty<ContentNodeKit>()
+                    : _dataSource.GetTypeContentSources(scope, refreshedIds).ToArray();
 
                 _contentStore.UpdateContentTypes(removedIds, typesA, kits);
-                _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()).ToArray());
-                _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()).ToArray());
+                if (!otherIds.IsCollectionEmpty())
+                    _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()));
+                if (!newIds.IsCollectionEmpty())
+                    _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()));
                 scope.Complete();
             }
         }
 
-        private void RefreshMediaTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds, IEnumerable<int> otherIds, IEnumerable<int> newIds)
+        private void RefreshMediaTypesLocked(List<int> removedIds, List<int> refreshedIds, List<int> otherIds, List<int> newIds)
         {
+            if (removedIds.IsCollectionEmpty() && refreshedIds.IsCollectionEmpty() && otherIds.IsCollectionEmpty() && newIds.IsCollectionEmpty())
+                return;
+
             // locks:
             // media (and content types) are read-locked while reading media
             // mediaStore is wlocked (so readable, only no new views)
             // and it can be wlocked by 1 thread only at a time
 
-            var refreshedIdsA = refreshedIds.ToArray();
-
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.MediaTypes);
 
-                var typesA = CreateContentTypes(PublishedItemType.Media, refreshedIdsA).ToArray();
-                var kits = _dataSource.GetTypeMediaSources(scope, refreshedIdsA);
+                var typesA = refreshedIds == null
+                    ? Array.Empty<IPublishedContentType>()
+                    : CreateContentTypes(PublishedItemType.Media, refreshedIds.ToArray()).ToArray();
+
+                var kits = refreshedIds == null
+                    ? Array.Empty<ContentNodeKit>()
+                    : _dataSource.GetTypeMediaSources(scope, refreshedIds).ToArray();
 
                 _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
                 _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());

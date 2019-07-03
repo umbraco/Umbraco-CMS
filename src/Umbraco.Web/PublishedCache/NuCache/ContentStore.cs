@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
@@ -275,6 +276,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void UpdateContentTypes(IEnumerable<IPublishedContentType> types)
         {
+            //nothing to do if this is empty, no need to lock/allocate/iterate/etc...            
+            if (!types.Any()) return; 
+
             var lockInfo = new WriteLockInfo();
             try
             {
@@ -330,12 +334,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public void UpdateContentTypes(IEnumerable<int> removedIds, IEnumerable<IPublishedContentType> refreshedTypes, IEnumerable<ContentNodeKit> kits)
+        public void UpdateContentTypes(IReadOnlyCollection<int> removedIds, IReadOnlyCollection<IPublishedContentType> refreshedTypes, IReadOnlyCollection<ContentNodeKit> kits)
         {
-            var removedIdsA = removedIds?.ToArray() ?? Array.Empty<int>();
-            var refreshedTypesA = refreshedTypes?.ToArray() ?? Array.Empty<IPublishedContentType>();
-            var refreshedIdsA = refreshedTypesA.Select(x => x.Id).ToArray();
+            var removedIdsA = removedIds ?? Array.Empty<int>();
+            var refreshedTypesA = refreshedTypes ?? Array.Empty<IPublishedContentType>();
+            var refreshedIdsA = refreshedTypesA.Select(x => x.Id).ToList();
             kits = kits ?? Array.Empty<ContentNodeKit>();
+
+            if (kits.Count == 0 && refreshedIdsA.Count == 0 && removedIdsA.Count == 0)
+                return; //exit - there is nothing to do here
 
             var lockInfo = new WriteLockInfo();
             try
@@ -352,7 +359,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     var node = link.Value;
                     if (node == null) continue;
                     var contentTypeId = node.ContentType.Id;
-                    if (removedIdsA.Contains(contentTypeId)) removedContentTypeNodes.Add(node.Id);
+                    if (removedIds.Contains(contentTypeId)) removedContentTypeNodes.Add(node.Id);
                     if (refreshedIdsA.Contains(contentTypeId)) refreshedContentTypeNodes.Add(node.Id);
                 }
 
