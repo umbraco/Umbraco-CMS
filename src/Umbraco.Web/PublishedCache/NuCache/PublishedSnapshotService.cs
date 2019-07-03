@@ -819,19 +819,25 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (_publishedModelFactory.IsLiveFactory())
             {
-                //In the case of Pure Live - we actually need to refresh all of the content
+                //In the case of Pure Live - we actually need to refresh all of the content and the media
+                //see https://github.com/umbraco/Umbraco-CMS/issues/5671
+                //The underlying issue is that in Pure Live the ILivePublishedModelFactory will re-compile all of the classes/models
+                //into a new DLL for the application which includes both content types and media types.
+                //Since the models in the cache are based on these actual classes, all of the objects in the cache need to be updated
+                //to use the newest version of the class.
                 using (_contentStore.GetScopedWriteLock(_scopeProvider))
+                using (_mediaStore.GetScopedWriteLock(_scopeProvider))
                 {
                     NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
-                    
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
                 }
             }
 
             ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
         }
-        
+
         private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<List<int>, List<int>, List<int>, List<int>> action)
-            where T: IContentTypeComposition
+            where T : IContentTypeComposition
         {
             if (payloads.Length == 0) return; //nothing to do
 
