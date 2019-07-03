@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Scoping;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -189,9 +190,30 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var sql2 = Sql()
                 .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto))
+
+                //TODO: Why doesn't this overload have the ability to auto alias columns like the inner select above, instead we need to manually apply all aliases
+                //QUESTION: Why doesn't this work? but the below `.AndSelect<NodeDto>()` works? The problem now is that the output SQL has duplicate column names.
+                // NPoco seems to be able to map this correctly but it would be better to have aliased columns like below. These alias names seem to follow some sort
+                // of convention with the double underscore and these columns are in the exact same order as the auto-produced ones, however NPoco does not map these
+                // columns? 
+                //.AndSelect<NodeDto>(
+                //    x => Alias(x.NodeId, "NodeDto__NodeId"),
+                //    x => Alias(x.UniqueId, "NodeDto__UniqueId"),
+                //    x => Alias(x.ParentId, "NodeDto__ParentId"),
+                //    x => Alias(x.Level, "NodeDto__Level"),
+                //    x => Alias(x.Path, "NodeDto__Path"),
+                //    x => Alias(x.SortOrder, "NodeDto__SortOrder"),
+                //    x => Alias(x.Trashed, "NodeDto__Trashed"),
+                //    x => Alias(x.UserId, "NodeDto__UserId"),
+                //    x => Alias(x.Text, "NodeDto__Text"),
+                //    x => Alias(x.NodeObjectType, "NodeDto__NodeObjectType"),
+                //    x => Alias(x.CreateDate, "NodeDto__CreateDate"))
+                .AndSelect<NodeDto>()
+
                 .AndSelect<MemberPropertyTypeDto>()
                 .From<PropertyTypeDto>()
                 .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((pt, dt) => pt.DataTypeId == dt.NodeId)
+                .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((dt, n) => dt.NodeId == n.NodeId)
                 .InnerJoin<ContentTypeDto>().On<PropertyTypeDto, ContentTypeDto>((pt, ct) => pt.ContentTypeId == ct.NodeId)
                 .LeftJoin<PropertyTypeGroupDto>().On<PropertyTypeDto, PropertyTypeGroupDto>((pt, ptg) => pt.PropertyTypeGroupId == ptg.Id)
                 .LeftJoin<MemberPropertyTypeDto>().On<PropertyTypeDto, MemberPropertyTypeDto>((pt, mpt) => pt.Id == mpt.PropertyTypeId)
@@ -290,6 +312,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 Description = dto.Description,
                 DataTypeId = dto.DataTypeId,
+                DataTypeKey = dto.DataTypeDto.NodeDto.UniqueId,
                 Id = dto.Id,
                 Key = dto.UniqueId,
                 Mandatory = dto.Mandatory,
