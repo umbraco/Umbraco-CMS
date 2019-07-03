@@ -21,6 +21,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Search;
@@ -292,6 +293,14 @@ namespace Umbraco.Web.Editors
             var url = UmbracoContext.UrlProvider.GetUrl(id);
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id, culture);
             return new UrlAndAnchors(url, anchorValues);
+        }
+
+        [HttpGet]
+        [HttpPost]
+        public IEnumerable<string> GetAnchors(AnchorsModel model)
+        {
+            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEContent(model.RteContent);
+            return anchorValues;
         }
 
 
@@ -621,11 +630,9 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
                 default:
-                    return new int[0];
+                    return  Array.Empty<int>();
             }
-
         }
-
 
         public PagedResult<EntityBasic> GetPagedDescendants(
             int id,
