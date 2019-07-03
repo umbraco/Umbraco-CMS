@@ -42,6 +42,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly IEntityXmlSerializer _entitySerializer;
+        private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
@@ -73,7 +74,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             IDataSource dataSource, IGlobalSettings globalSettings,
-            IEntityXmlSerializer entitySerializer, IPublishedModelFactory publishedModelFactory,
+            IEntityXmlSerializer entitySerializer,
+            IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
@@ -95,6 +97,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
             _entitySerializer = entitySerializer;
+            _publishedModelFactory = publishedModelFactory;
 
             // we always want to handle repository events, configured or not
             // assuming no repository event will trigger before the whole db is ready
@@ -708,6 +711,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        /// <inheritdoc />
         public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
             // no cache, trash everything
@@ -800,6 +804,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        /// <inheritdoc />
         public override void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
             // no cache, nothing we can do
@@ -812,6 +817,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
+            if (_publishedModelFactory.IsLiveFactory())
+            {
+                //In the case of Pure Live - we actually need to refresh all of the content
+                using (_contentStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
+                    
+                }
+            }
+
             ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
         }
         
@@ -819,9 +834,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             where T: IContentTypeComposition
         {
             if (payloads.Length == 0) return; //nothing to do
-
-            //TODO: In the case of Pure Live here - we actually need to refresh all of the content types
-            // AFAIK this is a call to SetValueLocked(_contentNodes... ) or is it a call to _contentStore.SetAll
 
             var nameOfT = typeof(T).Name;
 
