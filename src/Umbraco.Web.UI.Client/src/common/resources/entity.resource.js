@@ -327,8 +327,8 @@ function entityResource($q, $http, umbRequestHelper) {
                 { type: type },
                 { culture: culture}
             ];
-            if (options && options.dataTypeId) {
-                args.push({ dataTypeId: options.dataTypeId });
+            if (options && options.dataTypeKey) {
+                args.push({ dataTypeKey: options.dataTypeKey });
             }
 
             return umbRequestHelper.resourcePromise(
@@ -356,8 +356,8 @@ function entityResource($q, $http, umbRequestHelper) {
         getChildren: function (id, type, options) {
 
             var args = [{ id: id }, { type: type }];
-            if (options && options.dataTypeId) {
-                args.push({ dataTypeId: options.dataTypeId });
+            if (options && options.dataTypeKey) {
+                args.push({ dataTypeKey: options.dataTypeKey });
             }
 
             return umbRequestHelper.resourcePromise(
@@ -434,7 +434,7 @@ function entityResource($q, $http, umbRequestHelper) {
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
                             filter: encodeURIComponent(options.filter),
-                            dataTypeId: options.dataTypeId
+                            dataTypeKey: options.dataTypeKey
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);
@@ -476,7 +476,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 filter: '',
                 orderDirection: "Ascending",
                 orderBy: "SortOrder",
-                dataTypeId: null
+                dataTypeKey: null
             };
             if (options === undefined) {
                 options = {};
@@ -506,7 +506,7 @@ function entityResource($q, $http, umbRequestHelper) {
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
                             filter: encodeURIComponent(options.filter),
-                            dataTypeId: options.dataTypeId
+                            dataTypeKey: options.dataTypeKey
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);
@@ -535,15 +535,15 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        search: function (query, type, searchFrom, canceler, dataTypeId) {
+        search: function (query, type, searchFrom, canceler, dataTypeKey) {
 
             var args = [{ query: query }, { type: type }];
             if (searchFrom) {
                 args.push({ searchFrom: searchFrom });
             }
 
-            if (dataTypeId) {
-                args.push({ dataTypeId: dataTypeId });
+            if (dataTypeKey) {
+                args.push({ dataTypeKey: dataTypeKey });
             }
 
             var httpConfig = {};

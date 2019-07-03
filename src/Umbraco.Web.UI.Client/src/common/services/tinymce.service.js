@@ -1121,7 +1121,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 entityResource.getAnchors(args.model.value).then(function (anchorValues) {
                     var linkPicker = {
                         currentTarget: currentTarget,
-                        dataTypeId: args.model.dataTypeId,
+                        dataTypeKey: args.model.dataTypeKey,
                         ignoreUserStartNodes: args.model.config.ignoreUserStartNodes,
                         anchors: anchorValues,
                         submit: function (model) {
@@ -1159,7 +1159,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     disableFolderSelect: true,
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
-                    dataTypeId: args.model.dataTypeId,
+                    dataTypeKey: args.model.dataTypeKey,
                     submit: function (model) {
                         self.insertMediaInEditor(args.editor, model.selection[0]);
                         editorService.close();

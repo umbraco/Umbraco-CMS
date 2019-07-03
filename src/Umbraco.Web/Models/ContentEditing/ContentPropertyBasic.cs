@@ -22,8 +22,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public int Id { get; set; }
 
-        //fixme: This name dataTypeId is inconsistent, but requires us to change it everywhere in angular
-        [DataMember(Name = "dataTypeId", IsRequired = false)] 
+        [DataMember(Name = "dataTypeKey", IsRequired = false)]
         [ReadOnly(true)]
         public Guid DataTypeKey { get; set; }
 

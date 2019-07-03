@@ -338,7 +338,7 @@ namespace Umbraco.Web.Trees
             //Here we need to figure out if the node is a container and if so check if the user has a custom start node, then check if that start node is a child
             // of this container node. If that is true, the HasChildren must be true so that the tree node still renders even though this current node is a container/list view.
             if (isContainer && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
-            {                    
+            {
                 var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
                 //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
                 // the UI that this node does have children and that it isn't a container
@@ -396,7 +396,7 @@ namespace Umbraco.Web.Trees
                 }
 
                 var menu = new MenuItemCollection();
-                // only add empty recycle bin if the current user is allowed to delete by default 
+                // only add empty recycle bin if the current user is allowed to delete by default
                 if (deleteAllowed)
                 {
 	                menu.Items.Add(new MenuItem("emptyRecycleBin", Services.TextService)
@@ -538,8 +538,8 @@ namespace Umbraco.Web.Trees
         {
             if (_ignoreUserStartNodes.HasValue) return _ignoreUserStartNodes.Value;
 
-            var dataTypeId = queryStrings.GetValue<Guid?>(TreeQueryStringParameters.DataTypeId);
-            _ignoreUserStartNodes = dataTypeId.HasValue ? Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value) : false;
+            var dataTypeKey = queryStrings.GetValue<Guid?>(TreeQueryStringParameters.DataTypeKey);
+            _ignoreUserStartNodes = dataTypeKey.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
 
             return _ignoreUserStartNodes.Value;
         }

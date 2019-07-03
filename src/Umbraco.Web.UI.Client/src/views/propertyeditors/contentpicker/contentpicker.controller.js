@@ -86,7 +86,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
-        dataTypeId: null,
+        dataTypeKey: null,
         maxNumber: 1,
         minNumber: 0,
         startNode: {
@@ -140,7 +140,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
         startNodeId: null,
-        dataTypeId: $scope.model.dataTypeId,
+        dataTypeKey: $scope.model.dataTypeKey,
         currentNode: editorState ? editorState.current : null,
         callback: function (data) {
             if (angular.isArray(data)) {
@@ -162,7 +162,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
 
-    dialogOptions.dataTypeId = $scope.model.dataTypeId;
+    dialogOptions.dataTypeKey = $scope.model.dataTypeKey;
 
     // if we can't pick more than one item, explicitly disable multiPicker in the dialog options
     if ($scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) === 1) {

@@ -104,10 +104,10 @@ namespace Umbraco.Web.Editors
         /// <param name="searchFrom">
         /// A starting point for the search, generally a node id, but for members this is a member type alias
         /// </param>
-        /// <param name="dataTypeId">If set used to look up whether user and group start node permissions will be ignored.</param>
+        /// <param name="dataTypeKey">If set used to look up whether user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, Guid? dataTypeId = null)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, Guid? dataTypeKey = null)
         {
             // NOTE: Theoretically you shouldn't be able to see member data if you don't have access to members right? ... but there is a member picker, so can't really do that
 
@@ -116,7 +116,7 @@ namespace Umbraco.Web.Editors
 
             //TODO: This uses the internal UmbracoTreeSearcher, this instead should delgate to the ISearchableTree implementation for the type
 
-            var ignoreUserStartNodes = dataTypeId.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value);
+            var ignoreUserStartNodes = dataTypeKey.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
             return ExamineSearch(query, type, searchFrom, ignoreUserStartNodes);
         }
 
@@ -424,7 +424,7 @@ namespace Umbraco.Web.Editors
         }
         #endregion
 
-        public IEnumerable<EntityBasic> GetChildren(int id, UmbracoEntityTypes type, Guid? dataTypeId = null)
+        public IEnumerable<EntityBasic> GetChildren(int id, UmbracoEntityTypes type, Guid? dataTypeKey = null)
         {
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
@@ -433,7 +433,7 @@ namespace Umbraco.Web.Editors
 
                 var startNodes = GetStartNodes(type);
 
-                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
+                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
 
                 // root is special: we reduce it to start nodes if the user's start node is not the default, then we need to return their start nodes
                 if (id == Constants.System.Root && startNodes.Length > 0 && startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
@@ -482,7 +482,7 @@ namespace Umbraco.Web.Editors
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
             string filter = "",
-            Guid? dataTypeId = null)
+            Guid? dataTypeKey = null)
         {
             if (int.TryParse(id, out var intId))
             {
@@ -507,7 +507,7 @@ namespace Umbraco.Web.Editors
                 //the EntityService can search paged members from the root
 
                 intId = -1;
-                return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter, dataTypeId);
+                return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter, dataTypeKey);
             }
 
             //the EntityService cannot search members of a certain type, this is currently not supported and would require
@@ -543,7 +543,7 @@ namespace Umbraco.Web.Editors
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
             string filter = "",
-            Guid? dataTypeId = null)
+            Guid? dataTypeKey = null)
         {
             if (pageNumber <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -558,7 +558,7 @@ namespace Umbraco.Web.Editors
 
                 var startNodes = GetStartNodes(type);
 
-                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
+                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
 
                 // root is special: we reduce it to start nodes if the user's start node is not the default, then we need to return their start nodes
                 if (id == Constants.System.Root && startNodes.Length > 0 && startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
@@ -642,7 +642,7 @@ namespace Umbraco.Web.Editors
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
             string filter = "",
-            Guid? dataTypeId = null)
+            Guid? dataTypeKey = null)
         {
             if (pageNumber <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -661,7 +661,7 @@ namespace Umbraco.Web.Editors
 
                     int[] aids = GetStartNodes(type);
 
-                    var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeId);
+                    var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
                     entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
                         ? Services.EntityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize, out totalRecords,
                             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
@@ -704,7 +704,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private bool IsDataTypeIgnoringUserStartNodes(Guid? dataTypeId) => dataTypeId.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value);
+        private bool IsDataTypeIgnoringUserStartNodes(Guid? dataTypeKey) => dataTypeKey.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
 
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
