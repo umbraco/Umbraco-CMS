@@ -44,7 +44,7 @@
                         </select>
                     </div>
 
-                    <div ng-if="vm.diff" class="diff" style="border-top: 1px solid #e9e9eb; margin-top: 30px;">
+                    <div ng-if="vm.diff && !vm.loading" class="diff" style="border-top: 1px solid #e9e9eb; margin-top: 30px;">
 
                         <h5><localize key="rollback_changes">Changes</localize></h5>
                         <small style="margin-bottom: 15px; display: block;"><localize key="rollback_diffHelp"></localize></small>
