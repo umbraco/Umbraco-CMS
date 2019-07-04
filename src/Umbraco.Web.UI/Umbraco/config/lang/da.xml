@@ -1022,10 +1022,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="undoEditCrop">Fortryd</key>
   </area>
   <area alias="rollback">
-    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
+    <key alias="changes">Ændringer</key>
+    <key alias="created">Oprettet</key>
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
+    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="htmlHelp">Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner på samme tid, brug 'diff'-oversigten</key>
     <key alias="rollbackTo">Tilbagerulning til</key>
     <key alias="selectVersion">Vælg version</key>
