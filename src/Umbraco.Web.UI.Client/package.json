@@ -47,6 +47,7 @@
     "@babel/core": "7.1.6",
     "@babel/preset-env": "7.1.6",
     "autoprefixer": "9.3.1",
+    "caniuse-lite": "^1.0.30000966",
     "cssnano": "4.1.7",
     "fs": "0.0.2",
     "gulp": "^3.9.1",
@@ -59,6 +60,7 @@
     "gulp-eslint": "^5.0.0",
     "gulp-imagemin": "^4.1.0",
     "gulp-less": "4.0.1",
+    "gulp-modify-file": "^1.0.1",
     "gulp-ngdocs": "0.3.0",
     "gulp-notify": "^3.0.0",
     "gulp-open": "3.0.1",
@@ -69,6 +71,7 @@
     "gulp-wrap": "0.14.0",
     "gulp-wrap-js": "0.4.1",
     "jasmine-core": "3.3.0",
+    "jsdom": "^15.1.1",
     "karma": "3.1.1",
     "karma-jasmine": "2.0.1",
     "karma-junit-reporter": "^1.2.0",
@@ -77,7 +80,6 @@
     "lodash": "4.17.11",
     "marked": "^0.5.2",
     "merge-stream": "1.0.1",
-    "run-sequence": "2.2.1",
-    "caniuse-lite": "^1.0.30000966"
+    "run-sequence": "2.2.1"
   }
 }

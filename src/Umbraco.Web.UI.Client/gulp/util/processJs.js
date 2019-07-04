@@ -23,7 +23,7 @@ module.exports = function(files, out) {
     // sort files in stream by path or any custom sort comparator
     task = task.pipe(babel())
         .pipe(sort())
-        .pipe(embedTemplates({ basePath: "./src/" }))
+        .pipe(embedTemplates({ basePath: "../umbraco.web.ui/umbraco/" })) // views runs first, to add filepath attribute, so need to reference the output html
         .pipe(concat(out))
         .pipe(wrap('(function(){\n%= body %\n})();'))
         .pipe(gulp.dest(config.root + config.targets.js));
