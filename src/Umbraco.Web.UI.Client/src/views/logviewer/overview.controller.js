@@ -43,14 +43,20 @@
         vm.searchLogQuery = searchLogQuery;
         vm.findMessageTemplate = findMessageTemplate;
         
-        function preFlightCheck(){
-            vm.loading = true;
+        function preFlightCheck(instance){
+            vm.loading = true;          
+
+            
             //Do our pre-flight check (to see if we can view logs)
             //IE the log file is NOT too big such as 1GB & crash the site
             logViewerResource.canViewLogs(vm.startDate, vm.endDate).then(function(result){
                 vm.loading = false;
                 vm.canLoadLogs = result;
 
+                if (instance) {
+                    instance.setDate(vm.period);
+                }
+                
                 if(result){
                     //Can view logs - so initalise
                     init();
@@ -117,7 +123,7 @@
             $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function() {
                 vm.loading = false;
             });
-
+            
             $timeout(function () {
                 navigationService.syncTree({ tree: "logViewer", path: "-1" });
             });
@@ -146,9 +152,9 @@
             mode: "range",
             maxDate: "today",
             conjunction: " to "
-        };
-        
-        vm.dateRangeChange = function(selectedDates) {
+        };        
+            
+        vm.dateRangeChange = function(selectedDates, dateStr, instance) {
             
             if(selectedDates.length > 0){
                 vm.startDate = selectedDates[0].toIsoDateString();
@@ -158,9 +164,9 @@
                     vm.period = [vm.startDate];
                 }else{
                     vm.period = [vm.startDate, vm.endDate];
-                }
-                
-                preFlightCheck();
+                }                
+                                
+                preFlightCheck(instance);
             }
 
         }
