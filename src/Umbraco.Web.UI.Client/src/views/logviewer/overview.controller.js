@@ -12,9 +12,9 @@
         vm.commonLogMessagesCount = 10;
 
         // ChartJS Options - for count/overview of log distribution
-        vm.logTypeLabels = ["Info", "Debug", "Warning", "Error", "Critical"];
+        vm.logTypeLabels = ["Debug", "Info", "Warning", "Error", "Fatal"];
         vm.logTypeData = [0, 0, 0, 0, 0];
-        vm.logTypeColors = [ '#dcdcdc', '#97bbcd', '#46bfbd', '#fdb45c', '#f7464a'];
+        vm.logTypeColors = ['#eaddd5', '#2bc37c', '#3544b1', '#ff9412', '#d42054'];
         vm.chartOptions = {
             legend: {
                 display: true,
@@ -74,7 +74,7 @@
                         "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
                     },
                     {
-                        "name": "Find all logs that has an exception property (Warning, Error & Critical with Exceptions)",
+                        "name": "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
                         "query": "Has(@Exception)"
                     },
                     {
@@ -113,8 +113,8 @@
                 vm.commonLogMessages = data;
             });
 
-            //Set loading indicatior to false when these 3 queries complete
-            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function(data) {
+            //Set loading indicator to false when these 3 queries complete
+            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function() {
                 vm.loading = false;
             });
 
@@ -148,7 +148,7 @@
             conjunction: " to "
         };
         
-        vm.dateRangeChange = function(selectedDates, dateStr, instance) {
+        vm.dateRangeChange = function(selectedDates) {
             
             if(selectedDates.length > 0){
                 vm.startDate = selectedDates[0].toIsoDateString();
