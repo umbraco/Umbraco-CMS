@@ -10,11 +10,12 @@
         vm.numberOfErrors = 0;
         vm.commonLogMessages = [];
         vm.commonLogMessagesCount = 10;
+        vm.dateRangeLabel = "";
 
         // ChartJS Options - for count/overview of log distribution
-        vm.logTypeLabels = ["Info", "Debug", "Warning", "Error", "Critical"];
+        vm.logTypeLabels = ["Info", "Debug", "Warning", "Error", "Fatal"];
         vm.logTypeData = [0, 0, 0, 0, 0];
-        vm.logTypeColors = [ '#dcdcdc', '#97bbcd', '#46bfbd', '#fdb45c', '#f7464a'];
+        vm.logTypeColors = ["#dcdcdc", "#97bbcd", "#46bfbd", "#fdb45c", "#f7464a"];
         vm.chartOptions = {
             legend: {
                 display: true,
@@ -23,35 +24,41 @@
         };
 
         let querystring = $location.search();
-        if(querystring.startDate){
+        if (querystring.startDate) {
             vm.startDate = querystring.startDate;
-        }else{
+            vm.dateRangeLabel = getDateRangeLabel("Selected Time Period");
+        } else {
             vm.startDate = new Date(Date.now());
-            vm.startDate.setDate(vm.startDate.getDate()-1);
+            vm.startDate.setDate(vm.startDate.getDate() - 1);
             vm.startDate = vm.startDate.toIsoDateString();
+            vm.dateRangeLabel = getDateRangeLabel("Today");
         }
 
-        if(querystring.endDate){
+        if (querystring.endDate) {
             vm.endDate = querystring.endDate;
-        }else{
+
+            if (querystring.endDate === querystring.startDate) {
+                vm.dateRangeLabel = getDateRangeLabel("Selected Date");
+            }
+        } else {
             vm.endDate = new Date(Date.now()).toIsoDateString();
         }
-        vm.period = [vm.startDate, vm.endDate];
 
+        vm.period = [vm.startDate, vm.endDate];
 
         //functions
         vm.searchLogQuery = searchLogQuery;
         vm.findMessageTemplate = findMessageTemplate;
-        
-        function preFlightCheck(){
+
+        function preFlightCheck() {
             vm.loading = true;
             //Do our pre-flight check (to see if we can view logs)
             //IE the log file is NOT too big such as 1GB & crash the site
-            logViewerResource.canViewLogs(vm.startDate, vm.endDate).then(function(result){
+            logViewerResource.canViewLogs(vm.startDate, vm.endDate).then(function (result) {
                 vm.loading = false;
                 vm.canLoadLogs = result;
 
-                if(result){
+                if (result) {
                     //Can view logs - so initalise
                     init();
                 }
@@ -62,39 +69,39 @@
         function init() {
 
             vm.loading = true;
-            
+
             var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
                 vm.searches = data;
             },
-            // fallback to some defaults if error from API response
-            function () {
-                vm.searches = [
-                    {
-                        "name": "Find all logs where the Level is NOT Verbose and NOT Debug",
-                        "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
-                    },
-                    {
-                        "name": "Find all logs that has an exception property (Warning, Error & Critical with Exceptions)",
-                        "query": "Has(@Exception)"
-                    },
-                    {
-                        "name": "Find all logs that have the property 'Duration'",
-                        "query": "Has(Duration)"
-                    },
-                    {
-                        "name": "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
-                        "query": "Has(Duration) and Duration > 1000"
-                    },
-                    {
-                        "name": "Find all logs that are from the namespace 'Umbraco.Core'",
-                        "query": "StartsWith(SourceContext, 'Umbraco.Core')"
-                    },
-                    {
-                        "name": "Find all logs that use a specific log message template",
-                        "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
-                    }
-                ]
-            });
+                // fallback to some defaults if error from API response
+                function () {
+                    vm.searches = [
+                        {
+                            "name": "Find all logs where the Level is NOT Verbose and NOT Debug",
+                            "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
+                        },
+                        {
+                            "name": "Find all logs that has an exception property (Warning, Error & Critical with Exceptions)",
+                            "query": "Has(@Exception)"
+                        },
+                        {
+                            "name": "Find all logs that have the property 'Duration'",
+                            "query": "Has(Duration)"
+                        },
+                        {
+                            "name": "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
+                            "query": "Has(Duration) and Duration > 1000"
+                        },
+                        {
+                            "name": "Find all logs that are from the namespace 'Umbraco.Core'",
+                            "query": "StartsWith(SourceContext, 'Umbraco.Core')"
+                        },
+                        {
+                            "name": "Find all logs that use a specific log message template",
+                            "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
+                        }
+                    ];
+                });
 
             var numOfErrors = logViewerResource.getNumberOfErrors(vm.startDate, vm.endDate).then(function (data) {
                 vm.numberOfErrors = data;
@@ -109,12 +116,12 @@
                 vm.logTypeData.push(data.Fatal);
             });
 
-            var commonMsgs = logViewerResource.getMessageTemplates(vm.startDate, vm.endDate).then(function(data){
+            var commonMsgs = logViewerResource.getMessageTemplates(vm.startDate, vm.endDate).then(function (data) {
                 vm.commonLogMessages = data;
             });
 
             //Set loading indicatior to false when these 3 queries complete
-            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function(data) {
+            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function (data) {
                 vm.loading = false;
             });
 
@@ -123,20 +130,21 @@
             });
         }
 
-        function searchLogQuery(logQuery){
-            $location.path("/settings/logViewer/search").search({lq: logQuery, startDate: vm.startDate, endDate: vm.endDate});
+        function searchLogQuery(logQuery) {
+            $location.path("/settings/logViewer/search").search({ lq: logQuery, startDate: vm.startDate, endDate: vm.endDate });
         }
 
-        function findMessageTemplate(template){
+        function findMessageTemplate(template) {
             var logQuery = "@MessageTemplate='" + template.MessageTemplate + "'";
             searchLogQuery(logQuery);
         }
 
-
-
-
-        preFlightCheck();
+        function getDateRangeLabel(suffix) {
+            return "Log Overview for " + suffix;
+        }
         
+        preFlightCheck();
+
         /////////////////////
 
         vm.config = {
@@ -147,20 +155,18 @@
             maxDate: "today",
             conjunction: " to "
         };
-        
-        vm.dateRangeChange = function(selectedDates, dateStr, instance) {
-            
-            if(selectedDates.length > 0){
-                vm.startDate = selectedDates[0].toIsoDateString();
-                vm.endDate = selectedDates[selectedDates.length-1].toIsoDateString(); // Take the last date as end
 
-                if(vm.startDate === vm.endDate){
-                    vm.period = [vm.startDate];
-                }else{
-                    vm.period = [vm.startDate, vm.endDate];
-                }
-                
-                preFlightCheck();
+        vm.dateRangeChange = function (selectedDates, dateStr, instance) {
+
+            if (selectedDates.length > 0) {
+
+                // Update view by re-requesting route with updated querystring.
+                // By doing this we make sure the URL matches the selected time period, aiding sharing the link.
+                // Also resolves a minor layout issue where the " to " conjunction between the selected dates
+                // is collapsed to a comma.
+                const startDate = selectedDates[0].toIsoDateString();
+                const endDate = selectedDates[selectedDates.length - 1].toIsoDateString(); // Take the last date as end
+                $location.path("/settings/logViewer/overview").search({ startDate: startDate, endDate: endDate });
             }
 
         }
