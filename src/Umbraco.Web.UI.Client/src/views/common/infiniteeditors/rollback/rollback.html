@@ -54,7 +54,7 @@
                                 <tr>
                                     <td class="bold">Name</td>
                                     <td>
-                                        <span ng-repeat="part in vm.diff.name">
+                                        <span ng-repeat="part in vm.diff.name track by $id(part)">
                                             <ins ng-if="part.added">{{part.value}}</ins>
                                             <del ng-if="part.removed">{{part.value}}</del>
                                             <span ng-if="!part.added && !part.removed">{{part.value}}</span>
@@ -64,7 +64,7 @@
                                 <tr ng-repeat="property in vm.diff.properties track by property.alias">
                                     <td class="bold">{{property.label}}</td>
                                     <td ng-class="{'pre-line': property.isObject, 'word-wrap': !property.isObject}">
-                                        <span ng-repeat="part in property.diff">
+                                        <span ng-repeat="part in property.diff track by $id(part)">
                                             <ins ng-if="part.added">{{part.value}}</ins>
                                             <del ng-if="part.removed">{{part.value}}</del>
                                             <span ng-if="!part.added && !part.removed">{{part.value}}</span>
