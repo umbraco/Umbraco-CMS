@@ -10,6 +10,7 @@
         vm.numberOfErrors = 0;
         vm.commonLogMessages = [];
         vm.commonLogMessagesCount = 10;
+        vm.dateRangeLabel = "";
 
         // ChartJS Options - for count/overview of log distribution
         vm.logTypeLabels = ["Debug", "Info", "Warning", "Error", "Fatal"];
@@ -23,41 +24,41 @@
         };
 
         let querystring = $location.search();
-        if(querystring.startDate){
+        if (querystring.startDate) {
             vm.startDate = querystring.startDate;
-        }else{
+            vm.dateRangeLabel = getDateRangeLabel("Selected Time Period");
+        } else {
             vm.startDate = new Date(Date.now());
-            vm.startDate.setDate(vm.startDate.getDate()-1);
+            vm.startDate.setDate(vm.startDate.getDate() - 1);
             vm.startDate = vm.startDate.toIsoDateString();
+            vm.dateRangeLabel = getDateRangeLabel("Today");
         }
 
-        if(querystring.endDate){
+        if (querystring.endDate) {
             vm.endDate = querystring.endDate;
-        }else{
+
+            if (querystring.endDate === querystring.startDate) {
+                vm.dateRangeLabel = getDateRangeLabel("Selected Date");
+            }
+        } else {
             vm.endDate = new Date(Date.now()).toIsoDateString();
         }
-        vm.period = [vm.startDate, vm.endDate];
 
+        vm.period = [vm.startDate, vm.endDate];
 
         //functions
         vm.searchLogQuery = searchLogQuery;
         vm.findMessageTemplate = findMessageTemplate;
-        
-        function preFlightCheck(instance){
-            vm.loading = true;          
 
-            
+        function preFlightCheck() {
+            vm.loading = true;
             //Do our pre-flight check (to see if we can view logs)
             //IE the log file is NOT too big such as 1GB & crash the site
-            logViewerResource.canViewLogs(vm.startDate, vm.endDate).then(function(result){
+            logViewerResource.canViewLogs(vm.startDate, vm.endDate).then(function (result) {
                 vm.loading = false;
                 vm.canLoadLogs = result;
 
-                if (instance) {
-                    instance.setDate(vm.period);
-                }
-                
-                if(result){
+                if (result) {
                     //Can view logs - so initalise
                     init();
                 }
@@ -68,7 +69,7 @@
         function init() {
 
             vm.loading = true;
-            
+
             var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
                 vm.searches = data;
             },
@@ -115,7 +116,7 @@
                 vm.logTypeData.push(data.Fatal);
             });
 
-            var commonMsgs = logViewerResource.getMessageTemplates(vm.startDate, vm.endDate).then(function(data){
+            var commonMsgs = logViewerResource.getMessageTemplates(vm.startDate, vm.endDate).then(function (data) {
                 vm.commonLogMessages = data;
             });
 
@@ -129,20 +130,21 @@
             });
         }
 
-        function searchLogQuery(logQuery){
-            $location.path("/settings/logViewer/search").search({lq: logQuery, startDate: vm.startDate, endDate: vm.endDate});
+        function searchLogQuery(logQuery) {
+            $location.path("/settings/logViewer/search").search({ lq: logQuery, startDate: vm.startDate, endDate: vm.endDate });
         }
 
-        function findMessageTemplate(template){
+        function findMessageTemplate(template) {
             var logQuery = "@MessageTemplate='" + template.MessageTemplate + "'";
             searchLogQuery(logQuery);
         }
 
-
-
-
-        preFlightCheck();
+        function getDateRangeLabel(suffix) {
+            return "Log Overview for " + suffix;
+        }
         
+        preFlightCheck();
+
         /////////////////////
 
         vm.config = {
@@ -152,21 +154,19 @@
             mode: "range",
             maxDate: "today",
             conjunction: " to "
-        };        
-            
-        vm.dateRangeChange = function(selectedDates, dateStr, instance) {
-            
-            if(selectedDates.length > 0){
-                vm.startDate = selectedDates[0].toIsoDateString();
-                vm.endDate = selectedDates[selectedDates.length-1].toIsoDateString(); // Take the last date as end
+        };
 
-                if(vm.startDate === vm.endDate){
-                    vm.period = [vm.startDate];
-                }else{
-                    vm.period = [vm.startDate, vm.endDate];
-                }                
-                                
-                preFlightCheck(instance);
+        vm.dateRangeChange = function (selectedDates, dateStr, instance) {
+
+            if (selectedDates.length > 0) {
+
+                // Update view by re-requesting route with updated querystring.
+                // By doing this we make sure the URL matches the selected time period, aiding sharing the link.
+                // Also resolves a minor layout issue where the " to " conjunction between the selected dates
+                // is collapsed to a comma.
+                const startDate = selectedDates[0].toIsoDateString();
+                const endDate = selectedDates[selectedDates.length - 1].toIsoDateString(); // Take the last date as end
+                $location.path("/settings/logViewer/overview").search({ startDate: startDate, endDate: endDate });
             }
 
         }
