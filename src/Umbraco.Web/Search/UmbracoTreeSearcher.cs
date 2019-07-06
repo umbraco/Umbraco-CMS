@@ -383,19 +383,7 @@ namespace Umbraco.Web.Search
         /// <param name="results"></param>
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
-        {
-            //add additional data
-            foreach (var result in results)
-            {
-                var m = _mapper.Map<SearchResultEntity>(result);
-                //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == Constants.Icons.DefaultIcon)
-                {
-                    m.Icon = Constants.Icons.MediaImage;
-                }
-                yield return m;
-            }
-        }
+            => _mapper.Map<IEnumerable<SearchResultEntity>>(results);
 
         /// <summary>
         /// Returns a collection of entities for content based on search results
