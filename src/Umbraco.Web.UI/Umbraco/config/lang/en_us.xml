@@ -530,6 +530,9 @@
     <key alias="anchor">#value or ?key=value</key>
     <key alias="enterAlias">Enter alias...</key>
     <key alias="generatingAlias">Generating alias...</key>
+      <key alias="emptyEmail">Your email can not be blank</key>
+      <key alias="emptyUsername">Your username can not be blank</key>
+      <key alias="emptyPassword">Your password can not be blank</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
