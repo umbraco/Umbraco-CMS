@@ -37,6 +37,7 @@ exports.docserve = series(docs, connectDocs, openDocs);
 
 exports.js = series(js);
 exports.views = series(views);
+exports.watch = series(watch);
 
 exports.runTests = series(js, testUnit);
 exports.testUnit = series(testUnit);
