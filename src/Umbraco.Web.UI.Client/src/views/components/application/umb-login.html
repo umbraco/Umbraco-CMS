@@ -183,7 +183,7 @@
                 </div>
 
                 <div ng-show="vm.view == 'request-password-reset'">
-                    <p>
+                    <p tabindex="0">
                         <localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</localize>
                     </p>
 
@@ -198,9 +198,11 @@
                         </div>
 
                         <div class="control-group" ng-show="vm.showEmailResetConfirmation">
-                            <div class="text-info">
+                            <div class="text-info" role="alert">
+                                <p tabindex="0">
                                 <localize key="login_requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</localize>
-                            </div>
+                                    </p>
+                                </div>
                         </div>
 
                         <div class="flex justify-between items-center">
