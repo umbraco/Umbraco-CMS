@@ -85,7 +85,7 @@ namespace Umbraco.Web.Editors
             };
         }
 
-       
+
 
         /// <summary>
         /// Check if the index has been rebuilt
@@ -250,7 +250,7 @@ namespace Umbraco.Web.Editors
 
         private void Indexer_IndexOperationComplete(object sender, EventArgs e)
         {
-            var indexer = (LuceneIndex)sender;
+            var indexer = (IIndex)sender;
 
             _logger.Debug<ExamineManagementController>("Logging operation completed for index {IndexName}", indexer.Name);
 
@@ -259,7 +259,7 @@ namespace Umbraco.Web.Editors
 
             _logger
                 .Info<ExamineManagementController
-                >($"Rebuilding index '{indexer.Name}' done, {indexer.CommitCount} items committed (can differ from the number of items in the index)");
+                >($"Rebuilding index '{indexer.Name}' done.");
 
             var cacheKey = "temp_indexing_op_" + indexer.Name;
             _runtimeCache.Clear(cacheKey);
