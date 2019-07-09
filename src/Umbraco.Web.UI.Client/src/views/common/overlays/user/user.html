@@ -23,9 +23,10 @@
         <umb-button
             alias="changePassword"
             type="button"
-            action="togglePasswordFields()"
+            action="togglePasswordFields($event)"
             button-style="action"
             label="Change password"
+            label-key="general_changePassword">
        </umb-button>
 
         <umb-button
@@ -106,7 +107,7 @@
 
            <umb-button
                type="button"
-               action="togglePasswordFields()"
+               action="togglePasswordFields($event)"
                label="Back"
                label-key="general_back"
                button-style="cancel">

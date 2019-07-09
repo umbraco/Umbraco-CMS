@@ -167,8 +167,9 @@ angular.module("umbraco")
 
         };
 
-        $scope.togglePasswordFields = function() {
+        $scope.togglePasswordFields = function($event) {
            clearPasswordFields();
+           $event.stopPropagation();
            $scope.showPasswordFields = !$scope.showPasswordFields;
         }
 
