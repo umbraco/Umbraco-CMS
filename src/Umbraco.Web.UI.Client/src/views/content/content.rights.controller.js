@@ -93,6 +93,7 @@
         function setPermissions(group) {
             assignGroupPermissions(group);  
             setViewSate("manageGroups");
+            $scope.dialog.confirmDiscardChanges = true;
         }
 
         /**

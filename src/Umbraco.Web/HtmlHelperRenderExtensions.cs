@@ -230,7 +230,9 @@ namespace Umbraco.Web
                 //that each token is unique to the controller/action/area instead of the default ASP.Net implementation which is that the token is unique
                 //per user.
                 _viewContext.HttpContext.Items["ufprt"] = _encryptedString;
+
             }
+
 
             private readonly ViewContext _viewContext;
             private readonly FormMethod _method;
@@ -243,7 +245,6 @@ namespace Umbraco.Web
                 if (this._disposed)
                     return;
                 this._disposed = true;
-
                 //Detect if the call is targeting UmbRegisterController/UmbProfileController/UmbLoginStatusController/UmbLoginController and if it is we automatically output a AntiForgeryToken()
                 // We have a controllerName and area so we can match
                 if (_controllerName == "UmbRegister"
@@ -251,7 +252,7 @@ namespace Umbraco.Web
                     || _controllerName == "UmbLoginStatus"
                     || _controllerName == "UmbLogin")
 			    {
-			        _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
+                    _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
 			    }
 
                 //write out the hidden surface form routes

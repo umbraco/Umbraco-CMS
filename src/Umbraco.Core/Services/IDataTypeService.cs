@@ -4,6 +4,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
+
     /// <summary>
     /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataType"/>
     /// </summary>

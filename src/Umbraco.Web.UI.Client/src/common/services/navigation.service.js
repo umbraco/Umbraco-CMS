@@ -349,7 +349,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         
         reloadSection: function(sectionAlias) {
             return navReadyPromise.promise.then(function () {
-                mainTreeApi.clearCache({ section: sectionAlias });
+                treeService.clearCache({ section: sectionAlias });
                 return mainTreeApi.load(sectionAlias);
             });
         },
