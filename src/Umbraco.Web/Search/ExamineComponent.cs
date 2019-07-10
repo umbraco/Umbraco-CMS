@@ -30,8 +30,9 @@ namespace Umbraco.Web.Search
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
         private static bool _disableExamineIndexing = false;
-        private static volatile bool _isConfigured = false;
-        private static readonly object IsConfiguredLocker = new object();
+        private static bool _isConfigured = false;
+        private static object _configuredInit = null;
+        private static object _isConfiguredLocker = new object();
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
@@ -91,7 +92,7 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                _logger.Debug<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
+                _logger.Info<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers(_logger);
@@ -120,7 +121,7 @@ namespace Umbraco.Web.Search
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
 
-            EnsureUnlocked(_logger, _examineManager);
+            ConfigureIndexes(_logger, _examineManager);
 
             // TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
             RebuildIndexes(_indexRebuilder, _logger, true, 5000);
@@ -161,25 +162,24 @@ namespace Umbraco.Web.Search
         }
 
         /// <summary>
-        /// Must be called to each index is unlocked before any indexing occurs
+        /// Called on startup to configure each index.
         /// </summary>
         /// <remarks>
         /// Indexing rebuilding can occur on a normal boot if the indexes are empty or on a cold boot by the database server messenger. Before
         /// either of these happens, we need to configure the indexes.
+        /// Configuring also ensure the indexes are not locked.
         /// </remarks>
-        private static void EnsureUnlocked(ILogger logger, IExamineManager examineManager)
+        private static void ConfigureIndexes(ILogger logger, IExamineManager examineManager)
         {
-            if (_disableExamineIndexing) return;
-            if (_isConfigured) return;
-
-            lock (IsConfiguredLocker)
-            {
-                //double check
-                if (_isConfigured) return;
-
-                _isConfigured = true;
-                examineManager.UnlockLuceneIndexes(logger);
-            }
+            LazyInitializer.EnsureInitialized(
+                ref _configuredInit,
+                ref _isConfigured,
+                ref _isConfiguredLocker,
+                () =>
+                {
+                    examineManager.ConfigureLuceneIndexes(logger, _disableExamineIndexing);
+                    return null;
+                });
         }
 
         #region Cache refresher updated event handlers
@@ -737,7 +737,7 @@ namespace Umbraco.Web.Search
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    .Where(x => (keepIfUnpublished && !x.PublishedValuesOnly) || !keepIfUnpublished)
+                    .Where(x => x.PublishedValuesOnly || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
                     index.DeleteFromIndex(strId);
@@ -800,7 +800,7 @@ namespace Umbraco.Web.Search
                 if (_waitMilliseconds > 0)
                     Thread.Sleep(_waitMilliseconds);
 
-                EnsureUnlocked(_logger, _indexRebuilder.ExamineManager);
+                ConfigureIndexes(_logger, _indexRebuilder.ExamineManager);
                 _indexRebuilder.RebuildIndexes(_onlyEmptyIndexes);
             }
         }
