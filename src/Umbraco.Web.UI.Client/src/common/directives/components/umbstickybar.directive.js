@@ -37,7 +37,7 @@ Use this directive make an element sticky and follow the page when scrolling. `u
         function setClass(addClass, current) {
             if (!initial) {
                 current.classList.toggle('umb-sticky-bar--active', addClass);
-            } else {
+            } else if (addClass) {
                 initial = false;
             }
         }
@@ -47,10 +47,10 @@ Use this directive make an element sticky and follow the page when scrolling. `u
         These are used by the IntersectionObserve to calculate scroll position
         **/
         function addSentinels(current) {
-            ['-top', '-bottom'].forEach(s => {
+            ['-top', '-bottom'].forEach((s, i) => {
                 const sentinel = document.createElement('div');
                 sentinel.classList.add('umb-sticky-sentinel', s);
-                current.parentElement.appendChild(sentinel);
+                current.parentElement[i ? 'appendChild' : 'prepend'](sentinel);
             });
         }
 
@@ -61,12 +61,13 @@ Use this directive make an element sticky and follow the page when scrolling. `u
         function observeFooter(current, container) {
             const observer = new IntersectionObserver((records, observer) => {
                 let [target, rootBounds, intersected] = [records[0].boundingClientRect, records[0].rootBounds, records[0].intersectionRatio === 1];
-
-                if (target.bottom > rootBounds.top && intersected) {
-                    setClass(true, current);
-                }
-                if (target.top < rootBounds.top && target.bottom < rootBounds.bottom) {
-                    setClass(false, current);
+                if (rootBounds && target) {
+                    if (target.bottom > rootBounds.top && intersected) {
+                        setClass(true, current);
+                    }
+                    if (target.top < rootBounds.top && target.bottom < rootBounds.bottom) {
+                        setClass(false, current);
+                    }
                 }
             }, {
                 threshold: [1],
@@ -83,13 +84,14 @@ Use this directive make an element sticky and follow the page when scrolling. `u
         function observeHeader(current, container) {
             const observer = new IntersectionObserver((records, observer) => {
                 let [target, rootBounds] = [records[0].boundingClientRect, records[0].rootBounds];
+                if (rootBounds && target) {
+                    if (target.bottom < rootBounds.top) {
+                        setClass(true, current);
+                    }
 
-                if (target.bottom < rootBounds.top) {
-                    setClass(true, current);
-                }
-
-                if (target.bottom >= rootBounds.top && target.bottom < rootBounds.bottom) {
-                    setClass(false, current);
+                    if (target.bottom >= rootBounds.top && target.bottom < rootBounds.bottom) {
+                        setClass(false, current);
+                    }
                 }
             }, {
                 threshold: [0],
@@ -99,15 +101,15 @@ Use this directive make an element sticky and follow the page when scrolling. `u
             observer.observe(current.parentElement.querySelector('.umb-sticky-sentinel.-top'));
         }
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope, el, attrs) {
 
             let current = el[0];
-            let container = current.closest('[data-element="editor-container"]');
-
-            addSentinels(current);
-
-            observeHeader(current, container);
-            observeFooter(current, container);
+            let container = current.closest('.umb-editor-container') || current.closest('.umb-dashboard');
+            if (container) {
+                addSentinels(current);
+                observeHeader(current, container);
+                observeFooter(current, container);
+            }
         }
 
         var directive = {
