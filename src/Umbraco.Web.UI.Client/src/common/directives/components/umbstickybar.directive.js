@@ -37,8 +37,6 @@ Use this directive make an element sticky and follow the page when scrolling. `u
         function setClass(addClass, current) {
             if (!initial) {
                 current.classList.toggle('umb-sticky-bar--active', addClass);
-            } else if (addClass) {
-                initial = false;
             }
         }
 
