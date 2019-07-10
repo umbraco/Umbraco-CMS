@@ -114,18 +114,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (options.IgnoreLocalDb == false)
             {
+                var shuttingDown = false;
                 var registered = mainDom.Register(
                     null,
                     () =>
                     {
                         lock (_storesLock)
                         {
-                            _contentStore.ReleaseLocalDb();
+                            _contentStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                             _localContentDb = null;
-                            _mediaStore.ReleaseLocalDb();
+                            _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                             _localMediaDb = null;
+                            shuttingDown = true;
                         }
                     });
+
 
                 if (registered)
                 {
@@ -134,9 +137,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
                     _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
 
-                    // if both local databases exist then GetTree will open them, else new databases will be created
-                    _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
-                    _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
+                    lock(_storesLock)
+                    {
+                        //if we're signalled to already shutdown then don't load in the local cache, this will remain as null
+                        if (!shuttingDown)
+                        {
+                            // if both local databases exist then GetTree will open them, else new databases will be created
+                            _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
+                            _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
+                        }
+                    }
                 }
 
                 // stores are created with a db so they can write to it, but they do not read from it,
