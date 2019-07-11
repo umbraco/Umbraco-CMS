@@ -176,6 +176,10 @@
         }
 
         function getThumbnail(file) {
+            if (file.extension === 'svg') {
+                return file.fileName;
+            }
+
             if (!file.isImage) {
                 return null;
             }

@@ -18,8 +18,8 @@
                     <div class="" ng-if="file.isImage || file.extension == 'svg'">
                         <div class="gravity-container">
                             <div class="viewport">
-                                <img ng-if="file.isClientSide" ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}"/>
-                                <a ng-if="!file.isClientSide" href="{{file.fileSrc}}" target="_blank">
+                                <img ng-if="file.isClientSide" ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}" />
+                                <a ng-if="!file.isClientSide" ng-href="{{file.fileSrc}}" target="_blank">
                                     <img ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}" />
                                 </a>
                             </div>
