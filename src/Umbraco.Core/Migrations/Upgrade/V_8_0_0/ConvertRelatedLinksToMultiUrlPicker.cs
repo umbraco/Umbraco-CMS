@@ -53,7 +53,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             
             foreach (var property in properties)
             {
-                var value = property.Value.ToString();
+                var value = property.Value?.ToString();
                 if (string.IsNullOrWhiteSpace(value))
                     continue;
 
