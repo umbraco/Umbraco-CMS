@@ -139,7 +139,7 @@ namespace Umbraco.Core.Runtime
                 // there should be none, really - this is here "just in case"
                 Compose(composition);
 
-                // acquire the main domain
+                // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
                 AcquireMainDom(mainDom);
 
                 // determine our runtime level
@@ -218,13 +218,13 @@ namespace Umbraco.Core.Runtime
                 IOHelper.SetRootDirectory(path);
         }
 
-        private void AcquireMainDom(MainDom mainDom)
+        private bool AcquireMainDom(MainDom mainDom)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    mainDom.Acquire();
+                    return mainDom.Acquire();
                 }
                 catch
                 {
