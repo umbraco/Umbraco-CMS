@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 
@@ -145,12 +146,20 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         IUmbracoEntity GetChildEntityFromRelation(IRelation relation);
 
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUmbracoEntity GetChildEntityFromRelation(IRelation relation, bool loadBaseType = false);
+
         /// <summary>
         /// Gets the Parent object from a Relation as an <see cref="IUmbracoEntity"/>
         /// </summary>
         /// <param name="relation">Relation to retrieve parent object from</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         IUmbracoEntity GetParentEntityFromRelation(IRelation relation);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUmbracoEntity GetParentEntityFromRelation(IRelation relation, bool loadBaseType = false);
 
         /// <summary>
         /// Gets the Parent and Child objects from a Relation as a <see cref="Tuple"/>"/> with <see cref="IUmbracoEntity"/>.
@@ -159,12 +168,20 @@ namespace Umbraco.Core.Services
         /// <returns>Returns a Tuple with Parent (item1) and Child (item2)</returns>
         Tuple<IUmbracoEntity, IUmbracoEntity> GetEntitiesFromRelation(IRelation relation);
 
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        Tuple<IUmbracoEntity, IUmbracoEntity> GetEntitiesFromRelation(IRelation relation, bool loadBaseType = false);
+
         /// <summary>
         /// Gets the Child objects from a list of Relations as a list of <see cref="IUmbracoEntity"/> objects.
         /// </summary>
         /// <param name="relations">List of relations to retrieve child objects from</param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/></returns>
         IEnumerable<IUmbracoEntity> GetChildEntitiesFromRelations(IEnumerable<IRelation> relations);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IUmbracoEntity> GetChildEntitiesFromRelations(IEnumerable<IRelation> relations, bool loadBaseType = false);
 
         /// <summary>
         /// Gets the Parent objects from a list of Relations as a list of <see cref="IUmbracoEntity"/> objects.
@@ -173,6 +190,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/></returns>
         IEnumerable<IUmbracoEntity> GetParentEntitiesFromRelations(IEnumerable<IRelation> relations);
 
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IUmbracoEntity> GetParentEntitiesFromRelations(IEnumerable<IRelation> relations, bool loadBaseType = false);
+
         /// <summary>
         /// Gets the Parent and Child objects from a list of Relations as a list of <see cref="IUmbracoEntity"/> objects.
         /// </summary>
@@ -180,6 +201,12 @@ namespace Umbraco.Core.Services
         /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c></param>
         IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(
             IEnumerable<IRelation> relations);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(
+            IEnumerable<IRelation> relations,
+            bool loadBaseType = false);
 
         /// <summary>
         /// Relates two objects by their entity Ids.

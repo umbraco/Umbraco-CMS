@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -55,6 +56,10 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         IUmbracoEntity GetByKey(Guid key);
 
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true);
+
         /// <summary>
         /// Gets an UmbracoEntity by its Id, and optionally loads the complete object graph.
         /// </summary>
@@ -62,8 +67,12 @@ namespace Umbraco.Core.Services
         /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
         /// </returns>
         /// <param name="id">Id of the object to retrieve</param>
-       /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        /// <returns>An <see cref="IUmbracoEntity"/></returns>
         IUmbracoEntity Get(int id);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUmbracoEntity Get(int id, bool loadBaseType = true);
 
         /// <summary>
         /// Gets an UmbracoEntity by its Id and UmbracoObjectType, and optionally loads the complete object graph.
@@ -76,6 +85,14 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType);
 
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUmbracoEntity GetByKey<T>(Guid key, bool loadBaseType = true) where T : IUmbracoEntity;
+
         /// <summary>
         /// Gets an UmbracoEntity by its Id and UmbracoObjectType, and optionally loads the complete object graph.
         /// </summary>
@@ -87,6 +104,9 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         IUmbracoEntity Get(int id, UmbracoObjectTypes umbracoObjectType);
 
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUmbracoEntity Get(int id, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true);
 
         /// <summary>
         /// Gets an UmbracoEntity by its Id and specified Type. Optionally loads the complete object graph.
@@ -98,6 +118,10 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the object to retrieve</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         IUmbracoEntity Get<T>(int id) where T : IUmbracoEntity;
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUmbracoEntity Get<T>(int id, bool loadBaseType = true) where T : IUmbracoEntity;
 
         /// <summary>
         /// Gets the parent of entity by its id
