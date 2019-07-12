@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -31,6 +32,7 @@ namespace Umbraco.Core.Services.Implement
         private IQuery<IContent> _queryNotTrashed;
         //TODO: The non-lazy object should be injected
         private readonly Lazy<PropertyValidationService> _propertyValidationService = new Lazy<PropertyValidationService>(() => new PropertyValidationService());
+        
 
         #region Constructors
 
@@ -757,6 +759,11 @@ namespace Umbraco.Core.Services.Implement
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException("Cannot save (un)publishing content, use the dedicated SavePublished method.");
 
+            if (content.Name != null && content.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
             var evtMsgs = EventMessagesFactory.Get();
 
             using (var scope = ScopeProvider.CreateScope())
@@ -870,6 +877,11 @@ namespace Umbraco.Core.Services.Implement
                     throw new NotSupportedException($"Culture \"{culture}\" is not supported by invariant content types.");
             }
 
+            if(content.Name != null && content.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
@@ -899,6 +911,11 @@ namespace Umbraco.Core.Services.Implement
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (cultures == null) throw new ArgumentNullException(nameof(cultures));
+
+            if (content.Name != null && content.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1680,12 +1697,11 @@ namespace Umbraco.Core.Services.Implement
             }
 
             const int pageSize = 500;
-            var page = 0;
             var total = long.MaxValue;
-            while (page * pageSize < total)
+            while (total > 0)
             {
                 //get descendants - ordered from deepest to shallowest
-                var descendants = GetPagedDescendants(content.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
+                var descendants = GetPagedDescendants(content.Id, 0, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
                 foreach (var c in descendants)
                     DoDelete(c);
             }
@@ -1889,9 +1905,8 @@ namespace Umbraco.Core.Services.Implement
             content.ParentId = parentId;
 
             // get the level delta (old pos to new pos)
-            var levelDelta = parent == null
-                ? 1 - content.Level + (parentId == Constants.System.RecycleBinContent ? 1 : 0)
-                : parent.Level + 1 - content.Level;
+            // note that recycle bin (id:-20) level is 0!
+            var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
 
             var paths = new Dictionary<int, string>();
 
@@ -1912,11 +1927,10 @@ namespace Umbraco.Core.Services.Implement
             paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString) : parent.Path) + "," + content.Id;
 
             const int pageSize = 500;
-            var page = 0;
             var total = long.MaxValue;
-            while (page * pageSize < total)
+            while (total > 0)
             {
-                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+                var descendants = GetPagedDescendantsLocked(originalPath, 0, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
                 foreach (var descendant in descendants)
                 {
                     moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
@@ -2886,24 +2900,15 @@ namespace Umbraco.Core.Services.Implement
             {
                 foreach (var property in blueprint.Properties)
                 {
-                    if (property.PropertyType.VariesByCulture())
-                    {
-                        content.SetValue(property.Alias, property.GetValue(culture), culture);
-                    }
-                    else
-                    {
-                        content.SetValue(property.Alias, property.GetValue());
-                    }
+					var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
+                    content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
                 }
 
-                content.Name = blueprint.Name;
                 if (!string.IsNullOrEmpty(culture))
                 {
                     content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
                 }
             }
-
-
 
             return content;
         }
@@ -3021,5 +3026,8 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
+
+
+        
     }
 }

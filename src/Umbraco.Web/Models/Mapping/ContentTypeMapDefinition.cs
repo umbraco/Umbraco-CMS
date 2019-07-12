@@ -219,6 +219,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.Name = source.Label;
             target.DataTypeId = source.DataTypeId;
+            target.DataTypeKey = source.DataTypeKey;
             target.Mandatory = source.Validation.Mandatory;
             target.ValidationRegExp = source.Validation.Pattern;
             target.Variations = source.AllowCultureVariant ? ContentVariation.Culture : ContentVariation.Nothing;
@@ -334,6 +335,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
             target.DataTypeId = source.DataTypeId;
+            target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;
             target.GroupId = source.GroupId;
             target.Id = source.Id;
@@ -349,6 +351,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
             target.DataTypeId = source.DataTypeId;
+            target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;
             target.GroupId = source.GroupId;
             target.Id = source.Id;

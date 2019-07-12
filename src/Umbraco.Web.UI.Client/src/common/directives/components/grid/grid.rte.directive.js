@@ -4,7 +4,9 @@ angular.module("umbraco.directives")
             scope: {
                 uniqueId: '=',
                 value: '=',
-                configuration: "="
+                configuration: "=", //this is the RTE configuration
+                datatypeKey: '@',
+                ignoreUserStartNodes: '@'
             },
             templateUrl: 'views/components/grid/grid-rte.html',
             replace: true,
@@ -34,6 +36,14 @@ angular.module("umbraco.directives")
                 if (!scope.configuration.maxImageSize && scope.configuration.maxImageSize !== 0) {
                     editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
                 }
+
+                //ensure the grid's global config is being passed up to the RTE, these 2 properties need to be in this format
+                //since below we are just passing up `scope` as the actual model and for 2 way binding to work with `value` that
+                //is the way it needs to be unless we start adding watchers. We'll just go with this for now but it's super ugly.
+                scope.config = {
+                    ignoreUserStartNodes: scope.ignoreUserStartNodes === "true"
+                }
+                scope.dataTypeKey = scope.datatypeKey; //Yes - this casing is rediculous, but it's because the var starts with `data` so it can't be `data-type-id` :/
 
                 //stores a reference to the editor
                 var tinyMceEditor = null;

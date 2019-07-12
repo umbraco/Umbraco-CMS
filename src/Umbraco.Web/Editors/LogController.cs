@@ -18,10 +18,15 @@ namespace Umbraco.Web.Editors
         [UmbracoApplicationAuthorize(Core.Constants.Applications.Content, Core.Constants.Applications.Media)]
         public PagedResult<AuditLog> GetPagedEntityLog(int id,
             int pageNumber = 1,
-            int pageSize = 0,
+            int pageSize = 10,
             Direction orderDirection = Direction.Descending,
             DateTime? sinceDate = null)
         {
+            if (pageSize <= 0 || pageNumber <= 0)
+            {
+                return new PagedResult<AuditLog>(0, pageNumber, pageSize);
+            }
+
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? SqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
             var result = Services.AuditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter: dateQuery);
@@ -37,10 +42,15 @@ namespace Umbraco.Web.Editors
 
         public PagedResult<AuditLog> GetPagedCurrentUserLog(
             int pageNumber = 1,
-            int pageSize = 0,
+            int pageSize = 10,
             Direction orderDirection = Direction.Descending,
             DateTime? sinceDate = null)
         {
+            if (pageSize <= 0 || pageNumber <= 0)
+            {
+                return new PagedResult<AuditLog>(0, pageNumber, pageSize);
+            }
+
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? SqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
             var userId = Security.GetUserId().ResultOr(0);
