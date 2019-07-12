@@ -123,6 +123,8 @@
 
         function pickGroup() {
             navigationService.allowHideDialog(false);
+            var previousConfirmDiscardChanges = $scope.dialog.confirmDiscardChanges;
+            $scope.dialog.confirmDiscardChanges = false;
             editorService.memberGroupPicker({
                 multiPicker: true,
                 submit: function(model) {
@@ -144,6 +146,7 @@
                 close: function() {
                     editorService.close();
                     navigationService.allowHideDialog(true);
+                    $scope.dialog.confirmDiscardChanges = previousConfirmDiscardChanges;
                 }
             });
         }
@@ -155,6 +158,8 @@
 
         function pickMember() {
             navigationService.allowHideDialog(false);
+            var previousConfirmDiscardChanges = $scope.dialog.confirmDiscardChanges;
+            $scope.dialog.confirmDiscardChanges = false;
             // TODO: once editorService has a memberPicker method, use that instead
             editorService.treePicker({
                 multiPicker: true,
@@ -196,6 +201,7 @@
                 close: function () {
                     editorService.close();
                     navigationService.allowHideDialog(true);
+                    $scope.dialog.confirmDiscardChanges = previousConfirmDiscardChanges;
                 }
             });
         }
@@ -214,6 +220,8 @@
 
         function pickPage(page) {
             navigationService.allowHideDialog(false);
+            var previousConfirmDiscardChanges = $scope.dialog.confirmDiscardChanges;
+            $scope.dialog.confirmDiscardChanges = false;
             editorService.contentPicker({
                 submit: function (model) {
                     if (page === vm.loginPage) {
@@ -229,6 +237,7 @@
                 close: function () {
                     editorService.close();
                     navigationService.allowHideDialog(true);
+                    $scope.dialog.confirmDiscardChanges = previousConfirmDiscardChanges;
                 }
             });
         }
