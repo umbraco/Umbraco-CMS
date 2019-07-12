@@ -175,13 +175,13 @@ namespace Umbraco.Web
         #region Search
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, string culture = null, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = null)
         {
             return Search(term, 0, 0, out _, culture, indexName);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = null, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = null)
         {
             indexName = string.IsNullOrEmpty(indexName)
                 ? Constants.UmbracoIndexes.ExternalIndexName
@@ -195,20 +195,29 @@ namespace Umbraco.Web
             // default to max 500 results
             var count = skip == 0 && take == 0 ? 500 : skip + take;
 
-            //set this to the specific culture or to the culture in the request
-            culture = culture ?? _variationContextAccessor.VariationContext.Culture;
-
             ISearchResults results;
-            if (culture.IsNullOrWhiteSpace())
+            if (culture == "*")
             {
+                //search everything
+
                 results = searcher.Search(term, count);
+            }
+            else if (culture.IsNullOrWhiteSpace())
+            {
+                //only search invariant
+
+                var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, "n"); //must not vary by culture
+                qry = qry.And().ManagedQuery(term);
+                results = qry.Execute(count);
             }
             else
             {
+                //search only the specified culture
+
                 //get all index fields suffixed with the culture name supplied
-                var cultureFields = umbIndex.GetCultureFields(culture);
+                var cultureFields = umbIndex.GetCultureFields(culture).ToArray();
                 var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, "y"); //must vary by culture
-                qry = qry.And().ManagedQuery(term, cultureFields.ToArray());
+                qry = qry.And().ManagedQuery(term, cultureFields);
                 results = qry.Execute(count);
             }
 
