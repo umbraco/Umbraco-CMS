@@ -71,37 +71,37 @@
             vm.loading = true;
 
             var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
-                vm.searches = data;
-            },
-            // fallback to some defaults if error from API response
-            function () {
-                vm.searches = [
-                    {
-                        "name": "Find all logs where the Level is NOT Verbose and NOT Debug",
-                        "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
+                    vm.searches = data;
+                },
+                // fallback to some defaults if error from API response
+                function () {
+                    vm.searches = [
+                        {
+                            "name": "Find all logs where the Level is NOT Verbose and NOT Debug",
+                            "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
                     },
-                    {
-                        "name": "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
-                        "query": "Has(@Exception)"
+                        {
+                            "name": "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
+                            "query": "Has(@Exception)"
                     },
-                    {
-                        "name": "Find all logs that have the property 'Duration'",
-                        "query": "Has(Duration)"
+                        {
+                            "name": "Find all logs that have the property 'Duration'",
+                            "query": "Has(Duration)"
                     },
-                    {
-                        "name": "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
-                        "query": "Has(Duration) and Duration > 1000"
+                        {
+                            "name": "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
+                            "query": "Has(Duration) and Duration > 1000"
                     },
-                    {
-                        "name": "Find all logs that are from the namespace 'Umbraco.Core'",
-                        "query": "StartsWith(SourceContext, 'Umbraco.Core')"
+                        {
+                            "name": "Find all logs that are from the namespace 'Umbraco.Core'",
+                            "query": "StartsWith(SourceContext, 'Umbraco.Core')"
                     },
-                    {
-                        "name": "Find all logs that use a specific log message template",
-                        "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
+                        {
+                            "name": "Find all logs that use a specific log message template",
+                            "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
                     }
                 ]
-            });
+                });
 
             var numOfErrors = logViewerResource.getNumberOfErrors(vm.startDate, vm.endDate).then(function (data) {
                 vm.numberOfErrors = data;
@@ -109,11 +109,13 @@
 
             var logCounts = logViewerResource.getLogLevelCounts(vm.startDate, vm.endDate).then(function (data) {
                 vm.logTypeData = [];
-                vm.logTypeData.push(data.Information);
-                vm.logTypeData.push(data.Debug);
-                vm.logTypeData.push(data.Warning);
-                vm.logTypeData.push(data.Error);
-                vm.logTypeData.push(data.Fatal);
+
+                for (let [key, value] of Object.entries(data)) {
+                    const index = vm.logTypeLabels.findIndex(x => key.startsWith(x));
+                    if (index > -1 && index < vm.logTypeData.length) {
+                        vm.logTypeData[index] = value;
+                    }                
+                }
             });
 
             var commonMsgs = logViewerResource.getMessageTemplates(vm.startDate, vm.endDate).then(function (data) {
@@ -121,17 +123,24 @@
             });
 
             //Set loading indicator to false when these 3 queries complete
-            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function() {
+            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function () {
                 vm.loading = false;
             });
-            
+
             $timeout(function () {
-                navigationService.syncTree({ tree: "logViewer", path: "-1" });
+                navigationService.syncTree({
+                    tree: "logViewer",
+                    path: "-1"
+                });
             });
         }
 
         function searchLogQuery(logQuery) {
-            $location.path("/settings/logViewer/search").search({ lq: logQuery, startDate: vm.startDate, endDate: vm.endDate });
+            $location.path("/settings/logViewer/search").search({
+                lq: logQuery,
+                startDate: vm.startDate,
+                endDate: vm.endDate
+            });
         }
 
         function findMessageTemplate(template) {
@@ -142,7 +151,7 @@
         function getDateRangeLabel(suffix) {
             return "Log Overview for " + suffix;
         }
-        
+
         preFlightCheck();
 
         /////////////////////
@@ -166,7 +175,10 @@
                 // is collapsed to a comma.
                 const startDate = selectedDates[0].toIsoDateString();
                 const endDate = selectedDates[selectedDates.length - 1].toIsoDateString(); // Take the last date as end
-                $location.path("/settings/logViewer/overview").search({ startDate: startDate, endDate: endDate });
+                $location.path("/settings/logViewer/overview").search({
+                    startDate: startDate,
+                    endDate: endDate
+                });
             }
 
         }
