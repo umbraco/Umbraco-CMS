@@ -12,13 +12,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             $scope.model.title = localizationService.localize("defaultdialogs_selectLink");
         }
 
+        var dataTypeId = null;
+        if(dialogOptions && dialogOptions.dataTypeId){
+            dataTypeId = dialogOptions.dataTypeId;
+        }
+
+
         $scope.dialogTreeEventHandler = $({});
         $scope.model.target = {};
         $scope.searchInfo = {
             searchFromId: null,
             searchFromName: null,
             showSearch: false,
-            dataTypeId: dialogOptions.dataTypeId,
+            dataTypeId: dataTypeId,
             results: [],
             selectedSearchResults: []
         };
@@ -115,12 +121,17 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                     startNodeId = -1;
                     startNodeIsVirtual = true;
                 }
+                var dataTypeId = null;
+                if(dialogOptions && dialogOptions.dataTypeId){
+                    dataTypeId = dialogOptions.dataTypeId;
+                }
+
                 $scope.mediaPickerOverlay = {
                     view: "mediapicker",
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
                     show: true,
-                    dataTypeId: dialogOptions.dataTypeId,
+                    dataTypeId: dataTypeId,
                     submit: function (model) {
                         var media = model.selectedImages[0];
 

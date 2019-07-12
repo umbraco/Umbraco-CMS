@@ -8,13 +8,17 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			searchText = value + "...";
 		});
 
+        var dataTypeId = null;
+        if($scope.model && $scope.model.dataTypeId) {
+            dataTypeId = $scope.model.dataTypeId;
+        }
 		$scope.dialogTreeEventHandler = $({});
 		$scope.target = {};
 		$scope.searchInfo = {
 			searchFromId: null,
 			searchFromName: null,
 			showSearch: false,
-            dataTypeId: $scope.model.dataTypeId,
+            dataTypeId: dataTypeId,
 			results: [],
 			selectedSearchResults: []
 		}

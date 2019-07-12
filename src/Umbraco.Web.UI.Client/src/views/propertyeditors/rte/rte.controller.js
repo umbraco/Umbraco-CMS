@@ -272,11 +272,16 @@ angular.module("umbraco")
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
 
                         entityResource.getAnchors($scope.model.value).then(function(anchorValues){
+                            var dataTypeId = null;
+                            if($scope.model && $scope.model.dataTypeId) {
+                                dataTypeId = $scope.model.dataTypeId;
+                            }
+
                             $scope.linkPickerOverlay = {
                                 view: "linkpicker",
                                 currentTarget: currentTarget,
                                 anchors: anchorValues,
-                                dataTypeId: $scope.model.dataTypeId,
+                                dataTypeId: dataTypeId,
                                 ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes,
                                 show: true,
                                 submit: function(model) {
@@ -300,6 +305,10 @@ angular.module("umbraco")
                             startNodeId = -1;
                             startNodeIsVirtual = true;
                         }
+                        var dataTypeId = null;
+                        if($scope.model && $scope.model.dataTypeId) {
+                            dataTypeId = $scope.model.dataTypeId;
+                        }
 
                         $scope.mediaPickerOverlay = {
                             currentTarget: currentTarget,
@@ -308,7 +317,7 @@ angular.module("umbraco")
                             disableFolderSelect: true,
                             startNodeId: startNodeId,
                             startNodeIsVirtual: startNodeIsVirtual,
-                            dataTypeId: $scope.model.dataTypeId,
+                            dataTypeId: dataTypeId,
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {

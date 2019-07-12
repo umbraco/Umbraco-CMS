@@ -4,6 +4,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         var tree = null;
         var dialogOptions = $scope.model;
+
+        var dataTypeId = null;
+        if(dialogOptions && dialogOptions.dataTypeId){
+            dataTypeId = dialogOptions.dataTypeId;
+        }
         $scope.treeReady = false;
         $scope.dialogTreeEventHandler = $({});
         $scope.section = dialogOptions.section;
@@ -16,7 +21,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             searchFromId: dialogOptions.startNodeId,
             searchFromName: null,
             showSearch: false,
-            dataTypeId: dialogOptions.dataTypeId,
+            dataTypeId: dataTypeId,
             results: [],
             selectedSearchResults: []
         }

@@ -107,13 +107,17 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         };
 
        $scope.add = function() {
+           var dataTypeId = null;
+           if($scope.model && $scope.model.dataTypeId) {
+               dataTypeId = $scope.model.dataTypeId;
+           }
 
            $scope.mediaPickerOverlay = {
                view: "mediapicker",
                title: "Select media",
                startNodeId: $scope.model.config.startNodeId,
                startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
-               dataTypeId:  $scope.model.dataTypeId,
+               dataTypeId:  dataTypeId,
                multiPicker: multiPicker,
                onlyImages: onlyImages,
                disableFolderSelect: disableFolderSelect,

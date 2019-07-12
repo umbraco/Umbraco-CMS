@@ -19,13 +19,18 @@
             $scope.hasError = false;
 
             $scope.internal = function($event) {
+                var dataTypeId = null;
+                if($scope.model && $scope.model.dataTypeId) {
+                    dataTypeId = $scope.model.dataTypeId;
+                }
+
                $scope.currentEditLink = null;
 
                $scope.contentPickerOverlay = {};
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.dataTypeId = $scope.model.dataTypeId;
+               $scope.contentPickerOverlay.dataTypeId = dataTypeId;
                $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
@@ -45,13 +50,18 @@
             };
 
             $scope.selectInternal = function ($event, link) {
+                var dataTypeId = null;
+                if($scope.model && $scope.model.dataTypeId) {
+                    dataTypeId = $scope.model.dataTypeId;
+                }
+
                $scope.currentEditLink = link;
 
                $scope.contentPickerOverlay = {};
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.dataTypeId = $scope.model.dataTypeId;
+               $scope.contentPickerOverlay.dataTypeId = dataTypeId;
                $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {

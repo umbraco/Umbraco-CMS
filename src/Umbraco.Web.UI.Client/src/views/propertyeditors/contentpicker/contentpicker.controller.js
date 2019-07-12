@@ -180,10 +180,15 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     //dialog
     $scope.openContentPicker = function() {
+        var dataTypeId = null;
+        if($scope.model && $scope.model.dataTypeId) {
+            dataTypeId = $scope.model.dataTypeId;
+        }
+
       $scope.contentPickerOverlay = dialogOptions;
       $scope.contentPickerOverlay.view = "treepicker";
       $scope.contentPickerOverlay.show = true;
-      $scope.contentPickerOverlay.dataTypeId = $scope.model.dataTypeId;
+      $scope.contentPickerOverlay.dataTypeId = dataTypeId;
 
       $scope.contentPickerOverlay.submit = function(model) {
 

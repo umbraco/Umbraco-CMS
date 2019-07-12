@@ -13,11 +13,16 @@
         function openLinkPicker(editor, currentTarget, anchorElement) {
 
             entityResource.getAnchors(JSON.stringify($scope.model.value)).then(function(anchorValues) {
+                var dataTypeId = null;
+                if($scope.model && $scope.model.dataTypeId) {
+                    dataTypeId = $scope.model.dataTypeId;
+                }
+
                 vm.linkPickerOverlay = {
                     view: "linkpicker",
                     currentTarget: currentTarget,
                     anchors: anchorValues,
-                    dataTypeId: $scope.model.dataTypeId,
+                    dataTypeId: dataTypeId,
                     ignoreUserStartNodes : $scope.model.config.ignoreUserStartNodes,
                     show: true,
                     submit: function(model) {
@@ -40,13 +45,18 @@
                 startNodeIsVirtual = true;
             }
 
+            var dataTypeId = null;
+            if($scope.model && $scope.model.dataTypeId) {
+                dataTypeId = $scope.model.dataTypeId;
+            }
+
             vm.mediaPickerOverlay = {
                 currentTarget: currentTarget,
                 onlyImages: true,
                 showDetails: true,
                 startNodeId: startNodeId,
                 startNodeIsVirtual: startNodeIsVirtual,
-                dataTypeId: $scope.model.dataTypeId,
+                dataTypeId: dataTypeId,
                 view: "mediapicker",
                 show: true,
                 submit: function(model) {
