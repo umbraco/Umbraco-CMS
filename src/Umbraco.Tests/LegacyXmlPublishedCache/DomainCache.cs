@@ -27,13 +27,18 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         }
 
         /// <inheritdoc />
-        public IEnumerable<Domain> GetAssigned(int contentId, bool includeWildcards)
+        public IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false)
         {
-            return _domainService.GetAssignedDomains(contentId, includeWildcards)
+            return _domainService.GetAssignedDomains(documentId, includeWildcards)
                  .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
                 .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard));
         }
 
+        /// <inheritdoc />
+        public bool HasAssigned(int documentId, bool includeWildcards = false)
+            => documentId > 0 && GetAssigned(documentId, includeWildcards).Any();
+
+        /// <inheritdoc />
         public string DefaultCulture { get; }
     }
 }

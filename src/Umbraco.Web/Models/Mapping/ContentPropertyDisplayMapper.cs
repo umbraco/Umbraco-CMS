@@ -14,8 +14,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly ILocalizedTextService _textService;
 
-        public ContentPropertyDisplayMapper(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
-            : base(dataTypeService, logger, propertyEditors)
+        public ContentPropertyDisplayMapper(IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+            : base(dataTypeService, entityService, logger, propertyEditors)
         {
             _textService = textService;
         }

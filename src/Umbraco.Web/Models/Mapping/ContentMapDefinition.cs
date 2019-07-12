@@ -73,6 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             target.AllowedActions = GetActions(source);
             target.AllowedTemplates = GetAllowedTemplates(source);
             target.ContentApps = _commonMapper.GetContentApps(source);
+            target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(source.ContentType.Name);
             target.DocumentType = _commonMapper.GetContentType(source, context);
@@ -117,6 +118,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Alias
         private void Map(IContent source, ContentItemBasic<ContentPropertyBasic> target, MapperContext context)
         {
+            target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.CreateDate = source.CreateDate;
             target.Edited = source.Edited;
