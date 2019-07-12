@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -735,6 +736,32 @@ namespace Umbraco.Core.Services
         /// Occurs after a RelationType is Saved
         /// </summary>
         public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelationType>> SavedRelationType;
+        #endregion
+
+        #region Obsolete - only here for compat
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IUmbracoEntity GetChildEntityFromRelation(IRelation relation, bool loadBaseType = false) => GetChildEntityFromRelation(relation);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IUmbracoEntity GetParentEntityFromRelation(IRelation relation, bool loadBaseType = false) => GetParentEntityFromRelation(relation);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Tuple<IUmbracoEntity, IUmbracoEntity> GetEntitiesFromRelation(IRelation relation, bool loadBaseType = false) => GetEntitiesFromRelation(relation);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IEnumerable<IUmbracoEntity> GetChildEntitiesFromRelations(IEnumerable<IRelation> relations, bool loadBaseType = false) => GetChildEntitiesFromRelations(relations);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IEnumerable<IUmbracoEntity> GetParentEntitiesFromRelations(IEnumerable<IRelation> relations, bool loadBaseType = false) => GetParentEntitiesFromRelations(relations);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations, bool loadBaseType = false) => GetEntitiesFromRelations(relations);
         #endregion
     }
 }
