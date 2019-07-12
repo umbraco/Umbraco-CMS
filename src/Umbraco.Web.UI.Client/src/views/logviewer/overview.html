@@ -83,7 +83,7 @@
 
                     <div ng-show=" vm.canLoadLogs">
                         <!-- No of Errors -->
-                        <umb-box ng-click="vm.searchLogQuery('Has(@Exception)')" style="cursor:pointer;">
+                        <umb-box ng-click="vm.searchErrors()" style="cursor:pointer;">
                             <umb-box-header title="Number of Errors"></umb-box-header>
                             <umb-box-content class="block-form" style="font-size: 40px; font-weight:900; text-align:center; color:#fe6561;">
                                 {{ vm.numberOfErrors }}
