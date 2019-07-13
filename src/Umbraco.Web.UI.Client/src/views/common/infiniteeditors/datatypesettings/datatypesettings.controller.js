@@ -100,6 +100,10 @@
         }
 
         function submit() {
+            if (!formHelper.submitForm({ scope: $scope })) {
+                return;
+            }
+
             vm.saveButtonState = "busy";
 
             var preValues = dataTypeHelper.createPreValueProps(vm.dataType.preValues);

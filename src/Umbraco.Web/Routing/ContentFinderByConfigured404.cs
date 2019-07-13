@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -25,9 +25,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(PublishedRequest frequest)
         {
@@ -47,13 +47,13 @@ namespace Umbraco.Web.Routing
                 while (pos > 1)
                 {
                     route = route.Substring(0, pos);
-                    node = frequest.UmbracoContext.ContentCache.GetByRoute(route, culture: frequest?.Culture?.Name);
+                    node = frequest.UmbracoContext.Content.GetByRoute(route, culture: frequest?.Culture?.Name);
                     if (node != null) break;
                     pos = route.LastIndexOf('/');
                 }
                 if (node != null)
                 {
-                    var d = DomainHelper.FindWildcardDomainInPath(frequest.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), node.Path, null);
+                    var d = DomainUtilities.FindWildcardDomainInPath(frequest.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), node.Path, null);
                     if (d != null)
                         errorCulture = d.Culture;
                 }
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Routing
             {
                 _logger.Debug<ContentFinderByConfigured404>("Got id={ErrorNodeId}.", error404.Value);
 
-                content = frequest.UmbracoContext.ContentCache.GetById(error404.Value);
+                content = frequest.UmbracoContext.Content.GetById(error404.Value);
 
                 _logger.Debug<ContentFinderByConfigured404>(content == null
                     ? "Could not find content with that id."

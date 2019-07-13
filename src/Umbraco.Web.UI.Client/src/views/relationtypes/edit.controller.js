@@ -119,7 +119,6 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
 
             }, function (error) {
                 contentEditingHelper.handleSaveError({
-                    redirectOnFailure: false,
                     err: error
                 });
 

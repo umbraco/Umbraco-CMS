@@ -8,7 +8,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
@@ -40,9 +39,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IAppCache appCache,
             PublishedContentTypeCache contentTypeCache,
             XPathNavigator nav,
-            bool fromExamine,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            :base(umbracoContextAccessor)
+            bool fromExamine)
         {
             if (valueDictionary == null) throw new ArgumentNullException(nameof(valueDictionary));
             if (getParent == null) throw new ArgumentNullException(nameof(getParent));
@@ -158,8 +155,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override string Name => _name;
 
-        public override PublishedCultureInfo GetCulture(string culture = null) => null;
-
         private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
         public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
 
@@ -189,12 +184,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override IEnumerable<IPublishedContent> Children => _getChildren.Value;
 
+        public override IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
+
         public override IPublishedProperty GetProperty(string alias)
         {
             return _getProperty(this, alias);
         }
 
-        public override PublishedContentType ContentType => _contentType;
+        public override IPublishedContentType ContentType => _contentType;
 
         private readonly List<string> _keysAdded = new List<string>();
         private int _id;
@@ -215,7 +212,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         //private Guid _version;
         private int _level;
         private readonly ICollection<IPublishedProperty> _properties;
-        private readonly PublishedContentType _contentType;
+        private readonly IPublishedContentType _contentType;
 
         private void ValidateAndSetProperty(IReadOnlyDictionary<string, string> valueDictionary, Action<string> setProperty, params string[] potentialKeys)
         {

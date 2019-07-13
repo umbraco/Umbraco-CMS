@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Overlays.ItemPickerOverlay">
+<div ng-controller="Umbraco.Overlays.ItemPickerOverlay" class="umb-itempicker">
 
     <div class="form-search" ng-hide="model.filter === false" style="margin-bottom: 15px;">
         <i class="icon-search"></i>
@@ -11,13 +11,37 @@
                no-dirty-check />
     </div>
 
-    <ul class="umb-card-grid">
-        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm"
-            ng-click="selectItem(availableItem)"
-            class="-three-in-row">
+    <div class="umb-overlay__section-header" ng-if="(model.pasteItems | filter:searchTerm).length > 0">
+        <h5><localize key="content_createFromClipboard">Paste from clipboard</localize></h5>
+        <button ng-if="model.clickClearPaste" ng-click="model.clickClearPaste($event)" alt="Clear clipboard for entries accepted in this context.">
+            <i class="icon-trash"></i>
+        </button>
+    </div>
+
+    <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
+        <li ng-repeat="pasteItem in model.pasteItems | filter:searchTerm"
+            ng-click="model.clickPasteItem(pasteItem)">
+            <a class="umb-card-grid-item" href="" title="{{ pasteItem.name }}">
+                <span>
+                    <i class="{{ pasteItem.icon }}"></i>
+                    {{ pasteItem.name | truncate:true:36 }}
+                </span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="umb-overlay__section-header" ng-if="model.pasteItems.length > 0 && (model.availableItems | filter:searchTerm).length > 0">
+        <h5><localize key="content_createEmpty">Create new</localize></h5>
+    </div>
+
+    <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
+        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:searchTerm"
+            ng-click="selectItem(availableItem)">
             <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
-                <i class="{{ availableItem.icon }}"></i>
-                {{ availableItem.name }}
+                <span>
+                    <i class="{{ availableItem.icon }}"></i>
+                    {{ availableItem.name }}
+                </span>
             </a>
         </li>
     </ul>

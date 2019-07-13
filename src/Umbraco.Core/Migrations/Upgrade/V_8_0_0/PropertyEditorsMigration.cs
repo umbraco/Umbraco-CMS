@@ -30,7 +30,20 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     .Where<DataTypeDto>(x => x.EditorAlias == toAlias));
 
                 if (oldCount > 0)
-                    throw new InvalidOperationException($"Cannot rename datatype alias \"{fromAlias}\" to \"{toAlias}\" because the target alias is already used.");
+                {
+                    // If we throw it means that the upgrade will exit and cannot continue.
+                    // This will occur if a v7 site has the old "Obsolete" property editors that are already named with the `toAlias` name.
+                    // TODO: We should have an additional upgrade step when going from 7 -> 8 like we did with 6 -> 7 that shows a compatibility report,
+                    // this would include this check and then we can provide users with information on what they should do (i.e. before upgrading to v8 they will
+                    // need to migrate these old obsolete editors to non-obsolete editors)
+
+                    throw new InvalidOperationException(
+                        $"Cannot rename datatype alias \"{fromAlias}\" to \"{toAlias}\" because the target alias is already used." +
+                        $"This is generally because when upgrading from a v7 to v8 site, the v7 site contains Data Types that reference old and already Obsolete " +
+                        $"Property Editors. Before upgrading to v8, any Data Types using property editors that are named with the prefix '(Obsolete)' must be migrated " +
+                        $"to the non-obsolete v7 property editors of the same type.");
+                }
+                    
             }
 
             Database.Execute(Sql()

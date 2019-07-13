@@ -8,7 +8,9 @@
  * The main application controller
  * 
  */
-function MainController($scope, $location, appState, treeService, notificationsService, userService, historyService, updateChecker, assetsService, eventsService, tmhDynamicLocale, localStorageService, editorService, overlayService) {
+function MainController($scope, $location, appState, treeService, notificationsService, 
+    userService, historyService, updateChecker, navigationService, eventsService, 
+    tmhDynamicLocale, localStorageService, editorService, overlayService) {
 
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
@@ -18,7 +20,29 @@ function MainController($scope, $location, appState, treeService, notificationsS
     $scope.drawer = {};
     $scope.search = {};
     $scope.login = {};
+    $scope.tabbingActive = false;
     
+    // There are a number of ways to detect when a focus state should be shown when using the tab key and this seems to be the simplest solution. 
+    // For more information about this approach, see https://hackernoon.com/removing-that-ugly-focus-ring-and-keeping-it-too-6c8727fefcd2
+    function handleFirstTab(evt) {
+        if (evt.keyCode === 9) {
+            $scope.tabbingActive = true;
+            $scope.$digest();
+            window.removeEventListener('keydown', handleFirstTab);
+            window.addEventListener('mousedown', disableTabbingActive);
+        }
+    }
+    
+    function disableTabbingActive(evt) {
+        $scope.tabbingActive = false;
+        $scope.$digest();
+        window.removeEventListener('mousedown', disableTabbingActive);
+        window.addEventListener("keydown", handleFirstTab);
+    }
+
+    window.addEventListener("keydown", handleFirstTab);
+
+
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
     };
@@ -81,6 +105,13 @@ function MainController($scope, $location, appState, treeService, notificationsS
         //if the user has changed we need to redirect to the root so they don't try to continue editing the
         //last item in the URL (NOTE: the user id can equal zero, so we cannot just do !data.lastUserId since that will resolve to true)
         if (data.lastUserId !== undefined && data.lastUserId !== null && data.lastUserId !== data.user.id) {
+
+            var section = appState.getSectionState("currentSection");
+            if (section) {
+                //if there's a section already assigned, reload it so the tree is cleared
+                navigationService.reloadSection(section);
+            }
+
             $location.path("/").search("");
             historyService.removeAll();
             treeService.clearCache();

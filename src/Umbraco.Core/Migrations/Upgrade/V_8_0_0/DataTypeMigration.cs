@@ -1,28 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Newtonsoft.Json;
-using NPoco;
-using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
 
     public class DataTypeMigration : MigrationBase
     {
-        public DataTypeMigration(IMigrationContext context)
+        private readonly PreValueMigratorCollection _preValueMigrators;
+        private readonly PropertyEditorCollection _propertyEditors;
+        private readonly ILogger _logger;
+
+        public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators, PropertyEditorCollection propertyEditors, ILogger logger)
             : base(context)
-        { }
+        {
+            _preValueMigrators = preValueMigrators;
+            _propertyEditors = propertyEditors;
+            _logger = logger;
+        }
 
         public override void Migrate()
         {
-            // delete *all* keys and indexes - because of FKs
-            Delete.KeysAndIndexes().Do();
-
             // drop and create columns
             Delete.Column("pk").FromTable("cmsDataType").Do();
 
@@ -31,21 +36,17 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             // create column
             AddColumn<DataTypeDto>(Constants.DatabaseSchema.Tables.DataType, "config");
-            Execute.Sql(Sql().Update<DataTypeDto>(u => u.Set(x => x.Configuration, string.Empty)).SQL).Do();
-
-            // re-create *all* keys and indexes
-            foreach (var x in DatabaseSchemaCreator.OrderedTables)
-                Create.KeysAndIndexes(x).Do();
+            Execute.Sql(Sql().Update<DataTypeDto>(u => u.Set(x => x.Configuration, string.Empty))).Do();
 
             // renames
             Execute.Sql(Sql()
                 .Update<DataTypeDto>(u => u.Set(x => x.EditorAlias, "Umbraco.ColorPicker"))
-                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias").SQL).Do();
+                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias")).Do();
 
             // from preValues to configuration...
             var sql = Sql()
                 .Select<DataTypeDto>()
-                .AndSelect<PreValueDto>(x => x.Alias, x => x.SortOrder, x => x.Value)
+                .AndSelect<PreValueDto>(x => x.Id, x => x.Alias, x => x.SortOrder, x => x.Value)
                 .From<DataTypeDto>()
                 .InnerJoin<PreValueDto>().On<DataTypeDto, PreValueDto>((left, right) => left.NodeId == right.NodeId)
                 .OrderBy<DataTypeDto>(x => x.NodeId)
@@ -60,43 +61,45 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     .From<DataTypeDto>()
                     .Where<DataTypeDto>(x => x.NodeId == group.Key)).First();
 
-                var aliases = group.Select(x => x.Alias).Distinct().ToArray();
-                if (aliases.Length == 1 && string.IsNullOrWhiteSpace(aliases[0]))
+                // migrate the preValues to configuration
+                var migrator = _preValueMigrators.GetMigrator(dataType.EditorAlias) ?? new DefaultPreValueMigrator();
+                var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, group.ToDictionary(x => x.Alias, x => x));
+                var json = JsonConvert.SerializeObject(config);
+
+                // validate - and kill the migration if it fails
+                var newAlias = migrator.GetNewAlias(dataType.EditorAlias);
+                if (newAlias == null)
                 {
-                    // array-based prevalues
-                    var values = new Dictionary<string, object> { ["values"] = group.OrderBy(x => x.SortOrder).Select(x => x.Value).ToArray() };
-                    dataType.Configuration = JsonConvert.SerializeObject(values);
+                    _logger.Warn<DataTypeMigration>("Skipping validation of configuration for data type {NodeId} : {EditorAlias}."
+                                                    + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
+                                                    dataType.NodeId, dataType.EditorAlias);
+                }
+                else if (!_propertyEditors.TryGet(newAlias, out var propertyEditor))
+                {
+                    _logger.Warn<DataTypeMigration>("Skipping validation of configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})"
+                                                    + " because no property editor with that alias was found."
+                                                    + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
+                                                    dataType.NodeId, newAlias, dataType.EditorAlias);
                 }
                 else
                 {
-                    // assuming we don't want to fall back to array
-                    if (aliases.Length != group.Count() || aliases.Any(string.IsNullOrWhiteSpace))
-                        throw new InvalidOperationException($"Cannot migrate datatype w/ id={dataType.NodeId} preValues: duplicate or null/empty alias.");
-
-                    // dictionary-base prevalues
-                    var values = group.ToDictionary(x => x.Alias, x => x.Value);
-                    dataType.Configuration = JsonConvert.SerializeObject(values);
+                    var configEditor = propertyEditor.GetConfigurationEditor();
+                    try
+                    {
+                        var _ = configEditor.FromDatabase(json);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Warn<DataTypeMigration>(e, "Failed to validate configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})."
+                                                        + " Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.",
+                                                        dataType.NodeId, newAlias, dataType.EditorAlias);
+                    }
                 }
 
+                // update
+                dataType.Configuration = JsonConvert.SerializeObject(config);
                 Database.Update(dataType);
             }
-        }
-
-        [TableName("cmsDataTypePreValues")]
-        [ExplicitColumns]
-        public class PreValueDto
-        {
-            [Column("datatypeNodeId")]
-            public int NodeId { get; set; }
-
-            [Column("alias")]
-            public string Alias { get; set; }
-
-            [Column("sortorder")]
-            public int SortOrder { get; set; }
-
-            [Column("value")]
-            public string Value { get; set; }
         }
     }
 }

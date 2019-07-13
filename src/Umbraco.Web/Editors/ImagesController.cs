@@ -61,7 +61,7 @@ namespace Umbraco.Web.Editors
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
             var response = Request.CreateResponse(HttpStatusCode.Found);
             var imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
-            response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&upscale=false&width={width}", UriKind.Relative);
+            response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&upscale=false&width={width}&animationprocessmode=first&mode=max", UriKind.Relative);
             return response;
         }
         

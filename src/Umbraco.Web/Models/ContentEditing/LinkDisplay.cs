@@ -9,9 +9,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
-        [DataMember(Name = "isMedia")]
-        public bool IsMedia { get; set; }
-
         [DataMember(Name = "name")]
         public string Name { get; set; }
 

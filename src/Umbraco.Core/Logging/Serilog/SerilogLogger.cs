@@ -13,7 +13,7 @@ namespace Umbraco.Core.Logging.Serilog
     ///<summary>
     /// Implements <see cref="ILogger"/> on top of Serilog.
     ///</summary>
-    public class SerilogLogger : ILogger
+    public class SerilogLogger : ILogger, IDisposable
     {
         /// <summary>
         /// Initialize a new instance of the <see cref="SerilogLogger"/> class with a configuration file.
@@ -270,6 +270,11 @@ namespace Umbraco.Core.Logging.Serilog
         public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
         {
             LoggerFor(reporting).Verbose(messageTemplate, propertyValues);
+        }
+
+        public void Dispose()
+        {
+            Log.CloseAndFlush();
         }
     }
 }
