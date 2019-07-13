@@ -121,7 +121,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         if ($scope.maxItems === 0)
             $scope.maxItems = 1000;
 
-        $scope.singleMode = $scope.minItems === 1 && $scope.maxItems === 1;
+        $scope.singleMode = $scope.minItems === 1 && $scope.maxItems === 1 && $scope.model.config.contentTypes.length === 1;
         $scope.showIcons = Object.toBoolean($scope.model.config.showIcons);
         $scope.wideMode = Object.toBoolean($scope.model.config.hideLabel);
         $scope.hasContentTypes = $scope.model.config.contentTypes.length > 0;
@@ -146,6 +146,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
             $scope.currentNode = newNode;
             $scope.setDirty();
+            validate();
         };
 
         $scope.openNodeTypePicker = function ($event) {
@@ -231,14 +232,22 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             }
         };
 
+        $scope.canDeleteNode = function (idx) {
+            return ($scope.nodes.length > $scope.minItems)
+                ? true
+                : $scope.model.config.contentTypes.length > 1;
+        }
+
         $scope.deleteNode = function (idx) {
-            if ($scope.nodes.length > $scope.model.config.minItems) {
-                $scope.nodes.splice(idx, 1);
-                $scope.setDirty();
-                updateModel();
-            }
+            $scope.nodes.splice(idx, 1);
+            $scope.setDirty();
+            updateModel();
+            validate();
         };
         $scope.requestDeleteNode = function (idx) {
+            if (!$scope.canDeleteNode(idx)) {
+                return;
+            }
             if ($scope.model.config.confirmDeletes === true) {
                 localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
                     const overlay = {
@@ -466,8 +475,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     }
                 }
 
-                // Enforce min items
-                if ($scope.nodes.length < $scope.model.config.minItems) {
+                // Enforce min items if we only have one scaffold type
+                if ($scope.nodes.length < $scope.model.config.minItems && $scope.scaffolds.length === 1) {
                     for (var i = $scope.nodes.length; i < $scope.model.config.minItems; i++) {
                         $scope.addNode($scope.scaffolds[0].contentTypeAlias);
                     }
@@ -477,6 +486,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 if ($scope.singleMode || ($scope.nodes.length === 1 && $scope.maxItems === 1)) {
                     $scope.currentNode = $scope.nodes[0];
                 }
+
+                validate();
 
                 $scope.inited = true;
                 
@@ -554,6 +565,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 }
                 $scope.model.value = newValues;
             }
+        }
+
+        var validate = function () {
+            $scope.nestedContentForm.minCount.$setValidity("minCount", $scope.nodes.length >= $scope.minItems);
         }
 
         $scope.$watch("currentNode", function (newVal) {
