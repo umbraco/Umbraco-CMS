@@ -184,7 +184,6 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
                         savedContent: data,
-                        redirectOnSuccess: !infiniteMode,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
@@ -206,7 +205,6 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
 
                     contentEditingHelper.handleSaveError({
                         err: err,
-                        redirectOnFailure: !infiniteMode,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
                     
@@ -286,7 +284,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
     /** Callback for when user clicks the back-icon */
     $scope.onBack = function() {
         if ($scope.page.listViewPath) {
-            $location.path($scope.page.listViewPath);
+            $location.path($scope.page.listViewPath.split("?")[0]);
         }
     };
     

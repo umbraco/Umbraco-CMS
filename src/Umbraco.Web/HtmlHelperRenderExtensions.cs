@@ -223,7 +223,16 @@ namespace Umbraco.Web
                 _method = method;
 			    _controllerName = controllerName;
                 _encryptedString = UrlHelperRenderExtensions.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
+
+                //For UmbracoForm's we want to add our routing string to the httpcontext items in the case where anti-forgery tokens are used.
+                //In which case our custom UmbracoAntiForgeryAdditionalDataProvider will kick in and validate the values in the request against
+                //the values that will be appended to the token. This essentially means that when anti-forgery tokens are used with UmbracoForm's forms,
+                //that each token is unique to the controller/action/area instead of the default ASP.Net implementation which is that the token is unique
+                //per user.
+                _viewContext.HttpContext.Items["ufprt"] = _encryptedString;
+
             }
+
 
             private readonly ViewContext _viewContext;
             private readonly FormMethod _method;
@@ -236,7 +245,6 @@ namespace Umbraco.Web
                 if (this._disposed)
                     return;
                 this._disposed = true;
-
                 //Detect if the call is targeting UmbRegisterController/UmbProfileController/UmbLoginStatusController/UmbLoginController and if it is we automatically output a AntiForgeryToken()
                 // We have a controllerName and area so we can match
                 if (_controllerName == "UmbRegister"
@@ -244,7 +252,7 @@ namespace Umbraco.Web
                     || _controllerName == "UmbLoginStatus"
                     || _controllerName == "UmbLogin")
 			    {
-			        _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
+                    _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
 			    }
 
                 //write out the hidden surface form routes

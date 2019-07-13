@@ -248,6 +248,11 @@ namespace Umbraco.Tests.Testing
 
             // register empty content apps collection
             Composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
+
+            // manifest
+            Composition.ManifestValueValidators();
+            Composition.ManifestFilters();
+
         }
 
         protected virtual void ComposeMapper(bool configure)

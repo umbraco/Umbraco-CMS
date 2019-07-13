@@ -96,6 +96,14 @@
                 vm.logOptions.filterExpression = querystring.lq;
             }
 
+            if(querystring.startDate){
+                vm.logOptions.startDate = querystring.startDate;
+            }
+
+            if(querystring.endDate){
+                vm.logOptions.endDate = querystring.endDate;
+            }
+
             vm.loading = true;
 
             logViewerResource.getSavedSearches().then(function (data) {
@@ -270,7 +278,11 @@
                 submitButtonLabel: "Save Search",
                 disableSubmitButton: true,
                 view: "logviewersearch",
-                query: vm.logOptions.filterExpression,
+                query: {
+                    filterExpression: vm.logOptions.filterExpression,
+                    startDate: vm.logOptions.startDate,
+                    endDate: vm.logOptions.endDate
+                },
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom

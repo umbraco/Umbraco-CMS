@@ -228,6 +228,7 @@ app.config(function ($routeProvider) {
 
             },
             reloadOnSearch: false,
+            reloadOnUrl: false,
             resolve: canRoute(true)
         })
         .otherwise({ redirectTo: '/login' });

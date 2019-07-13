@@ -389,7 +389,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private DatabaseSchemaResult ValidateSchema(IScope scope)
         {
-            if (_databaseFactory.Configured == false)
+            if (_databaseFactory.Initialized == false)
                 return new DatabaseSchemaResult(_databaseFactory.SqlContext.SqlSyntax);
 
             if (_databaseSchemaValidationResult != null)
@@ -513,7 +513,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private Attempt<Result> CheckReadyForInstall()
         {
-            if (_databaseFactory.Configured == false)
+            if (_databaseFactory.CanConnect == false)
             {
                 return Attempt.Fail(new Result
                 {

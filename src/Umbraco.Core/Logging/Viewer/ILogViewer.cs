@@ -26,26 +26,26 @@ namespace Umbraco.Core.Logging.Viewer
         /// A count of number of errors
         /// By counting Warnings with Exceptions, Errors & Fatal messages
         /// </summary>
-        int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate);
+        int GetNumberOfErrors(LogTimePeriod logTimePeriod);
 
         /// <summary>
         /// Returns a number of the different log level entries
         /// </summary>
-        LogLevelCounts GetLogLevelCounts(DateTimeOffset startDate, DateTimeOffset endDate);
+        LogLevelCounts GetLogLevelCounts(LogTimePeriod logTimePeriod);
 
         /// <summary>
         /// Returns a list of all unique message templates and their counts
         /// </summary>
-        IEnumerable<LogTemplate> GetMessageTemplates(DateTimeOffset startDate, DateTimeOffset endDate);
+        IEnumerable<LogTemplate> GetMessageTemplates(LogTimePeriod logTimePeriod);
 
         bool CanHandleLargeLogs { get; }
 
-        bool CheckCanOpenLogs(DateTimeOffset startDate, DateTimeOffset endDate);
+        bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
 
         /// <summary>
         /// Returns the collection of logs
         /// </summary>
-        PagedResult<LogMessage> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate,
+        PagedResult<LogMessage> GetLogs(LogTimePeriod logTimePeriod,
             int pageNumber = 1,
             int pageSize = 100,
             Direction orderDirection = Direction.Descending,

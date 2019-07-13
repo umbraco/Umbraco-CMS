@@ -439,7 +439,7 @@ namespace Umbraco.Web.Macros
             // this was, and still is, an ugly piece of nonsense
 
             var value = string.Empty;
-            var cache = _umbracoContextAccessor.UmbracoContext.ContentCache;
+            var cache = _umbracoContextAccessor.UmbracoContext.Content;
 
             var splitpath = (string[])pageElements["splitpath"];
             for (var i = splitpath.Length - 1; i > 0; i--) // at 0 we have root (-1)
