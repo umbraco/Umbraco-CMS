@@ -54,7 +54,6 @@ namespace Umbraco.Core.Models.Membership
             _isLockedOut = false;
             _startContentIds = new int[] { };
             _startMediaIds = new int[] { };
-
         }
 
         /// <summary>

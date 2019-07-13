@@ -191,7 +191,7 @@ namespace Umbraco.Core.Mapping
         private TTarget Map<TTarget>(object source, Type sourceType, MapperContext context)
         {
             if (source == null)
-                throw new ArgumentNullException(nameof(source));
+                return default;
 
             var targetType = typeof(TTarget);
 

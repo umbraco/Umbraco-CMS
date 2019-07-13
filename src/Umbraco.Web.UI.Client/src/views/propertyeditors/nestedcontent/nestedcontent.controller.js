@@ -93,8 +93,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "iconHelper",
     "clipboardService",
     "eventsService",
-    
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService) {
+    "overlayService",
+
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
         
         var contentTypeAliases = [];
         _.each($scope.model.config.contentTypes, function (contentType) {
@@ -239,10 +240,23 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         };
         $scope.requestDeleteNode = function (idx) {
             if ($scope.model.config.confirmDeletes === true) {
-                localizationService.localize("content_nestedContentDeleteItem").then(function (value) {
-                    if (confirm(value)) {
-                        $scope.deleteNode(idx);
-                    }
+                localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
+                    const overlay = {
+                        title: data[1],
+                        content: data[0],
+                        closeButtonLabel: data[2],
+                        submitButtonLabel: data[3],
+                        submitButtonStyle: "danger",
+                        close: function () {
+                            overlayService.close();
+                        },
+                        submit: function () {
+                            $scope.deleteNode(idx);
+                            overlayService.close();
+                        }
+                    };
+
+                    overlayService.open(overlay);
                 });
             } else {
                 $scope.deleteNode(idx);

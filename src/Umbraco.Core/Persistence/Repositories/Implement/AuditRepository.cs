@@ -74,6 +74,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters)).ToList();
         }
 
+        public IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query)
+        {
+            var sqlClause = GetBaseQuery(false)
+                .Where<LogDto>(x => x.Header == type.ToString());
+            var translator = new SqlTranslator<IAuditItem>(sqlClause, query);
+            var sql = translator.Translate();
+
+            var dtos = Database.Fetch<LogDto>(sql);
+
+            return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters)).ToList();
+        }
+
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             var sql = SqlContext.Sql();

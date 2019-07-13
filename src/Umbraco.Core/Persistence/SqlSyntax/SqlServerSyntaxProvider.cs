@@ -225,6 +225,18 @@ order by T.name, I.name");
 
         }
 
+        /// <inheritdoc />
+        public override bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName)
+        {
+            constraintName = db.Fetch<string>(@"select con.[name] as [constraintName]
+from sys.default_constraints con
+join sys.columns col on con.object_id=col.default_object_id
+join sys.tables tbl on col.object_id=tbl.object_id
+where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
+                       .FirstOrDefault();
+            return !constraintName.IsNullOrWhiteSpace();
+        }
+
         public override bool DoesTableExist(IDatabase db, string tableName)
         {
             var result =
@@ -276,7 +288,7 @@ order by T.name, I.name");
             return null;
         }
 
-        public override string DeleteDefaultConstraint => "ALTER TABLE [{0}] DROP CONSTRAINT [DF_{0}_{1}]";
+        public override string DeleteDefaultConstraint => "ALTER TABLE {0} DROP CONSTRAINT {2}";
 
         public override string DropIndex => "DROP INDEX {0} ON {1}";
 

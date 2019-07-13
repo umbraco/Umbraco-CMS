@@ -28,7 +28,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public IPublishedElement Unwrap() => _content;
 
         /// <inheritdoc />
-        public PublishedContentType ContentType => _content.ContentType;
+        public IPublishedContentType ContentType => _content.ContentType;
 
         /// <inheritdoc />
         public Guid Key => _content.Key;

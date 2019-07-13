@@ -84,16 +84,18 @@ namespace Umbraco.Web.PublishedCache
         /// Gets contents at root.
         /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="culture">A culture.</param>
         /// <returns>The contents.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IEnumerable<IPublishedContent> GetAtRoot(bool preview);
+        IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null);
 
         /// <summary>
         /// Gets contents at root.
         /// </summary>
+        /// <param name="culture">A culture.</param>
         /// <returns>The contents.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IEnumerable<IPublishedContent> GetAtRoot();
+        IEnumerable<IPublishedContent> GetAtRoot(string culture = null);
 
         /// <summary>
         /// Gets a content resulting from an XPath query.
@@ -217,7 +219,7 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         /// <param name="id">The content type unique identifier.</param>
         /// <returns>The content type, or null.</returns>
-        PublishedContentType GetContentType(int id);
+        IPublishedContentType GetContentType(int id);
 
         /// <summary>
         /// Gets a content type identified by its alias.
@@ -225,13 +227,13 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="alias">The content type alias.</param>
         /// <returns>The content type, or null.</returns>
         /// <remarks>The alias is case-insensitive.</remarks>
-        PublishedContentType GetContentType(string alias);
+        IPublishedContentType GetContentType(string alias);
 
         /// <summary>
         /// Gets contents of a given content type.
         /// </summary>
         /// <param name="contentType">The content type.</param>
         /// <returns>The contents.</returns>
-        IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType);
+        IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
     }
 }
