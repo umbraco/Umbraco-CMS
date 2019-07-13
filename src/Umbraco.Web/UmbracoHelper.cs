@@ -493,6 +493,18 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Returns a string with a friendly url from a node.
+        /// IE.: Instead of having /482 (id) as an url, you can have
+        /// /screenshots/developer/macros (spoken url)
+        /// </summary>
+        /// <param name="guid">Identifier for the node that should be returned</param>
+        /// <returns>String with a friendly url from a node</returns>
+        public string NiceUrl(Guid guid)
+        {
+            return Url(guid);
+        }
+
+        /// <summary>
         /// Gets the url of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
