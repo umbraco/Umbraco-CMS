@@ -112,7 +112,7 @@
 
                 for (let [key, value] of Object.entries(data)) {
                     const index = vm.logTypeLabels.findIndex(x => key.startsWith(x));
-                    if (index > -1 && index < vm.logTypeData.length) {
+                    if (index > -1) {
                         vm.logTypeData[index] = value;
                     }                
                 }
