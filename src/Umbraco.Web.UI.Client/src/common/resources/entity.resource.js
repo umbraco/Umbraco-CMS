@@ -172,7 +172,7 @@ function entityResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "entityApiBaseUrl",
                         "GetUrlAndAnchors",
-                        { id: id })),
+                        [{ id: id }])),
                 'Failed to retrieve url and anchors data for id ' + id);
         },
 
