@@ -21,7 +21,8 @@
       prevent-default
       class="btn btn-{{buttonStyle}} dropdown-toggle umb-button-group__toggle umb-button--{{size}}" 
       ng-if="subButtons.length > 0"
-      ng-click="toggleDropdown()">
+      ng-click="toggleDropdown()"
+      aria-expanded="{{dropdown.isOpen}}">
       <span class="caret"></span>
    </button>
 
