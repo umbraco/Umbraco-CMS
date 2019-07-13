@@ -503,6 +503,16 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Gets the url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentGuid">The content identifier.</param>
+        /// <returns>The url for the content.</returns>
+        public string Url(Guid contentGuid)
+        {
+            return UrlProvider.GetUrl(contentGuid);
+        }
+
+        /// <summary>
         /// Gets the url of a content identified by its identifier, in a specified mode.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
@@ -511,6 +521,17 @@ namespace Umbraco.Web
         public string Url(int contentId, UrlProviderMode mode)
         {
             return UrlProvider.GetUrl(contentId, mode);
+        }
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// </summary>
+        /// <param name="contentGuid">The content identifier.</param>
+        /// <param name="mode">The mode.</param>
+        /// <returns>The url for the content.</returns>
+        public string Url(Guid contentGuid, UrlProviderMode mode)
+        {
+            return UrlProvider.GetUrl(contentGuid, mode);
         }
 
         /// <summary>
