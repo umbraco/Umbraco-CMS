@@ -24,7 +24,11 @@
       ng-click="toggleDropdown()"
       aria-expanded="{{dropdown.isOpen}}"
       aria-controls="publishing-options">
-      <span class="caret"></span>
+      <span class="caret">
+         <span class="visuallyhidden">
+            <localize key="{{labelKey}}">{{label}}</localize>
+         </span>
+      </span>
    </button>
 
    <umb-dropdown ng-show="subButtons.length > 0 && dropdown.isOpen" class="umb-button-group__sub-buttons" on-close="closeDropdown()" ng-class="{'-align-right': float === 'right'}" id="publishing-options">
