@@ -49,8 +49,9 @@
         //functions
         vm.searchLogQuery = searchLogQuery;
         vm.findMessageTemplate = findMessageTemplate;
+        vm.searchErrors = searchErrors;
 
-        function preFlightCheck() {
+        function preFlightCheck(){
             vm.loading = true;
             //Do our pre-flight check (to see if we can view logs)
             //IE the log file is NOT too big such as 1GB & crash the site
@@ -150,6 +151,11 @@
 
         function getDateRangeLabel(suffix) {
             return "Log Overview for " + suffix;
+        }
+      
+        function searchErrors(){
+            var logQuery = "@Level='Fatal' or @Level='Error' or Has(@Exception)";
+            searchLogQuery(logQuery);
         }
 
         preFlightCheck();
