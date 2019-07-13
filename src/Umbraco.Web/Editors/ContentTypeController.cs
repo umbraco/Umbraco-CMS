@@ -373,7 +373,7 @@ namespace Umbraco.Web.Editors
             else
                 ct = new ContentType(parentId);
 
-            ct.Icon = "icon-document";
+            ct.Icon = Constants.Icons.Content;
 
             var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(ct);
             return dto;

@@ -21,6 +21,7 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private int _dataTypeId;
+        private Guid _dataTypeKey;
         private Lazy<int> _propertyGroupId;
         private string _propertyEditorAlias;
         private ValueStorageType _valueStorageType;
@@ -137,6 +138,13 @@ namespace Umbraco.Core.Models
         {
             get => _dataTypeId;
             set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, nameof(DataTypeId));
+        }
+
+        [DataMember]
+        public Guid DataTypeKey
+        {
+            get => _dataTypeKey;
+            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeKey, nameof(DataTypeKey));
         }
 
         /// <summary>

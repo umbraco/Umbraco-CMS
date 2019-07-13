@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Core.Xml.XPath;
 using Umbraco.Web.PublishedCache.NuCache.Navigable;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -23,9 +18,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ContentStore.Snapshot _snapshot;
         private readonly IAppCache _snapshotCache;
         private readonly IAppCache _elementsCache;
-        private readonly DomainHelper _domainHelper;
+        private readonly IDomainCache _domainCache;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ILocalizationService _localizationService;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
         #region Constructor
 
@@ -34,15 +29,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // it's too late for UmbracoContext which has captured previewDefault and stuff into these ctor vars
         // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
 
-        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings, ILocalizationService localizationService)
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, IDomainCache domainCache, IGlobalSettings globalSettings, IVariationContextAccessor variationContextAccessor)
             : base(previewDefault)
         {
             _snapshot = snapshot;
             _snapshotCache = snapshotCache;
             _elementsCache = elementsCache;
-            _domainHelper = domainHelper;
+            _domainCache = domainCache;
             _globalSettings = globalSettings;
-            _localizationService = localizationService;
+            _variationContextAccessor = variationContextAccessor;
         }
 
         private bool HideTopLevelNodeFromPath => _globalSettings.HideTopLevelNodeFromPath;
@@ -109,8 +104,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.GetUrlSegment(culture) == parts[0])
-                    : GetAtRoot(preview).FirstOrDefault(x => x.GetUrlSegment(culture) == parts[0]);
+                    ? GetAtRoot(preview).SelectMany(x => x.Children(culture)).FirstOrDefault(x => x.UrlSegment(culture) == parts[0])
+                    : GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
                 content = FollowRoute(content, parts, 1, culture);
             }
 
@@ -119,7 +114,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
-                content = GetAtRoot(preview).FirstOrDefault(x => x.GetUrlSegment(culture) == parts[0]);
+                content = GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
             }
 
             return content;
@@ -149,8 +144,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // or we reach the content root, collecting urls in the way
             var pathParts = new List<string>();
             var n = node;
-            var urlSegment = n.GetUrlSegment(culture);
-            var hasDomains = _domainHelper.NodeHasDomains(n.Id);
+            var urlSegment = n.UrlSegment(culture);
+            var hasDomains = _domainCache.HasAssigned(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
                 // no segment indicates this is not published when this is a variant
@@ -161,9 +156,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // move to parent node
                 n = n.Parent;
                 if (n != null)
-                    urlSegment = n.GetUrlSegment(culture);
+                    urlSegment = n.UrlSegment(culture);
 
-                hasDomains = n != null && _domainHelper.NodeHasDomains(n.Id);
+                hasDomains = n != null && _domainCache.HasAssigned(n.Id);
             }
 
             // at this point this will be the urlSegment of the root, no segment indicates this is not published when this is a variant
@@ -189,9 +184,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (content != null && i < parts.Count)
             {
                 var part = parts[i++];
-                content = content.Children.FirstOrDefault(x =>
+                content = content.Children(culture).FirstOrDefault(x =>
                 {
-                    var urlSegment = x.GetUrlSegment(culture);
+                    var urlSegment = x.UrlSegment(culture);
                     return urlSegment == part;
                 });
             }
@@ -243,7 +238,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var guidUdi = contentId as GuidUdi;
             if (guidUdi == null)
                 throw new ArgumentException($"Udi must be of type {typeof(GuidUdi).Name}.", nameof(contentId));
-            
+
             if (guidUdi.EntityType != Constants.UdiEntityType.Document)
                 throw new ArgumentException($"Udi entity type must be \"{Constants.UdiEntityType.Document}\".", nameof(contentId));
 
@@ -258,30 +253,30 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return preview || n.PublishedModel != null;
         }
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        IEnumerable<IPublishedContent> INavigableData.GetAtRoot(bool preview) => GetAtRoot(preview);
+
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
         {
-            if (PublishedSnapshotService.CacheContentCacheRoots == false)
-                return GetAtRootNoCache(preview);
+            // handle context culture for variant
+            if (culture == null)
+                culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
 
-            var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
-                ? _elementsCache
-                : _snapshotCache;
-
-            if (cache == null)
-                return GetAtRootNoCache(preview);
-
-            // note: ToArray is important here, we want to cache the result, not the function!
-            return (IEnumerable<IPublishedContent>)cache.Get(
-                CacheKeys.ContentCacheRoots(preview),
-                () => GetAtRootNoCache(preview).ToArray());
-        }
-
-        private IEnumerable<IPublishedContent> GetAtRootNoCache(bool preview)
-        {
-            var c = _snapshot.GetAtRoot();
-
+            // _snapshot.GetAtRoot() returns all ContentNode at root
             // both .Draft and .Published cannot be null at the same time
-            return c.Select(n => GetNodePublishedContent(n, preview)).WhereNotNull().OrderBy(x => x.SortOrder);
+            // root is already sorted by sortOrder, and does not contain nulls
+            //
+            // GetNodePublishedContent may return null if !preview and there is no
+            // published model, so we need to filter these nulls out
+
+            var atRoot = _snapshot.GetAtRoot()
+                .Select(n => GetNodePublishedContent(n, preview))
+                .WhereNotNull();
+
+            // if a culture is specified, we must ensure that it is avail/published
+            if (culture != "*")
+                atRoot = atRoot.Where(x => x.IsInvariantOrHasCulture(culture));
+
+            return atRoot;
         }
 
         private static IPublishedContent GetNodePublishedContent(ContentNode node, bool preview)
@@ -388,12 +383,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Content types
 
-        public override PublishedContentType GetContentType(int id)
+        public override IPublishedContentType GetContentType(int id)
         {
             return _snapshot.GetContentType(id);
         }
 
-        public override PublishedContentType GetContentType(string alias)
+        public override IPublishedContentType GetContentType(string alias)
         {
             return _snapshot.GetContentType(alias);
         }

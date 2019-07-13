@@ -77,7 +77,7 @@ namespace Umbraco.Examine
         /// <remarks>
         /// This is not thread safe, use with care
         /// </remarks>
-        internal static void UnlockLuceneIndexes(this IExamineManager examineManager, ILogger logger)
+        internal static void ConfigureLuceneIndexes(this IExamineManager examineManager, ILogger logger, bool disableExamineIndexing)
         {
             foreach (var luceneIndexer in examineManager.Indexes.OfType<LuceneIndex>())
             {
@@ -85,6 +85,8 @@ namespace Umbraco.Examine
                 //indexing operations. We used to wait for indexing operations to complete but this can cause more problems than that is worth because
                 //that could end up halting shutdown for a very long time causing overlapping appdomains and many other problems.
                 luceneIndexer.WaitForIndexQueueOnShutdown = false;
+
+                if (disableExamineIndexing) continue; //exit if not enabled, we don't need to unlock them if we're not maindom
 
                 //we should check if the index is locked ... it shouldn't be! We are using simple fs lock now and we are also ensuring that
                 //the indexes are not operational unless MainDom is true
