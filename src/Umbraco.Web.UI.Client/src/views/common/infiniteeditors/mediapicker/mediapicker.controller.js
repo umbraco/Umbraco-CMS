@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
+        function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService) {
 
             if (!$scope.model.title) {
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
