@@ -411,6 +411,14 @@
         flex-direction: column;
         align-items: flex-start;
 
+        > .icon {
+            font-size: 50px;
+            line-height: 50px;
+            color: @gray-4;
+            display: block;
+            text-align: center;
+        }
+
         > span {
             color: @white;
             background: @ui-light-active-border;
@@ -418,7 +426,7 @@
             font-size: 10px;
             line-height: 130%;
             display: block;
-            margin-top: -30px;
+            margin-top: -25px;
             min-width: 2em;
         }
 
@@ -426,13 +434,6 @@
             display: block;
             margin-top: 1em;
         }
-    }
-
-    .icon {
-        font-size: 40px;
-        line-height: 50px;
-        color: @gray-3;
-        display: block;
     }
 }
 
@@ -804,11 +805,14 @@
     align-items: center;
 
     .file-icon {
-        display: inline-block;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
         position: relative;
-        padding: 5px 0;
+        padding: 10px 0;
 
         > .icon {
+            display: block;
             font-size: 70px;
             line-height: 110%;
             color: @gray-4;
@@ -821,9 +825,9 @@
             padding: 1px 3px;
             font-size: 12px;
             line-height: 130%;
-            position: absolute;
-            top: 45px;
-            left: 10px;
+            display: block;
+            margin-top: -35px;
+            min-width: 2em;
         }
     }
 }
