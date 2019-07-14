@@ -109,7 +109,6 @@ Use this directive to render a date time picker
                     }
                     loaded = true;
                     grabElementAndRunFlatpickr();
-
                 });
             });
 
@@ -178,7 +177,7 @@ Use this directive to render a date time picker
 				};
 			}
 
-			// bind hook for onOpen
+			// bind hook for onClose
 			if(ctrl.options && ctrl.onClose) {
 				ctrl.options.onClose = function(selectedDates, dateStr, instance) {
 					$timeout(function() {
