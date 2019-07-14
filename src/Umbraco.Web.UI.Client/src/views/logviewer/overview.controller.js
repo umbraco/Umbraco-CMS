@@ -4,6 +4,7 @@
     function LogViewerOverviewController($q, $location, $timeout, logViewerResource, navigationService) {
 
         var vm = this;
+
         vm.loading = false;
         vm.canLoadLogs = false;
         vm.searches = [];
@@ -22,43 +23,41 @@
             }
         };
 
+        // Fuctions
+        vm.searchLogQuery = searchLogQuery;
+        vm.findMessageTemplate = findMessageTemplate;
+        vm.searchErrors = searchErrors;
+
         let querystring = $location.search();
-        if(querystring.startDate){
+        if (querystring.startDate) {
             vm.startDate = querystring.startDate;
-        }else{
+        } else {
             vm.startDate = new Date(Date.now());
             vm.startDate.setDate(vm.startDate.getDate()-1);
             vm.startDate = vm.startDate.toIsoDateString();
         }
 
-        if(querystring.endDate){
+        if (querystring.endDate) {
             vm.endDate = querystring.endDate;
-        }else{
+        } else {
             vm.endDate = new Date(Date.now()).toIsoDateString();
         }
         vm.period = [vm.startDate, vm.endDate];
 
-
-        //functions
-        vm.searchLogQuery = searchLogQuery;
-        vm.findMessageTemplate = findMessageTemplate;
-        vm.searchErrors = searchErrors;
-
-        function preFlightCheck(){
+        function preFlightCheck() {
             vm.loading = true;
-            //Do our pre-flight check (to see if we can view logs)
-            //IE the log file is NOT too big such as 1GB & crash the site
+            // Do our pre-flight check (to see if we can view logs)
+            // IE the log file is NOT too big such as 1GB & crash the site
             logViewerResource.canViewLogs(vm.startDate, vm.endDate).then(function(result){
                 vm.loading = false;
                 vm.canLoadLogs = result;
 
-                if(result){
-                    //Can view logs - so initalise
+                if (result) {
+                    // Can view logs - so initalise
                     init();
                 }
             });
         }
-
 
         function init() {
 
@@ -114,7 +113,7 @@
                 vm.commonLogMessages = data;
             });
 
-            //Set loading indicatior to false when these 3 queries complete
+            // Set loading indicatior to false when these 3 queries complete
             $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function(data) {
                 vm.loading = false;
             });
@@ -124,25 +123,21 @@
             });
         }
 
-        function searchLogQuery(logQuery){
+        function searchLogQuery(logQuery) {
             $location.path("/settings/logViewer/search").search({lq: logQuery, startDate: vm.startDate, endDate: vm.endDate});
         }
 
-        function findMessageTemplate(template){
+        function findMessageTemplate(template) {
             var logQuery = "@MessageTemplate='" + template.MessageTemplate + "'";
             searchLogQuery(logQuery);
         }
 
-        function searchErrors(){
+        function searchErrors() {
             var logQuery = "@Level='Fatal' or @Level='Error' or Has(@Exception)";
             searchLogQuery(logQuery);
         }
 
-
-
         preFlightCheck();
-        
-        /////////////////////
 
         vm.config = {
             enableTime: false,
@@ -153,15 +148,26 @@
             conjunction: " to "
         };
         
-        vm.dateRangeChange = function(selectedDates, dateStr, instance) {
-            
-            if(selectedDates.length > 0){
-                vm.startDate = selectedDates[0].toIsoDateString();
-                vm.endDate = selectedDates[selectedDates.length-1].toIsoDateString(); // Take the last date as end
+        vm.dateRangeChange = function (selectedDates, dateStr, instance) {
 
-                if(vm.startDate === vm.endDate){
+            if (selectedDates.length > 0) {
+
+                vm.startDate = selectedDates[0].toIsoDateString();
+                vm.endDate = selectedDates[selectedDates.length - 1].toIsoDateString(); // Take the last date as end
+
+                // Check if date range has changed
+                if (vm.startDate === vm.endDate && vm.startDate === vm.period[0]) {
+                    // Same date
+                    return;
+                }
+                else if (vm.startDate === vm.period[0] && vm.endDate === vm.period[1]) {
+                    // Same date range
+                    return;
+                }
+
+                if (vm.startDate === vm.endDate) {
                     vm.period = [vm.startDate];
-                }else{
+                } else {
                     vm.period = [vm.startDate, vm.endDate];
                 }
                 
