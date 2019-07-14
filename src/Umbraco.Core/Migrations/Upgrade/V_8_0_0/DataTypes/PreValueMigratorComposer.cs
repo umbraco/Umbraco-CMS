@@ -19,6 +19,7 @@ public class PreValueMigratorComposer : ICoreComposer
             .Append<NestedContentPreValueMigrator>()
             .Append<DecimalPreValueMigrator>()
             .Append<ListViewPreValueMigrator>()
+            .Append<DropDownFlexiblePreValueMigrator>()
             .Append<ValueListPreValueMigrator>();
     }
 }
