@@ -31,7 +31,7 @@
                 <div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail">
                     <span class="file-icon">
                         <i class="icon {{media.icon}}"></i>
-                        <span>.{{media.extension}}</span>
+                        <span ng-if="media.extension">.{{media.extension}}</span>
                     </span>
                     <small>{{media.name}}</small>
                 </div>
