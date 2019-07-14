@@ -402,31 +402,39 @@
 
 .umb-sortable-thumbnails .umb-icon-holder {
     text-align: center;
-}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-.umb-sortable-thumbnails .umb-icon-holder .icon {
-    font-size: 40px;
-    line-height: 50px;
-    color: @gray-3;
-    display: block;
-}
+    .file-icon {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
 
-.umb-sortable-thumbnails .umb-icon-holder .file-icon > span {
-    color: @white;
-    background: @gray-4;
-    padding: 1px 3px;
-    font-size: 10px;
-    line-height: 130%;
-    display: block;
-    margin-top: -30px;
-    width: 2em;
-}
+        > span {
+            color: @white;
+            background: @ui-light-active-border;
+            padding: 1px 3px;
+            font-size: 10px;
+            line-height: 130%;
+            display: block;
+            margin-top: -30px;
+            min-width: 2em;
+        }
 
-.umb-sortable-thumbnails .umb-icon-holder .file-icon + small {
-    display: block;
-    margin-top: 1em;
-}
+        & + small {
+            display: block;
+            margin-top: 1em;
+        }
+    }
 
+    .icon {
+        font-size: 40px;
+        line-height: 50px;
+        color: @gray-3;
+        display: block;
+    }
+}
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__wrapper {
     width: 124px;
@@ -789,28 +797,35 @@
   padding-top: 27px;
 }
 
-.umb-fileupload .file-icon {
-  display: inline-block;
-  position: relative;
-  padding: 5px 0;
-
-  > .icon {
-    font-size: 70px;
-    line-height: 110%;
-    color: @gray-4;
+.umb-fileupload .umb-icon-holder {
     text-align: center;
-  }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-  > span {
-    color: @white;
-    background: @gray-4;
-    padding: 1px 3px;
-    font-size: 12px;
-    line-height: 130%;
-    position: absolute;
-    top: 45px;
-    left: 10px;
-  }
+    .file-icon {
+        display: inline-block;
+        position: relative;
+        padding: 5px 0;
+
+        > .icon {
+            font-size: 70px;
+            line-height: 110%;
+            color: @gray-4;
+            text-align: center;
+        }
+
+        > span {
+            color: @white;
+            background: @ui-light-active-border;
+            padding: 1px 3px;
+            font-size: 12px;
+            line-height: 130%;
+            position: absolute;
+            top: 45px;
+            left: 10px;
+        }
+    }
 }
 
 .umb-fileupload input {
