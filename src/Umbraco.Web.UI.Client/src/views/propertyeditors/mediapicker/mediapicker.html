@@ -19,22 +19,23 @@
                 <!-- IMAGE -->
                 <img ng-if="media.thumbnail"
                      ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
-                     alt="" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
+                     alt="{{media.name}}" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
 
                 <!-- SVG -->
-                <img ng-if="!media.thumbnail && media.metaData.umbracoExtension.Value === 'svg'"
-                     ng-class="{'trashed': media.trashed}" ng-src="{{media.metaData.umbracoFile.Value}}"
-                     alt="" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
-                <img ng-if="!media.thumbnail && media.metaData.umbracoExtension.Value !== 'svg' && media.extension === 'svg'"
+                <img ng-if="media.thumbnail && media.extension === 'svg'"
+                     ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
+                     alt="{{media.name}}"
+                     title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
+                <img ng-if="!media.thumbnail && media.extension === 'svg'"
                      ng-class="{'trashed': media.trashed}" ng-src="{{media.file}}"
-                     alt=""
+                     alt="{{media.name}}"
                      title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
 
                 <!-- FILE -->
-                <div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail || media.metaData.umbracoExtension.Value === 'svg' || media.extension === 'svg'">
+                <div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail || media.extension === 'svg'">
                     <span class="file-icon">
                         <i class="icon {{media.icon}} large"></i>
-                        <span>.{{media.metaData.umbracoExtension.Value}}</span>
+                        <span>.{{media.extension}}</span>
                     </span>
                     <small>{{media.name}}</small>
                 </div>
