@@ -12,6 +12,15 @@
         vm.commonLogMessages = [];
         vm.commonLogMessagesCount = 10;
 
+        vm.config = {
+            enableTime: false,
+            dateFormat: "Y-m-d",
+            time_24hr: false,
+            mode: "range",
+            maxDate: "today",
+            conjunction: " to "
+        };
+
         // ChartJS Options - for count/overview of log distribution
         vm.logTypeLabels = ["Info", "Debug", "Warning", "Error", "Critical"];
         vm.logTypeData = [0, 0, 0, 0, 0];
@@ -27,6 +36,7 @@
         vm.searchLogQuery = searchLogQuery;
         vm.findMessageTemplate = findMessageTemplate;
         vm.searchErrors = searchErrors;
+        vm.dateRangeChange = dateRangeChange;
 
         let querystring = $location.search();
         if (querystring.startDate) {
@@ -123,32 +133,7 @@
             });
         }
 
-        function searchLogQuery(logQuery) {
-            $location.path("/settings/logViewer/search").search({lq: logQuery, startDate: vm.startDate, endDate: vm.endDate});
-        }
-
-        function findMessageTemplate(template) {
-            var logQuery = "@MessageTemplate='" + template.MessageTemplate + "'";
-            searchLogQuery(logQuery);
-        }
-
-        function searchErrors() {
-            var logQuery = "@Level='Fatal' or @Level='Error' or Has(@Exception)";
-            searchLogQuery(logQuery);
-        }
-
-        preFlightCheck();
-
-        vm.config = {
-            enableTime: false,
-            dateFormat: "Y-m-d",
-            time_24hr: false,
-            mode: "range",
-            maxDate: "today",
-            conjunction: " to "
-        };
-        
-        vm.dateRangeChange = function (selectedDates, dateStr, instance) {
+        function dateRangeChange(selectedDates, dateStr, instance) {
 
             if (selectedDates.length > 0) {
 
@@ -170,11 +155,26 @@
                 } else {
                     vm.period = [vm.startDate, vm.endDate];
                 }
-                
+
                 preFlightCheck();
             }
-
         }
+
+        function searchLogQuery(logQuery) {
+            $location.path("/settings/logViewer/search").search({lq: logQuery, startDate: vm.startDate, endDate: vm.endDate});
+        }
+
+        function findMessageTemplate(template) {
+            var logQuery = "@MessageTemplate='" + template.MessageTemplate + "'";
+            searchLogQuery(logQuery);
+        }
+
+        function searchErrors() {
+            var logQuery = "@Level='Fatal' or @Level='Error' or Has(@Exception)";
+            searchLogQuery(logQuery);
+        }
+
+        preFlightCheck();
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.LogViewer.OverviewController", LogViewerOverviewController);
