@@ -1057,7 +1057,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
                 _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
-                _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
+                if(newIds != null && newIds.Any())
+                {
+                    _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
+                }
                 scope.Complete();
             }
         }
