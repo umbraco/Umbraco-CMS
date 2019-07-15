@@ -7,6 +7,7 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Controllers
 {
+    [UmbracoProxyRouteOnly]
     public class UmbRegisterController : SurfaceController
     {
         [HttpPost]

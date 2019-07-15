@@ -11,6 +11,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Controllers
 {
+    [UmbracoProxyRouteOnly]
     [MemberAuthorize]
     public class UmbProfileController : SurfaceController
     {

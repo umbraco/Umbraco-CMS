@@ -74,10 +74,26 @@ namespace Umbraco.Web.Security
                 return false;
 
             //ensure they all match
-            return additionalDataParts.Count == requestParts.Count
+            var paramsMatch = additionalDataParts.Count == requestParts.Count
                 && additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Controller] == requestParts[RenderRouteHandler.ReservedAdditionalKeys.Controller]
                 && additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Action] == requestParts[RenderRouteHandler.ReservedAdditionalKeys.Action]
                 && additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Area] == requestParts[RenderRouteHandler.ReservedAdditionalKeys.Area];
+
+            if (!paramsMatch)
+                return false;
+
+            //now make sure the ufprt route params match the normal route params
+            var rd = context.Request.RequestContext.RouteData;
+            var currentAction = rd.GetRequiredString("action");
+            var currentController = rd.GetRequiredString("controller");
+
+            if (currentController != additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Controller])
+                return false;
+
+            if (currentAction != additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Action])
+                return false;
+
+            return true;
         }
 
         internal class AdditionalData
