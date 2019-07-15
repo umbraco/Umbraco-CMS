@@ -28,23 +28,22 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
         if (dialogOptions.currentTarget) {
             // clone the current target so we don't accidentally update the caller's model while manipulating $scope.model.target
             $scope.model.target = angular.copy(dialogOptions.currentTarget);
-            //if we have a node ID, we fetch the current node to build the form data
+            // if we have a node ID, we fetch the current node to build the form data
             if ($scope.model.target.id || $scope.model.target.udi) {
 
-                //will be either a udi or an int
+                // will be either a udi or an int
                 var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
 
                 // is it a content link?
                 if (!$scope.model.target.isMedia) {
                     // get the content path
                     entityResource.getPath(id, "Document").then(function (path) {
-                        //now sync the tree to this path
+                        // now sync the tree to this path
                         $scope.dialogTreeEventHandler.syncTree({
                             path: path,
                             tree: "content"
                         });
                     });
-
 
                     entityResource.getUrlAndAnchors(id).then(function(resp){
                         $scope.anchorValues = resp.anchorValues;
