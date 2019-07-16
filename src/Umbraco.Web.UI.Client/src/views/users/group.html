@@ -48,7 +48,7 @@
                                         </a>
                                     </umb-control-group>
 
-                                    <umb-control-group style="margin-bottom: 20px;" label="@user_startnode" description="@user_startnodehelp">
+                                    <umb-control-group style="margin-bottom: 20px;" label="@user_startnode" description="@user_startnodehelp" required="true">
                                         <umb-node-preview
                                             ng-if="vm.userGroup.contentStartNode.id"
                                             style="max-width: 100%;"
@@ -69,9 +69,10 @@
                                             <localize key="general_add">Add</localize>
                                         </a>
 
+                                        <input type="hidden" ng-model="_contentStartNodeValidation" ng-required="!vm.userGroup.contentStartNode" />
                                     </umb-control-group>
 
-                                    <umb-control-group label="@user_mediastartnode" description="@user_mediastartnodehelp">
+                                    <umb-control-group label="@user_mediastartnode" description="@user_mediastartnodehelp" required="true">
                                         
                                         <umb-node-preview
                                             ng-if="vm.userGroup.mediaStartNode.id"
@@ -93,6 +94,7 @@
                                             <localize key="general_add">Add</localize>
                                         </a>
 
+                                        <input type="hidden" ng-model="_mediaStartNodeValidation" ng-required="!vm.userGroup.mediaStartNode" />
                                     </umb-control-group>
 
                                 </umb-box-content>
