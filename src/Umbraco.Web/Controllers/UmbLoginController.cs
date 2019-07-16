@@ -12,6 +12,7 @@ namespace Umbraco.Web.Controllers
     {
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateUmbracoFormRouteString]
         public ActionResult HandleLogin([Bind(Prefix = "loginModel")]LoginModel model)
         {
             if (ModelState.IsValid == false)
