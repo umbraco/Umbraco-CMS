@@ -41,9 +41,9 @@ namespace Umbraco.Web.Mvc
                 throw new HttpUmbracoFormRouteStringException("The required Umbraco request data is invalid.");
             }
 
-            if (additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Controller] != filterContext.ActionDescriptor.ControllerDescriptor.ControllerName ||
-                additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Action] != filterContext.ActionDescriptor.ActionName ||
-                additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Area].NullOrWhiteSpaceAsNull() != filterContext.RouteData.DataTokens["area"]?.ToString().NullOrWhiteSpaceAsNull())
+            if (!additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Controller].InvariantEquals(filterContext.ActionDescriptor.ControllerDescriptor.ControllerName) ||
+                !additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Action].InvariantEquals(filterContext.ActionDescriptor.ActionName) ||
+                (!additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Area].IsNullOrWhiteSpace() && !additionalDataParts[RenderRouteHandler.ReservedAdditionalKeys.Area].InvariantEquals(filterContext.RouteData.DataTokens["area"]?.ToString())))
             {
                 throw new HttpUmbracoFormRouteStringException("The required Umbraco request data is invalid.");
             }
