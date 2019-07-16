@@ -50,10 +50,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var properties = Database.Fetch<PropertyDataDto>(sqlPropertyData);
 
             // Create a Multi URL Picker datatype for the converted RelatedLinks data
-            
+
             foreach (var property in properties)
             {
-                var value = property.Value.ToString();
+                var value = property.Value?.ToString();
                 if (string.IsNullOrWhiteSpace(value))
                     continue;
 
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         Name = relatedLink.Caption,
                         Target = relatedLink.NewWindow ? "_blank" : null,
                         Udi = udi,
-                        // Should only have a URL if it's an external link otherwise it wil be a UDI 
+                        // Should only have a URL if it's an external link otherwise it wil be a UDI
                         Url = relatedLink.IsInternal == false ? relatedLink.Link : null
                     };
 
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 Database.Update(property);
             }
 
-            
+
         }
     }
 
