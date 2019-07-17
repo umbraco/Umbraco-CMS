@@ -12,7 +12,6 @@
 
 <!-- Comment added by Jan Skovgaard (@BatJan on GitHub) -->
 <!-- TODO: Once the initial PR has been accepted move on to refactor the below markup slightly
-    1: use #{{anchor.label}} in the href attribute and add the prevent-default directive
     2: Figure make sure to add corresponding id's on the component containing the class ".umb-group-panel__header" so they match up
     3: Figure out if anything else needs to be added - Perhaps a visuallyhidden text saying "Jump to" for a better screen reader experience?
     4: Ensure that the dropdown and it's items are revealed when navigation to a tab with a drupdown activated
@@ -20,7 +19,7 @@
 -->
 <ul class="dropdown-menu umb-sub-views-nav-item__anchor_dropdown" ng-if="vm.item.anchors && vm.item.anchors.length > 1">
     <li ng-repeat="anchor in vm.item.anchors" ng-class="{'is-active': vm.item.active && anchor.active}">
-        <a href="" ng-click="vm.anchorClicked(anchor, $event)">
+        <a href="#group-{{anchor.id}}" ng-click="vm.anchorClicked(anchor, $event)" prevent-default>
             {{anchor.label}}
         </a>
     </li>
