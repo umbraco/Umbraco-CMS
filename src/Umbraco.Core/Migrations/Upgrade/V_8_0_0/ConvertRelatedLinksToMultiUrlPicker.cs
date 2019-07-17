@@ -19,8 +19,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var sqlDataTypes = Sql()
                 .Select<DataTypeDto>()
                 .From<DataTypeDto>()
-                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.RelatedLinks"
-                                         || x.EditorAlias == "Umbraco.RelatedLinks2");
+                .Where<DataTypeDto>(x => x.EditorAlias == Constants.PropertyEditors.Legacy.Aliases.RelatedLinks
+                                         || x.EditorAlias == Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2);
 
             var dataTypes = Database.Fetch<DataTypeDto>(sqlDataTypes);
             var dataTypeIds = dataTypes.Select(x => x.NodeId).ToList();
