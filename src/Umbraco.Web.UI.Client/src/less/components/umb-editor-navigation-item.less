@@ -125,10 +125,8 @@
     // center align horizontal
     left: 50%;
     transform: translateX(-50%);
-    
-    visibility:hidden;
     opacity: 0;
-    transition: visibility 0s 500ms, opacity 250ms 250ms;
+    transition: opacity 250ms 250ms;
 }
 .umb-sub-views-nav-item__anchor_dropdown li a {
     border-left: 4px solid transparent;
@@ -137,10 +135,11 @@
     border-left-color: @ui-selected-border;
 }
 
+.umb-sub-views-nav-item:focus-within .umb-sub-views-nav-item__anchor_dropdown,
 .umb-sub-views-nav-item:hover .umb-sub-views-nav-item__anchor_dropdown {
     visibility:visible;
     opacity: 1;
-    transition: visibility 0s 0s, opacity 20ms 0s;
+    transition: opacity 20ms 0s;
 }
 
 
