@@ -10,14 +10,10 @@
     <div ng-show="vm.item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
 </button>
 
-<!-- Comment added by Jan Skovgaard (@BatJan on GitHub) -->
-<!-- TODO: Once the initial PR has been accepted move on to refactor the below markup slightly
-    3: Figure out if anything else needs to be added - Perhaps a visuallyhidden text saying "Jump to" for a better screen reader experience?
--->
 <ul class="dropdown-menu umb-sub-views-nav-item__anchor_dropdown" ng-if="vm.item.anchors && vm.item.anchors.length > 1">
     <li ng-repeat="anchor in vm.item.anchors" ng-class="{'is-active': vm.item.active && anchor.active}">
         <a href="#group-{{anchor.id}}" ng-click="vm.anchorClicked(anchor, $event)" prevent-default>
-            {{anchor.label}}
+            <span class="visuallyhidden"><localize key="visuallyHiddenTexts_jumpTo">Jump to</localize></span> {{anchor.label}} <span class="visuallyhidden"><localize key="visuallyHiddenTexts_group"> group</localize></span>
         </a>
     </li>
 </ul>
