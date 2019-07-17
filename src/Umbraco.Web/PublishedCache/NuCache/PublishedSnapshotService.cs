@@ -30,6 +30,7 @@ using File = System.IO.File;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
+
     internal class PublishedSnapshotService : PublishedSnapshotServiceBase
     {
         private readonly ServiceContext _serviceContext;
@@ -68,7 +69,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public PublishedSnapshotService(Options options, IMainDom mainDom, IRuntimeState runtime,
+        public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
@@ -131,7 +132,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         // if both local databases exist then GetTree will open them, else new databases will be created
                         _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
                         _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
-                    }, 
+                    },
                     () =>
                     {
                         //"release" phase of MainDom
@@ -255,19 +256,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             TearDownRepositoryEvents();
             base.Dispose();
-        }
-
-        public class Options
-        {
-            // disabled: prevents the published snapshot from updating and exposing changes
-            //           or even creating a new published snapshot to see changes, uses old cache = bad
-            //
-            //// indicates that the snapshot cache should reuse the application request cache
-            //// otherwise a new cache object would be created for the snapshot specifically,
-            //// which is the default - web boot manager uses this to optimize facades
-            //public bool PublishedSnapshotCacheIsApplicationRequestCache;
-
-            public bool IgnoreLocalDb;
         }
 
         #endregion
