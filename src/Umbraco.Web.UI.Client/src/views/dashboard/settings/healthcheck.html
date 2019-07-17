@@ -35,22 +35,22 @@
                         <div class="umb-healthcheck-messages" ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
 
                             <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
-                                <i class="icon-check color-green"></i>
+                                <i class="icon-check color-green" aria-hidden="true"></i>
                                 {{ group.totalSuccess }}
                             </div>
 
                             <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
-                                <i class="icon-alert color-orange"></i>
+                                <i class="icon-alert color-orange" aria-hidden="true"></i>
                                 {{ group.totalWarning }}
                             </div>
 
                             <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
-                                <i class="icon-delete color-red"></i>
+                                <i class="icon-delete color-red" aria-hidden="true"></i>
                                 {{ group.totalError }}
                             </div>
 
                             <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
-                                <i class="umb-healthcheck-status-icon icon-info"></i>
+                                <i class="umb-healthcheck-status-icon icon-info" aria-hidden="true"></i>
                                 {{ group.totalInfo }}
                             </div>
 
