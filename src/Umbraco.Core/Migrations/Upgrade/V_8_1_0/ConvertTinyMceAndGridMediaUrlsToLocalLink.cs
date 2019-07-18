@@ -85,7 +85,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
 
             if (exceptions.Any())
             {
-                throw new AggregateException(exceptions);
+                throw new AggregateException("One or more errors related to unexpected data in grid values occurred.", exceptions);
             }
 
             Context.AddPostMigration<RebuildPublishedSnapshot>();
