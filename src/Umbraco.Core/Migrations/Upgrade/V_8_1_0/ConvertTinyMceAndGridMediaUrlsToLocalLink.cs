@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -36,6 +37,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
 
             var properties = Database.Fetch<PropertyDataDto>(sqlPropertyData);
 
+            var exceptions = new List<Exception>();
             foreach (var property in properties)
             {
                 var value = property.TextValue;
@@ -43,19 +45,34 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
 
                 if (property.PropertyTypeDto.DataTypeDto.EditorAlias == Constants.PropertyEditors.Aliases.Grid)
                 {
-                    var obj = JsonConvert.DeserializeObject<JObject>(value);
-                    var allControls = obj.SelectTokens("$.sections..rows..areas..controls");
-
-                    foreach (var control in allControls.SelectMany(c => c))
+                    try
                     {
-                        var controlValue = control["value"];
-                        if (controlValue.Type == JTokenType.String)
+                        var obj = JsonConvert.DeserializeObject<JObject>(value);
+                        var allControls = obj.SelectTokens("$.sections..rows..areas..controls");
+
+                        foreach (var control in allControls.SelectMany(c => c))
                         {
-                            control["value"] = UpdateMediaUrls(mediaLinkPattern, controlValue.Value<string>());
+                            var controlValue = control["value"];
+                            if (controlValue.Type == JTokenType.String)
+                            {
+                                control["value"] = UpdateMediaUrls(mediaLinkPattern, controlValue.Value<string>());
+                            }
                         }
+
+                        property.TextValue = JsonConvert.SerializeObject(obj);
+                    }
+                    catch (JsonException e)
+                    {
+                        exceptions.Add(new InvalidOperationException(
+                            "Cannot deserialize the value as json. This can be because the property editor " +
+                            "type is changed from another type into a grid. Old versions of the value in this " +
+                            "property can have the structure from the old property editor type. This needs to be " +
+                            "changed manually before updating the database.\n" +
+                            $"Property info: Id = {property.Id}, LanguageId = {property.LanguageId}, VersionId = {property.VersionId}, Value = {property.Value}"
+                            , e));
+                        continue;
                     }
 
-                    property.TextValue = JsonConvert.SerializeObject(obj);
                 }
                 else
                 {
@@ -63,6 +80,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                 }
 
                 Database.Update(property);
+            }
+
+
+            if (exceptions.Any())
+            {
+                throw new AggregateException("One or more errors related to unexpected data in grid values occurred.", exceptions);
             }
 
             Context.AddPostMigration<RebuildPublishedSnapshot>();
