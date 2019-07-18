@@ -405,7 +405,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
     };
 
    $scope.publish = function () {
-        applySelected(
+       var attempt = applySelected(
                 function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
                 function (count, total) {
                     var key = (total === 1 ? "bulk_publishedItemOfItem" : "bulk_publishedItemOfItems");
@@ -415,10 +415,15 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                     var key = (total === 1 ? "bulk_publishedItem" : "bulk_publishedItems");
                     return localizationService.localize(key, [total]);
                 });
+        if (attempt) {
+            attempt.then(function () {
+                $scope.getContent();
+            });
+        }
    };
 
     $scope.unpublish = function() {
-        applySelected(
+        var attempt = applySelected(
             function(selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
             function(count, total) {
                 var key = (total === 1 ? "bulk_unpublishedItemOfItem" : "bulk_unpublishedItemOfItems");
@@ -428,6 +433,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                 var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
                 return localizationService.localize(key, [total]);
             });
+        if (attempt) {
+            attempt.then(function () {
+                $scope.getContent();
+            });
+        }
     };
 
     $scope.move = function() {
