@@ -184,6 +184,10 @@
 
           $scope.content = data;
 
+          if (data.isChildOfListView && data.trashed === false) {
+              $scope.page.listViewPath = $routeParams.page ? '/content/content/edit/' + data.parentId + '?page=' + $routeParams.page : '/content/content/edit/' + data.parentId;
+          }
+          
           init($scope.content);
 
           resetLastListPageNumber($scope.content);
