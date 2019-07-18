@@ -27,13 +27,18 @@
       editorState.set($scope.content);
 
       //We fetch all ancestors of the node to generate the footer breadcrumb navigation
-      if (!$scope.page.isNew) {
-        if (content.parentId && content.parentId !== -1) {
-          entityResource.getAncestors(content.id, "document")
-            .then(function (anc) {
-              $scope.ancestors = anc;
-            });
+      if (content.parentId && content.parentId !== -1) {
+        var ancestorIds = content.path.split(',');
+        ancestorIds.shift(); // Remove -1   
+        if ($scope.page.isNew) {
+            ancestorIds.pop(); // Remove 0
         }
+        entityResource.getByIds(ancestorIds, 'document').then(function (anc) {
+            $scope.ancestors = anc;
+            if ($scope.page.isNew) {
+                $scope.ancestors.push({ name: "Untitled" })
+            }
+        });
       }
 
       evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
