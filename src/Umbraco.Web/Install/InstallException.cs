@@ -1,44 +1,105 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Install
 {
     /// <summary>
-    /// Used for steps to be able to return a json structure back to the UI
+    /// Used for steps to be able to return a JSON structure back to the UI.
     /// </summary>
+    /// <seealso cref="System.Exception" />
+    [Serializable]
     internal class InstallException : Exception
     {
-        private readonly string _message;
+        /// <summary>
+        /// Gets the view.
+        /// </summary>
+        /// <value>
+        /// The view.
+        /// </value>
         public string View { get; private set; }
+
+        /// <summary>
+        /// Gets the view model.
+        /// </summary>
+        /// <value>
+        /// The view model.
+        /// </value>
         public object ViewModel { get; private set; }
 
-        public override string Message
-        {
-            get { return _message; }
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InstallException" /> class.
+        /// </summary>
+        public InstallException()
+        { }
 
-        public InstallException(string message, string view, object viewModel)
-        {
-            _message = message;
-            View = view;
-            ViewModel = viewModel;
-        }
-
-        public InstallException(string message, object viewModel)
-        {
-            _message = message;
-            View = "error";
-            ViewModel = viewModel;
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InstallException" /> class.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
         public InstallException(string message)
+            : this(message, "error", null)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InstallException" /> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="viewModel">The view model.</param>
+        public InstallException(string message, object viewModel)
+           : this(message, "error", viewModel)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InstallException" /> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="view">The view.</param>
+        /// <param name="viewModel">The view model.</param>
+        public InstallException(string message, string view, object viewModel)
+            : base(message)
         {
-            _message = message;
-            View = "error";
-            ViewModel = null;
+            this.View = view;
+            this.ViewModel = viewModel;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InstallException" /> class.
+        /// </summary>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception, or a null reference (<see langword="Nothing" /> in Visual Basic) if no inner exception is specified.</param>
+        public InstallException(string message, Exception innerException)
+            : base(message, innerException)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InstallException" /> class.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+        protected InstallException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.View = info.GetString(nameof(this.View));
+            this.ViewModel = info.GetValue(nameof(this.ViewModel), typeof(object));
+        }
+
+        /// <summary>
+        /// When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with information about the exception.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+        /// <exception cref="ArgumentNullException">info</exception>
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
+
+            info.AddValue(nameof(this.View), this.View);
+            info.AddValue(nameof(this.ViewModel), this.ViewModel, typeof(object));
+
+            base.GetObjectData(info, context);
         }
     }
 }
