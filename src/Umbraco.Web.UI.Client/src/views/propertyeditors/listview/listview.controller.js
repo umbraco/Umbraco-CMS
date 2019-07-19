@@ -53,7 +53,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     $scope.actionInProgress = false;
     $scope.selection = [];
     $scope.folders = [];
-    $scope.page = {};
+    $scope.page = {
+        createDropdownOpen: false
+    };
     $scope.listViewResultSet = {
         totalPages: 0,
         items: []
@@ -795,8 +797,18 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             .search("blueprintId", blueprintId);
     }
 
+    function toggleDropdown () {
+        $scope.page.createDropdownOpen = !$scope.page.createDropdownOpen;
+    }
+
+    function leaveDropdown () {
+        $scope.page.createDropdownOpen = false;
+    }
+
     $scope.createBlank = createBlank;
     $scope.createFromBlueprint = createFromBlueprint;
+    $scope.toggleDropdown = toggleDropdown;
+    $scope.leaveDropdown = leaveDropdown;
 
     //GO!
     initView();
