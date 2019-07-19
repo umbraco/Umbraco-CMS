@@ -52,11 +52,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var propertyValues = sourceObject.ToObject<Dictionary<string, object>>();
 
-            if (!propertyValues.TryGetValue("key", out var keyo)
-                || !Guid.TryParse(keyo.ToString(), out var key))
-                key = Guid.Empty;
-
-            IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);
+            IPublishedElement element = new PublishedElement(publishedContentType, Guid.NewGuid(), propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);
             element = PublishedModelFactory.CreateModel(element);
             return element;
         }
