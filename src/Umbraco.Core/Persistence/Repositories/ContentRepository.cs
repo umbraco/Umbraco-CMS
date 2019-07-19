@@ -851,6 +851,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             var sql = string.Format(@"select umbracoNode.id, umbracoNode.parentID, umbracoNode.sortOrder, cmsPreviewXml.{0}, umbracoNode.{1} from umbracoNode
 inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
 inner join cmsDocument on cmsPreviewXml.versionId = cmsDocument.versionId and cmsDocument.newest=1
+where umbracoNode.trashed = 0
 order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
                 SqlSyntax.GetQuotedColumnName("xml"),
                 SqlSyntax.GetQuotedColumnName("level"),
@@ -1184,7 +1185,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             //order by update date DESC, if there is corrupted published flags we only want the latest!
             var publishedSql = new Sql(@"SELECT cmsDocument.nodeId, cmsDocument.published, cmsDocument.versionId, cmsDocument.updateDate, cmsDocument.newest
 FROM cmsDocument INNER JOIN cmsContentVersion ON cmsContentVersion.VersionId = cmsDocument.versionId
-WHERE cmsDocument.published = 1 AND cmsDocument.nodeId IN 
+WHERE cmsDocument.published = 1 AND cmsDocument.nodeId IN
 (" + parsedOriginalSql + @")
 ORDER BY cmsContentVersion.id DESC
 ", sqlFull.Arguments);
