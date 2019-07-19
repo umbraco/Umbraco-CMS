@@ -28,6 +28,7 @@
                            <span class="caret"></span>
                         </button>
 
+
                        <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                            <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
                                 <button type="button" ng-click="createBlank(entityType,contentType.alias)" prevent-default>
@@ -50,7 +51,7 @@
                            <span class="caret" aria-hidden="true"></span>
                        </button>
 
-                       <button ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
+                       <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                            <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
                                <button type="button" ng-click="createBlank(entityType,contentType.alias)" prevent-default>
                                    <i class="{{::contentType.icon}}" aria-hidden="true"></i>
@@ -62,7 +63,7 @@
                                    {{::blueprint.name}}
                                </button>
                            </umb-dropdown-item>
-                       </button>
+                       </umb-dropdown>
                    </div>
 
                    <ul class="umb-actions umb-actions-child">
