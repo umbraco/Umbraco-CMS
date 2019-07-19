@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEnumerable<IMacro> GetMany(params Guid[] ids)
         {
-            return ids.Length > 0 ? ids.Select(Get) : GetAllNoIds();
+            return ids.Length > 0 ? ids.Select(Get).ToArray() : GetAllNoIds();
         }
 
         public bool Exists(Guid id)
