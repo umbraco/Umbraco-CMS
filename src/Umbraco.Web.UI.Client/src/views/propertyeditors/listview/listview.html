@@ -21,7 +21,7 @@
                    <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints">
                        <a class="btn btn-white dropdown-toggle" data-toggle="dropdown" ng-href="">
                            <span ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
-                               <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
+                               <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}} - NAME!?
                            </span>
                            <span class="caret" ng-click="page.createDropdownOpen = !page.createDropdownOpen"></span>
                        </a>
@@ -37,10 +37,10 @@
                    </div>
 
                    <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints">
-                       <a class="btn btn-white dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="page.createDropdownOpen = !page.createDropdownOpen">
+                       <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown" ng-click="page.createDropdownOpen = !page.createDropdownOpen">
                            <localize key="actions_create">Create</localize>
-                           <span class="caret"></span>
-                       </a>
+                           <span class="caret" aria-hidden="true"></span>
+                       </button>
 
                        <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                            <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
@@ -62,7 +62,7 @@
                            <a ng-click="createFromBlueprint(blueprint.id)">
                                <i class="large {{docType.icon}}"></i>
                                <span class="menu-label">
-                                   {{blueprint.name}}
+                                   {{blueprint.name}} &nbsp;
                                </span>
                            </a>
                        </li>
