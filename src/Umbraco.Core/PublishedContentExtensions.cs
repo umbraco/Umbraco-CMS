@@ -111,10 +111,6 @@ namespace Umbraco.Core
         /// </remarks>
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
         {
-            // invariant has invariant value (whatever the requested culture)
-            if (!content.ContentType.VariesByCulture() && culture != "*")
-                culture = "";
-
             // handle context culture for variant
             if (culture == null)
                 culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
