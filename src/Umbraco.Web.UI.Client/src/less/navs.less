@@ -237,7 +237,26 @@
     color: @ui-option-type;
 }
 
-.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-submenu:hover > a, .dropdown-submenu:focus > a {
+.dropdown-menu > li > button {
+  background: transparent;
+  border: 0;
+  padding: 8px 20px;
+  color: @ui-option-type;
+  display: block;
+  clear: both;
+  font-weight: normal;
+  line-height: 20px;
+  white-space: nowrap;
+  cursor:pointer;
+  width: 100%;
+}
+
+.dropdown-menu > li > a:hover, 
+.dropdown-menu > li > a:focus, 
+.dropdown-menu > li > button:hover, 
+.dropdown-menu > li > button:focus, 
+.dropdown-submenu:hover > a, 
+.dropdown-submenu:focus > a {
     color: @ui-option-type-hover;
     background: @ui-option-hover;
 }
