@@ -733,17 +733,17 @@ namespace Umbraco.Tests.PublishedContent
             AssertDocuments(documents, "N1-fr-FR");
 
             documents = snapshot.Content.GetById(1).Children("fr-FR").ToArray();
-            AssertDocuments(documents, "N4", "N7-fr-FR"); //TODO: Returns invariant ... is that expected?
+            AssertDocuments(documents, "N4", "N7-fr-FR"); //NOTE: Returns invariant, this is expected
             documents = snapshot.Content.GetById(1).Children("").ToArray();
             AssertDocuments(documents, "N4"); //Only returns invariant since that is what was requested
 
             documents = snapshot.Content.GetById(4).Children("fr-FR").ToArray();
-            AssertDocuments(documents, "N10-fr-FR", "N11"); //TODO: Returns invariant ... is that expected?
+            AssertDocuments(documents, "N10-fr-FR", "N11"); //NOTE: Returns invariant, this is expected
             documents = snapshot.Content.GetById(4).Children("").ToArray();
             AssertDocuments(documents, "N11"); //Only returns invariant since that is what was requested
 
             documents = snapshot.Content.GetById(7).Children("fr-FR").ToArray();
-            AssertDocuments(documents, "N12-fr-FR", "N13"); //TODO: Returns invariant ... is that expected?
+            AssertDocuments(documents, "N12-fr-FR", "N13"); //NOTE: Returns invariant, this is expected
             documents = snapshot.Content.GetById(7).Children("").ToArray();
             AssertDocuments(documents, "N13"); //Only returns invariant since that is what was requested
 
