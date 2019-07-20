@@ -233,4 +233,47 @@ angular.module('umbraco.directives')
                 });
             }
         };
+    })
+    
+    // A slightly modified version of https://github.com/myplanet/angular-deep-blur/blob/master/angular-deep-blur.js - Kudos to Ufuk Kayserilioglu (paracycle)
+    .directive('deepBlur', function ($timeout) {
+        return {
+
+            restrict: 'A',
+
+            controller: function ($scope, $element, $attrs) {
+                var leaveExpr = $attrs.deepBlur,
+                    dom = $element[0];
+
+                    window.console.log('leave expression: ', leaveExpr);
+                    window.console.log('dom: ', dom);
+
+                function containsDom(parent, dom) {
+                    while (dom) {
+                        if (dom === parent) {
+                            return true;
+                        }
+                        dom = dom.parentNode;
+                    }
+                    return false;
+                }
+
+                function onBlur(e) {
+                    var targetElement = e.relatedTarget;
+
+                    var isInDomWhatever = containsDom(dom, targetElement);
+                    window.console.log(isInDomWhatever);
+
+                    if (!containsDom(dom, targetElement)) {
+                        $timeout(function () {
+                            $scope.$apply(leaveExpr);
+                        }, 10);
+                    }
+                }
+
+                dom.addEventListener('blur', onBlur, true);
+            }
+        };
     });
+
+    
