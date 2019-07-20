@@ -1,8 +1,9 @@
 <div class="umb-layout-selector" ng-show="vm.showLayoutSelector">
 
-   <div class="umb-layout-selector__active-layout" ng-click="vm.toggleLayoutDropdown()">
-      <i class="{{ vm.activeLayout.icon }}"></i>
-   </div>
+   <button type="button" class="umb-layout-selector__active-layout" ng-click="vm.toggleLayoutDropdown()" prevent-default>
+      <i class="{{ vm.activeLayout.icon }}" aria-hidden="true"></i>
+      <!-- TODO: Add some generic text here saying "Active layout: List" where the stuff after : updates once a selection is made. Might need to extend the directive with a method doing that -->
+   </button>
 
    <div ng-if="vm.layoutDropDownIsOpen"
         class="umb-layout-selector__dropdown shadow-depth-3 animated -half-second fadeIn"
@@ -14,7 +15,8 @@
             ng-class="{'-active': layout.active }"
             ng-attr-title="{{layout.name}}">
 
-           <i class="{{ layout.icon }} umb-layout-selector__dropdown-item-icon"></i>
+           <i class="{{ layout.icon }} umb-layout-selector__dropdown-item-icon" aria-hidden="true"></i>
+           <span class="sr-only">{{layout.name}}</span>
        </div>
 
    </div>
