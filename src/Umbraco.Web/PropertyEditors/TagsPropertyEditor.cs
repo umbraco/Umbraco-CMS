@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
@@ -38,9 +39,15 @@ namespace Umbraco.Web.PropertyEditors
             /// <inheritdoc />
             public override object FromEditor(ContentPropertyData editorValue, object currentValue)
             {
-                return editorValue.Value is JArray json
-                    ? json.Select(x => x.Value<string>())
-                    : null;
+                if (editorValue.Value is JArray json)
+                {
+                    return json.Select(x => x.Value<string>());
+                }
+                else if ( editorValue.Value is string stringValue && !String.IsNullOrWhiteSpace(stringValue))
+                {
+                    return stringValue.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                }
+                return null;
             }
 
             /// <inheritdoc />
