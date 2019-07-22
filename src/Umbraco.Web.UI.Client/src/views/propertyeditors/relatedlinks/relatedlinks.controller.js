@@ -18,7 +18,7 @@
             $scope.currentEditLink = null;
             $scope.hasError = false;
 
-            const dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
+            var dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
 
             $scope.internal = function($event) {
                 

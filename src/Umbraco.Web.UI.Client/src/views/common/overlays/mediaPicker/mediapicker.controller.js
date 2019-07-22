@@ -54,7 +54,7 @@ angular.module("umbraco")
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
-                dataTypeId: dataTypeId,
+                dataTypeId: dataTypeId
             };
 
             //preload selected item

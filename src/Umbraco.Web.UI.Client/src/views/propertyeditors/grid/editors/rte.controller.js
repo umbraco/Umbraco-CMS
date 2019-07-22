@@ -10,7 +10,7 @@
         vm.openMacroPicker = openMacroPicker;
         vm.openEmbed = openEmbed;
 
-        const dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
+        var dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
 
         function openLinkPicker(editor, currentTarget, anchorElement) {
 
