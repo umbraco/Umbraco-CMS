@@ -404,7 +404,8 @@ function entityResource($q, $http, umbRequestHelper) {
                 pageNumber: 100,
                 filter: '',
                 orderDirection: "Ascending",
-                orderBy: "SortOrder"
+                orderBy: "SortOrder",
+                dataTypeKey: null
             };
             if (options === undefined) {
                 options = {};
@@ -420,6 +421,7 @@ function entityResource($q, $http, umbRequestHelper) {
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
+
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
