@@ -16,17 +16,13 @@ angular.module("umbraco")
         }
 
         $scope.setImage = function(){
-            var dataTypeId = null;
-            if($scope.model && $scope.model.dataTypeId) {
-                dataTypeId = $scope.model.dataTypeId;
-            }
-
+            
             $scope.mediaPickerOverlay = {};
             $scope.mediaPickerOverlay.view = "mediapicker";
-            $scope.mediaPickerOverlay.startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
-            $scope.mediaPickerOverlay.startNodeIsVirtual = $scope.mediaPickerOverlay.startNodeId ? $scope.model.config.startNodeIsVirtual : undefined;
-            $scope.mediaPickerOverlay.dataTypeId = dataTypeId;
-            $scope.mediaPickerOverlay.cropSize = $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined;
+            $scope.mediaPickerOverlay.startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : null;
+            $scope.mediaPickerOverlay.startNodeIsVirtual = $scope.mediaPickerOverlay.startNodeId ? $scope.model.config.startNodeIsVirtual : null;
+            $scope.mediaPickerOverlay.dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
+            $scope.mediaPickerOverlay.cropSize = $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : null;
             $scope.mediaPickerOverlay.showDetails = true;
             $scope.mediaPickerOverlay.disableFolderSelect = true;
             $scope.mediaPickerOverlay.onlyImages = true;

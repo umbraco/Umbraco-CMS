@@ -68,15 +68,10 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             target: link.target
         } : null;
 
-        var dataTypeId = null;
-        if($scope.model && $scope.model.dataTypeId) {
-            dataTypeId = $scope.model.dataTypeId;
-        }
-
         $scope.linkPickerOverlay = {
             view: "linkpicker",
             currentTarget: target,
-            dataTypeId: dataTypeId,
+            dataTypeId: ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null,
             ignoreUserStartNodes : $scope.model.config.ignoreUserStartNodes,
             show: true,
             submit: function (model) {

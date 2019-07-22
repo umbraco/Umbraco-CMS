@@ -52,6 +52,8 @@ angular.module("umbraco")
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
 
+            const dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
+
             //queue file loading
             if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
                 await.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope));
@@ -272,11 +274,7 @@ angular.module("umbraco")
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
 
                         entityResource.getAnchors($scope.model.value).then(function(anchorValues){
-                            var dataTypeId = null;
-                            if($scope.model && $scope.model.dataTypeId) {
-                                dataTypeId = $scope.model.dataTypeId;
-                            }
-
+                            
                             $scope.linkPickerOverlay = {
                                 view: "linkpicker",
                                 currentTarget: currentTarget,
@@ -305,11 +303,7 @@ angular.module("umbraco")
                             startNodeId = -1;
                             startNodeIsVirtual = true;
                         }
-                        var dataTypeId = null;
-                        if($scope.model && $scope.model.dataTypeId) {
-                            dataTypeId = $scope.model.dataTypeId;
-                        }
-
+                        
                         $scope.mediaPickerOverlay = {
                             currentTarget: currentTarget,
                             onlyImages: true,

@@ -17,7 +17,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             dataTypeId = dialogOptions.dataTypeId;
         }
 
-
         $scope.dialogTreeEventHandler = $({});
         $scope.model.target = {};
         $scope.searchInfo = {
@@ -28,7 +27,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             results: [],
             selectedSearchResults: []
         };
-        $scope.customTreeParams = dialogOptions.dataTypeId ? "dataTypeId=" + dialogOptions.dataTypeId : "";
+        $scope.customTreeParams = dataTypeId !== null ? "dataTypeId=" + dataTypeId : "";
         $scope.showTarget = $scope.model.hideTarget !== true;
 
         if (dialogOptions.currentTarget) {
@@ -121,11 +120,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                     startNodeId = -1;
                     startNodeIsVirtual = true;
                 }
-                var dataTypeId = null;
-                if(dialogOptions && dialogOptions.dataTypeId){
-                    dataTypeId = dialogOptions.dataTypeId;
-                }
-
+                
                 $scope.mediaPickerOverlay = {
                     view: "mediapicker",
                     startNodeId: startNodeId,

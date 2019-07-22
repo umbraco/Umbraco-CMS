@@ -18,12 +18,10 @@
             $scope.currentEditLink = null;
             $scope.hasError = false;
 
-            $scope.internal = function($event) {
-                var dataTypeId = null;
-                if($scope.model && $scope.model.dataTypeId) {
-                    dataTypeId = $scope.model.dataTypeId;
-                }
+            const dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
 
+            $scope.internal = function($event) {
+                
                $scope.currentEditLink = null;
 
                $scope.contentPickerOverlay = {};
@@ -50,11 +48,7 @@
             };
 
             $scope.selectInternal = function ($event, link) {
-                var dataTypeId = null;
-                if($scope.model && $scope.model.dataTypeId) {
-                    dataTypeId = $scope.model.dataTypeId;
-                }
-
+                
                $scope.currentEditLink = link;
 
                $scope.contentPickerOverlay = {};

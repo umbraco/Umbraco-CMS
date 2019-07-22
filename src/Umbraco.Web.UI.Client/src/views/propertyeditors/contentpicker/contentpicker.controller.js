@@ -68,11 +68,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showPathOnHover: false,
         dataTypeId: null,
         maxNumber: 1,
-        minNumber : 0,
+        minNumber: 0,
         startNode: {
             query: "",
             type: "content",
-	        id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
+            id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
         }
     };
 
@@ -104,8 +104,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
-        ? "Media"
-        : "Document";
+            ? "Media"
+            : "Document";
     $scope.allowOpenButton = entityType === "Document";
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
@@ -144,7 +144,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         dialogOptions.filterCssClass = "not-allowed";
         var currFilter = dialogOptions.filter;
         //now change the filter to be a method
-        dialogOptions.filter = function(i) {
+        dialogOptions.filter = function (i) {
             //filter out the list view nodes
             if (i.metaData.isContainer) {
                 return true;
@@ -179,34 +179,30 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     //dialog
-    $scope.openContentPicker = function() {
-        var dataTypeId = null;
-        if($scope.model && $scope.model.dataTypeId) {
-            dataTypeId = $scope.model.dataTypeId;
+    $scope.openContentPicker = function () {
+        
+        $scope.contentPickerOverlay = dialogOptions;
+        $scope.contentPickerOverlay.view = "treepicker";
+        $scope.contentPickerOverlay.show = true;
+        $scope.contentPickerOverlay.dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
+
+        $scope.contentPickerOverlay.submit = function (model) {
+
+            if (angular.isArray(model.selection)) {
+                _.each(model.selection, function (item, i) {
+                    $scope.add(item);
+                });
+                angularHelper.getCurrentForm($scope).$setDirty();
+            }
+
+            $scope.contentPickerOverlay.show = false;
+            $scope.contentPickerOverlay = null;
         }
 
-      $scope.contentPickerOverlay = dialogOptions;
-      $scope.contentPickerOverlay.view = "treepicker";
-      $scope.contentPickerOverlay.show = true;
-      $scope.contentPickerOverlay.dataTypeId = dataTypeId;
-
-      $scope.contentPickerOverlay.submit = function(model) {
-
-          if (angular.isArray(model.selection)) {
-             _.each(model.selection, function (item, i) {
-                  $scope.add(item);
-              });
-              angularHelper.getCurrentForm($scope).$setDirty();
-          }
-
-          $scope.contentPickerOverlay.show = false;
-          $scope.contentPickerOverlay = null;
-      }
-
-      $scope.contentPickerOverlay.close = function(oldModel) {
-          $scope.contentPickerOverlay.show = false;
-          $scope.contentPickerOverlay = null;
-      }
+        $scope.contentPickerOverlay.close = function (oldModel) {
+            $scope.contentPickerOverlay.show = false;
+            $scope.contentPickerOverlay = null;
+        }
 
     };
 
@@ -246,13 +242,13 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.renderModel = [];
     };
 
-    $scope.openMiniEditor = function(node) {
-        miniEditorHelper.launchMiniEditor(node).then(function(updatedNode){
+    $scope.openMiniEditor = function (node) {
+        miniEditorHelper.launchMiniEditor(node).then(function (updatedNode) {
             // update the node
             node.name = updatedNode.name;
             node.published = updatedNode.hasPublishedVersion;
-            if(entityType !== "Member") {
-                entityResource.getUrl(updatedNode.id, entityType).then(function(data){
+            if (entityType !== "Member") {
+                entityResource.getUrl(updatedNode.id, entityType).then(function (data) {
                     node.url = data;
                 });
             }
@@ -261,7 +257,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     //when the scope is destroyed we need to unsubscribe
     $scope.$on('$destroy', function () {
-        if(unsubscribe) {
+        if (unsubscribe) {
             unsubscribe();
         }
     });
@@ -270,12 +266,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     //load current data if anything selected
     if (modelIds.length > 0) {
-        entityResource.getByIds(modelIds, entityType).then(function(data) {
+        entityResource.getByIds(modelIds, entityType).then(function (data) {
 
             _.each(modelIds,
-                function(id, i) {
+                function (id, i) {
                     var entity = _.find(data,
-                        function(d) {
+                        function (d) {
                             return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
                         });
 
@@ -299,10 +295,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     function setEntityUrl(entity) {
 
         // get url for content and media items
-        if(entityType !== "Member") {
-            entityResource.getUrl(entity.id, entityType).then(function(data){
+        if (entityType !== "Member") {
+            entityResource.getUrl(entity.id, entityType).then(function (data) {
                 // update url
-                angular.forEach($scope.renderModel, function(item){
+                angular.forEach($scope.renderModel, function (item) {
                     if (item.id === entity.id) {
                         if (entity.trashed) {
                             item.url = localizationService.dictionary.general_recycleBin;
@@ -324,7 +320,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     function addSelectedItem(item) {
 
         // set icon
-        if(item.icon) {
+        if (item.icon) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
         }
 
@@ -359,7 +355,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     function setSortingState(items) {
         // disable sorting if the list only consist of one item
-        if(items.length > 1) {
+        if (items.length > 1) {
             $scope.sortableOptions.disabled = false;
         } else {
             $scope.sortableOptions.disabled = true;
