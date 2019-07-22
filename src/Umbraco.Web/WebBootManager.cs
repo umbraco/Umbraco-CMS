@@ -190,8 +190,6 @@ namespace Umbraco.Web
 
             base.Complete(afterComplete);
 
-            AntiForgeryConfig.AdditionalDataProvider = new UmbracoAntiForgeryAdditionalDataProvider(AntiForgeryConfig.AdditionalDataProvider);
-
             //Now, startup all of our legacy startup handler
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
 

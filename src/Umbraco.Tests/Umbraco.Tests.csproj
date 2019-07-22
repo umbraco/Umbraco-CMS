@@ -197,7 +197,6 @@
     <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Home.cs" />
-    <Compile Include="Security\UmbracoAntiForgeryAdditionalDataProviderTests.cs" />
     <Compile Include="Services\AuditServiceTests.cs" />
     <Compile Include="Services\ConsentServiceTests.cs" />
     <Compile Include="Services\MemberGroupServiceTests.cs" />
@@ -399,6 +398,7 @@
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
+    <Compile Include="Web\Mvc\ValidateUmbracoFormRouteStringAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
