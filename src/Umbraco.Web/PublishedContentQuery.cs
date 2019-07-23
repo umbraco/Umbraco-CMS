@@ -215,7 +215,7 @@ namespace Umbraco.Web
                 //search only the specified culture
 
                 //get all index fields suffixed with the culture name supplied
-                var cultureFields = umbIndex.GetCultureFields(culture).ToArray();
+                var cultureFields = umbIndex.GetCultureAndInvariantFields(culture).ToArray();
                 var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, "y"); //must vary by culture
                 qry = qry.And().ManagedQuery(term, cultureFields);
                 results = qry.Execute(count);
