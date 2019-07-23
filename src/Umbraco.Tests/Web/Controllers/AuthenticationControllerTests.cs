@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Http;
@@ -63,8 +64,15 @@ namespace Umbraco.Tests.Web.Controllers
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
                     .Returns(() => null);
 
-                var baseDir = IOHelper.MapPath("", false).TrimEnd(IOHelper.DirSepChar);
-                HttpContext.Current = new HttpContext(new SimpleWorkerRequest("/", baseDir, "", "", new StringWriter()));
+                if (Thread.GetDomain().GetData(".appPath") != null)
+                {
+                    HttpContext.Current = new HttpContext(new SimpleWorkerRequest("", "", new StringWriter()));
+                }
+                else
+                {
+                    var baseDir = IOHelper.MapPath("", false).TrimEnd(IOHelper.DirSepChar);
+                    HttpContext.Current = new HttpContext(new SimpleWorkerRequest("/", baseDir, "", "", new StringWriter()));
+                }
                 IOHelper.ForceNotHosted = true;
                 var usersController = new AuthenticationController(
                     Factory.GetInstance<IGlobalSettings>(),
