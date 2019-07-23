@@ -429,6 +429,7 @@
     <key alias="linkToMedia">Link til medie</key>
     <key alias="selectContentStartNode">Vælg indhold startnode</key>
     <key alias="selectMedia">Vælg medie</key>
+    <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
     <key alias="selectItem">Vælg item</key>
     <key alias="selectLink">Vælg link</key>
@@ -438,6 +439,7 @@
     <key alias="selectMediaStartNode">Vælg medie startnode</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
+    <key alias="selectMemberType">Vælg medlemstype</key>
     <key alias="selectNode">Vælg node</key>
     <key alias="selectSections">Vælg sektioner</key>
     <key alias="selectUsers">Vælg brugere</key>
