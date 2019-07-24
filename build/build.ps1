@@ -15,7 +15,7 @@
     [Parameter(Mandatory=$false)]
     [Alias("doc")]
     [switch] $docfx = $false,
-	
+
     # keep the build directories, don't clear them
     [Parameter(Mandatory=$false)]
     [Alias("c")]
@@ -392,13 +392,13 @@
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
-        -Symbols -SymbolPackageFormat snupkg -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Core." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Web.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
-        -Symbols -SymbolPackageFormat snupkg -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Web." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
@@ -429,37 +429,37 @@
     Write-Host "Prepare Azure Gallery"
     $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
   })
-  
+
   $ubuild.DefineMethod("PrepareCSharpDocs",
   {
     Write-Host "Prepare C# Documentation"
-	
+
     $src = "$($this.SolutionRoot)\src"
       $tmp = $this.BuildTemp
       $out = $this.BuildOutput
     $DocFxJson = Join-Path -Path $src "\ApiDocs\docfx.json"
     $DocFxSiteOutput = Join-Path -Path $tmp "\_site\*.*"
-	
+
 
 	#restore nuget packages
 	$this.RestoreNuGet()
     # run DocFx
     $DocFx = $this.BuildEnv.DocFx
-    
+
     & $DocFx metadata $DocFxJson
     & $DocFx build $DocFxJson
 
     # zip it
     & $this.BuildEnv.Zip a -tzip -r "$out\csharp-docs.zip" $DocFxSiteOutput
   })
-  
+
   $ubuild.DefineMethod("PrepareAngularDocs",
   {
     Write-Host "Prepare Angular Documentation"
-	
+
     $src = "$($this.SolutionRoot)\src"
       $out = $this.BuildOutput
-    
+
     $this.CompileBelle()
 
     "Moving to Umbraco.Web.UI.Client folder"

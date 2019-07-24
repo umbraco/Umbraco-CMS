@@ -8,6 +8,7 @@
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
+        var watchingCulture = false;
 
         //setup scope vars
         $scope.defaultButton = null;
@@ -32,26 +33,58 @@
         $scope.allowOpen = true;
         $scope.app = null;
 
+        //initializes any watches
+        function startWatches(content) {
+
+            //watch for changes to isNew & the content.id, set the page.isNew accordingly and load the breadcrumb if we can
+            $scope.$watchGroup(['isNew', 'content.id'], function (newVal, oldVal) {
+                
+                var contentId = newVal[1];
+                $scope.page.isNew = Object.toBoolean(newVal[0]);
+
+                //We fetch all ancestors of the node to generate the footer breadcrumb navigation
+                if (!$scope.page.isNew && contentId && content.parentId && content.parentId !== -1) {
+                    loadBreadcrumb();
+                    if (!watchingCulture) {
+                        $scope.$watch('culture',
+                            function (value, oldValue) {
+                                if (value !== oldValue) {
+                                    loadBreadcrumb();
+                                }
+                            });
+                    }
+                }
+            });
+
+        }
+
+        //this initializes the editor with the data which will be called more than once if the data is re-loaded
         function init() {
-            
+
             var content = $scope.content;
-            
-            // we need to check whether an app is present in the current data, if not we will present the default app.
+
+            if (content.id && content.isChildOfListView && content.trashed === false) {
+                $scope.page.listViewPath = ($routeParams.page) ?
+                    "/content/content/edit/" + content.parentId + "?page=" + $routeParams.page :
+                    "/content/content/edit/" + content.parentId;
+            }
+
+            // we need to check wether an app is present in the current data, if not we will present the default app.
             var isAppPresent = false;
-            
+
             // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
             if ($scope.app) {
-                
+
                 // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
-                _.forEach(content.apps, function(app) {
+                _.forEach(content.apps, function (app) {
                     if (app === $scope.app) {
                         isAppPresent = true;
                     }
                 });
-                
+
                 // if we did reload our DocType, but still have the same app we will try to find it by the alias.
                 if (isAppPresent === false) {
-                    _.forEach(content.apps, function(app) {
+                    _.forEach(content.apps, function (app) {
                         if (app.alias === $scope.app.alias) {
                             isAppPresent = true;
                             app.active = true;
@@ -59,7 +92,7 @@
                         }
                     });
                 }
-                
+
             }
 
             // if we still dont have a app, lets show the first one:
@@ -67,21 +100,8 @@
                 content.apps[0].active = true;
                 $scope.appChanged(content.apps[0]);
             }
-            
-            editorState.set(content);
 
-            //We fetch all ancestors of the node to generate the footer breadcrumb navigation
-            if (!$scope.page.isNew) {
-                if (content.parentId && content.parentId !== -1) {
-                    loadBreadcrumb();
-                    $scope.$watch('culture',
-                        function (value, oldValue) {
-                            if (value !== oldValue) {
-                                loadBreadcrumb();
-                            }
-                        });
-                }
-            }
+            editorState.set(content);
 
             bindEvents();
 
@@ -124,10 +144,10 @@
         function isContentCultureVariant() {
             return $scope.content.variants.length > 1;
         }
-        
+
         function reload() {
             $scope.page.loading = true;
-            loadContent().then(function() {
+            loadContent().then(function () {
                 $scope.page.loading = false;
             });
         }
@@ -140,7 +160,7 @@
 
             evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
                 // if this content item uses the updated doc type we need to reload the content item
-                if(args && args.documentType && $scope.content.documentType.id === args.documentType.id) {
+                if (args && args.documentType && $scope.content.documentType.id === args.documentType.id) {
                     reload();
                 }
             }));
@@ -157,12 +177,6 @@
                 .then(function (data) {
 
                     $scope.content = data;
-
-                    if (data.isChildOfListView && data.trashed === false) {
-                        $scope.page.listViewPath = ($routeParams.page) ?
-                            "/content/content/edit/" + data.parentId + "?page=" + $routeParams.page :
-                            "/content/content/edit/" + data.parentId;
-                    }
 
                     init();
 
@@ -225,7 +239,7 @@
             $scope.page.showPreviewButton = true;
 
         }
-        
+
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(content, path, initialLoad) {
 
@@ -234,9 +248,13 @@
             }
 
             if (!$scope.content.isChildOfListView) {
-                navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
-                    $scope.page.menu.currentNode = syncArgs.node;
-                });
+                navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true })
+                    .then(function (syncArgs) {
+                        $scope.page.menu.currentNode = syncArgs.node;
+                    }, function () {
+                        //handle the rejection
+                        console.log("A problem occurred syncing the tree! A path is probably incorrect.")
+                    });
             }
             else if (initialLoad === true) {
 
@@ -334,7 +352,7 @@
             $scope.contentForm.$dirty = false;
 
             for (var i = 0; i < $scope.content.variants.length; i++) {
-                if($scope.content.variants[i].isDirty){
+                if ($scope.content.variants[i].isDirty) {
                     $scope.contentForm.$dirty = true;
                     return;
                 }
@@ -343,7 +361,7 @@
 
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
-            
+
             //Used to check validility of nested form - coming from Content Apps mostly
             //Set them all to be invalid
             var fieldsToRollback = checkValidility();
@@ -355,7 +373,8 @@
                 content: $scope.content,
                 create: $scope.page.isNew,
                 action: args.action,
-                showNotifications: args.showNotifications
+                showNotifications: args.showNotifications,
+                softRedirect: true
             }).then(function (data) {
                 //success
                 init();
@@ -374,11 +393,6 @@
             },
                 function (err) {
                     syncTreeNode($scope.content, $scope.content.path);
-
-                    //error
-                    if (err) {
-                        editorState.set($scope.content);
-                    }
 
                     resetNestedFieldValiation(fieldsToRollback);
 
@@ -432,9 +446,9 @@
 
             //need to show a notification else it's not clear there was an error.
             localizationService.localizeMany([
-                    "speechBubbles_validationFailedHeader",
-                    "speechBubbles_validationFailedMessage"
-                ]
+                "speechBubbles_validationFailedHeader",
+                "speechBubbles_validationFailedMessage"
+            ]
             ).then(function (data) {
                 notificationsService.error(data[0], data[1]);
             });
@@ -451,6 +465,7 @@
                     $scope.content = data;
 
                     init();
+                    startWatches($scope.content);
 
                     resetLastListPageNumber($scope.content);
 
@@ -465,13 +480,14 @@
             $scope.page.loading = true;
 
             loadContent().then(function () {
+                startWatches($scope.content);
                 $scope.page.loading = false;
             });
         }
 
         $scope.unpublish = function () {
             clearNotifications($scope.content);
-            if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {
+            if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {                
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/unpublish.html",
@@ -505,6 +521,7 @@
                         overlayService.close();
                     }
                 };
+
                 overlayService.open(dialog);
             }
         };
@@ -521,7 +538,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_saveToPublish",
-                        submit: function(model) {
+                        submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -529,14 +546,14 @@
                                 saveMethod: contentResource.sendToPublish,
                                 action: "sendToPublish",
                                 showNotifications: false
-                            }).then(function(data) {
-                                    //show all notifications manually here since we disabled showing them automatically in the save method
-                                    formHelper.showNotifications(data);
-                                    clearNotifications($scope.content);
-                                    overlayService.close();
-                                    return $q.when(data);
-                                },
-                                function(err) {
+                            }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
+                                overlayService.close();
+                                return $q.when(data);
+                            },
+                                function (err) {
                                     clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
@@ -545,7 +562,7 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function() {
+                        close: function () {
                             overlayService.close();
                         }
                     };
@@ -574,14 +591,13 @@
             if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
-
                     var dialog = {
                         parentScope: $scope,
                         view: "views/content/overlays/publish.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_saveAndPublish",
-                        submit: function(model) {
+                        submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -589,14 +605,14 @@
                                 saveMethod: contentResource.publish,
                                 action: "publish",
                                 showNotifications: false
-                            }).then(function(data) {
-                                    //show all notifications manually here since we disabled showing them automatically in the save method
-                                    formHelper.showNotifications(data);
-                                    clearNotifications($scope.content);
-                                    overlayService.close();
-                                    return $q.when(data);
-                                },
-                                function(err) {
+                            }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
+                                overlayService.close();
+                                return $q.when(data);
+                            },
+                                function (err) {
                                     clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
@@ -605,11 +621,10 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function() {
+                        close: function () {
                             overlayService.close();
                         }
                     };
-
                     overlayService.open(dialog);
                 }
                 else {
@@ -628,7 +643,7 @@
                     $scope.page.buttonGroupState = "success";
                 }, function () {
                     $scope.page.buttonGroupState = "error";
-                });;
+                });
             }
         };
 
@@ -645,7 +660,7 @@
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_save",
-                        submit: function(model) {
+                        submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
@@ -653,14 +668,14 @@
                                 saveMethod: $scope.saveMethod(),
                                 action: "save",
                                 showNotifications: false
-                            }).then(function(data) {
-                                    //show all notifications manually here since we disabled showing them automatically in the save method
-                                    formHelper.showNotifications(data);
-                                    clearNotifications($scope.content);
-                                    overlayService.close();
-                                    return $q.when(data);
-                                },
-                                function(err) {
+                            }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
+                                overlayService.close();
+                                return $q.when(data);
+                            },
+                                function (err) {
                                     clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
@@ -669,7 +684,7 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function(oldModel) {
+                        close: function (oldModel) {
                             overlayService.close();
                         }
                     };
@@ -696,7 +711,7 @@
 
         };
 
-        $scope.schedule = function() {
+        $scope.schedule = function () {
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
@@ -766,7 +781,7 @@
             }
         };
 
-        $scope.publishDescendants = function() {
+        $scope.publishDescendants = function () {
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "publishDescendants" })) {
@@ -894,13 +909,13 @@
          * @param {any} app
          */
         $scope.appChanged = function (app) {
-            
+
             $scope.app = app;
-            
+
             $scope.$broadcast("editors.apps.appChanged", { app: app });
-            
+
             createButtons($scope.content);
-            
+
         };
 
         /**
@@ -918,11 +933,11 @@
                 $scope.infiniteModel.close($scope.infiniteModel);
             }
         };
-        
+
         /**
          * Call back when user click the back-icon
          */
-        $scope.onBack = function() {
+        $scope.onBack = function () {
             if ($scope.infiniteModel && $scope.infiniteModel.close) {
                 $scope.infiniteModel.close($scope.infiniteModel);
             } else {
@@ -938,9 +953,7 @@
             }
             //since we are not notifying and clearing server validation messages when they are received due to how the variant
             //switching works, we need to ensure they are cleared when this editor is destroyed
-            if (!$scope.page.isNew) {
-                serverValidationManager.clear();
-            }
+            serverValidationManager.clear();
         });
 
     }

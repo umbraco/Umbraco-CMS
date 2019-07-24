@@ -23,7 +23,7 @@ namespace Umbraco.Web.Trees
         {
             return Services.MemberTypeService.GetAll()
                 .OrderBy(x => x.Name)
-                .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings, "icon-item-arrangement", false));
+                .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings, Constants.Icons.MemberType, false));
         }
     }
 }

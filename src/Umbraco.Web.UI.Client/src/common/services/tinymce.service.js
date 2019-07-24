@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService, editorService, editorState) {
+function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -895,38 +895,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         },
 
-		/**
-		 * @ngdoc method
-		 * @name umbraco.services.tinyMceService#getAnchorNames
-		 * @methodOf umbraco.services.tinyMceService
-		 *
-		 * @description
-		 * From the given string, generates a string array where each item is the id attribute value from a named anchor
-		 * 'some string <a id="anchor"></a>with a named anchor' returns ['anchor']
-		 *
-		 * @param {string} input the string to parse
-		 */
-        getAnchorNames: function (input) {
-        var anchors = [];
-        if (!input) {
-            return anchors;
-        }
-
-            var anchorPattern = /<a id=\\"(.*?)\\">/gi;
-            var matches = input.match(anchorPattern);
-
-
-            if (matches) {
-                anchors = matches.map(function (v) {
-                    return v.substring(v.indexOf('"') + 1, v.lastIndexOf('\\'));
-                });
-            }
-
-	    return anchors.filter(function(val, i, self) {
-              return self.indexOf(val) === i;
-            });
-        },
-
         insertLinkInEditor: function (editor, target, anchorElm) {
 
             var href = target.url;
@@ -1146,47 +1114,42 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             let self = this;
 
-            function getIgnoreUserStartNodes(args) {
-                var ignoreUserStartNodes = false;
-                // Most property editors have a "config" property with ignoreUserStartNodes on then
-                if (args.model.config) {
-                    ignoreUserStartNodes = Object.toBoolean(args.model.config.ignoreUserStartNodes);
-                }
-                // EXCEPT for the grid's TinyMCE editor, that one wants to be special and the config is called "configuration" instead
-                else if (args.model.configuration) {
-                    ignoreUserStartNodes = Object.toBoolean(args.model.configuration.ignoreUserStartNodes);
-                }
-                return ignoreUserStartNodes;
-            }
-
             //create link picker
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
-                var linkPicker = {
-                    currentTarget: currentTarget,
-                    anchors: editorState.current ? self.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
-                    ignoreUserStartNodes: getIgnoreUserStartNodes(args),
-                    submit: function (model) {
-                        self.insertLinkInEditor(args.editor, model.target, anchorElement);
-                        editorService.close();
-                    },
-                    close: function () {
-                        editorService.close();
-                    }
-                };
-                editorService.linkPicker(linkPicker);
+
+
+                entityResource.getAnchors(args.model.value).then(function (anchorValues) {
+                    var linkPicker = {
+                        currentTarget: currentTarget,
+                        dataTypeKey: args.model.dataTypeKey,
+                        ignoreUserStartNodes: args.model.config.ignoreUserStartNodes,
+                        anchors: anchorValues,
+                        submit: function (model) {
+                            self.insertLinkInEditor(args.editor, model.target, anchorElement);
+                            editorService.close();
+                        },
+                        close: function () {
+                            editorService.close();
+                        }
+                    };
+                    editorService.linkPicker(linkPicker);
+                });
+             
             });
 
             //Create the insert media plugin
             self.createMediaPicker(args.editor, function (currentTarget, userData) {
 
-                var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                var startNodeIsVirtual = userData.startMediaIds.length !== 1;
-
-                var ignoreUserStartNodes = getIgnoreUserStartNodes(args);
-                if (ignoreUserStartNodes) {
-                    ignoreUserStartNodes = true;
-                    startNodeId = -1;
-                    startNodeIsVirtual = true;
+                var startNodeId, startNodeIsVirtual;
+                if (!args.model.config.startNodeId) {
+                    if (args.model.config.ignoreUserStartNodes === true) {
+                        startNodeId = -1;
+                        startNodeIsVirtual = true;
+                    }
+                    else {
+                        startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                        startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                    }
                 }
 
                 var mediaPicker = {
@@ -1196,7 +1159,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     disableFolderSelect: true,
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
-                    ignoreUserStartNodes: ignoreUserStartNodes,
+                    dataTypeKey: args.model.dataTypeKey,
                     submit: function (model) {
                         self.insertMediaInEditor(args.editor, model.selection[0]);
                         editorService.close();

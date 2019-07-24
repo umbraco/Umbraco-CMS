@@ -2,29 +2,69 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Web.PublishedCache; // published snapshot
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
 {
     /// <summary>
     /// Provides utilities to handle domains.
     /// </summary>
-    public class DomainHelper
+    public static class DomainUtilities
     {
-        private readonly IDomainCache _domainCache;
-        private readonly ISiteDomainHelper _siteDomainHelper;
+        #region Document Culture
 
-        public DomainHelper(IDomainCache domainCache, ISiteDomainHelper siteDomainHelper)
+        /// <summary>
+        /// Gets the culture assigned to a document by domains, in the context of a current Uri.
+        /// </summary>
+        /// <param name="contentId">The document identifier.</param>
+        /// <param name="contentPath">The document path.</param>
+        /// <param name="current">An optional current Uri.</param>
+        /// <param name="umbracoContext">An Umbraco context.</param>
+        /// <param name="siteDomainHelper">The site domain helper.</param>
+        /// <returns>The culture assigned to the document by domains.</returns>
+        /// <remarks>
+        /// <para>In 1:1 multilingual setup, a document contains several cultures (there is not
+        /// one document per culture), and domains, withing the context of a current Uri, assign
+        /// a culture to that document.</para>
+        /// </remarks>
+        internal static string GetCultureFromDomains(int contentId, string contentPath, Uri current, UmbracoContext umbracoContext, ISiteDomainHelper siteDomainHelper)
         {
-            _domainCache = domainCache;
-            _siteDomainHelper = siteDomainHelper;
+            if (umbracoContext == null)
+                throw new InvalidOperationException("A current UmbracoContext is required.");
+
+            if (current == null)
+                current = umbracoContext.CleanedUmbracoUrl;
+
+            // get the published route, else the preview route
+            // if both are null then the content does not exist
+            var route = umbracoContext.Content.GetRouteById(contentId) ??
+                        umbracoContext.Content.GetRouteById(true, contentId);
+
+            if (route == null)
+                return null;
+
+            var pos = route.IndexOf('/');
+            var domain = pos == 0
+                ? null
+                : DomainForNode(umbracoContext.Domains, siteDomainHelper, int.Parse(route.Substring(0, pos)), current);
+
+            var rootContentId = domain?.ContentId ?? -1;
+            var wcDomain = FindWildcardDomainInPath(umbracoContext.Domains.GetAll(true), contentPath, rootContentId);
+
+            if (wcDomain != null) return wcDomain.Culture.Name;
+            if (domain != null) return domain.Culture.Name;
+            return umbracoContext.Domains.DefaultCulture;
         }
 
-        #region Domain for Node
+        #endregion
+
+        #region Domain for Document
 
         /// <summary>
         /// Finds the domain for the specified node, if any, that best matches a specified uri.
         /// </summary>
+        /// <param name="domainCache">A domain cache.</param>
+        /// <param name="siteDomainHelper">The site domain helper.</param>
         /// <param name="nodeId">The node identifier.</param>
         /// <param name="current">The uri, or null.</param>
         /// <param name="culture">The culture, or null.</param>
@@ -35,14 +75,14 @@ namespace Umbraco.Web.Routing
         /// <para>If culture is null, uses the default culture for the installation instead. Otherwise,
         /// will try with the specified culture, else return null.</para>
         /// </remarks>
-        internal DomainAndUri DomainForNode(int nodeId, Uri current, string culture = null)
+        internal static DomainAndUri DomainForNode(IDomainCache domainCache, ISiteDomainHelper siteDomainHelper, int nodeId, Uri current, string culture = null)
         {
             // be safe
             if (nodeId <= 0)
                 return null;
 
             // get the domains on that node
-            var domains = _domainCache.GetAssigned(nodeId, false).ToArray();
+            var domains = domainCache.GetAssigned(nodeId).ToArray();
 
             // none?
             if (domains.Length == 0)
@@ -50,37 +90,28 @@ namespace Umbraco.Web.Routing
 
             // else filter
             // it could be that none apply (due to culture)
-            return SelectDomain(domains, current, culture, _domainCache.DefaultCulture,
-                (cdomainAndUris, ccurrent, cculture, cdefaultCulture) => _siteDomainHelper.MapDomain(cdomainAndUris, ccurrent, cculture, cdefaultCulture));
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether a specified node has domains.
-        /// </summary>
-        /// <param name="nodeId">The node identifier.</param>
-        /// <returns>True if the node has domains, else false.</returns>
-        internal bool NodeHasDomains(int nodeId)
-        {
-            return nodeId > 0 && _domainCache.GetAssigned(nodeId, false).Any();
+            return SelectDomain(domains, current, culture, domainCache.DefaultCulture, siteDomainHelper.MapDomain);
         }
 
         /// <summary>
         /// Find the domains for the specified node, if any, that match a specified uri.
         /// </summary>
+        /// <param name="domainCache">A domain cache.</param>
+        /// <param name="siteDomainHelper">The site domain helper.</param>
         /// <param name="nodeId">The node identifier.</param>
         /// <param name="current">The uri, or null.</param>
         /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain. True by default.</param>
         /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
         /// <remarks>If at least a domain is set on the node then the method returns the domains that
         /// best match the specified uri, else it returns null.</remarks>
-        internal IEnumerable<DomainAndUri> DomainsForNode(int nodeId, Uri current, bool excludeDefault = true)
+        internal static IEnumerable<DomainAndUri> DomainsForNode(IDomainCache domainCache, ISiteDomainHelper siteDomainHelper, int nodeId, Uri current, bool excludeDefault = true)
         {
             // be safe
             if (nodeId <= 0)
                 return null;
 
             // get the domains on that node
-            var domains = _domainCache.GetAssigned(nodeId, false).ToArray();
+            var domains = domainCache.GetAssigned(nodeId).ToArray();
 
             // none?
             if (domains.Length == 0)
@@ -90,7 +121,7 @@ namespace Umbraco.Web.Routing
             var domainAndUris = SelectDomains(domains, current).ToArray();
 
             // filter
-            return _siteDomainHelper.MapDomains(domainAndUris, current, excludeDefault, null, _domainCache.DefaultCulture).ToArray();
+            return siteDomainHelper.MapDomains(domainAndUris, current, excludeDefault, null, domainCache.DefaultCulture).ToArray();
         }
 
         #endregion
@@ -252,7 +283,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Parses a domain name into a URI. 
+        /// Parses a domain name into a URI.
         /// </summary>
         /// <param name="domainName">The domain name to parse</param>
         /// <param name="currentUri">The currently requested URI. If the domain name is relative, the authority of URI will be used.</param>

@@ -9,30 +9,38 @@ namespace Umbraco.Tests.Testing.Objects
 {
     internal class TestDataSource : IDataSource
     {
-        private readonly Dictionary<int, ContentNodeKit> _kits;
-
         public TestDataSource(params ContentNodeKit[] kits)
             : this((IEnumerable<ContentNodeKit>) kits)
         { }
 
         public TestDataSource(IEnumerable<ContentNodeKit> kits)
         {
-            _kits = kits.ToDictionary(x => x.Node.Id, x => x);
+            Kits = kits.ToDictionary(x => x.Node.Id, x => x);
         }
+
+        public Dictionary<int, ContentNodeKit> Kits { get; }
+
+        // note: it is important to clone the returned kits, as the inner
+        // ContentNode is directly reused and modified by the snapshot service
 
         public ContentNodeKit GetContentSource(IScope scope, int id)
-            => _kits.TryGetValue(id, out var kit) ? kit : default;
+            => Kits.TryGetValue(id, out var kit) ? kit.Clone() : default;
 
         public IEnumerable<ContentNodeKit> GetAllContentSources(IScope scope)
-            => _kits.Values;
+            => Kits.Values
+                .OrderBy(x => x.Node.Level)
+                .Select(x => x.Clone());
 
         public IEnumerable<ContentNodeKit> GetBranchContentSources(IScope scope, int id)
-        {
-            throw new NotImplementedException();
-        }
+            => Kits.Values
+                .Where(x => x.Node.Path.EndsWith("," + id) || x.Node.Path.Contains("," + id + ","))
+                .OrderBy(x => x.Node.Level).ThenBy(x => x.Node.SortOrder)
+                .Select(x => x.Clone());
 
         public IEnumerable<ContentNodeKit> GetTypeContentSources(IScope scope, IEnumerable<int> ids)
-            => _kits.Values.Where(x => ids.Contains(x.ContentTypeId));
+            => Kits.Values
+                .Where(x => ids.Contains(x.ContentTypeId))
+                .Select(x => x.Clone());
 
         public ContentNodeKit GetMediaSource(IScope scope, int id)
         {

@@ -474,6 +474,11 @@
         if (!property.inherited) {
 
           var oldPropertyModel = angular.copy(property);
+          if (oldPropertyModel.allowCultureVariant === undefined) {
+            // this is necessary for comparison when detecting changes to the property
+            oldPropertyModel.allowCultureVariant = scope.model.allowCultureVariant;
+            oldPropertyModel.alias = "";
+          }
           var propertyModel = angular.copy(property);
 
           var propertySettings = {

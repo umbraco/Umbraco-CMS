@@ -14,11 +14,18 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         public override void Migrate()
         {
             //Get anything currently scheduled
-            var scheduleSql = new Sql()
-                .Select("nodeId", "releaseDate", "expireDate")
+            var releaseSql = new Sql()
+                .Select("nodeId", "releaseDate")
                 .From("umbracoDocument")
-                .Where("releaseDate IS NOT NULL OR expireDate IS NOT NULL");
-            var schedules = Database.Dictionary<int, (DateTime? releaseDate, DateTime? expireDate)> (scheduleSql);
+                .Where("releaseDate IS NOT NULL");
+            var releases = Database.Dictionary<int, DateTime> (releaseSql);
+
+            var expireSql = new Sql()
+                .Select("nodeId", "expireDate")
+                .From("umbracoDocument")
+                .Where("expireDate IS NOT NULL");
+            var expires = Database.Dictionary<int, DateTime>(expireSql);
+
 
             //drop old cols
             Delete.Column("releaseDate").FromTable("umbracoDocument").Do();
@@ -27,20 +34,25 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Create.Table<ContentScheduleDto>(true).Do();
 
             //migrate the schedule
-            foreach(var s in schedules)
+            foreach(var s in releases)
             {
-                var date = s.Value.releaseDate;
+                var date = s.Value;
                 var action = ContentScheduleAction.Release.ToString();
-                if (!date.HasValue)
-                {
-                    date = s.Value.expireDate;
-                    action = ContentScheduleAction.Expire.ToString();
-                }
 
                 Insert.IntoTable(ContentScheduleDto.TableName)
-                    .Row(new { nodeId = s.Key, date = date.Value, action = action })
+                    .Row(new { id = Guid.NewGuid(), nodeId = s.Key, date = date, action = action })
                     .Do();
             }
+
+            foreach (var s in expires)
+            {
+                var date = s.Value;
+                var action = ContentScheduleAction.Expire.ToString();
+
+                Insert.IntoTable(ContentScheduleDto.TableName)
+                    .Row(new { id = Guid.NewGuid(), nodeId = s.Key, date = date, action = action })
+                    .Do();
+            }            
         }
     }
 }
