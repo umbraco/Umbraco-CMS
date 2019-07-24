@@ -70,8 +70,11 @@ namespace Umbraco.Tests.Web
             return new PublishedContentQuery(snapshot, variationContextAccessor, examineManager.Object);
         }
 
-        [Test]
-        public void Search_Wildcard()
+        [TestCase("fr-fr", ExpectedResult = "1, 3", TestName = "Search Culture: fr-fr. Must return both fr-fr and invariant results")]
+        [TestCase("en-us", ExpectedResult = "1, 2", TestName = "Search Culture: en-us. Must return both en-us and invariant results")]
+        [TestCase("*", ExpectedResult = "1, 2, 3", TestName = "Search Culture: *. Must return all cultures and all invariant results")]
+        [TestCase(null, ExpectedResult = "1", TestName = "Search Culture: null. Must return only invariant results")]
+        public string Search(string culture)
         {
             using (var luceneDir = new RandomIdRAMDirectory())
             {
@@ -80,76 +83,11 @@ namespace Umbraco.Tests.Web
                 {
                     var pcq = CreatePublishedContentQuery(indexer);
 
-                    var results = pcq.Search("Products", "*", "TestIndex");
+                    var results = pcq.Search("Products", culture, "TestIndex");
 
-                    var ids = results.Select(x => x.Content.Id).ToList();
-                    Assert.AreEqual(3, ids.Count);
+                    var ids = results.Select(x => x.Content.Id).ToArray();
 
-                    //returns results for all fields and document types
-                    Assert.IsTrue(ids.Contains(1) && ids.Contains(2) && ids.Contains(3));
-                }
-            }
-        }
-
-        [Test]
-        public void Search_Invariant()
-        {
-            using (var luceneDir = new RandomIdRAMDirectory())
-            {
-                var fieldNames = new[] { "title", "title_en-us", "title_fr-fr" };
-                using (var indexer = CreateTestIndex(luceneDir, fieldNames))
-                {
-                    var pcq = CreatePublishedContentQuery(indexer);
-
-                    var results = pcq.Search("Products", null, "TestIndex");
-
-                    var ids = results.Select(x => x.Content.Id).ToList();
-                    Assert.AreEqual(1, ids.Count);
-
-                    //returns results for only invariant fields and invariant documents
-                    Assert.IsTrue(ids.Contains(1) && !ids.Contains(2) && !ids.Contains(3));
-                }
-            }
-        }
-
-        [Test]
-        public void Search_Culture1()
-        {
-            using (var luceneDir = new RandomIdRAMDirectory())
-            {
-                var fieldNames = new[] { "title", "title_en-us", "title_fr-fr" };
-                using (var indexer = CreateTestIndex(luceneDir, fieldNames))
-                {
-                    var pcq = CreatePublishedContentQuery(indexer);
-
-                    var results = pcq.Search("Products", "en-us", "TestIndex");
-
-                    var ids = results.Select(x => x.Content.Id).ToList();
-                    Assert.AreEqual(2, ids.Count);
-
-                    //returns results for en-us fields and invariant fields for all document types
-                    Assert.IsTrue(ids.Contains(1) && ids.Contains(2) && !ids.Contains(3));
-                }
-            }
-        }
-
-        [Test]
-        public void Search_Culture2()
-        {
-            using (var luceneDir = new RandomIdRAMDirectory())
-            {
-                var fieldNames = new[] { "title", "title_en-us", "title_fr-fr" };
-                using (var indexer = CreateTestIndex(luceneDir, fieldNames))
-                {
-                    var pcq = CreatePublishedContentQuery(indexer);
-
-                    var results = pcq.Search("Products", "fr-fr", "TestIndex");
-
-                    var ids = results.Select(x => x.Content.Id).ToList();
-                    Assert.AreEqual(2, ids.Count);
-
-                    //returns results for fr-fr fields and invariant fields for all document types
-                    Assert.IsTrue(ids.Contains(1) && !ids.Contains(2) && ids.Contains(3));
+                    return string.Join(", ", ids);
                 }
             }
         }
