@@ -39,14 +39,23 @@ namespace Umbraco.Web.PropertyEditors
             /// <inheritdoc />
             public override object FromEditor(ContentPropertyData editorValue, object currentValue)
             {
+                var value = editorValue?.Value?.ToString();
+
+                if (string.IsNullOrEmpty(value))
+                {
+                    return null;
+                }
+
                 if (editorValue.Value is JArray json)
                 {
                     return json.Select(x => x.Value<string>());
                 }
-                else if ( editorValue.Value is string stringValue && !String.IsNullOrWhiteSpace(stringValue))
+
+                if (string.IsNullOrWhiteSpace(value) == false)
                 {
-                    return stringValue.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    return value.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 }
+
                 return null;
             }
 
