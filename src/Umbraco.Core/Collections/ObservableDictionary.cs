@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Collections
 {
@@ -235,15 +236,76 @@ namespace Umbraco.Core.Collections
 
         #endregion
 
+        /// <summary>
+        /// The exception that is thrown when a duplicate key inserted.
+        /// </summary>
+        /// <seealso cref="System.Collections.ObjectModel.ObservableCollection{TValue}" />
+        /// <seealso cref="System.Collections.Generic.IReadOnlyDictionary{TKey, TValue}" />
+        /// <seealso cref="System.Collections.Generic.IDictionary{TKey, TValue}" />
+        [Serializable]
         internal class DuplicateKeyException : Exception
         {
+            /// <summary>
+            /// Gets the key.
+            /// </summary>
+            /// <value>
+            /// The key.
+            /// </value>
+            public string Key { get; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DuplicateKeyException" /> class.
+            /// </summary>
+            public DuplicateKeyException()
+            { }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DuplicateKeyException" /> class.
+            /// </summary>
+            /// <param name="key">The key.</param>
             public DuplicateKeyException(string key)
-                : base("Attempted to insert duplicate key \"" + key + "\" in collection.")
+                : this(key, null)
+            { }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DuplicateKeyException" /> class.
+            /// </summary>
+            /// <param name="key">The key.</param>
+            /// <param name="innerException">The exception that is the cause of the current exception, or a null reference (<see langword="Nothing" /> in Visual Basic) if no inner exception is specified.</param>
+            public DuplicateKeyException(string key, Exception innerException)
+                : base("Attempted to insert duplicate key \"" + key + "\" in collection.", innerException)
             {
-                Key = key;
+                this.Key = key;
             }
 
-            public string Key { get; }
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DuplicateKeyException" /> class.
+            /// </summary>
+            /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+            /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+            protected DuplicateKeyException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+                this.Key = info.GetString(nameof(this.Key));
+            }
+
+            /// <summary>
+            /// When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with information about the exception.
+            /// </summary>
+            /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+            /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+            /// <exception cref="ArgumentNullException">info</exception>
+            public override void GetObjectData(SerializationInfo info, StreamingContext context)
+            {
+                if (info == null)
+                {
+                    throw new ArgumentNullException(nameof(info));
+                }
+
+                info.AddValue(nameof(this.Key), this.Key);
+
+                base.GetObjectData(info, context);
+            }
         }
     }
 }
