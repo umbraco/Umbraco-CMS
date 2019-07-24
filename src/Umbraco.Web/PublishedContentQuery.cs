@@ -216,8 +216,7 @@ namespace Umbraco.Web
 
                 //get all index fields suffixed with the culture name supplied
                 var cultureFields = umbIndex.GetCultureAndInvariantFields(culture).ToArray();
-                var qry = searcher.CreateQuery();
-                qry = qry.ManagedQuery(term, cultureFields);
+                var qry = searcher.CreateQuery().ManagedQuery(term, cultureFields);
                 results = qry.Execute(count);
             }
 
@@ -313,7 +312,7 @@ namespace Umbraco.Web
             }
         }
 
-        
+
 
 
         #endregion
