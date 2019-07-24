@@ -10,14 +10,17 @@
         vm.openMacroPicker = openMacroPicker;
         vm.openEmbed = openEmbed;
 
+        var dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
+
         function openLinkPicker(editor, currentTarget, anchorElement) {
 
             entityResource.getAnchors(JSON.stringify($scope.model.value)).then(function(anchorValues) {
+                
                 vm.linkPickerOverlay = {
                     view: "linkpicker",
                     currentTarget: currentTarget,
                     anchors: anchorValues,
-                    dataTypeId: $scope.model.dataTypeId,
+                    dataTypeId: dataTypeId,
                     ignoreUserStartNodes : $scope.model.config.ignoreUserStartNodes,
                     show: true,
                     submit: function(model) {
@@ -46,7 +49,7 @@
                 showDetails: true,
                 startNodeId: startNodeId,
                 startNodeIsVirtual: startNodeIsVirtual,
-                dataTypeId: $scope.model.dataTypeId,
+                dataTypeId: dataTypeId,
                 view: "mediapicker",
                 show: true,
                 submit: function(model) {

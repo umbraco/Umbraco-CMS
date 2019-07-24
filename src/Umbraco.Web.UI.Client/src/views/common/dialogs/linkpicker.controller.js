@@ -14,7 +14,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			searchFromId: null,
 			searchFromName: null,
 			showSearch: false,
-            dataTypeId: $scope.model.dataTypeId,
+            dataTypeId: ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null,
 			results: [],
 			selectedSearchResults: []
 		}
