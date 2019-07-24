@@ -20,14 +20,22 @@ namespace Umbraco.Web
     {
         private readonly IPublishedSnapshot _publishedSnapshot;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IExamineManager _examineManager;
+
+        [Obsolete("Use the constructor with all parameters instead")]
+        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor)
+            : this (publishedSnapshot, variationContextAccessor, ExamineManager.Instance)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentQuery"/> class.
         /// </summary>
-        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor)
+        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, IExamineManager examineManager)
         {
             _publishedSnapshot = publishedSnapshot ?? throw new ArgumentNullException(nameof(publishedSnapshot));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
+            _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
         }
 
         #region Content
@@ -187,7 +195,7 @@ namespace Umbraco.Web
                 ? Constants.UmbracoIndexes.ExternalIndexName
                 : indexName;
 
-            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
+            if (!_examineManager.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
                 throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
 
             var searcher = umbIndex.GetSearcher();
@@ -216,8 +224,7 @@ namespace Umbraco.Web
 
                 //get all index fields suffixed with the culture name supplied
                 var cultureFields = umbIndex.GetCultureAndInvariantFields(culture).ToArray();
-                var qry = searcher.CreateQuery();
-                qry = qry.ManagedQuery(term, cultureFields);
+                var qry = searcher.CreateQuery().ManagedQuery(term, cultureFields);
                 results = qry.Execute(count);
             }
 
@@ -313,7 +320,7 @@ namespace Umbraco.Web
             }
         }
 
-        
+
 
 
         #endregion
