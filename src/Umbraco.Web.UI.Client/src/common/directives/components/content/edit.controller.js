@@ -20,6 +20,12 @@
         $scope.page.menu.currentSection = appState.getSectionState("currentSection");
         $scope.page.listViewPath = null;
         $scope.page.isNew = $scope.isNew ? true : false;
+
+        if (infiniteMode) {
+            $scope.page.allowInfinitePublishAndClose = $scope.infiniteModel.allowPublishAndClose;
+            $scope.page.allowInfiniteSaveAndClose = $scope.infiniteModel.allowSaveAndClose;
+        }
+
         $scope.page.buttonGroupState = "init";
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
         $scope.page.hideChangeVariant = false;
@@ -30,7 +36,7 @@
             
             var content = $scope.content;
             
-            // we need to check wether an app is present in the current data, if not we will present the default app.
+            // we need to check whether an app is present in the current data, if not we will present the default app.
             var isAppPresent = false;
             
             // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
@@ -347,11 +353,16 @@
                 saveMethod: args.saveMethod,
                 scope: $scope,
                 content: $scope.content,
+                create: $scope.page.isNew,
                 action: args.action,
                 showNotifications: args.showNotifications
             }).then(function (data) {
                 //success
                 init();
+
+                //needs to be manually set for infinite editing mode
+                $scope.page.isNew = false;
+
                 syncTreeNode($scope.content, data.path);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });

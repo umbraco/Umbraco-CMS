@@ -331,13 +331,17 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Opens a media editor in infinite editing, the submit callback returns the updated content item
+         * Opens a content editor in infinite editing, the submit callback returns the updated content item
          * @param {Object} editor rendering options
          * @param {String} editor.id The id of the content item
          * @param {Boolean} editor.create Create new content item
          * @param {Function} editor.submit Callback function when the publish and close button is clicked. Returns the editor model object
          * @param {Function} editor.close Callback function when the close button is clicked.
-         *
+         * @param {String} editor.parentId If editor.create is true, provide parentId for the creation of the content item
+         * @param {String} editor.documentTypeAlias If editor.create is true, provide document type alias for the creation of the content item
+         * @param {Boolean} editor.allowSaveAndClose If editor is being used in infinite editing allows the editor to close when the save action is performed
+         * @param {Boolean} editor.allowPublishAndClose If editor is being used in infinite editing allows the editor to close when the publish action is performed
+         * 
          * @returns {Object} editor object
          */
         function contentEditor(editor) {

@@ -13,6 +13,9 @@ function ContentEditController($scope, $rootScope, $routeParams, contentResource
     function scaffoldEmpty() {
         return contentResource.getScaffold($routeParams.id, $routeParams.doctype);
     }
+    function scaffoldInfiniteEmpty() {
+        return contentResource.getScaffold($scope.model.parentId, $scope.model.doctype);
+    }
     function scaffoldBlueprint() {
         return contentResource.getBlueprintScaffold($routeParams.id, $routeParams.blueprintId);
     }
@@ -20,9 +23,15 @@ function ContentEditController($scope, $rootScope, $routeParams, contentResource
     $scope.contentId = infiniteMode ? $scope.model.id : $routeParams.id;
     $scope.saveMethod = contentResource.save;
     $scope.getMethod = contentResource.getById;
-    $scope.getScaffoldMethod = $routeParams.blueprintId ? scaffoldBlueprint : scaffoldEmpty;
+    $scope.getScaffoldMethod = $routeParams.blueprintId ? scaffoldBlueprint : infiniteMode ? scaffoldInfiniteEmpty : scaffoldEmpty;
     $scope.page = $routeParams.page;
     $scope.isNew = infiniteMode ? $scope.model.create : $routeParams.create;
+
+    if (infiniteMode && $scope.isNew) {
+        $scope.parentId = $scope.model.parentId;
+        $scope.doctype = $scope.model.documentTypeAlias;
+    }
+
     //load the default culture selected in the main tree if any
     $scope.culture = $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
 

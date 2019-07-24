@@ -53,6 +53,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (args.showNotifications === undefined) {
                 args.showNotifications = true;
             }
+            if (args.create === undefined) {
+                if ($routeParams.create) {
+                    args.create = true;
+                }
+            }
 
             var redirectOnSuccess = args.redirectOnSuccess !== undefined ? args.redirectOnSuccess : true;
             var redirectOnFailure = args.redirectOnFailure !== undefined ? args.redirectOnFailure : true;
@@ -66,7 +71,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 args.scope.busy = true;
 
-                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles(), args.showNotifications)
+                return args.saveMethod(args.content, args.create, fileManager.getFiles(), args.showNotifications)
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: args.scope });
