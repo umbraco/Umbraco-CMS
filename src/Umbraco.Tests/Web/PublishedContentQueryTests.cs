@@ -36,22 +36,26 @@ namespace Umbraco.Tests.Web
         {
             var indexer = new TestIndex("TestIndex", luceneDirectory, fieldNames);
 
-            //populate with some test data
-            indexer.IndexItem(new ValueSet("1", "content", new Dictionary<string, object>
+            using (indexer.ProcessNonAsync())
             {
-                [fieldNames[0]] = "Hello world, there are products here",
-                [UmbracoContentIndex.VariesByCultureFieldName] = "n"
-            }));
-            indexer.IndexItem(new ValueSet("2", "content", new Dictionary<string, object>
-            {
-                [fieldNames[1]] = "Hello world, there are products here",
-                [UmbracoContentIndex.VariesByCultureFieldName] = "y"
-            }));
-            indexer.IndexItem(new ValueSet("3", "content", new Dictionary<string, object>
-            {
-                [fieldNames[2]] = "Hello world, there are products here",
-                [UmbracoContentIndex.VariesByCultureFieldName] = "y"
-            }));
+                //populate with some test data
+                indexer.IndexItem(new ValueSet("1", "content", new Dictionary<string, object>
+                {
+                    [fieldNames[0]] = "Hello world, there are products here",
+                    [UmbracoContentIndex.VariesByCultureFieldName] = "n"
+                }));
+                indexer.IndexItem(new ValueSet("2", "content", new Dictionary<string, object>
+                {
+                    [fieldNames[1]] = "Hello world, there are products here",
+                    [UmbracoContentIndex.VariesByCultureFieldName] = "y"
+                }));
+                indexer.IndexItem(new ValueSet("3", "content", new Dictionary<string, object>
+                {
+                    [fieldNames[2]] = "Hello world, there are products here",
+                    [UmbracoContentIndex.VariesByCultureFieldName] = "y"
+                }));
+            }
+            
             return indexer;
         }
 
@@ -80,7 +84,7 @@ namespace Umbraco.Tests.Web
             {
                 var fieldNames = new[] { "title", "title_en-us", "title_fr-fr" };
                 using (var indexer = CreateTestIndex(luceneDir, fieldNames))
-                {
+                {   
                     var pcq = CreatePublishedContentQuery(indexer);
 
                     var results = pcq.Search("Products", culture, "TestIndex");
