@@ -19,7 +19,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         private Dictionary<int, List<PropertyTypeDto>> _propertyTypes;
         private HashSet<int> _elementTypesInUse;
 
-        private ConfigurationEditor _dropDownConfigEditor;
+        private ConfigurationEditor _valueListConfigEditor;
 
         public NestedContentPropertyEditorsMigration(IMigrationContext context)
             : base(context)
@@ -30,6 +30,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Prepare();
 
             bool refreshCache = UpdatePropertyData();
+            refreshCache |= UpdateElementTypes();
 
             // if some data types have been updated directly in the database (editing DataTypeDto and/or PropertyDataDto),
             // bypassing the services, then we need to rebuild the cache entirely, including the umbracoContentNu table
@@ -46,7 +47,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 .Where<NodeDto>(node => node.NodeObjectType == Constants.ObjectTypes.DocumentType))
                 .ToDictionary(ct => ct.Alias, ct => ct.NodeId);
 
-            _dropDownConfigEditor = new DropDownFlexibleConfigurationEditor();
+            _valueListConfigEditor = new ValueListConfigurationEditor();
 
             _elementTypesInUse = new HashSet<int>();
             _propertyTypes = new Dictionary<int, List<PropertyTypeDto>>();
@@ -137,10 +138,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     case Constants.PropertyEditors.Aliases.RadioButtonList:
                     case Constants.PropertyEditors.Aliases.CheckBoxList:
                     case Constants.PropertyEditors.Aliases.DropDownListFlexible:
-                        var config = (DropDownFlexibleConfiguration)_dropDownConfigEditor.FromDatabase(pt.DataTypeDto.Configuration);
-                        if (pt.DataTypeDto.EditorAlias == Constants.PropertyEditors.Aliases.CheckBoxList)
-                            config.Multiple = true;
-                        element[pt.Alias] = UpdateValueList(propertyValue, config);
+                        var config = (ValueListConfiguration)_valueListConfigEditor.FromDatabase(pt.DataTypeDto.Configuration);
+                        bool isMultiple = true;
+                        if (pt.DataTypeDto.EditorAlias == Constants.PropertyEditors.Aliases.RadioButtonList)
+                            isMultiple = false;
+                        element[pt.Alias] = UpdateValueList(propertyValue, config, isMultiple);
                         changed = true;
                         break;
 
@@ -184,11 +186,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             }
         }
 
-        private string UpdateValueList(string propertyValue, DropDownFlexibleConfiguration config)
+        private string UpdateValueList(string propertyValue, ValueListConfiguration config, bool isMultiple)
         {
             var propData = new PropertyDataDto { VarcharValue = propertyValue };
             
-            if (UpdatePropertyDataDto(propData, config, isMultiple: true))
+            if (UpdatePropertyDataDto(propData, config, isMultiple: isMultiple))
             {
                 return propData.VarcharValue;
             }
@@ -240,8 +242,44 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             return JsonConvert.SerializeObject(links);
         }
 
-        // dummy editor for deserialization
-        protected class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDownFlexibleConfiguration>
-        { }
+        private bool UpdateElementTypes()
+        {
+            bool refreshCache = false;
+
+            var documentContentTypesInUse = Database.Fetch<ContentDto>(Sql()
+                .SelectDistinct<ContentDto>(x => x.ContentTypeId)
+                .From<ContentDto>())
+                .Select(x => x.ContentTypeId)
+                .ToHashSet();
+
+            var childContentTypes = Database.Fetch<ContentType2ContentTypeDto>(Sql()
+                .SelectDistinct<ContentType2ContentTypeDto>(x => x.ChildId)
+                .From<ContentType2ContentTypeDto>())
+                .Select(x => x.ChildId)
+                .ToHashSet();                
+
+            foreach( var elementTypeId in _elementTypesInUse)
+            {
+                string elementTypeAlias = _elementTypeIds.First(t => t.Value == elementTypeId).Key;
+
+                if (documentContentTypesInUse.Contains(elementTypeId))
+                {
+                    Logger.Warn<NestedContentPropertyEditorsMigration>("Content type {ContentTypeAlias} is used in nested content but could not be converted to an element type (documents exist)", elementTypeAlias);
+                }
+                else if (childContentTypes.Contains(elementTypeId))
+                {
+                    Logger.Warn<NestedContentPropertyEditorsMigration>("Content type {ContentTypeAlias} is used in nested content but could not be converted to an element type (has compositions)", elementTypeAlias);
+                }
+                else
+                {
+                    Database.Execute(Sql().Update<ContentTypeDto>(u => u.Set(x => x.IsElement, true)).Where<ContentTypeDto>(x => x.NodeId == elementTypeId));
+                    Logger.Info<NestedContentPropertyEditorsMigration>("Marked content type {ContentTypeAlias} as an element type", elementTypeAlias);
+                    refreshCache = true;
+                }
+            }
+
+            return refreshCache;
+        }
+
     }
 }
