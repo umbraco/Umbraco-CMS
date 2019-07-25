@@ -84,12 +84,17 @@ namespace Umbraco.Web.Routing
                     yield break;
 
                 var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
-                if (string.IsNullOrWhiteSpace(umbracoUrlName))
+                var aliases = umbracoUrlName?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (aliases == null || aliases.Any() == false)
                     yield break;
 
-                var path = "/" + umbracoUrlName;
-                var uri = new Uri(path, UriKind.Relative);
-                yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                foreach (var alias in aliases.Distinct())
+                {
+                    var path = "/" + alias;
+                    var uri = new Uri(path, UriKind.Relative);
+                    yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                }
             }
             else
             {
