@@ -102,6 +102,7 @@
                 return x.value === item.value && x.label === item.label;
             });
 
+            angularHelper.getCurrentForm($scope).$setDirty();
         };
 
         $scope.add = function (evt) {
@@ -120,6 +121,7 @@
                     $scope.newLabel = "";
                     $scope.hasError = false;
                     $scope.focusOnNew = true;
+                    angularHelper.getCurrentForm($scope).$setDirty();
                     return;
                 }
 
