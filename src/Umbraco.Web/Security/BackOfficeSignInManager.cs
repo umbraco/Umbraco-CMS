@@ -117,7 +117,7 @@ namespace Umbraco.Web.Security
                 var userIdentity = await CreateUserIdentityAsync(user);
                 if (userIdentity is UmbracoBackOfficeIdentity backOfficeIdentity)
                 {
-                    if(backOfficeIdentity.StartContentNodes.Length == 0 || backOfficeIdentity.StartMediaNodes.Length == 0)
+                    if (backOfficeIdentity.StartContentNodes.Length == 0 || backOfficeIdentity.StartMediaNodes.Length == 0)
                     {
                         _logger.WriteCore(TraceEventType.Information, 0,
                             $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}, no content and/or media start nodes could be found for any of the user's groups", null, null);
