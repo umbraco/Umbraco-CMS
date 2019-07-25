@@ -78,9 +78,20 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         setDatePickerVal();
     };
 
-    $scope.inputChanged = function() {
-        setDate($scope.model.datetimePickerValue);
-        setDatePickerVal();
+    $scope.inputChanged = function () {        
+        if ($scope.model.datetimePickerValue == "" && $scope.hasDatetimePickerValue) {
+                $scope.clearDate();
+        } else if ($scope.model.datetimePickerValue) {
+            var momentDate = moment($scope.model.datetimePickerValue, $scope.model.config.format, true);
+            if (!momentDate || !momentDate.isValid()) {
+                momentDate = moment(new Date($scope.model.datetimePickerValue));
+            }
+            if (momentDate && momentDate.isValid()) {
+                setDate(momentDate.format("YYYY-MM-DD HH:mm:ss"));
+            }
+            setDatePickerVal();
+            flatPickr.setDate($scope.model.value, false);
+        }
     }
     
     //here we declare a special method which will be called whenever the value has changed from the server
