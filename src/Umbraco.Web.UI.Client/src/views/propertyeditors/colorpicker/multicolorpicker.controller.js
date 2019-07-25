@@ -140,19 +140,6 @@
             tolerance: 'pointer',
             update: function (e, ui) {
                 angularHelper.getCurrentForm($scope).$setDirty();
-
-                // Get the new and old index for the moved element (using the text as the identifier, so
-                // we'd have a problem if two prevalues were the same, but that would be unlikely)
-                var newIndex = ui.item.index();
-                var movedPrevalueText = $('pre', ui.item).text();
-                var originalIndex = getElementIndexByPrevalueText(movedPrevalueText);
-
-                //// Move the element in the model
-                if (originalIndex > -1) {
-                    var movedElement = $scope.model.value[originalIndex];
-                    $scope.model.value.splice(originalIndex, 1);
-                    $scope.model.value.splice(newIndex, 0, movedElement);
-                }
             }
         };
 
