@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models;
@@ -15,13 +16,28 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
     public class NestedContentPropertyEditorsMigration : PropertyEditorsMigrationBase
     {
         private Dictionary<string, int> _elementTypeIds;
-        private ConfigurationEditor _configEditor;
+        private Dictionary<int, List<PropertyTypeDto>> _propertyTypes;
+        private HashSet<int> _elementTypesInUse;
+
+        private ConfigurationEditor _dropDownConfigEditor;
 
         public NestedContentPropertyEditorsMigration(IMigrationContext context)
             : base(context)
         { }
 
         public override void Migrate()
+        {
+            Prepare();
+
+            bool refreshCache = UpdatePropertyData();
+
+            // if some data types have been updated directly in the database (editing DataTypeDto and/or PropertyDataDto),
+            // bypassing the services, then we need to rebuild the cache entirely, including the umbracoContentNu table
+            if (refreshCache)
+                Context.AddPostMigration<RebuildPublishedSnapshot>();
+        }
+
+        private void Prepare()
         {
             _elementTypeIds = Database.Fetch<ContentTypeDto>(Sql()
                 .Select<ContentTypeDto>(x => x.NodeId, x => x.Alias)
@@ -30,13 +46,17 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 .Where<NodeDto>(node => node.NodeObjectType == Constants.ObjectTypes.DocumentType))
                 .ToDictionary(ct => ct.Alias, ct => ct.NodeId);
 
-            _configEditor = new DropDownFlexibleConfigurationEditor();
+            _dropDownConfigEditor = new DropDownFlexibleConfigurationEditor();
 
-            var dataTypes = GetDataTypes(Constants.PropertyEditors.Aliases.NestedContent);            
+            _elementTypesInUse = new HashSet<int>();
+            _propertyTypes = new Dictionary<int, List<PropertyTypeDto>>();
+        }
 
+        private bool UpdatePropertyData()
+        {
             var refreshCache = false;
-            //ConfigurationEditor configurationEditor = null;
 
+            var dataTypes = GetDataTypes(Constants.PropertyEditors.Aliases.NestedContent);
             foreach (var dataType in dataTypes)
             {
                 // get property data dtos
@@ -58,79 +78,167 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 }
             }
 
-            // if some data types have been updated directly in the database (editing DataTypeDto and/or PropertyDataDto),
-            // bypassing the services, then we need to rebuild the cache entirely, including the umbracoContentNu table
-            if (refreshCache)
-                Context.AddPostMigration<RebuildPublishedSnapshot>();
+            return refreshCache;
         }
 
         private bool UpdateNestedPropertyDataDto(PropertyDataDto pd)
         {
-            if (String.IsNullOrWhiteSpace(pd.TextValue))
-                return false;
-
-            bool changed = false;
-
-            var objects = JsonConvert.DeserializeObject<List<JObject>>(pd.TextValue);
-            foreach(var sourceObject in objects)
+            if ( UpdateNestedContent(pd.TextValue, out string newValue))
             {
-                var elementTypeAlias = sourceObject["ncContentTypeAlias"]?.ToObject<string>();
-                if (string.IsNullOrEmpty(elementTypeAlias))
-                    continue;
-
-                var propertyValues = sourceObject.ToObject<Dictionary<string, string>>();
-
-                var elementTypeId = _elementTypeIds[elementTypeAlias];
-
-                var propertyTypes = Database.Fetch<PropertyTypeDto>(Sql()
-                        .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto))
-                        .From<PropertyTypeDto>()
-                        .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((pt, dt) => pt.DataTypeId == dt.NodeId)
-                        .Where<PropertyTypeDto>(pt => pt.ContentTypeId == elementTypeId)
-                        );
-
-                foreach(var pt in propertyTypes.Where(pt => propertyValues.ContainsKey(pt.Alias)))
-                {
-                    DropDownFlexibleConfiguration config;
-                    switch(pt.DataTypeDto.EditorAlias)
-                    {
-                        case Constants.PropertyEditors.Aliases.RadioButtonList:
-                            config = (DropDownFlexibleConfiguration)_configEditor.FromDatabase(pt.DataTypeDto.Configuration);
-                            config.Multiple = false;
-                            changed = UpdateValueList(sourceObject, propertyValues, pt, config);
-                            break;
-                        case Constants.PropertyEditors.Aliases.CheckBoxList:
-                            config = (DropDownFlexibleConfiguration)_configEditor.FromDatabase(pt.DataTypeDto.Configuration);
-                            config.Multiple = true;
-                            changed = UpdateValueList(sourceObject, propertyValues, pt, config);
-                            break;
-                        case Constants.PropertyEditors.Aliases.DropDownListFlexible:
-                            config = (DropDownFlexibleConfiguration)_configEditor.FromDatabase(pt.DataTypeDto.Configuration);
-                            changed = UpdateValueList(sourceObject, propertyValues, pt, config);
-                            break;
-                    }
-                }
-            }
-
-            if (changed)
-                pd.TextValue = JsonConvert.SerializeObject(objects);
-
-            return changed;
-        }
-
-        private bool UpdateValueList(JObject sourceObject, Dictionary<string, string> propertyValues, PropertyTypeDto pt, DropDownFlexibleConfiguration config)
-        {
-            var propData = new PropertyDataDto { VarcharValue = propertyValues[pt.Alias] };
-            
-            if (UpdatePropertyDataDto(propData, config, isMultiple: true))
-            {
-                sourceObject[pt.Alias] = propData.VarcharValue;
+                pd.TextValue = newValue;
                 return true;
             }
 
             return false;
         }
 
+        private bool UpdateNestedContent(string inputValue, out string newValue)
+        {
+            bool changed = false;
+            newValue = inputValue;
+
+            if (String.IsNullOrWhiteSpace(inputValue))
+                return false;
+
+            var elements = JsonConvert.DeserializeObject<List<JObject>>(inputValue);
+            foreach(var element in elements)
+            {
+                var elementTypeAlias = element["ncContentTypeAlias"]?.ToObject<string>();
+                if (string.IsNullOrEmpty(elementTypeAlias))
+                    continue;
+                changed |= UpdateElement(element, elementTypeAlias);
+            }
+
+            if (changed)
+                newValue = JsonConvert.SerializeObject(elements);
+
+            return changed;
+        }
+
+        private bool UpdateElement(JObject element, string elementTypeAlias)
+        {
+            bool changed = false;
+
+            var elementTypeId = _elementTypeIds[elementTypeAlias];
+            _elementTypesInUse.Add(elementTypeId);
+
+            var propertyValues = element.ToObject<Dictionary<string, string>>();
+            var propertyTypes = GetPropertyTypes(elementTypeId);
+
+            foreach (var pt in propertyTypes)
+            {
+                if (!propertyValues.ContainsKey(pt.Alias) || String.IsNullOrWhiteSpace(propertyValues[pt.Alias]))
+                    continue;                
+
+                var propertyValue = propertyValues[pt.Alias];
+
+                switch (pt.DataTypeDto.EditorAlias)
+                {
+                    case Constants.PropertyEditors.Aliases.RadioButtonList:
+                    case Constants.PropertyEditors.Aliases.CheckBoxList:
+                    case Constants.PropertyEditors.Aliases.DropDownListFlexible:
+                        var config = (DropDownFlexibleConfiguration)_dropDownConfigEditor.FromDatabase(pt.DataTypeDto.Configuration);
+                        if (pt.DataTypeDto.EditorAlias == Constants.PropertyEditors.Aliases.CheckBoxList)
+                            config.Multiple = true;
+                        element[pt.Alias] = UpdateValueList(propertyValue, config);
+                        changed = true;
+                        break;
+
+                    case Constants.PropertyEditors.Aliases.NestedContent:
+                        if ( UpdateNestedContent(propertyValue, out string newNestedContentValue))
+                        {
+                            element[pt.Alias] = newNestedContentValue;
+                            changed = true;
+                        }
+                        break;
+
+                    case Constants.PropertyEditors.Aliases.MultiUrlPicker:                        
+                        if (string.IsNullOrWhiteSpace(propertyValue))
+                            continue;
+                        element[pt.Alias] = ConvertRelatedLinksToMultiUrlPicker(propertyValue);
+                        changed = true;
+                        break;
+                }
+            }
+
+            return changed;
+        }
+
+        private List<PropertyTypeDto> GetPropertyTypes(int elementTypeId)
+        {
+            if (_propertyTypes.TryGetValue(elementTypeId, out var result))
+            {
+                return result;
+            }
+            else
+            {
+                result = Database.Fetch<PropertyTypeDto>(Sql()
+                        .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto))
+                        .From<PropertyTypeDto>()
+                        .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((pt, dt) => pt.DataTypeId == dt.NodeId)
+                        .Where<PropertyTypeDto>(pt => pt.ContentTypeId == elementTypeId)
+                        );
+                _propertyTypes[elementTypeId] = result;
+
+                return result;
+            }
+        }
+
+        private string UpdateValueList(string propertyValue, DropDownFlexibleConfiguration config)
+        {
+            var propData = new PropertyDataDto { VarcharValue = propertyValue };
+            
+            if (UpdatePropertyDataDto(propData, config, isMultiple: true))
+            {
+                return propData.VarcharValue;
+            }
+
+            return propertyValue;
+        }
+
+        private string ConvertRelatedLinksToMultiUrlPicker(string value)
+        {
+            var relatedLinks = JsonConvert.DeserializeObject<List<RelatedLink>>(value);
+            var links = new List<LinkDto>();
+            foreach (var relatedLink in relatedLinks)
+            {
+                GuidUdi udi = null;
+                if (relatedLink.IsInternal)
+                {
+                    var linkIsUdi = GuidUdi.TryParse(relatedLink.Link, out udi);
+                    if (linkIsUdi == false)
+                    {
+                        // oh no.. probably an integer, yikes!
+                        if (int.TryParse(relatedLink.Link, out var intId))
+                        {
+                            var sqlNodeData = Sql()
+                                .Select<NodeDto>()
+                                .Where<NodeDto>(x => x.NodeId == intId);
+
+                            var node = Database.Fetch<NodeDto>(sqlNodeData).FirstOrDefault();
+                            if (node != null)
+                                // Note: RelatedLinks did not allow for picking media items,
+                                // so if there's a value this will be a content item - hence
+                                // the hardcoded "document" here
+                                udi = new GuidUdi("document", node.UniqueId);
+                        }
+                    }
+                }
+
+                var link = new LinkDto
+                {
+                    Name = relatedLink.Caption,
+                    Target = relatedLink.NewWindow ? "_blank" : null,
+                    Udi = udi,
+                    // Should only have a URL if it's an external link otherwise it wil be a UDI
+                    Url = relatedLink.IsInternal == false ? relatedLink.Link : null
+                };
+
+                links.Add(link);
+            }
+
+            return JsonConvert.SerializeObject(links);
+        }
 
         // dummy editor for deserialization
         protected class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDownFlexibleConfiguration>
