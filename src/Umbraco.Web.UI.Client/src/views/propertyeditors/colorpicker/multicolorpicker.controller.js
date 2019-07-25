@@ -143,16 +143,6 @@
             }
         };
 
-        function getElementIndexByPrevalueText(value) {
-            for (var i = 0; i < $scope.model.value.length; i++) {
-                if ($scope.model.value[i].value === value) {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-
         //load the separate css for the editor to avoid it blocking our js loading
         assetsService.loadCss("lib/spectrum/spectrum.css", $scope);
     });
