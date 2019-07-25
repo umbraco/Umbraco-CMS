@@ -52,7 +52,7 @@ angular.module("umbraco")
                 });
 
             var dataTypeKey = null;
-            if ($scope.model && $scope.model.dataTypeKey) {
+            if($scope.model && $scope.model.dataTypeKey) {
                 dataTypeKey = $scope.model.dataTypeKey;
             }
             $scope.searchOptions = {
@@ -102,14 +102,14 @@ angular.module("umbraco")
                     var altText = $scope.target.altText;
                     entityResource.getById(id, "Media")
                         .then(function (node) {
-                                $scope.target = node;
-                                if (ensureWithinStartNode(node)) {
-                                    selectImage(node);
-                                    $scope.target.url = mediaHelper.resolveFile(node);
-                                    $scope.target.altText = altText;
-                                    $scope.openDetailsDialog();
-                                }
-                            },
+                            $scope.target = node;
+                            if (ensureWithinStartNode(node)) {
+                                selectImage(node);
+                                $scope.target.url = mediaHelper.resolveFile(node);
+                                $scope.target.altText = altText;
+                                $scope.openDetailsDialog();
+                            }
+                        },
                             gotoStartNode);
                 }
             }
@@ -160,17 +160,11 @@ angular.module("umbraco")
                 }
 
                 if (!folder) {
-                    folder = {
-                        id: -1,
-                        name: "Media",
-                        icon: "icon-folder"
-                    };
+                    folder = { id: -1, name: "Media", icon: "icon-folder" };
                 }
 
                 if (folder.id > 0) {
-                    entityResource.getAncestors(folder.id, "media", null, {
-                            dataTypeKey: dataTypeKey
-                        })
+                    entityResource.getAncestors(folder.id, "media", null, { dataTypeKey: dataTypeKey })
                         .then(function (anc) {
                             $scope.path = _.filter(anc,
                                 function (f) {
@@ -274,18 +268,10 @@ angular.module("umbraco")
 
                 // also make sure the node is not trashed
                 if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
-                    $scope.gotoFolder({
-                        id: $scope.lastOpenedNode,
-                        name: "Media",
-                        icon: "icon-folder"
-                    });
+                    $scope.gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder" });
                     return true;
                 } else {
-                    $scope.gotoFolder({
-                        id: $scope.startNodeId,
-                        name: "Media",
-                        icon: "icon-folder"
-                    });
+                    $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
                     return false;
                 }
             }
@@ -302,11 +288,7 @@ angular.module("umbraco")
             }
 
             function gotoStartNode(err) {
-                $scope.gotoFolder({
-                    id: $scope.startNodeId,
-                    name: "Media",
-                    icon: "icon-folder"
-                });
+                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
             }
 
             $scope.openDetailsDialog = function () {
@@ -333,7 +315,7 @@ angular.module("umbraco")
                     if ($scope.searchOptions.filter) {
                         searchMedia();
                     } else {
-
+                        
                         // reset pagination
                         $scope.searchOptions = {
                             pageNumber: 1,
@@ -395,23 +377,28 @@ angular.module("umbraco")
                 if (mediaItem.metaData) {
                     mediaItem.properties = [];
                     if (mediaItem.metaData.umbracoWidth && mediaItem.metaData.umbracoHeight) {
-                        mediaItem.properties.push({
-                            alias: "umbracoWidth",
-                            editor: mediaItem.metaData.umbracoWidth.PropertyEditorAlias,
-                            value: mediaItem.metaData.umbracoWidth.Value
-                        }, {
-                            alias: "umbracoHeight",
-                            editor: mediaItem.metaData.umbracoHeight.PropertyEditorAlias,
-                            value: mediaItem.metaData.umbracoHeight.Value
-                        });
+                        mediaItem.properties.push(
+                            {
+                                alias: "umbracoWidth",
+                                editor: mediaItem.metaData.umbracoWidth.PropertyEditorAlias,
+                                value: mediaItem.metaData.umbracoWidth.Value
+                            },
+                            {
+                                alias: "umbracoHeight",
+                                editor: mediaItem.metaData.umbracoHeight.PropertyEditorAlias,
+                                value: mediaItem.metaData.umbracoHeight.Value
+                            }
+                        );
                     }
                     if (mediaItem.metaData.umbracoFile) {
                         // this is required for resolving files through the mediahelper
-                        mediaItem.properties.push({
-                            alias: "umbracoFile",
-                            editor: mediaItem.metaData.umbracoFile.PropertyEditorAlias,
-                            value: mediaItem.metaData.umbracoFile.Value
-                        });
+                        mediaItem.properties.push(
+                            {
+                                alias: "umbracoFile",
+                                editor: mediaItem.metaData.umbracoFile.PropertyEditorAlias,
+                                value: mediaItem.metaData.umbracoFile.Value
+                            }
+                        );
                     }
                 }
             }
@@ -440,7 +427,9 @@ angular.module("umbraco")
                     var imageIsSelected = false;
 
                     if ($scope.model && angular.isArray($scope.model.selection)) {
-                        for (var selectedImageIndex = 0; selectedImageIndex < $scope.model.selection.length; selectedImageIndex++) {
+                        for (var selectedImageIndex = 0;
+                            selectedImageIndex < $scope.model.selection.length;
+                            selectedImageIndex++) {
                             var selectedImage = $scope.model.selection[selectedImageIndex];
 
                             if (folderImage.key === selectedImage.key) {
