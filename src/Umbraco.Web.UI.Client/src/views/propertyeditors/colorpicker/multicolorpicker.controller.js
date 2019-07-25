@@ -139,7 +139,9 @@
             items: '> div.control-group',
             tolerance: 'pointer',
             update: function (e, ui) {
-                // Get the new and old index for the moved element (using the text as the identifier, so 
+                angularHelper.getCurrentForm($scope).$setDirty();
+
+                // Get the new and old index for the moved element (using the text as the identifier, so
                 // we'd have a problem if two prevalues were the same, but that would be unlikely)
                 var newIndex = ui.item.index();
                 var movedPrevalueText = $('pre', ui.item).text();
