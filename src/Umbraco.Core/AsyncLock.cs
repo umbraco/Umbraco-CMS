@@ -67,31 +67,34 @@ namespace Umbraco.Core
                 : new NamedSemaphoreReleaser(_semaphore2);
         }
 
-        public Task<IDisposable> LockAsync()
-        {
-            var wait = _semaphore != null
-                ? _semaphore.WaitAsync()
-                : _semaphore2.WaitOneAsync();
+        //NOTE: We don't use the "Async" part of this lock at all
+        //TODO: Remove this and rename this class something like SystemWideLock, then we can re-instate this logic if we ever need an Async lock again
 
-            return wait.IsCompleted
-                ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
-                : wait.ContinueWith((_, state) => (((AsyncLock) state).CreateReleaser()),
-                    this, CancellationToken.None,
-                    TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-        }
+        //public Task<IDisposable> LockAsync()
+        //{
+        //    var wait = _semaphore != null
+        //        ? _semaphore.WaitAsync()
+        //        : _semaphore2.WaitOneAsync();
 
-        public Task<IDisposable> LockAsync(int millisecondsTimeout)
-        {
-            var wait = _semaphore != null
-                ? _semaphore.WaitAsync(millisecondsTimeout)
-                : _semaphore2.WaitOneAsync(millisecondsTimeout);
+        //    return wait.IsCompleted
+        //        ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
+        //        : wait.ContinueWith((_, state) => (((AsyncLock) state).CreateReleaser()),
+        //            this, CancellationToken.None,
+        //            TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+        //}
 
-            return wait.IsCompleted
-                ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
-                : wait.ContinueWith((_, state) => (((AsyncLock)state).CreateReleaser()),
-                    this, CancellationToken.None,
-                    TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-        }
+        //public Task<IDisposable> LockAsync(int millisecondsTimeout)
+        //{
+        //    var wait = _semaphore != null
+        //        ? _semaphore.WaitAsync(millisecondsTimeout)
+        //        : _semaphore2.WaitOneAsync(millisecondsTimeout);
+
+        //    return wait.IsCompleted
+        //        ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
+        //        : wait.ContinueWith((_, state) => (((AsyncLock)state).CreateReleaser()),
+        //            this, CancellationToken.None,
+        //            TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+        //}
 
         public IDisposable Lock()
         {
