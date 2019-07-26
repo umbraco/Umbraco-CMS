@@ -11,6 +11,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
+using System.Web;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -63,7 +64,19 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
         }
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        {
+            var converted = Convert(inter, preview);
+
+            return new HtmlString(converted == null ? string.Empty : converted);
+        }
+
+        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        {
+            return Convert(inter, preview);
+        }
+
+        private string Convert(object source, bool preview)
         {
             if (source == null)
             {
