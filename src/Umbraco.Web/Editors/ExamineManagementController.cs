@@ -80,7 +80,7 @@ namespace Umbraco.Web.Editors
                     Id = x.Id,
                     Score = x.Score,
                     //order the values by key
-                    Values = new Dictionary<string, string>(x.Values.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => y.Value))
+                    Values = new Dictionary<string, object>(x.AllValues.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => (object)y.Value))
                 })
             };
         }

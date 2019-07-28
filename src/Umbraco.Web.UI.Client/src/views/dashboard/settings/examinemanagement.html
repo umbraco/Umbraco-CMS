@@ -157,7 +157,7 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <span>{{result.values['nodeName']}}</span>&nbsp;
+                                                                    <span>{{result.values['nodeName'][0]}}</span>&nbsp;
                                                                     <a class="color-green" href="" ng-click="vm.showSearchResultDialog(result.values)">
                                                                         <em>({{result.fieldCount}} fields)</em>
                                                                     </a>
@@ -298,7 +298,7 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <span>{{result.values['nodeName']}}</span>&nbsp;
+                                                                    <span>{{result.values['nodeName'][0]}}</span>&nbsp;
                                                                     <a class="color-green" href="" ng-click="vm.showSearchResultDialog(result.values)">
                                                                         <em>({{result.fieldCount}} fields)</em>
                                                                     </a>
