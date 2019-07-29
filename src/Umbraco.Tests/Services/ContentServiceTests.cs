@@ -829,6 +829,13 @@ namespace Umbraco.Tests.Services
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.AreEqual(PublishedState.Unpublished, content.PublishedState); //just double checking
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+            //TODO: This fails!? Why? Because in the ContentService.CommitDocumentChangesInternal method when we detect it's the last lang being unpublished,
+            // we swap the unpublishing flag to true which means we end up setting the property content.PublishedState = PublishedState.Unpublishing, because of this
+            // inside of the DocumentRepository we treat many things differently including not publishing the removed culture.
+            // So how do we fix that? Well when we unpublish the last culture we want to both save the unpublishing of the culture AND unpublish the document, the easy
+            // way to do this will be to perform a double save operation, though that's not the prettiest way to do it. Ideally we take care of this all in one process
+            // in the DocumentRepository but that might require another transitory status like PublishedState.UnpublishingLastCulture ... though that's not pretty either.
+            // It might be possible in some other magicaly way, i'm just leaving these notes here mostly for myself :)
             Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
         }
 
