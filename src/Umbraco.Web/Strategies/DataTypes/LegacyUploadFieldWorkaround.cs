@@ -2,22 +2,22 @@
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Strategies.DataTypes
 {
-	/// <summary>
-	/// Before Save Content/Media subscriber that checks for Upload fields and updates related fields accordingly.
-	/// </summary>
-	/// <remarks>
-	/// This is an intermediate fix for the legacy DataTypeUploadField and the FileHandlerData, so that properties
-	/// are saved correctly when using the Upload field on a (legacy) Document or Media class.
-	/// </remarks>
-	public class LegacyUploadFieldWorkaround : ApplicationEventHandler
+    /// <summary>
+    /// Before Save Content/Media subscriber that checks for Upload fields and updates related fields accordingly.
+    /// </summary>
+    /// <remarks>
+    /// This is an intermediate fix for the legacy DataTypeUploadField and the FileHandlerData, so that properties
+    /// are saved correctly when using the Upload field on a (legacy) Document or Media class.
+    /// </remarks>
+    [Weight(-100)]
+    public class LegacyUploadFieldWorkaround : ApplicationEventHandler
 	{
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {

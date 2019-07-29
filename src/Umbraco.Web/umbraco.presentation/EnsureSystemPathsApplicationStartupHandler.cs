@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Web;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.businesslogic;
-using umbraco.interfaces;
+using Umbraco.Core.ObjectResolution;
 
 namespace umbraco.presentation
 {
+    [Weight(-100)]
     public class EnsureSystemPathsApplicationStartupHandler : ApplicationEventHandler
     {
         protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)

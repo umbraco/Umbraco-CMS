@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
@@ -23,6 +21,7 @@ namespace Umbraco.Web.Strategies
     /// out the "server address" ie the address to which server-to-server requests should be sent - because it
     /// probably is not the "current request address" - especially in multi-domains configurations.</para>
     /// </remarks>
+    [Weight(-100)]
     public sealed class ServerRegistrationEventHandler : ApplicationEventHandler
     {
         private DatabaseServerRegistrar _registrar;

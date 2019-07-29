@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
@@ -20,10 +21,11 @@ using Document = umbraco.cms.businesslogic.web.Document;
 
 namespace Umbraco.Web.Search
 {
-	/// <summary>
-	/// Used to wire up events for Examine
-	/// </summary>
-	public sealed class ExamineEvents : ApplicationEventHandler
+    /// <summary>
+    /// Used to wire up events for Examine
+    /// </summary>
+    [Weight(-100)]
+    public sealed class ExamineEvents : ApplicationEventHandler
 	{
 	    // the default enlist priority is 100
 	    // enlist with a lower priority to ensure that anything "default" runs after us

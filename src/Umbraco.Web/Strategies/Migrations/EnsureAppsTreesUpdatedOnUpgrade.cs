@@ -1,7 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using umbraco.BusinessLogic;
-using umbraco.interfaces;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
@@ -9,6 +9,7 @@ namespace Umbraco.Web.Strategies.Migrations
     /// This is kind of a hack to ensure that Apps and Trees that might still reside in the db is
     /// written to the 'new' applications.config and trees.config files upon upgrade to version 6.0
     /// </summary>
+    [Weight(-100)]
     public class EnsureAppsTreesUpdatedOnUpgrade : ApplicationEventHandler
     {
         /// <summary>

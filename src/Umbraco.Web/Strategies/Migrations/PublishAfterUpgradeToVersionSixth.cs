@@ -5,10 +5,8 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.UnitOfWork;
-using umbraco.interfaces;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
@@ -16,6 +14,7 @@ namespace Umbraco.Web.Strategies.Migrations
     /// This event ensures that upgrades from (configured) versions lower then 6.0.0
     /// have their publish state updated after the database schema has been migrated.
     /// </summary>
+    [Weight(-100)]
     public class PublishAfterUpgradeToVersionSixth : MigrationStartupHander
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)

@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
-using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core.Models;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Strategies
 {
     /// <summary>
     /// Subscribes to the relavent events in order to send out notifications
     /// </summary>
+    [Weight(-100)]
     public sealed class NotificationsHandler : ApplicationEventHandler
     {
 

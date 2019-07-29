@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Examine;
 using Lucene.Net.Documents;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using UmbracoExamine;
 
 namespace Umbraco.Web.PropertyEditors
@@ -148,6 +144,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
         /// </summary>
+        [Weight(-100)]
         private class GridPropertyEditorApplicationStartup : ApplicationEventHandler
         {
             /// <summary>

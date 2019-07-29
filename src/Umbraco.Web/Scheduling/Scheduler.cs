@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
-using Umbraco.Web.HealthCheck;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Scheduling
@@ -18,6 +16,7 @@ namespace Umbraco.Web.Scheduling
     /// All tasks are run in a background task runner which is web aware and will wind down the task correctly instead of killing it completely when
     /// the app domain shuts down.
     /// </remarks>
+    [Weight(-100)]
     internal sealed class Scheduler : ApplicationEventHandler
     {
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;

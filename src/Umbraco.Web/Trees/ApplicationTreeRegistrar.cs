@@ -2,11 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using umbraco.businesslogic;
-using Umbraco.Core.Services;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Trees
 {
@@ -17,6 +16,7 @@ namespace Umbraco.Web.Trees
     /// TODO: This is really not a very ideal process but the code is found here because tree plugins are in the Web project or the legacy business logic project.
     /// Moving forward we can put the base tree plugin classes in the core and then this can all just be taken care of normally within the service.
     /// </remarks>
+    [Weight(-100)]
     public sealed class ApplicationTreeRegistrar : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)

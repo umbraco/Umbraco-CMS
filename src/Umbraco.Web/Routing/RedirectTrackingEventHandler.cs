@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -24,6 +25,7 @@ namespace Umbraco.Web.Routing
     /// <para>not managing domains because we don't know how to do it - changing domains => must create a higher level strategy using rewriting rules probably</para>
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
     /// </remarks>
+    [Weight(-100)]
     public class RedirectTrackingEventHandler : ApplicationEventHandler
     {
         private const string ContextKey1 = "Umbraco.Web.Routing.RedirectTrackingEventHandler.1";

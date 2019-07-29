@@ -2,9 +2,9 @@
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Events;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Services;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
@@ -19,6 +19,7 @@ namespace Umbraco.Web.Strategies.Migrations
     /// - Media & Content Xml : if current is less than, or equal to, 7.3.0 - because 7.3.0 adds .Key to cached items
     /// </para>
     /// </remarks>
+    [Weight(-100)]
     public class RebuildXmlCachesAfterUpgrade : MigrationStartupHander
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)

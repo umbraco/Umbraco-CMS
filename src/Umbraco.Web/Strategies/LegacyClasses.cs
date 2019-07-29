@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Publishing;
-using Umbraco.Web.Cache;
-
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Strategies.Publishing
 {
     [Obsolete("This is not used and will be removed from the codebase in future versions")]
+    [Weight(-100)]
     public class UpdateCacheAfterPublish : ApplicationEventHandler
     {
     }
 
     [Obsolete("This is not used and will be removed from the codebase in future versions")]
+    [Weight(-100)]
     public class UpdateCacheAfterUnPublish : ApplicationEventHandler
     {
     }

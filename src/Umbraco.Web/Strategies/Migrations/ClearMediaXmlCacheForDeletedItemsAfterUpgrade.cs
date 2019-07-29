@@ -4,8 +4,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
-using umbraco.interfaces;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
@@ -17,6 +16,7 @@ namespace Umbraco.Web.Strategies.Migrations
     ///
     /// * If current is less than or equal to 7.0.0
     /// </remarks>
+    [Weight(-100)]
     public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : MigrationStartupHander
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)

@@ -1,22 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
-using umbraco.interfaces;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
     /// <summary>
     /// Creates the built in list view data types
     /// </summary>
+    [Weight(-100)]
     public class EnsureDefaultListViewDataTypesCreated : MigrationStartupHander
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
