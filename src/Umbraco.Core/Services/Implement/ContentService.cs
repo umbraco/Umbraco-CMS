@@ -932,13 +932,10 @@ namespace Umbraco.Core.Services.Implement
 
                 var varies = content.ContentType.VariesByCulture();
 
-                if (cultures.Length == 0)
+                if (cultures.Length == 0 && !varies)
                 {
                     //no cultures specified and doesn't vary, so publish it, else nothing to publish
-                    return !varies
-                        ? SaveAndPublish(content, userId: userId, raiseEvents: raiseEvents)
-                        //TODO: Though we may not have cultures to publish, shouldn't we continue to Save in this case??
-                        : new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
+                    return SaveAndPublish(content, userId: userId, raiseEvents: raiseEvents);
                 }
 
                 if (cultures.Any(x => x == null || x == "*"))

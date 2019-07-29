@@ -889,8 +889,6 @@ namespace Umbraco.Tests.Services
 
             //Change some data since Unpublish should always Save
             content.SetCultureName("content-en-updated", langUk.IsoCode);
-            //var saveResult = ServiceContext.ContentService.Save(content);
-            //content = ServiceContext.ContentService.GetById(content.Id);
 
             unpublished = ServiceContext.ContentService.Unpublish(content, langUk.IsoCode); //unpublish again
             Assert.IsTrue(unpublished.Success);
@@ -901,6 +899,47 @@ namespace Umbraco.Tests.Services
             //ensure that even though the culture was already unpublished that the data was still persisted
             Assert.AreEqual("content-en-updated", content.GetCultureName(langUk.IsoCode));
         }
+
+        [Test]
+        public void Publishing_No_Cultures_Still_Saves()
+        {
+            // Arrange
+
+            var langUk = new Language("en-GB") { IsDefault = true };
+            var langFr = new Language("fr-FR");
+
+            ServiceContext.LocalizationService.Save(langFr);
+            ServiceContext.LocalizationService.Save(langUk);
+
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            IContent content = new Content("content", Constants.System.Root, contentType);
+            content.SetCultureName("content-fr", langFr.IsoCode);
+            content.SetCultureName("content-en", langUk.IsoCode);
+
+            var published = ServiceContext.ContentService.SaveAndPublish(content, new[] { langFr.IsoCode, langUk.IsoCode });
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+            Assert.IsTrue(published.Success);
+            Assert.AreEqual(PublishedState.Published, content.PublishedState);
+
+            //re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+
+            //Change some data since SaveAndPublish should always Save
+            content.SetCultureName("content-en-updated", langUk.IsoCode);
+
+            var saved = ServiceContext.ContentService.SaveAndPublish(content, new string [] { }); //save without cultures            
+            Assert.AreEqual(PublishResultType.FailedPublishNothingToPublish, saved.Result);
+
+            //re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            //ensure that even though nothing was published that the data was still persisted
+            Assert.AreEqual("content-en-updated", content.GetCultureName(langUk.IsoCode));
+        }
+
 
         [Test]
         public void Pending_Invariant_Property_Changes_Affect_Default_Language_Edited_State()
