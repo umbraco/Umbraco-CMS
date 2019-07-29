@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
         /// </returns>
         internal static string[] GetUserAvatarUrls(this IUser user, IAppCache cache)
         {
-            // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.  
+            // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.
             // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
             // and the website will not run.
             // Also, check if the user has explicitly removed all avatars including a Gravatar, this will be possible and the value will be "none"
@@ -310,9 +310,10 @@ namespace Umbraco.Core.Models
             // assume groupSn and userSn each don't contain duplicates
 
             var asn = groupSn.Concat(userSn).Distinct().ToArray();
-            var paths = asn.Length > 0
-                ? entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path)
-                : new Dictionary<int, string>();
+
+            var paths = (asn.Length == 1 && asn[0] == Constants.System.Root) || asn.Length == 0
+                ? new Dictionary<int, string>()
+                : entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
 
             paths[Constants.System.Root] = Constants.System.RootString; // entityService does not get that one
 
