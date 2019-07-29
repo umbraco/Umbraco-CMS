@@ -887,11 +887,19 @@ namespace Umbraco.Tests.Services
 
             content = ServiceContext.ContentService.GetById(content.Id);
 
+            //Change some data since Unpublish should always Save
+            content.SetCultureName("content-en-updated", langUk.IsoCode);
+            //var saveResult = ServiceContext.ContentService.Save(content);
+            //content = ServiceContext.ContentService.GetById(content.Id);
+
             unpublished = ServiceContext.ContentService.Unpublish(content, langUk.IsoCode); //unpublish again
             Assert.IsTrue(unpublished.Success);
             Assert.AreEqual(PublishResultType.SuccessUnpublishAlready, unpublished.Result);
             Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
 
+            content = ServiceContext.ContentService.GetById(content.Id);
+            //ensure that even though the culture was already unpublished that the data was still persisted
+            Assert.AreEqual("content-en-updated", content.GetCultureName(langUk.IsoCode));
         }
 
         [Test]

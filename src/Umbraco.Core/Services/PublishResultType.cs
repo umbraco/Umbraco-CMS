@@ -118,9 +118,9 @@
         FailedPublishContentInvalid = FailedPublish | 8,
 
         /// <summary>
-        /// The document could not be published because it has no publishing flags or values.
+        /// The document could not be published because it has no publishing flags or values or if its a variant document, no cultures were specified to be published.
         /// </summary>
-        FailedPublishNothingToPublish = FailedPublish | 9, // TODO: in ContentService.StrategyCanPublish - weird - do we have a test for that case?
+        FailedPublishNothingToPublish = FailedPublish | 9, 
 
         /// <summary>
         /// The document could not be published because some mandatory cultures are missing.

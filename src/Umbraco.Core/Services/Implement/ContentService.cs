@@ -937,6 +937,7 @@ namespace Umbraco.Core.Services.Implement
                     //no cultures specified and doesn't vary, so publish it, else nothing to publish
                     return !varies
                         ? SaveAndPublish(content, userId: userId, raiseEvents: raiseEvents)
+                        //TODO: Though we may not have cultures to publish, shouldn't we continue to Save in this case??
                         : new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
                 }
 
@@ -1005,39 +1006,33 @@ namespace Umbraco.Core.Services.Implement
                     // to be non-routable so that when it's re-published all variants were as they were.
 
                     content.PublishedState = PublishedState.Unpublishing;
+                    var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, allLangs, userId);
+                    scope.Complete();
+                    return result;
                 }
                 else
                 {
-                    // unpublish the culture, this will change the document state to Publishing! ... which is expected because this will
+                    // Unpublish the culture, this will change the document state to Publishing! ... which is expected because this will
                     // essentially be re-publishing the document with the requested culture removed.
                     // The call to CommitDocumentChangesInternal will perform all the checks like if this is a mandatory culture or the last culture being unpublished
                     // and will then unpublish the document accordingly.
+                    // If the result of this is false it means there was no culture to unpublish (i.e. it was already unpublished or it did not exist)
                     var removed = content.UnpublishCulture(culture);
 
-                    //TODO: if !removed then there is really nothing to process and we should exit here with SuccessUnpublishAlready.
+                    //save and publish any changes
+                    var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, allLangs, userId);
 
+                    scope.Complete();
 
-                    //TODO: Move this logic into CommitDocumentChangesInternal, we are already looking up the item there
+                    // In one case the result will be PublishStatusType.FailedPublishNothingToPublish which means that no cultures
+                    // were specified to be published which will be the case when removed is false. In that case
+                    // we want to swap the result type to PublishResultType.SuccessUnpublishAlready (that was the expectation before).
+                    if (result.Result == PublishResultType.FailedPublishNothingToPublish && !removed)
+                        return new PublishResult(PublishResultType.SuccessUnpublishAlready, evtMsgs, content);
 
-                    //// We are unpublishing a culture but there's a chance that the user might be trying
-                    //// to unpublish a culture that is already unpublished so we need to lookup the current
-                    //// persisted item and check since it would be quicker to do that than continue and re-publish everything.                    
-                    //var persisted = content.HasIdentity ? GetById(content.Id) : null;
-
-                    //if (persisted != null && !persisted.IsCulturePublished(culture))
-                    //{
-                    //    //it was already unpublished
-                    //    //TODO: We then need to check if all cultures are unpublished
-                    //    return new PublishResult(PublishResultType.SuccessUnpublishAlready, evtMsgs, content);
-                    //}
-
+                    return result;
                 }
-
-                var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, allLangs, userId);
-                scope.Complete();
-                return result;
             }
-
         }
 
         /// <summary>
