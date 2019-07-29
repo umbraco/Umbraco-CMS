@@ -623,6 +623,7 @@
     <key alias="language">Sprog</key>
     <key alias="last">Sidste</key>
     <key alias="layout">Layout</key>
+    <key alias="less">Vis mindre</key>
     <key alias="loading">Henter</key>
     <key alias="locked">Låst</key>
     <key alias="login">Log ind</key>
@@ -631,6 +632,7 @@
     <key alias="macro">Makro</key>
     <key alias="mandatory">Påkrævet</key>
     <key alias="message">Besked</key>
+    <key alias="less">Vis mere</key>
     <key alias="move">Flyt</key>
     <key alias="name">Navn</key>
     <key alias="new">Ny</key>

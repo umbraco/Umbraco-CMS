@@ -656,6 +656,7 @@
     <key alias="language">Language</key>
     <key alias="last">Last</key>
     <key alias="layout">Layout</key>
+    <key alias="less">Show Less</key>
     <key alias="links">Links</key>
     <key alias="loading">Loading</key>
     <key alias="locked">Locked</key>
@@ -665,6 +666,7 @@
     <key alias="macro">Macro</key>
     <key alias="mandatory">Mandatory</key>
     <key alias="message">Message</key>
+    <key alias="more">Show More</key>
     <key alias="move">Move</key>
     <key alias="name">Name</key>
     <key alias="new">New</key>

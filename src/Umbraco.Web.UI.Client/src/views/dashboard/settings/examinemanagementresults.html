@@ -3,8 +3,12 @@
     <table class="table table-bordered table-condensed">
         <thead>
         <tr>
-            <th class="score"><localize key="general_field">Field</localize></th>
-            <th class="id"><localize key="general_value">Value</localize></th>
+            <th class="score">
+                <localize key="general_field">Field</localize>
+            </th>
+            <th class="id">
+                <localize key="general_value">Value</localize>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -16,13 +20,25 @@
 
             </td>
             <td ng-if="val.length<=1">
-                {{val[0] }}</td>
+                {{val[0] }}
+            </td>
             <td ng-if="val.length>1">
                 <table>
-                    <tr ng-repeat="subValue in val">
+                    <tr ng-repeat="subValue in val | limitTo: model.showLimit">
 
-                        <td >
-                            {{subValue}}</td>
+                        <td>
+                            {{subValue}}
+                        </td>
+                    </tr>
+                </table>
+                <table>
+
+                    <tr ng-if="model.showOrHide">
+                        <td><a class="color-green" ng-click="model.showHide()"> <localize key="general_more">Show More</localize></a></td>
+                    </tr>
+
+                    <tr ng-if="!model.showOrHide">
+                        <td><a class="color-red"  ng-click="model.showHide()"> <localize key="general_more">Show Less</localize></a></td>
                     </tr>
                 </table>
 
@@ -30,5 +46,4 @@
         </tr>
         </tbody>
     </table>
-
 </div>

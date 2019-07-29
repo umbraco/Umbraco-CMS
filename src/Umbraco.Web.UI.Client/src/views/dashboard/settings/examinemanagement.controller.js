@@ -31,10 +31,17 @@ function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelp
                 vm.searchResults.overlay = {
                     title: value,
                     searchResultValues: values,
-                    view: "views/dashboard/settings/examinemanagementresults.html",
-                    close: function () {
-                        vm.searchResults.overlay = null;
-                    }
+                    showLimit: 5,
+                    view: 'views/dashboard/settings/examinemanagementresults.html',
+                    showHide: function showHide() {
+                        if(vm.searchResults.overlay.showLimit === undefined){
+                            vm.searchResults.overlay.showLimit =5;
+                         
+                        }else{
+                            vm.searchResults.overlay.showLimit =undefined;
+                        }
+                        return false;
+                    },
                 };
             });
         }

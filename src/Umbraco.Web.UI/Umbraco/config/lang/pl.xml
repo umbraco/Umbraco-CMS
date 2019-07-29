@@ -498,6 +498,7 @@
     <key alias="language">Język</key>
     <key alias="last">Ostatni</key>
     <key alias="layout">Układ</key>
+    <key alias="less">Pokaż mniej</key>
     <key alias="loading">Ładowanie</key>
     <key alias="locked">Zablokowany</key>
     <key alias="login">Zaloguj</key>
@@ -505,6 +506,7 @@
     <key alias="logout">Wyloguj</key>
     <key alias="macro">Makro</key>
     <key alias="mandatory">Obowiązkowy</key>
+    <key alias="more">Pokaż więcej</key>
     <key alias="move">Przenieś</key>
     <key alias="name">Nazwa</key>
     <key alias="new">Nowy</key>
