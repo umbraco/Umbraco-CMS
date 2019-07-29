@@ -1012,7 +1012,9 @@ namespace Umbraco.Core.Services.Implement
                     // essentially be re-publishing the document with the requested culture removed.
                     // The call to CommitDocumentChangesInternal will perform all the checks like if this is a mandatory culture or the last culture being unpublished
                     // and will then unpublish the document accordingly.
-                    content.UnpublishCulture(culture);
+                    var removed = content.UnpublishCulture(culture);
+
+                    //TODO: if !removed then there is really nothing to process and we should exit here with SuccessUnpublishAlready.
 
 
                     //TODO: Move this logic into CommitDocumentChangesInternal, we are already looking up the item there
@@ -2613,8 +2615,14 @@ namespace Umbraco.Core.Services.Implement
                 if (culturesPublishing == null)
                     throw new InvalidOperationException("Internal error, variesByCulture but culturesPublishing is null.");
 
-                if (content.Published && culturesPublishing.Count == 0 && culturesUnpublishing.Count == 0) // no published cultures = cannot be published
+                if (content.Published && culturesPublishing.Count == 0 && culturesUnpublishing.Count == 0)
+                {
+                    // no published cultures = cannot be published
+                    // This will occur if for example, a culture that is already unpublished is sent to be unpublished again, or vice versa, in that case
+                    // there will be nothing to publish/unpublish.
                     return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
+                }
+                
 
                 // missing mandatory culture = cannot be published
                 var mandatoryCultures = allLangs.Where(x => x.IsMandatory).Select(x => x.IsoCode);
