@@ -92,10 +92,6 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 }
             }
 
-            // TODO: This isn't used!?
-            function clearCache(section) {
-                treeService.clearCache({ section: section });
-            }
 
             /**
              * Re-loads the tree with the updated parameters

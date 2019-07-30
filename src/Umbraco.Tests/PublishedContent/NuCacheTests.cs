@@ -169,7 +169,7 @@ namespace Umbraco.Tests.PublishedContent
             _variationAccesor = new TestVariationContextAccessor();
 
             // at last, create the complete NuCache snapshot service!
-            var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
+            var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
                 null,
                 runtime,
