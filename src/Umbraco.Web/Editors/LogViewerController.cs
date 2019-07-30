@@ -15,11 +15,11 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class LogViewerController : UmbracoAuthorizedJsonController
     {
-        private ILogViewer _logViewer;
+        private readonly ILogViewer _logViewer;
 
         public LogViewerController(ILogViewer logViewer)
         {
-            _logViewer = logViewer;
+            _logViewer = logViewer ?? throw new ArgumentNullException(nameof(logViewer));
         }
 
         private bool CanViewLogs(LogTimePeriod logTimePeriod)
@@ -90,8 +90,6 @@ namespace Umbraco.Web.Editors
             }
 
             var direction = orderDirection == "Descending" ? Direction.Descending : Direction.Ascending;
-
-
 
             return _logViewer.GetLogs(logTimePeriod, filterExpression: filterExpression, pageNumber: pageNumber, orderDirection: direction, logLevels: logLevels);
         }
