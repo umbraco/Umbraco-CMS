@@ -13,6 +13,10 @@
         /// <summary>
         /// Refreshes the factory.
         /// </summary>
+        /// <remarks>
+        /// <para>This will typically re-compiled models/classes into a new DLL that are used to populate the cache.</para>
+        /// <para>This is called prior to refreshing the cache.</para>
+        /// </remarks>
         void Refresh();
     }
 }

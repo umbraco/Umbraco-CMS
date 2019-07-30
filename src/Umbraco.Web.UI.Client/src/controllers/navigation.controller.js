@@ -140,8 +140,9 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     //// TODO: remove this it's not a thing
     //$scope.selectedId = navigationService.currentId;
 
+    var isInit = false;
     var evts = [];
-
+    
     //Listen for global state changes
     evts.push(eventsService.on("appState.globalState.changed", function (e, args) {
         if (args.key === "showNavigation") {
@@ -236,8 +237,10 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     }));
 
     //when the application is ready and the user is authorized, setup the data
+    //this will occur anytime a new user logs in!
     evts.push(eventsService.on("app.ready", function (evt, data) {
-        init();
+        $scope.authenticated = true;
+        ensureInit();
     }));
 
     // event for infinite editors
@@ -305,9 +308,14 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     /**
      * Called when the app is ready and sets up the navigation (should only be called once)
      */
-    function init() {
+    function ensureInit() {
 
-        $scope.authenticated = true;
+        //only run once ever!
+        if (isInit) {
+            return;
+        }
+
+        isInit = true;
 
         var navInit = false;
 
