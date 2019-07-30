@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -31,6 +32,7 @@ namespace Umbraco.Core.Services.Implement
         private IQuery<IContent> _queryNotTrashed;
         //TODO: The non-lazy object should be injected
         private readonly Lazy<PropertyValidationService> _propertyValidationService = new Lazy<PropertyValidationService>(() => new PropertyValidationService());
+        
 
         #region Constructors
 
@@ -3024,5 +3026,8 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
+
+
+        
     }
 }
