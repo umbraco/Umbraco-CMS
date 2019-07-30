@@ -27,7 +27,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             InitializeInheritedContentTypes();
 
-            var publishedContent = _ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.Content.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("inherited", false));
         }
 
@@ -36,7 +36,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             InitializeInheritedContentTypes();
 
-            var publishedContent = _ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.Content.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("base", false), Is.False);
         }
 
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             InitializeInheritedContentTypes();
 
-            var publishedContent = _ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.Content.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("inherited", true));
         }
 
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.PublishedContent
             InitializeInheritedContentTypes();
             ContentTypesCache.GetPublishedContentTypeByAlias = null;
 
-            var publishedContent = _ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.Content.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("base", true));
         }
 
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             InitializeInheritedContentTypes();
 
-            var publishedContent = _ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.Content.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("invalidbase", true), Is.False);
         }
 

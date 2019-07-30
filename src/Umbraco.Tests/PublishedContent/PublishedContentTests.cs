@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,6 +11,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Composing;
 using Moq;
+using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -32,6 +34,8 @@ namespace Umbraco.Tests.PublishedContent
         protected override void Compose()
         {
             base.Compose();
+            _publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
+            Composition.RegisterUnique<IPublishedSnapshotAccessor>(_publishedSnapshotAccessorMock.Object);
 
             Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
             Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
@@ -59,18 +63,19 @@ namespace Umbraco.Tests.PublishedContent
             // when they are requested, but we must declare those that we
             // explicitely want to be here...
 
-            var propertyTypes = new[]
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
                 // AutoPublishedContentType will auto-generate other properties
-                factory.CreatePropertyType("umbracoNaviHide", 1001),
-                factory.CreatePropertyType("selectedNodes", 1),
-                factory.CreatePropertyType("umbracoUrlAlias", 1),
-                factory.CreatePropertyType("content", 1002),
-                factory.CreatePropertyType("testRecursive", 1),
-            };
+                yield return factory.CreatePropertyType(contentType, "umbracoNaviHide", 1001);
+                yield return factory.CreatePropertyType(contentType, "selectedNodes", 1);
+                yield return factory.CreatePropertyType(contentType, "umbracoUrlAlias", 1);
+                yield return factory.CreatePropertyType(contentType, "content", 1002);
+                yield return factory.CreatePropertyType(contentType, "testRecursive", 1);
+            }
+
             var compositionAliases = new[] { "MyCompositionAlias" };
-            var anythingType = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
-            var homeType = new AutoPublishedContentType(0, "home", compositionAliases, propertyTypes);
+            var anythingType = new AutoPublishedContentType(0, "anything", compositionAliases, CreatePropertyTypes);
+            var homeType = new AutoPublishedContentType(0, "home", compositionAliases, CreatePropertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => alias.InvariantEquals("home") ? homeType : anythingType;
         }
 
@@ -87,6 +92,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         private readonly Guid _node1173Guid = Guid.NewGuid();
+        private Mock<IPublishedSnapshotAccessor> _publishedSnapshotAccessorMock;
 
         protected override string GetXmlContent(int templateId)
         {
@@ -136,7 +142,7 @@ namespace Umbraco.Tests.PublishedContent
         internal IPublishedContent GetNode(int id)
         {
             var ctx = GetUmbracoContext("/test");
-            var doc = ctx.ContentCache.GetById(id);
+            var doc = ctx.Content.GetById(id);
             Assert.IsNotNull(doc);
             return doc;
         }
@@ -145,16 +151,16 @@ namespace Umbraco.Tests.PublishedContent
         public void GetNodeByIds()
         {
             var ctx = GetUmbracoContext("/test");
-            var contentById = ctx.ContentCache.GetById(1173);
+            var contentById = ctx.Content.GetById(1173);
             Assert.IsNotNull(contentById);
-            var contentByGuid = ctx.ContentCache.GetById(_node1173Guid);
+            var contentByGuid = ctx.Content.GetById(_node1173Guid);
             Assert.IsNotNull(contentByGuid);
             Assert.AreEqual(contentById.Id, contentByGuid.Id);
             Assert.AreEqual(contentById.Key, contentByGuid.Key);
 
-            contentById = ctx.ContentCache.GetById(666);
+            contentById = ctx.Content.GetById(666);
             Assert.IsNull(contentById);
-            contentByGuid = ctx.ContentCache.GetById(Guid.NewGuid());
+            contentByGuid = ctx.Content.GetById(Guid.NewGuid());
             Assert.IsNull(contentByGuid);
         }
 
@@ -163,7 +169,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children.Where(x => x.IsVisible()).ToIndexedArray();
+            var items = doc.Children().Where(x => x.IsVisible()).ToIndexedArray();
 
             foreach (var item in items)
             {
@@ -184,7 +190,7 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetNode(1173);
 
             var items = doc
-                .Children
+                .Children()
                 .Where(x => x.IsVisible())
                 .ToIndexedArray();
 
@@ -239,7 +245,7 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetNode(1173);
             var ct = doc.ContentType;
 
-            var items = doc.Children
+            var items = doc.Children()
                 .Select(x => x.CreateModel()) // linq, returns IEnumerable<IPublishedContent>
 
                 // only way around this is to make sure every IEnumerable<T> extension
@@ -271,7 +277,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children.Take(4).ToIndexedArray();
+            var items = doc.Children().Take(4).ToIndexedArray();
 
             foreach (var item in items)
             {
@@ -291,7 +297,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            foreach (var d in doc.Children.Skip(1).ToIndexedArray())
+            foreach (var d in doc.Children().Skip(1).ToIndexedArray())
             {
                 if (d.Content.Id != 1176)
                 {
@@ -309,7 +315,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children
+            var items = doc.Children()
                 .Concat(new[] { GetNode(1175), GetNode(4444) })
                 .ToIndexedArray();
 
@@ -394,7 +400,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var doc = GetNode(1046);
 
-            var found1 = doc.Children.GroupBy(x => x.ContentType.Alias).ToArray();
+            var found1 = doc.Children().GroupBy(x => x.ContentType.Alias).ToArray();
 
             Assert.AreEqual(2, found1.Length);
             Assert.AreEqual(2, found1.Single(x => x.Key.ToString() == "Home").Count());
@@ -415,8 +421,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var doc = GetNode(1046);
 
-            var found1 = doc.Children.Where(x => x.ContentType.Alias == "CustomDocument");
-            var found2 = doc.Children.Where(x => x.ContentType.Alias == "Home");
+            var found1 = doc.Children().Where(x => x.ContentType.Alias == "CustomDocument");
+            var found2 = doc.Children().Where(x => x.ContentType.Alias == "Home");
 
             Assert.AreEqual(1, found1.Count());
             Assert.AreEqual(2, found2.Count());
@@ -427,7 +433,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var ordered = doc.Children.OrderBy(x => x.UpdateDate);
+            var ordered = doc.Children().OrderBy(x => x.UpdateDate);
 
             var correctOrder = new[] { 1178, 1177, 1174, 1176 };
             for (var i = 0; i < correctOrder.Length; i++)
@@ -792,14 +798,104 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsTrue(customDoc3.IsDescendantOrSelf(customDoc3));
         }
 
+        [Test]
+        public void SiblingsAndSelf()
+        {
+            // Structure:
+            // - Root : 1046 (no parent)
+            // -- Level1.1: 1173 (parent 1046)
+            // --- Level1.1.1: 1174 (parent 1173)
+            // --- Level1.1.2: 117 (parent 1173)
+            // --- Level1.1.3: 1177 (parent 1173)
+            // --- Level1.1.4: 1178 (parent 1173)
+            // --- Level1.1.5: 1176 (parent 1173)
+            // -- Level1.2: 1175 (parent 1046)
+            // -- Level1.3: 4444 (parent 1046)
+            var root = GetNode(1046);
+            var level1_1 = GetNode(1173);
+            var level1_1_1 = GetNode(1174);
+            var level1_1_2 = GetNode(117);
+            var level1_1_3 = GetNode(1177);
+            var level1_1_4 = GetNode(1178);
+            var level1_1_5 = GetNode(1176);
+            var level1_2 = GetNode(1175);
+            var level1_3 = GetNode(4444);
+
+            _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot(It.IsAny<string>())).Returns(new []{root});
+
+            CollectionAssertAreEqual(new []{root}, root.SiblingsAndSelf());
+
+            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_1.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_2.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_3.SiblingsAndSelf());
+
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_1.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_2.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_3.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_4.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_5.SiblingsAndSelf());
+
+        }
+
+         [Test]
+        public void Siblings()
+        {
+            // Structure:
+            // - Root : 1046 (no parent)
+            // -- Level1.1: 1173 (parent 1046)
+            // --- Level1.1.1: 1174 (parent 1173)
+            // --- Level1.1.2: 117 (parent 1173)
+            // --- Level1.1.3: 1177 (parent 1173)
+            // --- Level1.1.4: 1178 (parent 1173)
+            // --- Level1.1.5: 1176 (parent 1173)
+            // -- Level1.2: 1175 (parent 1046)
+            // -- Level1.3: 4444 (parent 1046)
+            var root = GetNode(1046);
+            var level1_1 = GetNode(1173);
+            var level1_1_1 = GetNode(1174);
+            var level1_1_2 = GetNode(117);
+            var level1_1_3 = GetNode(1177);
+            var level1_1_4 = GetNode(1178);
+            var level1_1_5 = GetNode(1176);
+            var level1_2 = GetNode(1175);
+            var level1_3 = GetNode(4444);
+
+            _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot(It.IsAny<string>())).Returns(new []{root});
+
+            CollectionAssertAreEqual(new IPublishedContent[0], root.Siblings());
+
+            CollectionAssertAreEqual( new []{level1_2, level1_3}, level1_1.Siblings());
+            CollectionAssertAreEqual( new []{level1_1,  level1_3}, level1_2.Siblings());
+            CollectionAssertAreEqual( new []{level1_1, level1_2}, level1_3.Siblings());
+
+            CollectionAssertAreEqual( new []{ level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_1.Siblings());
+            CollectionAssertAreEqual( new []{level1_1_1,  level1_1_3, level1_1_4, level1_1_5}, level1_1_2.Siblings());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2,  level1_1_4, level1_1_5}, level1_1_3.Siblings());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3,  level1_1_5}, level1_1_4.Siblings());
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4}, level1_1_5.Siblings());
+
+        }
+
+        private void CollectionAssertAreEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual)
+        where T: IPublishedContent
+        {
+            var e = expected.Select(x => x.Id);
+            var a = actual.Select(x => x.Id);
+            CollectionAssert.AreEquivalent(e, a, $"\nExpected:\n{string.Join(", ", e)}\n\nActual:\n{string.Join(", ", a)}");
+        }
 
         [Test]
         public void FragmentProperty()
         {
             var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
-            var pt = factory.CreatePropertyType("detached", 1003);
-            var ct = factory.CreateContentType(0, "alias", new[] { pt });
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "detached", 1003);
+            }
+
+            var ct = factory.CreateContentType(0, "alias", CreatePropertyTypes);
+            var pt = ct.GetPropertyType("detached");
             var prop = new PublishedElementPropertyBase(pt, null, false, PropertyCacheLevel.None, 5548);
             Assert.IsInstanceOf<int>(prop.GetValue());
             Assert.AreEqual(5548, prop.GetValue());
@@ -817,16 +913,20 @@ namespace Umbraco.Tests.PublishedContent
         {
             var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
-            var pt1 = factory.CreatePropertyType("legend", 1004);
-            var pt2 = factory.CreatePropertyType("image", 1005);
-            var pt3 = factory.CreatePropertyType("size", 1003);
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "legend", 1004);
+                yield return factory.CreatePropertyType(contentType, "image", 1005);
+                yield return factory.CreatePropertyType(contentType, "size", 1003);
+            }
+
             const string val1 = "boom bam";
             const int val2 = 0;
             const int val3 = 666;
 
             var guid = Guid.NewGuid();
 
-            var ct = factory.CreateContentType(0, "alias", new[] { pt1, pt2, pt3 });
+            var ct = factory.CreateContentType(0, "alias", CreatePropertyTypes);
 
             var c = new ImageWithLegendModel(ct, guid, new Dictionary<string, object>
             {
@@ -841,7 +941,7 @@ namespace Umbraco.Tests.PublishedContent
 
         class ImageWithLegendModel : PublishedElement
         {
-            public ImageWithLegendModel(PublishedContentType contentType, Guid fragmentKey, Dictionary<string, object> values, bool previewing)
+            public ImageWithLegendModel(IPublishedContentType contentType, Guid fragmentKey, Dictionary<string, object> values, bool previewing)
                 : base(contentType, fragmentKey, values, previewing)
             { }
 

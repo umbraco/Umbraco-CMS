@@ -1,10 +1,10 @@
 <div ng-controller="Umbraco.PropertyEditors.Grid.EmbedController">
 
-	<div class="umb-editor-placeholder" ng-click="setEmbed()" ng-if="trustedValue === null">
+	<div class="umb-editor-placeholder" ng-click="setEmbed()" ng-if="control.value === null">
 		<i class="icon icon-movie-alt"></i>
 		<div class="help-text"><localize key="grid_clickToEmbed">Click to embed</localize></div>
 	</div>
 
-	<div ng-if="control.value" ng-bind-html="trustedValue"></div>
+	<div ng-if="control.value" ng-bind-html="embedHtml"></div>
 
 </div>

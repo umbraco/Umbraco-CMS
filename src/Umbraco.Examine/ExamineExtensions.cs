@@ -28,6 +28,8 @@ namespace Umbraco.Examine
         /// </remarks>
         internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new Regex("^([_\\w]+)_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
 
+        //TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
+
         /// <summary>
         /// Returns all index fields that are culture specific (suffixed)
         /// </summary>
@@ -43,6 +45,31 @@ namespace Umbraco.Examine
                 var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
                 if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
                     yield return field;
+            }
+        }
+
+        /// <summary>
+        /// Returns all index fields that are culture specific (suffixed) or invariant
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetCultureAndInvariantFields(this IUmbracoIndex index, string culture)
+        {
+            var allFields = index.GetFields();
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var field in allFields)
+            {
+                var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
+                if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
+                {
+                    yield return field; //matches this culture field
+                }
+                else if (!match.Success)
+                {
+                    yield return field; //matches no culture field (invariant)
+                }
+                    
             }
         }
 
@@ -75,7 +102,7 @@ namespace Umbraco.Examine
         /// <remarks>
         /// This is not thread safe, use with care
         /// </remarks>
-        internal static void UnlockLuceneIndexes(this IExamineManager examineManager, ILogger logger)
+        internal static void ConfigureLuceneIndexes(this IExamineManager examineManager, ILogger logger, bool disableExamineIndexing)
         {
             foreach (var luceneIndexer in examineManager.Indexes.OfType<LuceneIndex>())
             {
@@ -83,6 +110,8 @@ namespace Umbraco.Examine
                 //indexing operations. We used to wait for indexing operations to complete but this can cause more problems than that is worth because
                 //that could end up halting shutdown for a very long time causing overlapping appdomains and many other problems.
                 luceneIndexer.WaitForIndexQueueOnShutdown = false;
+
+                if (disableExamineIndexing) continue; //exit if not enabled, we don't need to unlock them if we're not maindom
 
                 //we should check if the index is locked ... it shouldn't be! We are using simple fs lock now and we are also ensuring that
                 //the indexes are not operational unless MainDom is true

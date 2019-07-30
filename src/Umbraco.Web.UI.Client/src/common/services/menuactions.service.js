@@ -71,7 +71,9 @@ function umbracoMenuActions(treeService, $location, navigationService, appState,
             if (treeRoot && treeRoot.root) {
                 var treeNode = treeService.getDescendantNode(treeRoot.root, args.entity.id, args.treeAlias);
                 if (treeNode) {
-                    treeService.loadNodeChildren({ node: treeNode, section: args.section });
+                    treeService.loadNodeChildren({ node: treeNode, section: args.section }).then(function () {
+                        navigationService.hideMenu();
+                    });
                 }                
             }
 

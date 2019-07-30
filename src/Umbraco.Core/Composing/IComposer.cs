@@ -8,7 +8,6 @@
         /// <summary>
         /// Compose.
         /// </summary>
-        /// <param name="composition"></param>
         void Compose(Composition composition);
     }
 }

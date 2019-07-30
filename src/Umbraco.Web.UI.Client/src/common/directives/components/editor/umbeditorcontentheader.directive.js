@@ -1,10 +1,12 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader() {
+    function EditorContentHeader(serverValidationManager) {
 
         function link(scope, el, attr, ctrl) {
-
+            
+            var unsubscribe = [];
+            
             if (!scope.serverValidationNameField) {
                 scope.serverValidationNameField = "Name";
             }
@@ -15,8 +17,43 @@
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
-
+            scope.vm.variantsWithError = [];
+            scope.vm.defaultVariant = null;
+            
+            scope.vm.errorsOnOtherVariants = false;// indicating wether to show that other variants, than the current, have errors.
+            
+            function checkErrorsOnOtherVariants() {
+                var check = false;
+                angular.forEach(scope.content.variants, function (variant) {
+                    if (scope.openVariants.indexOf(variant.language.culture) === -1 && scope.variantHasError(variant.language.culture)) {
+                        check = true;
+                    }
+                });
+                scope.vm.errorsOnOtherVariants = check;
+            }
+            
+            function onCultureValidation(valid, errors, allErrors, culture) {
+                var index = scope.vm.variantsWithError.indexOf(culture);
+                if(valid === true) {
+                    if (index !== -1) {
+                        scope.vm.variantsWithError.splice(index, 1);
+                    }
+                } else {
+                    if (index === -1) {
+                        scope.vm.variantsWithError.push(culture);
+                    }
+                }
+                checkErrorsOnOtherVariants();
+            }
+            
             function onInit() {
+                
+                // find default.
+                angular.forEach(scope.content.variants, function (variant) {
+                    if (variant.language.isDefault) {
+                        scope.vm.defaultVariant = variant;
+                    }
+                });
                 
                 setCurrentVariant();
                 
@@ -26,12 +63,22 @@
                     }
                 });
                 
+                
+                angular.forEach(scope.content.variants, function (variant) {
+                    unsubscribe.push(serverValidationManager.subscribe(null, variant.language.culture, null, onCultureValidation));
+                });
+                
+                unsubscribe.push(serverValidationManager.subscribe(null, null, null, onCultureValidation));
+                
+                
+                
             }
 
             function setCurrentVariant() {
                 angular.forEach(scope.content.variants, function (variant) {
                     if (variant.active) {
                         scope.vm.currentVariant = variant;
+                        checkErrorsOnOtherVariants();
                     }
                 });
             }
@@ -80,9 +127,24 @@
              * @param {any} culture
              */
             scope.variantIsOpen = function(culture) {
-                if(scope.openVariants.indexOf(culture) !== -1) {
+                return (scope.openVariants.indexOf(culture) !== -1);
+            }
+            
+            /**
+             * Check whether a variant has a error, used to display errors in variant switcher.
+             * @param {any} culture
+             */
+            scope.variantHasError = function(culture) {
+                // if we are looking for the default language we also want to check for invariant.
+                if (culture === scope.vm.defaultVariant.language.culture) {
+                    if(scope.vm.variantsWithError.indexOf("invariant") !== -1) {
+                        return true;
+                    }
+                }
+                if(scope.vm.variantsWithError.indexOf(culture) !== -1) {
                     return true;
                 }
+                return false;
             }
 
             onInit();
@@ -103,6 +165,12 @@
                     }
                 });
             }
+            
+            scope.$on('$destroy', function () {
+                for (var u in unsubscribe) {
+                    unsubscribe[u]();
+                }
+            });
         }
 
 

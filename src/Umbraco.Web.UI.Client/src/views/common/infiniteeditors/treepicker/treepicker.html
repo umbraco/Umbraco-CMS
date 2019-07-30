@@ -27,7 +27,7 @@
                                         <a ng-click="vm.selectLanguage(language)" ng-repeat="language in vm.languages" href="">{{language.name}}</a>
                                     </div>
                                 </div>
-                        
+
                                 <div class="umb-control-group">
                                     <umb-tree-search-box
                                         ng-if="vm.enableSearh"
@@ -36,21 +36,22 @@
                                         search-from-id="{{vm.searchInfo.searchFromId}}"
                                         search-from-name="{{vm.searchInfo.searchFromName}}"
                                         show-search="{{vm.searchInfo.showSearch}}"
+                                        datatype-key="{{vm.searchInfo.dataTypeKey}}"
                                         section="{{vm.section}}">
                                     </umb-tree-search-box>
                                 </div>
-                        
+
                                 <umb-tree-search-results ng-if="vm.searchInfo.showSearch"
                                                             results="vm.searchInfo.results"
                                                             select-result-callback="vm.selectResult">
                                 </umb-tree-search-results>
-                        
+
                                 <umb-empty-state ng-if="!vm.hasItems && vm.emptyStateMessage" position="center">
                                     {{ vm.emptyStateMessage }}
                                 </umb-empty-state>
-                        
+
                                 <div ng-if="vm.treeReady" ng-hide="vm.searchInfo.showSearch" ng-animate="'tree-fade-out'">
-                                    <umb-tree 
+                                    <umb-tree
                                         section="{{vm.section}}"
                                         treealias="{{vm.treeAlias}}"
                                         hideheader="{{vm.hideHeader}}"
@@ -64,17 +65,17 @@
                                         api="vm.dialogTreeApi">
                                     </umb-tree>
                                 </div>
-                        
+
                             </div>
-                        
-                            <umb-mini-list-view 
+
+                            <umb-mini-list-view
                                 ng-if="vm.miniListView"
                                 node="vm.miniListView"
                                 entity-type="{{vm.entityType}}"
                                 start-node-id="vm.startNodeId"
                                 on-select="vm.selectListViewNode(node)"
                                 on-close="vm.closeMiniListView()"
-                                entity-type-filter="filter">
+                                entity-type-filter="vm.filter">
                             </umb-mini-list-view>
 
                         </umb-box-content>
@@ -92,7 +93,7 @@
                         shortcut="esc"
                         action="vm.close()">
                     </umb-button>
-    
+
                     <umb-button
                         ng-if="vm.multiPicker"
                         type="button"
@@ -100,7 +101,7 @@
                         label-key="general_submit"
                         action="vm.submit(model)">
                     </umb-button>
-            
+
                 </umb-editor-footer-content-right>
 
             </umb-editor-footer>

@@ -10,6 +10,7 @@ using Microsoft.Owin.Security.DataProtection;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -60,6 +61,7 @@ namespace Umbraco.Web.Security
             IEntityService entityService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider,
+            UmbracoMapper mapper,
             IContentSection contentSectionConfig,
             IGlobalSettings globalSettings)
         {
@@ -69,7 +71,7 @@ namespace Umbraco.Web.Security
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
             var manager = new BackOfficeUserManager(
-                new BackOfficeUserStore(userService, memberTypeService, entityService, externalLoginService, globalSettings, membershipProvider));
+                new BackOfficeUserStore(userService, memberTypeService, entityService, externalLoginService, globalSettings, membershipProvider, mapper));
             manager.InitUserManager(manager, membershipProvider, contentSectionConfig, options);
             return manager;
         }

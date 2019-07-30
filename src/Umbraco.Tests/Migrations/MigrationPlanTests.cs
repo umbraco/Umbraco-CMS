@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Migrations
                 .To("bbb")
                 .From("ccc")
                 .To("ddd");
-            Assert.Throws<Exception>(() => plan.Validate());
+            Assert.Throws<InvalidOperationException>(() => plan.Validate());
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Migrations
                 .To("bbb")
                 .To("ccc")
                 .To("aaa");
-            Assert.Throws<Exception>(() => plan.Validate());
+            Assert.Throws<InvalidOperationException>(() => plan.Validate());
         }
 
         [Test]

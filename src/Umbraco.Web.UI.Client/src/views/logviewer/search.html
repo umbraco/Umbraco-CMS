@@ -51,18 +51,19 @@
 
                         <div style="position:relative; width:100%;">
                             <!-- Search/expression filter -->
-                            <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%;" placeholder="Search logs&hellip;" />
+                            <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%; padding-right: 160px;" placeholder="Search logs&hellip;" />
 
                             <!-- Save Search & Clear Search icon buttons -->
-                            <ins class="icon-rate" ng-if="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 160px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
-                            <ins class="icon-wrong" ng-if="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 140px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
+                            <ins class="icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="position: absolute; top: 0; line-height: 32px; right: 140px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
+                            <ins class="icon-wrong" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="position: absolute; top: 0; line-height: 32px; right: 120px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
 
-                            <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top:0;">
-                                <span class="ng-binding">Example Searches</span>
-                                <ins class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
+                            <!-- Saved Searches -->
+                            <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top: 1px; right: 0; position: absolute;">
+                                <span class="ng-binding">Saved Searches</span>
+                                <ins class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}" style="margin-top: 0;"></ins>
                             </a>
 
-                            <!-- Common Searches Dropdown -->
+                            <!-- Saved Searches Dropdown -->
                             <umb-dropdown ng-if="vm.dropdownOpen"  style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: -10px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                                 <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active}" ng-repeat="search in vm.searches">
                                     <a href="" class="umb-variant-switcher__name-wrapper" ng-click="vm.selectSearch(search)" prevent-default>
@@ -106,15 +107,15 @@
                                 Total Items: {{ vm.logItems.totalItems }}
                             </div>
 
-                            <table class="table table-hover" ng-if="vm.logItems.totalItems > 0">
+                            <table class="table table-hover" style="table-layout: fixed;" ng-if="vm.logItems.totalItems > 0">
                                 <thead>
                                     <tr>
-                                        <th style="min-width:100px;" ng-click="vm.toggleOrderBy()">
+                                        <th style="width: 20%;" ng-click="vm.toggleOrderBy()">
                                             Timestamp
                                             <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
                                         </th>
-                                        <th>Level</th>
-                                        <th>Machine</th>
+                                        <th style="width: 15%;">Level</th>
+                                        <th style="width: 20%;">Machine</th>
                                         <th>Message</th>
                                     </tr>
                                 </thead>
@@ -123,14 +124,14 @@
                                         <td>{{ log.Timestamp | date:'medium' }}</td>
                                         <td><umb-badge size="s" color="{{ log.logTypeColor }}">{{ log.Level }}</umb-badge></td>
                                         <td><small>{{ log.Properties.MachineName.Value }}</small></td>
-                                        <td>{{ log.RenderedMessage }}</td>
+                                        <td style="word-break: break-word;">{{ log.RenderedMessage }}</td>
                                     </tr>
 
                                     <!-- Log Details (Exception & Properties) -->
                                     <tr ng-repeat-end ng-if="log.open">
                                         <td colspan="4">
-                                            <div ng-if="log.Exception" style="border-left:4px solid #fe6561; padding:0 10px 10px 10px; box-shadow:rgba(0,0,0,0.07) 2px 2px 10px">
-                                                <h3 style="color:#fe6561;">Exception</h3>
+                                            <div ng-if="log.Exception" style="border-left:4px solid #D42054; padding:0 10px 10px 10px; box-shadow:rgba(0,0,0,0.07) 2px 2px 10px">
+                                                <h3 class="text-error">Exception</h3>
                                                 <p style="white-space: pre-wrap;">{{ log.Exception }}</p>
                                             </div>
 

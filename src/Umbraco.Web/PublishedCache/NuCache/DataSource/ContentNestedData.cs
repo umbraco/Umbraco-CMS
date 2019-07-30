@@ -16,5 +16,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         [JsonProperty("cultureData")]
         [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<CultureVariation>))]
         public Dictionary<string, CultureVariation> CultureData { get; set; }
+
+        [JsonProperty("urlSegment")]
+        public string UrlSegment { get; set; }
     }
 }

@@ -86,9 +86,6 @@
     <key alias="domainExists">Domena '%0%' jest aktualnie przypisana</key>
     <key alias="domainUpdated">Domena '%0%' została zaktualizowana</key>
     <key alias="orEdit">Edytuj Aktualne Domeny</key>
-    <key alias="domainHelp"><![CDATA[Poprawne domeny to: "example.com", "www.example.com", "example.com:8080" lub
-    "https://www.example.com/". Wspierane są jednopoziomowe ścieżki domen, np. "example.com/en" jednakże powinno się ich unikać.
-    Preferowane jest użycie powyższych ustawień języka.]]></key>
     <key alias="inherit">Odziedziczona</key>
     <key alias="setLanguage">Język</key>
     <key alias="setLanguageHelp"><![CDATA[Wybierz język dla węzła,<br /> lub wybierz dziedziczenie języka z węzła rodzica. Zostanie to zastosowane<br />
@@ -396,13 +393,6 @@
     <key alias="usernameHint">Twoja nazwa użytkownika to przeważnie Twój adres e-mail</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Dozwolone węzły pochodne</key>
-    <key alias="create">Stwórz</key>
-    <key alias="deletetab">Usuń zakładkę</key>
-    <key alias="description">Opis</key>
-    <key alias="newtab">Nowa zakładka</key>
-    <key alias="tab">Zakładka</key>
-    <key alias="thumbnail">Miniatura</key>
     <key alias="createListView" version="7.2">Stwórz niestandardowy widok listy</key>
     <key alias="removeListView" version="7.2">Usuń niestandardowy widok listy</key>
   </area>

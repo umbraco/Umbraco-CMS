@@ -85,9 +85,8 @@ namespace Umbraco.Tests.TestHelpers
                 if (Options.Database == UmbracoTestOptions.Database.None)
                     return TestObjects.GetDatabaseFactoryMock();
 
-                var logger = f.GetInstance<ILogger>();
-                var mappers = f.GetInstance<IMapperCollection>();
-                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), logger, new Lazy<IMapperCollection>(() => mappers));
+                var lazyMappers = new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>);
+                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), f.GetInstance<ILogger>(), lazyMappers);
                 factory.ResetForTests();
                 return factory;
             });
@@ -354,7 +353,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
+        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IEnumerable<IMediaUrlProvider> mediaUrlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService
             var service = snapshotService ?? PublishedSnapshotService as PublishedSnapshotService;
@@ -381,6 +380,7 @@ namespace Umbraco.Tests.TestHelpers
                     Factory.GetInstance<IGlobalSettings>()),
                 umbracoSettings ?? Factory.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
+                mediaUrlProviders ?? Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
                 new TestVariationContextAccessor());
 

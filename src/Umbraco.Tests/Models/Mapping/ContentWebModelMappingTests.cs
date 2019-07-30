@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.Linq;
-using AutoMapper;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -22,7 +21,7 @@ using Current = Umbraco.Web.Composing.Current;
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class ContentWebModelMappingTests : TestWithDatabaseBase
     {
         private IContentTypeService _contentTypeService;

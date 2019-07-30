@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
@@ -24,8 +25,8 @@ namespace Umbraco.Web.Macros
         /// </summary>
         /// <param name="frequest">The <see cref="PublishedRequest"/> pointing to the document.</param>
         /// <remarks>
-        /// The difference between creating the page with PublishedContentRequest vs an IPublishedContent item is
-        /// that the PublishedContentRequest takes into account how a template is assigned during the routing process whereas
+        /// The difference between creating the page with PublishedRequest vs an IPublishedContent item is
+        /// that the PublishedRequest takes into account how a template is assigned during the routing process whereas
         /// with an IPublishedContent item, the template id is assigned purely based on the default.
         /// </remarks>
         internal PublishedContentHashtableConverter(PublishedRequest frequest)
@@ -139,14 +140,14 @@ namespace Umbraco.Web.Macros
             private readonly object _sourceValue;
             private readonly IPublishedContent _content;
 
-            public PagePublishedProperty(PublishedPropertyType propertyType, IPublishedContent content)
+            public PagePublishedProperty(IPublishedPropertyType propertyType, IPublishedContent content)
                 : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
             {
                 _sourceValue = null;
                 _content = content;
             }
 
-            public PagePublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, Umbraco.Core.Models.Property property)
+            public PagePublishedProperty(IPublishedPropertyType propertyType, IPublishedContent content, Umbraco.Core.Models.Property property)
                 : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
             {
                 _sourceValue = property.GetValue();
@@ -198,10 +199,10 @@ namespace Umbraco.Web.Macros
                 Id = _inner.Id;
                 Key = _inner.Key;
 
-                // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
                 CreatorName = _inner.GetCreatorProfile()?.Name;
                 WriterName = _inner.GetWriterProfile()?.Name;
 
+                // TODO: inject
                 var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(_inner);
                 ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentType);
 
@@ -217,7 +218,7 @@ namespace Umbraco.Web.Macros
                 Parent = new PagePublishedContent(_inner.ParentId);
             }
 
-            public PublishedContentType ContentType { get; }
+            public IPublishedContentType ContentType { get; }
 
             public int Id { get; }
 
@@ -229,19 +230,6 @@ namespace Umbraco.Web.Macros
 
             public string Name => _inner.Name;
 
-            public PublishedCultureInfo GetCulture(string culture = null)
-            {
-                // handle context culture
-                if (culture == null)
-                    culture = _variationContextAccessor.VariationContext.Culture;
-
-                // no invariant culture infos
-                if (culture == "") return null;
-
-                // get
-                return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
-            }
-
             public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
             {
                 get
@@ -252,8 +240,9 @@ namespace Umbraco.Web.Macros
                     if (_cultureInfos != null)
                         return _cultureInfos;
 
+                    var urlSegmentProviders = Current.UrlSegmentProviders; // TODO inject
                     return _cultureInfos = _inner.PublishCultureInfos.Values
-                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, x.Date));
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(urlSegmentProviders, x.Culture), x.Date));
                 }
             }
 
@@ -277,8 +266,6 @@ namespace Umbraco.Web.Macros
 
             public string Url => throw new NotImplementedException();
 
-            public string GetUrl(string culture = null) => throw new NotSupportedException();
-
             public PublishedItemType ItemType => PublishedItemType.Content;
 
             public bool IsDraft(string culture = null)
@@ -294,6 +281,8 @@ namespace Umbraco.Web.Macros
             public IPublishedContent Parent { get; }
 
             public IEnumerable<IPublishedContent> Children => throw new NotImplementedException();
+
+            public IEnumerable<IPublishedContent> ChildrenForAllCultures => throw new NotImplementedException();
 
             public IEnumerable<IPublishedProperty> Properties => _properties;
 

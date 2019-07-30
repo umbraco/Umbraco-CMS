@@ -15,13 +15,12 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Testing;
-using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Services
 {
@@ -43,7 +42,7 @@ namespace Umbraco.Tests.Services
 
         protected override IPublishedSnapshotService CreatePublishedSnapshotService()
         {
-            var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
+            var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
@@ -64,15 +63,15 @@ namespace Umbraco.Tests.Services
                 null,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
-                Mock.Of<IUmbracoContextAccessor>(),
                 Logger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>());
+                Mock.Of<IPublishedModelFactory>(),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
         }
 
         public class LocalServerMessenger : ServerMessengerBase

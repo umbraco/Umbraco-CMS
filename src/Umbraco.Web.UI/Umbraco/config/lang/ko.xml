@@ -40,7 +40,6 @@
     <key alias="domainCreated">새로운 '%0%' 도메인이 생성되었습니다</key>
     <key alias="domainDeleted">'%0%' 도메인이 삭제되었습니다</key>
     <key alias="domainExists">'%0%' 도메인이 이미 존재합니다</key>
-    <key alias="domainHelp">예제: yourdomain.com, www.yourdomain.com</key>
     <key alias="domainUpdated">'%0%' 도메인이 업데이트 되었습니다</key>
     <key alias="orEdit">현재 도메인 수정</key>
   </area>
@@ -202,13 +201,6 @@
     <key alias="displayName">국가명</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">자식노드 타입 허용</key>
-    <key alias="create">생성</key>
-    <key alias="deletetab">색인 삭제</key>
-    <key alias="description">설명</key>
-    <key alias="newtab">새 색인</key>
-    <key alias="tab">색인</key>
-    <key alias="thumbnail">썸네일</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">이전값 더하기</key>

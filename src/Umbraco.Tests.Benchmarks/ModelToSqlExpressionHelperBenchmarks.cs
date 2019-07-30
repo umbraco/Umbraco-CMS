@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
 using Moq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -13,9 +15,20 @@ namespace Umbraco.Tests.Benchmarks
     [MemoryDiagnoser]
     public class ModelToSqlExpressionHelperBenchmarks
     {
+        protected Lazy<ISqlContext> MockSqlContext()
+        {
+            var sqlContext = Mock.Of<ISqlContext>();
+            var syntax = new SqlCeSyntaxProvider();
+            Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(syntax);
+            return new Lazy<ISqlContext>(() => sqlContext);
+        }
+
+        protected ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> CreateMaps()
+            => new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
+
         public ModelToSqlExpressionHelperBenchmarks()
         {
-            var contentMapper = new ContentMapper();
+            var contentMapper = new ContentMapper(MockSqlContext(), CreateMaps());
             _cachedExpression = new CachedExpression();
             var mapperCollection = new Mock<IMapperCollection>();
             mapperCollection.Setup(x => x[It.IsAny<Type>()]).Returns(contentMapper);
