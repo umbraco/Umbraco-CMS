@@ -4,13 +4,16 @@
         <div class="umb-table-head">
             <div class="umb-table-row">
                 <div class="umb-table-cell">
-                    <input class="umb-table__input" type="checkbox"
-                           ng-show="vm.allowSelectAll"
-                           ng-click="vm.selectAll($event)"
-                           ng-checked="vm.isSelectedAll()">
+
+                    <a href="" style="text-decoration: none;" ng-show="vm.allowSelectAll" ng-click="vm.selectAll()">
+                        <umb-checkmark checked="vm.isSelectedAll()" size="xs"></umb-checkmark>
+                    </a>
+
                 </div>
                 <div class="umb-table-cell umb-table__name">
-                    <a class="umb-table-head__link sortable" href="#" ng-click="vm.sort('Name', true, true)" prevent-default>
+                    <a class="umb-table-head__link sortable" href="#"
+                        ng-click="vm.sort('Name', true, true)"
+                        prevent-default>
                         <localize key="general_name">Name</localize>
                         <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': vm.isSortDirection('Name', 'asc'), 'icon-navigation-down': vm.isSortDirection('Name', 'desc')}"></i>
                     </a>
@@ -19,7 +22,7 @@
                     <localize key="general_status">Status</localize>
                 </div>
                 <div class="umb-table-cell" ng-repeat="column in vm.itemProperties track by column.alias">
-                    <a class="umb-table-head__link" title="Sort by {{ column.header }}" href="#"
+                    <a class="umb-table-head__link" href="#"
                        ng-click="vm.sort(column.alias, column.allowSorting, column.isSystem)"
                        ng-class="{'sortable':column.allowSorting}" prevent-default>
                         <span ng-bind="column.header"></span>
@@ -30,9 +33,9 @@
         </div>
         <!-- Listview body section -->
         <div class="umb-table-body">
-            <div class="umb-table-row"
+            <div class="umb-table-row -selectable"
                  ng-repeat="item in vm.items track by $index"
-                 ng-class="{'umb-table-row--selected':item.selected}"
+                 ng-class="{'-selected':item.selected, '-light':!item.published && item.updater != null}"
                  ng-click="vm.selectItem(item, $index, $event)">
 
                 <div class="umb-table-cell">
@@ -40,7 +43,8 @@
                     <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
                 </div>
                 <div class="umb-table-cell umb-table__name">
-                    <a title="{{ item.name }}" class="umb-table-body__link" href=""
+                    <a title="{{ item.name }}" class="umb-table-body__link"
+                       ng-href="{{'#' + item.editPath}}"
                        ng-click="vm.clickItem(item, $event)"
                        ng-bind="item.name">
                     </a>

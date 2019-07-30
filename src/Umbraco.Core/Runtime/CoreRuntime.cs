@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Web;
+using System.Web.Hosting;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -12,10 +10,8 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
-using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Runtime
@@ -70,15 +66,19 @@ namespace Umbraco.Core.Runtime
             // objects.
 
             using (var timer = profilingLogger.TraceDuration<CoreRuntime>(
-                $"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()} on {NetworkHelper.MachineName}.",
+                $"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()}.",
                 "Booted.",
                 "Boot failed."))
             {
+                logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationID}', path '{HostingPhysicalPath}', server '{MachineName}'.",
+                    HostingEnvironment.SiteName,
+                    HostingEnvironment.ApplicationID,
+                    HostingEnvironment.ApplicationPhysicalPath,
+                    NetworkHelper.MachineName);
                 logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
                 ConfigureUnhandledException();
-                ConfigureAssemblyResolve();
                 ConfigureApplicationRootPath();
 
                 Boot(register, timer);
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Runtime
                 // there should be none, really - this is here "just in case"
                 Compose(composition);
 
-                // acquire the main domain
+                // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
                 AcquireMainDom(mainDom);
 
                 // determine our runtime level
@@ -211,20 +211,6 @@ namespace Umbraco.Core.Runtime
             };
         }
 
-        protected virtual void ConfigureAssemblyResolve()
-        {
-            // When an assembly can't be resolved. In here we can do magic with the assembly name and try loading another.
-            // This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-            {
-                // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
-                // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stack overflow
-                if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
-                    return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
-                return null;
-            };
-        }
-
         protected virtual void ConfigureApplicationRootPath()
         {
             var path = GetApplicationRootPath();
@@ -232,13 +218,13 @@ namespace Umbraco.Core.Runtime
                 IOHelper.SetRootDirectory(path);
         }
 
-        private void AcquireMainDom(MainDom mainDom)
+        private bool AcquireMainDom(MainDom mainDom)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    mainDom.Acquire();
+                    return mainDom.Acquire();
                 }
                 catch
                 {

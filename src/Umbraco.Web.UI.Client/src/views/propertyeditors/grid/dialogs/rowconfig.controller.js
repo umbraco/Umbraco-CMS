@@ -90,6 +90,12 @@ function RowConfigController($scope, localizationService) {
         }
     }
 
+    $scope.submit = function () {
+        if ($scope.model.submit) {
+            $scope.model.submit($scope.currentRow);
+        }
+    }
+
     $scope.nameChanged = false;
     var originalName = $scope.currentRow.name;
     $scope.$watch("currentRow", function(row) {

@@ -45,10 +45,6 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
-        private const string TokenExternalSignInError = "ExternalSignInError";
-        private const string TokenPasswordResetCode = "PasswordResetCode";
-        private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
-
         public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
         {
@@ -174,12 +170,26 @@ namespace Umbraco.Web.Editors
                     : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
                 : CultureInfo.GetCultureInfo(culture);
 
-            var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
-                //the dictionary returned is fine but the delimiter between an 'area' and a 'value' is a '/' but the javascript
-                // in the back office requires the delimiter to be a '_' so we'll just replace it
-                .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
+            var allValues = Services.TextService.GetAllStoredValues(cultureInfo);
+            var pathedValues = allValues.Select(kv =>
+            {
+                var slashIndex = kv.Key.IndexOf('/');
+                var areaAlias = kv.Key.Substring(0, slashIndex);
+                var valueAlias = kv.Key.Substring(slashIndex+1);
+                return new
+                {
+                    areaAlias,
+                    valueAlias,
+                    value = kv.Value
+                };
+            });
 
-            return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
+            Dictionary<string, Dictionary<string, string>> nestedDictionary = pathedValues
+                .GroupBy(pv => pv.areaAlias)
+                .ToDictionary(pv => pv.Key, pv =>
+                    pv.ToDictionary(pve => pve.valueAlias, pve => pve.value));
+
+            return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.Indented };
         }
 
         /// <summary>
@@ -294,13 +304,13 @@ namespace Umbraco.Web.Editors
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed
-                    TempData[TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
+                    TempData[ViewDataExtensions.TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
                     return RedirectToLocal(Url.Action("Default", "BackOffice"));
                 }
             }
 
             //Add error and redirect for it to be displayed
-            TempData[TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
+            TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
@@ -314,7 +324,7 @@ namespace Umbraco.Web.Editors
             if (loginInfo == null)
             {
                 //Add error and redirect for it to be displayed
-                TempData[TokenExternalSignInError] = new[] { "An error occurred, could not get external login info" };
+                TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "An error occurred, could not get external login info" };
                 return RedirectToLocal(Url.Action("Default", "BackOffice"));
             }
 
@@ -325,7 +335,7 @@ namespace Umbraco.Web.Editors
             }
 
             //Add errors and redirect for it to be displayed
-            TempData[TokenExternalSignInError] = result.Errors;
+            TempData[ViewDataExtensions.TokenExternalSignInError] = result.Errors;
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
@@ -341,17 +351,12 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewBag.UmbracoPath = GlobalSettings.GetUmbracoMvcArea();
+            ViewData.SetUmbracoPath(GlobalSettings.GetUmbracoMvcArea());
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
-            foreach (var tempDataTokenName in TempDataTokenNames)
-            {
-                if (TempData[tempDataTokenName] != null)
-                {
-                    ViewData[tempDataTokenName] = TempData[tempDataTokenName];
-                    return defaultResponse();
-                }
-            }
+            if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
+                ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
+                return defaultResponse();
 
             //First check if there's external login info, if there's not proceed as normal
             var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
@@ -416,7 +421,7 @@ namespace Umbraco.Web.Editors
             {
                 if (await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions) == false)
                 {
-                    ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to an account" };
+                    ViewData.SetExternalSignInError(new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to an account" });
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
@@ -440,7 +445,7 @@ namespace Umbraco.Web.Editors
             //we are allowing auto-linking/creating of local accounts
             if (loginInfo.Email.IsNullOrWhiteSpace())
             {
-                ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
+                ViewData.SetExternalSignInError(new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." });
             }
             else
             {
@@ -448,7 +453,7 @@ namespace Umbraco.Web.Editors
                 var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
                 if (foundByEmail != null)
                 {
-                    ViewData[TokenExternalSignInError] = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
+                    ViewData.SetExternalSignInError(new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider });
                 }
                 else
                 {
@@ -477,21 +482,21 @@ namespace Umbraco.Web.Editors
 
                     if (userCreationResult.Succeeded == false)
                     {
-                        ViewData[TokenExternalSignInError] = userCreationResult.Errors;
+                        ViewData.SetExternalSignInError(userCreationResult.Errors);
                     }
                     else
                     {
                         var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
                         if (linkResult.Succeeded == false)
                         {
-                            ViewData[TokenExternalSignInError] = linkResult.Errors;
+                            ViewData.SetExternalSignInError(linkResult.Errors);
 
                             //If this fails, we should really delete the user since it will be in an inconsistent state!
                             var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
                             if (deleteResult.Succeeded == false)
                             {
                                 //DOH! ... this isn't good, combine all errors to be shown
-                                ViewData[TokenExternalSignInError] = linkResult.Errors.Concat(deleteResult.Errors);
+                                ViewData.SetExternalSignInError(linkResult.Errors.Concat(deleteResult.Errors));
                             }
                         }
                         else

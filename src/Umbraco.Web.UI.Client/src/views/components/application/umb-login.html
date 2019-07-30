@@ -146,12 +146,11 @@
 
                     </div>
 
-                    <form method="POST" name="vm.loginForm" ng-submit="vm.loginSubmit(vm.login, vm.password)">
+                    <form method="POST" name="vm.loginForm" ng-submit="vm.loginSubmit()">
 
-                        <div class="control-group" ng-show="vm.loginForm.$invalid">
-                            <div class="text-error">{{vm.errorMsg}}</div>
+                        <div ng-messages="vm.loginForm.$error" class="control-group" aria-live="assertive">
+                            <p ng-message="auth" class="text-error" role="alert">{{vm.errorMsg}}</p>
                         </div>
-
                         <div class="control-group" ng-class="{error: vm.loginForm.username.$invalid}">
                             <label>{{vm.labels.usernameLabel}}</label>
                             <input type="text" ng-model="vm.login" name="username" class="-full-width-input" placeholder="{{vm.labels.usernamePlaceholder}}" focus-when="{{vm.view === 'login'}}" />
@@ -169,12 +168,11 @@
                         </div>
 
                         <div class="flex justify-between items-center">
-                            <umb-button
-                                button-style="success"
-                                size="m"
-                                label-key="general_login"
-                                state="vm.loginStates.submitButton"
-                                type="submit">
+                            <umb-button button-style="success"
+                                        size="m"
+                                        label-key="general_login"
+                                        state="vm.loginStates.submitButton"
+                                        type="submit">
                             </umb-button>
                             <div ng-show="vm.allowPasswordReset">
                                 <a class="muted" style="text-decoration: underline;" href="#" prevent-default ng-click="vm.showRequestPasswordReset()"><localize key="login_forgottenPassword">Forgotten password?</localize></a>
@@ -258,6 +256,11 @@
                         <a class="muted" href="#" prevent-default ng-click="vm.showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
                     </div>
                 </div>
+
+                <div ng-show="vm.view == '2fa-login'">
+                    <div ng-include='vm.twoFactor.view'></div>
+                </div>
+
             </div>
         </div>
     </div>

@@ -15,8 +15,8 @@ namespace Umbraco.Web.PublishedCache
     /// <remarks>This cache is not snapshotted, so it refreshes any time things change.</remarks>
     public class PublishedContentTypeCache
     {
-        private readonly Dictionary<string, PublishedContentType> _typesByAlias = new Dictionary<string, PublishedContentType>();
-        private readonly Dictionary<int, PublishedContentType> _typesById = new Dictionary<int, PublishedContentType>();
+        private readonly Dictionary<string, IPublishedContentType> _typesByAlias = new Dictionary<string, IPublishedContentType>();
+        private readonly Dictionary<int, IPublishedContentType> _typesById = new Dictionary<int, IPublishedContentType>();
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
@@ -136,7 +136,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="itemType">An item type.</param>
         /// <param name="alias">An alias.</param>
         /// <returns>The published content type corresponding to the item type and alias.</returns>
-        public PublishedContentType Get(PublishedItemType itemType, string alias)
+        public IPublishedContentType Get(PublishedItemType itemType, string alias)
         {
             var aliasKey = GetAliasKey(itemType, alias);
 
@@ -174,7 +174,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="itemType">An item type.</param>
         /// <param name="id">An identifier.</param>
         /// <returns>The published content type corresponding to the item type and identifier.</returns>
-        public PublishedContentType Get(PublishedItemType itemType, int id)
+        public IPublishedContentType Get(PublishedItemType itemType, int id)
         {
             try
             {
@@ -204,7 +204,7 @@ namespace Umbraco.Web.PublishedCache
             }
         }
 
-        private PublishedContentType CreatePublishedContentType(PublishedItemType itemType, string alias)
+        private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, string alias)
         {
             if (GetPublishedContentTypeByAlias != null)
                 return GetPublishedContentTypeByAlias(alias);
@@ -231,7 +231,7 @@ namespace Umbraco.Web.PublishedCache
             return _publishedContentTypeFactory.CreateContentType(contentType);
         }
 
-        private PublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
+        private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
         {
             if (GetPublishedContentTypeById != null)
                 return GetPublishedContentTypeById(id);
@@ -259,8 +259,8 @@ namespace Umbraco.Web.PublishedCache
         }
 
         // for unit tests - changing the callback must reset the cache obviously
-        private Func<string, PublishedContentType> _getPublishedContentTypeByAlias;
-        internal Func<string, PublishedContentType> GetPublishedContentTypeByAlias
+        private Func<string, IPublishedContentType> _getPublishedContentTypeByAlias;
+        internal Func<string, IPublishedContentType> GetPublishedContentTypeByAlias
         {
             get => _getPublishedContentTypeByAlias;
             set
@@ -282,8 +282,8 @@ namespace Umbraco.Web.PublishedCache
         }
 
         // for unit tests - changing the callback must reset the cache obviously
-        private Func<int, PublishedContentType> _getPublishedContentTypeById;
-        internal Func<int, PublishedContentType> GetPublishedContentTypeById
+        private Func<int, IPublishedContentType> _getPublishedContentTypeById;
+        internal Func<int, IPublishedContentType> GetPublishedContentTypeById
         {
             get => _getPublishedContentTypeById;
             set
@@ -326,7 +326,7 @@ namespace Umbraco.Web.PublishedCache
             return k + ":" + alias;
         }
 
-        private static string GetAliasKey(PublishedContentType contentType)
+        private static string GetAliasKey(IPublishedContentType contentType)
         {
             return GetAliasKey(contentType.ItemType, contentType.Alias);
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Linq;
 using Umbraco.Core.Logging;
@@ -26,9 +26,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(PublishedRequest frequest)
         {
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Routing
 
             if (frequest.Uri.AbsolutePath != "/") // no alias if "/"
             {
-                node = FindContentByAlias(frequest.UmbracoContext.ContentCache,
+                node = FindContentByAlias(frequest.UmbracoContext.Content,
                     frequest.HasDomain ? frequest.Domain.ContentId : 0,
                     frequest.Culture.Name,
                     frequest.Uri.GetAbsolutePathDecoded());

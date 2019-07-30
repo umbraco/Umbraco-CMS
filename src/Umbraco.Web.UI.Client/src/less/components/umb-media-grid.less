@@ -38,12 +38,12 @@
 }
 
 .umb-media-grid__item.-selected {
-    
-    //background: @ui-selected;
     color:@ui-selected-type;
-    //border-color: @ui-selected-border;
-    //box-shadow: 0 2px 8px 0 darken(@ui-selected-border, 20);
-    
+    .umb-media-grid__item-overlay {
+        color: @ui-selected-type;
+    }
+}
+.umb-media-grid__item.-selected, .umb-media-grid__item:hover {
     &::before {
         content: "";
         position: absolute;
@@ -57,12 +57,16 @@
         box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
         pointer-events: none;
     }
-    
-    .umb-media-grid__item-overlay {
-        color: @ui-selected-type;
-        //background: @ui-selected-border;
+}
+.umb-media-grid__item:hover {
+    &::before {
+        opacity: .33;
     }
-    
+}
+.umb-media-grid__item.-selected:hover {
+    &::before {
+        opacity: .75;
+    }
 }
 
 .umb-media-grid__item-file-icon > span {
@@ -158,6 +162,9 @@
 
 .umb-media-grid__item:hover .umb-media-grid__item-overlay {
    opacity: 1;
+   i {
+       text-decoration: none;
+   }
 }
 
 .umb-media-grid__item-name {
@@ -211,7 +218,7 @@
     transition: opacity 150ms;
     
     &:hover {
-        color: @ui-action-disgrete-type-hover;
+        color: @ui-action-discreet-type-hover;
     }
 }
 

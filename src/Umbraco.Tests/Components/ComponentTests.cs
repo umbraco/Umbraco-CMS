@@ -4,6 +4,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Compose;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -299,11 +300,19 @@ namespace Umbraco.Tests.Components
             composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             Assert.Throws<Exception>(() => composers.Compose());
+            Console.WriteLine("throws:");
+            composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var requirements = composers.GetRequirements(false);
+            Console.WriteLine(Composers.GetComposersReport(requirements));
 
             types = new[] { typeof(Composer2) };
             composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             Assert.Throws<Exception>(() => composers.Compose());
+            Console.WriteLine("throws:");
+            composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
+            requirements = composers.GetRequirements(false);
+            Console.WriteLine(Composers.GetComposersReport(requirements));
 
             types = new[] { typeof(Composer12) };
             composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
@@ -347,6 +356,25 @@ namespace Umbraco.Tests.Components
             Assert.AreEqual(2, Composed.Count); // both
             Assert.AreEqual(typeof(Composer26), Composed[0]);
             Assert.AreEqual(typeof(Composer27), Composed[1]);
+        }
+
+        [Test]
+        public void AllComposers()
+        {
+            var typeLoader = new TypeLoader(AppCaches.Disabled.RuntimeCache, IOHelper.MapPath("~/App_Data/TEMP"), Mock.Of<IProfilingLogger>());
+
+            var register = MockRegister();
+            var composition = new Composition(register, typeLoader, Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run));
+
+            var types = typeLoader.GetTypes<IComposer>().Where(x => x.FullName.StartsWith("Umbraco.Core.") || x.FullName.StartsWith("Umbraco.Web"));
+            var composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var requirements = composers.GetRequirements();
+            var report = Composers.GetComposersReport(requirements);
+            Console.WriteLine(report);
+            var composerTypes = composers.SortComposers(requirements);
+
+            foreach (var type in composerTypes)
+                Console.WriteLine(type);
         }
 
         #region Compothings

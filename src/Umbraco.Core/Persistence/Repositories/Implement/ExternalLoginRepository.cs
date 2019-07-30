@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override IIdentityUserLogin PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.Where(GetBaseWhereClause(), new { id = id });
 
             var dto = Database.Fetch<ExternalLoginDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (dto == null)
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IIdentityUserLogin entity)
         {
-            ((EntityBase)entity).AddingEntity();
+            entity.AddingEntity();
 
             var dto = ExternalLoginFactory.BuildDto(entity);
 
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IIdentityUserLogin entity)
         {
-            ((EntityBase)entity).UpdatingEntity();
+            entity.UpdatingEntity();
             
             var dto = ExternalLoginFactory.BuildDto(entity);
 

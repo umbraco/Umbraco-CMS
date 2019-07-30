@@ -13,7 +13,9 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
@@ -37,10 +39,14 @@ namespace Umbraco.Tests.TestHelpers
         /// <remarks>This is just a void factory that has no actual database.</remarks>
         public IUmbracoDatabaseFactory GetDatabaseFactoryMock(bool configured = true, bool canConnect = true)
         {
+            var sqlSyntax = new SqlCeSyntaxProvider();
+            var sqlContext = Mock.Of<ISqlContext>();
+            Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(sqlSyntax);
+
             var databaseFactoryMock = new Mock<IUmbracoDatabaseFactory>();
             databaseFactoryMock.Setup(x => x.Configured).Returns(configured);
             databaseFactoryMock.Setup(x => x.CanConnect).Returns(canConnect);
-            databaseFactoryMock.Setup(x => x.SqlContext).Returns(Mock.Of<ISqlContext>());
+            databaseFactoryMock.Setup(x => x.SqlContext).Returns(sqlContext);
 
             // can create a database - but don't try to use it!
             if (configured && canConnect)
@@ -117,6 +123,7 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoSettings = GetUmbracoSettings();
             var globalSettings = GetGlobalSettings();
             var urlProviders = new UrlProviderCollection(Enumerable.Empty<IUrlProvider>());
+            var mediaUrlProviders = new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>());
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
 
@@ -128,6 +135,7 @@ namespace Umbraco.Tests.TestHelpers
                 umbracoSettings,
                 globalSettings,
                 urlProviders,
+                mediaUrlProviders,
                 Mock.Of<IUserService>());
 
             return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
@@ -140,7 +148,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
             var webRoutingSectionMock = new Mock<IWebRoutingSection>();
-            webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlProviderMode.Auto.ToString());
+            webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
             umbracoSettingsMock.Setup(x => x.WebRouting).Returns(webRoutingSectionMock.Object);
             return umbracoSettingsMock.Object;
         }

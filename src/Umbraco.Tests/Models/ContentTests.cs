@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Models
 
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
-            content.PublishCulture(langFr);                             //we've set the name, now we're publishing it
+            content.PublishCulture(CultureImpact.Explicit(langFr, false));                             //we've set the name, now we're publishing it
             Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos"));     //now it will be changed since the collection has changed
             var frCultureName = content.PublishCultureInfos[langFr];
             Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Models
 
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
-            content.PublishCulture(langFr);                             //we've set the name, now we're publishing it
+            content.PublishCulture(CultureImpact.Explicit(langFr, false));                             //we've set the name, now we're publishing it
             Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
             Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos"));     //it's true now since we've updated a name
         }
@@ -303,7 +303,7 @@ namespace Umbraco.Tests.Models
 
             content.SetCultureName("Hello", "en-US");
             content.SetCultureName("World", "es-ES");
-            content.PublishCulture("en-US");
+            content.PublishCulture(CultureImpact.All);
 
             // should not try to clone something that's not Published or Unpublished
             // (and in fact it will not work)
@@ -414,7 +414,7 @@ namespace Umbraco.Tests.Models
 
             content.SetCultureName("Hello", "en-US");
             content.SetCultureName("World", "es-ES");
-            content.PublishCulture("en-US");
+            content.PublishCulture(CultureImpact.All);
 
             var i = 200;
             foreach (var property in content.Properties)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
@@ -98,6 +99,12 @@ namespace Umbraco.Web.ContentApps
                 var configTabName = listViewConfig["tabName"];
                 if (configTabName != null && String.IsNullOrWhiteSpace(configTabName.ToString()) == false)
                     contentApp.Name = configTabName.ToString();
+            }
+            // if the list view is configured to show umbContent first, update the list view content app weight accordingly
+            if(listViewConfig.ContainsKey("showContentFirst") &&
+               listViewConfig["showContentFirst"]?.ToString().TryConvertTo<bool>().Result == true)
+            {
+                contentApp.Weight = ContentEditorContentAppFactory.Weight + 1;
             }
 
             //This is the view model used for the list view app

@@ -47,6 +47,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 globalSettings,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
@@ -74,6 +75,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 globalSettings,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
@@ -104,6 +106,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 globalSettings,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
@@ -141,6 +144,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
                 globalSettings,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());

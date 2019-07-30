@@ -71,7 +71,7 @@ namespace Umbraco.Web.Trees
                 //if there are no trees defined for this section but the section is defined then we can have a simple
                 //full screen section without trees
                 var name = Services.TextService.Localize("sections/" + application);
-                return TreeRootNode.CreateSingleTreeRoot(Constants.System.Root.ToInvariantString(), null, null, name, TreeNodeCollection.Empty, true);
+                return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
             }
 
             // handle request for a specific tree / or when there is only one tree
@@ -114,7 +114,7 @@ namespace Umbraco.Web.Trees
 
                 // otherwise it's a section with all empty trees, aka a fullscreen section
                 // todo is this true? what if we just failed to TryGetRootNode on all of them? SD: Yes it's true but we should check the result of TryGetRootNode and throw?
-                return TreeRootNode.CreateSingleTreeRoot(Constants.System.Root.ToInvariantString(), null, null, name, TreeNodeCollection.Empty, true);
+                return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
             }
 
             // for many groups
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Trees
             var rootNode = await GetRootNode(tree, querystring);
 
             var sectionRoot = TreeRootNode.CreateSingleTreeRoot(
-                Constants.System.Root.ToInvariantString(),
+                Constants.System.RootString,
                 rootNode.ChildNodesUrl,
                 rootNode.MenuUrl,
                 rootNode.Name,

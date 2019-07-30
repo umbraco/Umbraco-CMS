@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         {
             // because that version of RTE converter parses {locallink} and executes macros, its value has
             // to be cached at the published snapshot level, because we have no idea what the macros may depend on actually.
@@ -63,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
         }
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null)
             {
@@ -72,9 +72,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var sourceString = source.ToString();
 
-            // ensures string is parsed for {localLink} and urls are resolved correctly
+            // ensures string is parsed for {localLink} and urls and media are resolved correctly
             sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, Current.UmbracoContext);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
+            sourceString = TemplateUtilities.ResolveMediaFromTextString(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly
             sourceString = RenderRteMacros(sourceString, preview);
@@ -88,31 +89,34 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 // Find all images with rel attribute
                 var imgNodes = doc.DocumentNode.SelectNodes("//img[@rel]");
 
+                var modified = false;
                 if (imgNodes != null)
                 {
-                    var modified = false;
-
                     foreach (var img in imgNodes)
                     {
-                        var firstOrDefault = img.Attributes.FirstOrDefault(x => x.Name == "rel");
-                        if (firstOrDefault != null)
+                        var nodeId = img.GetAttributeValue("rel", string.Empty);
+                        if (int.TryParse(nodeId, out _))
                         {
-                            var rel = firstOrDefault.Value;
-
-                            // Check that the rel attribute is a integer before removing
-                            int nodeId;
-                            if (int.TryParse(rel, out nodeId))
-                            {
-                                img.Attributes.Remove("rel");
-                                modified = true;
-                            }
+                            img.Attributes.Remove("rel");
+                            modified = true;
                         }
                     }
+                }
 
-                    if (modified)
+                // Find all a and img tags with a data-udi attribute
+                var dataUdiNodes = doc.DocumentNode.SelectNodes("(//a|//img)[@data-udi]");
+                if (dataUdiNodes != null)
+                {
+                    foreach (var node in dataUdiNodes)
                     {
-                        return doc.DocumentNode.OuterHtml;
+                        node.Attributes.Remove("data-udi");
+                        modified = true;
                     }
+                }
+
+                if (modified)
+                {
+                    return doc.DocumentNode.OuterHtml;
                 }
             }
 
