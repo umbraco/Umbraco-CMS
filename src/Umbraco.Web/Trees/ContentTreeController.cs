@@ -217,7 +217,6 @@ namespace Umbraco.Web.Trees
 
             return result;
         }
-
         /// <summary>
         /// Returns a collection of all menu items that can be on a content node
         /// </summary>

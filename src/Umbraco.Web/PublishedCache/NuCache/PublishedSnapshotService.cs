@@ -30,7 +30,8 @@ using File = System.IO.File;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    class PublishedSnapshotService : PublishedSnapshotServiceBase
+
+    internal class PublishedSnapshotService : PublishedSnapshotServiceBase
     {
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
@@ -42,6 +43,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly IEntityXmlSerializer _entitySerializer;
+        private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
@@ -55,7 +57,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private BPlusTree<int, ContentNodeKit> _localContentDb;
         private BPlusTree<int, ContentNodeKit> _localMediaDb;
-        private readonly bool _localDbExists;
+        private bool _localDbExists;
 
         // define constant - determines whether to use cache when previewing
         // to store eg routes, property converted values, anything - caching
@@ -67,13 +69,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public PublishedSnapshotService(Options options, IMainDom mainDom, IRuntimeState runtime,
+        public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             IDataSource dataSource, IGlobalSettings globalSettings,
-            IEntityXmlSerializer entitySerializer, IPublishedModelFactory publishedModelFactory,
+            IEntityXmlSerializer entitySerializer,
+            IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
@@ -95,6 +98,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
             _entitySerializer = entitySerializer;
+            _publishedModelFactory = publishedModelFactory;
 
             // we always want to handle repository events, configured or not
             // assuming no repository event will trigger before the whole db is ready
@@ -112,29 +116,35 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (options.IgnoreLocalDb == false)
             {
                 var registered = mainDom.Register(
-                    null,
                     () =>
                     {
+                        //"install" phase of MainDom
+                        //this is inside of a lock in MainDom so this is guaranteed to run if MainDom was acquired and guaranteed
+                        //to not run if MainDom wasn't acquired.
+                        //If MainDom was not acquired, then _localContentDb and _localMediaDb will remain null which means this appdomain
+                        //will load in published content via the DB and in that case this appdomain will probably not exist long enough to
+                        //serve more than a page of content.
+
+                        var path = GetLocalFilesPath();
+                        var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+                        var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
+                        _localDbExists = File.Exists(localContentDbPath) && File.Exists(localMediaDbPath);
+                        // if both local databases exist then GetTree will open them, else new databases will be created
+                        _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
+                        _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
+                    },
+                    () =>
+                    {
+                        //"release" phase of MainDom
+
                         lock (_storesLock)
                         {
-                            _contentStore.ReleaseLocalDb();
+                            _contentStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                             _localContentDb = null;
-                            _mediaStore.ReleaseLocalDb();
+                            _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                             _localMediaDb = null;
                         }
                     });
-
-                if (registered)
-                {
-                    var path = GetLocalFilesPath();
-                    var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
-                    var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-                    _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
-
-                    // if both local databases exist then GetTree will open them, else new databases will be created
-                    _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
-                    _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
-                }
 
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
@@ -246,19 +256,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             TearDownRepositoryEvents();
             base.Dispose();
-        }
-
-        public class Options
-        {
-            // disabled: prevents the published snapshot from updating and exposing changes
-            //           or even creating a new published snapshot to see changes, uses old cache = bad
-            //
-            //// indicates that the snapshot cache should reuse the application request cache
-            //// otherwise a new cache object would be created for the snapshot specifically,
-            //// which is the default - web boot manager uses this to optimize facades
-            //public bool PublishedSnapshotCacheIsApplicationRequestCache;
-
-            public bool IgnoreLocalDb;
         }
 
         #endregion
@@ -708,6 +705,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        /// <inheritdoc />
         public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
             // no cache, trash everything
@@ -800,6 +798,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        /// <inheritdoc />
         public override void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
             // no cache, nothing we can do
@@ -812,33 +811,49 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
+            if (_publishedModelFactory.IsLiveFactory())
+            {
+                //In the case of Pure Live - we actually need to refresh all of the content and the media
+                //see https://github.com/umbraco/Umbraco-CMS/issues/5671
+                //The underlying issue is that in Pure Live the ILivePublishedModelFactory will re-compile all of the classes/models
+                //into a new DLL for the application which includes both content types and media types.
+                //Since the models in the cache are based on these actual classes, all of the objects in the cache need to be updated
+                //to use the newest version of the class.
+                using (_contentStore.GetScopedWriteLock(_scopeProvider))
+                using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
+                }
+            }
+
             ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
         }
 
-        private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<IEnumerable<int>, IEnumerable<int>, IEnumerable<int>, IEnumerable<int>> action)
+        private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<List<int>, List<int>, List<int>, List<int>> action)
+            where T : IContentTypeComposition
         {
+            if (payloads.Length == 0) return; //nothing to do
+
             var nameOfT = typeof(T).Name;
 
-            var removedIds = new List<int>();
-            var refreshedIds = new List<int>();
-            var otherIds = new List<int>();
-            var newIds = new List<int>();
+            List<int> removedIds = null, refreshedIds = null, otherIds = null, newIds = null;
 
             foreach (var payload in payloads)
             {
                 if (payload.ItemType != nameOfT) continue;
 
                 if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
-                    removedIds.Add(payload.Id);
+                    AddToList(ref removedIds, payload.Id);
                 else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
-                    refreshedIds.Add(payload.Id);
+                    AddToList(ref refreshedIds, payload.Id);
                 else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther))
-                    otherIds.Add(payload.Id);
+                    AddToList(ref otherIds, payload.Id);
                 else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.Create))
-                    newIds.Add(payload.Id);
+                    AddToList(ref newIds, payload.Id);
             }
 
-            if (removedIds.Count == 0 && refreshedIds.Count == 0 && otherIds.Count == 0 && newIds.Count == 0) return;
+            if (removedIds.IsCollectionEmpty() && refreshedIds.IsCollectionEmpty() && otherIds.IsCollectionEmpty() && newIds.IsCollectionEmpty()) return;
 
             using (store.GetScopedWriteLock(_scopeProvider))
             {
@@ -925,15 +940,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        //Methods used to prevent allocations of lists        
+        private void AddToList(ref List<int> list, int val) => GetOrCreateList(ref list).Add(val);
+        private List<int> GetOrCreateList(ref List<int> list) => list ?? (list = new List<int>());
+
         #endregion
 
         #region Content Types
 
-        private IEnumerable<IPublishedContentType> CreateContentTypes(PublishedItemType itemType, int[] ids)
+        private IReadOnlyCollection<IPublishedContentType> CreateContentTypes(PublishedItemType itemType, int[] ids)
         {
             // XxxTypeService.GetAll(empty) returns everything!
             if (ids.Length == 0)
-                return Enumerable.Empty<IPublishedContentType>();
+                return Array.Empty<IPublishedContentType>();
 
             IEnumerable<IContentTypeComposition> contentTypes;
             switch (itemType)
@@ -953,7 +972,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // some may be missing - not checking here
 
-            return contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x));
+            return contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x)).ToList();
         }
 
         private IPublishedContentType CreateContentType(PublishedItemType itemType, int id)
@@ -977,48 +996,64 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return contentType == null ? null : _publishedContentTypeFactory.CreateContentType(contentType);
         }
 
-        private void RefreshContentTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds, IEnumerable<int> otherIds, IEnumerable<int> newIds)
+        private void RefreshContentTypesLocked(List<int> removedIds, List<int> refreshedIds, List<int> otherIds, List<int> newIds)
         {
+            if (removedIds.IsCollectionEmpty() && refreshedIds.IsCollectionEmpty() && otherIds.IsCollectionEmpty() && newIds.IsCollectionEmpty())
+                return;
+
             // locks:
             // content (and content types) are read-locked while reading content
             // contentStore is wlocked (so readable, only no new views)
             // and it can be wlocked by 1 thread only at a time
 
-            var refreshedIdsA = refreshedIds.ToArray();
-
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.ContentTypes);
 
-                var typesA = CreateContentTypes(PublishedItemType.Content, refreshedIdsA).ToArray();
-                var kits = _dataSource.GetTypeContentSources(scope, refreshedIdsA);
+                var typesA = refreshedIds.IsCollectionEmpty()
+                    ? Array.Empty<IPublishedContentType>()
+                    : CreateContentTypes(PublishedItemType.Content, refreshedIds.ToArray()).ToArray();
+
+                var kits = refreshedIds.IsCollectionEmpty()
+                    ? Array.Empty<ContentNodeKit>()
+                    : _dataSource.GetTypeContentSources(scope, refreshedIds).ToArray();
 
                 _contentStore.UpdateContentTypes(removedIds, typesA, kits);
-                _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()).ToArray());
-                _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()).ToArray());
+                if (!otherIds.IsCollectionEmpty())
+                    _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()));
+                if (!newIds.IsCollectionEmpty())
+                    _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()));
                 scope.Complete();
             }
         }
 
-        private void RefreshMediaTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds, IEnumerable<int> otherIds, IEnumerable<int> newIds)
+        private void RefreshMediaTypesLocked(List<int> removedIds, List<int> refreshedIds, List<int> otherIds, List<int> newIds)
         {
+            if (removedIds.IsCollectionEmpty() && refreshedIds.IsCollectionEmpty() && otherIds.IsCollectionEmpty() && newIds.IsCollectionEmpty())
+                return;
+
             // locks:
             // media (and content types) are read-locked while reading media
             // mediaStore is wlocked (so readable, only no new views)
             // and it can be wlocked by 1 thread only at a time
 
-            var refreshedIdsA = refreshedIds.ToArray();
-
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.MediaTypes);
 
-                var typesA = CreateContentTypes(PublishedItemType.Media, refreshedIdsA).ToArray();
-                var kits = _dataSource.GetTypeMediaSources(scope, refreshedIdsA);
+                var typesA = refreshedIds == null
+                    ? Array.Empty<IPublishedContentType>()
+                    : CreateContentTypes(PublishedItemType.Media, refreshedIds.ToArray()).ToArray();
+
+                var kits = refreshedIds == null
+                    ? Array.Empty<ContentNodeKit>()
+                    : _dataSource.GetTypeMediaSources(scope, refreshedIds).ToArray();
 
                 _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
-                _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
-                _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
+                if (!otherIds.IsCollectionEmpty())
+                    _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
+                if (!newIds.IsCollectionEmpty())
+                    _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
                 scope.Complete();
             }
         }
