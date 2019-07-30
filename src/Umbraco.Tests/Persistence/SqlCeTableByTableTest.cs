@@ -316,7 +316,7 @@ namespace Umbraco.Tests.Persistence
 
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
-                helper.CreateTable<MemberTypeDto>();
+                helper.CreateTable<MemberPropertyTypeDto>();
 
                 scope.Complete();
             }

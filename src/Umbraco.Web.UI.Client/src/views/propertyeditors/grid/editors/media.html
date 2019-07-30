@@ -5,11 +5,10 @@
         <div ng-id="!control.$inserted" class="help-text"><localize key="grid_clickToInsertImage">Click to insert image</localize></div>
 	</div>
 
-	<div ng-if="control.value">
+	<div ng-if="thumbnailUrl !== null">
 		<img
-			ng-if="url"
 			ng-click="setImage()"
-			ng-src="{{url}}"
+			ng-src="{{thumbnailUrl}}"
 			class="fullSizeImage" />
         <input type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
  	</div>

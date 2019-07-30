@@ -22,7 +22,7 @@ namespace Umbraco.Web.Trees
 
             //this will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Users}/{Constants.Trees.Users}/users";
-            root.Icon = "icon-users";
+            root.Icon = Constants.Icons.UserGroup;
 
             root.HasChildren = false;
             return root;

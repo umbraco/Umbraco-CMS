@@ -19,16 +19,16 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Tags);
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof (IEnumerable<string>);
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return Array.Empty<string>();
 
@@ -43,7 +43,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return source.ToString().Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             return (string[]) source;
         }

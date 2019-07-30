@@ -1,5 +1,5 @@
-<ul class="umb-tabs-nav">
-    <li class="umb-tab" ng-repeat="tab in vm.tabs |  limitTo: vm.maxTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': tabHasError}" val-tab>
+<ul role="tablist" class="umb-tabs-nav">
+    <li class="umb-tab" role="tab" aria-selected="true" tabindex="0" ng-repeat="tab in vm.tabs |  limitTo: vm.maxTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': tabHasError}" val-tab>
         <a ng-href="" ng-click="vm.clickTab($event, tab)">{{ tab.label }}</a>
     </li>
 

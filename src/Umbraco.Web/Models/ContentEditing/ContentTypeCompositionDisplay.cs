@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -21,14 +15,6 @@ namespace Umbraco.Web.Models.ContentEditing
         }
 
         //name, alias, icon, thumb, desc, inherited from basic
-
-        //List view
-        [DataMember(Name = "isContainer")]
-        public bool IsContainer { get; set; }
-
-        //Element
-        [DataMember(Name = "isElement")]
-        public bool IsElement { get; set; }
 
         [DataMember(Name = "listViewEditorName")]
         [ReadOnly(true)]
@@ -84,6 +70,5 @@ namespace Umbraco.Web.Models.ContentEditing
         //Tabs
         [DataMember(Name = "groups")]
         public IEnumerable<PropertyGroupDisplay<TPropertyTypeDisplay>> Groups { get; set; }
-
     }
 }

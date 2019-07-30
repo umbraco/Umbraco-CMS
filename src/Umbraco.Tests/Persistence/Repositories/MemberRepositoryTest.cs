@@ -29,7 +29,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MemberRepository CreateRepository(IScopeProvider provider, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var templateRepository = Mock.Of<ITemplateRepository>();
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
+            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository);
             memberGroupRepository = new MemberGroupRepository(accessor, AppCaches.Disabled, Logger);
             var tagRepo = new TagRepository(accessor, AppCaches.Disabled, Logger);
             var repository = new MemberRepository(accessor, AppCaches.Disabled, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>());
@@ -196,17 +198,17 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.Save(memberType);
-                
+
 
                 var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.Save(member);
-                
+
 
                 sut = repository.Get(member.Id);
                 //when the password is null it will not overwrite what is already there.
                 sut.RawPasswordValue = null;
                 repository.Save(sut);
-                
+
                 sut = repository.Get(member.Id);
 
                 Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
@@ -226,17 +228,17 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.Save(memberType);
-                
+
 
                 var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.Save(member);
-                
+
 
                 sut = repository.Get(member.Id);
                 sut.Username = "This is new";
                 sut.Email = "thisisnew@hello.com";
                 repository.Save(sut);
-                
+
                 sut = repository.Get(member.Id);
 
                 Assert.That(sut.Email, Is.EqualTo("thisisnew@hello.com"));
@@ -278,7 +280,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     memberType = MockedContentTypes.CreateSimpleMemberType();
                     memberTypeRepository.Save(memberType);
-                    
+
                 }
 
                 var member = MockedMember.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);

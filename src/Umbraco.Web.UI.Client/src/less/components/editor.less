@@ -90,6 +90,9 @@
 
 .umb-editor-header__name-and-description {
     margin-right: 20px;
+    .umb-panel-header-description {
+    	padding: 0 10px;
+    }
 }
 
 .-split-view-active .umb-editor-header__name-and-description {
@@ -108,7 +111,7 @@ input.umb-editor-header__name-input {
 	margin-bottom: 0;
 	font-weight: bold;
 	box-sizing: border-box;
-	height: 30px;
+	height: 32px;
 	line-height: 32px;
 	width: 100%;
 	padding: 0 10px;
@@ -166,9 +169,17 @@ a.umb-editor-header__close-split-view:hover {
     height: 30px;
 	text-decoration: none !important;
 	font-size: 13px;
-	//color: @gray-4;
     color: @ui-action-discreet-type;
-	//background-color: @white;
+    
+    max-width: 50%;
+    white-space: nowrap;
+    
+    user-select: none;
+    
+    span {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 }
 
 a.umb-variant-switcher__toggle {
@@ -180,6 +191,25 @@ a.umb-variant-switcher__toggle {
             color: @ui-action-discreet-type-hover;
         }
 	}
+    
+    &.--error {
+        &::before {
+            content: '!';
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            background-color: @errorBackground;
+            color: @errorText;
+        }
+    }
 }
 
 .umb-variant-switcher__expand {
@@ -196,20 +226,16 @@ a.umb-variant-switcher__toggle {
 	align-items: center;
 	border-bottom: 1px solid @gray-9;
     position: relative;
-    &:hover .umb-variant-switcher__name-wrapper {
-        
-    }
 }
 
 .umb-variant-switcher__item:last-child {
 	border-bottom: none;
 }
 
-.umb-variant-switcher_item--current {
+.umb-variant-switcher__item.--current {
     color: @ui-light-active-type;
 }
-.umb-variant-switcher_item--current .umb-variant-switcher__name-wrapper {
-	//background-color: @gray-10;
+.umb-variant-switcher__item.--current .umb-variant-switcher__name-wrapper {
 	border-left: 4px solid @ui-active;
 }
 
@@ -218,7 +244,7 @@ a.umb-variant-switcher__toggle {
 	outline: none;
 }
 
-.umb-variant-switcher_item--not-allowed:not(.umb-variant-switcher_item--current) .umb-variant-switcher__name-wrapper:hover {
+.umb-variant-switcher__item.--not-allowed:not(.--current) .umb-variant-switcher__name-wrapper:hover {
 	//background-color: @white !important;
 	cursor: default;
 }
@@ -226,6 +252,29 @@ a.umb-variant-switcher__toggle {
 .umb-variant-switcher__item:hover .umb-variant-switcher__split-view {
 	display: block;
 	cursor: pointer;
+}
+
+.umb-variant-switcher__item.--error {
+    .umb-variant-switcher__name {
+        color: @red;
+        &::after {
+            content: '!';
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+            top: -6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 7px;
+            font-size: 8px;
+            text-align: center;
+            font-weight: bold;
+            background-color: @errorBackground;
+            color: @errorText;
+        }
+    }
 }
 
 .umb-variant-switcher__name-wrapper {
@@ -302,7 +351,7 @@ a.umb-variant-switcher__toggle {
 	padding: 10px 20px;
 	background: @white;
 	border-top: 1px solid @gray-9;
-	z-index: 1;
+	z-index: 30;
 	bottom: 0;
 	display: flex;
 	align-items: center;

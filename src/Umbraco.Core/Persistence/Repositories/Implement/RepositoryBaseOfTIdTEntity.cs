@@ -78,50 +78,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        // TODO: but now that we have 1 unique repository?
-        // this is a *bad* idea because PerformCount captures the current repository and its UOW
-        //
-        //private static RepositoryCachePolicyOptions _defaultOptions;
-        //protected virtual RepositoryCachePolicyOptions DefaultOptions
-        //{
-        //    get
-        //    {
-        //        return _defaultOptions ?? (_defaultOptions
-        //            = new RepositoryCachePolicyOptions(() =>
-        //            {
-        //                // get count of all entities of current type (TEntity) to ensure cached result is correct
-        //                // create query once if it is needed (no need for locking here) - query is static!
-        //                var query = _hasIdQuery ?? (_hasIdQuery = Query<TEntity>.Builder.Where(x => x.Id != 0));
-        //                return PerformCount(query);
-        //            }));
-        //    }
-        //}
-
+        // ReSharper disable once StaticMemberInGenericType
+        private static RepositoryCachePolicyOptions _defaultOptions;
+        // ReSharper disable once InconsistentNaming
         protected virtual RepositoryCachePolicyOptions DefaultOptions
         {
             get
             {
-                return new RepositoryCachePolicyOptions(() =>
-                {
-                    // get count of all entities of current type (TEntity) to ensure cached result is correct
-                    // create query once if it is needed (no need for locking here) - query is static!
-                    var query = _hasIdQuery ?? (_hasIdQuery = AmbientScope.SqlContext.Query<TEntity>().Where(x => x.Id != 0));
-                    return PerformCount(query);
-                });
+                return _defaultOptions ?? (_defaultOptions
+                    = new RepositoryCachePolicyOptions(() =>
+                    {
+                        // get count of all entities of current type (TEntity) to ensure cached result is correct
+                        // create query once if it is needed (no need for locking here) - query is static!
+                        var query = _hasIdQuery ?? (_hasIdQuery = AmbientScope.SqlContext.Query<TEntity>().Where(x => x.Id != 0));
+                        return PerformCount(query);
+                    }));
             }
         }
-
-        // this would be better for perfs BUT it breaks the tests - l8tr
-        //
-        //private static IRepositoryCachePolicy<TEntity, TId> _defaultCachePolicy;
-        //protected virtual IRepositoryCachePolicy<TEntity, TId> DefaultCachePolicy
-        //{
-        //    get
-        //    {
-        //        return _defaultCachePolicy ?? (_defaultCachePolicy
-        //            = new DefaultRepositoryCachePolicy<TEntity, TId>(IsolatedCache, DefaultOptions));
-        //    }
-        //}
 
         protected IRepositoryCachePolicy<TEntity, TId> CachePolicy
         {

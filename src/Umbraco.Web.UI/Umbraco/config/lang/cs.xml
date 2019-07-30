@@ -259,13 +259,6 @@
     <key alias="filter">Pište pro filtrování...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Povolené podřízené typy uzlů</key>
-    <key alias="create">Vytvořit</key>
-    <key alias="deletetab">Odstranit záložku</key>
-    <key alias="description">Popis</key>
-    <key alias="newtab">Nová záložka</key>
-    <key alias="tab">Záložka</key>
-    <key alias="thumbnail">Miniatura</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Přidat předlohu</key>

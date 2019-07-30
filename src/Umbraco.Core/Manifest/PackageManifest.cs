@@ -10,6 +10,16 @@ namespace Umbraco.Core.Manifest
     public class PackageManifest
     {
         /// <summary>
+        /// Gets the source path of the manifest.
+        /// </summary>
+        /// <remarks>
+        /// <para>Gets the full absolute file path of the manifest,
+        /// using system directory separators.</para>
+        /// </remarks>
+        [JsonIgnore]
+        public string Source { get; set; }
+
+        /// <summary>
         /// Gets or sets the scripts listed in the manifest.
         /// </summary>
         [JsonProperty("javascript")]

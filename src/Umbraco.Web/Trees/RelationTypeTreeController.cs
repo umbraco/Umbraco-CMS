@@ -18,7 +18,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.ActionAlias));
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 nodes.AddRange(Services.RelationService.GetAllRelationTypes()
                     .Select(rt => CreateTreeNode(rt.Id.ToString(), id, queryStrings, rt.Name,

@@ -7,17 +7,23 @@ angular.module("umbraco")
             umbRequestHelper,
             angularHelper,
             $element,
-            eventsService
+            eventsService,
+            editorService
         ) {
 
             // Grid status variables
             var placeHolder = "";
             var currentForm = angularHelper.getCurrentForm($scope);
 
+            $scope.currentRowWithActiveChild = null;
+            $scope.currentCellWithActiveChild = null;
+            $scope.active = null;
+
             $scope.currentRow = null;
             $scope.currentCell = null;
             $scope.currentToolsControl = null;
             $scope.currentControl = null;
+
             $scope.openRTEToolbarId = null;
             $scope.hasSettings = false;
             $scope.showRowConfigurations = true;
@@ -28,7 +34,7 @@ angular.module("umbraco")
             // Sortable options
             // *********************************************
 
-            var draggedRteSettings;
+            var draggedRteSettings;// holds a dictionary of RTE settings to remember when dragging things around.
 
             $scope.sortableOptionsRow = {
                 distance: 10,
@@ -86,7 +92,7 @@ angular.module("umbraco")
                 }
             };
 
-            var notIncludedRte = [];
+            var notIncludedRte = [];// used for RTEs that has been affected by the sorting
             var cancelMove = false;
             var startingArea;
             $scope.sortableOptionsCell = {
@@ -128,17 +134,17 @@ angular.module("umbraco")
                         (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                         $scope.$apply(function () {
-                            event.target.getScope_HackForSortable().area.dropNotAllowed = true;
+                            area.dropNotAllowed = true;
                         });
 
                         ui.placeholder.hide();
                         cancelMove = true;
                     }
                     else {
-                        if (event.target.getScope_HackForSortable().area.controls.length == 0) {
+                        if (area.controls.length == 0) {
 
                             $scope.$apply(function () {
-                                event.target.getScope_HackForSortable().area.dropOnEmpty = true;
+                                area.dropOnEmpty = true;
                             });
                             ui.placeholder.hide();
                         } else {
@@ -163,16 +169,32 @@ angular.module("umbraco")
                             ui.item.sortable.cancel();
                         }
                         ui.item.parents(".umb-cell-content").find(".umb-rte").each(function (key, value) {
-                            var v1 = value.id;
+                            var rteId = value.id;
 
-                            if ($.inArray(v1, notIncludedRte) < 0) {
-                                notIncludedRte.splice(0, 0, v1);
+                            if ($.inArray(rteId, notIncludedRte) < 0) {
+                                
+                                // remember this RTEs settings, cause we need to update it later.
+                                var editor = _.findWhere(tinyMCE.editors, { id: rteId })
+                                if (editor) {
+                                    draggedRteSettings[rteId] = editor.settings;
+                                }
+                                notIncludedRte.splice(0, 0, rteId);
                             }
                         });
                     }
                     else {
                         $(event.target).find(".umb-rte").each(function () {
-                            if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
+                            
+                            var rteId = $(this).attr("id");
+                            
+                            if ($.inArray(rteId, notIncludedRte) < 0) {
+                                
+                                // remember this RTEs settings, cause we need to update it later.
+                                var editor = _.findWhere(tinyMCE.editors, { id: rteId })
+                                if (editor) {
+                                    draggedRteSettings[rteId] = editor.settings;
+                                }
+                                
                                 notIncludedRte.splice(0, 0, $(this).attr("id"));
                             }
                         });
@@ -190,17 +212,20 @@ angular.module("umbraco")
                     ui.item[0].style.opacity = "0.5";
 
                     // reset dragged RTE settings in case a RTE isn't dragged
-                    draggedRteSettings = undefined;
+                    draggedRteSettings = {};
+                    notIncludedRte = [];
+                    
                     ui.item[0].style.display = "block";
                     ui.item.find(".umb-rte").each(function (key, value) {
-                        notIncludedRte = [];
+                        
                         var rteId = value.id;
-
-                        var editors = _.findWhere(tinyMCE.editors, { id: rteId });
+                        
+                        // remember this RTEs settings, cause we need to update it later.
+                        var editor = _.findWhere(tinyMCE.editors, { id: rteId });
 
                         // save the dragged RTE settings
-                        if (editors) {
-                            draggedRteSettings = editors.settings;
+                        if (editor) {
+                            draggedRteSettings[rteId] = editor.settings;
 
                             // remove the dragged RTE
                             tinyMCE.execCommand("mceRemoveEditor", false, rteId);
@@ -217,30 +242,40 @@ angular.module("umbraco")
                     ui.item.offsetParent().find(".umb-rte").each(function (key, value) {
                         var rteId = value.id;
                         if ($.inArray(rteId, notIncludedRte) < 0) {
+                            
+                            var editor = _.findWhere(tinyMCE.editors, { id: rteId });
+                            if (editor) {
+                                draggedRteSettings[rteId] = editor.settings;
+                            }
+                            
                             // add all dragged's neighbouring RTEs in the new cell
                             notIncludedRte.splice(0, 0, rteId);
                         }
                     });
+                    
+                    // reconstruct the dragged RTE (could be undefined when dragging something else than RTE)
+                    if (draggedRteSettings !== undefined) {
+                        tinyMCE.init(draggedRteSettings);
+                    }
 
-                        // reconstruct the dragged RTE (could be undefined when dragging something else than RTE)
-                        if (draggedRteSettings !== undefined) {
-                            tinyMCE.init(draggedRteSettings);
-                        }
-
-                        _.forEach(notIncludedRte, function (id) {
-                            // reset all the other RTEs
-                            if (draggedRteSettings === undefined || id !== draggedRteSettings.id) {
-                                var rteSettings = _.findWhere(tinyMCE.editors, { id: id }).settings;
-                                tinyMCE.execCommand("mceRemoveEditor", false, id);
-                                tinyMCE.init(rteSettings);
+                    _.forEach(notIncludedRte, function (rteId) {
+                        // reset all the other RTEs
+                        if (draggedRteSettings === undefined || rteId !== draggedRteSettings.id) {
+                            tinyMCE.execCommand("mceRemoveEditor", false, rteId);
+                            if (draggedRteSettings[rteId]) {
+                                tinyMCE.init(draggedRteSettings[rteId]);
                             }
-                        });
+                        }
+                    });
 
                     $scope.$apply(function () {
-
                         var cell = event.target.getScope_HackForSortable().area;
-                        cell.hasActiveChild = hasActiveChild(cell, cell.controls);
-                        cell.active = false;
+
+                        if (hasActiveChild(cell, cell.controls)) {
+                            $scope.currentCellWithActiveChild = cell;
+                        }
+                        $scope.active = cell;
+
                     });
                 }
 
@@ -274,7 +309,7 @@ angular.module("umbraco")
                 localizationService.localize("grid_insertControl").then(function (value) {
                     title = value;
                     $scope.editorOverlay = {
-                        view: "itempicker",
+                        view: "itempicker", 
                         filter: area.$allowedEditors.length > 15,
                         title: title,
                         availableItems: area.$allowedEditors,
@@ -309,12 +344,12 @@ angular.module("umbraco")
             // Row management function
             // *********************************************
 
-            $scope.clickRow = function (index, rows) {
-                rows[index].active = true;
-            };
+            $scope.clickRow = function (index, rows, $event) {
 
-            $scope.clickOutsideRow = function (index, rows) {
-                rows[index].active = false;
+                $scope.currentRowWithActiveChild = null;
+                $scope.active = rows[index];
+
+                $event.stopPropagation();
             };
 
             function getAllowedLayouts(section) {
@@ -361,6 +396,7 @@ angular.module("umbraco")
                 if (section.rows.length > 0) {
                     section.rows.splice($index, 1);
                     $scope.currentRow = null;
+                    $scope.currentRowWithActiveChild = null;
                     $scope.openRTEToolbarId = null;
                     currentForm.$setDirty();
                 }
@@ -432,44 +468,46 @@ angular.module("umbraco")
                     });
                 }
 
-                $scope.gridItemSettingsDialog = {};
-                $scope.gridItemSettingsDialog.view = "views/propertyeditors/grid/dialogs/config.html";
-                $scope.gridItemSettingsDialog.title = "Settings";
-                $scope.gridItemSettingsDialog.styles = styles;
-                $scope.gridItemSettingsDialog.config = config;
+                var dialogOptions = {
+                    view: "views/propertyeditors/grid/dialogs/config.html",
+                    size: "small",
+                    styles: styles,
+                    config: config,
+                    submit: function (model) {
+                        var styleObject = {};
+                        var configObject = {};
 
-                $scope.gridItemSettingsDialog.show = true;
+                        _.each(model.styles, function (style) {
+                            if (style.value) {
+                                styleObject[style.key] = addModifier(style.value, style.modifier);
+                            }
+                        });
+                        _.each(model.config, function (cfg) {
+                            cfg.alias = cfg.key;
+                            cfg.label = cfg.value;
 
-                $scope.gridItemSettingsDialog.submit = function (model) {
+                            if (cfg.value) {
+                                configObject[cfg.key] = addModifier(cfg.value, cfg.modifier);
+                            }
+                        });
 
-                    var styleObject = {};
-                    var configObject = {};
+                        gridItem.styles = styleObject;
+                        gridItem.config = configObject;
+                        gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
 
-                    _.each(model.styles, function (style) {
-                        if (style.value) {
-                            styleObject[style.key] = addModifier(style.value, style.modifier);
-                        }
-                    });
-                    _.each(model.config, function (cfg) {
-                        if (cfg.value) {
-                            configObject[cfg.key] = addModifier(cfg.value, cfg.modifier);
-                        }
-                    });
+                        currentForm.$setDirty();
 
-                    gridItem.styles = styleObject;
-                    gridItem.config = configObject;
-                    gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
-
-                    currentForm.$setDirty();
-
-                    $scope.gridItemSettingsDialog.show = false;
-                    $scope.gridItemSettingsDialog = null;
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
                 };
 
-                $scope.gridItemSettingsDialog.close = function (oldModel) {
-                    $scope.gridItemSettingsDialog.show = false;
-                    $scope.gridItemSettingsDialog = null;
-                };
+                localizationService.localize("general_settings").then(value => {
+                    dialogOptions.title = value;
+                    editorService.open(dialogOptions);
+                });
 
             };
 
@@ -515,14 +553,13 @@ angular.module("umbraco")
             // Area management functions
             // *********************************************
 
-            $scope.clickCell = function (index, cells, row) {
-                cells[index].active = true;
-                row.hasActiveChild = true;
-            };
+            $scope.clickCell = function (index, cells, row, $event) {
 
-            $scope.clickOutsideCell = function (index, cells, row) {
-                cells[index].active = false;
-                row.hasActiveChild = hasActiveChild(row, cells);
+                $scope.currentCellWithActiveChild = null;
+
+                $scope.active = cells[index];
+                $scope.currentRowWithActiveChild = row;
+                $event.stopPropagation();
             };
 
             $scope.cellPreview = function (cell) {
@@ -538,14 +575,12 @@ angular.module("umbraco")
             // *********************************************
             // Control management functions
             // *********************************************
-            $scope.clickControl = function (index, controls, cell) {
-                controls[index].active = true;
-                cell.hasActiveChild = true;
-            };
+            $scope.clickControl = function (index, controls, cell, $event) {
 
-            $scope.clickOutsideControl = function (index, controls, cell) {
-                controls[index].active = false;
-                cell.hasActiveChild = hasActiveChild(cell, controls);
+                $scope.active = controls[index];
+                $scope.currentCellWithActiveChild = cell;
+
+                $event.stopPropagation();
             };
 
             function hasActiveChild(item, children) {
@@ -597,7 +632,7 @@ angular.module("umbraco")
                     index = cell.controls.length;
                 }
 
-                newControl.active = true;
+                $scope.active = newControl;
 
                 //populate control
                 $scope.initControl(newControl, index + 1);
@@ -885,11 +920,9 @@ angular.module("umbraco")
                 //Localize the grid editor names
                 angular.forEach($scope.availableEditors, function (value, key) {
                     //If no translation is provided, keep using the editor name from the manifest
-                    if (localizationService.dictionary.hasOwnProperty("grid_" + value.alias)) {
-                        localizationService.localize("grid_" + value.alias).then(function (v) {
-                            value.name = v;
-                        });
-                    }
+                    localizationService.localize("grid_" + value.alias, undefined, value.name).then(function (v) {
+                        value.name = v;
+                    });
                 });
 
                 $scope.contentReady = true;

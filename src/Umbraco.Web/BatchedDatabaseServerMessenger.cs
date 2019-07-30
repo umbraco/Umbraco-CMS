@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.Composing;
+using System.ComponentModel;
 
 namespace Umbraco.Web
 {
@@ -26,10 +27,16 @@ namespace Umbraco.Web
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
 
+        [Obsolete("This overload should not be used, enableDistCalls has no effect")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings,
-            bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(runtime, scopeProvider, sqlContext, proflog, globalSettings, enableDistCalls, options)
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings, bool enableDistCalls, DatabaseServerMessengerOptions options)
+            : this(runtime, databaseFactory, scopeProvider, sqlContext, proflog, globalSettings, options)
+        { }
+
+        public BatchedDatabaseServerMessenger(
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings, DatabaseServerMessengerOptions options)
+            : base(runtime, scopeProvider, sqlContext, proflog, globalSettings, true, options)
         {
             _databaseFactory = databaseFactory;
         }

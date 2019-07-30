@@ -2,19 +2,21 @@
     border: 2px solid @white;
     width: 25px;
     height: 25px;
-    background: @gray-7;
-    border-radius: 50%;
+    border: 1px solid @gray-7;
+    border-radius: 3px;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: @white;
+    color: @gray-7;
     cursor: pointer;
     font-size: 15px;
 }
 
 .umb-checkmark--checked {
-    background: @green;
+    background: @ui-active;
+    border-color: @ui-active;
+    color: @white;
 }
 
 .umb-checkmark--xs {
