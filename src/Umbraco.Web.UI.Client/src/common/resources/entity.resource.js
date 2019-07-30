@@ -2,10 +2,10 @@
     * @ngdoc service
     * @name umbraco.resources.entityResource
     * @description Loads in basic data for all entities
-    * 
+    *
     * ##What is an entity?
     * An entity is a basic **read-only** representation of an Umbraco node. It contains only the most
-    * basic properties used to display the item in trees, lists and navigation. 
+    * basic properties used to display the item in trees, lists and navigation.
     *
     * ##What is the difference between entity and content/media/etc...?
     * the entity only contains the basic node data, name, id and guid, whereas content
@@ -15,7 +15,7 @@
     *
     * ##Entity object types?
     * You need to specify the type of object you want returned.
-    * 
+    *
     * The core object types are:
     *
     * - Document
@@ -35,7 +35,7 @@ function entityResource($q, $http, umbRequestHelper) {
 
     //the factory object returned
     return {
-        
+
         getSafeAlias: function (value, camelCase) {
 
             if (!value) {
@@ -64,10 +64,10 @@ function entityResource($q, $http, umbRequestHelper) {
          *    .then(function(pathArray) {
          *        alert('its here!');
          *    });
-         * </pre> 
-         * 
+         * </pre>
+         *
          * @param {Int} id Id of node to return the public url to
-         * @param {string} type Object type name     
+         * @param {string} type Object type name
          * @returns {Promise} resourcePromise object containing the url.
          *
          */
@@ -100,8 +100,8 @@ function entityResource($q, $http, umbRequestHelper) {
          *    .then(function(url) {
          *        alert('its here!');
          *    });
-         * </pre> 
-         * 
+         * </pre>
+         *
          * @param {Int} id Id of node to return the public url to
          * @param {string} type Object type name
          * @returns {Promise} resourcePromise object containing the url.
@@ -135,17 +135,17 @@ function entityResource($q, $http, umbRequestHelper) {
          * //get media by id
          * entityResource.getEntityById(0, "Media")
          *    .then(function(ent) {
-         *        var myDoc = ent; 
+         *        var myDoc = ent;
          *        alert('its here!');
          *    });
-         * </pre> 
-         * 
+         * </pre>
+         *
          * @param {Int} id id of entity to return
-         * @param {string} type Object type name        
+         * @param {string} type Object type name
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getById: function (id, type) {      
+        getById: function (id, type) {
 
             if (id === -1 || id === "-1") {
                 return null;
@@ -160,6 +160,39 @@ function entityResource($q, $http, umbRequestHelper) {
                 'Failed to retrieve entity data for id ' + id);
         },
 
+
+        getUrlAndAnchors: function (id) {
+
+            if (id === -1 || id === "-1") {
+                return null;
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "entityApiBaseUrl",
+                        "GetUrlAndAnchors",
+                        [{ id: id }])),
+                'Failed to retrieve url and anchors data for id ' + id);
+        },
+
+        getAnchors: function (rteContent) {
+
+            if (!rteContent || rteContent.length === 0) {
+                return [];
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "entityApiBaseUrl",
+                        'GetAnchors'),
+                    {
+                        rteContent: rteContent
+                    }),
+                'Failed to anchors data for rte content ' + rteContent);
+        },
+        
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getByIds
@@ -173,18 +206,18 @@ function entityResource($q, $http, umbRequestHelper) {
          * //Get templates for ids
          * entityResource.getEntitiesByIds( [1234,2526,28262], "Template")
          *    .then(function(templateArray) {
-         *        var myDoc = contentArray; 
+         *        var myDoc = contentArray;
          *        alert('they are here!');
          *    });
-         * </pre> 
-         * 
+         * </pre>
+         *
          * @param {Array} ids ids of entities to return as an array
-         * @param {string} type type name        
+         * @param {string} type type name
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
         getByIds: function (ids, type) {
-            
+
             var query = "type=" + type;
 
             return umbRequestHelper.resourcePromise(
@@ -212,14 +245,14 @@ function entityResource($q, $http, umbRequestHelper) {
          * //get content by xpath
          * entityResource.getByQuery("$current", -1, "Document")
          *    .then(function(ent) {
-         *        var myDoc = ent; 
+         *        var myDoc = ent;
          *        alert('its here!');
          *    });
-         * </pre> 
-         * 
+         * </pre>
+         *
          * @param {string} query xpath to use in query
          * @param {Int} nodeContextId id id to start from
-         * @param {string} type Object type name        
+         * @param {string} type Object type name
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
@@ -247,12 +280,12 @@ function entityResource($q, $http, umbRequestHelper) {
          * //Only return media
          * entityResource.getAll("Media")
          *    .then(function(ent) {
-         *        var myDoc = ent; 
+         *        var myDoc = ent;
          *        alert('its here!');
          *    });
-         * </pre> 
-         * 
-         * @param {string} type Object type name        
+         * </pre>
+         *
+         * @param {string} type Object type name
          * @param {string} postFilter optional filter expression which will execute a dynamic where clause on the server
          * @returns {Promise} resourcePromise object containing the entity.
          *
@@ -277,40 +310,36 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          * @description
          * Gets ancestor entities for a given item
-         *        
-         * 
+         *
+         *
          * @param {string} type Object type name
          * @param {string} culture Culture
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getAncestors: function (id, type, culture, options) {        
-            var defaults = {
-                ignoreUserStartNodes: false
-            };
-            if (options === undefined) {
-                options = {};
+        getAncestors: function (id, type, culture, options) {
+            if (!culture) {
+                culture = "";
             }
-            //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
-            //now copy back to the options we will use
-            options = defaults;
-            if (culture === undefined) culture = "";
+
+            var args = [
+                { id: id },
+                { type: type },
+                { culture: culture}
+            ];
+            if (options && options.dataTypeKey) {
+                args.push({ dataTypeKey: options.dataTypeKey });
+            }
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetAncestors",
-                       [
-                           { id: id },
-                           { type: type },
-                           { culture: culture },
-                           { ignoreUserStartNodes: options.ignoreUserStartNodes }
-                       ])),
-
+                       args)),
                        'Failed to retrieve ancestor data for id ' + id);
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getChildren
@@ -318,20 +347,25 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          * @description
          * Gets children entities for a given item
-         *        
+         *
          * @param {Int} parentid id of content item to return children of
-         * @param {string} type Object type name        
+         * @param {string} type Object type name
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getChildren: function (id, type) {
+        getChildren: function (id, type, options) {
+
+            var args = [{ id: id }, { type: type }];
+            if (options && options.dataTypeKey) {
+                args.push({ dataTypeKey: options.dataTypeKey });
+            }
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetChildren",
-                       [{ id: id }, { type: type }])),
+                       args)),
                'Failed to retrieve child data for id ' + id);
         },
 
@@ -347,11 +381,11 @@ function entityResource($q, $http, umbRequestHelper) {
           * <pre>
           * entityResource.getPagedChildren(1234, "Content", {pageSize: 10, pageNumber: 2})
           *    .then(function(contentArray) {
-          *        var children = contentArray; 
+          *        var children = contentArray;
           *        alert('they are here!');
           *    });
-          * </pre> 
-          * 
+          * </pre>
+          *
           * @param {Int} parentid id of content item to return children of
           * @param {string} type Object type name
           * @param {Object} options optional options object
@@ -370,7 +404,8 @@ function entityResource($q, $http, umbRequestHelper) {
                 pageNumber: 100,
                 filter: '',
                 orderDirection: "Ascending",
-                orderBy: "SortOrder"
+                orderBy: "SortOrder",
+                dataTypeKey: null
             };
             if (options === undefined) {
                 options = {};
@@ -387,6 +422,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 options.orderDirection = "Descending";
             }
 
+
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -399,7 +435,8 @@ function entityResource($q, $http, umbRequestHelper) {
                             pageSize: options.pageSize,
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
-                            filter: encodeURIComponent(options.filter)
+                            filter: encodeURIComponent(options.filter),
+                            dataTypeKey: options.dataTypeKey
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);
@@ -417,11 +454,11 @@ function entityResource($q, $http, umbRequestHelper) {
           * <pre>
           * entityResource.getPagedDescendants(1234, "Document", {pageSize: 10, pageNumber: 2})
           *    .then(function(contentArray) {
-          *        var children = contentArray; 
+          *        var children = contentArray;
           *        alert('they are here!');
           *    });
-          * </pre> 
-          * 
+          * </pre>
+          *
           * @param {Int} parentid id of content item to return descendants of
           * @param {string} type Object type name
           * @param {Object} options optional options object
@@ -441,7 +478,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 filter: '',
                 orderDirection: "Ascending",
                 orderBy: "SortOrder",
-                ignoreUserStartNodes: false
+                dataTypeKey: null
             };
             if (options === undefined) {
                 options = {};
@@ -471,12 +508,13 @@ function entityResource($q, $http, umbRequestHelper) {
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
                             filter: encodeURIComponent(options.filter),
-                            ignoreUserStartNodes: options.ignoreUserStartNodes
+                            dataTypeKey: options.dataTypeKey
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);
         },
-     
+
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#search
@@ -489,29 +527,26 @@ function entityResource($q, $http, umbRequestHelper) {
          * <pre>
          * entityResource.search("news", "Media")
          *    .then(function(mediaArray) {
-         *        var myDoc = mediaArray; 
+         *        var myDoc = mediaArray;
          *        alert('they are here!');
          *    });
-         * </pre> 
-         * 
-         * @param {String} Query search query 
-         * @param {String} Type type of conten to search        
+         * </pre>
+         *
+         * @param {String} Query search query
+         * @param {String} Type type of conten to search
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        search: function (query, type, options, canceler) {
+        search: function (query, type, searchFrom, canceler, dataTypeKey) {
 
             var args = [{ query: query }, { type: type }];
-
-            if(options !== undefined) {
-                if (options.searchFrom) {
-                    args.push({ searchFrom: options.searchFrom });
-                } 
-                if (options.ignoreUserStartNodes) {
-                    args.push({ ignoreUserStartNodes: options.ignoreUserStartNodes });
-                }                 
+            if (searchFrom) {
+                args.push({ searchFrom: searchFrom });
             }
-            
+
+            if (dataTypeKey) {
+                args.push({ dataTypeKey: dataTypeKey });
+            }
 
             var httpConfig = {};
             if (canceler) {
@@ -527,7 +562,7 @@ function entityResource($q, $http, umbRequestHelper) {
                     httpConfig),
                 'Failed to retrieve entity data for query ' + query);
         },
-        
+
 
         /**
          * @ngdoc method
@@ -541,12 +576,12 @@ function entityResource($q, $http, umbRequestHelper) {
          * <pre>
          * entityResource.searchAll("bob")
          *    .then(function(array) {
-         *        var myDoc = array; 
+         *        var myDoc = array;
          *        alert('they are here!');
          *    });
-         * </pre> 
-         * 
-         * @param {String} Query search query 
+         * </pre>
+         *
+         * @param {String} Query search query
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
@@ -566,7 +601,9 @@ function entityResource($q, $http, umbRequestHelper) {
                     httpConfig),
                 'Failed to retrieve entity data for query ' + query);
         }
-            
+
+
+
     };
 }
 

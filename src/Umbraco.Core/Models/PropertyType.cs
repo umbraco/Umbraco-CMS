@@ -21,6 +21,7 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private int _dataTypeId;
+        private Guid _dataTypeKey;
         private Lazy<int> _propertyGroupId;
         private string _propertyEditorAlias;
         private ValueStorageType _valueStorageType;
@@ -113,7 +114,7 @@ namespace Umbraco.Core.Models
         /// Gets of sets the alias of the property type.
         /// </summary>
         [DataMember]
-        public string Alias
+        public virtual string Alias
         {
             get => _alias;
             set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, nameof(Alias));
@@ -137,6 +138,13 @@ namespace Umbraco.Core.Models
         {
             get => _dataTypeId;
             set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, nameof(DataTypeId));
+        }
+
+        [DataMember]
+        public Guid DataTypeKey
+        {
+            get => _dataTypeKey;
+            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeKey, nameof(DataTypeKey));
         }
 
         /// <summary>

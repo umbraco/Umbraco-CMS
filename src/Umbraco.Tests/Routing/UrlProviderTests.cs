@@ -10,8 +10,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.LegacyXmlPublishedCache;
+using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Routing
                 Assert.AreEqual(randomSample.Value, result);
             }
 
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
             Assert.AreEqual(8, cachedRoutes.Count);
@@ -142,7 +142,7 @@ namespace Umbraco.Tests.Routing
                 new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings: globalSettings.Object);
 
-            
+
             var result = umbracoContext.UrlProvider.GetUrl(nodeId);
             Assert.AreEqual(niceUrlMatch, result);
         }
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Routing
 
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
-            var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+            var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
             publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Routing
                 snapshotService: snapshotService.Object);
 
             //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative url.
-            var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
+            var url = umbracoContext.UrlProvider.GetUrl(1234, culture: "fr-FR");
 
             Assert.AreEqual("/home/test-fr/", url);
         }
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.Routing
             var umbracoSettings = Current.Configs.Settings();
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
-            var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+            var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
             publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Routing
                 snapshotService: snapshotService.Object);
 
 
-            var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
+            var url = umbracoContext.UrlProvider.GetUrl(1234, culture: "fr-FR");
 
             Assert.AreEqual("/home/test-fr/", url);
         }
@@ -258,7 +258,7 @@ namespace Umbraco.Tests.Routing
             var umbracoSettings = Current.Configs.Settings();
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
-            var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+            var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
             publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.Routing
                 snapshotService: snapshotService.Object);
 
 
-            var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
+            var url = umbracoContext.UrlProvider.GetUrl(1234, culture: "fr-FR");
 
             //the current uri is not the culture specific domain we want, so the result is an absolute path to the culture specific domain
             Assert.AreEqual("http://example.fr/home/test-fr/", url);
@@ -314,7 +314,7 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual("/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
 
-            umbracoContext.UrlProvider.Mode = UrlProviderMode.Absolute;
+            umbracoContext.UrlProvider.Mode = UrlMode.Absolute;
             Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
         }
 
@@ -332,10 +332,10 @@ namespace Umbraco.Tests.Routing
             }, globalSettings: globalSettings.Object);
 
             //mock the Umbraco settings that we need
-            
+
             Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
 
-            umbracoContext.UrlProvider.Mode = UrlProviderMode.Absolute;
+            umbracoContext.UrlProvider.Mode = UrlMode.Absolute;
 
             Assert.AreEqual("#", umbracoContext.UrlProvider.GetUrl(999999));
         }

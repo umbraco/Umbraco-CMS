@@ -55,16 +55,16 @@ angular.module('umbraco')
 		};
 
 		$scope.clear = function() {
-			$scope.model.value.id = undefined;
-			$scope.node = undefined;
-			$scope.model.value.query = undefined;
+			$scope.model.value.id = null;
+            $scope.node = null;
+            $scope.model.value.query = null;
 		};
 		
 
 		//we always need to ensure we dont submit anything broken
 	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 	    	if($scope.model.value.type === "member"){
-	    		$scope.model.value.id = -1;
+	    		$scope.model.value.id = null;
 	    		$scope.model.value.query = "";
 	    	}
 	    });

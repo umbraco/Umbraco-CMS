@@ -13,7 +13,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public virtual UrlInfo GetMediaUrl(UmbracoContext umbracoContext, IPublishedContent content,
             string propertyAlias,
-            UrlProviderMode mode, string culture, Uri current)
+            UrlMode mode, string culture, Uri current)
         {
             var prop = content.GetProperty(propertyAlias);
             var value = prop?.GetValue(culture);
@@ -40,23 +40,27 @@ namespace Umbraco.Web.Routing
             return url == null ? null : UrlInfo.Url(url.ToString(), culture);
         }
 
-        private Uri AssembleUrl(string path, Uri current, UrlProviderMode mode)
+        private Uri AssembleUrl(string path, Uri current, UrlMode mode)
         {
             if (string.IsNullOrEmpty(path))
                 return null;
 
+            // the stored path is absolute so we just return it as is
+            if(Uri.IsWellFormedUriString(path, UriKind.Absolute))
+                return new Uri(path);
+
             Uri uri;
 
             if (current == null)
-                mode = UrlProviderMode.Relative; // best we can do
+                mode = UrlMode.Relative; // best we can do
 
             switch (mode)
             {
-                case UrlProviderMode.Absolute:
+                case UrlMode.Absolute:
                     uri = new Uri(current?.GetLeftPart(UriPartial.Authority) + path);
                     break;
-                case UrlProviderMode.Relative:
-                case UrlProviderMode.Auto:
+                case UrlMode.Relative:
+                case UrlMode.Auto:
                     uri = new Uri(path, UriKind.Relative);
                     break;
                 default:
