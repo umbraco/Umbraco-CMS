@@ -3,7 +3,7 @@
 * @name umbraco.services.mediaHelper
 * @description A helper object used for dealing with media items
 **/
-function mediaHelper(umbRequestHelper) {
+function mediaHelper(umbRequestHelper, $log) {
 
     //container of fileresolvers
     var _mediaFileResolvers = {};
@@ -13,11 +13,11 @@ function mediaHelper(umbRequestHelper) {
          * @ngdoc function
          * @name umbraco.services.mediaHelper#getImagePropertyValue
          * @methodOf umbraco.services.mediaHelper
-         * @function    
+         * @function
          *
          * @description
          * Returns the file path associated with the media property if there is one
-         * 
+         *
          * @param {object} options Options object
          * @param {object} options.mediaModel The media object to retrieve the image path from
          * @param {object} options.imageOnly Optional, if true then will only return a path if the media item is an image
@@ -80,11 +80,11 @@ function mediaHelper(umbRequestHelper) {
          * @ngdoc function
          * @name umbraco.services.mediaHelper#getImagePropertyValue
          * @methodOf umbraco.services.mediaHelper
-         * @function    
+         * @function
          *
          * @description
          * Returns the actual image path associated with the image property if there is one
-         * 
+         *
          * @param {object} options Options object
          * @param {object} options.imageModel The media object to retrieve the image path from
          */
@@ -104,11 +104,11 @@ function mediaHelper(umbRequestHelper) {
          * @ngdoc function
          * @name umbraco.services.mediaHelper#getThumbnail
          * @methodOf umbraco.services.mediaHelper
-         * @function    
+         * @function
          *
          * @description
          * formats the display model used to display the content to the model used to save the content
-         * 
+         *
          * @param {object} options Options object
          * @param {object} options.imageModel The media object to retrieve the image path from
          */
@@ -133,18 +133,20 @@ function mediaHelper(umbRequestHelper) {
          * @ngdoc function
          * @name umbraco.services.mediaHelper#resolveFileFromEntity
          * @methodOf umbraco.services.mediaHelper
-         * @function    
+         * @function
          *
          * @description
          * Gets the media file url for a media entity returned with the entityResource
-         * 
+         *
          * @param {object} mediaEntity A media Entity returned from the entityResource
          * @param {boolean} thumbnail Whether to return the thumbnail url or normal url
          */
         resolveFileFromEntity: function (mediaEntity, thumbnail) {
 
             if (!angular.isObject(mediaEntity.metaData) || !mediaEntity.metaData.MediaPath) {
-                throw "Cannot resolve the file url from the mediaEntity, it does not contain the required metaData";
+                //don't throw since this image legitimately might not contain a media path, but output a warning
+                $log.warn("Cannot resolve the file url from the mediaEntity, it does not contain the required metaData");
+                return null;
             }
 
             if (thumbnail) {
@@ -164,11 +166,11 @@ function mediaHelper(umbRequestHelper) {
          * @ngdoc function
          * @name umbraco.services.mediaHelper#resolveFile
          * @methodOf umbraco.services.mediaHelper
-         * @function    
+         * @function
          *
          * @description
          * Gets the media file url for a media object returned with the mediaResource
-         * 
+         *
          * @param {object} mediaEntity A media Entity returned from the entityResource
          * @param {boolean} thumbnail Whether to return the thumbnail url or normal url
          */
@@ -240,11 +242,11 @@ function mediaHelper(umbRequestHelper) {
          * @ngdoc function
          * @name umbraco.services.mediaHelper#scaleToMaxSize
          * @methodOf umbraco.services.mediaHelper
-         * @function    
+         * @function
          *
          * @description
          * Finds the corrct max width and max height, given maximum dimensions and keeping aspect ratios
-         * 
+         *
          * @param {number} maxSize Maximum width & height
          * @param {number} width Current width
          * @param {number} height Current height
@@ -283,11 +285,11 @@ function mediaHelper(umbRequestHelper) {
          * @ngdoc function
          * @name umbraco.services.mediaHelper#getThumbnailFromPath
          * @methodOf umbraco.services.mediaHelper
-         * @function    
+         * @function
          *
          * @description
          * Returns the path to the thumbnail version of a given media library image path
-         * 
+         *
          * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
          */
         getThumbnailFromPath: function (imagePath) {
@@ -310,11 +312,11 @@ function mediaHelper(umbRequestHelper) {
          * @ngdoc function
          * @name umbraco.services.mediaHelper#detectIfImageByExtension
          * @methodOf umbraco.services.mediaHelper
-         * @function    
+         * @function
          *
          * @description
          * Returns true/false, indicating if the given path has an allowed image extension
-         * 
+         *
          * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
          */
         detectIfImageByExtension: function (imagePath) {

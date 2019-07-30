@@ -16,15 +16,17 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentPropertyBasicMapper<TDestination>
         where TDestination : ContentPropertyBasic, new()
     {
+        private readonly IEntityService _entityService;
         private readonly ILogger _logger;
         private readonly PropertyEditorCollection _propertyEditors;
         protected IDataTypeService DataTypeService { get; }
 
-        public ContentPropertyBasicMapper(IDataTypeService dataTypeService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyBasicMapper(IDataTypeService dataTypeService, IEntityService entityService, ILogger logger, PropertyEditorCollection propertyEditors)
         {
             _logger = logger;
             _propertyEditors = propertyEditors;
             DataTypeService = dataTypeService;
+            _entityService = entityService;
         }
 
         /// <summary>
@@ -48,6 +50,7 @@ namespace Umbraco.Web.Models.Mapping
             dest.Alias = property.Alias;
             dest.PropertyEditor = editor;
             dest.Editor = editor.Alias;
+            dest.DataTypeKey = property.PropertyType.DataTypeKey;
 
             // if there's a set of property aliases specified, we will check if the current property's value should be mapped.
             // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.
