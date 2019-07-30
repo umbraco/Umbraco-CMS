@@ -51,13 +51,17 @@ angular.module("umbraco")
                     $scope.acceptedMediatypes = types;
                 });
 
+            var dataTypeKey = null;
+            if($scope.model && $scope.model.dataTypeKey) {
+                dataTypeKey = $scope.model.dataTypeKey;
+            }
             $scope.searchOptions = {
                 pageNumber: 1,
                 pageSize: 100,
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
-                dataTypeKey: $scope.model.dataTypeKey
+                dataTypeKey: dataTypeKey
             };
 
             //preload selected item
@@ -160,7 +164,7 @@ angular.module("umbraco")
                 }
 
                 if (folder.id > 0) {
-                    entityResource.getAncestors(folder.id, "media", null, { dataTypeKey: $scope.model.dataTypeKey })
+                    entityResource.getAncestors(folder.id, "media", null, { dataTypeKey: dataTypeKey })
                         .then(function (anc) {
                             $scope.path = _.filter(anc,
                                 function (f) {
@@ -311,6 +315,7 @@ angular.module("umbraco")
                     if ($scope.searchOptions.filter) {
                         searchMedia();
                     } else {
+                        
                         // reset pagination
                         $scope.searchOptions = {
                             pageNumber: 1,
@@ -318,7 +323,7 @@ angular.module("umbraco")
                             totalItems: 0,
                             totalPages: 0,
                             filter: '',
-                            dataTypeKey: $scope.model.dataTypeKey
+                            dataTypeKey: dataTypeKey
                         };
                         getChildren($scope.currentFolder.id);
                     }
