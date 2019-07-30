@@ -146,19 +146,26 @@ namespace Umbraco.Web.Models.Mapping
             var fields = context.MapEnumerable<ConfigurationField,DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
             var configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.Configuration);
 
-            MapConfigurationFields(fields, configurationDictionary);
+            MapConfigurationFields(dataType, fields, configurationDictionary);
 
             return fields;
         }
-
-        private void MapConfigurationFields(List<DataTypeConfigurationFieldDisplay> fields, IDictionary<string, object> configuration)
+        
+        private void MapConfigurationFields(IDataType dataType, List<DataTypeConfigurationFieldDisplay> fields, IDictionary<string, object> configuration)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             // now we need to wire up the pre-values values with the actual fields defined
-            foreach (var field in fields)
+            foreach (var field in fields.ToList())
             {
+                //filter out the not-supported pre-values for built-in data types
+                if (dataType != null && dataType.IsBuildInDataType() && field.Key.InvariantEquals(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes))
+                {
+                    fields.Remove(field);
+                    continue;
+                }
+
                 if (configuration.TryGetValue(field.Key, out var value))
                 {
                     field.Value = value;
@@ -194,7 +201,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var defaultConfiguration = configurationEditor.DefaultConfiguration;
             if (defaultConfiguration != null)
-                MapConfigurationFields(fields, defaultConfiguration);
+                MapConfigurationFields(null, fields, defaultConfiguration);
 
             return fields;
         }
