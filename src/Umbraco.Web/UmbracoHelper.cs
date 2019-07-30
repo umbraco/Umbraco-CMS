@@ -5,6 +5,7 @@ using System.Web;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
@@ -819,7 +820,7 @@ namespace Umbraco.Web
             {
                 decryptedString = ufprt.DecryptWithMachineKey();
             }
-            catch (FormatException)
+            catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
             {
                 Current.Logger.Warn(typeof(UmbracoHelper), "A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
                 parts = null;

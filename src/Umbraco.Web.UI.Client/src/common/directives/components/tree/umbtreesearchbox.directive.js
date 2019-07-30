@@ -12,6 +12,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             searchFromName: "@",
             showSearch: "@",
             section: "@",
+            datatypeKey: "@",
             hideSearchCallback: "=",
             searchCallback: "="
         },
@@ -33,6 +34,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             if (!scope.showSearch) {
                 scope.showSearch = "false";
             }
+
 
             //used to cancel any request in progress if another one needs to take it's place
             var canceler = null;
@@ -58,6 +60,11 @@ function treeSearchBox(localizationService, searchService, $q) {
                     //append a start node context if there is one
                     if (scope.searchFromId) {
                         searchArgs["searchFrom"] = scope.searchFromId;
+                    }
+
+                    //append dataTypeId value if there is one
+                    if (scope.datatypeKey) {
+                        searchArgs["dataTypeKey"] = scope.datatypeKey;
                     }
 
                     searcher(searchArgs).then(function (data) {

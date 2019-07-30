@@ -15,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
