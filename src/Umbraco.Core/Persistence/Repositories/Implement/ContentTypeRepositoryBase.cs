@@ -1013,8 +1013,9 @@ AND umbracoNode.id <> @id",
             if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
             {
                 var sql = Sql()
-                    .SelectAll()
+                    .Select<DataTypeDto>(dt => dt.Select(x => x.NodeDto))
                     .From<DataTypeDto>()
+                    .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((dt, n) => dt.NodeId == n.NodeId)
                     .Where("propertyEditorAlias = @propertyEditorAlias", new { propertyEditorAlias = propertyType.PropertyEditorAlias })
                     .OrderBy<DataTypeDto>(typeDto => typeDto.NodeId);
                 var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
@@ -1022,6 +1023,7 @@ AND umbracoNode.id <> @id",
                 if (datatype != null)
                 {
                     propertyType.DataTypeId = datatype.NodeId;
+                    propertyType.DataTypeKey = datatype.NodeDto.UniqueId;
                 }
                 else
                 {
