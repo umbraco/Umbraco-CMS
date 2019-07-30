@@ -94,11 +94,12 @@ namespace Umbraco.Core.ObjectResolution
             var type = o.GetType();
             var attr = type.GetCustomAttribute<WeightAttribute>(true);
             if (attr != null) return attr.Weight;
-            var name = type.Assembly.FullName;
+            var assemblyName = type.Assembly.GetName();
+            var fullName = assemblyName.FullName;
 
             // we should really attribute all our Core handlers, so this is temp
-            var core = name.InvariantStartsWith("Umbraco.") || name.InvariantStartsWith("Concorde.");
-            return core ? -DefaultPluginWeight : DefaultPluginWeight;
+            var isCore = assemblyName.Name.Equals("umbraco", StringComparison.InvariantCultureIgnoreCase) || fullName.InvariantStartsWith("umbraco.") || fullName.InvariantStartsWith("concorde.");
+            return isCore ? -DefaultPluginWeight : DefaultPluginWeight;
         }
 
         /// <summary>
