@@ -36,8 +36,6 @@ namespace Umbraco.Web.Runtime
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
-
-            AntiForgeryConfig.AdditionalDataProvider = new UmbracoAntiForgeryAdditionalDataProvider(AntiForgeryConfig.AdditionalDataProvider);
         }
 
         public void Terminate()
