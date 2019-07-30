@@ -48,6 +48,31 @@ namespace Umbraco.Examine
             }
         }
 
+        /// <summary>
+        /// Returns all index fields that are culture specific (suffixed) or invariant
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetCultureAndInvariantFields(this IUmbracoIndex index, string culture)
+        {
+            var allFields = index.GetFields();
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var field in allFields)
+            {
+                var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
+                if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
+                {
+                    yield return field; //matches this culture field
+                }
+                else if (!match.Success)
+                {
+                    yield return field; //matches no culture field (invariant)
+                }
+                    
+            }
+        }
+
         internal static bool TryParseLuceneQuery(string query)
         {
             // TODO: I'd assume there would be a more strict way to parse the query but not that i can find yet, for now we'll

@@ -94,6 +94,10 @@
                 content.apps[0].active = true;
                 $scope.appChanged(content.apps[0]);
             }
+            // otherwise make sure the save options are up to date with the current content state
+            else {
+                createButtons($scope.content);
+            }
 
             editorState.set(content);
 

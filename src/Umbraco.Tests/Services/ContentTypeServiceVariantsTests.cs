@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Services
 
         protected override IPublishedSnapshotService CreatePublishedSnapshotService()
         {
-            var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
+            var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
