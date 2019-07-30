@@ -39,31 +39,6 @@ namespace Umbraco.Web.Search
         }
 
         /// <summary>
-        /// This method is obsolete, use the overload with ignoreUserStartNodes instead
-        /// Searches for results based on the entity type
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="entityType"></param>
-        /// <param name="totalFound"></param>
-        /// <param name="searchFrom">
-        /// A starting point for the search, generally a node id, but for members this is a member type alias
-        /// </param>
-        /// <param name="pageSize"></param>
-        /// <param name="pageIndex"></param>
-        /// <returns></returns>
-        [Obsolete("This method is obsolete, use the overload with ignoreUserStartNodes instead", false)]
-        public IEnumerable<SearchResultEntity> ExamineSearch(
-            string query,
-            UmbracoEntityTypes entityType,
-            int pageSize,
-            long pageIndex,
-            out long totalFound,
-            string searchFrom = null)
-        {
-            return ExamineSearch(query, entityType, pageSize, pageIndex, out totalFound, ignoreUserStartNodes: false, searchFrom);
-        }
-
-        /// <summary>
         /// Searches for results based on the entity type
         /// </summary>
         /// <param name="query"></param>
@@ -80,10 +55,7 @@ namespace Umbraco.Web.Search
             string query,
             UmbracoEntityTypes entityType,
             int pageSize,
-            long pageIndex,
-            out long totalFound,
-            bool ignoreUserStartNodes,
-            string searchFrom = null)
+            long pageIndex, out long totalFound, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             var sb = new StringBuilder();
 
@@ -385,9 +357,9 @@ namespace Umbraco.Web.Search
                 var m = _mapper.Map<SearchResultEntity>(result);
 
                 //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
+                if (m.Icon == Constants.Icons.DefaultIcon)
                 {
-                    m.Icon = "icon-user";
+                    m.Icon = Constants.Icons.Member;
                 }
 
                 if (result.Values.ContainsKey("email") && result.Values["email"] != null)
@@ -418,9 +390,9 @@ namespace Umbraco.Web.Search
             {
                 var m = _mapper.Map<SearchResultEntity>(result);
                 //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
+                if (m.Icon == Constants.Icons.DefaultIcon)
                 {
-                    m.Icon = "icon-picture";
+                    m.Icon = Constants.Icons.MediaImage;
                 }
                 yield return m;
             }
