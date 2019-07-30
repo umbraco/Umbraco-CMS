@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             // the cache policy will always want everything
             // even GetMany(ids) gets everything and filters afterwards
-            if (ids.Any()) throw new Exception("panic");
+            if (ids.Any()) throw new PanicException("There can be no ids specified");
             return CommonRepository.GetAllTypes().OfType<IMediaType>();
         }
 
