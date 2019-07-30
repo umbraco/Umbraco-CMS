@@ -12,6 +12,7 @@
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
     <key alias="createPackage">Skapa paket</key>
+    <key alias="createblueprint">Skapa innehållsmall</key>
     <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
@@ -43,7 +44,6 @@
     <key alias="domainCreated">Har skapat domännamnet %0%</key>
     <key alias="domainDeleted">Har tagit bort domännamnet %0%</key>
     <key alias="domainExists">Domänen %0% är redan tillagd</key>
-    <key alias="domainHelp">t.ex.: dittdomannamn.se, www.dittdomannamn.se</key>
     <key alias="domainUpdated">Domännamnet %0% har uppdaterats</key>
     <key alias="duplicateDomain">Domänen är redan tilldelad</key>
     <key alias="inherit">Ärv</key>
@@ -60,6 +60,42 @@
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visar för</key>
+    <key alias="delete">Innehållet raderat</key>
+    <key alias="unpublish">Innehållet avpublicerat</key>
+    <key alias="unpublishvariant">Innehållet avpublicerat för språk: %0% </key>
+    <key alias="publish">Spara och publicera utförd av användaren</key>
+    <key alias="publishvariant">Innehåll publicerat för språk: %0% </key>
+    <key alias="save">Innehåll sparat</key>
+    <key alias="savevariant">Innehåll sparat för språk: %0%</key>
+    <key alias="move">Innehåll flyttat</key>
+    <key alias="copy">Innehåll kopierat</key>
+    <key alias="rollback">Innehållet rullades tillbaka</key>
+    <key alias="sendtopublish">Innehåll skickat för publicering</key>
+    <key alias="sendtopublishvariant">Innehåll skickat för publicering för språk: %0%</key>
+    <key alias="sort">Sortering av underliggande objekt utfört av användaren</key>
+    <key alias="smallCopy">Kopiera</key>
+    <key alias="smallPublish">Publicera</key>
+    <key alias="smallPublishVariant">Publicera</key>
+    <key alias="smallMove">Flytta</key>
+    <key alias="smallSave">Spara</key>
+    <key alias="smallSaveVariant">Spara</key>
+    <key alias="smallDelete">Ta bort</key>
+    <key alias="smallUnpublish">Avpublicera</key>
+    <key alias="smallUnpublishVariant">Avpublicera</key>
+    <key alias="smallRollBack">Rulla tillbaka</key>
+    <key alias="smallSendToPublish">Skicka till publicering</key>
+    <key alias="smallSendToPublishVariant">Skicka till publicering</key>
+    <key alias="smallSort">Sortera</key>
+    <key alias="historyIncludingVariants">Historik (alla varianter)</key>
+  </area>
+  <area alias="blueprints">
+    <key alias="createBlueprintFrom">Skapa en ny innehållsmall för '%0%'</key>
+    <key alias="blankBlueprint">Tom</key>
+    <key alias="selectBlueprint">Välj en innehållsmall</key>
+    <key alias="createdBlueprintHeading">Innehållsmall skapad</key>
+    <key alias="createdBlueprintMessage">En innehållsmall skapades från '%0%'</key>
+    <key alias="duplicateBlueprintMessage">En annan innehållsmall med samma namn finns redan</key>
+    <key alias="blueprintDescription">En innehållsmall är fördefinierat innehåll som en redaktör kan välja att använda som grund för att skapa nytt innehåll</key>
   </area>
   <area alias="buttons">
     <key alias="bold">Fetstil</key>
@@ -78,6 +114,7 @@
     <key alias="listNumeric">Numrerad lista</key>
     <key alias="macroInsert">Infoga macro</key>
     <key alias="pictureInsert">Infoga bild</key>
+    <key alias="publishAndClose">Publicera och stäng</key>
     <key alias="relations">Ändra relation</key>
     <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
@@ -143,14 +180,18 @@
     <key alias="membertype">Medlemstyp</key>
     <key alias="noDate">Inget datum valt</key>
     <key alias="nodeName">Sidnamn</key>
+    <key alias="noProperties">Inget innehåll kan läggas till för det här objektet</key>
     <key alias="notmemberof">Ej medlem av grupp(er)</key>
     <key alias="otherElements">Egenskaper</key>
     <key alias="parentNotPublished">Detta dokument är publicerat men syns inte eftersom den överordnade sidan %0% inte är publicerad</key>
     <key alias="parentNotPublishedAnomaly">Oops: detta dokument är publicerat men finns inte i cacheminnet (internt fel)</key>
     <key alias="publish">Publicera</key>
+    <key alias="published">Publicerad</key>
     <key alias="publishStatus">Publiceringsstatus</key>
     <key alias="releaseDate">Publiceringsdatum</key>
     <key alias="removeDate">Rensa datum</key>
+    <key alias="schedulePublishHelp">Välj datum och tid för att publicera och / eller avpublicera innehållsobjektet.</key>
+    <key alias="setDate">Välj datum</key>
     <key alias="sortDone">Sorteringsordningen har uppdaterats</key>
     <key alias="sortHelp">För att sortera noderna, dra i dem eller klicka på någon av kolumnrubrikerna. Du kan markera flera noder samtidigt genom att hålla nere SHIFT eller CONTROL medan du klickar</key>
     <key alias="statistics">Statistik</key>
@@ -181,6 +222,14 @@
     <key alias="welcome">Välkommen</key>
     <key alias="visit">Besök</key>
   </area>
+  <area alias="dashboardTabs">
+    <key alias="contentIntro">Komma igång</key>
+    <key alias="contentRedirectManager">URL-omdirigeringshantering</key>
+    <key alias="mediaFolderBrowser">Innehåll</key>
+    <key alias="settingsWelcome">Välkommen</key>
+    <key alias="memberIntro">Komma igång</key>
+    <key alias="formsInstall">Installera Umbraco Forms</key>
+  </area>
   <area alias="prompt">
     <key alias="stay">Stay</key>
     <key alias="discardChanges">Discard changes</key>
@@ -188,27 +237,27 @@
     <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
   </area>
   <area alias="bulk">
-    <key alias="done">Done</key>
-    <key alias="deletedItem">Deleted %0% item</key>
-    <key alias="deletedItems">Deleted %0% items</key>
-    <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
-    <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
-    <key alias="publishedItem">Published %0% item</key>
-    <key alias="publishedItems">Published %0% items</key>
-    <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
-    <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
-    <key alias="unpublishedItem">Unpublished %0% item</key>
-    <key alias="unpublishedItems">Unpublished %0% items</key>
-    <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
-    <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
-    <key alias="movedItem">Moved %0% item</key>
-    <key alias="movedItems">Moved %0% items</key>
-    <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
-    <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
-    <key alias="copiedItem">Copied %0% item</key>
-    <key alias="copiedItems">Copied %0% items</key>
-    <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
-    <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
+    <key alias="done">Klar</key>
+    <key alias="deletedItem">Tog bort %0% objekt</key>
+    <key alias="deletedItems">Tog bort %0% objekt</key>
+    <key alias="deletedItemOfItem">Tog bort %0% av %1% objekt</key>
+    <key alias="deletedItemOfItems">Tog bort %0% av %1% objekt</key>
+    <key alias="publishedItem">Publicerade %0% objekt</key>
+    <key alias="publishedItems">Publicerade %0% objekt</key>
+    <key alias="publishedItemOfItem">Publicerade %0% av %1% objekt</key>
+    <key alias="publishedItemOfItems">Publicerade %0% av %1% objekt</key>
+    <key alias="unpublishedItem">Avpublicerade %0% objekt</key>
+    <key alias="unpublishedItems">Avpublicerade %0% objekt</key>
+    <key alias="unpublishedItemOfItem">Avpublicerade %0% av %1% objekt</key>
+    <key alias="unpublishedItemOfItems">Avpublicerade %0% av %1% objekt</key>
+    <key alias="movedItem">Flyttade %0% objekt</key>
+    <key alias="movedItems">Flyttade %0% objekt</key>
+    <key alias="movedItemOfItem">Flyttade %0% av %1% objekt</key>
+    <key alias="movedItemOfItems">Flyttade %0% av %1% objekt</key>
+    <key alias="copiedItem">Kopierade %0% objekt</key>
+    <key alias="copiedItems">Kopierade %0% objekt</key>
+    <key alias="copiedItemOfItem">Kopierade %0% av %1% objekt</key>
+    <key alias="copiedItemOfItems">Kopierade %0% av %1% objekt</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Namn</key>
@@ -258,15 +307,8 @@
     <key alias="displayName">Språknamn</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Tillåtna typer för underliggande noder</key>
-    <key alias="create">Skapa</key>
     <key alias="createListView">Skapa en anpassad listvy</key>
-    <key alias="deletetab">Ta bort flik</key>
-    <key alias="description">Beskrivning</key>
-    <key alias="newtab">Ny flik</key>
     <key alias="removeListView">Radera anpassad listvy</key>
-    <key alias="tab">Flik</key>
-    <key alias="thumbnail">Miniatyrbild</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Lägg till värde</key>
@@ -325,6 +367,7 @@
     <key alias="comment">Kommentar</key>
     <key alias="confirm">Bekräfta</key>
     <key alias="constrainProportions">Begränsa proportioner</key>
+    <key alias="content">Innehåll</key>
     <key alias="continue">Fortsätt</key>
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
@@ -345,8 +388,11 @@
     <key alias="error">Fel</key>
     <key alias="findDocument">Hitta</key>
     <key alias="folder">Mapp</key>
+    <key alias="general">Generella</key>
+    <key alias="groups">Grupper</key>
     <key alias="height">Höjd</key>
     <key alias="help">Hjälp</key>
+    <key alias="history">Historik</key>
     <key alias="icon">Ikon</key>
     <key alias="import">Importera</key>
     <key alias="innerMargin">Innermarginal</key>
@@ -355,6 +401,7 @@
     <key alias="justify">Justera</key>
     <key alias="language">Språk</key>
     <key alias="layout">Layout</key>
+    <key alias="links">Länkar</key>
     <key alias="loading">Laddar</key>
     <key alias="locked">Låst</key>
     <key alias="login">Logga in</key>
@@ -370,6 +417,7 @@
     <key alias="ok">OK</key>
     <key alias="open">Öppna</key>
     <key alias="or">eller</key>
+    <key alias="orderBy">Sortering</key>
     <key alias="password">Lösenord</key>
     <key alias="path">Sökväg</key>
     <key alias="pleasewait">Ett ögonblick...</key>
@@ -378,12 +426,15 @@
     <key alias="reciept">E-postadress för formulärsdata</key>
     <key alias="recycleBin">Papperskorg</key>
     <key alias="remaining">Återstående</key>
+    <key alias="remove">Ta bort</key>
     <key alias="rename">Döp om</key>
     <key alias="renew">Förnya</key>
     <key alias="required">Obligatorisk</key>
     <key alias="retry">Försök igen</key>
     <key alias="rights">Rättigheter</key>
+    <key alias="scheduledPublishing">Schemalagd publicering</key>
     <key alias="search">Sök</key>
+    <key alias="searchNoResult">Tyvärr kan vi inte hitta det du söker.</key>
     <key alias="searchResults">Sökresultat</key>
     <key alias="server">Server</key>
     <key alias="show">Visa</key>
@@ -516,6 +567,7 @@
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klicka för att ladda upp</key>
+    <key alias="orClickHereToUpload">eller klicka här för att välja filer</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
@@ -722,6 +774,7 @@
     <key alias="styles">Stilar</key>
   </area>
   <area alias="template">
+    <key alias="createdDate">Skapad</key>
     <key alias="edittemplate">Redigera sidmall</key>
     <key alias="insertContentArea">Lägg in innehållsyta</key>
     <key alias="insertContentAreaPlaceHolder">Lägg in platshållare för innehållsyta</key>
@@ -855,6 +908,7 @@
     <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
     <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
     <key alias="contentChannel">Innehållskanal</key>
+    <key alias="createUser">Skapa användare</key>
     <key alias="descriptionField">Fält för beskrivning</key>
     <key alias="disabled">Avaktivera användare</key>
     <key alias="documentType">Dokumenttyp</key>
@@ -881,6 +935,8 @@
     <key alias="resetPassword">Återställ lösenord</key>
     <key alias="searchAllChildren">Sök igenom alla undernoder</key>
     <key alias="sessionExpires">Sessionen går ut</key>
+    <key alias="sortNameAscending">Namn (A-Z)</key>
+    <key alias="sortNameDescending">Namn (Z-A)</key>
     <key alias="startnode">Startnod i innehåll</key>
     <key alias="username">Användarens namn</key>
     <key alias="userPermissions">Användarrättigheter</key>

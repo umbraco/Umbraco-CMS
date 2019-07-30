@@ -22,7 +22,7 @@ function startUpVideosDashboardController($scope, dashboardResource) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function startUpDynamicContentController($timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
+function startUpDynamicContentController($q, $timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
     var vm = this;
     var evts = [];
 

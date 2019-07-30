@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using AutoMapper;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -11,7 +10,6 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Models.Mapping
@@ -27,22 +25,6 @@ namespace Umbraco.Tests.Models.Mapping
         private readonly Mock<IEntityService> _entityService = new Mock<IEntityService>();
         private readonly Mock<IFileService> _fileService = new Mock<IFileService>();
         private Mock<PropertyEditorCollection> _editorsMock;
-
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            // FIXME: are we initializing mappers that... have already been?
-            Mapper.Reset();
-            Mapper.Initialize(configuration =>
-            {
-                //initialize our content type mapper
-                var profile1 = new ContentTypeMapperProfile(_editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>(), Mock.Of<ILogger>());
-                configuration.AddProfile(profile1);
-                var profile2 = new EntityMapperProfile();
-                configuration.AddProfile(profile2);
-            });
-        }
 
         protected override void Compose()
         {

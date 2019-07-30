@@ -15,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -173,7 +174,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            var rootNodeAsString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+            var rootNodeAsString = Constants.System.RootString;
             var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
 
             var node = new TreeNode(
@@ -366,7 +367,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected bool IsDialog(FormDataCollection queryStrings)
         {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IsDialog);
+            return queryStrings.GetValue<string>(TreeQueryStringParameters.Use) == "dialog";
         }
 
         /// <summary>

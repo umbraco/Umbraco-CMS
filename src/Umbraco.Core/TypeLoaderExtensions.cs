@@ -33,13 +33,5 @@ namespace Umbraco.Core
         {
             return mgr.GetTypes<IPackageAction>();
         }
-
-        /// <summary>
-        /// Gets all classes inheriting from BaseMapper and marked with the MapperForAttribute.
-        /// </summary>
-        public static IEnumerable<Type> GetAssignedMapperTypes(this TypeLoader mgr)
-        {
-            return mgr.GetTypesWithAttribute<BaseMapper, MapperForAttribute>();
-        }
     }
 }

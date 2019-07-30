@@ -62,24 +62,6 @@
                         </umb-user-group-preview>
                     </div>
         
-                    <div class="umb-notifications" style="bottom: 0;" ng-if="vm.showNotification">
-                        <div class="umb-notification alert alert-block alert-form umb-notifications__notification animated -half-second fadeIn -no-border -extra-padding">
-                            <h4 style="font-size: 16px;"><localize key="prompt_unsavedChanges"></localize></h4>
-                            <p style="line-height: 1.6em; margin-bottom: 10px;"><localize key="prompt_unsavedChangesWarning"></localize></p>
-                            <umb-button
-                                label-key="prompt_discardChanges"
-                                action="vm.discardChanges();"
-                                type="button">
-                            </umb-button>
-                            <umb-button
-                                label-key="prompt_stay"
-                                action="vm.stay()"
-                                type="button"
-                                button-style="action">
-                            </umb-button>
-                        </div>
-                    </div>
-
                 </form>
 
             </div>
@@ -116,12 +98,7 @@
                 <umb-control-group
                     ng-repeat="(category, permissions) in vm.selectedUserGroup.permissions"
                     label="{{category}}">
-                    <umb-permission
-                        ng-repeat="permission in permissions"
-                        name="permission.name"
-                        description="permission.description"
-                        selected="permission.checked">
-                    </umb-permission>
+                    <umb-toggle-group items="permissions"></umb-toggle-group>
                 </umb-control-group>
             </div>
         </div>

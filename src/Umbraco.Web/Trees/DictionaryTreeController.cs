@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
 
             Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 nodes.AddRange(
                     Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
@@ -104,7 +104,7 @@ namespace Umbraco.Web.Trees
 
             menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-            if (id != Constants.System.Root.ToInvariantString())
+            if (id != Constants.System.RootString)
                 menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));

@@ -3,19 +3,19 @@
         <div ng-if="!vm.languages">
             <p><localize key="prompt_confirmListViewPublish"></localize></p>
         </div>
-    
+
         <div ng-if="vm.languages.length > 1">
-    
+
             <div class="mb3">
                 <p><localize key="content_languagesToPublish"></localize></p>
             </div>
-    
+
             <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
                 <umb-load-indicator></umb-load-indicator>
             </div>
-    
+
             <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
-    
+
                 <div class="umb-list-item" ng-repeat="language in vm.languages track by language.id">
                     <ng-form name="publishLanguageSelectorForm">
                         <div class="flex">
@@ -28,20 +28,20 @@
                                 style="margin-right: 8px;" />
                             <div>
                                 <label for="{{language.culture}}" style="margin-bottom: 2px;">
-                                    <span ng-class="{'bold': language.isDefault}">{{ language.name }}</span>
+                                    <span>{{ language.name }}</span>
                                 </label>
-    
-                                <div class="umb-permission__description">
+
+                                <div class="umb-list-item__description">
                                     <span ng-if="language.isMandatory"><localize key="languages_mandatoryLanguage"></localize></span>
                                 </div>
-    
+
                             </div>
                         </div>
-    
+
                     </ng-form>
                 </div>
             </div>
-    
+
         </div>
-    
+
     </div>

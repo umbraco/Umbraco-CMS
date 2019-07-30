@@ -93,5 +93,10 @@ namespace Umbraco.Web.Routing
         {
             return !Equals(left, right);
         }
+
+        public override string ToString()
+        {
+            return Text;
+        }
     }
 }

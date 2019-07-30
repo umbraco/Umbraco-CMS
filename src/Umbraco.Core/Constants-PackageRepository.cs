@@ -3,7 +3,7 @@
     public static partial class Constants
     {
         /// <summary>
-        ///     Defines the constants used for the Umbraco package repository
+        /// Defines the constants used for the Umbraco package repository
         /// </summary>
         public static class PackageRepository
         {

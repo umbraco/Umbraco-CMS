@@ -1,39 +1,39 @@
 /**
-    * @ngdoc service
-    * @name umbraco.resources.logViewerResource
-    * @description Retrives Umbraco log items (by default from JSON files on disk)
-    *
-    *
-    **/
-   function logViewerResource($q, $http, umbRequestHelper) {
+ * @ngdoc service
+ * @name umbraco.resources.logViewerResource
+ * @description Retrives Umbraco log items (by default from JSON files on disk)
+ *
+ *
+ **/
+function logViewerResource($q, $http, umbRequestHelper) {
 
     //the factory object returned
     return {
 
-        getNumberOfErrors: function () {
+        getNumberOfErrors: function (startDate, endDate) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "logViewerApiBaseUrl",
-                        "GetNumberOfErrors")),
+                        "GetNumberOfErrors")+ '?startDate='+startDate+ '&endDate='+  endDate ),
                 'Failed to retrieve number of errors in logs');
         },
 
-        getLogLevelCounts: function () {
+        getLogLevelCounts: function (startDate, endDate) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "logViewerApiBaseUrl",
-                        "GetLogLevelCounts")),
+                        "GetLogLevelCounts")+ '?startDate='+startDate+ '&endDate='+  endDate ),
                 'Failed to retrieve log level counts');
         },
 
-        getMessageTemplates: function () {
+        getMessageTemplates: function (startDate, endDate) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "logViewerApiBaseUrl",
-                        "GetMessageTemplates")),
+                        "GetMessageTemplates")+ '?startDate='+startDate+ '&endDate='+  endDate ),
                 'Failed to retrieve log templates');
         },
 
@@ -93,12 +93,12 @@
                 'Failed to retrieve common log messages');
         },
 
-        canViewLogs: function () {
+        canViewLogs: function (startDate, endDate) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "logViewerApiBaseUrl",
-                        "GetCanViewLogs")),
+                        "GetCanViewLogs") + '?startDate='+startDate+ '&endDate='+  endDate ),
                 'Failed to retrieve state if logs can be viewed');
         }
 

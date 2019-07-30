@@ -60,6 +60,7 @@ function confirmDirective() {
         link: function (scope, element, attr, ctrl) {
             scope.showCancel = false;
             scope.showConfirm = false;
+            scope.confirmButtonState = "init";
 
             if (scope.onConfirm) {
                 scope.showConfirm = true;
@@ -67,6 +68,15 @@ function confirmDirective() {
 
             if (scope.onCancel) {
                 scope.showCancel = true;
+            }
+
+            scope.confirm = function () {
+                if (!scope.onConfirm) {
+                    return;
+                }
+
+                scope.confirmButtonState = "busy";
+                scope.onConfirm();
             }
         }
     };

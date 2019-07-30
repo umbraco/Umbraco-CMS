@@ -21,11 +21,7 @@
                     <div class="block-form" ng-show="!vm.loading">
                         <span ng-bind-html="vm.labels.headline"></span>
                         <umb-control-group>
-                            <umb-permission ng-repeat="option in vm.notifyOptions"
-                                            name="option.name"
-                                            description="option.description"
-                                            selected="option.checked">
-                            </umb-permission>
+                            <umb-toggle-group items="vm.notifyOptions" on-click="vm.notificationChanged(item)"></umb-toggle-group>
                         </umb-control-group>
                     </div>
                 </div>
@@ -42,7 +38,8 @@
                     type="button"
                     action="vm.save(vm.notifyOptions)"
                     state="vm.saveState"
-                    button-style="action">
+                    button-style="success"
+                    disabled="!vm.canSave">
         </umb-button>
     </div>
 </div>

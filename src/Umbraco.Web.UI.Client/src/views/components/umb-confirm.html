@@ -1,9 +1,21 @@
 <div>
     <p ng-hide="!caption" class="umb-abstract">{{caption}}</p>
     <div class="umb-pane btn-toolbar umb-btn-toolbar">
-    	<div class="control-group umb-control-group">
-    		<a ng-if="showCancel" href class="btn btn-link" ng-click="onCancel()"><localize key="general_cancel">Cancel</localize></a>
-    		<a ng-if="showConfirm" href class="btn btn-{{confirmButtonStyle || 'primary'}}" ng-click="onConfirm()"><localize key="general_ok">Ok</localize></a>
-    	</div>
+        <div class="control-group umb-control-group">
+            <umb-button ng-if="showCancel"
+                        type="button"
+                        action="onCancel()"
+                        button-style="link"
+                        disabled="confirmButtonState === 'busy'"
+                        label-key="general_cancel">
+            </umb-button>
+            <umb-button ng-if="showConfirm"
+                        type="button"
+                        action="confirm()"
+                        button-style="{{confirmButtonStyle || 'primary'}}"
+                        state="confirmButtonState"
+                        label-key="general_ok">
+            </umb-button>
+        </div>
 	</div>
 </div>

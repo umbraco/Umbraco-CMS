@@ -51,7 +51,7 @@
     @{
         var externalLoginUrl = Url.Action("ExternalLogin", "BackOffice", new
         {
-            area = ViewBag.UmbracoPath,
+            area = ViewData.GetUmbracoPath(),
             //Custom redirect URL since we don't want to just redirect to the back office since this is for authing upgrades
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
@@ -61,7 +61,7 @@
     <script type="text/javascript">
     document.angularReady = function (app) {
 
-        @Html.AngularValueExternalLoginInfoScript((IEnumerable<string>)ViewBag.ExternalSignInError)
+        @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())
         @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
 
     }

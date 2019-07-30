@@ -41,7 +41,6 @@
     <key alias="domainCreated">הדומיין החדש %0% נוסף בהצלחה</key>
     <key alias="domainDeleted">הדומיין %0% נמחק</key>
     <key alias="domainExists">הדומיין %0% כבר מוקצה</key>
-    <key alias="domainHelp">לדוגמא: yourdomain.com, www.yourdomain.com</key>
     <key alias="domainUpdated">הדומיין %0% עודכן בהצלחה</key>
     <key alias="orEdit">ערוך דומיין נוכחי</key>
   </area>
@@ -203,13 +202,6 @@
     <key alias="displayName">שם התצוגה לשפה</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">תת פריטי תוכן מאושרים:</key>
-    <key alias="create">צור</key>
-    <key alias="deletetab">מחק לשונית</key>
-    <key alias="description">תיאור</key>
-    <key alias="newtab">לשונית חדשה</key>
-    <key alias="tab">לשונית</key>
-    <key alias="thumbnail">תמונה ממוזערת</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">הוסף ערך מקדים</key>

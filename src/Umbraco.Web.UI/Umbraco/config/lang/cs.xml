@@ -47,8 +47,6 @@
     <key alias="domainCreated">Nová doména '%0%' byla vytvořena</key>
     <key alias="domainDeleted">Doména '%0%' je odstraněna</key>
     <key alias="domainExists">Doména '%0%' už byla přiřazena</key>
-    <key alias="domainHelp"><![CDATA[Platná doménová jména jsou: "example.com", "www.example.com", "example.com:8080" nebo
-        "https://www.example.com/".<br /><br />Jednoúrovňové cesty v doménách jsou podporovány, např. "example.com/en". Měli byste se jich nicméně vyvarovat. Raději použijte nastavení kultury výše.]]></key>
     <key alias="domainUpdated">Doména '%0%' byla aktualizována</key>
     <key alias="orEdit">Editace aktuálních domén</key>
     <key alias="inherit">Dědit</key>
@@ -261,13 +259,6 @@
     <key alias="filter">Pište pro filtrování...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Povolené podřízené typy uzlů</key>
-    <key alias="create">Vytvořit</key>
-    <key alias="deletetab">Odstranit záložku</key>
-    <key alias="description">Popis</key>
-    <key alias="newtab">Nová záložka</key>
-    <key alias="tab">Záložka</key>
-    <key alias="thumbnail">Miniatura</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Přidat předlohu</key>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
@@ -9,7 +10,7 @@ namespace Umbraco.Web.ContentApps
     internal class ContentEditorContentAppFactory : IContentAppFactory
     {
         // see note on ContentApp
-        private const int Weight = -100;
+        internal const int Weight = -100;
 
         private ContentApp _contentApp;
         private ContentApp _mediaApp;
@@ -18,22 +19,25 @@ namespace Umbraco.Web.ContentApps
         {
             switch (o)
             {
-                case IContent _:
+                case IContent content when content.Properties.Count > 0:
                     return _contentApp ?? (_contentApp = new ContentApp
                     {
                         Alias = "umbContent",
                         Name = "Content",
-                        Icon = "icon-document",
+                        Icon = Constants.Icons.Content,
                         View = "views/content/apps/content/content.html",
                         Weight = Weight
                     });
 
-                case IMedia media when !media.ContentType.IsContainer && media.ContentType.Alias != Core.Constants.Conventions.MediaTypes.Folder:
+                case IContent _:
+                    return null;
+
+                case IMedia media when !media.ContentType.IsContainer || media.Properties.Count > 0:
                     return _mediaApp ?? (_mediaApp = new ContentApp
                     {
                         Alias = "umbContent",
                         Name = "Content",
-                        Icon = "icon-document",
+                        Icon = Constants.Icons.Content,
                         View = "views/media/apps/content/content.html",
                         Weight = Weight
                     });

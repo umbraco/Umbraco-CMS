@@ -3,8 +3,8 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -26,6 +26,8 @@ namespace Umbraco.Web.Editors.Filters
             if (_userService == null) throw new ArgumentNullException(nameof(userService));
             _userService = userService;
         }
+
+        private static UmbracoMapper Mapper => Current.Mapper;
 
         private IUserService UserService => _userService ?? Current.Services.UserService; // TODO: inject
 

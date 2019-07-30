@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -7,14 +8,14 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Property))]
     public sealed class PropertyMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public PropertyMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        protected override void DefineMaps()
         {
-            CacheMap<Property, PropertyDataDto>(src => src.Id, dto => dto.Id);
-            CacheMap<Property, PropertyDataDto>(src => src.PropertyTypeId, dto => dto.PropertyTypeId);
+            DefineMap<Property, PropertyDataDto>(nameof(Property.Id), nameof(PropertyDataDto.Id));
+            DefineMap<Property, PropertyDataDto>(nameof(Property.PropertyTypeId), nameof(PropertyDataDto.PropertyTypeId));
         }
     }
 }

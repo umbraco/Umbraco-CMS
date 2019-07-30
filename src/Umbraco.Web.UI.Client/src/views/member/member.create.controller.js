@@ -16,7 +16,10 @@ function memberCreateController($scope, memberTypeResource, iconHelper, navigati
         const showMenu = true;
         navigationService.hideDialog(showMenu);
     };
-    
+
+    $scope.hideActions = function () {
+        navigationService.hideNavigation();
+    };
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.Member.CreateController", memberCreateController);
