@@ -49,7 +49,7 @@ namespace Umbraco.Web.Cache
             var idsRemoved = new HashSet<int>();
             var isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
 
-            foreach (var payload in payloads)
+            foreach (var payload in payloads.Where(x => x.Id != default))
             {
                 isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
 

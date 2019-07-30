@@ -184,8 +184,12 @@ namespace Umbraco.Core.Services.Implement
                 //now load in supplementary
                 var found = _supplementFileSources.Where(x =>
                 {
-                    var fileName = Path.GetFileName(x.File.FullName);
-                    return fileName.InvariantStartsWith(culture.Name) && fileName.InvariantEndsWith(".xml");
+                    var extension = Path.GetExtension(x.File.FullName);
+                    var fileCultureName = Path.GetFileNameWithoutExtension(x.File.FullName).Replace("_", "-").Replace(".user", "");
+                    return extension.InvariantEquals(".xml") && (
+                        fileCultureName.InvariantEquals(culture.Name)
+                        || fileCultureName.InvariantEquals(culture.TwoLetterISOLanguageName)
+                    );
                 });
 
                 foreach (var supplementaryFile in found)
@@ -203,7 +207,7 @@ namespace Umbraco.Core.Services.Implement
                             continue;
                         }
 
-                        if (xChildDoc.Root == null) continue;
+                        if (xChildDoc.Root == null || xChildDoc.Root.Name != "language") continue;
                         foreach (var xArea in xChildDoc.Root.Elements("area")
                             .Where(x => ((string)x.Attribute("alias")).IsNullOrWhiteSpace() == false))
                         {

@@ -164,19 +164,19 @@ namespace Umbraco.Web.Routing
         {
             if (LockedEvents) return;
 
-            var contentCache = Current.UmbracoContext.ContentCache;
+            var contentCache = Current.UmbracoContext.Content;
             foreach (var entity in args.PublishedEntities)
             {
                 var entityContent = contentCache.GetById(entity.Id);
                 if (entityContent == null) continue;
 
                 // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures) 
-                var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Select(c => c.Key).ToArray()
+                var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray()
                     ?? new[] {(string) null};
                 foreach (var x in entityContent.DescendantsOrSelf())
                 {
                     // if this entity defines specific cultures, use those instead of the default ones
-                    var cultures = x.Cultures.Any() ? x.Cultures.Select(c => c.Key) : defaultCultures;
+                    var cultures = x.Cultures.Any() ? x.Cultures.Keys : defaultCultures;
 
                     foreach (var culture in cultures)
                     {
@@ -210,7 +210,7 @@ namespace Umbraco.Web.Routing
 
         private static void CreateRedirect(int contentId, string culture, Guid contentKey, string oldRoute)
         {
-            var contentCache = Current.UmbracoContext.ContentCache;
+            var contentCache = Current.UmbracoContext.Content;
             var newRoute = contentCache.GetRouteById(contentId, culture);
             if (IsNotRoute(newRoute) || oldRoute == newRoute) return;
             var redirectUrlService = Current.Services.RedirectUrlService;

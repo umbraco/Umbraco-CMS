@@ -14,7 +14,7 @@ namespace Umbraco.Core.Xml
     /// <summary>
     /// The XmlHelper class contains general helper methods for working with xml in umbraco.
     /// </summary>
-    internal class XmlHelper
+    public class XmlHelper
     {
         /// <summary>
         /// Creates or sets an attribute on the XmlNode if an Attributes collection is available
@@ -341,7 +341,7 @@ namespace Umbraco.Core.Xml
         /// </summary>
         /// <param name="n">The XmlNode.</param>
         /// <returns>the value as a string</returns>
-        public static string GetNodeValue(XmlNode n)
+        internal static string GetNodeValue(XmlNode n)
         {
             var value = string.Empty;
             if (n == null || n.FirstChild == null)
@@ -373,7 +373,7 @@ namespace Umbraco.Core.Xml
         /// <param name="rootName">Name of the root.</param>
         /// <param name="elementName">Name of the element.</param>
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-        public static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
+        internal static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
         {
             return Split(new XmlDocument(), data, separator, rootName, elementName);
         }
@@ -387,7 +387,7 @@ namespace Umbraco.Core.Xml
         /// <param name="rootName">Name of the root node.</param>
         /// <param name="elementName">Name of the element node.</param>
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-        public static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
+        internal static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
         {
             // load new XML document.
             xml.LoadXml(string.Concat("<", rootName, "/>"));
@@ -416,7 +416,7 @@ namespace Umbraco.Core.Xml
         /// </summary>
         /// <param name="tag"></param>
         /// <returns></returns>
-        public static Dictionary<string, string> GetAttributesFromElement(string tag)
+        internal static Dictionary<string, string> GetAttributesFromElement(string tag)
         {
             var m =
                 Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",

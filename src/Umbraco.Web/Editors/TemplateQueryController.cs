@@ -103,8 +103,8 @@ namespace Umbraco.Web.Editors
             {
                 contents = sourceDocument == null
                     ? Enumerable.Empty<IPublishedContent>()
-                    : sourceDocument.Children(model.ContentType.Alias);
-                queryExpression.AppendFormat(".Children(\"{0}\")", model.ContentType.Alias);
+                    : sourceDocument.ChildrenOfType(model.ContentType.Alias);
+                queryExpression.AppendFormat(".ChildrenOfType(\"{0}\")", model.ContentType.Alias);
             }
             else
             {

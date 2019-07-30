@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -8,28 +9,28 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(User))]
     public sealed class UserMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public UserMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        protected override void DefineMaps()
         {
-            CacheMap<User, UserDto>(src => src.Id, dto => dto.Id);
-            CacheMap<User, UserDto>(src => src.Email, dto => dto.Email);
-            CacheMap<User, UserDto>(src => src.Username, dto => dto.Login);
-            CacheMap<User, UserDto>(src => src.RawPasswordValue, dto => dto.Password);
-            CacheMap<User, UserDto>(src => src.Name, dto => dto.UserName);
+            DefineMap<User, UserDto>(nameof(User.Id), nameof(UserDto.Id));
+            DefineMap<User, UserDto>(nameof(User.Email), nameof(UserDto.Email));
+            DefineMap<User, UserDto>(nameof(User.Username), nameof(UserDto.Login));
+            DefineMap<User, UserDto>(nameof(User.RawPasswordValue), nameof(UserDto.Password));
+            DefineMap<User, UserDto>(nameof(User.Name), nameof(UserDto.UserName));
             //NOTE: This column in the db is *not* used!
-            //CacheMap<User, UserDto>(src => src.DefaultPermissions, dto => dto.DefaultPermissions);
-            CacheMap<User, UserDto>(src => src.IsApproved, dto => dto.Disabled);
-            CacheMap<User, UserDto>(src => src.IsLockedOut, dto => dto.NoConsole);
-            CacheMap<User, UserDto>(src => src.Language, dto => dto.UserLanguage);
-            CacheMap<User, UserDto>(src => src.CreateDate, dto => dto.CreateDate);
-            CacheMap<User, UserDto>(src => src.UpdateDate, dto => dto.UpdateDate);
-            CacheMap<User, UserDto>(src => src.LastLockoutDate, dto => dto.LastLockoutDate);
-            CacheMap<User, UserDto>(src => src.LastLoginDate, dto => dto.LastLoginDate);
-            CacheMap<User, UserDto>(src => src.LastPasswordChangeDate, dto => dto.LastPasswordChangeDate);
-            CacheMap<User, UserDto>(src => src.SecurityStamp, dto => dto.SecurityStampToken);
+            //DefineMap<User, UserDto>(nameof(User.DefaultPermissions), nameof(UserDto.DefaultPermissions));
+            DefineMap<User, UserDto>(nameof(User.IsApproved), nameof(UserDto.Disabled));
+            DefineMap<User, UserDto>(nameof(User.IsLockedOut), nameof(UserDto.NoConsole));
+            DefineMap<User, UserDto>(nameof(User.Language), nameof(UserDto.UserLanguage));
+            DefineMap<User, UserDto>(nameof(User.CreateDate), nameof(UserDto.CreateDate));
+            DefineMap<User, UserDto>(nameof(User.UpdateDate), nameof(UserDto.UpdateDate));
+            DefineMap<User, UserDto>(nameof(User.LastLockoutDate), nameof(UserDto.LastLockoutDate));
+            DefineMap<User, UserDto>(nameof(User.LastLoginDate), nameof(UserDto.LastLoginDate));
+            DefineMap<User, UserDto>(nameof(User.LastPasswordChangeDate), nameof(UserDto.LastPasswordChangeDate));
+            DefineMap<User, UserDto>(nameof(User.SecurityStamp), nameof(UserDto.SecurityStampToken));
         }
     }
 }

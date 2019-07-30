@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -71,7 +72,7 @@ namespace Umbraco.Tests.Scoping
 
         protected override IPublishedSnapshotService CreatePublishedSnapshotService()
         {
-            var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
+            var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
@@ -91,15 +92,15 @@ namespace Umbraco.Tests.Scoping
                 null,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
-                Mock.Of<IUmbracoContextAccessor>(),
                 Logger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>());
+                Mock.Of<IPublishedModelFactory>(),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
@@ -116,6 +117,7 @@ namespace Umbraco.Tests.Scoping
                 new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
                 umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor());
 
@@ -146,11 +148,11 @@ namespace Umbraco.Tests.Scoping
             {
                 evented++;
 
-                var e = umbracoContext.ContentCache.GetById(item.Id);
+                var e = umbracoContext.Content.GetById(item.Id);
 
                 // during events, due to LiveSnapshot, we see the changes
                 Assert.IsNotNull(e);
-                Assert.AreEqual("changed", e.Name);
+                Assert.AreEqual("changed", e.Name());
             };
 
             using (var scope = ScopeProvider.CreateScope())
@@ -160,9 +162,9 @@ namespace Umbraco.Tests.Scoping
             }
 
             // been created
-            var x = umbracoContext.ContentCache.GetById(item.Id);
+            var x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual("name", x.Name);
+            Assert.AreEqual("name", x.Name());
 
             ContentService.Published += OnPublishedAssert;
 
@@ -182,9 +184,9 @@ namespace Umbraco.Tests.Scoping
             // after the scope,
             // if completed, we see the changes
             // else changes have been rolled back
-            x = umbracoContext.ContentCache.GetById(item.Id);
+            x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual(complete ? "changed" : "name", x.Name);
+            Assert.AreEqual(complete ? "changed" : "name", x.Name());
         }
     }
 }

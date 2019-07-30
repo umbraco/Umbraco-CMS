@@ -41,12 +41,12 @@ module.exports = {
             assets: "./src/assets/**"
         }
     },
-    root: "../Umbraco.Web.UI/Umbraco/",
+    root: "../Umbraco.Web.UI/",
     targets: {
-        js: "js/",
-        lib: "lib/",
-        views: "views/",
-        css: "assets/css/",
-        assets: "assets/"
+        js: "Umbraco/js/",
+        lib: "Umbraco/lib/",
+        views: "Umbraco/views/",
+        css: "Umbraco/assets/css/",
+        assets: "Umbraco/assets/"
     }
 };

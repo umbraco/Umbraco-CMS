@@ -92,12 +92,15 @@ namespace Umbraco.Tests.PublishedContent
             throw new NotImplementedException();
         }
 
+        public override IPublishedContent GetById(bool preview, Udi nodeId)
+            => throw new NotSupportedException();
+
         public override bool HasById(bool preview, int contentId)
         {
             return _content.ContainsKey(contentId);
         }
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
         {
             return _content.Values.Where(x => x.Parent == null);
         }
@@ -137,27 +140,27 @@ namespace Umbraco.Tests.PublishedContent
             return _content.Count > 0;
         }
 
-        public override PublishedContentType GetContentType(int id)
+        public override IPublishedContentType GetContentType(int id)
         {
             throw new NotImplementedException();
         }
 
-        public override PublishedContentType GetContentType(string alias)
+        public override IPublishedContentType GetContentType(string alias)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
+        public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {
             throw new NotImplementedException();
         }
     }
 
-    class SolidPublishedContent : IPublishedContent
+    internal class SolidPublishedContent : IPublishedContent
     {
         #region Constructor
 
-        public SolidPublishedContent(PublishedContentType contentType)
+        public SolidPublishedContent(IPublishedContentType contentType)
         {
             // initialize boring stuff
             TemplateId = 0;
@@ -173,13 +176,19 @@ namespace Umbraco.Tests.PublishedContent
 
         #region Content
 
+        private Dictionary<string, PublishedCultureInfo> _cultures;
+
+        private Dictionary<string, PublishedCultureInfo> GetCultures()
+        {
+            return new Dictionary<string, PublishedCultureInfo> { { "", new PublishedCultureInfo("", Name, UrlSegment, UpdateDate) } };
+        }
+
         public int Id { get; set; }
         public Guid Key { get; set; }
         public int? TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
-        public PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
-        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ?? (_cultures = GetCultures());
         public string UrlSegment { get; set; }
         public string WriterName { get; set; }
         public string CreatorName { get; set; }
@@ -191,9 +200,8 @@ namespace Umbraco.Tests.PublishedContent
         public Guid Version { get; set; }
         public int Level { get; set; }
         public string Url { get; set; }
-        public string GetUrl(string culture = null) => throw new NotSupportedException();
 
-        public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
+        public PublishedItemType ItemType => PublishedItemType.Content;
         public bool IsDraft(string culture = null) => false;
         public bool IsPublished(string culture = null) => true;
 
@@ -206,12 +214,13 @@ namespace Umbraco.Tests.PublishedContent
 
         public IPublishedContent Parent { get; set; }
         public IEnumerable<IPublishedContent> Children { get; set; }
+        public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
         #endregion
 
         #region ContentType
 
-        public PublishedContentType ContentType { get; private set; }
+        public IPublishedContentType ContentType { get; set; }
 
         #endregion
 
@@ -233,7 +242,7 @@ namespace Umbraco.Tests.PublishedContent
             while (content != null && (property == null || property.HasValue() == false))
             {
                 content = content.Parent;
-                property = content == null ? null : content.GetProperty(alias);
+                property = content?.GetProperty(alias);
             }
 
             return property;
@@ -253,7 +262,7 @@ namespace Umbraco.Tests.PublishedContent
 
     internal class SolidPublishedProperty : IPublishedProperty
     {
-        public PublishedPropertyType PropertyType { get; set; }
+        public IPublishedPropertyType PropertyType { get; set; }
         public string Alias { get; set; }
         public object SolidSourceValue { get; set; }
         public object SolidValue { get; set; }
@@ -397,7 +406,7 @@ namespace Umbraco.Tests.PublishedContent
 
     class AutoPublishedContentType : PublishedContentType
     {
-        private static readonly PublishedPropertyType Default;
+        private static readonly IPublishedPropertyType Default;
 
         static AutoPublishedContentType()
         {
@@ -412,11 +421,19 @@ namespace Umbraco.Tests.PublishedContent
             : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
         { }
 
+        public AutoPublishedContentType(int id, string alias, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
+            : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
+        { }
+
         public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
             : base(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
         { }
 
-        public override PublishedPropertyType GetPropertyType(string alias)
+        public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
+            : base(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
+        { }
+
+        public override IPublishedPropertyType GetPropertyType(string alias)
         {
             var propertyType = base.GetPropertyType(alias);
             return propertyType ?? Default;

@@ -14,6 +14,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 Published = PrimitiveSerializer.Boolean.ReadFrom(stream),
                 Name = PrimitiveSerializer.String.ReadFrom(stream),
+                UrlSegment = PrimitiveSerializer.String.ReadFrom(stream),
                 VersionId = PrimitiveSerializer.Int32.ReadFrom(stream),
                 VersionDate = PrimitiveSerializer.DateTime.ReadFrom(stream),
                 WriterId = PrimitiveSerializer.Int32.ReadFrom(stream),
@@ -27,6 +28,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             PrimitiveSerializer.Boolean.WriteTo(value.Published, stream);
             PrimitiveSerializer.String.WriteTo(value.Name, stream);
+            PrimitiveSerializer.String.WriteTo(value.UrlSegment, stream);
             PrimitiveSerializer.Int32.WriteTo(value.VersionId, stream);
             PrimitiveSerializer.DateTime.WriteTo(value.VersionDate, stream);
             PrimitiveSerializer.Int32.WriteTo(value.WriterId, stream);

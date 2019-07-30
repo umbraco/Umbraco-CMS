@@ -10,35 +10,35 @@
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
 
-        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
+        <div class="umb-list-item"
+             ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
             <ng-form name="publishVariantSelectorForm">
-                <div class="flex">
-                    <input id="{{variant.htmlId}}"
-                           name="publishVariantSelector"
-                           type="checkbox"
-                           ng-model="variant.publish"
-                           ng-change="vm.changeSelection(variant)"
-                           ng-disabled="(vm.isNew && variant.language.isMandatory) || (variant.canSave === false)"
-                           style="margin-right: 8px;"
-                           val-server-field="{{variant.htmlId}}" />
+                <div class="flex" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
+
+                    <umb-checkbox input-id="{{variant.htmlId}}"
+                                  name="publishVariantSelector"
+                                  model="variant.publish"
+                                  on-change="vm.changeSelection(variant)"
+                                  disabled="(variant.canPublish === false)"
+                                  server-validation-field="{{variant.htmlId}}" />
                     <div>
                         <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                             <span>{{ variant.language.name }}</span>
+                            <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+
+                            <span class="db umb-list-item__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                <umb-variant-state variant="variant"></umb-variant-state>
+                                <span ng-if="variant.language.isMandatory"> - </span>
+                                <span ng-if="variant.language.isMandatory" ng-class="{'text-error': (variant.language.isMandatory && variant.willPublish === false) }"><localize key="languages_mandatoryLanguage"></localize></span>
+                            </span>
+
+                            <span class="db" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                                <span class="db umb-list-item__description text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
+                            </span>
+
+                            <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
+
                         </label>
-
-                        <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                            <umb-variant-state variant="variant"></umb-variant-state>
-                            <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                        </div>
-
-                        <div ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
-                            <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</div>
-                        </div>
-
-                        <div ng-repeat="notification in variant.notifications">
-                            <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
-                        </div>
-
                     </div>
                 </div>
 
@@ -60,11 +60,11 @@
                 </div>
 
                 <div ng-if="!(variant.notifications && variant.notifications.length > 0)">
-                    <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
+                    <umb-variant-state class="umb-list-item__description" variant="variant"></umb-variant-state>
                 </div>
 
                 <div ng-repeat="notification in variant.notifications">
-                    <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                    <div class="umb-list-item__description text-success">{{notification.message}}</div>
                 </div>
 
             </div>

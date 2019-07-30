@@ -88,9 +88,6 @@
     <key alias="domainExists">Domaine '%0%' déjà assigné</key>
     <key alias="domainUpdated">Domaine '%0%' mis à jour</key>
     <key alias="orEdit">Editer les domaines actuels</key>
-    <key alias="domainHelp"><![CDATA[Les formats de domaines suivants sont autorisés : "example.com", "www.example.com", "example.com:8080" ou
-        "https://www.example.com/".<br /><br />Les domaines contenant un chemin d'un niveau sont autorisés, ex : "example.com/en". Pour autant, cela
-        devrait être évité. Utilisez plutôt la gestion de la culture et des noms d'hôte.]]></key>
     <key alias="inherit">Hériter</key>
     <key alias="setLanguage">Culture</key>
     <key alias="setLanguageHelp"><![CDATA[Définir la culture pour les noeuds enfants du noeud courant,<br /> ou hériter de la culture des noeuds parents. S'appliquera aussi<br />
@@ -383,7 +380,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Editez les différentes versions de langues pour l'élément de dictionaire '<em>%0%</em>' ci-dessous.<br/>Vous pouvez ajouter d'autres langues depuis le menu ci-dessous "Langues".
+      Editez les différentes versions de langues pour l'élément de dictionaire '<em>%0%</em>' ci-dessous.
    ]]></key>
     <key alias="displayName">Nom de Culture</key>
     <key alias="changeKeyError"><![CDATA[
@@ -409,13 +406,6 @@
     <key alias="usernameHint">Votre nom d'utilisateur est généralement votre adresse email</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Types de noeuds enfants autorisés</key>
-    <key alias="create">Créer</key>
-    <key alias="deletetab">Supprimer l'onglet</key>
-    <key alias="description">Description</key>
-    <key alias="newtab">Nouvel onglet</key>
-    <key alias="tab">Onglet</key>
-    <key alias="thumbnail">Miniature</key>
     <key alias="createListView" version="7.2">Créer une liste personnalisée</key>
     <key alias="removeListView" version="7.2">Supprimer la liste personnalisée</key>
   </area>
@@ -1823,7 +1813,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="noSniffSetHeaderInConfigSuccess">Une configuration a été ajoutée dans votre fichier web.config pour créer un header protégeant contre les vulnérabilités de MIME sniffing.</key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, a été trouvé.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, n'a pas été trouvé.]]></key>
-    <key alias="hSTSSetHeaderInConfigDescription">Ajoute l'en-tête 'Strict-Transport-Security' avec la valeur 'max-age=10886400; preload' à la section httpProtocol/customHeaders du fichier web.config. Utilisez cette correction uniquement si vos domaines vont fonctionner en https pour les 18 prochaines semaines (minimum).</key>
+    <key alias="hSTSSetHeaderInConfigDescription">Ajoute l'en-tête 'Strict-Transport-Security' avec la valeur 'max-age=10886400' à la section httpProtocol/customHeaders du fichier web.config. Utilisez cette correction uniquement si vos domaines vont fonctionner en https pour les 18 prochaines semaines (minimum).</key>
     <key alias="hSTSSetHeaderInConfigSuccess">L'en-tête HSTS a été ajouté dans votre fichier web.config.</key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> a été trouvé.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> n'a pas été trouvé.]]></key>

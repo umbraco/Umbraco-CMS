@@ -16,24 +16,24 @@
             <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.publishedVariantFilter">
                 <ng-form name="unpublishVariantSelectorForm">
                     <div class="flex">
-                        <input id="{{variant.htmlId}}"
-                                name="unpublishVariantSelector"
-                                type="checkbox"
-                                ng-model="variant.save"
-                                ng-change="vm.changeSelection(variant)"
-                                ng-disabled="variant.disabled"
-                                style="margin-right: 8px;"
-                                val-server-field="{{variant.htmlId}}" />
+
+                        <umb-checkbox
+                            input-id="{{variant.htmlId}}"
+                            name="unpublishVariantSelector"
+                            model="variant.save"
+                            on-change="vm.changeSelection(variant)"
+                            disabled="variant.disabled"
+                            server-validation-field="{{variant.htmlId}}"/>
+
                         <div>
                             <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
-                            </label>
-    
-                            <div class="umb-permission__description">
-                                <umb-variant-state variant="variant"></umb-variant-state>
-                                <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                            </div>
-    
+
+                                <span class="db umb-list-item__description">
+                                    <umb-variant-state variant="variant"></umb-variant-state>
+                                    <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                                </span>
+                            </label>    
                         </div>
                     </div>
     
@@ -55,7 +55,7 @@
                     </div>
     
                     <div>
-                        <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
+                        <umb-variant-state class="umb-list-item__description" variant="variant"></umb-variant-state>
                     </div>
                 </div>
             </div>

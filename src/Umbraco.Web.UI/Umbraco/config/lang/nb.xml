@@ -50,8 +50,7 @@
     <key alias="domainExists">Domenet '%0%' er allerede tilknyttet</key>
     <key alias="domainUpdated">Domenet '%0%' er nå oppdatert</key>
     <key alias="orEdit">eller rediger eksisterende domener</key>
-    <key alias="domainHelp"><![CDATA[Gyldige domenenavn er: "eksempel.no", "www.eksempel.no", "eksempel.no:8080" eller "https://www.eksempel.no/".<br/><br/>Stier med ett nivå støttes, f.eks. "eksempel.com/no". Imidlertid bør det unngås. Bruk heller språkinnstillingen over.]]></key>
-    <key alias="inherit">Arv</key>
+   <key alias="inherit">Arv</key>
     <key alias="setLanguage">Språk</key>
     <key alias="setLanguageHelp"><![CDATA[Sett språk for underordnede noder eller arv språk fra overordnet.<br/>Vil også gjelde denne noden, med mindre et underordnet domene også gjelder.]]></key>
     <key alias="setDomains">Domener</key>
@@ -269,13 +268,6 @@
     <key alias="enterTags">Skriv inn nøkkelord (trykk på Enter etter hvert nøkkelord)...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Tillatte underordnede noder</key>
-    <key alias="create">Opprett</key>
-    <key alias="deletetab">Slett arkfane</key>
-    <key alias="description">Beskrivelse</key>
-    <key alias="newtab">Ny arkfane</key>
-    <key alias="tab">Arkfane</key>
-    <key alias="thumbnail">Miniatyrbilde</key>
     <key alias="createListView" version="7.2">Opprett brukerdefinert listevisning</key>
     <key alias="removeListView" version="7.2">Fjern brukerdefinert listevisning</key>
   </area>

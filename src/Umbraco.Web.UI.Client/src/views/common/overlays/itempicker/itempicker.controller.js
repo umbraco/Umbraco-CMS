@@ -8,6 +8,10 @@ function ItemPickerOverlay($scope, localizationService) {
                 $scope.model.title = value;
             });
         }
+
+        if (!$scope.model.orderBy) {
+            $scope.model.orderBy = "name";
+        }
     }
 
     $scope.selectItem = function(item) {

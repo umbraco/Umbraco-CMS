@@ -9,7 +9,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
-using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
@@ -19,10 +18,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     {
         private readonly IAppCache _appCache;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly RoutesCache _routesCache;
         private readonly IDomainCache _domainCache;
-        private readonly DomainHelper _domainHelper;
         private readonly PublishedContentTypeCache _contentTypeCache;
 
         // initialize a PublishedContentCache instance with
@@ -35,8 +32,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IDomainCache domainCache, // an IDomainCache implementation
             IAppCache appCache, // an IAppCache that should be at request-level
             IGlobalSettings globalSettings,
-            ISiteDomainHelper siteDomainHelper,
-            IUmbracoContextAccessor umbracoContextAccessor,
             PublishedContentTypeCache contentTypeCache, // a PublishedContentType cache
             RoutesCache routesCache, // a RoutesCache
             string previewToken) // a preview token string (or null if not previewing)
@@ -44,11 +39,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             _appCache = appCache;
             _globalSettings = globalSettings;
-            _umbracoContextAccessor = umbracoContextAccessor;
             _routesCache = routesCache; // may be null for unit-testing
             _contentTypeCache = contentTypeCache;
             _domainCache = domainCache;
-            _domainHelper = new DomainHelper(_domainCache, siteDomainHelper);
 
             _xmlStore = xmlStore;
             _xml = _xmlStore.Xml; // capture - because the cache has to remain consistent
@@ -107,7 +100,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             // that would be returned - the "deepest" route - and that is the route we want to cache, *not* the
             // longer one - so make sure we don't cache the wrong route
 
-            var deepest = DomainHelper.ExistsDomainInPath(_domainCache.GetAll(false), content.Path, domainRootNodeId) == false;
+            var deepest = DomainUtilities.ExistsDomainInPath(_domainCache.GetAll(false), content.Path, domainRootNodeId) == false;
 
             if (deepest)
                 _routesCache.Store(content.Id, route, true); // trusted route
@@ -267,16 +260,16 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             // or we reach the content root, collecting urls in the way
             var pathParts = new List<string>();
             var n = node;
-            var hasDomains = _domainHelper.NodeHasDomains(n.Id);
+            var hasDomains = _domainCache.HasAssigned(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
                 // get the url
-                var urlName = n.UrlSegment;
+                var urlName = n.UrlSegment();
                 pathParts.Add(urlName);
 
                 // move to parent node
                 n = n.Parent;
-                hasDomains = n != null && _domainHelper.NodeHasDomains(n.Id);
+                hasDomains = n != null && _domainCache.HasAssigned(n.Id);
             }
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
@@ -320,13 +313,13 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private IPublishedContent ConvertToDocument(XmlNode xmlNode, bool isPreviewing)
         {
-            return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache,_umbracoContextAccessor);
+            return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache);
         }
 
         private IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes, bool isPreviewing)
         {
             return xmlNodes.Cast<XmlNode>()
-                .Select(xmlNode => XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache, _umbracoContextAccessor));
+                .Select(xmlNode => XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache));
         }
 
         #endregion
@@ -381,12 +374,15 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
+        public override IPublishedContent GetById(bool preview, Udi nodeId)
+            => throw new NotSupportedException();
+
         public override bool HasById(bool preview, int contentId)
         {
             return GetXml(preview).CreateNavigator().MoveToId(contentId.ToString(CultureInfo.InvariantCulture));
         }
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
         {
             return ConvertToDocuments(GetXml(preview).SelectNodes(XPathStrings.RootDocuments), preview);
         }
@@ -536,12 +532,12 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #region Content types
 
-        public override PublishedContentType GetContentType(int id)
+        public override IPublishedContentType GetContentType(int id)
         {
             return _contentTypeCache.Get(PublishedItemType.Content, id);
         }
 
-        public override PublishedContentType GetContentType(string alias)
+        public override IPublishedContentType GetContentType(string alias)
         {
             return _contentTypeCache.Get(PublishedItemType.Content, alias);
         }

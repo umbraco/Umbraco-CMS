@@ -209,7 +209,7 @@ namespace Umbraco.Web.Editors
                     Alias = y.Alias,
                     View = y.View
                 })
-            });
+            }).ToList();
         }
     }
 }

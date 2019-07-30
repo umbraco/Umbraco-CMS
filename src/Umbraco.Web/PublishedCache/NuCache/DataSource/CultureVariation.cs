@@ -11,6 +11,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("urlSegment")]
+        public string UrlSegment { get; set; }
+
         [JsonProperty("date")]
         public DateTime Date { get; set; }
 

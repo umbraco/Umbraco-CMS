@@ -77,6 +77,19 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = new Mock<IEntityService>();
             entityService.Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = $"-1,{x}", Id = x }).ToList());
+            entityService.Setup(x => x.GetKey(It.IsAny<int>(), UmbracoObjectTypes.DataType))
+                .Returns((int id, UmbracoObjectTypes objType) =>
+                {
+                    switch (id)
+                    {
+                        case Constants.DataTypes.Textbox:
+                            return Attempt.Succeed(Constants.DataTypes.Guids.TextstringGuid);
+                        case Constants.DataTypes.RichtextEditor:
+                            return Attempt.Succeed(Constants.DataTypes.Guids.RichtextEditorGuid);
+                    }
+                    return Attempt.Fail<Guid>();
+                });
+
 
             var dataTypeService = new Mock<IDataTypeService>();
             dataTypeService.Setup(service => service.GetDataType(It.IsAny<int>()))

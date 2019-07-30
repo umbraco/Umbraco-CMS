@@ -181,13 +181,13 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             contentTypeService.Save(contentType);
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content1.PublishCulture();
+            content1.PublishCulture(CultureImpact.Invariant);
             contentService.SaveAndPublish(content1);
             id2 = content1.Id;
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.PublishCulture();
+            content2.PublishCulture(CultureImpact.Invariant);
             contentService.SaveAndPublish(content2);
             id3 = content2.Id;
 

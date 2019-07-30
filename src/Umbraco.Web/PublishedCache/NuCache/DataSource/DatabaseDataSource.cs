@@ -98,6 +98,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public IEnumerable<ContentNodeKit> GetTypeContentSources(IScope scope, IEnumerable<int> ids)
         {
+            if (!ids.Any()) return Enumerable.Empty<ContentNodeKit>();
+
             var sql = ContentSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
                 .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
@@ -169,6 +171,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScope scope, IEnumerable<int> ids)
         {
+            if (!ids.Any()) return Enumerable.Empty<ContentNodeKit>();
+
             var sql = MediaSourcesSelect(scope)
                     .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
                     .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
@@ -223,6 +227,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     p = new ContentData
                     {
                         Name = dto.PubName,
+                        UrlSegment = nested.UrlSegment,
                         Published = true,
                         TemplateId = dto.PubTemplateId,
                         VersionId = dto.VersionId,

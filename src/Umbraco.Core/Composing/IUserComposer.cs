@@ -4,7 +4,7 @@
     /// Represents a user <see cref="IComposer"/>.
     /// </summary>
     /// <remarks>
-    /// <para>All user composers require (compose after) all core composers.</para>
+    /// <para>User composers compose after core composers, and before the final composer.</para>
     /// </remarks>
     [ComposeAfter(typeof(ICoreComposer))]
     public interface IUserComposer : IComposer

@@ -66,44 +66,44 @@ namespace Umbraco.Core
         /// <summary>
         /// Determines whether the content type is invariant.
         /// </summary>
-        public static bool VariesByNothing(this PublishedContentType contentType) => contentType.Variations.VariesByNothing();
+        public static bool VariesByNothing(this IPublishedContentType contentType) => contentType.Variations.VariesByNothing();
 
         /// <summary>
         /// Determines whether the content type varies by culture.
         /// </summary>
         /// <remarks>And then it could also vary by segment.</remarks>
-        public static bool VariesByCulture(this PublishedContentType contentType) => contentType.Variations.VariesByCulture();
+        public static bool VariesByCulture(this IPublishedContentType contentType) => contentType.Variations.VariesByCulture();
 
         /// <summary>
         /// Determines whether the content type varies by segment.
         /// </summary>
         /// <remarks>And then it could also vary by culture.</remarks>
-        public static bool VariesBySegment(this PublishedContentType contentType) => contentType.Variations.VariesBySegment();
+        public static bool VariesBySegment(this IPublishedContentType contentType) => contentType.Variations.VariesBySegment();
 
         /// <summary>
         /// Determines whether the content type varies by culture and segment.
         /// </summary>
-        public static bool VariesByCultureAndSegment(this PublishedContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
+        public static bool VariesByCultureAndSegment(this IPublishedContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
 
         /// <summary>
         /// Determines whether the property type is invariant.
         /// </summary>
-        public static bool VariesByNothing(this PublishedPropertyType propertyType) => propertyType.Variations.VariesByNothing();
+        public static bool VariesByNothing(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByNothing();
 
         /// <summary>
         /// Determines whether the property type varies by culture.
         /// </summary>
-        public static bool VariesByCulture(this PublishedPropertyType propertyType) => propertyType.Variations.VariesByCulture();
+        public static bool VariesByCulture(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByCulture();
 
         /// <summary>
         /// Determines whether the property type varies by segment.
         /// </summary>
-        public static bool VariesBySegment(this PublishedPropertyType propertyType) => propertyType.Variations.VariesBySegment();
+        public static bool VariesBySegment(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesBySegment();
 
         /// <summary>
         /// Determines whether the property type varies by culture and segment.
         /// </summary>
-        public static bool VariesByCultureAndSegment(this PublishedPropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
+        public static bool VariesByCultureAndSegment(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
 
         /// <summary>
         /// Determines whether a variation is invariant.

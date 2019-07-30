@@ -79,6 +79,12 @@ angular.module("umbraco")
                 }
             }
 
+            $scope.submit = function () {
+                if ($scope.model.submit) {
+                    $scope.model.submit($scope.currentLayout);
+                }
+            }
+
     		$scope.$watch("currentLayout", function(layout){
     		    if(layout){
     		        var total = 0;

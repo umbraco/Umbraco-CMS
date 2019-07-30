@@ -434,7 +434,18 @@ ORDER BY colName";
 
         protected override void PersistNewItem(IUser entity)
         {
-            ((User) entity).AddingEntity();
+            // the use may have no identity, ie ID is zero, and be v7 super
+            // user - then it has been marked - and we must not persist it
+            // as new, as we do not want to create a new user - instead, persist
+            // it as updated
+            // see also: UserFactory.BuildEntity
+            if (((User) entity).AdditionalData.ContainsKey("IS_V7_ZERO"))
+            {
+                PersistUpdatedItem(entity);
+                return;
+            }
+
+            entity.AddingEntity();
 
             // ensure security stamp if missing
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
@@ -484,7 +495,7 @@ ORDER BY colName";
         protected override void PersistUpdatedItem(IUser entity)
         {
             // updates Modified date
-            ((User) entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             // ensure security stamp if missing
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
@@ -822,7 +833,7 @@ ORDER BY colName";
 
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             var mapper = _mapperCollection[typeof(IUser)];
-            var mappedField = mapper.Map(SqlContext.SqlSyntax, expressionMember.Name);
+            var mappedField = mapper.Map(expressionMember.Name);
 
             if (mappedField.IsNullOrWhiteSpace())
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");

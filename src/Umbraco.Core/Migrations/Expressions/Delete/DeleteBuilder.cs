@@ -1,4 +1,4 @@
-﻿using NPoco;
+﻿using Umbraco.Core.Exceptions;
 using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Delete.Column;
 using Umbraco.Core.Migrations.Expressions.Delete.Constraint;
@@ -29,9 +29,19 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         }
 
         /// <inheritdoc />
-        public IExecutableBuilder KeysAndIndexes(string tableName = null)
+        public IExecutableBuilder KeysAndIndexes<TDto>(bool local = true, bool foreign = true)
         {
-            return new DeleteKeysAndIndexesBuilder(_context) { TableName = tableName };
+            var syntax = _context.SqlContext.SqlSyntax;
+            var tableDefinition = DefinitionFactory.GetTableDefinition(typeof(TDto), syntax);
+            return KeysAndIndexes(tableDefinition.Name, local, foreign);
+        }
+
+        /// <inheritdoc />
+        public IExecutableBuilder KeysAndIndexes(string tableName, bool local = true, bool foreign = true)
+        {
+            if (tableName.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(tableName));
+            return new DeleteKeysAndIndexesBuilder(_context) { TableName = tableName, DeleteLocal = local, DeleteForeign = foreign };
         }
 
         /// <inheritdoc />
@@ -100,7 +110,7 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         public IDeleteDefaultConstraintOnTableBuilder DefaultConstraint()
         {
             var expression = new DeleteDefaultConstraintExpression(_context);
-            return new DeleteDefaultConstraintBuilder(expression);
+            return new DeleteDefaultConstraintBuilder(_context, expression);
         }
     }
 }

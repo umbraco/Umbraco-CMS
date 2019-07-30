@@ -119,8 +119,8 @@ namespace Umbraco.Web.Cache
                 () => MemberGroupService.Deleted -= MemberGroupService_Deleted);
 
             // bind to media events - handles all media changes
-            Bind(() => MediaService.TreeChanged += MediaService_Changed,
-                () => MediaService.TreeChanged -= MediaService_Changed);
+            Bind(() => MediaService.TreeChanged += MediaService_TreeChanged,
+                () => MediaService.TreeChanged -= MediaService_TreeChanged);
 
             // bind to content events
             Bind(() => ContentService.Saved += ContentService_Saved, // needed for permissions
@@ -403,7 +403,7 @@ namespace Umbraco.Web.Cache
 
         #region MediaService
 
-        private void MediaService_Changed(IMediaService sender, TreeChange<IMedia>.EventArgs args)
+        private void MediaService_TreeChanged(IMediaService sender, TreeChange<IMedia>.EventArgs args)
         {
             _distributedCache.RefreshMediaCache(args.Changes.ToArray());
         }
