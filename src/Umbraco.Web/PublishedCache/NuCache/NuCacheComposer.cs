@@ -15,7 +15,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // register the NuCache published snapshot service
             // must register default options, required in the service ctor
-            composition.Register(factory => new PublishedSnapshotService.Options());
+            composition.Register(factory => new PublishedSnapshotServiceOptions());
             composition.SetPublishedSnapshotService<PublishedSnapshotService>();
 
             // add the NuCache health check (hidden from type finder)
