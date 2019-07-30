@@ -11,26 +11,28 @@
         vm.showBackButton = true;
         vm.page = {};
 
+        // this array is also used to map the logTypeColor param onto the log items
+        // in setLogTypeColors()
         vm.logLevels = [
             {
                 name: 'Verbose',
-                logTypeColor: 'gray'
+                logTypeColor: ''
             },
             {
                 name: 'Debug',
-                logTypeColor: 'secondary'
+                logTypeColor: 'gray'
             },
             {
                 name: 'Information',
-                logTypeColor: 'primary'
+                logTypeColor: 'success' 
             },
             {
                 name: 'Warning',
-                logTypeColor: 'warning'
+                logTypeColor: 'primary'
             },
             {
                 name: 'Error',
-                logTypeColor: 'danger'
+                logTypeColor: 'warning'
             },
             {
                 name: 'Fatal',
@@ -118,7 +120,7 @@
                         "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
                     },
                     {
-                        "name": "Find all logs that has an exception property (Warning, Error & Critical with Exceptions)",
+                        "name": "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
                         "query": "Has(@Exception)"
                     },
                     {
@@ -173,25 +175,8 @@
         }
 
         function setLogTypeColor(logItems) {
-            angular.forEach(logItems, function (log) {
-                switch (log.Level) {
-                    case "Information":
-                        log.logTypeColor = "primary";
-                        break;
-                    case "Debug":
-                        log.logTypeColor = "secondary";
-                        break;
-                    case "Warning":
-                        log.logTypeColor = "warning";
-                        break;
-                    case "Fatal":
-                    case "Error":
-                        log.logTypeColor = "danger";
-                        break;
-                    default:
-                        log.logTypeColor = "gray";
-                }
-            });
+            logItems.forEach(logItem => 
+                logItem.logTypeColor = vm.logLevels.find(x => x.name === logItem.Level).logTypeColor);
         }
 
         function getFilterName(array) {

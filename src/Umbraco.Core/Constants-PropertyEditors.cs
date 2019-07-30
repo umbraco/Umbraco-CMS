@@ -14,6 +14,23 @@ namespace Umbraco.Core
             /// </summary>
             public const string InternalGenericPropertiesPrefix = "_umb_";
 
+            public static class Legacy
+            {
+                public static class Aliases
+                {
+                    public const string Textbox = "Umbraco.Textbox";
+                    public const string Date = "Umbraco.Date";
+                    public const string ContentPicker2 = "Umbraco.ContentPicker2";
+                    public const string MediaPicker2 = "Umbraco.MediaPicker2";
+                    public const string MemberPicker2 = "Umbraco.MemberPicker2";
+                    public const string MultiNodeTreePicker2 = "Umbraco.MultiNodeTreePicker2";
+                    public const string TextboxMultiple = "Umbraco.TextboxMultiple";
+                    public const string RelatedLinks2 = "Umbraco.RelatedLinks2";
+                    public const string RelatedLinks = "Umbraco.RelatedLinks";
+
+                }
+            }
+
             /// <summary>
             /// Defines Umbraco built-in property editor aliases.
             /// </summary>
