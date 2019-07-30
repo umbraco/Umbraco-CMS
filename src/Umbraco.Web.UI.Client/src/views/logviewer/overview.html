@@ -3,7 +3,7 @@
     <umb-editor-view footer="false">
 
         <umb-editor-header
-            name="'Log Overview for Today'"
+            name="vm.dateRangeLabel"
             name-locked="true"
             hide-icon="true"
             hide-description="true"
@@ -74,11 +74,10 @@
                     <umb-box>
                         <umb-box-header title="Time Period"></umb-box-header>
 
-                        <umb-flatpickr
-                            class="datepicker"
-                            ng-model="vm.period"
-                            options="vm.config"
-                            on-close="vm.dateRangeChange(selectedDates, dateStr, instance)">
+                        <umb-flatpickr class="datepicker"
+                                       ng-model="vm.period"
+                                       options="vm.config"
+                                       on-close="vm.dateRangeChange(selectedDates, dateStr, instance)">
                         </umb-flatpickr>
                     </umb-box>
 
