@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -200,7 +201,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var mediaType = GetMediaType(mediaTypeAlias);
                 if (mediaType == null)
-                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback // causes rollback
+                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
 
                 var media = new Models.Media(name, parent, mediaType);
                 CreateMedia(scope, media, parent, userId, false);
@@ -226,13 +227,13 @@ namespace Umbraco.Core.Services.Implement
                 // locking the media tree secures media types too
                 scope.WriteLock(Constants.Locks.MediaTree);
 
-                var mediaType = GetMediaType(mediaTypeAlias); // + locks // + locks
+                var mediaType = GetMediaType(mediaTypeAlias); // + locks
                 if (mediaType == null)
-                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback // causes rollback
+                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
 
-                var parent = parentId > 0 ? GetById(parentId) : null; // + locks // + locks
+                var parent = parentId > 0 ? GetById(parentId) : null; // + locks
                 if (parentId > 0 && parent == null)
-                    throw new ArgumentException("No media with that id.", nameof(parentId)); // causes rollback // causes rollback
+                    throw new ArgumentException("No media with that id.", nameof(parentId)); // causes rollback
 
                 var media = parentId > 0 ? new Models.Media(name, parent, mediaType) : new Models.Media(name, parentId, mediaType);
                 CreateMedia(scope, media, parent, userId, true);
@@ -260,9 +261,9 @@ namespace Umbraco.Core.Services.Implement
                 // locking the media tree secures media types too
                 scope.WriteLock(Constants.Locks.MediaTree);
 
-                var mediaType = GetMediaType(mediaTypeAlias); // + locks // + locks
+                var mediaType = GetMediaType(mediaTypeAlias); // + locks
                 if (mediaType == null)
-                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback // causes rollback
+                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
 
                 var media = new Models.Media(name, parent, mediaType);
                 CreateMedia(scope, media, parent, userId, true);
@@ -289,7 +290,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
-            
+
             if (withIdentity == false)
                 return;
 
@@ -644,8 +645,6 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 // poor man's validation?
-                // poor man's validation?
-
                 if (string.IsNullOrWhiteSpace(media.Name))
                     throw new ArgumentException("Media has no name.", nameof(media));
 
@@ -716,7 +715,7 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
         #region Delete
-        
+
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
@@ -933,7 +932,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var parent = parentId == Constants.System.Root ? null : GetById(parentId);
                 if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
-                    throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback // causes rollback
+                    throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
 
                 var moveEventInfo = new MoveEventInfo<IMedia>(media, media.Path, parentId);
                 var moveEventArgs = new MoveEventArgs<IMedia>(true, evtMsgs, moveEventInfo);
@@ -946,12 +945,6 @@ namespace Umbraco.Core.Services.Implement
                 // if media was trashed, and since we're not moving to the recycle bin,
                 // indicate that the trashed status should be changed to false, else just
                 // leave it unchanged
-                // if media was trashed, and since we're not moving to the recycle bin,
-
-                // indicate that the trashed status should be changed to false, else just
-
-                // leave it unchanged
-
                 var trashed = media.Trashed ? false : (bool?) null;
 
                 PerformMoveLocked(media, parentId, parent, userId, moves, trashed);
@@ -975,9 +968,8 @@ namespace Umbraco.Core.Services.Implement
             media.ParentId = parentId;
 
             // get the level delta (old pos to new pos)
-            var levelDelta = parent == null
-                ? 1 - media.Level + (parentId == Constants.System.RecycleBinMedia ? 1 : 0)
-                : parent.Level + 1 - media.Level;
+            // note that recycle bin (id:-20) level is 0!
+            var levelDelta = 1 - media.Level + (parent?.Level ?? 0);
 
             var paths = new Dictionary<int, string>();
 
@@ -1024,7 +1016,15 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
-        public OperationResult EmptyRecycleBin()
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
+        public OperationResult EmptyRecycleBin() => EmptyRecycleBin(Constants.Security.SuperUserId);
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
+        /// </summary>
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
+        public OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId)
         {
             var nodeObjectType = Constants.ObjectTypes.Media;
             var deleted = new List<IMedia>();
@@ -1034,17 +1034,11 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
+                // no idea what those events are for, keep a simplified version
+
                 // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
                 // each deleted items will have its own deleting/deleted events. so, files and such
                 // are managed by Delete, and not here.
-
-                // no idea what those events are for, keep a simplified version
-                // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
-                // each deleted items will have its own deleting/deleted events. so, files and such
-
-                // emptying the recycle bin means deleting whatever is in there - do it properly!
-                // are managed by Delete, and not here.
-                // no idea what those events are for, keep a simplified version
                 var args = new RecycleBinEventArgs(nodeObjectType, evtMsgs);
 
                 if (scope.Events.DispatchCancelable(EmptyingRecycleBin, this, args))
@@ -1063,7 +1057,7 @@ namespace Umbraco.Core.Services.Implement
                 args.CanCancel = false;
                 scope.Events.Dispatch(EmptiedRecycleBin, this, args);
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.Remove)).ToEventArgs());
-                Audit(AuditType.Delete, 0, Constants.System.RecycleBinMedia, "Empty Media recycle bin");
+                Audit(AuditType.Delete, userId, Constants.System.RecycleBinMedia, "Empty Media recycle bin");
                 scope.Complete();
             }
 
@@ -1105,11 +1099,6 @@ namespace Umbraco.Core.Services.Implement
                 {
                     // if the current sort order equals that of the media we don't
                     // need to update it, so just increment the sort order and continue.
-                    // if the current sort order equals that of the media we don't
-
-                    // else update
-                    // need to update it, so just increment the sort order and continue.
-                    // save
                     if (media.SortOrder == sortOrder)
                     {
                         sortOrder++;

@@ -86,7 +86,6 @@ function MemberGroupsEditController($scope, $routeParams, appState, navigationSe
                 }, function (err) {
 
                     contentEditingHelper.handleSaveError({
-                        redirectOnFailure: false,
                         err: err
                     });
 

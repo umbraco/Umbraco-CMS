@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string TruncateTable { get; }
         string CreateConstraint { get; }
         string DeleteConstraint { get; }
-        
+
         string DeleteDefaultConstraint { get; }
         string FormatDateTime(DateTime date, bool includeTime = true);
         string Format(TableDefinition table);
@@ -106,5 +106,20 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// A Tuple containing: TableName, IndexName, ColumnName, IsUnique
         /// </returns>
         IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
+
+        /// <summary>
+        /// Tries to gets the name of the default constraint on a column.
+        /// </summary>
+        /// <param name="db">The database.</param>
+        /// <param name="tableName">The table name.</param>
+        /// <param name="columnName">The column name.</param>
+        /// <param name="constraintName">The constraint name.</param>
+        /// <returns>A value indicating whether a default constraint was found.</returns>
+        /// <remarks>
+        /// <para>Some database engines (e.g. SqlCe) may not have names for default constraints,
+        /// in which case the function may return true, but <paramref name="constraintName"/> is
+        /// unspecified.</para>
+        /// </remarks>
+        bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
     }
 }

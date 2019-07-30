@@ -35,7 +35,6 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
                 vm.page.saveButtonState = "success";
             }, function (error) {
                 contentEditingHelper.handleSaveError({
-                    redirectOnFailure: false,
                     err: error
                 });
 

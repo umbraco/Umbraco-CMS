@@ -69,6 +69,16 @@ namespace Umbraco.Core.Migrations.Expressions.Create
         ICreateConstraintOnTableBuilder PrimaryKey(string primaryKeyName);
 
         /// <summary>
+        /// Builds a Create Primary Key expression.
+        /// </summary>
+        ICreateConstraintOnTableBuilder PrimaryKey(bool clustered);
+
+        /// <summary>
+        /// Builds a Create Primary Key expression.
+        /// </summary>
+        ICreateConstraintOnTableBuilder PrimaryKey(string primaryKeyName, bool clustered);
+
+        /// <summary>
         /// Builds a Create Unique Constraint expression.
         /// </summary>
         ICreateConstraintOnTableBuilder UniqueConstraint();

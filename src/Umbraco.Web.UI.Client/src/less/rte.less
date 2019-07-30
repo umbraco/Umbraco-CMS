@@ -5,10 +5,6 @@
     position: relative;
     
     .umb-property-editor--limit-width();
-
-    .-loading {
-        position: absolute;
-    }
 }
 
 .umb-rte .mce-tinymce {
@@ -66,6 +62,17 @@
 
 
 /* pre-value editor */
-.rte-editor-preval .control-group .controls > div > label .mce-ico {
-    line-height: 20px;
+.rte-editor-preval .control-group .controls > div > label {
+    cursor: pointer !important;
+
+    .mce-cmd .checkbox {
+        padding-right: 0;
+    }
+    .mce-ico {
+        line-height: 20px;
+    }
+}
+
+.mce-fullscreen {
+    position:absolute;
 }

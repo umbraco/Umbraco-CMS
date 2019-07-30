@@ -318,13 +318,6 @@
     <key alias="email">输入您的电子邮件</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">允许子项节点类型</key>
-    <key alias="create">创建</key>
-    <key alias="deletetab">删除选项卡</key>
-    <key alias="description">描述</key>
-    <key alias="newtab">新建选项卡</key>
-    <key alias="tab">选项卡</key>
-    <key alias="thumbnail">缩略图</key>
     <key alias="createListView" version="7.2">创建自定义列表视图</key>
     <key alias="removeListView" version="7.2">删除自定义列表视图</key>
   </area>

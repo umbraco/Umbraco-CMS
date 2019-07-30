@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
@@ -122,6 +123,7 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoSettings = GetUmbracoSettings();
             var globalSettings = GetGlobalSettings();
             var urlProviders = new UrlProviderCollection(Enumerable.Empty<IUrlProvider>());
+            var mediaUrlProviders = new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>());
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
 
@@ -133,6 +135,7 @@ namespace Umbraco.Tests.TestHelpers
                 umbracoSettings,
                 globalSettings,
                 urlProviders,
+                mediaUrlProviders,
                 Mock.Of<IUserService>());
 
             return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
@@ -145,7 +148,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
             var webRoutingSectionMock = new Mock<IWebRoutingSection>();
-            webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlProviderMode.Auto.ToString());
+            webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
             umbracoSettingsMock.Setup(x => x.WebRouting).Returns(webRoutingSectionMock.Object);
             return umbracoSettingsMock.Object;
         }

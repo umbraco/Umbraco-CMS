@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -95,6 +96,7 @@ namespace Umbraco.Web.Cache
             // now we can trigger the event
             base.Refresh(payloads);
         }
+
 
         public override void RefreshAll()
         {

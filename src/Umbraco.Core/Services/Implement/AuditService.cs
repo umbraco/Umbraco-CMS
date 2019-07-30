@@ -51,8 +51,8 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var result = sinceDate.HasValue == false
-                    ? _auditRepository.Get(Query<IAuditItem>().Where(x => x.UserId == userId && x.AuditType == type))
-                    : _auditRepository.Get(Query<IAuditItem>().Where(x => x.UserId == userId && x.AuditType == type && x.CreateDate >= sinceDate.Value));
+                    ? _auditRepository.Get(type, Query<IAuditItem>().Where(x => x.UserId == userId))
+                    : _auditRepository.Get(type, Query<IAuditItem>().Where(x => x.UserId == userId && x.CreateDate >= sinceDate.Value));
                 scope.Complete();
                 return result;
             }
@@ -63,8 +63,8 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var result = sinceDate.HasValue == false
-                    ? _auditRepository.Get(Query<IAuditItem>().Where(x => x.AuditType == type))
-                    : _auditRepository.Get(Query<IAuditItem>().Where(x => x.AuditType == type && x.CreateDate >= sinceDate.Value));
+                    ? _auditRepository.Get(type, Query<IAuditItem>())
+                    : _auditRepository.Get(type, Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate.Value));
                 scope.Complete();
                 return result;
             }

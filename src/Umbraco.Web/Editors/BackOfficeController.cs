@@ -170,12 +170,26 @@ namespace Umbraco.Web.Editors
                     : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
                 : CultureInfo.GetCultureInfo(culture);
 
-            var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
-                //the dictionary returned is fine but the delimiter between an 'area' and a 'value' is a '/' but the javascript
-                // in the back office requires the delimiter to be a '_' so we'll just replace it
-                .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
+            var allValues = Services.TextService.GetAllStoredValues(cultureInfo);
+            var pathedValues = allValues.Select(kv =>
+            {
+                var slashIndex = kv.Key.IndexOf('/');
+                var areaAlias = kv.Key.Substring(0, slashIndex);
+                var valueAlias = kv.Key.Substring(slashIndex+1);
+                return new
+                {
+                    areaAlias,
+                    valueAlias,
+                    value = kv.Value
+                };
+            });
 
-            return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
+            Dictionary<string, Dictionary<string, string>> nestedDictionary = pathedValues
+                .GroupBy(pv => pv.areaAlias)
+                .ToDictionary(pv => pv.Key, pv =>
+                    pv.ToDictionary(pve => pve.valueAlias, pve => pve.value));
+
+            return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.Indented };
         }
 
         /// <summary>
