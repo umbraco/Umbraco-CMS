@@ -1139,9 +1139,6 @@ namespace Umbraco.Core.Services.Implement
 
             if (publishing)
             {
-                //TODO: Check if it's a culture being unpublished and that's why we are publishing the document. In that case
-                // we should check if the culture is already unpublished since it might be the user is trying to unpublish an already unpublished culture?
-
                 //determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
                 culturesUnpublishing = content.GetCulturesUnpublishing();
                 culturesPublishing = variesByCulture

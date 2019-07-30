@@ -512,20 +512,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var a in allPropertyDataDtos)
                 a.PropertyTypeDto = indexedPropertyTypeDtos[a.PropertyTypeId];
 
-            // prefetch configuration for tag properties
-            var tagEditors = new Dictionary<string, TagConfiguration>();
-            foreach (var propertyTypeDto in indexedPropertyTypeDtos.Values)
-            {
-                var editorAlias = propertyTypeDto.DataTypeDto.EditorAlias;
-                var editorAttribute = PropertyEditors[editorAlias].GetTagAttribute();
-                if (editorAttribute == null) continue;
-                var tagConfigurationSource = propertyTypeDto.DataTypeDto.Configuration;
-                var tagConfiguration = string.IsNullOrWhiteSpace(tagConfigurationSource)
-                    ? new TagConfiguration()
-                    : JsonConvert.DeserializeObject<TagConfiguration>(tagConfigurationSource);
-                if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = editorAttribute.Delimiter;
-                tagEditors[editorAlias] = tagConfiguration;
-            }
+            //TODO: This logic was here but then we never used the data being passed to GetPropertyCollections, this will save a bit of CPU without it!
+            //// prefetch configuration for tag properties
+            //var tagEditors = new Dictionary<string, TagConfiguration>();
+            //foreach (var propertyTypeDto in indexedPropertyTypeDtos.Values)
+            //{
+            //    var editorAlias = propertyTypeDto.DataTypeDto.EditorAlias;
+            //    var editorAttribute = PropertyEditors[editorAlias].GetTagAttribute();
+            //    if (editorAttribute == null) continue;
+            //    var tagConfigurationSource = propertyTypeDto.DataTypeDto.Configuration;
+            //    var tagConfiguration = string.IsNullOrWhiteSpace(tagConfigurationSource)
+            //        ? new TagConfiguration()
+            //        : JsonConvert.DeserializeObject<TagConfiguration>(tagConfigurationSource);
+            //    if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = editorAttribute.Delimiter;
+            //    tagEditors[editorAlias] = tagConfiguration;
+            //}
 
             // now we have
             // - the definitions
@@ -533,10 +534,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // - tag editors
             // and we need to build the proper property collections
 
-            return GetPropertyCollections(temps, allPropertyDataDtos, tagEditors);
+            return GetPropertyCollections(temps, allPropertyDataDtos
+                /*, tagEditors*/);
         }
 
-        private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos, Dictionary<string, TagConfiguration> tagConfigurations)
+        private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos
+            /*, Dictionary<string, TagConfiguration> tagConfigurations*/)
             where T : class, IContentBase
         {
             var result = new Dictionary<int, PropertyCollection>();
