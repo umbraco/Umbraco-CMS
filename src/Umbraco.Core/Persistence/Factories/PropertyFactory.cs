@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Factories
         public static IEnumerable<Property> BuildEntities(PropertyType[] propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
         {
             var properties = new List<Property>();
-            var xdtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>) x);
+            var xdtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>)x);
 
             foreach (var propertyType in propertyTypes)
             {
@@ -130,6 +130,9 @@ namespace Umbraco.Core.Persistence.Factories
                     // publishing = deal with edit and published values
                     foreach (var propertyValue in property.Values)
                     {
+                        var isInvariantValue = propertyValue.Culture == null;
+                        var isCultureValue = propertyValue.Culture != null && propertyValue.Segment == null;
+
                         // deal with published value
                         if (propertyValue.PublishedValue != null && publishedVersionId > 0)
                             propertyDataDtos.Add(BuildDto(publishedVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
@@ -138,26 +141,34 @@ namespace Umbraco.Core.Persistence.Factories
                         if (propertyValue.EditedValue != null)
                             propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
 
+                        // property.Values will contain ALL of it's values, both variant and invariant which will be populated if the administrator has previously
+                        // changed the property type to be variant vs invariant.
+                        // We need to check for this scenario here because otherwise the editedCultures and edited flags
+                        // will end up incorrectly so here we need to only process edited cultures based on the
+                        // current value type and how the property varies.
+
+                        if (property.PropertyType.VariesByCulture() && isInvariantValue) continue;
+                        if (!property.PropertyType.VariesByCulture() && isCultureValue) continue;
+
                         // use explicit equals here, else object comparison fails at comparing eg strings
                         var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
+
                         edited |= !sameValues;
 
-                        if (entityVariesByCulture // cultures can be edited, ie CultureNeutral is supported
-                            && propertyValue.Culture != null && propertyValue.Segment == null // and value is CultureNeutral
-                            && !sameValues) // and edited and published are different
+                        if (entityVariesByCulture && !sameValues)
                         {
-                            editedCultures.Add(propertyValue.Culture); // report culture as edited
-                        }
+                            if (isCultureValue) 
+                            {
+                                editedCultures.Add(propertyValue.Culture); // report culture as edited
+                            }
+                            else if (isInvariantValue)
+                            {
+                                // flag culture as edited if it contains an edited invariant property
+                                if (defaultCulture == null)
+                                    defaultCulture = languageRepository.GetDefaultIsoCode();
 
-                        // flag culture as edited if it contains an edited invariant property
-                        if (propertyValue.Culture == null //invariant property
-                            && !sameValues // and edited and published are different
-                            && entityVariesByCulture) //only when the entity is variant
-                        {
-                            if (defaultCulture == null)
-                                defaultCulture = languageRepository.GetDefaultIsoCode();
-
-                            editedCultures.Add(defaultCulture);
+                                editedCultures.Add(defaultCulture);
+                            }
                         }
                     }
                 }
@@ -167,7 +178,7 @@ namespace Umbraco.Core.Persistence.Factories
                     {
                         // not publishing = only deal with edit values
                         if (propertyValue.EditedValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property,  languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
                     }
                     edited = true;
                 }
