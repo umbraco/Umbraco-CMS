@@ -42,8 +42,8 @@ namespace Umbraco.Core.Composing
         private string _currentAssembliesHash;
         private IEnumerable<Assembly> _assemblies;
         private bool _reportedChange;
-        private static string _localTempPath;
-        private static string _fileBasePath;
+        private readonly string _localTempPath;
+        private string _fileBasePath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.

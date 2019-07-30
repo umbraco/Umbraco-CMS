@@ -370,6 +370,28 @@ When building a custom infinite editor view you can use the same components as a
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#contentTypePicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a content type picker in infinite editing, the submit callback returns an array of selected items
+         *
+         * @param {Object} editor rendering options
+         * @param {Boolean} editor.multiPicker Pick one or multiple items
+         * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
+         * @param {Function} editor.close Callback function when the close button is clicked.
+         *
+         * @returns {Object} editor object
+         */
+        function contentTypePicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            editor.size = "small";
+            editor.section = "settings";
+            editor.treeAlias = "documentTypes";
+            open(editor);
+        }
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#copy
          * @methodOf umbraco.services.editorService
          *
@@ -881,6 +903,7 @@ When building a custom infinite editor view you can use the same components as a
             mediaEditor: mediaEditor,
             contentEditor: contentEditor,
             contentPicker: contentPicker,
+            contentTypePicker: contentTypePicker,
             copy: copy,
             move: move,
             embed: embed,
