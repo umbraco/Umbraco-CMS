@@ -836,6 +836,10 @@ namespace Umbraco.Tests.Services
             // way to do this will be to perform a double save operation, though that's not the prettiest way to do it. Ideally we take care of this all in one process
             // in the DocumentRepository but that might require another transitory status like PublishedState.UnpublishingLastCulture ... though that's not pretty either.
             // It might be possible in some other magicaly way, i'm just leaving these notes here mostly for myself :)
+            // UPDATE - ok, i 'think' instead of doing a check inside of CommitDocumentChangesInternal for the last culture being unpublished, we could actually do this check
+            // directly inside of the DocumentRepository
+            // UPDATE 2 - ok that won't work because there is some business logic that needs to occur in CommitDocumentChangesInternal when it needs to be unpublished, this will
+            // be tricky without doing a double save, hrm.
             Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
         }
 

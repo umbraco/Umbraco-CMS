@@ -1125,6 +1125,18 @@ namespace Umbraco.Core.Services.Implement
             var changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
             var previouslyPublished = content.HasIdentity && content.Published;
 
+            //inline method to persist the document with the documentRepository since this logic could be called a couple times below
+            void SaveDocument(IContent c)
+            {
+                // save, always
+                if (c.HasIdentity == false)
+                    c.CreatorId = userId;
+                c.WriterId = userId;
+
+                // saving does NOT change the published version, unless PublishedState is Publishing or Unpublishing
+                _documentRepository.Save(c);
+            }
+
             if (publishing)
             {
                 //TODO: Check if it's a culture being unpublished and that's why we are publishing the document. In that case
@@ -1146,11 +1158,15 @@ namespace Umbraco.Core.Services.Implement
                     //check if a culture has been unpublished and if there are no cultures left, and then unpublish document as a whole
                     if (publishResult.Result == PublishResultType.SuccessUnpublishCulture && content.PublishCultureInfos.Count == 0)
                     {
-                        publishing = false;
-                        unpublishing = content.Published; // if not published yet, nothing to do
+                        // This is a special case! We are unpublishing the last culture and to persist that we need to re-publish without any cultures
+                        // so the state needs to remain Publishing to do that. However, we then also need to unpublish the document and to do that
+                        // the state needs to be Unpublishing and it cannot be both. This state is used within the documentRepository to know how to
+                        // persist certain things. So before proceeding below, we need to save the Publishing state to publish no cultures, then we can
+                        // mark the document for Unpublishing.
+                        SaveDocument(content);
 
-                        // we may end up in a state where we won't publish nor unpublish
-                        // keep going, though, as we want to save anyways
+                        //set the flag to unpublish and continue
+                        unpublishing = content.Published; // if not published yet, nothing to do
                     }
                 }
                 else
@@ -1212,13 +1228,8 @@ namespace Umbraco.Core.Services.Implement
                 }
             }
 
-            // save, always
-            if (content.HasIdentity == false)
-                content.CreatorId = userId;
-            content.WriterId = userId;
-
-            // saving does NOT change the published version, unless PublishedState is Publishing or Unpublishing
-            _documentRepository.Save(content);
+            //Persist the document
+            SaveDocument(content);
 
             // raise the Saved event, always
             if (raiseEvents)
@@ -2758,6 +2769,7 @@ namespace Umbraco.Core.Services.Implement
         {
             var attempt = new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
 
+            //TODO: What is this check?? we just created this attempt and of course it is Success?!
             if (attempt.Success == false)
                 return attempt;
 
