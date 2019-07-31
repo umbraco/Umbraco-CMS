@@ -810,12 +810,18 @@ namespace Umbraco.Tests.Services
             var document = (IContent)new Content("document", -1, contentType);
             document.SetCultureName("doc1en", "en");
             document.SetCultureName("doc1fr", "fr");
-            document.SetValue("value1", "v1en", "en");
-            document.SetValue("value1", "v1fr", "fr");
-            ServiceContext.ContentService.Save(document);
+            document.SetValue("value1", "v1en-init", "en");
+            document.SetValue("value1", "v1fr-init", "fr");
+            ServiceContext.ContentService.SaveAndPublish(document); //all values are published which means the document is not 'edited'
 
-            //at this stage there will be 4 property values stored in the DB for "value1" against "en" and "fr" for both edited/published versions,
-            //for the published values, these will be null
+            document = ServiceContext.ContentService.GetById(document.Id);
+            Assert.IsFalse(document.IsCultureEdited("en"));
+            Assert.IsFalse(document.IsCultureEdited("fr"));
+            Assert.IsFalse(document.Edited);
+
+            document.SetValue("value1", "v1en", "en"); //change the property culture value, so now this culture will be edited
+            document.SetValue("value1", "v1fr", "fr"); //change the property culture value, so now this culture will be edited
+            ServiceContext.ContentService.Save(document);
 
             document = ServiceContext.ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
@@ -829,17 +835,16 @@ namespace Umbraco.Tests.Services
 
             // switch property type to Nothing
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Nothing;
-            ServiceContext.ContentTypeService.Save(contentType);
+            ServiceContext.ContentTypeService.Save(contentType); //This is going to have to re-normalize the "Edited" flag
             
             document = ServiceContext.ContentService.GetById(document.Id);
+            Assert.IsTrue(document.IsCultureEdited("en")); //This will remain true because there is now a pending change for the invariant property data which is flagged under the default lang
+            Assert.IsFalse(document.IsCultureEdited("fr")); //This will be false because nothing has changed for this culture and the property no longer reflects variant changes
             Assert.IsTrue(document.Edited);
 
-            // publish the document
-            document.SetValue("value1", "v1inv"); //update the invariant value
+            //update the invariant value and publish
+            document.SetValue("value1", "v1inv"); 
             ServiceContext.ContentService.SaveAndPublish(document);
-
-            //at this stage there will be 6 property values stored in the DB for "value1" against "en", "fr" and null for both edited/published versions,
-            //for the published values for the cultures, these will still be null but the invariant edited/published values will both be "v1inv".
 
             document = ServiceContext.ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
@@ -848,8 +853,8 @@ namespace Umbraco.Tests.Services
             Assert.IsNull(document.GetValue("value1", "en")); //The values are there but the business logic returns null
             Assert.IsNull(document.GetValue("value1", "fr")); //The values are there but the business logic returns null
             Assert.AreEqual("v1inv", document.GetValue("value1"));
-            Assert.IsFalse(document.IsCultureEdited("en")); //This returns false, the culture shouldn't be marked as edited because the invariant property value is published
-            Assert.IsFalse(document.IsCultureEdited("fr")); //This returns false, the culture shouldn't be marked as edited because the invariant property value is published
+            Assert.IsFalse(document.IsCultureEdited("en")); //This returns false, everything is published - however in the DB this is not the case for the "en" version of the property
+            Assert.IsFalse(document.IsCultureEdited("fr")); //This returns false, everything is published
             Assert.IsFalse(document.Edited);
 
             // switch property back to Culture

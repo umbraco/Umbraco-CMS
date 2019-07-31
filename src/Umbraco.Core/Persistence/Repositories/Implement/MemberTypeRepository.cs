@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
     {
-        public MemberTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository)
-            : base(scopeAccessor, cache, logger, commonRepository)
+        public MemberTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository)
+            : base(scopeAccessor, cache, logger, commonRepository, languageRepository)
         { }
 
         protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;

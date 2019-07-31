@@ -166,8 +166,8 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
                 var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, tRepository, AppCaches);
-                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository);
                 var languageRepository = new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
+                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
                 var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository);
 
                 // Act
@@ -200,8 +200,8 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
                 var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, tRepository, AppCaches);
-                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository);
                 var languageRepository = new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
+                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
                 var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository);
 
                 // Act
@@ -232,8 +232,8 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
                 var commonRepository = new ContentTypeCommonRepository((IScopeAccessor) provider, tRepository, AppCaches);
-                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository);
-                var languageRepository = new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
+                var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Logger);
+                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
                 var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository);
 
                 // Act
@@ -267,8 +267,8 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
                 var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, tRepository, AppCaches);
-                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository);
-                var languageRepository = new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
+                var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Logger);
+                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);  
                 var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository);
 
                 // Act

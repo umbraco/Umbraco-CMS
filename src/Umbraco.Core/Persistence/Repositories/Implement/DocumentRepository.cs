@@ -386,7 +386,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
             }
 
             // refresh content
@@ -571,7 +571,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
             }
 
             // refresh content
@@ -1297,25 +1297,30 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 };
         }
 
-        private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, bool publishing, HashSet<string> editedCultures)
+        private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, HashSet<string> editedCultures)
         {
             var allCultures = content.AvailableCultures.Union(content.PublishedCultures); // union = distinct
             foreach (var culture in allCultures)
-                yield return new DocumentCultureVariationDto
+            {
+                var dto = new DocumentCultureVariationDto
                 {
                     NodeId = content.Id,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
 
                     Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
-
-                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
-
                     Available = content.IsCultureAvailable(culture),
-                    Published = content.IsCulturePublished(culture),
-                    Edited = content.IsCultureAvailable(culture) &&
-                             (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)))
+                    Published = content.IsCulturePublished(culture)
                 };
+
+                // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
+
+                dto.Edited = content.IsCultureAvailable(culture) &&
+                             (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)));
+
+                yield return dto;
+            }
+                
         }
 
         private class ContentVariation
