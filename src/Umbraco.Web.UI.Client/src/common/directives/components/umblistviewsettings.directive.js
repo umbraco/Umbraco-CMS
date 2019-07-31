@@ -6,12 +6,13 @@
         function link(scope) {
 
             scope.dataType = {};
-            scope.editDataTypeSettings = false;
             scope.customListViewCreated = false;
+            
+            const checkForCustomListView = () => scope.dataType.name === "List View - " + scope.modelAlias;
 
-            /* ---------- INIT ---------- */
+            /* ---------- INIT ---------- */ 
 
-            function activate() {
+            const activate = () => {
 
                 if (scope.enableListView) {
 
@@ -26,26 +27,24 @@
 
                 } else {
                     scope.dataType = {};
-                }
-
-            }
+                } 
+            } 
 
             /* ----------- LIST VIEW SETTINGS --------- */
-            scope.toggleEditListViewDataTypeSettings = function () {
+            const showSettingsOverlay = () => {
                 const overlay = {
                     view: 'views/components/umb-list-view-settings-overlay.html',
                     hideDescription: true,
                     hideIcon: true,
+                    size: 'small',
                     dataType: scope.dataType,
                     title: 'List view settings',
                     submit: model => {
-                        scope.dataType = model.dataType;
-                        const preValues = dataTypeHelper.createPreValueProps(scope.dataType.preValues);
+                        const preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
 
-                        dataTypeResource.save(scope.dataType, preValues, false).then(dataType => {
-                            // store data type
-                            scope.dataType = dataType;
-                        });
+                        // store data type   
+                        dataTypeResource.save(model.dataType, preValues, false)
+                            .then(dataType => scope.dataType = dataType);                      
                         
                         editorService.close();
                     },
@@ -58,9 +57,11 @@
 
             /* ---------- CUSTOM LIST VIEW ---------- */
 
-            scope.createCustomListViewDataType = function () {
+            scope.createCustomListViewDataType = () => {
 
-                dataTypeResource.createCustomListView(scope.modelAlias).then(function (dataType) {
+                scope.loading = true;
+                
+                dataTypeResource.createCustomListView(scope.modelAlias).then(dataType => {
 
                     // store data type
                     scope.dataType = dataType;
@@ -72,53 +73,44 @@
                     scope.customListViewCreated = true;
 
                     // show settings overlay
-                    scope.toggleEditListViewDataTypeSettings();
+                    showSettingsOverlay();
+                    
+                    scope.loading = false;
 
-                });
+                }); 
+            }; 
 
-            };
-
-            scope.removeCustomListDataType = function () {
+            scope.removeCustomListDataType = () => {
+                
+                scope.loading = true;
 
                 // delete custom list view data type
-                dataTypeResource.deleteById(scope.dataType.id).then(function (dataType) {
+                dataTypeResource.deleteById(scope.dataType.id).then(dataType => {
 
                     // set list view name on scope
-                    if (scope.contentType === "documentType") {
+                    scope.listViewName = `List View - ${scope.contentType === 'documentType' ? 'Content' : 'Media'}`;
 
-                        scope.listViewName = "List View - Content";
-
-                    } else if (scope.contentType === "mediaType") {
-
-                        scope.listViewName = "List View - Media";
-
-                    }
-
-                    // get default data type
+                    // get default data type 
                     dataTypeResource.getByName(scope.listViewName)
-                        .then(function (dataType) {
+                        .then(defaultDataType => {
 
                             // store data type
-                            scope.dataType = dataType;
+                            scope.dataType = defaultDataType;
 
                             // change state to default list view
                             scope.customListViewCreated = false;
-
+                            
+                            scope.loading = false;
                         });
                 });
-
             };
 
-            scope.toggle = function () {
-                if (scope.enableListView) {
-                    scope.enableListView = false;
-                    return;
-                }
-                scope.enableListView = true;
-            };
-
+            scope.toggle = () => scope.enableListView = !scope.enableListView;           
+            scope.showSettingsOverlay = () => showSettingsOverlay();
+            
+            
             /* ----------- SCOPE WATCHERS ----------- */
-            var unbindEnableListViewWatcher = scope.$watch('enableListView', function (newValue) {
+            const unbindEnableListViewWatcher = scope.$watch('enableListView', newValue => {
 
                 if (newValue !== undefined) {
                     activate();
@@ -127,16 +119,7 @@
             });
 
             // clean up
-            scope.$on('$destroy', function () {
-                unbindEnableListViewWatcher();
-            });
-
-            /* ----------- METHODS ---------- */
-
-            function checkForCustomListView() {
-                return scope.dataType.name === "List View - " + scope.modelAlias;
-            }
-
+            scope.$on('$destroy', () => unbindEnableListViewWatcher());
         }
 
         var directive = {
