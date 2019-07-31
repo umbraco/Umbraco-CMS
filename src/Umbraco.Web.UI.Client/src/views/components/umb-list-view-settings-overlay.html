@@ -6,16 +6,14 @@
         hide-description="model.hideDescription" 
         hide-icon="model.hideIcon">
     </umb-editor-header>
-    <umb-editor-container>
+    <umb-editor-container class="umb-list-view-settings__overlay">
        <form name="listViewSettingsForm" novalidate val-form-manager>
            <umb-box>
                <umb-box-content>
                     <!-- list view settings -->
-                    <div class="form-horizontal">
-                        <umb-property property="preValue" ng-repeat="preValue in model.dataType.preValues">
-                            <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
-                        </umb-property>
-                    </div>                   
+                    <umb-property property="preValue" ng-repeat="preValue in model.dataType.preValues">
+                        <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+                    </umb-property>
                </umb-box-content>
            </umb-box>
         </form>
