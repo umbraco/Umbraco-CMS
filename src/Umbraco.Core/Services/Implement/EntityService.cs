@@ -277,11 +277,6 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public virtual IEnumerable<IEntitySlim> GetChildren(int parentId, UmbracoObjectTypes objectType)
         {
-            throw new LockTimeoutException(new Exception("TODO"))
-            {
-                Reason = "TODO must be removed.. Only for test purpose"
-            };
-
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 try
