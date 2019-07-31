@@ -6,6 +6,7 @@ using Umbraco.Core.Migrations.Upgrade.Common;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_2_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -182,6 +183,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<RenameUserLoginDtoDateIndex>("{0372A42B-DECF-498D-B4D1-6379E907EB94}");
             To<FixContentNuCascade>("{5B1E0D93-F5A3-449B-84BA-65366B84E2D4}");
 
+            // to 8.2.0....
+            To<AddLockTableColumns>("{8DC6A949-0FE4-4846-9C1D-61E49DDADFF9}");
             //FINAL
         }
     }

@@ -173,6 +173,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return items.Select(x => new Tuple<string, string, string, string>(x.TableName, x.ColumnName, x.Name, x.Definition));
         }
 
+        public override bool IsReadUncommittedSupported => true;
+
         public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");

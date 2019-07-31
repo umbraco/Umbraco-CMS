@@ -311,9 +311,9 @@ namespace Umbraco.Core.Models
 
             var asn = groupSn.Concat(userSn).Distinct().ToArray();
 
-            var paths = asn.Length == 0 || asn.Contains(Constants.System.Root)
-                ? new Dictionary<int, string>()
-                : entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
+            var paths = asn.Length > 0
+                ? entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path)
+                : new Dictionary<int, string>();
 
             paths[Constants.System.Root] = Constants.System.RootString; // entityService does not get that one
 

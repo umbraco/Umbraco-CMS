@@ -7,6 +7,7 @@ using NPoco.FluentMappings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.Persistence.Interceptors;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -238,13 +239,15 @@ namespace Umbraco.Core.Persistence
             // so that everything NPoco is properly cached for the lifetime of the application
             _pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver);
+
             _pocoDataFactory = factory;
             var config = new FluentConfig(xmappers => factory);
 
             // create the database factory
             _npocoDatabaseFactory = DatabaseFactory.Config(x => x
                 .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
-                .WithFluentConfig(config)); // with proper configuration
+                .WithFluentConfig(config) // with proper configuration
+                .WithInterceptor(new LockTimeoutInterceptor()));
 
             if (_npocoDatabaseFactory == null)
                 throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");

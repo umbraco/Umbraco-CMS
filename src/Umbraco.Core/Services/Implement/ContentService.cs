@@ -32,7 +32,7 @@ namespace Umbraco.Core.Services.Implement
         private IQuery<IContent> _queryNotTrashed;
         //TODO: The non-lazy object should be injected
         private readonly Lazy<PropertyValidationService> _propertyValidationService = new Lazy<PropertyValidationService>(() => new PropertyValidationService());
-        
+
 
         #region Constructors
 
@@ -1666,7 +1666,7 @@ namespace Umbraco.Core.Services.Implement
                     return OperationResult.Cancel(evtMsgs);
                 }
 
-                scope.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock("Delete content!", Constants.Locks.ContentTree);
 
                 // if it's not trashed yet, and published, we should unpublish
                 // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
@@ -1790,7 +1790,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock("Move content to recycle bin", Constants.Locks.ContentTree);
 
                 var originalPath = content.Path;
                 var moveEventInfo = new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent);
@@ -3028,6 +3028,6 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
 
-        
+
     }
 }

@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Scoping
 {
@@ -235,6 +239,7 @@ namespace Umbraco.Core.Scoping
                 try
                 {
                     _database.BeginTransaction(IsolationLevel);
+                    _database.Execute("SET LOCK_TIMEOUT 1800;");
                     return _database;
                 }
                 catch
@@ -505,7 +510,14 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
+        [Obsolete("Use the overload with reason")]
+        [Browsable(false)]
         public void WriteLock(params int[] lockIds)
+        {
+            WriteLock("N/A", lockIds);
+        }
+
+        public void WriteLock(string reason, params int[] lockIds)
         {
             // soon as we get Database, a transaction is started
 
@@ -515,10 +527,43 @@ namespace Umbraco.Core.Scoping
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
             {
-                var i = Database.Execute("UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+                Database.Execute(@"SET LOCK_TIMEOUT 1800;");
+                var i = Database.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END), lastWorkStarted = @lastWorkStarted WHERE id=@id", new { id = lockId, lastWorkStarted = reason });
                 if (i == 0) // ensure we are actually locking!
                     throw new Exception($"LockObject with id={lockId} does not exist.");
             }
+        }
+
+        /// <inheritdoc />
+        public IDictionary<int, string> TrySpyLock(params int[] lockIds)
+        {
+
+            using (var db = _scopeProvider.DatabaseFactory.CreateDatabase())
+            {
+                if (!db.SqlContext.SqlSyntax.IsReadUncommittedSupported)
+                {
+                    return lockIds.ToDictionary(x => x, x=> (string)null);
+                };
+
+                db.BeginTransaction(IsolationLevel.ReadUncommitted);
+                try
+                {
+                    return db.Fetch<LockDto>(db.SqlContext.Sql()
+                        .SelectAll()
+                        .From<LockDto>()
+                        .WhereIn<LockDto>(x => x.Id, lockIds)).ToDictionary(x => x.Id, x => x.LastWorkStarted);
+                }
+                finally
+                {
+                    db.CompleteTransaction();
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public string TrySpyLock(int lockId)
+        {
+            return TrySpyLock(new []{lockId})[lockId];
         }
     }
 }

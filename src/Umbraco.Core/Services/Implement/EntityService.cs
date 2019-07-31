@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -257,20 +258,43 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public virtual IEnumerable<IEntitySlim> GetChildren(int parentId)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
-                return _entityRepository.GetByQuery(query);
+                try
+                {
+                    var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
+                    return _entityRepository.GetByQuery(query);
+                }
+                catch (LockTimeoutException e)
+                {
+                    e.Reason = scope.TrySpyLock(Constants.Locks.ContentTree);
+
+                    throw;
+                }
             }
         }
 
         /// <inheritdoc />
         public virtual IEnumerable<IEntitySlim> GetChildren(int parentId, UmbracoObjectTypes objectType)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            throw new LockTimeoutException(new Exception("TODO"))
             {
-                var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
-                return _entityRepository.GetByQuery(query, objectType.GetGuid());
+                Reason = "TODO must be removed.. Only for test purpose"
+            };
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                try
+                {
+                    var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
+                    return _entityRepository.GetByQuery(query, objectType.GetGuid());
+                }
+                catch (LockTimeoutException e)
+                {
+                    e.Reason = scope.TrySpyLock(Constants.Locks.ContentTree);
+
+                    throw;
+                }
             }
         }
 

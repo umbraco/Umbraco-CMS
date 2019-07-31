@@ -200,7 +200,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             return "NVARCHAR";
         }
-        
+
+        public abstract bool IsReadUncommittedSupported { get; }
+
         public virtual IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             return new List<string>();
@@ -559,5 +561,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string ConvertIntegerToOrderableString => "REPLACE(STR({0}, 8), SPACE(1), '0')";
         public virtual string ConvertDateToOrderableString => "CONVERT(nvarchar, {0}, 102)";
         public virtual string ConvertDecimalToOrderableString => "REPLACE(STR({0}, 20, 9), SPACE(1), '0')";
+
+
     }
 }

@@ -47,6 +47,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return indexType;
         }
 
+        public override bool IsReadUncommittedSupported => false;
+
         public override string GetConcat(params string[] args)
         {
             return "(" + string.Join("+", args) + ")";

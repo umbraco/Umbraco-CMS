@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
@@ -57,6 +59,29 @@ namespace Umbraco.Core.Scoping
         /// Write-locks some lock objects.
         /// </summary>
         /// <param name="lockIds">The lock object identifiers.</param>
+        [Obsolete("Use the overload with reason")]
+        [Browsable(false)]
         void WriteLock(params int[] lockIds);
+
+        /// <summary>
+        /// Write-locks some lock objects.
+        /// </summary>
+        /// <param name="reason">The reason the lock is taken.</param>
+        /// <param name="lockIds">The lock object identifiers.</param>
+        void WriteLock(string reason, params int[] lockIds);
+
+        /// <summary>
+        /// Bypasses all db-locks and reads the LastWorkStarted column on the specified locks.
+        /// </summary>
+        /// <param name="lockIds">The lock ids from the Constants.Locks.*</param>
+        /// <returns>A dictionary with the lock is as key, and the last started work as value. Note value can be null if we don't know or use SqlCe.</returns>
+        IDictionary<int, string> TrySpyLock(params int[] lockIds);
+
+        /// <summary>
+        /// Bypasses all db-locks and reads the LastWorkStarted column on the specified lock.
+        /// </summary>
+        /// <param name="lockId">The lock id from the Constants.Locks.*</param>
+        /// <returns>The last started work. Note this can be null if we don't know or use SqlCe.</returns>
+        string TrySpyLock(int lockId);
     }
 }

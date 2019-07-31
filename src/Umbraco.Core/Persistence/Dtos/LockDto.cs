@@ -20,5 +20,10 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Length(64)]
         public string Name { get; set; }
+
+        [Column("lastWorkStarted")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(64)]
+        public string LastWorkStarted { get; set; }
     }
 }
