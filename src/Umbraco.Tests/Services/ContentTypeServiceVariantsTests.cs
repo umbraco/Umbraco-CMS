@@ -112,18 +112,8 @@ namespace Umbraco.Tests.Services
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Nothing;
-            var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
-            {
-                Alias = "title",
-                Name = "Title",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88,
-                Variations = ContentVariation.Nothing
-            });
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
             var contentType2 = MockedContentTypes.CreateBasicContentType("test");
             ServiceContext.ContentTypeService.Save(contentType2);
@@ -156,18 +146,8 @@ namespace Umbraco.Tests.Services
         {            
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Nothing;
-            var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
-            {
-                Alias = "title",
-                Name = "Title",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88,
-                Variations = ContentVariation.Nothing
-            });
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
             //create some content of this content type
@@ -205,18 +185,8 @@ namespace Umbraco.Tests.Services
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
-            var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
-            {
-                Alias = "title",
-                Name = "Title",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88,
-                Variations = ContentVariation.Culture
-            });
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            var properties = CreatePropertyCollection(("title", ContentVariation.Culture));
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
             //create some content of this content type
@@ -321,18 +291,8 @@ namespace Umbraco.Tests.Services
             //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
-            var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
-            {
-                Alias = "title",
-                Name = "Title",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88,
-                Variations = ContentVariation.Culture
-            });
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            var properties = CreatePropertyCollection(("title", ContentVariation.Culture));
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
             //create some content of this content type
@@ -364,18 +324,8 @@ namespace Umbraco.Tests.Services
             //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
-            var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
-            {
-                Alias = "title",
-                Name = "Title",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88,
-                Variations = ContentVariation.Culture
-            });
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            var properties = CreatePropertyCollection(("title", ContentVariation.Culture));
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
             //compose this from the other one
@@ -420,18 +370,8 @@ namespace Umbraco.Tests.Services
             //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
-            var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
-            {
-                Alias = "title",
-                Name = "Title",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88,
-                Variations = ContentVariation.Culture
-            });
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            var properties = CreatePropertyCollection(("title", ContentVariation.Culture));
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
             //compose this from the other one
