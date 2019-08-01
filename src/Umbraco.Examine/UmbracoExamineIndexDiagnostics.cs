@@ -14,6 +14,7 @@ namespace Umbraco.Examine
         public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger logger)
             : base(index, logger)
         {
+            _index = index;
         }
 
         public override IReadOnlyDictionary<string, object> Metadata
