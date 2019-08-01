@@ -10,6 +10,7 @@ using Umbraco.Examine;
 
 namespace Umbraco.Web.Search
 {
+
     /// <summary>
     /// Configures and installs Examine.
     /// </summary>

@@ -233,6 +233,9 @@
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
+    <Compile Include="Search\ExamineFinalComponent.cs" />
+    <Compile Include="Search\ExamineFinalComposer.cs" />
+    <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
