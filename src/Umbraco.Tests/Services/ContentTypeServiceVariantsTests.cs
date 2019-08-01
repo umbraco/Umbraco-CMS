@@ -156,8 +156,12 @@ namespace Umbraco.Tests.Services
             doc.SetValue("title", "hello world");
             ServiceContext.ContentService.Save(doc);
 
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+
             Assert.AreEqual("Hello1", doc.Name);
             Assert.AreEqual("hello world", doc.GetValue("title"));
+            Assert.IsTrue(doc.Edited);
+            Assert.IsFalse (doc.IsCultureEdited("en-US"));
 
             //change the content type to be variant, we will also update the name here to detect the copy changes
             doc.Name = "Hello2";
@@ -168,6 +172,8 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual("Hello2", doc.GetCultureName("en-US"));
             Assert.AreEqual("hello world", doc.GetValue("title")); //We are not checking against en-US here because properties will remain invariant
+            Assert.IsTrue(doc.Edited);
+            Assert.IsTrue(doc.IsCultureEdited("en-US"));
 
             //change back property type to be invariant, we will also update the name here to detect the copy changes
             doc.SetCultureName("Hello3", "en-US");
@@ -178,6 +184,8 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual("Hello3", doc.Name);
             Assert.AreEqual("hello world", doc.GetValue("title"));
+            Assert.IsTrue(doc.Edited);
+            Assert.IsFalse(doc.IsCultureEdited("en-US"));
         }
 
         [Test]
@@ -195,8 +203,11 @@ namespace Umbraco.Tests.Services
             doc.SetValue("title", "hello world", "en-US");
             ServiceContext.ContentService.Save(doc);
 
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
             Assert.AreEqual("Hello1", doc.GetCultureName("en-US"));
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
+            Assert.IsTrue(doc.Edited);
+            Assert.IsTrue(doc.IsCultureEdited("en-US"));
 
             //change the content type to be invariant, we will also update the name here to detect the copy changes
             doc.SetCultureName("Hello2", "en-US");
@@ -207,6 +218,8 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual("Hello2", doc.Name);
             Assert.AreEqual("hello world", doc.GetValue("title"));
+            Assert.IsTrue(doc.Edited);
+            Assert.IsFalse(doc.IsCultureEdited("en-US"));
 
             //change back property type to be variant, we will also update the name here to detect the copy changes
             doc.Name = "Hello3";
@@ -219,6 +232,8 @@ namespace Umbraco.Tests.Services
             //exists it will not be returned because the property type is invariant,
             //so this check proves that null will be returned
             Assert.IsNull(doc.GetValue("title", "en-US"));
+            Assert.IsTrue(doc.Edited);
+            Assert.IsTrue(doc.IsCultureEdited("en-US")); // this is true because the name change is copied to the default language
 
             //we can now switch the property type to be variant and the value can be returned again
             contentType.PropertyTypes.First().Variations = ContentVariation.Culture;
@@ -227,8 +242,11 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual("Hello3", doc.GetCultureName("en-US"));
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
+            Assert.IsTrue(doc.Edited);
+            Assert.IsTrue(doc.IsCultureEdited("en-US"));
 
         }
+
 
         [Test]
         public void Change_Property_Type_From_To_Variant_On_Invariant_Content_Type()
