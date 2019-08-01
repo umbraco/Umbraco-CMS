@@ -124,6 +124,13 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             _elementTypesInUse.Add(elementTypeId);
 
             var propertyValues = element.ToObject<Dictionary<string, string>>();
+            if (!propertyValues.TryGetValue("key", out var keyo)
+                || !Guid.TryParse(keyo.ToString(), out var key))
+            {
+                changed = true;
+                element["key"] = Guid.NewGuid();
+            }
+
             var propertyTypes = GetPropertyTypes(elementTypeId);
 
             foreach (var pt in propertyTypes)
