@@ -136,14 +136,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         $scope.allowAddMedia = hasAccessToMedia;
 
                         setupViewModel();
-
-                        //When the model value changes sync the view model
-                        $scope.$watch("model.value",
-                            function (newVal, oldVal) {
-                                if (newVal !== oldVal) {
-                                    setupViewModel();
-                                }
-                            });
                     });
                 });
         }
@@ -226,24 +218,24 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         };
 
-
-
         $scope.sortableOptions = {
-            disabled: !$scope.isMultiPicker,
+            containment: 'parent',
+            cursor: 'move',
+            tolerance: 'pointer',
+            disabled: !multiPicker,
             items: "li:not(.add-wrapper)",
             cancel: ".unsortable",
             update: function (e, ui) {
-                var r = [];
-                // TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the
-                // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
-                // watch do all the rest.
-                $timeout(function () {
-                    angular.forEach($scope.mediaItems, function (value, key) {
-                        r.push($scope.model.config.idType === "udi" ? value.udi : value.id);
-                    });
-                    $scope.ids = r;
+                $timeout(function() {
+                    // TODO: Instead of doing this with a timeout would be better to use a watch like we do in the
+                    // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
+                    // watch do all the rest.
+                    $scope.ids = _.map($scope.mediaItems,
+                        function (item) {
+                            return $scope.model.config.idType === "udi" ? item.udi : item.id;
+                        });
                     sync();
-                }, 500, false);
+                });
             }
         };
 
