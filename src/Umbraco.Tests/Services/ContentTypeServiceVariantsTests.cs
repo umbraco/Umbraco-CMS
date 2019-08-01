@@ -880,9 +880,6 @@ namespace Umbraco.Tests.Services
             document.SetValue("value1", "v1fr2", "fr"); //update the value now that it's variant again
             ServiceContext.ContentService.SaveAndPublish(document);
 
-            //at this stage there will be 4 property values stored in the DB for "value1" against "en", "fr" for both edited/published versions,
-            //with the change back to Culture, it deletes the invariant property values.
-
             document = ServiceContext.ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
