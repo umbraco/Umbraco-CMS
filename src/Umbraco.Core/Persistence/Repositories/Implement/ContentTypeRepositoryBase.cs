@@ -648,14 +648,14 @@ AND umbracoNode.id <> @id",
                     case ContentVariation.Culture:
                         CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
                         CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedL);
-                        RenormalizeDocumentCultureVariations(propertyTypeIds, impactedL);
+                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
                         //TODO: Here we need to normalize the umbracoDocumentCultureVariation table for it's edited flags which are calculated based
                         //on changed property or name values
                         break;
                     case ContentVariation.Nothing:
                         CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
                         CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedL);
-                        RenormalizeDocumentCultureVariations(propertyTypeIds, impactedL);
+                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
                         //TODO: Here we need to normalize the umbracoDocumentCultureVariation table for it's edited flags which are calculated based
                         //on changed property or name values
                         break;
@@ -1024,19 +1024,17 @@ AND umbracoNode.id <> @id",
         }
 
         /// <summary>
-        /// Re-normalizes the edited value in the umbracoDocumentCultureVariation table when property variations are changed
+        /// Re-normalizes the edited value in the umbracoDocumentCultureVariation and umbracoDocument table when variations are changed
         /// </summary>
         /// <param name="propertyTypeIds"></param>
         /// <param name="contentTypeIds"></param>
         /// <remarks>
         /// If this is not done, then in some cases the "edited" value for a particular culture for a document will remain true when it should be false
         /// if the property was changed to invariant. In order to do this we need to recalculate this value based on the values stored for each
-        /// property, culture and current/published version. The end result is to update the edited value in the umbracoDocumentCultureVariation table so we
-        /// make sure to join this table with the lookups so that only relevant data is returned.
+        /// property, culture and current/published version.
         /// </remarks>
-        private void RenormalizeDocumentCultureVariations(IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int> contentTypeIds = null)
+        private void RenormalizeDocumentEditedFlags(IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int> contentTypeIds = null)
         {
-
             var defaultLang = LanguageRepository.GetDefaultId();
 
            //This will build up a query to get the property values of both the current and the published version so that we can check
@@ -1073,14 +1071,16 @@ AND umbracoNode.id <> @id",
                 .OrderBy<ContentVersionDto>(x => x.NodeId)
                 .OrderBy<PropertyDataDto>(x => x.PropertyTypeId, x => x.LanguageId, x => x.VersionId);
 
-            //keep track of this node/lang to mark or unmark as edited
-            var editedVersions = new Dictionary<(int nodeId, int? langId), bool>();
-
+            //keep track of this node/lang to mark or unmark a culture as edited
+            var editedLanguageVersions = new Dictionary<(int nodeId, int? langId), bool>();
+            //keep track of which node to mark or unmark as edited 
+            var editedDocument = new Dictionary<int, bool>();
             var nodeId = -1;
             var propertyTypeId = -1;
+            
             PropertyValueVersionDto pubRow = null;
 
-            //This is a QUERY we are not fetching this all into memory so we cannot make any changes during this iteration, we are just collecting data.
+            //This is a reader (Query), we are not fetching this all into memory so we cannot make any changes during this iteration, we are just collecting data.
             //Published data will always come before Current data based on the version id sort.
             //There will only be one published row (max) and one current row per property.
             foreach (var row in Database.Query<PropertyValueVersionDto>(propertySql))
@@ -1105,49 +1105,28 @@ AND umbracoNode.id <> @id",
                         || propVariations.VariesByCulture() && !row.LanguageId.HasValue)
                     {
                         //Flag this as not edited for this node/lang if the key doesn't exist
-                        if (!editedVersions.TryGetValue((row.NodeId, row.LanguageId), out _))
-                            editedVersions.Add((row.NodeId, row.LanguageId), false);
+                        if (!editedLanguageVersions.TryGetValue((row.NodeId, row.LanguageId), out _))
+                            editedLanguageVersions.Add((row.NodeId, row.LanguageId), false);
+
+                        //mark as false if the item doesn't exist, else coerce to true
+                        editedDocument[row.NodeId] = editedDocument.TryGetValue(row.NodeId, out var edited) ? (edited |= false) : false;
                     }
                     else if (pubRow == null)
                     {
                         //this would mean that that this property is 'edited' since there is no published version
-                        editedVersions.Add((row.NodeId, row.LanguageId), true);
+                        editedLanguageVersions.Add((row.NodeId, row.LanguageId), true);
+                        editedDocument[row.NodeId] = true;
                     }
                     //compare the property values, if they differ from versions then flag the current version as edited
                     else if (IsPropertyValueChanged(pubRow, row))
                     {
                         //Here we would check if the property is invariant, in which case the edited language should be indicated by the default lang
-                        editedVersions[(row.NodeId, !propVariations.VariesByCulture() ? defaultLang : row.LanguageId)] = true;
+                        editedLanguageVersions[(row.NodeId, !propVariations.VariesByCulture() ? defaultLang : row.LanguageId)] = true;
+                        editedDocument[row.NodeId] = true;
                     }
 
                     //reset
                     pubRow = null;
-                }
-            }
-
-            //lookup all matching rows in umbracoDocumentCultureVariation
-            var docCultureVariationsToUpdate = Database.Fetch<DocumentCultureVariationDto>(
-                Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
-                .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedVersions.Keys.Select(x => x.langId).ToList())
-                .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, editedVersions.Keys.Select(x => x.nodeId)))
-                //convert to dictionary with the same key type
-                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
-
-            foreach (var ev in editedVersions)
-            {
-                if (docCultureVariationsToUpdate.TryGetValue(ev.Key, out var docVariations))
-                {
-                    //check if it needs updating
-                    if (docVariations.Edited != ev.Value)
-                    {
-                        docVariations.Edited = ev.Value;
-                        Database.Update(docVariations);
-                    }
-                }
-                else
-                {
-                    //the row doesn't exist but needs creating
-                    //TODO: Does this ever happen?? Need to see if we can test this
                 }
             }
 
@@ -1172,8 +1151,57 @@ AND umbracoNode.id <> @id",
             //    .Where<ContentVersionDto>(x => x.Current, "cv1")
             //    .OrderBy("cv1.nodeId, cvcv1.versionId, cvcv1.languageId");
 
-            //var names = Database.Fetch<NameCompareDto>(nameSql);
+            ////This is a reader (Query), we are not fetching this all into memory so we cannot make any changes during this iteration, we are just collecting data.
+            //foreach (var name in Database.Query<NameCompareDto>(nameSql))
+            //{
+            //    if (name.CurrentName != name.PublishedName)
+            //    {
 
+            //    }
+            //}
+
+            //lookup all matching rows in umbracoDocumentCultureVariation
+            var docCultureVariationsToUpdate = editedLanguageVersions.InGroupsOf(2000)
+                .SelectMany(_ => Database.Fetch<DocumentCultureVariationDto>(
+                    Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
+                            .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedLanguageVersions.Keys.Select(x => x.langId).ToList())
+                            .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, editedLanguageVersions.Keys.Select(x => x.nodeId))))
+                //convert to dictionary with the same key type
+                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
+
+            var toUpdate = new List<DocumentCultureVariationDto>();
+            foreach (var ev in editedLanguageVersions)
+            {
+                if (docCultureVariationsToUpdate.TryGetValue(ev.Key, out var docVariations))
+                {
+                    //check if it needs updating
+                    if (docVariations.Edited != ev.Value)
+                    {
+                        docVariations.Edited = ev.Value;
+                        toUpdate.Add(docVariations);
+                    }
+                }
+                else
+                {
+                    //the row doesn't exist but needs creating
+                    //TODO: Does this ever happen?? Need to see if we can test this
+                    throw new PanicException($"The existing DocumentCultureVariationDto was not found for node {ev.Key.nodeId} and language {ev.Key.langId}");
+                }
+            }
+
+            //Now bulk update the table DocumentCultureVariationDto, once for edited = true, another for edited = false
+            foreach (var editValue in toUpdate.GroupBy(x => x.Edited))
+            {
+                Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
+                    .WhereIn<DocumentCultureVariationDto>(x => x.Id, editValue.Select(x => x.Id)));
+            }
+
+            //Now bulk update the umbracoDocument table
+            foreach(var editValue in editedDocument.GroupBy(x => x.Value))
+            {
+                Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, editValue.Key))
+                    .WhereIn<DocumentDto>(x => x.NodeId, editValue.Select(x => x.Key)));
+            }
         }
 
         private static bool IsPropertyValueChanged(PropertyValueVersionDto pubRow, PropertyValueVersionDto row)

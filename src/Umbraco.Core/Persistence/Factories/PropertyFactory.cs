@@ -104,10 +104,9 @@ namespace Umbraco.Core.Persistence.Factories
         /// <param name="properties">The properties to map</param>
         /// <param name="languageRepository"></param>
         /// <param name="edited">out parameter indicating that one or more properties have been edited</param>
-        /// <param name="editedCultures">out parameter containing a collection of edited cultures when the contentVariation varies by culture</param>
-        /// <param name="persistedEditedCultures">
-        /// out parameter containing a collection of edited cultures that are currently persisted in the database which is used to maintain the edited state
-        /// of each culture value (in cases where variance is being switched)
+        /// <param name="editedCultures">
+        /// Out parameter containing a collection of edited cultures when the contentVariation varies by culture.
+        /// The value of this will be used to populate the edited cultures in the umbracoDocumentCultureVariation table.
         /// </param>
         /// <returns></returns>
         public static IEnumerable<PropertyDataDto> BuildDtos(ContentVariation contentVariation, int currentVersionId, int publishedVersionId, IEnumerable<Property> properties,
@@ -146,14 +145,16 @@ namespace Umbraco.Core.Persistence.Factories
                         if (propertyValue.EditedValue != null)
                             propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
 
-                        //// property.Values will contain ALL of it's values, both variant and invariant which will be populated if the administrator has previously
-                        //// changed the property type to be variant vs invariant.
-                        //// We need to check for this scenario here because otherwise the editedCultures and edited flags
-                        //// will end up incorrectly so here we need to only process edited cultures based on the
-                        //// current value type and how the property varies.
+                        // property.Values will contain ALL of it's values, both variant and invariant which will be populated if the
+                        // administrator has previously changed the property type to be variant vs invariant.
+                        // We need to check for this scenario here because otherwise the editedCultures and edited flags
+                        // will end up incorrectly set in the umbracoDocumentCultureVariation table so here we need to
+                        // only process edited cultures based on the current value type and how the property varies.
+                        // The above logic will still persist the currently saved property value for each culture in case the admin
+                        // decides to swap the property's variance again, in which case the edited flag will be recalculated.
 
-                        //if (property.PropertyType.VariesByCulture() && isInvariantValue) continue;
-                        //if (!property.PropertyType.VariesByCulture() && isCultureValue) continue;
+                        if (property.PropertyType.VariesByCulture() && isInvariantValue || !property.PropertyType.VariesByCulture() && isCultureValue)
+                            continue;
 
                         // use explicit equals here, else object comparison fails at comparing eg strings
                         var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);

@@ -828,12 +828,14 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
             Assert.AreEqual("v1en", document.GetValue("value1", "en"));
+            Assert.AreEqual("v1en-init", document.GetValue("value1", "en", published: true));
             Assert.AreEqual("v1fr", document.GetValue("value1", "fr"));
+            Assert.AreEqual("v1fr-init", document.GetValue("value1", "fr", published: true));
             Assert.IsTrue(document.IsCultureEdited("en")); //This will be true because the edited value isn't the same as the published value
             Assert.IsTrue(document.IsCultureEdited("fr")); //This will be true because the edited value isn't the same as the published value
             Assert.IsTrue(document.Edited);
 
-            // switch property type to Nothing
+            // switch property type to Invariant
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Nothing;
             ServiceContext.ContentTypeService.Save(contentType); //This is going to have to re-normalize the "Edited" flag
             
@@ -852,9 +854,12 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
             Assert.IsNull(document.GetValue("value1", "en")); //The values are there but the business logic returns null
             Assert.IsNull(document.GetValue("value1", "fr")); //The values are there but the business logic returns null
+            Assert.IsNull(document.GetValue("value1", "en", published: true)); //The values are there but the business logic returns null
+            Assert.IsNull(document.GetValue("value1", "fr", published: true)); //The values are there but the business logic returns null
             Assert.AreEqual("v1inv", document.GetValue("value1"));
-            Assert.IsFalse(document.IsCultureEdited("en")); //This returns false, everything is published - however in the DB this is not the case for the "en" version of the property
-            Assert.IsFalse(document.IsCultureEdited("fr")); //This returns false, everything is published
+            Assert.AreEqual("v1inv", document.GetValue("value1", published: true));
+            Assert.IsFalse(document.IsCultureEdited("en")); //This returns false, everything is published
+            Assert.IsFalse(document.IsCultureEdited("fr")); //This will be false because nothing has changed for this culture and the property no longer reflects variant changes
             Assert.IsFalse(document.Edited);
 
             // switch property back to Culture
@@ -863,14 +868,12 @@ namespace Umbraco.Tests.Services
                         
             document = ServiceContext.ContentService.GetById(document.Id);
             Assert.AreEqual("v1inv", document.GetValue("value1", "en")); //The invariant property value gets copied over to the default language
-            Assert.AreEqual("v1fr", document.GetValue("value1", "fr"));
+            Assert.AreEqual("v1inv", document.GetValue("value1", "en", published: true));
+            Assert.AreEqual("v1fr", document.GetValue("value1", "fr")); //values are still retained
+            Assert.AreEqual("v1fr-init", document.GetValue("value1", "fr", published: true)); //values are still retained
             Assert.IsFalse(document.IsCultureEdited("en")); //The invariant published AND edited values are copied over to the default language
-            //TODO: This fails - for some reason in the DB, the DocumentCultureVariationDto Edited flag is set to false for the FR culture
-            // I'm assuming this is somehow done during the ContentTypeService.Save method when changing variation. It should not be false but instead
-            // true because the values for it's edited vs published version are different. Perhaps it's false because that is the default boolean value and
-            // this row gets deleted somewhere along the way?
             Assert.IsTrue(document.IsCultureEdited("fr"));  //The previously existing french values are there and there is no published value
-            Assert.IsTrue(document.Edited);
+            Assert.IsTrue(document.Edited); //Will be flagged edited again because the french culture had pending changes
 
             // publish again
             document.SetValue("value1", "v1en2", "en"); //update the value now that it's variant again

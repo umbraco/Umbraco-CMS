@@ -511,7 +511,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
                 documentVersionDto.Published = false; // non-published version
-                Database.Insert(documentVersionDto);
+                Database.Insert(documentVersionDto); 
             }
 
             // replace the property data (rather than updating)
