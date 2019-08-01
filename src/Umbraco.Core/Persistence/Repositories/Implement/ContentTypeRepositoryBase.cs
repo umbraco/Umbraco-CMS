@@ -532,9 +532,15 @@ AND umbracoNode.id <> @id",
         {
             //if the entity does not vary at all, then the property cannot have a variance value greater than it
             if (entity.Variations == ContentVariation.Nothing)
+            {
                 foreach (var prop in entity.PropertyTypes)
-                    if (prop.Variations > entity.Variations)
+                {
+                    if (prop.IsPropertyDirty(nameof(prop.Variations)) && prop.Variations > entity.Variations)
                         throw new InvalidOperationException($"The property {prop.Alias} cannot have variations of {prop.Variations} with the content type variations of {entity.Variations}");
+                }
+                    
+            }
+                
         }
 
         private IEnumerable<IContentTypeComposition> GetImpactedContentTypes(IContentTypeComposition contentType, IEnumerable<IContentTypeComposition> all)
