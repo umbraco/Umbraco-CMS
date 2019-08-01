@@ -796,6 +796,85 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Change_Property_Variations_From_Invariant_To_Variant_And_Ensure_Edited_Values_Are_Renormalized()
+        {
+            // one simple content type, variant, with both variant and invariant properties
+            // can change an invariant property to variant and back
+
+            CreateFrenchAndEnglishLangs();
+
+            var contentType = CreateContentType(ContentVariation.Culture);
+
+            var properties = CreatePropertyCollection(("value1", ContentVariation.Nothing));
+
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var document = (IContent)new Content("document", -1, contentType);
+            document.SetCultureName("doc1en", "en");
+            document.SetCultureName("doc1fr", "fr");
+            document.SetValue("value1", "v1en-init");
+            ServiceContext.ContentService.SaveAndPublish(document); //all values are published which means the document is not 'edited'
+
+            document = ServiceContext.ContentService.GetById(document.Id);
+            Assert.IsFalse(document.IsCultureEdited("en"));
+            Assert.IsFalse(document.IsCultureEdited("fr"));
+            Assert.IsFalse(document.Edited);
+
+            document.SetValue("value1", "v1en"); //change the property value, so now the invariant (default) culture will be edited
+            ServiceContext.ContentService.Save(document);
+
+            document = ServiceContext.ContentService.GetById(document.Id);
+            Assert.AreEqual("doc1en", document.Name);
+            Assert.AreEqual("doc1en", document.GetCultureName("en"));
+            Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+            Assert.AreEqual("v1en", document.GetValue("value1"));
+            Assert.AreEqual("v1en-init", document.GetValue("value1", published: true));            
+            Assert.IsTrue(document.IsCultureEdited("en")); //This is true because the invariant property reflects changes on the default lang
+            Assert.IsFalse(document.IsCultureEdited("fr")); 
+            Assert.IsTrue(document.Edited);
+
+            // switch property type to Culture
+            contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType); //This is going to have to re-normalize the "Edited" flag
+
+            document = ServiceContext.ContentService.GetById(document.Id);
+            Assert.IsTrue(document.IsCultureEdited("en")); //Remains true 
+            Assert.IsFalse(document.IsCultureEdited("fr")); //False because no french property has ever been edited
+            Assert.IsTrue(document.Edited);
+
+            //update the culture value and publish
+            document.SetValue("value1", "v1en2", "en");
+            ServiceContext.ContentService.SaveAndPublish(document);
+
+            document = ServiceContext.ContentService.GetById(document.Id);
+            Assert.AreEqual("doc1en", document.Name);
+            Assert.AreEqual("doc1en", document.GetCultureName("en"));
+            Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+            Assert.IsNull(document.GetValue("value1")); //The values are there but the business logic returns null
+            Assert.IsNull(document.GetValue("value1", published: true)); //The values are there but the business logic returns null
+            Assert.AreEqual("v1en2", document.GetValue("value1", "en"));
+            Assert.AreEqual("v1en2", document.GetValue("value1", "en", published: true));
+            Assert.IsFalse(document.IsCultureEdited("en")); //This returns false, everything is published
+            Assert.IsFalse(document.IsCultureEdited("fr")); //False because no french property has ever been edited
+            Assert.IsFalse(document.Edited);
+
+            // switch property back to Invariant
+            contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Nothing;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            document = ServiceContext.ContentService.GetById(document.Id);
+            Assert.AreEqual("v1en2", document.GetValue("value1")); //The variant property value gets copied over to the invariant
+            Assert.AreEqual("v1en2", document.GetValue("value1", published: true));
+            Assert.IsNull(document.GetValue("value1", "fr"));  //The values are there but the business logic returns null
+            Assert.IsNull(document.GetValue("value1", "fr", published: true));  //The values are there but the business logic returns null
+            Assert.IsFalse(document.IsCultureEdited("en")); //The variant published AND edited values are copied over to the invariant
+            Assert.IsFalse(document.IsCultureEdited("fr"));  
+            Assert.IsFalse(document.Edited);
+
+        }
+
+        [Test]
         public void Change_Variations_ComposedContentType_1()
         {
             // one composing content type, variant, with both variant and invariant properties
