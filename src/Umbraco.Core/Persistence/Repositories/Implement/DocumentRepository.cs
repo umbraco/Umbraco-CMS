@@ -1310,13 +1310,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                     Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
                     Available = content.IsCultureAvailable(culture),
-                    Published = content.IsCulturePublished(culture)
+                    Published = content.IsCulturePublished(culture),
+                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
+                    Edited = content.IsCultureAvailable(culture) &&
+                             (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)))
                 };
-
-                // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
-
-                dto.Edited = content.IsCultureAvailable(culture) &&
-                             (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)));
 
                 yield return dto;
             }

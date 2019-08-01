@@ -110,7 +110,6 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Change_Content_Type_Variation_Clears_Redirects()
         {
-            //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Nothing;
             var contentCollection = new PropertyTypeCollection(true);
@@ -154,8 +153,7 @@ namespace Umbraco.Tests.Services
 
         [Test]
         public void Change_Content_Type_From_Invariant_Variant()
-        {
-            //create content type with a property type that varies by culture
+        {            
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Nothing;
             var contentCollection = new PropertyTypeCollection(true);
@@ -205,7 +203,6 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Change_Content_Type_From_Variant_Invariant()
         {
-            //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
             var contentCollection = new PropertyTypeCollection(true);
@@ -264,39 +261,49 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Change_Property_Type_From_Invariant_Variant()
+        public void Change_Property_Type_From_To_Variant_On_Invariant_Content_Type()
         {
-            //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Nothing;
-            var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
-            {
-                Alias = "title",
-                Name = "Title",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88,
-                Variations = ContentVariation.Nothing
-            });
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            //change the property type to be variant
+            contentType.PropertyTypes.First().Variations = ContentVariation.Culture;
+
+            //Cannot change a property type to be variant if the content type itself is not variant
+            Assert.Throws<InvalidOperationException>(() => ServiceContext.ContentTypeService.Save(contentType));
+        }
+
+        [Test]
+        public void Change_Property_Type_From_Invariant_Variant()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
             //create some content of this content type
             IContent doc = MockedContent.CreateBasicContent(contentType);
-            doc.Name = "Home";
+            doc.SetCultureName("Home", "en-US");
             doc.SetValue("title", "hello world");
             ServiceContext.ContentService.Save(doc);
 
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
             Assert.AreEqual("hello world", doc.GetValue("title"));
-
+            Assert.IsTrue(doc.IsCultureEdited("en-US")); //invariant prop changes show up on default lang
+            Assert.IsTrue(doc.Edited);
+            
             //change the property type to be variant
             contentType.PropertyTypes.First().Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
+            Assert.IsTrue(doc.IsCultureEdited("en-US"));
+            Assert.IsTrue(doc.Edited);
 
             //change back property type to be invariant
             contentType.PropertyTypes.First().Variations = ContentVariation.Nothing;
@@ -304,6 +311,8 @@ namespace Umbraco.Tests.Services
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("hello world", doc.GetValue("title"));
+            Assert.IsTrue(doc.IsCultureEdited("en-US"));  //invariant prop changes show up on default lang
+            Assert.IsTrue(doc.Edited);
         }
 
         [Test]
@@ -470,28 +479,11 @@ namespace Umbraco.Tests.Services
 
             CreateFrenchAndEnglishLangs();
 
-            var contentType = new ContentType(-1)
-            {
-                Alias = "contentType",
-                Name = "contentType",
-                Variations = ContentVariation.Culture
-            };
+            var contentType = CreateContentType(ContentVariation.Culture);
 
-            var properties = new PropertyTypeCollection(true)
-            {
-                new PropertyType("value1", ValueStorageType.Ntext)
-                {
-                    Alias = "value1",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Culture
-                },
-                new PropertyType("value2", ValueStorageType.Ntext)
-                {
-                    Alias = "value2",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                }
-            };
+            var properties = CreatePropertyCollection(
+                ("value1", ContentVariation.Culture),
+                ("value2", ContentVariation.Nothing));
 
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
@@ -579,28 +571,11 @@ namespace Umbraco.Tests.Services
             var languageFr = new Language("fr");
             ServiceContext.LocalizationService.Save(languageFr);
 
-            var contentType = new ContentType(-1)
-            {
-                Alias = "contentType",
-                Name = "contentType",
-                Variations = ContentVariation.Nothing
-            };
+            var contentType = CreateContentType(ContentVariation.Nothing);
 
-            var properties = new PropertyTypeCollection(true)
-            {
-                new PropertyType("value1", ValueStorageType.Ntext)
-                {
-                    Alias = "value1",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                },
-                new PropertyType("value2", ValueStorageType.Ntext)
-                {
-                    Alias = "value2",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                }
-            };
+            var properties = CreatePropertyCollection(
+                ("value1", ContentVariation.Nothing),
+                ("value2", ContentVariation.Nothing));
 
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
@@ -681,28 +656,11 @@ namespace Umbraco.Tests.Services
 
             CreateFrenchAndEnglishLangs();
 
-            var contentType = new ContentType(-1)
-            {
-                Alias = "contentType",
-                Name = "contentType",
-                Variations = ContentVariation.Culture
-            };
+            var contentType = CreateContentType(ContentVariation.Culture);
 
-            var properties = new PropertyTypeCollection(true)
-            {
-                new PropertyType("value1", ValueStorageType.Ntext)
-                {
-                    Alias = "value1",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Culture
-                },
-                new PropertyType("value2", ValueStorageType.Ntext)
-                {
-                    Alias = "value2",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                }
-            };
+            var properties = CreatePropertyCollection(
+                ("value1", ContentVariation.Culture),
+                ("value2", ContentVariation.Nothing));
 
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
@@ -780,29 +738,16 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Change_Variations_SimpleContentType_VariantPropertyToInvariantAndBack_While_Publishing()
+        public void Change_Property_Variations_From_Variant_To_Invariant_And_Ensure_Edited_Values_Are_Renormalized()
         {
             // one simple content type, variant, with both variant and invariant properties
             // can change an invariant property to variant and back
 
             CreateFrenchAndEnglishLangs();
 
-            var contentType = new ContentType(-1)
-            {
-                Alias = "contentType",
-                Name = "contentType",
-                Variations = ContentVariation.Culture
-            };
+            var contentType = CreateContentType(ContentVariation.Culture);
 
-            var properties = new PropertyTypeCollection(true)
-            {
-                new PropertyType("value1", ValueStorageType.Ntext)
-                {
-                    Alias = "value1",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Culture
-                }
-            };
+            var properties = CreatePropertyCollection(("value1", ContentVariation.Culture));
 
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
@@ -902,54 +847,20 @@ namespace Umbraco.Tests.Services
 
             CreateFrenchAndEnglishLangs();
 
-            var composing = new ContentType(-1)
-            {
-                Alias = "composing",
-                Name = "composing",
-                Variations = ContentVariation.Culture
-            };
+            var composing = CreateContentType(ContentVariation.Culture, "composing");
 
-            var properties1 = new PropertyTypeCollection(true)
-            {
-                new PropertyType("value11", ValueStorageType.Ntext)
-                {
-                    Alias = "value11",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Culture
-                },
-                new PropertyType("value12", ValueStorageType.Ntext)
-                {
-                    Alias = "value12",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                }
-            };
+            var properties1 = CreatePropertyCollection(
+                ("value11", ContentVariation.Culture),
+                ("value12", ContentVariation.Nothing));
 
             composing.PropertyGroups.Add(new PropertyGroup(properties1) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(composing);
 
-            var composed = new ContentType(-1)
-            {
-                Alias = "composed",
-                Name = "composed",
-                Variations = ContentVariation.Culture
-            };
+            var composed = CreateContentType(ContentVariation.Culture, "composed");
 
-            var properties2 = new PropertyTypeCollection(true)
-            {
-                new PropertyType("value21", ValueStorageType.Ntext)
-                {
-                    Alias = "value21",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Culture
-                },
-                new PropertyType("value22", ValueStorageType.Ntext)
-                {
-                    Alias = "value22",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                }
-            };
+            var properties2 = CreatePropertyCollection(
+                ("value21", ContentVariation.Culture),
+                ("value22", ContentVariation.Nothing));
 
             composed.PropertyGroups.Add(new PropertyGroup(properties2) { Name = "Content" });
             composed.AddContentType(composing);
@@ -1031,81 +942,30 @@ namespace Umbraco.Tests.Services
 
             CreateFrenchAndEnglishLangs();
 
-            var composing = new ContentType(-1)
-            {
-                Alias = "composing",
-                Name = "composing",
-                Variations = ContentVariation.Culture
-            };
+            var composing = CreateContentType(ContentVariation.Culture, "composing");
 
-            var properties1 = new PropertyTypeCollection(true)
-            {
-                new PropertyType("value11", ValueStorageType.Ntext)
-                {
-                    Alias = "value11",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Culture
-                },
-                new PropertyType("value12", ValueStorageType.Ntext)
-                {
-                    Alias = "value12",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                }
-            };
+            var properties1 = CreatePropertyCollection(
+                ("value11", ContentVariation.Culture),
+                ("value12", ContentVariation.Nothing));
 
             composing.PropertyGroups.Add(new PropertyGroup(properties1) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(composing);
 
-            var composed1 = new ContentType(-1)
-            {
-                Alias = "composed1",
-                Name = "composed1",
-                Variations = ContentVariation.Culture
-            };
+            var composed1 = CreateContentType(ContentVariation.Culture, "composed1");
 
-            var properties2 = new PropertyTypeCollection(true)
-            {
-                new PropertyType("value21", ValueStorageType.Ntext)
-                {
-                    Alias = "value21",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Culture
-                },
-                new PropertyType("value22", ValueStorageType.Ntext)
-                {
-                    Alias = "value22",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                }
-            };
+            var properties2 = CreatePropertyCollection(
+                ("value21", ContentVariation.Culture),
+                ("value22", ContentVariation.Nothing));
 
             composed1.PropertyGroups.Add(new PropertyGroup(properties2) { Name = "Content" });
             composed1.AddContentType(composing);
             ServiceContext.ContentTypeService.Save(composed1);
 
-            var composed2 = new ContentType(-1)
-            {
-                Alias = "composed2",
-                Name = "composed2",
-                Variations = ContentVariation.Nothing
-            };
+            var composed2 = CreateContentType(ContentVariation.Nothing, "composed2");
 
-            var properties3 = new PropertyTypeCollection(true)
-            {
-                new PropertyType("value31", ValueStorageType.Ntext)
-                {
-                    Alias = "value31",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                },
-                new PropertyType("value32", ValueStorageType.Ntext)
-                {
-                    Alias = "value32",
-                    DataTypeId = -88,
-                    Variations = ContentVariation.Nothing
-                }
-            };
+            var properties3 = CreatePropertyCollection(
+                ("value31", ContentVariation.Nothing),
+                ("value32", ContentVariation.Nothing));
 
             composed2.PropertyGroups.Add(new PropertyGroup(properties3) { Name = "Content" });
             composed2.AddContentType(composing);
@@ -1218,6 +1078,28 @@ namespace Umbraco.Tests.Services
             ServiceContext.LocalizationService.Save(languageEn);
             var languageFr = new Language("fr");
             ServiceContext.LocalizationService.Save(languageFr);
+        }
+
+        private IContentType CreateContentType(ContentVariation variance, string alias = "contentType") => new ContentType(-1)
+        {
+            Alias = alias,
+            Name = alias,
+            Variations = variance
+        };
+
+        private PropertyTypeCollection CreatePropertyCollection(params (string alias, ContentVariation variance)[] props)
+        {
+            var propertyCollection = new PropertyTypeCollection(true);
+
+            foreach (var (alias, variance) in props)
+                propertyCollection.Add(new PropertyType(alias, ValueStorageType.Ntext)
+                {
+                    Alias = alias,
+                    DataTypeId = -88,
+                    Variations = variance
+                });
+
+            return propertyCollection;
         }
     }
 }

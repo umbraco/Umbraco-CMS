@@ -100,6 +100,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected void PersistNewBaseContentType(IContentTypeComposition entity)
         {
+            ValidateVariations(entity);
+
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             //Cannot add a duplicate content type
@@ -165,11 +167,11 @@ AND umbracoNode.nodeObjectType = @objectType",
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
-                                    {
-                                        Id = entity.Id,
-                                        AllowedId = allowedContentType.Id.Value,
-                                        SortOrder = allowedContentType.SortOrder
-                                    });
+                {
+                    Id = entity.Id,
+                    AllowedId = allowedContentType.Id.Value,
+                    SortOrder = allowedContentType.SortOrder
+                });
             }
 
 
@@ -216,6 +218,8 @@ AND umbracoNode.nodeObjectType = @objectType",
 
         protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
         {
+            ValidateVariations(entity);
+
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             // ensure the alias is not used already
@@ -372,7 +376,7 @@ AND umbracoNode.id <> @id",
             foreach (var propertyGroup in entity.PropertyGroups)
             {
                 // insert or update group
-                var groupDto = PropertyGroupFactory.BuildGroupDto(propertyGroup,entity.Id);
+                var groupDto = PropertyGroupFactory.BuildGroupDto(propertyGroup, entity.Id);
                 var groupId = propertyGroup.HasIdentity
                     ? Database.Update(groupDto)
                     : Convert.ToInt32(Database.Insert(groupDto));
@@ -390,7 +394,7 @@ AND umbracoNode.id <> @id",
 
             //check if the content type variation has been changed
             var contentTypeVariationDirty = entity.IsPropertyDirty("Variations");
-            var oldContentTypeVariation = (ContentVariation) dtoPk.Variations;
+            var oldContentTypeVariation = (ContentVariation)dtoPk.Variations;
             var newContentTypeVariation = entity.Variations;
             var contentTypeVariationChanging = contentTypeVariationDirty && oldContentTypeVariation != newContentTypeVariation;
             if (contentTypeVariationChanging)
@@ -451,7 +455,7 @@ AND umbracoNode.id <> @id",
                 // via composition, with their original variations (ie not filtered by this
                 // content type variations - we need this true value to make decisions.
 
-                foreach (var propertyType in ((ContentTypeCompositionBase) entity).RawComposedPropertyTypes)
+                foreach (var propertyType in ((ContentTypeCompositionBase)entity).RawComposedPropertyTypes)
                 {
                     if (propertyType.VariesBySegment() || newContentTypeVariation.VariesBySegment())
                         throw new NotSupportedException(); // TODO: support this
@@ -520,6 +524,19 @@ AND umbracoNode.id <> @id",
             CommonRepository.ClearCache(); // always
         }
 
+        /// <summary>
+        /// Ensures that no property types are flagged for a variance that is not supported by the content type itself
+        /// </summary>
+        /// <param name="entity"></param>
+        private void ValidateVariations(IContentTypeComposition entity)
+        {
+            //if the entity does not vary at all, then the property cannot have a variance value greater than it
+            if (entity.Variations == ContentVariation.Nothing)
+                foreach (var prop in entity.PropertyTypes)
+                    if (prop.Variations > entity.Variations)
+                        throw new InvalidOperationException($"The property {prop.Alias} cannot have variations of {prop.Variations} with the content type variations of {entity.Variations}");
+        }
+
         private IEnumerable<IContentTypeComposition> GetImpactedContentTypes(IContentTypeComposition contentType, IEnumerable<IContentTypeComposition> all)
         {
             var impact = new List<IContentTypeComposition>();
@@ -527,12 +544,12 @@ AND umbracoNode.id <> @id",
 
             var tree = new Dictionary<int, List<IContentTypeComposition>>();
             foreach (var x in all)
-            foreach (var y in x.ContentTypeComposition)
-            {
-                if (!tree.TryGetValue(y.Id, out var list))
-                    list = tree[y.Id] = new List<IContentTypeComposition>();
-                list.Add(x);
-            }
+                foreach (var y in x.ContentTypeComposition)
+                {
+                    if (!tree.TryGetValue(y.Id, out var list))
+                        list = tree[y.Id] = new List<IContentTypeComposition>();
+                    list.Add(x);
+                }
 
             var nset = new List<IContentTypeComposition>();
             do
@@ -574,7 +591,7 @@ AND umbracoNode.id <> @id",
                 // new property type, ignore
                 if (!oldVariations.TryGetValue(propertyType.Id, out var oldVariationB))
                     continue;
-                var oldVariation = (ContentVariation) oldVariationB; // NPoco cannot fetch directly
+                var oldVariation = (ContentVariation)oldVariationB; // NPoco cannot fetch directly
 
                 // only those property types that *actually* changed
                 var newVariation = propertyType.Variations;
@@ -638,7 +655,7 @@ AND umbracoNode.id <> @id",
             var impactedL = impacted.Select(x => x.Id).ToList();
 
             //Group by the "To" variation so we can bulk update in the correct batches
-            foreach(var grouping in propertyTypeChanges.GroupBy(x => x.Value.ToVariation))
+            foreach (var grouping in propertyTypeChanges.GroupBy(x => x.Value.ToVariation))
             {
                 var propertyTypeIds = grouping.Select(x => x.Key).ToList();
                 var toVariation = grouping.Key;
@@ -1037,8 +1054,8 @@ AND umbracoNode.id <> @id",
         {
             var defaultLang = LanguageRepository.GetDefaultId();
 
-           //This will build up a query to get the property values of both the current and the published version so that we can check
-           //based on the current variance of each item to see if it's 'edited' value should be true/false.
+            //This will build up a query to get the property values of both the current and the published version so that we can check
+            //based on the current variance of each item to see if it's 'edited' value should be true/false.
 
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
             if (whereInArgsCount > 2000)
@@ -1077,7 +1094,7 @@ AND umbracoNode.id <> @id",
             var editedDocument = new Dictionary<int, bool>();
             var nodeId = -1;
             var propertyTypeId = -1;
-            
+
             PropertyValueVersionDto pubRow = null;
 
             //This is a reader (Query), we are not fetching this all into memory so we cannot make any changes during this iteration, we are just collecting data.
@@ -1087,7 +1104,7 @@ AND umbracoNode.id <> @id",
             {
                 //make sure to reset on each node/property change
                 if (nodeId != row.NodeId || propertyTypeId != row.PropertyTypeId)
-                {                    
+                {
                     nodeId = row.NodeId;
                     propertyTypeId = row.PropertyTypeId;
                     pubRow = null;
@@ -1114,7 +1131,7 @@ AND umbracoNode.id <> @id",
                     else if (pubRow == null)
                     {
                         //this would mean that that this property is 'edited' since there is no published version
-                        editedLanguageVersions.Add((row.NodeId, row.LanguageId), true);
+                        editedLanguageVersions[(row.NodeId, row.LanguageId)] = true;
                         editedDocument[row.NodeId] = true;
                     }
                     //compare the property values, if they differ from versions then flag the current version as edited
@@ -1181,10 +1198,9 @@ AND umbracoNode.id <> @id",
                         toUpdate.Add(docVariations);
                     }
                 }
-                else
+                else if (ev.Key.langId.HasValue)
                 {
-                    //the row doesn't exist but needs creating
-                    //TODO: Does this ever happen?? Need to see if we can test this
+                    //This should never happen! If a property culture is flagged as edited then the culture must exist at the document level
                     throw new PanicException($"The existing DocumentCultureVariationDto was not found for node {ev.Key.nodeId} and language {ev.Key.langId}");
                 }
             }
@@ -1197,7 +1213,7 @@ AND umbracoNode.id <> @id",
             }
 
             //Now bulk update the umbracoDocument table
-            foreach(var editValue in editedDocument.GroupBy(x => x.Value))
+            foreach (var editValue in editedDocument.GroupBy(x => x.Value))
             {
                 Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, editValue.Key))
                     .WhereIn<DocumentDto>(x => x.NodeId, editValue.Select(x => x.Key)));
@@ -1226,7 +1242,7 @@ AND umbracoNode.id <> @id",
         }
 
         private class PropertyValueVersionDto
-        {   
+        {
             public int VersionId { get; set; }
             public int PropertyTypeId { get; set; }
             public int? LanguageId { get; set; }
