@@ -671,16 +671,12 @@ AND umbracoNode.id <> @id",
                     case ContentVariation.Culture:
                         CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
                         CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedL);
-                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
-                        //TODO: Here we need to normalize the umbracoDocumentCultureVariation table for it's edited flags which are calculated based
-                        //on changed property or name values
+                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);                        
                         break;
                     case ContentVariation.Nothing:
                         CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
                         CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedL);
-                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
-                        //TODO: Here we need to normalize the umbracoDocumentCultureVariation table for it's edited flags which are calculated based
-                        //on changed property or name values
+                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);                        
                         break;
                     case ContentVariation.CultureAndSegment:
                     case ContentVariation.Segment:
@@ -689,55 +685,6 @@ AND umbracoNode.id <> @id",
                 }
             }
         }
-
-        //private HashSet<string> GetEditedCultures(ContentVariation contentVariation, int currentVersionId, int publishedVersionId, IEnumerable<PropertyDataDto> properties)
-        //{
-        //    HashSet<string> editedCultures = null; // don't allocate unless necessary
-        //    string defaultCulture = null; //don't allocate unless necessary
-
-        //    var entityVariesByCulture = contentVariation.VariesByCulture();
-
-        //    // create dtos for each property values, but only for values that do actually exist
-        //    // ie have a non-null value, everything else is just ignored and won't have a db row
-
-        //    foreach (var property in properties)
-        //    {
-        //        if (property.PropertyType.SupportsPublishing)
-        //        {
-        //            //create the resulting hashset if it's not created and the entity varies by culture
-        //            if (entityVariesByCulture && editedCultures == null)
-        //                editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        //            // publishing = deal with edit and published values
-        //            foreach (var propertyValue in property.Values)
-        //            {
-        //                var isInvariantValue = propertyValue.Culture == null;
-        //                var isCultureValue = propertyValue.Culture != null && propertyValue.Segment == null;
-
-        //                // use explicit equals here, else object comparison fails at comparing eg strings
-        //                var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
-
-        //                if (entityVariesByCulture && !sameValues)
-        //                {
-        //                    if (isCultureValue)
-        //                    {
-        //                        editedCultures.Add(propertyValue.Culture); // report culture as edited
-        //                    }
-        //                    else if (isInvariantValue)
-        //                    {
-        //                        // flag culture as edited if it contains an edited invariant property
-        //                        if (defaultCulture == null)
-        //                            defaultCulture = languageRepository.GetDefaultIsoCode();
-
-        //                        editedCultures.Add(defaultCulture);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return editedCultures;
-        //}
 
         /// <summary>
         /// Moves variant data for a content type variation change.
@@ -1152,36 +1099,6 @@ AND umbracoNode.id <> @id",
                     pubRow = null;
                 }
             }
-
-            ////Generate SQL to lookup the current name vs the publish name for each language
-            //var nameSql = Sql()
-            //    .Select<ContentVersionDto>("cv1", x => x.NodeId, x => Alias(x.Id, "currentVersion"))
-            //    .AndSelect<ContentVersionCultureVariationDto>("cvcv1", x => x.LanguageId, x => Alias(x.Name, "currentName"))
-            //    .AndSelect<ContentVersionCultureVariationDto>("cvcv2", x => Alias(x.Name, "publishedName"))
-            //    .AndSelect<DocumentVersionDto>("dv", x => Alias(x.Id, "publishedVersion"))
-            //    .AndSelect<DocumentCultureVariationDto>("dcv", x => x.Id, x => x.Edited)
-            //    .From<ContentVersionCultureVariationDto>("cvcv1")
-            //    .InnerJoin<ContentVersionDto>("cv1")
-            //        .On<ContentVersionDto, ContentVersionCultureVariationDto>((left, right) => left.Id == right.VersionId, "cv1", "cvcv1")
-            //    .InnerJoin<DocumentCultureVariationDto>("dcv")
-            //        .On<DocumentCultureVariationDto, ContentVersionDto, ContentVersionCultureVariationDto>((left, right, other) => left.NodeId == right.NodeId && left.LanguageId == other.LanguageId, "dcv", "cv1", "cvcv1")
-            //    .LeftJoin<ContentVersionDto>(nested =>
-            //        nested.InnerJoin<DocumentVersionDto>("dv")
-            //                .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "cv2", "dv"), "cv2")
-            //        .On<ContentVersionDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, "cv1", "cv2")
-            //    .LeftJoin<ContentVersionCultureVariationDto>("cvcv2")
-            //        .On<ContentVersionCultureVariationDto, ContentVersionDto, ContentVersionCultureVariationDto>((left, right, other) => left.VersionId == right.Id && left.LanguageId == other.LanguageId, "cvcv2", "cv2", "cvcv1")
-            //    .Where<ContentVersionDto>(x => x.Current, "cv1")
-            //    .OrderBy("cv1.nodeId, cvcv1.versionId, cvcv1.languageId");
-
-            ////This is a reader (Query), we are not fetching this all into memory so we cannot make any changes during this iteration, we are just collecting data.
-            //foreach (var name in Database.Query<NameCompareDto>(nameSql))
-            //{
-            //    if (name.CurrentName != name.PublishedName)
-            //    {
-
-            //    }
-            //}
 
             //lookup all matching rows in umbracoDocumentCultureVariation
             var docCultureVariationsToUpdate = editedLanguageVersions.InGroupsOf(2000)
