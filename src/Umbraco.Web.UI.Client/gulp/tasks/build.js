@@ -6,5 +6,5 @@ var runSequence = require('run-sequence');
 
 // Build - build the files ready for production
 gulp.task('build', function(cb) {
-    runSequence("views", ["js", "dependencies", "less"], "test:unit", cb);
+    runSequence("views", ["js", "dependencies", "less"], "clean.views", "clean.dirs", "test:unit", cb);
 });

@@ -26,8 +26,7 @@ module.exports = function(files, out) {
         .pipe(embedTemplates({ basePath: "../umbraco.web.ui/umbraco/" })) // views runs first, to add filepath attribute, so need to reference the output html
         .pipe(concat(out))
         .pipe(wrap('(function(){\n%= body %\n})();'))
-        .pipe(gulp.dest(config.root + config.targets.js));
-    
+        .pipe(gulp.dest(config.root + config.targets.js));    
     
     return task;
     
