@@ -30,7 +30,8 @@ using File = System.IO.File;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    class PublishedSnapshotService : PublishedSnapshotServiceBase
+
+    internal class PublishedSnapshotService : PublishedSnapshotServiceBase
     {
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
@@ -56,7 +57,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private BPlusTree<int, ContentNodeKit> _localContentDb;
         private BPlusTree<int, ContentNodeKit> _localMediaDb;
-        private readonly bool _localDbExists;
+        private bool _localDbExists;
 
         // define constant - determines whether to use cache when previewing
         // to store eg routes, property converted values, anything - caching
@@ -68,7 +69,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public PublishedSnapshotService(Options options, IMainDom mainDom, IRuntimeState runtime,
+        public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
@@ -115,29 +116,35 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (options.IgnoreLocalDb == false)
             {
                 var registered = mainDom.Register(
-                    null,
                     () =>
                     {
+                        //"install" phase of MainDom
+                        //this is inside of a lock in MainDom so this is guaranteed to run if MainDom was acquired and guaranteed
+                        //to not run if MainDom wasn't acquired.
+                        //If MainDom was not acquired, then _localContentDb and _localMediaDb will remain null which means this appdomain
+                        //will load in published content via the DB and in that case this appdomain will probably not exist long enough to
+                        //serve more than a page of content.
+
+                        var path = GetLocalFilesPath();
+                        var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+                        var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
+                        _localDbExists = File.Exists(localContentDbPath) && File.Exists(localMediaDbPath);
+                        // if both local databases exist then GetTree will open them, else new databases will be created
+                        _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
+                        _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
+                    },
+                    () =>
+                    {
+                        //"release" phase of MainDom
+
                         lock (_storesLock)
                         {
-                            _contentStore.ReleaseLocalDb();
+                            _contentStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                             _localContentDb = null;
-                            _mediaStore.ReleaseLocalDb();
+                            _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                             _localMediaDb = null;
                         }
                     });
-
-                if (registered)
-                {
-                    var path = GetLocalFilesPath();
-                    var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
-                    var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-                    _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
-
-                    // if both local databases exist then GetTree will open them, else new databases will be created
-                    _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
-                    _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
-                }
 
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
@@ -249,19 +256,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             TearDownRepositoryEvents();
             base.Dispose();
-        }
-
-        public class Options
-        {
-            // disabled: prevents the published snapshot from updating and exposing changes
-            //           or even creating a new published snapshot to see changes, uses old cache = bad
-            //
-            //// indicates that the snapshot cache should reuse the application request cache
-            //// otherwise a new cache object would be created for the snapshot specifically,
-            //// which is the default - web boot manager uses this to optimize facades
-            //public bool PublishedSnapshotCacheIsApplicationRequestCache;
-
-            public bool IgnoreLocalDb;
         }
 
         #endregion
@@ -1056,8 +1050,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     : _dataSource.GetTypeMediaSources(scope, refreshedIds).ToArray();
 
                 _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
-                _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
-                _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
+                if (!otherIds.IsCollectionEmpty())
+                    _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
+                if (!newIds.IsCollectionEmpty())
+                    _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
                 scope.Complete();
             }
         }
