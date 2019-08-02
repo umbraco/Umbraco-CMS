@@ -94,6 +94,11 @@ function contentCreateController($scope,
         navigationService.hideDialog(showMenu);
     };
 
+    $scope.editContentType = function() {
+        $location.path("/settings/documenttypes/edit/" + $scope.contentTypeId).search("view", "permissions");
+        close();
+    }
+
     $scope.createBlank = createBlank;
     $scope.createOrSelectBlueprintIfAny = createOrSelectBlueprintIfAny;
     $scope.createFromBlueprint = createFromBlueprint;
