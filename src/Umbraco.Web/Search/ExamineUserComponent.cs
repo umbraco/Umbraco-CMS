@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Search
 {
@@ -7,12 +8,19 @@ namespace Umbraco.Web.Search
     /// </summary>
     public abstract class ExamineUserComponent : IComponent
     {
+        private readonly IMainDom _mainDom;
+
+        public ExamineUserComponent(IMainDom mainDom)
+        {
+            _mainDom = mainDom;
+        }
+
         /// <summary>
         /// Initialize the component, eagerly exits if ExamineComponent.ExamineEnabled == false
         /// </summary>
         public void Initialize()
         {
-            if (!ExamineComponent.ExamineEnabled) return;
+            if (!_mainDom.IsMainDom) return;
 
             InitializeComponent();
         }

@@ -16,18 +16,17 @@ using Umbraco.Examine;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Examine.LuceneEngine.Directories;
 using Umbraco.Core.Composing;
+using System.ComponentModel;
 
 namespace Umbraco.Web.Search
 {
-
-    public sealed class ExamineComponent : IComponent
+    public sealed class ExamineComponent : Umbraco.Core.Composing.IComponent
     {
         private readonly IExamineManager _examineManager;
         private readonly IContentValueSetBuilder _contentValueSetBuilder;
         private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
-        private static bool _disableExamineIndexing = false;
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;        
         private readonly IMainDom _mainDom;
@@ -39,16 +38,7 @@ namespace Umbraco.Web.Search
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
-
-        /// <summary>
-        /// Returns true if Examine is enabled for this AppDomain
-        /// </summary>
-        /// <remarks>
-        /// This flag should be used by custom Examine index implementors to determine if they should
-        /// execute. This value is true if this component successfully registered with <see cref="IMainDom"/>
-        /// </remarks>
-        public static bool ExamineEnabled => !_disableExamineIndexing;
-
+        
         public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
@@ -97,7 +87,6 @@ namespace Umbraco.Web.Search
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers(_logger);
-                _disableExamineIndexing = true;
                 return; //exit, do not continue
             }
 
@@ -126,14 +115,9 @@ namespace Umbraco.Web.Search
         public void Terminate()
         { }
 
-        /// <summary>
-        /// Called to rebuild empty indexes on startup
-        /// </summary>
-        /// <param name="indexRebuilder"></param>
-        /// <param name="logger"></param>
-        /// <param name="onlyEmptyIndexes"></param>
-        /// <param name="waitMilliseconds"></param>
-        public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0) => ExamineFinalComponent.RebuildIndexes(indexRebuilder, logger, onlyEmptyIndexes, waitMilliseconds);
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method should not be used and will be removed in future versions, rebuilding indexes can be done with the IndexRebuilder or the BackgroundIndexRebuilder")]
+        public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0) => Current.Factory.GetInstance<BackgroundIndexRebuilder>().RebuildIndexes(onlyEmptyIndexes, waitMilliseconds);
 
         #region Cache refresher updated event handlers
 
