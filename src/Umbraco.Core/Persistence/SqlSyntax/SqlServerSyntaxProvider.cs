@@ -241,7 +241,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             return !constraintName.IsNullOrWhiteSpace();
         }
 
-        public override void WriteLock(IDatabase db, string reason, params int[] lockIds)
+        public override void WriteLock(IDatabase db, int? writeLockReasonId, params int[] lockIds)
         {
             // soon as we get Database, a transaction is started
 
@@ -253,7 +253,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             foreach (var lockId in lockIds)
             {
                 db.Execute(@"SET LOCK_TIMEOUT 1800;");
-                var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = value*-1, lastWorkStarted = @lastWorkStarted WHERE id=@id", new { id = lockId, lastWorkStarted = reason });
+                var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = value*-1, writeLockReasonId = @writeLockReasonId WHERE id=@id", new { id = lockId, writeLockReasonId = writeLockReasonId });
                 if (i == 0) // ensure we are actually locking!
                     throw new Exception($"LockObject with id={lockId} does not exist.");
             }

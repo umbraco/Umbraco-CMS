@@ -18,6 +18,11 @@ namespace Umbraco.Core.Services
             return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture);
         }
 
+        public static string LocalizeLockReason(this ILocalizedTextService manager, short writeLockReasonId)
+        {
+            return manager.Localize($"writeLockReasons/Code_{writeLockReasonId}", Thread.CurrentThread.CurrentUICulture);
+        }
+
         /// <summary>
         /// Localize using the current thread culture
         /// </summary>

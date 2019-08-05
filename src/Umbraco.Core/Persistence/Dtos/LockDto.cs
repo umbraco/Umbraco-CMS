@@ -21,9 +21,8 @@ namespace Umbraco.Core.Persistence.Dtos
         [Length(64)]
         public string Name { get; set; }
 
-        [Column("lastWorkStarted")]
+        [Column("writeLockReasonId")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(64)]
-        public string LastWorkStarted { get; set; }
+        public short WriteLockReasonId { get; set; }
     }
 }

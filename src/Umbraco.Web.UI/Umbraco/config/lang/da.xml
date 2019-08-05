@@ -1610,4 +1610,14 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberIntro">Kom godt i gang</key>
     <key alias="formsInstall">Installer Umbraco Forms</key>
   </area>
+    <area alias="writeLockReasons">
+        <key alias="Code_1">Langvaring operation</key>
+        <key alias="Code_10000">Flytter indhold til papirkurven</key>
+        <key alias="Code_10001">Genskaber indhold fra papirkurven</key>
+        <key alias="Code_10002">Sletter indhold fra papirkurven</key>
+        <key alias="Code_10003">Flytter indhold</key>
+        <key alias="Code_10004">Kopier indhold</key>
+        <key alias="Code_10005">Sorterer indhold</key>
+        <key alias="Code_10006">Sletter alt indhold af en type</key>
+    </area>
 </language>

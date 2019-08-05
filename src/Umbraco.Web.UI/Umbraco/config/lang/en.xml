@@ -1130,7 +1130,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
-    
+
     <key alias="pathToFile">Path to file</key>
     <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
@@ -2124,5 +2124,15 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
-  </area>>
+  </area>
+    <area alias="writeLockReasons">
+        <key alias="Code_1">Langvaring operation</key>
+        <key alias="Code_10000">Move content to recycle bin</key>
+        <key alias="Code_10001">Restores content from recycle bin</key>
+        <key alias="Code_10002">Deletes content from recycle bin</key>
+        <key alias="Code_10003">Moves content</key>
+        <key alias="Code_10004">Copying content</key>
+        <key alias="Code_10005">Sort content</key>
+        <key alias="Code_10006">Deletes all content of a given type</key>
+    </area>
 </language>

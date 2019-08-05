@@ -228,7 +228,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public abstract bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
         public abstract void ReadLock(IDatabase db, params int[] lockIds);
-        public abstract void WriteLock(IDatabase db, string reason, params int[] lockIds);
+        public abstract void WriteLock(IDatabase db, int? writeLockReasonId, params int[] lockIds);
         public abstract bool IsLockTimeoutException(Exception exception);
 
 

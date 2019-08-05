@@ -501,32 +501,33 @@ namespace Umbraco.Core.Scoping
         [Browsable(false)]
         public void WriteLock(params int[] lockIds)
         {
-            WriteLock(string.Empty, lockIds);
-        }
-
-        public void WriteLock(string reason, params int[] lockIds)
-        {
-            Database.SqlContext.SqlSyntax.WriteLock(Database, reason, lockIds);
+            WriteLock(Constants.Locks.Reason.Default, lockIds);
         }
 
         /// <inheritdoc />
-        public IDictionary<int, string> TrySpyLock(params int[] lockIds)
+        public void WriteLock(short writeLockReasonId, params int[] lockIds)
+        {
+            Database.SqlContext.SqlSyntax.WriteLock(Database, writeLockReasonId, lockIds);
+        }
+
+        /// <inheritdoc />
+        public IDictionary<int, short> TrySpyLock(params int[] lockIds)
         {
             using (var db = _scopeProvider.DatabaseFactory.CreateDatabase())
             {
                 if (!db.SqlContext.SqlSyntax.IsReadUncommittedSupported)
                 {
-                    return lockIds.ToDictionary(x => x, x=> (string)null);
+                    return lockIds.ToDictionary(x => x, x=> Constants.Locks.Reason.Default);
                 };
 
                 return db.Fetch<LockDto>("SELECT * FROM umbracoLock WITH (NOLOCK) WHERE id IN (@lockIds)", new { lockIds })
-                    .ToDictionary(x => x.Id, x => x.LastWorkStarted);
+                    .ToDictionary(x => x.Id, x => x.WriteLockReasonId);
 
             }
         }
 
         /// <inheritdoc />
-        public string TrySpyLock(int lockId)
+        public short TrySpyLock(int lockId)
         {
             return TrySpyLock(new []{lockId})[lockId];
         }

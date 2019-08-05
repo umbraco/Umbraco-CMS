@@ -126,7 +126,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
 
         void ReadLock(IDatabase db, params int[] lockIds);
-        void WriteLock(IDatabase db, string reason, params int[] lockIds);
+        void WriteLock(IDatabase db, int? writeLockReasonId, params int[] lockIds);
         bool IsLockTimeoutException(Exception exception);
     }
 }

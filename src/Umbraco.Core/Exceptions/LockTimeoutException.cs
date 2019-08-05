@@ -7,12 +7,10 @@ namespace Umbraco.Core.Exceptions
     /// </summary>
     public class LockTimeoutException : Exception
     {
-        public override string Message => Reason ?? base.Message;
-
         public LockTimeoutException(Exception inner)
             : base(string.Empty, inner)
         { }
 
-        public string Reason { get; set; }
+        public short Reason { get; set; }
     }
 }

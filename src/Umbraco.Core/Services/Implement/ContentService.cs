@@ -1666,7 +1666,7 @@ namespace Umbraco.Core.Services.Implement
                     return OperationResult.Cancel(evtMsgs);
                 }
 
-                scope.WriteLock("Delete content!", Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.Reason.EmptyRecycleBin, Constants.Locks.ContentTree);
 
                 // if it's not trashed yet, and published, we should unpublish
                 // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
@@ -1790,7 +1790,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock("Move content to recycle bin", Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.Reason.MoveContentToRecycleBin, Constants.Locks.ContentTree);
 
                 var originalPath = content.Path;
                 var moveEventInfo = new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent);
@@ -1849,7 +1849,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.Reason.MoveContent, Constants.Locks.ContentTree);
 
                 var parent = parentId == Constants.System.Root ? null : GetById(parentId);
                 if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
@@ -1969,7 +1969,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.Reason.EmptyRecycleBin, Constants.Locks.ContentTree);
 
                 // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
                 // each deleted items will have its own deleting/deleted events. so, files and such
@@ -2052,7 +2052,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var copies = new List<Tuple<IContent, IContent>>();
 
-                scope.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.Reason.CopyContent, Constants.Locks.ContentTree);
 
                 // a copy is not published (but not really unpublishing either)
                 // update the create author and last edit author
@@ -2198,7 +2198,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.Reason.SortContent, Constants.Locks.ContentTree);
 
                 var ret = Sort(scope, itemsA, userId, evtMsgs, raiseEvents);
                 scope.Complete();
@@ -2227,7 +2227,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.Reason.SortContent, Constants.Locks.ContentTree);
                 var itemsA = GetByIds(idsA).ToArray();
 
                 var ret = Sort(scope, itemsA, userId, evtMsgs, raiseEvents);
@@ -2729,7 +2729,7 @@ namespace Umbraco.Core.Services.Implement
             //
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.Reason.DeleteContentOfTypes,Constants.Locks.ContentTree);
 
                 var query = Query<IContent>().WhereIn(x => x.ContentTypeId, contentTypeIdsA);
                 var contents = _documentRepository.Get(query).ToArray();

@@ -150,7 +150,7 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             return hasDefault;
         }
 
-        public override void WriteLock(IDatabase db, string reason, params int[] lockIds)
+        public override void WriteLock(IDatabase db, int? writeLockReasonId, params int[] lockIds)
         {
             // soon as we get Database, a transaction is started
 
@@ -162,7 +162,7 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             foreach (var lockId in lockIds)
             {
 
-                var i = db.Execute(@"UPDATE umbracoLock SET value = value*-1, lastWorkStarted = @lastWorkStarted WHERE id=@id", new { id = lockId, lastWorkStarted = reason });
+                var i = db.Execute(@"UPDATE umbracoLock SET value = value*-1, writeLockReasonId = @writeLockReasonId WHERE id=@id", new { id = lockId, writeLockReasonId = writeLockReasonId });
                 if (i == 0) // ensure we are actually locking!
                     throw new Exception($"LockObject with id={lockId} does not exist.");
             }

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_2_0
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
 
-            AddColumnIfNotExists<LockDto>(columns, "lastWorkStarted");
+            AddColumnIfNotExists<LockDto>(columns, "writeLockReasonId");
         }
     }
 }
