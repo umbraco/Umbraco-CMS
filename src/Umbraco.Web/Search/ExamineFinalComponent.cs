@@ -14,6 +14,7 @@ namespace Umbraco.Web.Search
     /// </summary>
     public sealed class ExamineFinalComponent : IComponent
     {
+
         private static volatile bool _isConfigured = false;
         private static readonly object IsConfiguredLocker = new object();
         private readonly IProfilingLogger _logger;
@@ -21,6 +22,13 @@ namespace Umbraco.Web.Search
         private static readonly object RebuildLocker = new object();
         private readonly IndexRebuilder _indexRebuilder;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
+
+        public ExamineFinalComponent(IProfilingLogger logger, IExamineManager examineManager, IndexRebuilder indexRebuilder)
+        {
+            _logger = logger;
+            _examineManager = examineManager;
+            _indexRebuilder = indexRebuilder;
+        }
 
         public void Initialize()
         {
