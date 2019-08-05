@@ -37,9 +37,9 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="content"></param>
         /// <returns>Returns null if no entry is found</returns>
-        public PublicAccessEntry GetEntryForContent(IContent content)
+        public PublicAccessEntry GetEntryForContent(IContent content, bool isPublicAccessEditor = false)
         {
-            return GetEntryForContent(content.Path.EnsureEndsWith("," + content.Id));
+            return GetEntryForContent(content.Path.EnsureEndsWith("," + content.Id), isPublicAccessEditor);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Services.Implement
         /// <remarks>
         /// NOTE: This method get's called *very* often! This will return the results from cache
         /// </remarks>
-        public PublicAccessEntry GetEntryForContent(string contentPath)
+        public PublicAccessEntry GetEntryForContent(string contentPath, bool isPublicAccessEditor = false)
         {
             //Get all ids in the path for the content item and ensure they all
             // parse to ints that are not -1.
@@ -68,6 +68,12 @@ namespace Umbraco.Core.Services.Implement
                 var entries = _publicAccessRepository.GetMany().ToArray();
 
                 scope.Complete();
+                if (isPublicAccessEditor)
+                {
+                    var found = entries.FirstOrDefault(x => x.ProtectedNodeId == ids[0]);
+                    if (found != null) {return found;}
+                     return null;
+                }
                 foreach (var id in ids)
                 {
                     var found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);

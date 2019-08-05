@@ -966,7 +966,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetPublicAccess", {
-                        contentId: contentId
+                        contentId: contentId,
+                        isPublicAccessEditor: true
                     })
                 ),
                 "Failed to get public access for content item with id " + contentId

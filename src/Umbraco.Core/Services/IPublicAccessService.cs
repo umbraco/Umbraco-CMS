@@ -20,14 +20,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns>Returns null if no entry is found</returns>
-        PublicAccessEntry GetEntryForContent(IContent content);
+        PublicAccessEntry GetEntryForContent(IContent content, bool isPublicAccessEditor = false);
 
         /// <summary>
         /// Gets the entry defined for the content item based on a content path
         /// </summary>
         /// <param name="contentPath"></param>
         /// <returns>Returns null if no entry is found</returns>
-        PublicAccessEntry GetEntryForContent(string contentPath);
+        PublicAccessEntry GetEntryForContent(string contentPath, bool isPublicAccessEditor = false);
 
         /// <summary>
         /// Returns true if the content has an entry for it's path
