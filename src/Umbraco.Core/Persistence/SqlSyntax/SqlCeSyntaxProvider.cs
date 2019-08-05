@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlServerCe;
 using System.Linq;
+using System.Transactions;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -12,10 +14,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
+
         public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
             return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
         }
+
 
         public override bool SupportsClustered()
         {
@@ -48,6 +52,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         public override bool IsReadUncommittedSupported => false;
+        public override System.Data.IsolationLevel DefaultIsolationLevel => System.Data.IsolationLevel.RepeatableRead;
 
         public override string GetConcat(params string[] args)
         {
@@ -143,6 +148,45 @@ ORDER BY TABLE_NAME, INDEX_NAME");
             var hasDefault = db.Fetch<bool>(@"select column_hasdefault from information_schema.columns
 where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault();
             return hasDefault;
+        }
+
+        public override void WriteLock(IDatabase db, string reason, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < (System.Data.IsolationLevel) IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            db.Execute(@"SET LOCK_TIMEOUT 1800;");
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+
+                var i = db.Execute(@"UPDATE umbracoLock SET value = value*-1, lastWorkStarted = @lastWorkStarted WHERE id=@id", new { id = lockId, lastWorkStarted = reason });
+                if (i == 0) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
+        }
+
+        public override bool IsLockTimeoutException(Exception exception)
+        {
+            return exception is SqlCeLockTimeoutException;
+        }
+
+        public override void ReadLock(IDatabase db, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < (System.Data.IsolationLevel) IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
         }
 
         public override bool DoesTableExist(IDatabase db, string tableName)

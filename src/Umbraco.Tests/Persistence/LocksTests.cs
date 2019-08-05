@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.Database.AcquireLockNodeReadLock(Constants.Locks.Servers);
+                scope.WriteLock("reason", Constants.Locks.Servers);
                 scope.Complete();
             }
         }
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Persistence
                     {
                         try
                         {
-                            scope.Database.AcquireLockNodeReadLock(Constants.Locks.Servers);
+                            scope.ReadLock(Constants.Locks.Servers);
                             lock (locker)
                             {
                                 acquired++;
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Persistence
                                 if (entered == threadCount) m1.Set();
                             }
                             ms[ic].WaitOne();
-                            scope.Database.AcquireLockNodeWriteLock(Constants.Locks.Servers);
+                            scope.WriteLock(nameof(ConcurrentWritersTest),Constants.Locks.Servers);
                             lock (locker)
                             {
                                 acquired++;
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Persistence
                 {
                     otherEv.WaitOne();
                     Console.WriteLine($"[{id1}] WAIT {id1}");
-                    scope.Database.AcquireLockNodeWriteLock(id1);
+                    scope.WriteLock(nameof(DeadLockTestThread),id1);
                     Console.WriteLine($"[{id1}] GRANT {id1}");
                     WriteLocks(scope.Database);
                     myEv.Set();
@@ -232,7 +232,7 @@ namespace Umbraco.Tests.Persistence
                         Thread.Sleep(200); // cannot wait due to deadlock... just give it a bit of time
 
                     Console.WriteLine($"[{id1}] WAIT {id2}");
-                    scope.Database.AcquireLockNodeWriteLock(id2);
+                    scope.WriteLock(nameof(DeadLockTestThread),id2);
                     Console.WriteLine($"[{id1}] GRANT {id2}");
                     WriteLocks(scope.Database);
                 }
@@ -284,7 +284,7 @@ namespace Umbraco.Tests.Persistence
                 {
                     otherEv.WaitOne();
                     Console.WriteLine($"[{id}] WAIT {id}");
-                    scope.Database.AcquireLockNodeWriteLock(id);
+                    scope.WriteLock(nameof(NoDeadLockTestThread), id);
                     Console.WriteLine($"[{id}] GRANT {id}");
                     WriteLocks(scope.Database);
                     myEv.Set();

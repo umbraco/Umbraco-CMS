@@ -5,6 +5,7 @@ using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
+using IsolationLevel = System.Data.IsolationLevel;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -77,6 +78,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string ConvertDateToOrderableString { get; }
         string ConvertDecimalToOrderableString { get; }
         bool IsReadUncommittedSupported { get; }
+        IsolationLevel DefaultIsolationLevel { get; }
 
         IEnumerable<string> GetTablesInSchema(IDatabase db);
         IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
@@ -122,5 +124,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// unspecified.</para>
         /// </remarks>
         bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
+
+        void ReadLock(IDatabase db, params int[] lockIds);
+        void WriteLock(IDatabase db, string reason, params int[] lockIds);
+        bool IsLockTimeoutException(Exception exception);
     }
 }

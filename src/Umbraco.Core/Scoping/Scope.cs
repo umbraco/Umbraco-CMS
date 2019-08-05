@@ -37,8 +37,6 @@ namespace Umbraco.Core.Scoping
         private ICompletable _fscope;
         private IEventDispatcher _eventDispatcher;
 
-        private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
-
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
             ILogger logger, FileSystems fileSystems, Scope parent, ScopeContext scopeContext, bool detachable,
@@ -209,7 +207,7 @@ namespace Umbraco.Core.Scoping
             {
                 if (_isolationLevel != IsolationLevel.Unspecified) return _isolationLevel;
                 if (ParentScope != null) return ParentScope.IsolationLevel;
-                return DefaultIsolationLevel;
+                return Database.SqlContext.SqlSyntax.DefaultIsolationLevel;
             }
         }
 
@@ -495,18 +493,7 @@ namespace Umbraco.Core.Scoping
         /// <inheritdoc />
         public void ReadLock(params int[] lockIds)
         {
-            // soon as we get Database, a transaction is started
-
-            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
-                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
-
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
-            foreach (var lockId in lockIds)
-            {
-                var i = Database.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
-                if (i == null) // ensure we are actually locking!
-                    throw new Exception($"LockObject with id={lockId} does not exist.");
-            }
+            Database.SqlContext.SqlSyntax.ReadLock(Database, lockIds);
         }
 
         /// <inheritdoc />
@@ -514,30 +501,17 @@ namespace Umbraco.Core.Scoping
         [Browsable(false)]
         public void WriteLock(params int[] lockIds)
         {
-            WriteLock("N/A", lockIds);
+            WriteLock(string.Empty, lockIds);
         }
 
         public void WriteLock(string reason, params int[] lockIds)
         {
-            // soon as we get Database, a transaction is started
-
-            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
-                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
-
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
-            foreach (var lockId in lockIds)
-            {
-                Database.Execute(@"SET LOCK_TIMEOUT 1800;");
-                var i = Database.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END), lastWorkStarted = @lastWorkStarted WHERE id=@id", new { id = lockId, lastWorkStarted = reason });
-                if (i == 0) // ensure we are actually locking!
-                    throw new Exception($"LockObject with id={lockId} does not exist.");
-            }
+            Database.SqlContext.SqlSyntax.WriteLock(Database, reason, lockIds);
         }
 
         /// <inheritdoc />
         public IDictionary<int, string> TrySpyLock(params int[] lockIds)
         {
-
             using (var db = _scopeProvider.DatabaseFactory.CreateDatabase())
             {
                 if (!db.SqlContext.SqlSyntax.IsReadUncommittedSupported)
@@ -545,18 +519,9 @@ namespace Umbraco.Core.Scoping
                     return lockIds.ToDictionary(x => x, x=> (string)null);
                 };
 
-                db.BeginTransaction(IsolationLevel.ReadUncommitted);
-                try
-                {
-                    return db.Fetch<LockDto>(db.SqlContext.Sql()
-                        .SelectAll()
-                        .From<LockDto>()
-                        .WhereIn<LockDto>(x => x.Id, lockIds)).ToDictionary(x => x.Id, x => x.LastWorkStarted);
-                }
-                finally
-                {
-                    db.CompleteTransaction();
-                }
+                return db.Fetch<LockDto>("SELECT * FROM umbracoLock WITH (NOLOCK) WHERE id IN (@lockIds)", new { lockIds })
+                    .ToDictionary(x => x.Id, x => x.LastWorkStarted);
+
             }
         }
 

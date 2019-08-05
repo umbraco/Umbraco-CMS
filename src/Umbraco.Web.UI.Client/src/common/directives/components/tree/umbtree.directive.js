@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService) {
+function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService,  $timeout) {
 
     return {
         restrict: 'E',
@@ -234,6 +234,8 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
             /** Method to load in the tree data */
             function loadTree() {
+               
+                
                 if ($scope.section) {
 
                     //default args
@@ -243,32 +245,51 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                     if ($scope.customtreeparams) {
                         args["queryString"] = $scope.customtreeparams;
                     }
-
-                    return treeService.getTree(args)
-                        .then(function (data) {
-                            //Only use the tree data, if we are still on the correct section
-                            if(data.alias !== $scope.section){
-                                return $q.reject();
-                            }
-                            
-                            //set the data once we have it
-                            $scope.tree = data;
-
-                            //set the root as the current active tree
-                            $scope.activeTree = $scope.tree.root;
-
-                            emitEvent("treeLoaded", { tree: $scope.tree });
-                            emitEvent("treeNodeExpanded", { tree: $scope.tree, node: $scope.tree.root, children: $scope.tree.root.children });
-                         
-                            return $q.when(data);
-                        }, function (reason) {
-                            notificationsService.error("Tree Error", reason);
-                            return $q.reject(reason);
-                        });
+                    
+                    $scope.isLoading = true;
+                    $scope.isLoadingReason = "";
+                    
+                    return getTree(args);
                 }
                 else {
                     return $q.reject();
                 }
+            }
+            
+            function getTree(args){
+                return treeService.getTree(args)
+                    .then(function (data) {
+
+
+                        //Only use the tree data, if we are still on the correct section
+                        if(data.alias !== $scope.section){
+                            return $q.reject();
+                        }
+
+                        //set the data once we have it
+                        $scope.tree = data;
+
+                        //set the root as the current active tree
+                        $scope.activeTree = $scope.tree.root;
+
+                        emitEvent("treeLoaded", { tree: $scope.tree });
+                        emitEvent("treeNodeExpanded", { tree: $scope.tree, node: $scope.tree.root, children: $scope.tree.root.children });
+
+                        $scope.isLoading = false;
+                        $scope.isLoadingReason = "";
+                        return $q.when(data);
+                    }, function (reason) {
+                        if(reason.status === 409){
+                            $scope.isLoading = true;
+                            $scope.isLoadingReason = reason.data;
+
+                            $timeout(function() { $q.when(getTree(args));}, 5000);
+                        }else{
+                            notificationsService.error("Tree Error", reason);
+                            return $q.reject(reason);
+                        }
+
+                    });
             }
 
             function loadChildren(node, forceReload) {

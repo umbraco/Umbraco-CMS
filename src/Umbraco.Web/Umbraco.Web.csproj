@@ -321,6 +321,7 @@
     <Compile Include="WebApi\Filters\HttpQueryStringModelBinder.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
+    <Compile Include="WebApi\LockTimeoutExceptionHandlerAttribute.cs" />
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
