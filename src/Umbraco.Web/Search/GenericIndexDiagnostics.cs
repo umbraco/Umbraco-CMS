@@ -8,6 +8,7 @@ using Umbraco.Examine;
 
 namespace Umbraco.Web.Search
 {
+
     /// <summary>
     /// Used to return diagnostic data for any index
     /// </summary>
