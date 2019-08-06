@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using Newtonsoft.Json;
+using Serilog;
 using Serilog.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -13,23 +14,16 @@ namespace Umbraco.Core.Logging.Viewer
 {
     public abstract class LogViewerSourceBase : ILogViewer
     {
-        protected LogViewerSourceBase(string pathToSearches = "", string pathToSerilog = "")
+        protected LogViewerSourceBase(string pathToSearches = "")
         {
             if (string.IsNullOrEmpty(pathToSearches))
                 // ReSharper disable once StringLiteralTypo
                 pathToSearches = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
 
             _searchesConfigPath = pathToSearches;
-
-            if (string.IsNullOrEmpty(pathToSerilog))
-                // ReSharper disable once StringLiteralTypo
-                pathToSerilog = IOHelper.MapPath("~/Config/serilog.config");
-
-            _serilogConfigPath = pathToSerilog;
         }
 
         private readonly string _searchesConfigPath;
-        private readonly string _serilogConfigPath;
 
         public abstract bool CanHandleLargeLogs { get; }
 
@@ -99,17 +93,13 @@ namespace Umbraco.Core.Logging.Viewer
         }
 
         /// <summary>
-        /// Get the Serilog minimum-level value from the config file. Assumes the config will exist
+        /// Get the Serilog minimum-level value from the config file. 
         /// </summary>
         /// <returns></returns>
         public string GetLogLevel()
         {
-            var xd = new XmlDocument();
-            xd.Load(_serilogConfigPath);
-
-            XmlNode levelNode = xd.DocumentElement?.SelectSingleNode("//*[@key='serilog:minimum-level']");
-
-            return levelNode != null ? levelNode.Attributes["value"].Value : "";
+            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(Log.Logger.IsEnabled)?.Min() ?? null;
+            return logLevel?.ToString() ?? "";
         }
 
         public LogLevelCounts GetLogLevelCounts(LogTimePeriod logTimePeriod)
