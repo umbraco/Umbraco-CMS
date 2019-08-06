@@ -1130,7 +1130,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
-    
+
     <key alias="pathToFile">Path to file</key>
     <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
@@ -1222,6 +1222,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="paSelectMembers"><![CDATA[Select the members who have access to the page <strong>%0%</strong>]]></key>
     <key alias="paMembers">Specific members protection</key>
     <key alias="paMembersHelp">If you wish to grant access to specific members</key>
+    <key alias="paInherit">Edit inherited protection</key>
+    <key alias="paInheritHelp"><![CDATA[If you wish to update the existing rules for <strong>the ancestor</strong> (%0%)]]></key>
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[

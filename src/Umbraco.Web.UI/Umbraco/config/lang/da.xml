@@ -976,6 +976,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="paSelectMembers"><![CDATA[Vælg de medlemmer der har adgang til siden <strong>%0%</strong>]]></key>
     <key alias="paMembers">Adgang til enkelte medlemmer</key>
     <key alias="paMembersHelp">Hvis du ønsker at give adgang til enkelte medlemmer</key>
+    <key alias="paInherit">Edit inherited protection</key>
+    <key alias="paInheritHelp"><![CDATA[If you wish to update the existing rules for <strong>the ancestor</strong>]]></key>
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">Udgivelsen kunne ikke udgives da publiceringsdato er sat</key>

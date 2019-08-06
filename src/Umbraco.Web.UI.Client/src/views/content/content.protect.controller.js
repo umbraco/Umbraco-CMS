@@ -22,7 +22,7 @@
         vm.removeMember = removeMember;
         vm.removeProtection = removeProtection;
         vm.removeProtectionConfirm = removeProtectionConfirm;
-
+        vm.inherit = {};
         vm.type = null;
         vm.step = null;
 
@@ -32,14 +32,27 @@
             // get the current public access protection
             contentResource.getPublicAccess(id).then(function (publicAccess) {
                 vm.loading = false;
-
+                console.log(publicAccess);
                 // init the current settings for public access (if any)
-                vm.loginPage = publicAccess.loginPage;
-                vm.errorPage = publicAccess.errorPage;
-                vm.groups = publicAccess.groups || [];
-                vm.members = publicAccess.members || [];
-                vm.canRemove = true;
-
+              
+                if(typeof publicAccess.inherit !== "undefined"){
+                    vm.inherit.loginPage = publicAccess.inherit.loginPage;
+                    vm.inherit.errorPage = publicAccess.inherit.errorPage;
+                    vm.inherit.groups = publicAccess.inherit.groups || [];
+                    vm.inherit.members = publicAccess.inherit.members || [];
+                    vm.inherit.Id = publicAccess.inherit.Id;
+                    vm.groups = [];
+                    vm.isInheriting = true;
+                    vm.members = [];
+                }else{
+                    vm.loginPage = publicAccess.self.loginPage;
+                    vm.errorPage = publicAccess.self.errorPage;
+                    vm.groups = publicAccess.self.groups || [];
+                    vm.members = publicAccess.self.members || [];
+                    vm.canRemove = true;
+                    vm.isInheriting = false;
+                }
+              
                 if (vm.members.length) {
                     vm.type = "member";
                     next();
@@ -55,7 +68,7 @@
         }
 
         function next() {
-            if (vm.type === "group") {
+            if (vm.type === "group" || vm.type === "inherit") {
                 vm.loading = true;
                 // get all existing member groups for lookup upon selection
                 // NOTE: if/when member groups support infinite editing, we can't rely on using a cached lookup list of valid groups anymore
@@ -63,6 +76,12 @@
                     vm.step = vm.type;
                     vm.allGroups = groups;
                     vm.hasGroups = groups.length > 0;
+                    if( vm.type === "inherit"){
+                        vm.loginPage = vm.inherit.loginPage;
+                        vm.errorPage = vm.inherit.errorPage;
+                        vm.groups = vm.inherit.groups;
+                        vm.canRemove = true;
+                    }
                     vm.loading = false;
                 });
             }
@@ -94,7 +113,8 @@
             vm.buttonState = "busy";
             var groups = _.map(vm.groups, function (group) { return group.name; });
             var usernames = _.map(vm.members, function (member) { return member.username; });
-            contentResource.updatePublicAccess(id, groups, usernames, vm.loginPage.id, vm.errorPage.id).then(
+            var finalId = vm.type === "inherit" ?  vm.inherit.Id : id;
+            contentResource.updatePublicAccess(finalId, groups, usernames, vm.loginPage.id, vm.errorPage.id).then(
                 function () {
                     localizationService.localize("publicAccess_paIsProtected", [$scope.currentNode.name]).then(function (value) {
                         vm.success = {

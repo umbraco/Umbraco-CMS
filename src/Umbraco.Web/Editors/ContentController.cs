@@ -2291,12 +2291,13 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage GetPublicAccess(int contentId, bool isPublicAccessEditor)
         {
             var content = Services.ContentService.GetById(contentId);
+            var key = "self";
             if (content == null)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
 
-            var entry = Services.PublicAccessService.GetEntryForContent(content, isPublicAccessEditor);
+            var entry = Services.PublicAccessService.GetEntryForContent(content);
             if (entry == null)
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
@@ -2342,13 +2343,27 @@ namespace Umbraco.Web.Editors
                 .Select(Mapper.Map<MemberGroupDisplay>)
                 .ToArray();
 
-            return Request.CreateResponse(HttpStatusCode.OK, new PublicAccess
+            if (isPublicAccessEditor && entry.ProtectedNodeId != contentId)
             {
-                Members = members,
-                Groups = groups,
-                LoginPage = loginPageEntity != null ? Mapper.Map<EntityBasic>(loginPageEntity) : null,
-                ErrorPage = errorPageEntity != null ? Mapper.Map<EntityBasic>(errorPageEntity) : null
+                key = "inherit";
+            }
+            var protectedNode = Services.ContentService.GetById(entry.ProtectedNodeId);
+            return Request.CreateResponse(HttpStatusCode.OK, new Dictionary<string, PublicAccess>()
+            {
+                {
+                    key, new PublicAccess
+                    {
+                        Id = entry.ProtectedNodeId,
+                        NodeName = protectedNode.Name,
+                        Members = members,
+                        Groups = groups,
+                        LoginPage = loginPageEntity != null ? Mapper.Map<EntityBasic>(loginPageEntity) : null,
+                        ErrorPage = errorPageEntity != null ? Mapper.Map<EntityBasic>(errorPageEntity) : null
+                    }
+
+                }
             });
+
         }
 
         // set up public access using role based access
@@ -2379,7 +2394,7 @@ namespace Umbraco.Web.Editors
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
 
-            if (entry == null)
+            if (entry == null || entry.ProtectedNodeId != contentId)
             {
                 entry = new PublicAccessEntry(content, loginPage, errorPage, new List<PublicAccessRule>());
 

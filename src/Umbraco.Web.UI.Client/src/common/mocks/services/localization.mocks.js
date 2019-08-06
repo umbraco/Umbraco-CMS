@@ -468,6 +468,8 @@ angular.module('umbraco.mocks').
                   "publicAccess_paErrorPage": "Error Page",
                   "publicAccess_paErrorPageHelp": "Used when people are logged on, but do not have access",
                   "publicAccess_paHowWould": "Choose how to restict access to this page",
+                  "publicAccess_paInherit": "Edit inherited protection",
+                  "publicAccess_paInheritHelp": "If you wish to update the existing rules for Ancestor",
                   "publicAccess_paIsProtected": "%0% is now protected",
                   "publicAccess_paIsRemoved": "Protection removed from %0%",
                   "publicAccess_paLoginPage": "Login Page",

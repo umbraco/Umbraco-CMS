@@ -19,6 +19,14 @@
                     </p>
 
                     <umb-pane>
+                        <div class="pa-select-type" ng-if=" vm.isInheriting">
+                            <input id="protectionTypeInherit" type="radio" name="protectionType" value="inherit" ng-model="vm.type">
+
+                            <label for="protectionTypeInherit">
+                                <h5 class="pa-access-header"><localize key="publicAccess_paInherit">Edit inherited protection</localize></h5>
+                                <p><localize key="publicAccess_paInheritHelp" >If you wish to update the existing rules for the ancestor</localize></p>
+                            </label>
+                        </div>
                         <div class="pa-select-type">
                             <input id="protectionTypeMember" type="radio" name="protectionType" value="member" ng-model="vm.type">
 
@@ -59,7 +67,7 @@
                         <p><localize key="publicAccess_paGroupsNoGroups">You need to create a member group before you can use group based authentication</localize></p>
                     </div>
 
-                    <div ng-show="vm.step === 'group' && vm.hasGroups">
+                    <div ng-show="(vm.step === 'group' && vm.hasGroups) || (vm.step === 'inherit' && vm.hasGroups)">
                         <p><localize key="publicAccess_paSelectGroups" tokens="[currentNode.name]">Select the groups that should have access to this page</localize></p>
                         <umb-pane>
                             <umb-node-preview ng-repeat="group in vm.groups | orderBy:'name'"
