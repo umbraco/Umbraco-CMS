@@ -5,6 +5,7 @@ using System.Threading;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
@@ -201,7 +202,7 @@ namespace Umbraco.Tests.Persistence
             thread2.Join();
 
             Assert.IsNotNull(e1);
-            Assert.IsInstanceOf<SqlCeLockTimeoutException>(e1);
+            Assert.IsInstanceOf<LockTimeoutException>(e1);
 
             // the assertion below depends on timing conditions - on a fast enough environment,
             // thread1 dies (deadlock) and frees thread2, which succeeds - however on a slow
@@ -210,7 +211,7 @@ namespace Umbraco.Tests.Persistence
             //
             //Assert.IsNull(e2);
             if (e2 != null)
-                Assert.IsInstanceOf<SqlCeLockTimeoutException>(e2);
+                Assert.IsInstanceOf<LockTimeoutException>(e2);
         }
 
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
