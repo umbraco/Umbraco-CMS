@@ -40,6 +40,7 @@
                     vm.inherit.errorPage = publicAccess.inherit.errorPage;
                     vm.inherit.groups = publicAccess.inherit.groups || [];
                     vm.inherit.members = publicAccess.inherit.members || [];
+                    vm.inherit.nodeName = publicAccess.inherit.NodeName;
                     vm.inherit.Id = publicAccess.inherit.Id;
                     vm.groups = [];
                     vm.isInheriting = true;

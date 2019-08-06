@@ -1223,7 +1223,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="paMembers">Specific members protection</key>
     <key alias="paMembersHelp">If you wish to grant access to specific members</key>
     <key alias="paInherit">Edit inherited protection</key>
-    <key alias="paInheritHelp"><![CDATA[If you wish to update the existing rules for <strong>the ancestor</strong> (%0%)]]></key>
+    <key alias="paInheritHelp"><![CDATA[If you wish to update the existing rules for <strong>%0%</strong>]]></key>
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[

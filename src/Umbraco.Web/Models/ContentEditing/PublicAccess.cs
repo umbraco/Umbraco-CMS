@@ -8,6 +8,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "Id")]
         public int Id { get; set; }
 
+        [DataMember(Name = "NodeName")]
+        public string NodeName { get; set; }
+
         [DataMember(Name = "groups")]
         public MemberGroupDisplay[] Groups { get; set; }
 
