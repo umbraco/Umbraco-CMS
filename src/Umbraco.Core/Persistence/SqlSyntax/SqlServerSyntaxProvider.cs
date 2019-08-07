@@ -175,7 +175,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         public override bool IsReadUncommittedSupported => true;
-        public override System.Data.IsolationLevel DefaultIsolationLevel => System.Data.IsolationLevel.RepeatableRead;
+        public override System.Data.IsolationLevel DefaultIsolationLevel => System.Data.IsolationLevel.ReadCommitted;
 
         public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
