@@ -233,6 +233,10 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //when a user logs out or timesout
     evts.push(eventsService.on("app.notAuthenticated", function () {
+        // must unload the current tree to avoid flickering when different users log in and out on the same browser
+        if ($scope.currentSection) {
+            $scope.treeApi.unload();
+        }
         $scope.authenticated = false;
     }));
 
@@ -240,6 +244,10 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     //this will occur anytime a new user logs in!
     evts.push(eventsService.on("app.ready", function (evt, data) {
         $scope.authenticated = true;
+        // reload the current tree (it was unloaded on log-out)
+        if ($scope.currentSection) {
+            $scope.treeApi.load({ section: $scope.currentSection, customTreeParams: $scope.customTreeParams, cacheKey: $scope.treeCacheKey });
+        }
         ensureInit();
     }));
 

@@ -62,6 +62,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             };
             vm.emitEvent = emitEvent;
             vm.load = load;
+            vm.unload = unload;
             vm.reloadNode = reloadNode;
             vm.syncTree = syncTree;
             vm.loadChildren = loadChildren;
@@ -70,6 +71,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             if ($scope.api) {
                 $scope.api.callbacks = vm.callbacks;
                 $scope.api.load = vm.load;
+                $scope.api.unload = vm.unload;
                 $scope.api.reloadNode = vm.reloadNode;
                 $scope.api.syncTree = vm.syncTree;
             }
@@ -117,6 +119,14 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 }
 
                 return loadTree();
+            }
+
+            function unload() {
+                $scope.tree = null;
+                $scope.activeTree = null;
+                $scope.currentNode = null;
+
+                emitEvent("treeUnloaded", { });
             }
 
             function reloadNode(node) {
