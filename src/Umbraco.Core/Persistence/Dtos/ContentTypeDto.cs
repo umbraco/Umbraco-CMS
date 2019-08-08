@@ -30,7 +30,6 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("thumbnail")]
         [Constraint(Default = "folder.png")]
-        [ResultColumn]
         public string Thumbnail { get; set; }
 
         [Column("description")]
