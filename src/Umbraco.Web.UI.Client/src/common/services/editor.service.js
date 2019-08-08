@@ -261,7 +261,7 @@ When building a custom infinite editor view you can use the same components as a
             */
             unbindKeyboardShortcuts();
 
-            // set flag so we know when the editor is open in "infinie mode"
+            // set flag so we know when the editor is open in "infinite mode"
             editor.infiniteMode = true;
 
             editors.push(editor);

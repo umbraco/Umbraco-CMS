@@ -23,7 +23,7 @@ module.exports = function(files, out) {
     // sort files in stream by path or any custom sort comparator
     task = task.pipe(babel())
         .pipe(sort())
-        .pipe(embedTemplates({ basePath: "./src/" }))
+        .pipe(embedTemplates({ basePath: "./src/", minimize:{ loose: true } }))
         .pipe(concat(out))
         .pipe(wrap('(function(){\n%= body %\n})();'))
         .pipe(gulp.dest(config.root + config.targets.js));
