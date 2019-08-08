@@ -1632,7 +1632,7 @@
             var that = this;
             // The function to be executed when you enter a link and press OK or Cancel.
             // Marks up the link and adds the ref.
-            var linkEnteredCallback = function (link) {
+            var linkEnteredCallback = function (link, title) {
 
                 if (link !== null) {
                     // (                          $1
@@ -1663,10 +1663,10 @@
 
                     if (!chunk.selection) {
                         if (isImage) {
-                            chunk.selection = "enter image description here";
+                            chunk.selection = title || "enter image description here";
                         }
                         else {
-                            chunk.selection = "enter link description here";
+                            chunk.selection = title || "enter link description here";
                         }
                     }
                 }
