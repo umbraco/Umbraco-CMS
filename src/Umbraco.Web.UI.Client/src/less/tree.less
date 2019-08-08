@@ -327,27 +327,6 @@ li.root > div > a.umb-options {
 div.not-published > i.icon,div.not-published > a{
 	opacity: 0.6;
 }
-div.protected:before{
-	content:"\e256";
-	font-family: 'icomoon';
-	color: @red;
-	position: absolute;
-	font-size: 20px;
-	padding-left: 7px;
-	padding-top: 7px;
-	bottom: 0;
-}
-
-div.has-unpublished-version:before{
-	content:"\e25a";
-	font-family: 'icomoon';
-	color: @green;
-	position: absolute;
-	font-size: 20px;
-	padding-left: 7px;
-	padding-top: 7px;
-	bottom: 0;
-}
 
 div.not-allowed > i.icon,div.not-allowed > a{
 	cursor: not-allowed;
@@ -369,6 +348,7 @@ div.is-container:before{
 	bottom: 0;
 }
 
+
 div.locked:before{
 	content:"\e0a7";
 	font-family: 'icomoon';
@@ -378,6 +358,29 @@ div.locked:before{
 	padding-left: 7px;
 	padding-top: 7px;
 	bottom: 0;
+}
+
+
+div.has-unpublished-version:before {
+    content: "\e25a";
+    font-family: 'icomoon';
+    color: @green;
+    position: absolute;
+    font-size: 20px;
+    padding-left: 7px;
+    padding-top: 7px;
+    bottom: 0;
+}
+
+div.protected:before {
+    content: "\e256";
+    font-family: 'icomoon';
+    color: @red;
+    position: absolute;
+    font-size: 20px;
+    padding-left: 7px;
+    padding-top: 7px;
+    bottom: 0;
 }
 
 .umb-tree li div.no-access .umb-tree-icon,
