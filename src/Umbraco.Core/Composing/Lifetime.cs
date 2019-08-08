@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Composing
+﻿using System;
+
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Specifies the lifetime of a registered instance.
@@ -12,13 +14,6 @@
         /// or MS.DI, PerDependency in Autofac.</remarks>
         Transient,
 
-        // TODO: We need to fix this up, currently LightInject is the only one that behaves differently from all other containers.
-        //  ... the simple fix would be to map this to PerScopeLifetime in LI but need to wait on a response here https://github.com/seesharper/LightInject/issues/494#issuecomment-518942625
-        //
-        // we use it for controllers, httpContextBase and other request scoped objects: MembershpHelper, TagQuery, UmbracoTreeSearcher and ISearchableTree
-        // - so that they are automatically disposed at the end of the scope (ie request)
-        // - not sure they should not be simply 'scoped'?
-        
         /// <summary>
         /// One unique instance per request.
         /// </summary>
@@ -28,7 +23,9 @@
         /// </para>
         /// Corresponds to
         /// <para>
-        /// PerRequestLifeTime in LightInject - means transient but disposed at the end of the current web request.
+        /// PerScopeLifetime in LightInject.
+        /// Although it would seem that this should map to PerRequestLifeTime in LightInject,
+        /// that is actually misleading since PerRequestLifeTime in LightInject means transient but disposed at the end of the current web request.
         /// see: https://github.com/seesharper/LightInject/issues/494#issuecomment-518493262
         /// </para>
         /// <para>

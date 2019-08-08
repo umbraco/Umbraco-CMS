@@ -145,7 +145,7 @@ namespace Umbraco.Core.Composing.LightInject
 
         /// <inheritdoc />
         public void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient)
-            => Container.Register(serviceType, GetLifetime(lifetime));
+            => Container.Register(serviceType, GetLifetime(lifetime, serviceType));
 
         /// <inheritdoc />
         public void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient)
@@ -158,7 +158,7 @@ namespace Umbraco.Core.Composing.LightInject
                 case Lifetime.Request:
                 case Lifetime.Scope:
                 case Lifetime.Singleton:
-                    Container.Register(serviceType, implementingType, GetLifetime(lifetime));
+                    Container.Register(serviceType, implementingType, GetLifetime(lifetime, serviceType));
                     break;
                 default:
                     throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Composing.LightInject
         public void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class
         {
-            Container.Register(f => factory(this), GetLifetime(lifetime));
+            Container.Register(f => factory(this), GetLifetime(lifetime, typeof(TService)));
         }
 
         /// <inheritdoc />
@@ -186,7 +186,7 @@ namespace Umbraco.Core.Composing.LightInject
             where TService : class
         {
             // note that there can only be one implementation or instance registered "for" a service
-            Container.Register(typeof(TService), implementingType, GetTargetedServiceName<TTarget>(), GetLifetime(lifetime));
+            Container.Register(typeof(TService), implementingType, GetTargetedServiceName<TTarget>(), GetLifetime(lifetime, typeof(TService)));
         }
 
         /// <inheritdoc />
@@ -194,7 +194,7 @@ namespace Umbraco.Core.Composing.LightInject
             where TService : class
         {
             // note that there can only be one implementation or instance registered "for" a service
-            Container.Register(f => factory(this), GetTargetedServiceName<TTarget>(), GetLifetime(lifetime));
+            Container.Register(f => factory(this), GetTargetedServiceName<TTarget>(), GetLifetime(lifetime, typeof(TService)));
         }
 
         /// <inheritdoc />
@@ -202,14 +202,20 @@ namespace Umbraco.Core.Composing.LightInject
             where TService : class
             => Container.RegisterInstance(typeof(TService), instance, GetTargetedServiceName<TTarget>());
 
-        private ILifetime GetLifetime(Lifetime lifetime)
+        protected virtual ILifetime GetLifetime(Lifetime lifetime, Type type)
         {
             switch (lifetime)
             {
                 case Lifetime.Transient:
                     return null;
                 case Lifetime.Request:
-                    return new PerRequestLifeTime();
+                    //LightInject behaves slightly differently than all containers and although it would seem that we should be using
+                    //PerRequestLifeTime here, it actually does not mean "one per request", it
+                    //just means transient per request and will be disposed at the end of the request.
+                    //LightInject's PerScopeLifetime is equivalent to "one per request" which is what we'd expect when using the Lifetime.Request since
+                    //that would be consistent with other containers.
+                    //See: https://github.com/umbraco/Umbraco-CMS/issues/6044#issuecomment-518949758
+                    return new PerScopeLifetime();
                 case Lifetime.Scope:
                     return new PerScopeLifetime();
                 case Lifetime.Singleton:
