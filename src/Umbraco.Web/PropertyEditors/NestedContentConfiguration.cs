@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.IO;
-using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -38,19 +36,6 @@ namespace Umbraco.Web.PropertyEditors
 
             [JsonProperty("nameTemplate")]
             public string Template { get; set; }
-
-            [JsonProperty("thumbnail")]
-            public string Thumbnail
-            {
-                get
-                {
-                    var thumbsFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Thumbnails));
-                    var files = Directory.GetFiles(thumbsFolder.FullName, $"{Alias}.*");
-
-                    return files.Length == 1 ?
-                        IOHelper.ResolveVirtualUrl($"{SystemDirectories.Thumbnails}/{Path.GetFileName(files[0])}") : null;
-                }
-            }
         }
     }
 }

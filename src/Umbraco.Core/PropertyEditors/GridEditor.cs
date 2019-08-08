@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.IO;
@@ -38,21 +37,6 @@ namespace Umbraco.Core.PropertyEditors
 
         [JsonProperty("icon", Required = Required.Always)]
         public string Icon { get; set; }
-
-        [JsonProperty("thumbnail")]
-        public string Thumbnail {
-            get
-            {
-                var thumbsFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Thumbnails));
-                var files = Directory.GetFiles(thumbsFolder.FullName, $"{Alias}.*");
-
-                return files.Length == 1 ?
-                    IOHelper.ResolveVirtualUrl($"{SystemDirectories.Thumbnails}/{Path.GetFileName(files[0])}") : null;
-            }
-        }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
 
         [JsonProperty("config")]
         public IDictionary<string, object> Config { get; set; }
