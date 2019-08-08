@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -31,14 +29,14 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.RootString)
             {
-                foreach (var macro in Services.MacroService.GetAll())
+                foreach (var macro in Services.MacroService.GetAll().OrderBy(m => m.Name))
                 {
                     nodes.Add(CreateTreeNode(
                         macro.Id.ToString(),
                         id,
                         queryStrings,
                         macro.Name,
-                        "icon-settings-alt",
+                        Constants.Icons.Macro,
                         false));
                 }
             }

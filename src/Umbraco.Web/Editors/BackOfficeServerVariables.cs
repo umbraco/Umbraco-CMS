@@ -20,6 +20,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
@@ -184,7 +185,7 @@ namespace Umbraco.Web.Editors
                         {
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))
-                        },                        
+                        },
                         {
                             "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
                                 controller => controller.GetById(0, UmbracoEntityTypes.Media))
@@ -236,10 +237,6 @@ namespace Umbraco.Web.Editors
                         {
                             "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
                                 controller => controller.GetCheck())
-                        },
-                        {
-                            "tagApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsController>(
-                                controller => controller.GetAllTags(null))
                         },
                         {
                             "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
@@ -307,7 +304,11 @@ namespace Umbraco.Web.Editors
                         },
 						{
                             "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
-                                controller => controller.GetNumberOfErrors())
+                                controller => controller.GetNumberOfErrors(null, null))
+                        },
+                        {
+                            "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
+                                controller => controller.GetStatus())
                         }
                     }
                 },

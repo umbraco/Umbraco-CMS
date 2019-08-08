@@ -8,7 +8,8 @@
 
         public override void Migrate()
         {
-            Delete.Table("umbracoMigration").Do();
+            if (TableExists("umbracoMigration"))
+                Delete.Table("umbracoMigration").Do();
         }
     }
 }

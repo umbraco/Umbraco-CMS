@@ -91,7 +91,6 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
                     function (err) {
 
                         contentEditingHelper.handleSaveError({
-                            redirectOnFailure: false,
                             err: err
                         });
                         

@@ -3,15 +3,19 @@
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
     function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService) {
 
+        var vm = {
+            labels: {
+                 mediaPicker_deletedItem: ""
+            }
+        }
+
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
-        var ignoreUserStartNodes = Object.toBoolean($scope.model.config.ignoreUserStartNodes);
+
         $scope.allowEditMedia = false;
         $scope.allowAddMedia = false;
-
-
 
         function setupViewModel() {
             $scope.mediaItems = [];
@@ -53,7 +57,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                                 return found;
                             } else {
                                 return {
-                                    name: localizationService.dictionary.mediaPicker_deletedItem,
+                                    name: vm.labels.mediaPicker_deletedItem,
                                     id: $scope.model.config.idType !== "udi" ? id : null,
                                     udi: $scope.model.config.idType === "udi" ? id : null,
                                     icon: "icon-picture",
@@ -108,32 +112,40 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function init() {
-            userService.getCurrentUser().then(function (userData) {
-                if (!$scope.model.config.startNodeId) {
-                    $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                    $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+
+            localizationService.localizeMany(["mediaPicker_deletedItem"])
+                .then(function(data) {
+                    vm.labels.mediaPicker_deletedItem = data[0];
+
+                    userService.getCurrentUser().then(function (userData) {
+
+                        if (!$scope.model.config.startNodeId) {
+                    if ($scope.model.config.ignoreUserStartNodes === true) {
+                        $scope.model.config.startNodeId = -1;
+                        $scope.model.config.startNodeIsVirtual = true;
+                    }
+                    else {
+                        $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                        $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                    }  
                 }
-                if (ignoreUserStartNodes === true) {
-                    $scope.model.config.startNodeId = -1;
-                    $scope.model.config.startNodeIsVirtual = true;
-                }
 
-                // only allow users to add and edit media if they have access to the media section
-                var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;
-                $scope.allowEditMedia = hasAccessToMedia;
-                $scope.allowAddMedia = hasAccessToMedia;
+                        // only allow users to add and edit media if they have access to the media section
+                        var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;
+                        $scope.allowEditMedia = hasAccessToMedia;
+                        $scope.allowAddMedia = hasAccessToMedia;
 
-                setupViewModel();
+                        setupViewModel();
 
-                //When the model value changes sync the view model
-                $scope.$watch("model.value",
-                    function (newVal, oldVal) {
-                        if (newVal !== oldVal) {
-                            setupViewModel();
-                        }
+                        //When the model value changes sync the view model
+                        $scope.$watch("model.value",
+                            function (newVal, oldVal) {
+                                if (newVal !== oldVal) {
+                                    setupViewModel();
+                                }
+                            });
                     });
-            });
-
+                });
         }
 
         $scope.remove = function (index) {
@@ -175,7 +187,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             var mediaPicker = {
                 startNodeId: $scope.model.config.startNodeId,
                 startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
-                ignoreUserStartNodes: ignoreUserStartNodes,
+                dataTypeKey: $scope.model.dataTypeKey,
                 multiPicker: multiPicker,
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the content type.
         /// </summary>
-        PublishedContentType ContentType { get; }
+        IPublishedContentType ContentType { get; }
 
         #endregion
 

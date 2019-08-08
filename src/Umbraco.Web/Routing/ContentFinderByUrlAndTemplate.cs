@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
             var path = frequest.Uri.GetAbsolutePathDecoded();
 
             if (frequest.HasDomain)
-                path = DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, path);
+                path = DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, path);
 
             // no template if "/"
             if (path == "/")

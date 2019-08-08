@@ -20,6 +20,13 @@ angular.module("umbraco")
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
 
+            var width = editorConfig.dimensions ? parseInt(editorConfig.dimensions.width, 10) || null : null;
+            var height = editorConfig.dimensions ? parseInt(editorConfig.dimensions.height, 10) || null : null;
+
+            $scope.containerWidth = editorConfig.mode === "distraction-free" ? (width ? width : "auto") : "auto";
+            $scope.containerHeight = editorConfig.mode === "distraction-free" ? (height ? height : "auto") : "auto";
+            $scope.containerOverflow = editorConfig.mode === "distraction-free" ? (height ? "auto" : "inherit") : "inherit";
+
             var promises = [];
 
             //queue file loading
@@ -41,10 +48,16 @@ angular.module("umbraco")
             $q.all(promises).then(function (result) {
 
                 var standardConfig = result[promises.length - 1];
-
+                
+                if (height !== null) {
+                    standardConfig.plugins.splice(standardConfig.plugins.indexOf("autoresize"), 1);
+                }
+                
                 //create a baseline Config to extend upon
                 var baseLineConfigObj = {
-                    maxImageSize: editorConfig.maxImageSize
+                    maxImageSize: editorConfig.maxImageSize,
+                    width: width,
+                    height: height
                 };
 
                 angular.extend(baseLineConfigObj, standardConfig);

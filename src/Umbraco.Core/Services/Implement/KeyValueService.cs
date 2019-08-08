@@ -28,7 +28,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (_initialized) return;
                 Initialize();
-                _initialized = true;
             }
         }
 
@@ -41,7 +40,10 @@ namespace Umbraco.Core.Services.Implement
             // then everything should be ok (the table should exist, etc)
 
             if (UmbracoVersion.LocalVersion != null && UmbracoVersion.LocalVersion.Major >= 8)
+            {
+                _initialized = true;
                 return;
+            }
 
             // else we are upgrading from 7, we can assume that the locks table
             // exists, but we need to create everything for key/value
@@ -53,6 +55,10 @@ namespace Umbraco.Core.Services.Implement
                 initMigration.Migrate();
                 scope.Complete();
             }
+
+            // but don't assume we are initializing
+            // we are upgrading from v7 and if anything goes wrong,
+            // the table and everything will be rolled back
         }
 
         /// <summary>
