@@ -14,13 +14,7 @@
 function ReadOnlyValueController($rootScope, $scope, $filter) {
 
     function formatDisplayValue() {
-        
-        if ($scope.model.config &&
-        angular.isArray($scope.model.config) &&
-        $scope.model.config.length > 0 &&
-        $scope.model.config[0] &&
-        $scope.model.config.filter) {
-
+        if ($scope.model.config && $scope.model.config.filter) {
             if ($scope.model.config.format) {
                 $scope.displayvalue = $filter($scope.model.config.filter)($scope.model.value, $scope.model.config.format);
             } else {
@@ -29,12 +23,11 @@ function ReadOnlyValueController($rootScope, $scope, $filter) {
         } else {
             $scope.displayvalue = $scope.model.value;
         }
-
     }
 
     //format the display value on init:
     formatDisplayValue();
-    
+
     $scope.$watch("model.value", function (newVal, oldVal) {
         //cannot just check for !newVal because it might be an empty string which we 
         //want to look for.

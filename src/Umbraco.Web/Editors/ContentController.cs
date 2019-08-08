@@ -598,8 +598,13 @@ namespace Umbraco.Web.Editors
                     Services.ContentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
                     //we need to reuse the underlying logic so return the result that it wants
                     return OperationResult.Succeed(new EventMessages());
+                },
+                content =>
+                {
+                    var display = MapToDisplay(content);
+                    SetupBlueprint(display, content);
+                    return display;
                 });
-            SetupBlueprint(contentItemDisplay, contentItemDisplay.PersistedContent);
 
             return contentItemDisplay;
         }
@@ -613,11 +618,15 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
-            var contentItemDisplay = PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
+            var contentItemDisplay = PostSaveInternal(
+                contentItem,
+                content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id),
+                MapToDisplay);
+
             return contentItemDisplay;
         }
 
-        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
+        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
         {
             //Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
             //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
@@ -648,7 +657,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the model state to the outgoing object and throw a validation message
-                    var forDisplay = MapToDisplay(contentItem.PersistedContent);
+                    var forDisplay = mapToDisplay(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
                 }
@@ -739,11 +748,7 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.PublishNew:
                     {
                         var publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
-                        //global notifications
-                        AddMessageForPublishStatus(new[] { publishStatus }, globalNotifications, successfulCultures);
-                        //variant specific notifications
-                        foreach (var c in successfulCultures)
-                            AddMessageForPublishStatus(new[] { publishStatus }, notifications.GetOrCreate(c), successfulCultures);
+                        AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
                     }
                     break;
                 case ContentSaveAction.PublishWithDescendants:
@@ -759,12 +764,7 @@ namespace Umbraco.Web.Editors
                         }
 
                         var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
-
-                        //global notifications
-                        AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
-                        //variant specific notifications
-                        foreach (var c in successfulCultures)
-                            AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                        AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                     }
                     break;
                 case ContentSaveAction.PublishWithDescendantsForce:
@@ -780,12 +780,7 @@ namespace Umbraco.Web.Editors
                         }
 
                         var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
-
-                        //global notifications
-                        AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
-                        //variant specific notifications
-                        foreach (var c in successfulCultures)
-                            AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                        AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                     }
                     break;
                 default:
@@ -793,7 +788,7 @@ namespace Umbraco.Web.Editors
             }
 
             //get the updated model
-            var display = MapToDisplay(contentItem.PersistedContent);
+            var display = mapToDisplay(contentItem.PersistedContent);
 
             //merge the tracked success messages with the outgoing model
             display.Notifications.AddRange(globalNotifications.Notifications);
@@ -821,6 +816,15 @@ namespace Umbraco.Web.Editors
             display.PersistedContent = contentItem.PersistedContent;
 
             return display;
+        }
+
+        private void AddPublishStatusNotifications(IReadOnlyCollection<PublishResult> publishStatus, SimpleNotificationModel globalNotifications, Dictionary<string, SimpleNotificationModel> variantNotifications, string[] successfulCultures)
+        {
+            //global notifications
+            AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
+            //variant specific notifications
+            foreach (var c in successfulCultures ?? Array.Empty<string>())
+                AddMessageForPublishStatus(publishStatus, variantNotifications.GetOrCreate(c), successfulCultures);
         }
 
         /// <summary>
@@ -1165,7 +1169,7 @@ namespace Umbraco.Web.Editors
                 var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: Security.CurrentUser.Id);
                 // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
-                successfulCultures = Array.Empty<string>();
+                successfulCultures = null; //must be null! this implies invariant
                 return publishStatus;
             }
 
@@ -1237,7 +1241,7 @@ namespace Umbraco.Web.Editors
                 //its invariant, proceed normally
                 var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
-                successfulCultures = Array.Empty<string>();
+                successfulCultures = null; //must be null! this implies invariant
                 return publishStatus;
             }
 
@@ -1678,7 +1682,7 @@ namespace Umbraco.Web.Editors
             {
                 try
                 {
-                    var uri = DomainHelper.ParseUriFromDomainName(domain.Name, Request.RequestUri);
+                    var uri = DomainUtilities.ParseUriFromDomainName(domain.Name, Request.RequestUri);
                 }
                 catch (UriFormatException)
                 {                    
@@ -2150,7 +2154,7 @@ namespace Umbraco.Web.Editors
                             {
                                 foreach (var c in successfulCultures)
                                 {
-                                    var names = string.Join(", ", status.Select(x => $"'{x.Content.GetCultureName(c)}'"));
+                                    var names = string.Join(", ", status.Select(x => $"'{(x.Content.ContentType.VariesByCulture() ? x.Content.GetCultureName(c) : x.Content.Name)}'"));
                                     display.AddWarningNotification(
                                         Services.TextService.Localize("publish"),
                                         Services.TextService.Localize("publish/contentPublishedFailedInvalid",

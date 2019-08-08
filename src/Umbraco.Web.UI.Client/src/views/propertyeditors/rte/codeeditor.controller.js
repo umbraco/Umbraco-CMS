@@ -12,11 +12,13 @@
             mode: "razor",
             theme: "chrome",
             showPrintMargin: false,
+            autoFocus: true,
             advanced: {
                 fontSize: "14px",
                 enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
                 enableBasicAutocompletion: true,
-                enableLiveAutocompletion: false
+                enableLiveAutocompletion: false,
+                wrap: true
             },
             onLoad: function(aceEditor) {
                 vm.aceEditor = aceEditor;

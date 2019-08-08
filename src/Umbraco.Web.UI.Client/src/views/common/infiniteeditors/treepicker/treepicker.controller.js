@@ -28,15 +28,16 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.treeAlias = $scope.model.treeAlias;
         vm.multiPicker = $scope.model.multiPicker;
         vm.hideHeader = (typeof $scope.model.hideHeader) === "boolean" ? $scope.model.hideHeader : true;
+        vm.dataTypeKey = $scope.model.dataTypeKey;
         vm.searchInfo = {
             searchFromId: $scope.model.startNodeId,
             searchFromName: null,
             showSearch: false,
+            dataTypeKey: vm.dataTypeKey,
             results: [],
             selectedSearchResults: []
         }
         vm.startNodeId = $scope.model.startNodeId;
-        vm.ignoreUserStartNodes = $scope.model.ignoreUserStartNodes;
         //Used for toggling an empty-state message
         //Some trees can have no items (dictionary & forms email templates)
         vm.hasItems = true;
@@ -59,6 +60,8 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.selectListViewNode = selectListViewNode;
         vm.submit = submit;
         vm.close = close;
+
+        var currentNode = $scope.model.currentNode;
 
         function initDialogTree() {
             vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
@@ -89,6 +92,14 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                 vm.entityType = "Document";
                 if (!$scope.model.title) {
                     localizationService.localize("defaultdialogs_selectContent").then(function(value){
+                        $scope.model.title = value;
+                    });
+                }
+            }
+            if (vm.treeAlias === "documentTypes") {
+                vm.entityType = "DocumentType";
+                if (!$scope.model.title) {
+                    localizationService.localize("defaultdialogs_selectContentType").then(function(value){
                         $scope.model.title = value;
                     });
                 }
@@ -161,6 +172,12 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     }
                 }
             }
+
+            vm.filter = {
+                filterAdvanced: $scope.model.filterAdvanced,
+                filterExclude: $scope.model.filterExclude,
+                filter: $scope.model.filter
+            };
         }
 
         /**
@@ -172,12 +189,13 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if (vm.startNodeId) {
                 queryParams["startNodeId"] = $scope.model.startNodeId;
             }
-            if (vm.ignoreUserStartNodes) {
-                queryParams["ignoreUserStartNodes"] = $scope.model.ignoreUserStartNodes;
-            }
             if (vm.selectedLanguage && vm.selectedLanguage.id) {
                 queryParams["culture"] = vm.selectedLanguage.culture;
             }
+            if (vm.dataTypeKey) {
+                queryParams["dataTypeKey"] = vm.dataTypeKey;
+            }
+                
             var queryString = $.param(queryParams); //create the query string from the params object
             
             if (!queryString) {
@@ -260,6 +278,12 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             vm.hasItems = args.tree.root.children.length > 0;
 
             tree = args.tree;
+
+            var nodeHasPath = currentNode && currentNode.path;
+            var startNodeNotDefined = !vm.startNodeId;
+            if (startNodeNotDefined && nodeHasPath) {
+                vm.dialogTreeApi.syncTree({ path: currentNode.path, activate: true });
+            }
         }
 
         //wires up selection

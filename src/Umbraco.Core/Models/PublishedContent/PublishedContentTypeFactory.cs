@@ -26,37 +26,46 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public PublishedContentType CreateContentType(IContentTypeComposition contentType)
+        public IPublishedContentType CreateContentType(IContentTypeComposition contentType)
         {
             return new PublishedContentType(contentType, this);
         }
 
-        // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
+        /// <summary>
+        /// This method is for tests and is not intended to be used directly from application code.
+        /// </summary>
+        /// <remarks>Values are assumed to be consisted and are not checked.</remarks>
+        internal IPublishedContentType CreateContentType(int id, string alias, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
             return new PublishedContentType(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations, isElement);
         }
 
-        // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
+        /// <summary>
+        /// This method is for tests and is not intended to be used directly from application code.
+        /// </summary>
+        /// <remarks>Values are assumed to be consisted and are not checked.</remarks>
+        internal IPublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
             return new PublishedContentType(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations, isElement);
         }
 
         /// <inheritdoc />
-        public PublishedPropertyType CreatePropertyType(PublishedContentType contentType, PropertyType propertyType)
+        public IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, PropertyType propertyType)
         {
             return new PublishedPropertyType(contentType, propertyType, _propertyValueConverters, _publishedModelFactory, this);
         }
 
         /// <inheritdoc />
-        public PublishedPropertyType CreatePropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations = ContentVariation.Nothing)
+        public IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations = ContentVariation.Nothing)
         {
             return new PublishedPropertyType(contentType, propertyTypeAlias, dataTypeId, true, variations, _propertyValueConverters, _publishedModelFactory, this);
         }
 
-        // for tests
-        internal PublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, bool umbraco = false, ContentVariation variations = ContentVariation.Nothing)
+        /// <summary>
+        /// This method is for tests and is not intended to be used directly from application code.
+        /// </summary>
+        /// <remarks>Values are assumed to be consisted and are not checked.</remarks>
+        internal IPublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, bool umbraco = false, ContentVariation variations = ContentVariation.Nothing)
         {
             return new PublishedPropertyType(propertyTypeAlias, dataTypeId, umbraco, variations, _propertyValueConverters, _publishedModelFactory, this);
         }

@@ -14,6 +14,12 @@
  */
 function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, localizationService, editorService, $q) {
 
+    var vm = {
+        labels: {
+            general_recycleBin: ""
+        }
+    };
+
     var unsubscribe;
 
     function subscribe() {
@@ -80,7 +86,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
-        ignoreUserStartNodes: false,
+        dataTypeKey: null,
         maxNumber: 1,
         minNumber: 0,
         startNode: {
@@ -118,8 +124,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = Object.toBoolean($scope.model.config.showOpenButton);
     $scope.model.config.showEditButton = Object.toBoolean($scope.model.config.showEditButton);
     $scope.model.config.showPathOnHover = Object.toBoolean($scope.model.config.showPathOnHover);
-    $scope.model.config.ignoreUserStartNodes = Object.toBoolean($scope.model.config.ignoreUserStartNodes);    
-    
+
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
@@ -135,7 +140,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
         startNodeId: null,
-        ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes,
+        dataTypeKey: $scope.model.dataTypeKey,
         currentNode: editorState ? editorState.current : null,
         callback: function (data) {
             if (angular.isArray(data)) {
@@ -153,9 +158,16 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         idType: "udi"
     };
 
-    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
+    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
+
+    dialogOptions.dataTypeKey = $scope.model.dataTypeKey;
+
+    // if we can't pick more than one item, explicitly disable multiPicker in the dialog options
+    if ($scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) === 1) {
+        dialogOptions.multiPicker = false;
+    }
 
     // add the current filter (if any) as title for the filtered out nodes
     if ($scope.model.config.filter) {
@@ -179,7 +191,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             if (!currFilter) {
                 return false;
             }
-            //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller, 
+            //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller,
             // but not much we can do about that since members require special filtering.
             var filterItem = currFilter.toLowerCase().split(',');
             var found = filterItem.indexOf(i.metaData.contentType.toLowerCase()) >= 0;
@@ -399,11 +411,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         // get url for content and media items
         if (entityType !== "Member") {
             entityResource.getUrl(entity.id, entityType).then(function (data) {
-                // update url                
+                // update url
                 angular.forEach($scope.renderModel, function (item) {
                     if (item.id === entity.id) {
                         if (entity.trashed) {
-                            item.url = localizationService.dictionary.general_recycleBin;
+                            item.url = vm.labels.general_recycleBin;
                         } else {
                             item.url = data;
                         }
@@ -445,7 +457,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             "url": item.url,
             "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
-            // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
+            // only content supports published/unpublished content so we set everything else to published so the UI looks correct
         });
 
         setEntityUrl(item);
@@ -461,12 +473,17 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     function init() {
-        syncRenderModel(false).then(function () {
-            //everything is loaded, start the watch on the model
-            startWatch();
-            subscribe();
-            validate();
-        });
+        localizationService.localizeMany(["general_recycleBin"])
+            .then(function(data) {
+                vm.labels.general_recycleBin = data[0];
+
+                syncRenderModel(false).then(function () {
+                    //everything is loaded, start the watch on the model
+                    startWatch();
+                    subscribe();
+                    validate();
+                });
+            });
     }
 
     init();
