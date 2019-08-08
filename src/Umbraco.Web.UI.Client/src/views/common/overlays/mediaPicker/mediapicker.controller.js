@@ -267,7 +267,7 @@ angular.module("umbraco")
 
                 // also make sure the node is not trashed
                 if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
-                    $scope.gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder" });
+                    $scope.gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder", path: node.path });
                     return true;
                 } else {
                     $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
