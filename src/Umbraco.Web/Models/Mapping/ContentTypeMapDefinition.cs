@@ -184,6 +184,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = source.ParentId;
             target.Path = source.Path;
+            target.Thumbnail = source.Thumbnail;
             target.Trashed = source.Trashed;
             target.UpdateDate = source.UpdateDate;
         }
@@ -386,6 +387,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = source.ParentId;
             target.Path = source.Path;
+            target.Thumbnail = source.Thumbnail;
 
             target.AllowedAsRoot = source.AllowAsRoot;
             target.AllowedContentTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
@@ -481,6 +483,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = source.ParentId;
             target.Path = source.Path;
+            target.Thumbnail = source.Thumbnail;
             target.Udi = MapContentTypeUdi(source);
             target.UpdateDate = source.UpdateDate;
 
@@ -517,6 +520,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = source.ParentId;
             target.Path = source.Path;
+            target.Thumbnail = source.Thumbnail;
             target.Trashed = source.Trashed;
             target.Udi = source.Udi;
         }

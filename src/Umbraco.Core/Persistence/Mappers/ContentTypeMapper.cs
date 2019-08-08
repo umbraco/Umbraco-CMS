@@ -35,6 +35,7 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.Icon), nameof(ContentTypeDto.Icon));
             DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.IsContainer), nameof(ContentTypeDto.IsContainer));
             DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.IsElement), nameof(ContentTypeDto.IsElement));
+            DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.Thumbnail), nameof(ContentTypeDto.Thumbnail));
         }
     }
 }
