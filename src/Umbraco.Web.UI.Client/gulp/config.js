@@ -24,9 +24,9 @@ module.exports = {
 
             //the controllers for views
             controllers: {
-                files: [
-                    "./src/*.controller.js",
-                    "./src/{views}/**/*.controller.js"
+                files: [                    
+                    "./src/views/**/*.controller.js",
+                    "./src/*.controller.js"
                 ], out: "umbraco.controllers.js"
             },
 
