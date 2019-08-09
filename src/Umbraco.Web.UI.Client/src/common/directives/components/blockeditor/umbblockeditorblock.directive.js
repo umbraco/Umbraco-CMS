@@ -1,4 +1,5 @@
-﻿angular.module("umbraco.directives").directive('umbBlockEditorBlock', [
+﻿//fixme: this needs to be component not a directive
+angular.module("umbraco.directives").directive('umbBlockEditorBlock', [
     function () {
         var link = function (scope, el, attr, ctrl) {
             scope.view = scope.block.view || attr.view;
