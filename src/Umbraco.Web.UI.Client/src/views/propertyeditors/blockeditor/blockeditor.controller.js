@@ -6,9 +6,7 @@
 
         vm.scaffolds = [];
         vm.loading = true;
-        vm.blocks = $scope.model.value ? $scope.model.value : [];
-        vm.config = $scope.model.config ? $scope.model.config.blocks : [];
-
+        
         let allowedElements = [];
 
         // it would be awesome if we could load all scaffolds in one go... however we need to have an eye out for performance,
@@ -17,13 +15,11 @@
 
         function init() {
             
-            _.each(vm.config, function (config) {
+            _.each($scope.model.config.blocks, function (config) {
                 contentResource.getScaffoldByUdi(-20, config.elementType).then(function (scaffold) {
                     if (scaffold.isElement) {
                         // the scaffold udi is not the same as the element type udi, but we need it to be for comparison
                         scaffold.udi = config.elementType;
-                        // shift this up to be consistent with other entities
-                        scaffold.thumbnail = scaffold.documentType.thumbnail;
                         vm.scaffolds.push(scaffold);
                     }
                     scaffoldsLoaded++;
@@ -37,14 +33,14 @@
 
         function initIfAllScaffoldsHaveLoaded() {
             // Initialize when all scaffolds have loaded
-            if (vm.config.length === scaffoldsLoaded) {
+            if ($scope.model.config.blocks.length === scaffoldsLoaded) {
                 vm.scaffolds = _.sortBy(vm.scaffolds, function (scaffold) {
-                    return _.findIndex(vm.config, function (blockConfig) {
+                    return _.findIndex($scope.model.config.blocks, function (blockConfig) {
                         return blockConfig.elementType === scaffold.udi;
                     });
                 });
 
-                _.each(vm.blocks, function (block) {
+                _.each($scope.model.value, function (block) {
                     applyFakeSettings(block);
                 });
 
@@ -89,7 +85,6 @@
                     alias: scaffold.contentTypeAlias,
                     name: scaffold.contentTypeName,
                     icon: iconHelper.convertFromLegacyIcon(scaffold.icon),
-                    thumbnail: scaffold.thumbnail,
                     description: scaffold.documentType.description
                 });
             });
@@ -98,11 +93,8 @@
                 return;
             }
 
-            if (vm.overlayMenu.availableItems.some(x => x.thumbnail)) {
-                vm.overlayMenu.size = 'large';
-            } else {
-                vm.overlayMenu.size = vm.overlayMenu.availableItems.length > 6 ? "medium" : "small";
-            }
+            //TODO: If we support larger thumbnails of some sort one day, this could be large
+            vm.overlayMenu.size = vm.overlayMenu.availableItems.length > 6 ? "medium" : "small";
 
             vm.overlayMenu.pasteItems = [];
             var availableNodesForPaste = clipboardService.retriveDataOfType("elementType", allowedElements);
@@ -142,56 +134,13 @@
                     view: 'views/propertyeditors/blockeditor/blockeditor.block.html'
                 }
             };
-            vm.openContent(element, block);
-        }
-
-        vm.editContent = function (block) {
-            var scaffold = _.findWhere(vm.scaffolds, {
-                udi: block.udi
-            });
-            var element = angular.copy(scaffold);
-            _.each(element.variants[0].tabs, function (tab) {
-                _.each(tab.properties, function (property) {
-                    if (block.content[property.alias]) {
-                        property.value = block.content[property.alias];
-                    }
-                });
-            });
-
-            vm.openContent(element, block);
-        }
-
-        vm.openContent = function (element, block) {
-            var options = {
-                element: element,
-                title: 'Edit block',
-                //fixme: This isn't really a component if its strongly tied to views in the property editor :/
-                view: "views/propertyeditors/blockeditor/blockeditor.editcontent.html",
-                submit: function (model) {
-                    _.each(element.variants[0].tabs, function (tab) {
-                        _.each(tab.properties, function (property) {
-                            block.content[property.alias] = property.value;
-                        });
-                    });
-                    if (vm.blocks.indexOf(block) < 0) {
-                        vm.blocks.push(block);
-                        applyFakeSettings(block);
-                    }
-
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.open(options);
+            openContent(element, block);
         }
 
         vm.editSettings = function (block) {
             var options = {
                 settings: block.settings,
                 title: "Edit settings",
-                //fixme: This isn't really a component if its strongly tied to views in the property editor :/
                 view: "views/propertyeditors/blockeditor/blockeditor.editsettings.html",
                 size: "small",
                 submit: function (model) {
@@ -204,11 +153,38 @@
             editorService.open(options);
         }
 
-        vm.remove = function (block) {
-            // this should be replaced by a custom dialog (pending some PRs)
-            if (confirm("TODO: Are you sure?")) {
-                vm.blocks.splice($scope.blocks.indexOf(block), 1);
-            }
+        vm.onRemove = function (block) {
+            $scope.model.value.splice($scope.model.value.indexOf(block), 1);
+        }
+
+        vm.onEdit = function (element, block) {
+            openContent(element, block);
+        }
+
+        function openContent(element, block) {
+            var options = {
+                element: element,
+                title: 'Edit block',
+                //fixme: This isn't really a component if its strongly tied to views in the property editor :/
+                view: "views/propertyeditors/blockeditor/blockeditor.editcontent.html",
+                submit: function (model) {
+                    _.each(element.variants[0].tabs, function (tab) {
+                        _.each(tab.properties, function (property) {
+                            block.content[property.alias] = property.value;
+                        });
+                    });
+                    if ($scope.model.value.indexOf(block) < 0) {
+                        $scope.model.value.push(block);
+                        applyFakeSettings(block);
+                    }
+
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+            editorService.open(options);
         }
 
         // TODO: remove this (only for testing)

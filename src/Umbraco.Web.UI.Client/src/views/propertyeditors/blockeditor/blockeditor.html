@@ -4,24 +4,13 @@
     </div>
 
     <div ng-if="!vm.loading">
-        <ul class="unstyled" ui-sortable="sortableOptions" ng-model="vm.blocks">
-            <li ng-repeat="block in vm.blocks">
-                <div class="handle">
-                    <div class="umb-node-preview umb-node-preview--sortable">
-                        <i ng-if="block.icon" class="umb-node-preview__icon {{ block.icon }}"></i>
-                        <div class="umb-node-preview__content">
-                            <div class="umb-node-preview__name" ng-attr-title="{{block.alias}}">TODO: Figure out how to name a block</div>
-                            <div class="umb-node-preview__description" ng-if="block.description">{{ block.description }}</div>
-                        </div>
-                        <div class="umb-node-preview__actions">
-                            <a class="umb-node-preview__action" title="Edit" href="" ng-click="vm.editContent(block)"><localize key="general_edit">Edit</localize></a>
-                            <a class="umb-node-preview__action" title="Settings" href="" ng-click="vm.editSettings(block)"><localize key="general_settings">Settings</localize></a>
-                            <a class="umb-node-preview__action umb-node-preview__action--red" title="Remove" ng-href="" ng-click="vm.remove(block)"><localize key="general_remove">Remove</localize></a>
-                        </div>
-                    </div>
-                </div>
-            </li>
-        </ul>
+        <umb-block-list blocks="model.value"
+                        config="model.config.blocks"
+                        scaffolds="vm.scaffolds"
+                        on-edit="vm.onEdit(element, block)"
+                        on-remove="vm.onRemove(element, block)"
+                        on-settings="vm.editSettings(block)">
+        </umb-block-list>
     </div>
 
     <div ng-if="!vm.loading" class="umb-nested-content__footer-bar">
