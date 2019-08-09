@@ -23,7 +23,12 @@ module.exports = {
             security: { files: ["./src/common/interceptors/**/*.js"], out: "umbraco.interceptors.js" },
 
             //the controllers for views
-            controllers: { files: ["./src/{views,controllers}/**/*.controller.js"], out: "umbraco.controllers.js" },
+            controllers: {
+                files: [
+                    "./src/*.controller.js",
+                    "./src/{views}/**/*.controller.js"
+                ], out: "umbraco.controllers.js"
+            },
 
             //directives/components 
             // - any JS file found in common / directives or common/ components
