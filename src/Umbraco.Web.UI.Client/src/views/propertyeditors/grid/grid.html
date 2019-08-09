@@ -226,11 +226,7 @@
 
                                                       <!-- if area is empty tools -->
                                                       <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0 && !sortMode && (area.maxItems == undefined || area.maxItems == '' || area.maxItems == 0 || area.maxItems > area.controls.length)">
-                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">
-                                                              <localize key="grid_addElement" ng-if="area.$allowedEditors.length > 1"></localize>
-                                                              <span ng-show="area.$allowedEditors.length === 1">
-                                                                  <localize key="general_add"></localize> {{ area.$allowedEditors[0].name }}</span>
-                                                          </div>
+                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);"><localize key="grid_addElement" /></div>
                                                       </div>
 
                                                  </div>
@@ -304,7 +300,6 @@
       ng-if="editorOverlay.show"
       model="editorOverlay"
       view="editorOverlay.view"
-      size="editorOverlay.size"
       position="target">
     </umb-overlay>
 

@@ -14,10 +14,6 @@ function ItemPickerOverlay($scope, localizationService) {
         }
     }
 
-    $scope.hasThumbs = function () {
-        return $scope.model.availableItems.some(x => x.thumbnail);
-    };
-
     $scope.selectItem = function (item) {
         $scope.model.selectedItem = item;
         $scope.submitForm($scope.model);
