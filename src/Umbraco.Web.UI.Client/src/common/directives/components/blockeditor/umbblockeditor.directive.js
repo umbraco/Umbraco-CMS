@@ -174,6 +174,7 @@ angular.module("umbraco.directives").directive('umbBlockEditor', [
                     var options = {
                         element: element,
                         title: 'Edit block',
+                        //fixme: This isn't really a component if its strongly tied to views in the property editor :/
                         view: "views/propertyeditors/blockeditor/blockeditor.editcontent.html",
                         submit: function (model) {
                             _.each(element.variants[0].tabs, function (tab) {
@@ -199,6 +200,7 @@ angular.module("umbraco.directives").directive('umbBlockEditor', [
                     var options = {
                         settings: block.settings,
                         title: "Edit settings",
+                        //fixme: This isn't really a component if its strongly tied to views in the property editor :/
                         view: "views/propertyeditors/blockeditor/blockeditor.editsettings.html",
                         size: "small",
                         submit: function (model) {

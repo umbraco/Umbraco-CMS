@@ -1,4 +1,13 @@
-﻿function BlockEditorEditContentController($scope) {
+﻿/**
+ * @ngdoc controller
+ * @name Umbraco.PropertyEditors.BlockEditor.EditContentController
+ * @function
+ *
+ * @description
+ * The controller for editing content with the block editor
+ */
+
+function BlockEditorEditContentController($scope) {
     var vm = this;
     vm.submit = submit;
     vm.close = close;
