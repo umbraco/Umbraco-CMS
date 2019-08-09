@@ -1,4 +1,14 @@
-﻿angular.module("umbraco")
+﻿/**
+ * @ngdoc controller
+ * @name Umbraco.PropertyEditors.BlockEditor.SettingsController
+ * @function
+ *
+ * @description
+ * The controller for the block editor's data type configuration
+ */
+
+//fixme: Rename this! it shouldn't be called Settings, it should be called Configuration because that is what we call pre-values in v8 (data type config)
+angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.BlockEditor.SettingsController", [
         "$scope",
         "contentTypeResource",
@@ -23,8 +33,9 @@
                 $scope.model.value = $scope.blocks;
             });
 
+            //fixme: This shouldn't be a method, using methods to return values in angular is a performance issue
             $scope.getBlockName = function(udi) {
-                return 'Get block name from somewhere...';
+                return 'TODO: Get block name from somewhere...';
             }
             
             $scope.addBlock = function () {
@@ -62,10 +73,12 @@
                 $scope.model.value.splice(index, 1);
             };
 
+            //fixme: This currently doesn't work or do anything
             $scope.editSettings = function (block) {
 
                 var pickerOptions = {
                     title: "Block settings",
+                    //fixme: This file needs to be renamed since it's inconsistent with other blockeditor file names, probably blockeditor.blocksettings.html
                     view: "views/propertyeditors/blockeditor/block.settings.html",
                     size: "small",                    
                     submit: function (model) {
