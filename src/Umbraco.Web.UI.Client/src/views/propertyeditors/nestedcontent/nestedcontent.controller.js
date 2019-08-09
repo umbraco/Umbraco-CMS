@@ -18,7 +18,7 @@
         $scope.remove = function (index) {
             $scope.model.value.splice(index, 1);
         }
-
+  
         $scope.sortableOptions = {
             axis: "y",
             cursor: "move",
@@ -184,7 +184,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 $scope.overlayMenu.availableItems.push({
                     alias: scaffold.contentTypeAlias,
                     name: scaffold.contentTypeName,
-                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
+                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon),
+                    description: scaffold.documentType.description
                 });
             });
 
@@ -192,7 +193,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return;
             }
             
-            $scope.overlayMenu.size = $scope.overlayMenu.availableItems.length > 6 ? "medium" : "small";
+                $scope.overlayMenu.size = $scope.overlayMenu.availableItems.length > 6 ? "medium" : "small";            
             
             $scope.overlayMenu.pasteItems = [];
             var availableNodesForPaste = clipboardService.retriveDataOfType("elementType", contentTypeAliases);

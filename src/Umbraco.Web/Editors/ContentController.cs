@@ -354,12 +354,34 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            return EmptyContent(parentId, contentType);
+        }
+
+        /// <summary>
+        /// Gets an empty content item for the
+        /// </summary>
+        /// <param name="udi"></param>
+        /// <param name="parentId"></param>
+        [OutgoingEditorModelEvent]
+        public ContentItemDisplay GetEmpty(GuidUdi udi, int parentId)
+        {
+            var contentType = Services.ContentTypeService.Get(udi.Guid);
+            if(contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return EmptyContent(parentId, contentType);
+        }
+
+        private ContentItemDisplay EmptyContent(int parentId, IContentType contentType)
+        {
             var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
             // translate the content type name if applicable
             mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
             // if your user type doesn't have access to the Settings section it would not get this property mapped
-            if (mapped.DocumentType != null)
+            if(mapped.DocumentType != null)
                 mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
 
             //remove the listview app if it exists

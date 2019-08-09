@@ -307,22 +307,22 @@ angular.module("umbraco")
             $scope.openEditorOverlay = function (event, area, index, key) {
                 var title = "";
                 localizationService.localize("grid_insertControl").then(function (value) {
-                    title = value;
-                    $scope.editorOverlay = {
-                        view: "itempicker", 
-                        filter: area.$allowedEditors.length > 15,
-                        title: title,
-                        availableItems: area.$allowedEditors,
-                        event: event,
-                        show: true,
-                        submit: function (model) {
-                            if (model.selectedItem) {
-                                $scope.addControl(model.selectedItem, area, index);
-                                $scope.editorOverlay.show = false;
-                                $scope.editorOverlay = null;
+                        title = value;
+                        $scope.editorOverlay = {
+                            view: "itempicker", 
+                            filter: area.$allowedEditors.length > 15,
+                            title: title,
+                            availableItems: area.$allowedEditors,
+                            event: event,
+                            show: true,
+                            submit: function (model) {
+                                if (model.selectedItem) {
+                                    $scope.addControl(model.selectedItem, area, index);
+                                    $scope.editorOverlay.show = false;
+                                    $scope.editorOverlay = null;
+                                }
                             }
-                        }
-                    };
+                        };
                 });
             };
 

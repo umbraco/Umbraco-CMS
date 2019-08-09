@@ -222,6 +222,8 @@
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
+    <Compile Include="PropertyEditors\BlockEditorConfiguration.cs" />
+    <Compile Include="PropertyEditors\BlockEditorConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockEditorPropertyEditor.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
