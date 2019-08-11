@@ -43,7 +43,7 @@
             </tbody>
         </table>
         <div>
-            <button type="button" class="btn" ng-click="add()">
+            <button type="button" class="btn" ng-click="add()" ng-disabled="!canAdd()">
                 <localize key="general_add">Add</localize>
             </button>
             <i class="icon icon-help-alt medium umb-nested-content__help-icon" ng-click="showHelpText = !showHelpText"></i>

@@ -15,6 +15,10 @@
             });
         }
 
+        $scope.canAdd = function () {
+            return !$scope.model.docTypes || !$scope.model.value || $scope.model.value.length < $scope.model.docTypes.length;
+        }
+
         $scope.remove = function (index) {
             $scope.model.value.splice(index, 1);
         }
@@ -60,7 +64,6 @@
 
             // Count doctype name occurrences
             var docTypeNameOccurrences = _.countBy(docTypes, 'name');
-            console.info(docTypeNameOccurrences);
             
             // Populate document type tab dictionary
             // And append alias to name if multiple doctypes have the same name
