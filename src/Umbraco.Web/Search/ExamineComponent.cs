@@ -101,8 +101,12 @@ namespace Umbraco.Web.Search
             }
 
             //create the indexes and register them with the manager
-            foreach(var index in _indexCreator.Create())
+            foreach (var index in _indexCreator.Create())
+            {
                 _examineManager.AddIndex(index);
+                _examineManager.AddSearcher(index.GetSearcher());
+            }
+
 
             _logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
