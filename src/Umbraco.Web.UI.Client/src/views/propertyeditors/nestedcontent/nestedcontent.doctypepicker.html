@@ -35,17 +35,17 @@
                         <input type="text" ng-model="config.nameTemplate" />
                     </td>
                     <td>
-                        <a class="btn btn-danger" ng-click="remove($index)">
+                        <button type="button" class="btn btn-danger" ng-click="remove($index)">
                             <localize key="general_delete">Delete</localize>
-                        </a>
+                        </button>
                     </td>
                 </tr>
             </tbody>
         </table>
         <div>
-            <a class="btn" ng-click="add()">
+            <button type="button" class="btn" ng-click="add()">
                 <localize key="general_add">Add</localize>
-            </a>
+            </button>
             <i class="icon icon-help-alt medium umb-nested-content__help-icon" ng-click="showHelpText = !showHelpText"></i>
         </div>
     </div>
