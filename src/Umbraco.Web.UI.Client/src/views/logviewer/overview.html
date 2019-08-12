@@ -74,11 +74,11 @@
                     <umb-box>
                         <umb-box-header title="Time Period"></umb-box-header>
 
-                        <umb-flatpickr class="datepicker"
+                        <umb-date-time-picker class="datepicker"
                                        ng-model="vm.period"
                                        options="vm.config"
                                        on-close="vm.dateRangeChange(selectedDates, dateStr, instance)">
-                        </umb-flatpickr>
+                        </umb-date-time-picker>
                     </umb-box>
 
                     <div ng-show=" vm.canLoadLogs">
