@@ -5,23 +5,23 @@
      * A component used to render a list of blocks
      */
     var umbBlockList = {
-        templateUrl: 'views/components/blockeditor/umb-block-list.html',
+        templateUrl: 'views/propertyeditors/blockeditor/umb-block-list.html',
         bindings: {
             blocks: "<",
             config: "<",
             scaffolds: "<",
             onEdit: "&",
-            onRemove: "&",
+            onRemove: "&", 
             onSettings: "&",           
             onSort: "&?"
         },
         controllerAs: 'vm',
-        controller: umbBlockListController
+        controller: umbBlockListController 
     };
 
     function umbBlockListController() { 
         var vm = this;
-
+         
         vm.sortableOptions = {
             axis: "y",
             cursor: "move",
@@ -39,7 +39,7 @@
                 udi: block.udi
             });
             var element = angular.copy(scaffold);
-            _.each(element.variants[0].tabs, function (tab) {
+            _.each(element.variants[0].tabs, function (tab) { 
                 _.each(tab.properties, function (property) {
                     if (block.content[property.alias]) {
                         property.value = block.content[property.alias];

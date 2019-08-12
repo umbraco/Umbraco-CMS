@@ -37,7 +37,7 @@ module.exports = {
                 files: [
                     "./src/common/directives/_module.js",
                     "./src/{common/directives,common/components}/**/*.js",
-                    "./src/{views}/**/*.{directive,component}.js"
+                    "./src/views/**/*.{directive,component}.js"
                 ],
                 out: "umbraco.directives.js"
             },

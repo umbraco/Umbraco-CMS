@@ -14,7 +14,11 @@
         var scaffoldsLoaded = 0;
 
         function init() {
-            
+
+            if (!$scope.model.value) {
+                $scope.model.value = [];
+            }
+
             _.each($scope.model.config.blocks, function (config) {
                 contentResource.getScaffoldByUdi(-20, config.elementType).then(function (scaffold) {
                     if (scaffold.isElement) {
