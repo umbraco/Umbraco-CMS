@@ -311,7 +311,6 @@
 
         //ensure to unregister from all events!
         $scope.$on('$destroy', function () {
-            console.log("I am unregistering", evts.length)
             for (var e in evts) {
                 eventsService.unsubscribe(evts[e]);
             }
