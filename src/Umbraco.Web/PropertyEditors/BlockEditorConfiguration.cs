@@ -6,7 +6,7 @@ namespace Umbraco.Web.PropertyEditors
 {
     public class BlockEditorConfiguration
     {
-        [ConfigurationField("blocks", "Blocks", "views/propertyeditors/blockeditor/blockeditor.settings.html")]
+        [ConfigurationField("blocks", "Blocks", "views/propertyeditors/blockeditor/blockeditor.prevalues.html")]
         public Block[] Blocks { get; set; }
 
         [ConfigurationField("view", "View", "textstring", Description = "The path to a custom view for rendering the editor")]

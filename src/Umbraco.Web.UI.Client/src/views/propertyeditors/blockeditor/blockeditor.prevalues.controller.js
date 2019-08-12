@@ -9,7 +9,7 @@
 
 //fixme: Rename this! it shouldn't be called Settings, it should be called Configuration because that is what we call pre-values in v8 (data type config)
 angular.module("umbraco")
-    .controller("Umbraco.PropertyEditors.BlockEditor.SettingsController", [
+    .controller("Umbraco.PrevalueEditors.BlockEditorController", [
         "$scope",
         "contentTypeResource",
         "editorService",

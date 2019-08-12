@@ -145,7 +145,7 @@
             var options = {
                 settings: block.settings,
                 title: "Edit settings",
-                view: "views/propertyeditors/blockeditor/blockeditor.editsettings.html",
+                view: "views/propertyeditors/blockeditor/blockeditor.editconfig.html",
                 size: "small",
                 submit: function (model) {
                     editorService.close();
