@@ -133,7 +133,7 @@ function entityResource($q, $http, umbRequestHelper) {
          * ##usage
          * <pre>
          * //get media by id
-         * entityResource.getEntityById(0, "Media")
+         * entityResource.getById(0, "Media")
          *    .then(function(ent) {
          *        var myDoc = ent;
          *        alert('its here!');
@@ -204,7 +204,7 @@ function entityResource($q, $http, umbRequestHelper) {
          * ##usage
          * <pre>
          * //Get templates for ids
-         * entityResource.getEntitiesByIds( [1234,2526,28262], "Template")
+         * entityResource.getByIds( [1234,2526,28262], "Template")
          *    .then(function(templateArray) {
          *        var myDoc = contentArray;
          *        alert('they are here!');

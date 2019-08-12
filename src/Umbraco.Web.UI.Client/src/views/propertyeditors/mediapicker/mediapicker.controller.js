@@ -229,7 +229,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
 
         $scope.sortableOptions = {
-            disabled: !$scope.isMultiPicker,
+            disabled: !multiPicker,
             items: "li:not(.add-wrapper)",
             cancel: ".unsortable",
             update: function (e, ui) {
