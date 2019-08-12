@@ -234,7 +234,7 @@ Use this directive to render a date time picker
 		}
     }
 
-    // umb-flatpickr is deprecated, but we keep it for backwards compatibility
+    // umbFlatpickr (umb-flatpickr) is deprecated, but we keep it for backwards compatibility
     angular.module('umbraco.directives').component('umbFlatpickr', umbDateTimePicker);
-    angular.module('umbraco.directives').component('umbDatetimePicker', umbDateTimePicker);
+    angular.module('umbraco.directives').component('umbDateTimePicker', umbDateTimePicker);
 })();
