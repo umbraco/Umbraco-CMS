@@ -93,8 +93,8 @@ Use this directive to render a date time picker
     };
     
     function umbDateTimePickerCtrl($element, $timeout, $scope, assetsService, userService) {
+
         var ctrl = this;
-        var loaded = false;
         var userLocale = null;
 
 		ctrl.$onInit = function() {
@@ -102,12 +102,13 @@ Use this directive to render a date time picker
             // load css file for the date picker
             assetsService.loadCss('lib/flatpickr/flatpickr.css', $scope).then(function () {
                 userService.getCurrentUser().then(function (user) {
+
                     // init date picker
                     userLocale = user.locale;
                     if (userLocale.indexOf('-') > -1) {
                         userLocale = userLocale.split('-')[0];
                     }
-                    loaded = true;
+
                     grabElementAndRunFlatpickr();
                 });
             });
