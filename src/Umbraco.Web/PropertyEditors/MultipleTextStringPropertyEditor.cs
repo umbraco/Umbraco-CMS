@@ -13,7 +13,13 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a multiple text string property editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.MultipleTextstring, "Repeatable textstrings", "multipletextbox", ValueType = ValueTypes.Text, Icon="icon-ordered-list", Group="lists")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.MultipleTextstring,
+        "Repeatable textstrings",
+        "multipletextbox",
+        ValueType = ValueTypes.Text,
+        Group = Constants.PropertyEditors.Groups.Lists,
+        Icon = "icon-ordered-list")]
     public class MultipleTextStringPropertyEditor : DataEditor
     {
         /// <summary>

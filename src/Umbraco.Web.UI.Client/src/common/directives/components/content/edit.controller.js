@@ -21,6 +21,12 @@
         $scope.page.menu.currentSection = appState.getSectionState("currentSection");
         $scope.page.listViewPath = null;
         $scope.page.isNew = $scope.isNew ? true : false;
+
+        if (infiniteMode) {
+            $scope.page.allowInfinitePublishAndClose = $scope.infiniteModel.allowPublishAndClose;
+            $scope.page.allowInfiniteSaveAndClose = $scope.infiniteModel.allowSaveAndClose;
+        }
+
         $scope.page.buttonGroupState = "init";
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
         $scope.page.hideChangeVariant = false;
@@ -369,12 +375,17 @@
                 saveMethod: args.saveMethod,
                 scope: $scope,
                 content: $scope.content,
+                create: $scope.page.isNew,
                 action: args.action,
                 showNotifications: args.showNotifications,
                 softRedirect: true
             }).then(function (data) {
                 //success
                 init();
+
+                //needs to be manually set for infinite editing mode
+                $scope.page.isNew = false;
+
                 syncTreeNode($scope.content, data.path);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
