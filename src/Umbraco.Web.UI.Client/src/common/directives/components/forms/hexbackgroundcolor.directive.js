@@ -38,7 +38,7 @@ function hexBgColor() {
                             return;
                         }
                         // Is it a hexa value - (#)AABBCCDD ?
-                        match = newVal.match(/^#?([0-9a-f]{3}|[0-9a-f]{8})$/i);
+                        match = newVal.match(/^#?([0-9a-f]{4}|[0-9a-f]{8})$/i);
                         if (match && match.length) {
                             setBackgroundColor(match[1]);
                             return;
