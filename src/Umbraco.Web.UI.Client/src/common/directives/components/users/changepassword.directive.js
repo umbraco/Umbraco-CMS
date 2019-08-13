@@ -17,8 +17,6 @@
       }
       */
 
-      $scope.showReset = false;
-
       //set defaults if they are not available
       if ($scope.config.disableToggle === undefined) {
         $scope.config.disableToggle = false;
@@ -132,7 +130,7 @@
     $scope.showOldPass = function () {
       return $scope.config.hasPassword &&
         !$scope.config.allowManuallyChangingPassword &&
-        !$scope.config.enablePasswordRetrieval && !$scope.showReset;
+        !$scope.config.enablePasswordRetrieval && !$scope.passwordValues.reset;
     };
       
     // TODO: I don't think we need this or the cancel button, this can be up to the editor rendering this directive
