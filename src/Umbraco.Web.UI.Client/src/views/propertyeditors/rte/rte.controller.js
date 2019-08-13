@@ -57,7 +57,10 @@ angular.module("umbraco")
                 var baseLineConfigObj = {
                     maxImageSize: editorConfig.maxImageSize,
                     width: width,
-                    height: height
+                    height: height,
+                    init_instance_callback: function(editor){
+                        $scope.isLoading = false;
+                    }
                 };
 
                 angular.extend(baseLineConfigObj, standardConfig);
@@ -84,9 +87,6 @@ angular.module("umbraco")
                     $timeout(function () {
                         tinymce.DOM.events.domLoaded = true;
                         tinymce.init(baseLineConfigObj);
-
-                        $scope.isLoading = false;
-
                     }, 200);
                 }
 
