@@ -532,6 +532,7 @@
               // push new init tab to the scope
               addInitGroup(scope.model.groups);
 
+              notifyChanged();
             },
             close: function() {
               if(_.isEqual(oldPropertyModel, propertyModel) === false) {
@@ -588,7 +589,12 @@
 
         }
 
+        notifyChanged();
       };
+
+      function notifyChanged() {
+        eventsService.emit("editors.groupsBuilder.changed");
+      }
 
       function addInitProperty(group) {
 
