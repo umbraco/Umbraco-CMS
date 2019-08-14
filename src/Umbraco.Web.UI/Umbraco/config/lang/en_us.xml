@@ -2142,4 +2142,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
   </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Go back</key>
+  </area>
 </language>
