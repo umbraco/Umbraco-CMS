@@ -19,6 +19,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
+using IMediaType = Umbraco.Core.Models.IMediaType;
 
 namespace Umbraco.Web.Editors
 {
@@ -135,12 +136,18 @@ namespace Umbraco.Web.Editors
         }
         public MediaTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new MediaType(parentId)
+            IMediaType mt;
+            if (parentId != Constants.System.Root)
             {
-                Icon = Constants.Icons.MediaImage
-            };
+                var parent = Services.MediaTypeService.Get(parentId);
+                mt = parent != null ? new MediaType(parent, string.Empty) : new MediaType(parentId);
+            }
+            else
+                mt = new MediaType(parentId);
 
-            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
+            mt.Icon = Constants.Icons.MediaImage;
+
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mt);
             return dto;
         }
 

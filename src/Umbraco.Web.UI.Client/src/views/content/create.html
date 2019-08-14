@@ -10,7 +10,7 @@
                 <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noDocumentTypesWithNoSettingsAccess"/></p>
                 <div ng-if="hasSettingsAccess">
                     <p class="abstract"><localize key="create_noDocumentTypes" /></p>
-                    <button class="btn umb-outline" href="#settings/documentTypes/edit/{{contentTypeId}}?view=permissions" ng-click="close()">
+                    <button class="btn umb-outline" ng-click="editContentType()">
                         <localize key="create_noDocumentTypesEditPermissions"/>
                     </button>
                 </div>
