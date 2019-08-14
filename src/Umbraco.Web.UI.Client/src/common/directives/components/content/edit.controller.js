@@ -36,14 +36,12 @@
         //initializes any watches
         function startWatches(content) {
 
-            //watch for changes to isNew & the content.id, set the page.isNew accordingly and load the breadcrumb if we can
-            $scope.$watchGroup(['isNew', 'content.id'], function (newVal, oldVal) {
-                
-                var contentId = newVal[1];
-                $scope.page.isNew = Object.toBoolean(newVal[0]);
+            //watch for changes to isNew, set the page.isNew accordingly and load the breadcrumb if we can
+            $scope.$watch('isNew', function (newVal, oldVal) {
+                $scope.page.isNew = Object.toBoolean(newVal);
 
                 //We fetch all ancestors of the node to generate the footer breadcrumb navigation
-                if (!$scope.page.isNew && contentId && content.parentId && content.parentId !== -1) {
+                if (content.parentId && content.parentId !== -1) {
                     loadBreadcrumb();
                     if (!watchingCulture) {
                         $scope.$watch('culture',
@@ -113,7 +111,12 @@
         }
 
         function loadBreadcrumb() {
-            entityResource.getAncestors($scope.content.id, "document", $scope.culture)
+            // load the parent breadcrumb when creating new content
+            var id = $scope.page.isNew ? $scope.content.parentId : $scope.content.id;
+            if (!id) {
+                return;
+            }
+            entityResource.getAncestors(id, "document", $scope.culture)
                 .then(function (anc) {
                     $scope.ancestors = anc;
                 });
