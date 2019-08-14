@@ -322,6 +322,7 @@
     <key alias="copyFailed">Failed to copy media</key>
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
