@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
@@ -65,7 +66,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenEightZe
                     string mediaPath = null;
 
                     //if there's values in dataNvarchar then ensure there's a media path match and extract it
-                    if (row.dataNvarchar != null && MediaFactory.TryMatch((string) row.dataNvarchar, out mediaPath))
+                    if (row.dataNvarchar != null && TryMatch((string) row.dataNvarchar, out mediaPath))
                     {
                         paths.Add(new MediaDto
                         {
@@ -75,7 +76,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenEightZe
                         });
                     }
                     //if there's values in dataNtext then ensure there's a media path match and extract it
-                    else if (row.dataNtext != null && MediaFactory.TryMatch((string) row.dataNtext, out mediaPath))
+                    else if (row.dataNtext != null && TryMatch((string) row.dataNtext, out mediaPath))
                     {
                         paths.Add(new MediaDto
                         {
@@ -96,6 +97,34 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenEightZe
 
         public override void Down()
         {
+        }
+
+        private static readonly Regex MediaPathPattern = new Regex(@"(/media/.+?)(?:['""]|$)", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Try getting a media path out of the string being stored for media
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="mediaPath"></param>
+        /// <returns></returns>
+        private static bool TryMatch(string text, out string mediaPath)
+        {
+            //TODO: In v8 we should allow exposing this via the property editor in a much nicer way so that the property editor
+            // can tell us directly what any URL is for a given property if it contains an asset
+
+            mediaPath = null;
+
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            var match = MediaPathPattern.Match(text);
+            if (match.Success == false || match.Groups.Count != 2)
+                return false;
+
+
+            var url = match.Groups[1].Value;
+            mediaPath = url;
+            return true;
         }
     }
 }
