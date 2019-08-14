@@ -115,7 +115,7 @@ namespace Umbraco.Web.Search
                 if (_waitMilliseconds > 0)
                     Thread.Sleep(_waitMilliseconds);
 
-                _indexRebuilder.ExamineManager.EnsureUnlocked(_mainDom, _logger);
+                _indexRebuilder.ExamineManager.ConfigureIndexes(_mainDom, _logger);
                 _indexRebuilder.RebuildIndexes(_onlyEmptyIndexes);
             }
         }

@@ -12,6 +12,7 @@ using Lucene.Net.Store;
 using Umbraco.Core;
 using Version = Lucene.Net.Util.Version;
 using Umbraco.Core.Logging;
+using System.Threading;
 
 namespace Umbraco.Examine
 {
@@ -28,29 +29,27 @@ namespace Umbraco.Examine
         /// </remarks>
         internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new Regex("^([_\\w]+)_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
 
-        private static volatile bool _isUnlocked = false;
-        private static readonly object IsUnlockedLocker = new object();
+        private static bool _isConfigured = false;
+        private static object _configuredInit = null;
+        private static object _isConfiguredLocker = new object();
 
         /// <summary>
-        /// Unlocks all Lucene based indexes registered with the <see cref="IExamineManager"/>
+        /// Called on startup to configure each index.
         /// </summary>
         /// <remarks>
-        /// Indexing rebuilding can occur on a normal boot if the indexes are empty or on a cold boot by the database server messenger. Before
-        /// either of these happens, we need to configure the indexes.
+        /// Configures and unlocks all Lucene based indexes registered with the <see cref="IExamineManager"/>.
         /// </remarks>
-        internal static void EnsureUnlocked(this IExamineManager examineManager, IMainDom mainDom, ILogger logger)
+        internal static void ConfigureIndexes(this IExamineManager examineManager, IMainDom mainDom, ILogger logger)
         {
-            if (!mainDom.IsMainDom) return;
-            if (_isUnlocked) return;
-
-            lock (IsUnlockedLocker)
-            {
-                //double check
-                if (_isUnlocked) return;
-
-                _isUnlocked = true;
-                examineManager.UnlockLuceneIndexes(logger);
-            }
+            LazyInitializer.EnsureInitialized(
+                ref _configuredInit,
+                ref _isConfigured,
+                ref _isConfiguredLocker,
+                () =>
+                {
+                    examineManager.ConfigureLuceneIndexes(logger, !mainDom.IsMainDom);
+                    return null;
+                });
         }
 
         //TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
