@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.PublishedCache.NuCache.Snap;
 
@@ -371,7 +372,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                     // if we have one already, ensure it's consistent
                     else if (_genObj.Gen != snapGen)
-                        throw new Exception("panic");
+                        throw new PanicException($"The generation {_genObj.Gen} does not equal the snapshot generation {snapGen}");
                 }
                 else
                 {

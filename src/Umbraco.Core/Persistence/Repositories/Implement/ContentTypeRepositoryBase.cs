@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -26,14 +27,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal abstract class ContentTypeRepositoryBase<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository)
+        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository)
             : base(scopeAccessor, cache, logger)
         {
             CommonRepository = commonRepository;
+            LanguageRepository = languageRepository;
         }
 
         protected IContentTypeCommonRepository CommonRepository { get; }
-
+        protected ILanguageRepository LanguageRepository { get; }
         protected abstract bool SupportsPublishing { get; }
 
         public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
@@ -98,6 +100,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected void PersistNewBaseContentType(IContentTypeComposition entity)
         {
+            ValidateVariations(entity);
+
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             //Cannot add a duplicate content type
@@ -163,11 +167,11 @@ AND umbracoNode.nodeObjectType = @objectType",
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
-                                    {
-                                        Id = entity.Id,
-                                        AllowedId = allowedContentType.Id.Value,
-                                        SortOrder = allowedContentType.SortOrder
-                                    });
+                {
+                    Id = entity.Id,
+                    AllowedId = allowedContentType.Id.Value,
+                    SortOrder = allowedContentType.SortOrder
+                });
             }
 
 
@@ -214,6 +218,8 @@ AND umbracoNode.nodeObjectType = @objectType",
 
         protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
         {
+            ValidateVariations(entity);
+
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             // ensure the alias is not used already
@@ -370,7 +376,7 @@ AND umbracoNode.id <> @id",
             foreach (var propertyGroup in entity.PropertyGroups)
             {
                 // insert or update group
-                var groupDto = PropertyGroupFactory.BuildGroupDto(propertyGroup,entity.Id);
+                var groupDto = PropertyGroupFactory.BuildGroupDto(propertyGroup, entity.Id);
                 var groupId = propertyGroup.HasIdentity
                     ? Database.Update(groupDto)
                     : Convert.ToInt32(Database.Insert(groupDto));
@@ -388,7 +394,7 @@ AND umbracoNode.id <> @id",
 
             //check if the content type variation has been changed
             var contentTypeVariationDirty = entity.IsPropertyDirty("Variations");
-            var oldContentTypeVariation = (ContentVariation) dtoPk.Variations;
+            var oldContentTypeVariation = (ContentVariation)dtoPk.Variations;
             var newContentTypeVariation = entity.Variations;
             var contentTypeVariationChanging = contentTypeVariationDirty && oldContentTypeVariation != newContentTypeVariation;
             if (contentTypeVariationChanging)
@@ -449,7 +455,7 @@ AND umbracoNode.id <> @id",
                 // via composition, with their original variations (ie not filtered by this
                 // content type variations - we need this true value to make decisions.
 
-                foreach (var propertyType in ((ContentTypeCompositionBase) entity).RawComposedPropertyTypes)
+                foreach (var propertyType in ((ContentTypeCompositionBase)entity).RawComposedPropertyTypes)
                 {
                     if (propertyType.VariesBySegment() || newContentTypeVariation.VariesBySegment())
                         throw new NotSupportedException(); // TODO: support this
@@ -518,6 +524,25 @@ AND umbracoNode.id <> @id",
             CommonRepository.ClearCache(); // always
         }
 
+        /// <summary>
+        /// Ensures that no property types are flagged for a variance that is not supported by the content type itself
+        /// </summary>
+        /// <param name="entity"></param>
+        private void ValidateVariations(IContentTypeComposition entity)
+        {
+            //if the entity does not vary at all, then the property cannot have a variance value greater than it
+            if (entity.Variations == ContentVariation.Nothing)
+            {
+                foreach (var prop in entity.PropertyTypes)
+                {
+                    if (prop.IsPropertyDirty(nameof(prop.Variations)) && prop.Variations > entity.Variations)
+                        throw new InvalidOperationException($"The property {prop.Alias} cannot have variations of {prop.Variations} with the content type variations of {entity.Variations}");
+                }
+                    
+            }
+                
+        }
+
         private IEnumerable<IContentTypeComposition> GetImpactedContentTypes(IContentTypeComposition contentType, IEnumerable<IContentTypeComposition> all)
         {
             var impact = new List<IContentTypeComposition>();
@@ -525,12 +550,12 @@ AND umbracoNode.id <> @id",
 
             var tree = new Dictionary<int, List<IContentTypeComposition>>();
             foreach (var x in all)
-            foreach (var y in x.ContentTypeComposition)
-            {
-                if (!tree.TryGetValue(y.Id, out var list))
-                    list = tree[y.Id] = new List<IContentTypeComposition>();
-                list.Add(x);
-            }
+                foreach (var y in x.ContentTypeComposition)
+                {
+                    if (!tree.TryGetValue(y.Id, out var list))
+                        list = tree[y.Id] = new List<IContentTypeComposition>();
+                    list.Add(x);
+                }
 
             var nset = new List<IContentTypeComposition>();
             do
@@ -572,7 +597,7 @@ AND umbracoNode.id <> @id",
                 // new property type, ignore
                 if (!oldVariations.TryGetValue(propertyType.Id, out var oldVariationB))
                     continue;
-                var oldVariation = (ContentVariation) oldVariationB; // NPoco cannot fetch directly
+                var oldVariation = (ContentVariation)oldVariationB; // NPoco cannot fetch directly
 
                 // only those property types that *actually* changed
                 var newVariation = propertyType.Variations;
@@ -636,7 +661,7 @@ AND umbracoNode.id <> @id",
             var impactedL = impacted.Select(x => x.Id).ToList();
 
             //Group by the "To" variation so we can bulk update in the correct batches
-            foreach(var grouping in propertyTypeChanges.GroupBy(x => x.Value.ToVariation))
+            foreach (var grouping in propertyTypeChanges.GroupBy(x => x.Value.ToVariation))
             {
                 var propertyTypeIds = grouping.Select(x => x.Key).ToList();
                 var toVariation = grouping.Key;
@@ -646,10 +671,12 @@ AND umbracoNode.id <> @id",
                     case ContentVariation.Culture:
                         CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
                         CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedL);
+                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);                        
                         break;
                     case ContentVariation.Nothing:
                         CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
                         CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedL);
+                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);                        
                         break;
                     case ContentVariation.CultureAndSegment:
                     case ContentVariation.Segment:
@@ -963,6 +990,205 @@ AND umbracoNode.id <> @id",
 
                 Database.Execute(sqlDelete);
             }
+
+        }
+
+        /// <summary>
+        /// Re-normalizes the edited value in the umbracoDocumentCultureVariation and umbracoDocument table when variations are changed
+        /// </summary>
+        /// <param name="propertyTypeIds"></param>
+        /// <param name="contentTypeIds"></param>
+        /// <remarks>
+        /// If this is not done, then in some cases the "edited" value for a particular culture for a document will remain true when it should be false
+        /// if the property was changed to invariant. In order to do this we need to recalculate this value based on the values stored for each
+        /// property, culture and current/published version.
+        /// </remarks>
+        private void RenormalizeDocumentEditedFlags(IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int> contentTypeIds = null)
+        {
+            var defaultLang = LanguageRepository.GetDefaultId();
+
+            //This will build up a query to get the property values of both the current and the published version so that we can check
+            //based on the current variance of each item to see if it's 'edited' value should be true/false.
+
+            var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
+            if (whereInArgsCount > 2000)
+                throw new NotSupportedException("Too many property/content types.");
+
+            var propertySql = Sql()
+                .Select<PropertyDataDto>()
+                .AndSelect<ContentVersionDto>(x => x.NodeId, x => x.Current)
+                .AndSelect<DocumentVersionDto>(x => x.Published)
+                .AndSelect<PropertyTypeDto>(x => x.Variations)
+                .From<PropertyDataDto>()
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, PropertyDataDto>((left, right) => left.Id == right.VersionId)
+                .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>((left, right) => left.Id == right.PropertyTypeId);
+
+            if (contentTypeIds != null)
+            {
+                propertySql.InnerJoin<ContentDto>().On<ContentDto, ContentVersionDto>((c, cversion) => c.NodeId == cversion.NodeId);
+            }
+
+            propertySql.LeftJoin<DocumentVersionDto>().On<DocumentVersionDto, ContentVersionDto>((docversion, cversion) => cversion.Id == docversion.Id)
+                .Where<DocumentVersionDto, ContentVersionDto>((docversion, cversion) => cversion.Current || docversion.Published)
+                .WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
+
+            if (contentTypeIds != null)
+            {
+                propertySql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+            }
+
+            propertySql
+                .OrderBy<ContentVersionDto>(x => x.NodeId)
+                .OrderBy<PropertyDataDto>(x => x.PropertyTypeId, x => x.LanguageId, x => x.VersionId);
+
+            //keep track of this node/lang to mark or unmark a culture as edited
+            var editedLanguageVersions = new Dictionary<(int nodeId, int? langId), bool>();
+            //keep track of which node to mark or unmark as edited 
+            var editedDocument = new Dictionary<int, bool>();
+            var nodeId = -1;
+            var propertyTypeId = -1;
+
+            PropertyValueVersionDto pubRow = null;
+
+            //This is a reader (Query), we are not fetching this all into memory so we cannot make any changes during this iteration, we are just collecting data.
+            //Published data will always come before Current data based on the version id sort.
+            //There will only be one published row (max) and one current row per property.
+            foreach (var row in Database.Query<PropertyValueVersionDto>(propertySql))
+            {
+                //make sure to reset on each node/property change
+                if (nodeId != row.NodeId || propertyTypeId != row.PropertyTypeId)
+                {
+                    nodeId = row.NodeId;
+                    propertyTypeId = row.PropertyTypeId;
+                    pubRow = null;
+                }
+
+                if (row.Published)
+                    pubRow = row;
+
+                if (row.Current)
+                {
+                    var propVariations = (ContentVariation)row.Variations;
+
+                    //if this prop doesn't vary but the row has a lang assigned or vice versa, flag this as not edited
+                    if (!propVariations.VariesByCulture() && row.LanguageId.HasValue
+                        || propVariations.VariesByCulture() && !row.LanguageId.HasValue)
+                    {
+                        //Flag this as not edited for this node/lang if the key doesn't exist
+                        if (!editedLanguageVersions.TryGetValue((row.NodeId, row.LanguageId), out _))
+                            editedLanguageVersions.Add((row.NodeId, row.LanguageId), false);
+
+                        //mark as false if the item doesn't exist, else coerce to true
+                        editedDocument[row.NodeId] = editedDocument.TryGetValue(row.NodeId, out var edited) ? (edited |= false) : false;
+                    }
+                    else if (pubRow == null)
+                    {
+                        //this would mean that that this property is 'edited' since there is no published version
+                        editedLanguageVersions[(row.NodeId, row.LanguageId)] = true;
+                        editedDocument[row.NodeId] = true;
+                    }
+                    //compare the property values, if they differ from versions then flag the current version as edited
+                    else if (IsPropertyValueChanged(pubRow, row))
+                    {
+                        //Here we would check if the property is invariant, in which case the edited language should be indicated by the default lang
+                        editedLanguageVersions[(row.NodeId, !propVariations.VariesByCulture() ? defaultLang : row.LanguageId)] = true;
+                        editedDocument[row.NodeId] = true;
+                    }
+
+                    //reset
+                    pubRow = null;
+                }
+            }
+
+            //lookup all matching rows in umbracoDocumentCultureVariation
+            var docCultureVariationsToUpdate = editedLanguageVersions.InGroupsOf(2000)
+                .SelectMany(_ => Database.Fetch<DocumentCultureVariationDto>(
+                    Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
+                            .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedLanguageVersions.Keys.Select(x => x.langId).ToList())
+                            .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, editedLanguageVersions.Keys.Select(x => x.nodeId))))
+                //convert to dictionary with the same key type
+                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
+
+            var toUpdate = new List<DocumentCultureVariationDto>();
+            foreach (var ev in editedLanguageVersions)
+            {
+                if (docCultureVariationsToUpdate.TryGetValue(ev.Key, out var docVariations))
+                {
+                    //check if it needs updating
+                    if (docVariations.Edited != ev.Value)
+                    {
+                        docVariations.Edited = ev.Value;
+                        toUpdate.Add(docVariations);
+                    }
+                }
+                else if (ev.Key.langId.HasValue)
+                {
+                    //This should never happen! If a property culture is flagged as edited then the culture must exist at the document level
+                    throw new PanicException($"The existing DocumentCultureVariationDto was not found for node {ev.Key.nodeId} and language {ev.Key.langId}");
+                }
+            }
+
+            //Now bulk update the table DocumentCultureVariationDto, once for edited = true, another for edited = false
+            foreach (var editValue in toUpdate.GroupBy(x => x.Edited))
+            {
+                Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
+                    .WhereIn<DocumentCultureVariationDto>(x => x.Id, editValue.Select(x => x.Id)));
+            }
+
+            //Now bulk update the umbracoDocument table
+            foreach (var editValue in editedDocument.GroupBy(x => x.Value))
+            {
+                Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, editValue.Key))
+                    .WhereIn<DocumentDto>(x => x.NodeId, editValue.Select(x => x.Key)));
+            }
+        }
+
+        private static bool IsPropertyValueChanged(PropertyValueVersionDto pubRow, PropertyValueVersionDto row)
+        {
+            return !pubRow.TextValue.IsNullOrWhiteSpace() && pubRow.TextValue != row.TextValue
+                                    || !pubRow.VarcharValue.IsNullOrWhiteSpace() && pubRow.VarcharValue != row.VarcharValue
+                                    || pubRow.DateValue.HasValue && pubRow.DateValue != row.DateValue
+                                    || pubRow.DecimalValue.HasValue && pubRow.DecimalValue != row.DecimalValue
+                                    || pubRow.IntValue.HasValue && pubRow.IntValue != row.IntValue;
+        }
+
+        private class NameCompareDto
+        {
+            public int NodeId { get; set; }
+            public int CurrentVersion { get; set; }
+            public int LanguageId { get; set; }
+            public string CurrentName { get; set; }
+            public string PublishedName { get; set; }
+            public int? PublishedVersion { get; set; }
+            public int Id { get; set; } // the Id of the DocumentCultureVariationDto
+            public bool Edited { get; set; }
+        }
+
+        private class PropertyValueVersionDto
+        {
+            public int VersionId { get; set; }
+            public int PropertyTypeId { get; set; }
+            public int? LanguageId { get; set; }
+            public string Segment { get; set; }
+            public int? IntValue { get; set; }
+
+            private decimal? _decimalValue;
+            [Column("decimalValue")]
+            public decimal? DecimalValue
+            {
+                get => _decimalValue;
+                set => _decimalValue = value?.Normalize();
+            }
+
+            public DateTime? DateValue { get; set; }
+            public string VarcharValue { get; set; }
+            public string TextValue { get; set; }
+
+            public int NodeId { get; set; }
+            public bool Current { get; set; }
+            public bool Published { get; set; }
+
+            public byte Variations { get; set; }
         }
 
         private void DeletePropertyType(int contentTypeId, int propertyTypeId)

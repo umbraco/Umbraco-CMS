@@ -14,6 +14,23 @@ namespace Umbraco.Core
             /// </summary>
             public const string InternalGenericPropertiesPrefix = "_umb_";
 
+            public static class Legacy
+            {
+                public static class Aliases
+                {
+                    public const string Textbox = "Umbraco.Textbox";
+                    public const string Date = "Umbraco.Date";
+                    public const string ContentPicker2 = "Umbraco.ContentPicker2";
+                    public const string MediaPicker2 = "Umbraco.MediaPicker2";
+                    public const string MemberPicker2 = "Umbraco.MemberPicker2";
+                    public const string MultiNodeTreePicker2 = "Umbraco.MultiNodeTreePicker2";
+                    public const string TextboxMultiple = "Umbraco.TextboxMultiple";
+                    public const string RelatedLinks2 = "Umbraco.RelatedLinks2";
+                    public const string RelatedLinks = "Umbraco.RelatedLinks";
+
+                }
+            }
+
             /// <summary>
             /// Defines Umbraco built-in property editor aliases.
             /// </summary>
@@ -185,6 +202,24 @@ namespace Umbraco.Core
                 /// </summary>
                 /// <remarks>Must be a valid <see cref="ValueTypes"/> value.</remarks>
                 public const string DataValueType = "umbracoDataValueType";
+            }
+
+            /// <summary>
+            /// Defines Umbraco's built-in property editor groups.
+            /// </summary>
+            public static class Groups
+            {
+                public const string Common = "Common";
+
+                public const string Lists = "Lists";
+
+                public const string Media = "Media";
+
+                public const string People = "People";
+
+                public const string Pickers = "Pickers";
+
+                public const string RichContent = "Rich Content";
             }
         }
     }
