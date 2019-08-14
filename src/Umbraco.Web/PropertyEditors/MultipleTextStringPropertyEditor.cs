@@ -2,6 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -62,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 if (!(editorValue.DataTypeConfiguration is MultipleTextStringConfiguration config))
-                    throw new Exception("panic");
+                    throw new PanicException($"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
                 var max = config.Maximum;
 
                 //The legacy property editor saved this data as new line delimited! strange but we have to maintain that.

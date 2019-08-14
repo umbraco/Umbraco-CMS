@@ -28,6 +28,31 @@ namespace Umbraco.Examine
         /// </remarks>
         internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new Regex("^([_\\w]+)_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
 
+        private static volatile bool _isUnlocked = false;
+        private static readonly object IsUnlockedLocker = new object();
+
+        /// <summary>
+        /// Unlocks all Lucene based indexes registered with the <see cref="IExamineManager"/>
+        /// </summary>
+        /// <remarks>
+        /// Indexing rebuilding can occur on a normal boot if the indexes are empty or on a cold boot by the database server messenger. Before
+        /// either of these happens, we need to configure the indexes.
+        /// </remarks>
+        internal static void EnsureUnlocked(this IExamineManager examineManager, IMainDom mainDom, ILogger logger)
+        {
+            if (!mainDom.IsMainDom) return;
+            if (_isUnlocked) return;
+
+            lock (IsUnlockedLocker)
+            {
+                //double check
+                if (_isUnlocked) return;
+
+                _isUnlocked = true;
+                examineManager.UnlockLuceneIndexes(logger);
+            }
+        }
+
         //TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
 
         /// <summary>
