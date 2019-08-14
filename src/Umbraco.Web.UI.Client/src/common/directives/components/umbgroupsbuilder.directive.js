@@ -47,6 +47,7 @@
       function setSortingOptions() {
 
         scope.sortableOptionsGroup = {
+          axis: 'y',
           distance: 10,
           tolerance: "pointer",
           opacity: 0.7,
@@ -65,6 +66,7 @@
         };
 
         scope.sortableOptionsProperty = {
+          axis: 'y',
           distance: 10,
           tolerance: "pointer",
           connectWith: ".umb-group-builder__properties",
@@ -530,6 +532,7 @@
               // push new init tab to the scope
               addInitGroup(scope.model.groups);
 
+              notifyChanged();
             },
             close: function() {
               if(_.isEqual(oldPropertyModel, propertyModel) === false) {
@@ -586,7 +589,12 @@
 
         }
 
+        notifyChanged();
       };
+
+      function notifyChanged() {
+        eventsService.emit("editors.groupsBuilder.changed");
+      }
 
       function addInitProperty(group) {
 

@@ -1,4 +1,4 @@
-﻿
+
 /**
 * @ngdoc service
 * @name umbraco.services.contentEditingHelper
@@ -54,12 +54,19 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             if (args.showNotifications === undefined) {
                 args.showNotifications = true;
             }
+			// needed for infinite editing to create new items
+			if (args.create === undefined) {
+                if ($routeParams.create) {
+                    args.create = true;
+                }
+            }
             if (args.softRedirect === undefined) {
                 //when true, the url will change but it won't actually re-route
                 //this is merely here for compatibility, if only the content/media/members used this service we'd prob be ok but tons of editors
                 //use this service unfortunately and probably packages too.
                 args.softRedirect = false; 
             }
+
 
             var self = this;
 
@@ -68,7 +75,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
             if (formHelper.submitForm({ scope: args.scope, action: args.action })) {
 
-                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles(), args.showNotifications)
+                return args.saveMethod(args.content, args.create, fileManager.getFiles(), args.showNotifications)
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: args.scope });

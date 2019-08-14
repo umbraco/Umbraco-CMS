@@ -53,7 +53,15 @@ namespace Umbraco.Web
         {
             // make sure we have a variation context
             if (_variationContextAccessor.VariationContext == null)
+            {
+                // TODO: By using _defaultCultureAccessor.DefaultCulture this means that the VariationContext will always return a variant culture, it will never
+                // return an empty string signifying that the culture is invariant. But does this matter? Are we actually expecting this to return an empty string
+                // for invariant routes? From what i can tell throughout the codebase is that whenever we are checking against the VariationContext.Culture we are
+                // also checking if the content type varies by culture or not. This is fine, however the code in the ctor of VariationContext is then misleading
+                // since it's assuming that the Culture can be empty (invariant) when in reality of a website this will never be empty since a real culture is always set here.
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
+            }
+                
 
             var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings);
 
