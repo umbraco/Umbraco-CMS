@@ -133,7 +133,7 @@ namespace Umbraco.Tests.PublishedContent
                 null,
                 _snapshotAccessor,
                 _variationAccesor,
-                Mock.Of<ILogger>(),
+                Mock.Of<IProfilingLogger>(),
                 scopeProvider,
                 Mock.Of<IDocumentRepository>(),
                 Mock.Of<IMediaRepository>(),

@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Services
                 null,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
-                Logger,
+                ProfilingLogger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,

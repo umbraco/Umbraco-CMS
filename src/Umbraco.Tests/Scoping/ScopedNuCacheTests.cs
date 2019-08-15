@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Scoping
                 null,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
-                Logger,
+                ProfilingLogger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,

@@ -37,7 +37,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly IScopeProvider _scopeProvider;
         private readonly IDataSource _dataSource;
-        private readonly ILogger _logger;
+        private readonly IProfilingLogger _logger;
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
         private readonly IMemberRepository _memberRepository;
@@ -71,7 +71,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, ILogger logger, IScopeProvider scopeProvider,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IProfilingLogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             IDataSource dataSource, IGlobalSettings globalSettings,
@@ -314,22 +314,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // before I read it? NO! because the WHOLE content tree is read-locked using WithReadLocked.
         // don't panic.
 
-        private void LockAndLoadContent(Action<IScope> action)
-        {
-            // first get a writer, then a scope
-            // if there already is a scope, the writer will attach to it
-            // otherwise, it will only exist here - cheap
-            using (_contentStore.GetScopedWriteLock(_scopeProvider))
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                action(scope);
-                scope.Complete();
-            }
-        }
-
         private bool LockAndLoadContent(Func<IScope, bool> action)
         {
+            
+
             // first get a writer, then a scope
             // if there already is a scope, the writer will attach to it
             // otherwise, it will only exist here - cheap
@@ -343,7 +331,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private void LoadContentFromDatabaseLocked(IScope scope)
+        private bool LoadContentFromDatabaseLocked(IScope scope)
         {
             // locks:
             // contentStore is wlocked (1 thread)
@@ -351,39 +339,38 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
+
             _contentStore.SetAllContentTypes(contentTypes);
 
-            // beware! at that point the cache is inconsistent,
-            // assuming we are going to SetAll content items!
+            using (_logger.TraceDuration<PublishedSnapshotService>("Loading content from database"))
+            {   
+                // beware! at that point the cache is inconsistent,
+                // assuming we are going to SetAll content items!
 
-            _localContentDb?.Clear();
+                _localContentDb?.Clear();
 
-            _logger.Debug<PublishedSnapshotService>("Loading content from database...");
-            var sw = Stopwatch.StartNew();
-            // IMPORTANT GetAllContentSources sorts kits by level
-            var kits = _dataSource.GetAllContentSources(scope);
-            _contentStore.SetAll(kits);
-            sw.Stop();
-            _logger.Debug<PublishedSnapshotService>("Loaded content from database ({Duration}ms)", sw.ElapsedMilliseconds);
+                // IMPORTANT GetAllContentSources sorts kits by level
+                var kits = _dataSource.GetAllContentSources(scope);
+                return _contentStore.SetAll(kits, false);
+            }
         }
 
         private bool LoadContentFromLocalDbLocked(IScope scope)
         {
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
-                .Select(x => _publishedContentTypeFactory.CreateContentType(x));
+                    .Select(x => _publishedContentTypeFactory.CreateContentType(x));
             _contentStore.SetAllContentTypes(contentTypes);
 
-            // beware! at that point the cache is inconsistent,
-            // assuming we are going to SetAll content items!
+            using (_logger.TraceDuration<PublishedSnapshotService>("Loading content from local cache file"))
+            {
+                // beware! at that point the cache is inconsistent,
+                // assuming we are going to SetAll content items!
 
-            _logger.Debug<PublishedSnapshotService>("Loading content from local db...");
-            var sw = Stopwatch.StartNew();
-            var kits = _localContentDb.Select(x => x.Value)
-                .OrderBy(x => x.Node.Level); // IMPORTANT sort by level
-            var ok = _contentStore.SetAll(kits, true);
-            sw.Stop();
-            _logger.Debug<PublishedSnapshotService>("Loaded content from local db ({Duration}ms)", sw.ElapsedMilliseconds);
-            return ok;
+                var kits = _localContentDb.Select(x => x.Value)
+                    .OrderBy(x => x.Node.Level)
+                    .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + order
+                return _contentStore.SetAllFastSorted(kits);
+            }
         }
 
         // keep these around - might be useful
@@ -408,18 +395,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //    _contentStore.Set(contentNode);
         //}
 
-        private void LockAndLoadMedia(Action<IScope> action)
-        {
-            // see note in LockAndLoadContent
-            using (_mediaStore.GetScopedWriteLock(_scopeProvider))
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                action(scope);
-                scope.Complete();
-            }
-        }
-
         private bool LockAndLoadMedia(Func<IScope, bool> action)
         {
             // see note in LockAndLoadContent
@@ -433,7 +408,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private void LoadMediaFromDatabaseLocked(IScope scope)
+        private bool LoadMediaFromDatabaseLocked(IScope scope)
         {
             // locks & notes: see content
 
@@ -441,37 +416,37 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
             _mediaStore.SetAllContentTypes(mediaTypes);
 
-            // beware! at that point the cache is inconsistent,
-            // assuming we are going to SetAll content items!
+            using (_logger.TraceDuration<PublishedSnapshotService>("Loading media from database"))
+            {
+                // beware! at that point the cache is inconsistent,
+                // assuming we are going to SetAll content items!
 
-            _localMediaDb?.Clear();
+                _localMediaDb?.Clear();
 
-            _logger.Debug<PublishedSnapshotService>("Loading media from database...");
-            var sw = Stopwatch.StartNew();
-            // IMPORTANT GetAllMediaSources sorts kits by level
-            var kits = _dataSource.GetAllMediaSources(scope);
-            _mediaStore.SetAll(kits);
-            sw.Stop();
-            _logger.Debug<PublishedSnapshotService>("Loaded media from database ({Duration}ms)", sw.ElapsedMilliseconds);
+                _logger.Debug<PublishedSnapshotService>("Loading media from database...");
+                // IMPORTANT GetAllMediaSources sorts kits by level
+                var kits = _dataSource.GetAllMediaSources(scope);
+                return _mediaStore.SetAll(kits);
+            }
         }
 
         private bool LoadMediaFromLocalDbLocked(IScope scope)
         {
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
-                .Select(x => _publishedContentTypeFactory.CreateContentType(x));
+                    .Select(x => _publishedContentTypeFactory.CreateContentType(x));
             _mediaStore.SetAllContentTypes(mediaTypes);
 
-            // beware! at that point the cache is inconsistent,
-            // assuming we are going to SetAll content items!
+            using (_logger.TraceDuration<PublishedSnapshotService>("Loading media from local cache file"))
+            {
+                // beware! at that point the cache is inconsistent,
+                // assuming we are going to SetAll content items!
 
-            _logger.Debug<PublishedSnapshotService>("Loading media from local db...");
-            var sw = Stopwatch.StartNew();
-            var kits = _localMediaDb.Select(x => x.Value)
-                .OrderBy(x => x.Node.Level); // IMPORTANT sort by level
-            var ok = _mediaStore.SetAll(kits, true);
-            sw.Stop();
-            _logger.Debug<PublishedSnapshotService>("Loaded media from local db ({Duration}ms)", sw.ElapsedMilliseconds);
-            return ok;
+                var kits = _localMediaDb.Select(x => x.Value)
+                    .OrderBy(x => x.Node.Level)
+                    .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + order; 
+                return _mediaStore.SetAllFastSorted(kits);
+            }
+             
         }
 
         // keep these around - might be useful
