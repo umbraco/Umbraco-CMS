@@ -350,8 +350,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _localContentDb?.Clear();
 
                 // IMPORTANT GetAllContentSources sorts kits by level
+                //TODO: We should sort by level + sort order and then we can use SetAllFastSorted
                 var kits = _dataSource.GetAllContentSources(scope);
-                return _contentStore.SetAll(kits, false);
+                return _contentStore.SetAll(kits);
             }
         }
 
@@ -425,6 +426,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 _logger.Debug<PublishedSnapshotService>("Loading media from database...");
                 // IMPORTANT GetAllMediaSources sorts kits by level
+                //TODO: We should sort by level + sort order and then we can use SetAllFastSorted
                 var kits = _dataSource.GetAllMediaSources(scope);
                 return _mediaStore.SetAll(kits);
             }

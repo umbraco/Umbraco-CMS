@@ -41,6 +41,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             PrimitiveSerializer.String.WriteTo(value.Node.Path, stream);
             PrimitiveSerializer.Int32.WriteTo(value.Node.SortOrder, stream);
             PrimitiveSerializer.Int32.WriteTo(value.Node.ParentContentId, stream);
+            //TODO: Why don't we write the FirstChildContentId + NextSiblingContentId? Then we can entirely avoid all overhead when loading on startup?
             PrimitiveSerializer.DateTime.WriteTo(value.Node.CreateDate, stream);
             PrimitiveSerializer.Int32.WriteTo(value.Node.CreatorId, stream);
             PrimitiveSerializer.Int32.WriteTo(value.ContentTypeId, stream);

@@ -650,7 +650,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return ok;
         }
 
-        public bool SetAll(IEnumerable<ContentNodeKit> kits, bool fromLocalDb = false)
+        public bool SetAll(IEnumerable<ContentNodeKit> kits)
         {
             var lockInfo = new WriteLockInfo();
             var ok = true;
@@ -675,8 +675,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _logger.Debug<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
-                    // don't refresh _localDb if we are reading from _localDb
-                    if (!fromLocalDb && _localDb != null) RegisterChange(kit.Node.Id, kit);
+                    if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                     AddNodeLocked(kit.Node, parent);
 
                     _xmap[kit.Node.Uid] = kit.Node.Id;
