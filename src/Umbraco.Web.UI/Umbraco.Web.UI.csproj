@@ -1028,9 +1028,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7151</DevelopmentServerPort>
+          <DevelopmentServerPort>7152</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7151</IISUrl>
+          <IISUrl>http://localhost:7152</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
