@@ -257,7 +257,7 @@
             view: "views/common/infiniteeditors/compositions/compositions.html",
             size: "small",
             submit: function() {
-              
+
               // make sure that all tabs has an init property
               if (scope.model.groups.length !== 0) {
                 angular.forEach(scope.model.groups, function(group) {
@@ -341,7 +341,7 @@
         scope.compositionsButtonState = "busy";
         $q.all([
             //get available composite types
-            availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
+            availableContentTypeResource(scope.model.id, [], propAliasesExisting, scope.model.isElement).then(function (result) {
                 setupAvailableContentTypesModel(result); 
             }),
                 //get where used document types
