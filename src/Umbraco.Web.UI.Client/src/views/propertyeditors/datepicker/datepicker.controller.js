@@ -44,10 +44,10 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         if (newVal != oldVal) {
             //check for c# System.DateTime.MinValue being passed as the clear indicator
             var minDate = moment('0001-01-01');
-            var newDate = moment(newVal);
+            var newDate = moment(newVal, 'YYYY-MM-DD HH:mm:ss');
 
             if (newDate.isAfter(minDate)) {
-                applyDate({ date: moment(newVal) });
+                applyDate({ date: newDate });
             } else {
                 $scope.clearDate();
             }
