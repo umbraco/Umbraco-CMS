@@ -796,7 +796,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_contentNodes.TryGetValue(id, out var link) && link.Value != null)
                 return link;
 
-            throw new PanicException($"panic: failed to get {description} with id={id}");
+            throw new PanicException($"failed to get {description} with id={id}");
         }
 
         private LinkedNode<ContentNode> GetParentLink(ContentNode content)
@@ -827,7 +827,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // must have children
             if (parent.FirstChildContentId < 0)
-                throw new Exception("panic: no children");
+                throw new PanicException("no children");
 
             // if first, clone parent + remove first child
             if (parent.FirstChildContentId == content.Id)
