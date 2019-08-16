@@ -1,6 +1,6 @@
 /**
 @ngdoc directive
-@name umbraco.directives.directive:umbLoadIndicator
+@name umbraco.directives.directive:umbLoader
 @restrict E
 
 @description
@@ -10,9 +10,9 @@ Use this directive to generate a loading indicator.
 <pre>
     <div ng-controller="My.Controller as vm">
 
-        <umb-load-indicator
+        <umb-loader
             ng-if="vm.loading">
-        </umb-load-indicator>
+        </umb-loader>
 
         <div class="content" ng-if="!vm.loading">
             <p>{{content}}</p>
@@ -43,22 +43,33 @@ Use this directive to generate a loading indicator.
         angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
+
+@param {string=} position The loader position ("top", "bottom").
+
 **/
 
 (function() {
   'use strict';
 
-  function UmbLoadIndicatorDirective() {
+  function UmbLoaderDirective() {
+
+    function link(scope, el, attr, ctrl) {
+        
+    }
 
     var directive = {
-      restrict: 'E',
-      replace: true,
-      templateUrl: 'views/components/umb-load-indicator.html'
+        restrict: 'E',
+        replace: true,
+        templateUrl: 'views/components/umb-loader.html',
+        scope: {
+            position: "@?"
+        },
+        link: link
     };
 
     return directive;
   }
-
-  angular.module('umbraco.directives').directive('umbLoadIndicator', UmbLoadIndicatorDirective);
+  
+  angular.module('umbraco.directives').directive('umbLoader', UmbLoaderDirective);
 
 })();
