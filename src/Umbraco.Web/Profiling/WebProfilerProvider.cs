@@ -31,7 +31,8 @@ namespace Umbraco.Web.Profiling
             // Remove Mini Profiler routes when not in debug mode
             if (GlobalSettings.DebugMode == false)
             {
-                var prefix = MiniProfiler.Settings.RouteBasePath.Replace("~/", string.Empty);
+                //NOTE: Keep the global fully qualified name, for some reason without it I was getting null refs
+                var prefix = global::StackExchange.Profiling.MiniProfiler.Settings.RouteBasePath.Replace("~/", string.Empty);
 
                 using (RouteTable.Routes.GetWriteLock())
                 {
