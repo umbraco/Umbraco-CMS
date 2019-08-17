@@ -12,12 +12,12 @@
 
                 <ul ng-if="nodeUrl" class="nav nav-stacked" style="margin-bottom: 0;">
                     <li>
-                        <ng-conainer ng-if="node.extension != 'svg'">
+                        <ng-container ng-if="node.extension != 'svg'">
                             <a href="{{nodeUrl}}" target="_blank">
                                 <i class="icon icon-window-popin"></i>
                                 <span>{{nodeUrl}}</span>
                             </a>
-                        </ng-conainer>
+                        </ng-container>
                         <a ng-if="node.extension == 'svg'">
                             <i class="icon icon-window-popin"></i>
                             <span ng-click="openSVG()">{{nodeUrl}}</span>
