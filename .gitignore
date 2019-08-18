@@ -134,7 +134,7 @@ preserve.belle
 #Ignore Rule for output of generated documentation files from Grunt docserve
 src/Umbraco.Web.UI.Client/docs/api
 src/*.boltdata/
-src/umbraco.sln.ide/*
+src/Umbraco.sln.ide/*
 src/.vs/
 
 src/Umbraco.Web.UI/[Jj]s/*

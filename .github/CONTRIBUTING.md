@@ -127,7 +127,7 @@ In order to build the Umbraco source code locally, first make sure you have the 
 
 The easiest way to get started is to run `build.ps1` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`. See [this page](BUILD.md) for more details.
 
-Alternatively, you can open `src\umbraco.sln` in Visual Studio 2017 (version 15.9.7 or higher, [the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
+Alternatively, you can open `src\Umbraco.sln` in Visual Studio 2017 (version 15.9.7 or higher, [the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
 
 ![Gulp build in Visual Studio](img/gulpbuild.png)
 

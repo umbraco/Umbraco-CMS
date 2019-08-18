@@ -27,7 +27,7 @@ $IndexPath = "./docs/api/index.html"
 ################ Do the c# docs
 
 # Build the solution in debug mode
-$SolutionPath = Join-Path -Path $src -ChildPath "umbraco.sln"
+$SolutionPath = Join-Path -Path $src -ChildPath "Umbraco.sln"
 #$uenv.CompileUmbraco()
 
 #restore nuget packages
