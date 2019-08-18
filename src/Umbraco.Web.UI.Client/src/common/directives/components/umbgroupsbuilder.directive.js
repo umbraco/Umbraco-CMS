@@ -17,6 +17,7 @@
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
       scope.sortingButtonKey = "general_reorder";
+      scope.compositionsButtonState = "init";
 
       function activate() {
 
@@ -337,6 +338,7 @@
         })), function(f) {
             return f !== null && f !== undefined;
         });
+        scope.compositionsButtonState = "busy";
         $q.all([
             //get available composite types
             availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
@@ -356,6 +358,7 @@
         ]).then(function() {
             //resolves when both other promises are done, now show it
             editorService.open(scope.compositionsDialogModel);
+            scope.compositionsButtonState = "init";
         });
 
       };
