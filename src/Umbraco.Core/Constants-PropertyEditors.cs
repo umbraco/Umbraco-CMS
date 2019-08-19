@@ -97,6 +97,11 @@ namespace Umbraco.Core
                 public const string MediaPicker = "Umbraco.MediaPicker";
 
                 /// <summary>
+                /// Multiple Media Picker.
+                /// </summary>
+                public const string MultipleMediaPicker = "Umbraco.MultipleMediaPicker";
+
+                /// <summary>
                 /// Member Picker.
                 /// </summary>
                 public const string MemberPicker = "Umbraco.MemberPicker";
