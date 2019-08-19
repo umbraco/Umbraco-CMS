@@ -160,7 +160,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _domainStore = new SnapDictionary<int, Domain>();
 
-            publishedModelFactory.WithSafeLiveFactory(LoadCaches);
+            publishedModelFactory.WithSafeLiveFactory(LoadCachesOnStartup);
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
@@ -172,7 +172,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private void LoadCaches()
+        private void LoadCachesOnStartup()
         {
             lock (_storesLock)
             {
@@ -186,19 +186,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     if (_localDbExists)
                     {
-                        okContent = LockAndLoadContent(LoadContentFromLocalDbLocked);
+                        okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
                         if (!okContent)
                             _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
-                        okMedia = LockAndLoadMedia(LoadMediaFromLocalDbLocked);
+                        okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
                         if (!okMedia)
                             _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
                     }
 
                     if (!okContent)
-                        LockAndLoadContent(LoadContentFromDatabaseLocked);
+                        LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
 
                     if (!okMedia)
-                        LockAndLoadMedia(LoadMediaFromDatabaseLocked);
+                        LockAndLoadMedia(scope => LoadMediaFromDatabaseLocked(scope, true));
 
                     LockAndLoadDomains();
                 }
@@ -333,7 +333,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private bool LoadContentFromDatabaseLocked(IScope scope)
+        private bool LoadContentFromDatabaseLocked(IScope scope, bool onStartup)
         {
             // locks:
             // contentStore is wlocked (1 thread)
@@ -353,11 +353,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 // IMPORTANT GetAllContentSources sorts kits by level + parentId + sortOrder
                 var kits = _dataSource.GetAllContentSources(scope);
-                return _contentStore.SetAllFastSorted(kits);
+                return onStartup ? _contentStore.SetAllFastSorted(kits) : _contentStore.SetAll(kits);
             }
         }
 
-        private bool LoadContentFromLocalDbLocked(IScope scope)
+        private bool LoadContentFromLocalDbLocked(bool onStartup)
         {
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
                     .Select(x => _publishedContentTypeFactory.CreateContentType(x));
@@ -372,7 +372,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     .OrderBy(x => x.Node.Level)
                     .ThenBy(x => x.Node.ParentContentId)
                     .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + parentId + sortOrder
-                return _contentStore.SetAllFastSorted(kits);
+                return onStartup ? _contentStore.SetAllFastSorted(kits) : _contentStore.SetAll(kits);
             }
         }
 
@@ -411,7 +411,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private bool LoadMediaFromDatabaseLocked(IScope scope)
+        private bool LoadMediaFromDatabaseLocked(IScope scope, bool onStartup)
         {
             // locks & notes: see content
 
@@ -429,11 +429,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _logger.Debug<PublishedSnapshotService>("Loading media from database...");
                 // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
                 var kits = _dataSource.GetAllMediaSources(scope);
-                return _mediaStore.SetAllFastSorted(kits);
+                return onStartup ? _mediaStore.SetAllFastSorted(kits) : _mediaStore.SetAll(kits);
             }
         }
 
-        private bool LoadMediaFromLocalDbLocked(IScope scope)
+        private bool LoadMediaFromLocalDbLocked(bool onStartup)
         {
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
                     .Select(x => _publishedContentTypeFactory.CreateContentType(x));
@@ -448,7 +448,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     .OrderBy(x => x.Node.Level)
                     .ThenBy(x => x.Node.ParentContentId)
                     .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + parentId + sortOrder
-                return _mediaStore.SetAllFastSorted(kits);
+                return onStartup ? _mediaStore.SetAllFastSorted(kits) : _mediaStore.SetAll(kits);
             }
 
         }
@@ -628,7 +628,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     using (var scope = _scopeProvider.CreateScope())
                     {
                         scope.ReadLock(Constants.Locks.ContentTree);
-                        LoadContentFromDatabaseLocked(scope);
+                        LoadContentFromDatabaseLocked(scope, false);
                         scope.Complete();
                     }
                     draftChanged = publishedChanged = true;
@@ -721,7 +721,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     using (var scope = _scopeProvider.CreateScope())
                     {
                         scope.ReadLock(Constants.Locks.MediaTree);
-                        LoadMediaFromDatabaseLocked(scope);
+                        LoadMediaFromDatabaseLocked(scope, false);
                         scope.Complete();
                     }
                     anythingChanged = true;
