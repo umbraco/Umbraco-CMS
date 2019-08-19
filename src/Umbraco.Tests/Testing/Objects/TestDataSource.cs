@@ -51,22 +51,22 @@ namespace Umbraco.Tests.Testing.Objects
 
         public ContentNodeKit GetMediaSource(IScope scope, int id)
         {
-            throw new NotImplementedException();
+            return default;
         }
 
         public IEnumerable<ContentNodeKit> GetAllMediaSources(IScope scope)
         {
-            throw new NotImplementedException();
+            return Enumerable.Empty<ContentNodeKit>();
         }
 
         public IEnumerable<ContentNodeKit> GetBranchMediaSources(IScope scope, int id)
         {
-            throw new NotImplementedException();
+            return Enumerable.Empty<ContentNodeKit>();
         }
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScope scope, IEnumerable<int> ids)
         {
-            throw new NotImplementedException();
+            return Enumerable.Empty<ContentNodeKit>();
         }
     }
 }

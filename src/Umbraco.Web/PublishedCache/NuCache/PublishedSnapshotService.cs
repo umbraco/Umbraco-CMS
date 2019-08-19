@@ -178,11 +178,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 // populate the stores
 
+
+                var okContent = false;
+                var okMedia = false;
+
                 try
                 {
-                    var okContent = false;
-                    var okMedia = false;
-
                     if (_localDbExists)
                     {
                         okContent = LockAndLoadContent(LoadContentFromLocalDbLocked);
@@ -204,6 +205,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 catch (Exception ex)
                 {
                     _logger.Fatal<PublishedSnapshotService>(ex, "Panic, exception while loading cache data.");
+                    throw;
                 }
 
                 // finally, cache is ready!
@@ -316,7 +318,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private bool LockAndLoadContent(Func<IScope, bool> action)
         {
-            
+
 
             // first get a writer, then a scope
             // if there already is a scope, the writer will attach to it
@@ -343,7 +345,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _contentStore.SetAllContentTypes(contentTypes);
 
             using (_logger.TraceDuration<PublishedSnapshotService>("Loading content from database"))
-            {   
+            {
                 // beware! at that point the cache is inconsistent,
                 // assuming we are going to SetAll content items!
 
@@ -448,7 +450,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + parentId + sortOrder
                 return _mediaStore.SetAllFastSorted(kits);
             }
-             
+
         }
 
         // keep these around - might be useful

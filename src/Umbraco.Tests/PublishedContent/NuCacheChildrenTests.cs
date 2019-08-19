@@ -79,12 +79,16 @@ namespace Umbraco.Tests.PublishedContent
                 _contentTypeVariant
             };
 
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            Mock.Get(contentTypeService).Setup(x => x.GetAll()).Returns(contentTypes);
-            Mock.Get(contentTypeService).Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
+            var contentTypeService = new Mock<IContentTypeService>();
+            contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
+            contentTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
 
-            var contentTypeServiceBaseFactory = Mock.Of<IContentTypeBaseServiceProvider>();
-            Mock.Get(contentTypeServiceBaseFactory).Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService);
+            var mediaTypeService = new Mock<IMediaTypeService>();
+            mediaTypeService.Setup(x => x.GetAll()).Returns(Enumerable.Empty<IMediaType>());
+            mediaTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(Enumerable.Empty<IMediaType>());
+
+            var contentTypeServiceBaseFactory = new Mock<IContentTypeBaseServiceProvider>();
+            contentTypeServiceBaseFactory.Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService.Object);
 
             var dataTypeService = Mock.Of<IDataTypeService>();
             Mock.Get(dataTypeService).Setup(x => x.GetAll()).Returns(dataTypes);
@@ -94,8 +98,10 @@ namespace Umbraco.Tests.PublishedContent
                 dataTypeService: dataTypeService,
                 memberTypeService: Mock.Of<IMemberTypeService>(),
                 memberService: Mock.Of<IMemberService>(),
-                contentTypeService: contentTypeService,
-                localizationService: Mock.Of<ILocalizationService>()
+                contentTypeService: contentTypeService.Object,
+                mediaTypeService: mediaTypeService.Object,
+                localizationService: Mock.Of<ILocalizationService>(),
+                domainService: Mock.Of<IDomainService>()
             );
 
             // create a scope provider

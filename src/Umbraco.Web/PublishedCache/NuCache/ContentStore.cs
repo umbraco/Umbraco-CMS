@@ -588,7 +588,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <param name="kits"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This requires that the collection is sorted by Level + Sort Order.
+        /// This requires that the collection is sorted by Level + ParentId + Sort Order. 
         /// This should be used only on a site startup as the first generations.
         /// </remarks>
         internal bool SetAllFastSorted(IEnumerable<ContentNodeKit> kits)
