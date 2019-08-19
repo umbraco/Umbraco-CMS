@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService) {
+    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper) {
 
         var vm = {
             labels: {
@@ -92,6 +92,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.model.value = $scope.ids.join();
         };
 
+        function setDirty() {
+            angularHelper.getCurrentForm($scope).$setDirty();
+        }
+
         function reloadUpdatedMediaItems(updatedMediaNodes) {
             // because the images can be edited through the media picker we need to 
             // reload. We only reload the images that is already picked but has been updated.
@@ -152,6 +156,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.mediaItems.splice(index, 1);
             $scope.ids.splice(index, 1);
             sync();
+            setDirty();
         };
 
         $scope.editItem = function (item) {
@@ -215,6 +220,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     });
                     sync();
                     reloadUpdatedMediaItems(model.updatedMediaNodes);
+                    setDirty();
                 },
                 close: function (model) {
                     editorService.close();
@@ -233,6 +239,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             items: "li:not(.add-wrapper)",
             cancel: ".unsortable",
             update: function (e, ui) {
+                setDirty();
                 var r = [];
                 // TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the
                 // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the

@@ -51,7 +51,10 @@ function contentCreateController($scope,
             .search("create", "true")
             /* when we create a new node we want to make sure it uses the same 
             language as what is selected in the tree */
-            .search("cculture", mainCulture);
+            .search("cculture", mainCulture)
+            /* when we create a new node we must make sure that any previously 
+            used blueprint is reset */
+            .search("blueprintId", null);
         close();
     }
 
