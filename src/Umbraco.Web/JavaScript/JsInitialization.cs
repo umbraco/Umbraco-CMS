@@ -60,6 +60,26 @@ namespace Umbraco.Web.JavaScript
             return WriteScript(jarray.ToString(), IOHelper.ResolveUrl(SystemDirectories.Umbraco), angularModule);
         }
 
+        public static string GetTinyJavascriptInitialization(HttpContextBase httpContext, IEnumerable<string> scripts)
+        {
+            var rawJs = new StringBuilder();
+            rawJs.AppendLine("LazyLoad.js([");
+
+            var first = true;
+            foreach (var file in scripts)
+            {
+                if (first) first = false;
+                else rawJs.AppendLine(",");
+                rawJs.Append("\"");
+                rawJs.Append(file);
+                rawJs.Append("\"");
+
+            }
+            rawJs.Append("]);");
+
+            return rawJs.ToString();
+        }
+
         /// <summary>
         /// Returns a list of optimized script paths for the back office
         /// </summary>
@@ -129,6 +149,17 @@ namespace Umbraco.Web.JavaScript
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.PreviewInitialize);
             return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
+        }
+
+        internal static IEnumerable<string> GetTinyMceInitialization()
+        {
+            var resources = JsonConvert.DeserializeObject<JArray>(Resources.TinyMceInitialize);
+            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
+        }
+
+        internal static IEnumerable<string> OptimizeTinyMceScriptFiles(HttpContextBase httpContext)
+        {
+            return OptimizeScriptFiles(httpContext, GetTinyMceInitialization());
         }
 
         /// <summary>

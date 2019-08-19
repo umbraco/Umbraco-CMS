@@ -1205,6 +1205,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
+    <None Include="JavaScript\TinyMceInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
   </ItemGroup>

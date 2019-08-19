@@ -28,6 +28,7 @@ using Umbraco.Web.JavaScript;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
+using System.Text;
 
 namespace Umbraco.Web.Editors
 {
@@ -208,6 +209,28 @@ namespace Umbraco.Web.Editors
             result += initCss.GetStylesheetInitialization(HttpContext);
 
             return JavaScript(result);
+        }
+
+        [MinifyJavaScriptResult(Order = 0)]
+        [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
+        public JavaScriptResult TinyMceEditor()
+        {
+            var files = JsInitialization.OptimizeTinyMceScriptFiles(HttpContext);
+
+            var rawJS = new StringBuilder();
+            rawJS.AppendLine("LazyLoad.js([");
+            var first = true;
+            foreach (var file in files)
+            {
+                if (first) first = false;
+                else rawJS.AppendLine(",");
+                rawJS.Append("\"");
+                rawJS.Append(file);
+                rawJS.Append("\"");
+
+            }
+            rawJS.Append("]);");
+            return JavaScript(rawJS.ToString());
         }
 
         /// <summary>
