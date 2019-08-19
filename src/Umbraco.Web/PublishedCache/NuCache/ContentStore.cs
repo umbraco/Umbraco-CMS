@@ -609,21 +609,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //  NextSiblingContentId
 
                 ContentNode prev = null;
-                var currLevel = 0;
+                ContentNode currParent = null;
 
                 foreach (var kit in kits)
                 {
-                    if (currLevel != kit.Node.Level)
-                    {
-                        prev = null; //reset since we're on a new level
-                        currLevel = kit.Node.Level;
-                    }   
-
                     if (!BuildKit(kit, out var parentLink)) 
                     {
                         ok = false;
                         continue; // skip that one
                     }
+
+                    if (currParent != null && currParent.Id != parentLink.Value.Id)
+                        prev = null; //changed parent
+
+                    currParent = parentLink.Value;
 
                     _logger.Debug<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);

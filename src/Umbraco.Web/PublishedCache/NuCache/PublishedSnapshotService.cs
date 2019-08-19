@@ -349,7 +349,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 _localContentDb?.Clear();
 
-                // IMPORTANT GetAllContentSources sorts kits by level + sortOrder
+                // IMPORTANT GetAllContentSources sorts kits by level + parentId + sortOrder
                 var kits = _dataSource.GetAllContentSources(scope);
                 return _contentStore.SetAllFastSorted(kits);
             }
@@ -368,7 +368,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 var kits = _localContentDb.Select(x => x.Value)
                     .OrderBy(x => x.Node.Level)
-                    .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + sortOrder
+                    .ThenBy(x => x.Node.ParentContentId)
+                    .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + parentId + sortOrder
                 return _contentStore.SetAllFastSorted(kits);
             }
         }
@@ -424,7 +425,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _localMediaDb?.Clear();
 
                 _logger.Debug<PublishedSnapshotService>("Loading media from database...");
-                // IMPORTANT GetAllMediaSources sorts kits by level + sortOrder
+                // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
                 var kits = _dataSource.GetAllMediaSources(scope);
                 return _mediaStore.SetAllFastSorted(kits);
             }
@@ -443,7 +444,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 var kits = _localMediaDb.Select(x => x.Value)
                     .OrderBy(x => x.Node.Level)
-                    .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + order; 
+                    .ThenBy(x => x.Node.ParentContentId)
+                    .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + parentId + sortOrder
                 return _mediaStore.SetAllFastSorted(kits);
             }
              
