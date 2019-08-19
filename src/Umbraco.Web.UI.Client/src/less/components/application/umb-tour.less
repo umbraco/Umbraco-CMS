@@ -1,8 +1,12 @@
-.umb-tour__loader {
-    background: @white;
-    z-index: @zindexTourModal;
+.umb-loader-wrapper.umb-tour__loader {
+    margin: 0;
     position: fixed;
-    height: 5px;
+    z-index: @zindexTourModal;
+
+    .umb-loader {
+        background-color: @white;
+        height: 5px;
+    }
 }
 
 .umb-tour__pulse {

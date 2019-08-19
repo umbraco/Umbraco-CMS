@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -31,7 +30,7 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
+        public UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             return null; // we have nothing to say
         }
@@ -53,23 +52,21 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            var node = umbracoContext.ContentCache.GetById(id);
+            var node = umbracoContext.Content.GetById(id);
             if (node == null)
                 yield break;
 
             if (!node.HasProperty(Constants.Conventions.Content.UrlAlias))
                 yield break;
 
-            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
-
             // look for domains, walking up the tree
             var n = node;
-            var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
+            var domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 // move to parent node
                 n = n.Parent;
-                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, excludeDefault: false);
+                domainUris = n == null ? null : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, excludeDefault: false);
             }
 
             // determine whether the alias property varies

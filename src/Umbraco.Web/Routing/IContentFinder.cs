@@ -8,9 +8,9 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
+        /// <param name="request">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
-        bool TryFindContent(PublishedRequest frequest);
+        bool TryFindContent(PublishedRequest request);
     }
 }

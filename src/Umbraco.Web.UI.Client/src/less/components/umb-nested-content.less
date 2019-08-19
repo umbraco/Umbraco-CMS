@@ -56,13 +56,20 @@
     -webkit-user-select: none;
     -o-user-select: none;
     user-select: none;
+
+    &:hover {
+        .umb-nested-content__heading .umb-nested-content__item-name {
+            padding-right: 60px;
+        }
+    }
+
 }
 
 .umb-nested-content__heading {
     line-height: 20px;
     position: relative;
     margin-top:1px;
-    padding: 15px 20px;
+    padding: 15px 5px;
     color:@ui-option-type;
     border-radius: 3px 3px 0 0;
     
@@ -71,39 +78,33 @@
     }
 
     i {
-        display: inline;
-        margin-right: 10px;
+        position: absolute;
+        margin-top: -1px;
     }
 
     .umb-nested-content__item-name {
-        display: inline;
+        display: block;
         max-height: 20px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        padding-left: 5px;
+
+        &.--has-icon {
+            padding-left: 30px;
+        }
     }
     
 }
 
 .umb-nested-content__icons {
     opacity: 0;
-    transition: opacity .15s ease-in-out;
+    transition: opacity 120ms ease-in-out;
     position: absolute;
-    right: 0px;
-    top: 2px;
-    background-color: @white;
+    right: 0;
+    top: 3px;
     padding: 5px;
-
-    &:before {
-        content: ' ';
-        position: absolute;
-        display: block;
-        width: 30px;
-        left: -30px;
-        top: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, rgba(255,255,255,0), white);
-    }
+    background-color: @white;
 }
 
 .umb-nested-content__item--active > .umb-nested-content__header-bar {
@@ -111,6 +112,9 @@
         background-color: @ui-active;
         &:hover {
             color:@ui-option-type;
+        }
+        .umb-nested-content__item-name {
+            padding-right: 60px;
         }
     }
     .umb-nested-content__icons {
@@ -130,41 +134,22 @@
 
 
 
-.umb-nested-content__icon,
-.umb-nested-content__icon.umb-nested-content__icon--disabled:hover {
+.umb-nested-content__icon {
     display: inline-block;
-    padding: 4px 6px;
+    padding: 4px;
     margin: 2px;
     cursor: pointer;
-    background: @white;
-    border: 1px solid @gray-7;
-    border-radius: 200px;
-    text-decoration: none !important;
+    color: @ui-option-type;
 }
 
-.umb-nested-content__icon.umb-nested-content__icon--disabled:hover {
-    cursor: default;
-}
-
-.umb-nested-content__icon:hover,
-.umb-nested-content__icon--active
-{
-    color: @white;
-    background: @blueMid;
-    border-color: @blueMid;
+.umb-nested-content__icon:hover {
+    color: @ui-option-type-hover;
     text-decoration: none;
 }
 
-.umb-nested-content__icon .icon,
-.umb-nested-content__icon.umb-nested-content__icon--disabled:hover .icon {
+.umb-nested-content__icon .icon {
     display: block;
     font-size: 16px !important;
-    color: @gray-3;
-}
-
-.umb-nested-content__icon:hover .icon,
-.umb-nested-content__icon--active .icon {
-    color: @white;
 }
 
 .umb-nested-content__icon--disabled {
@@ -221,16 +206,6 @@
 
 .umb-nested-content__item.ui-sortable-helper .umb-nested-content__content {
     display: none !important;
-}
-
-.umb-nested-content__help-text {
-    display: inline-block;
-    padding: 10px 20px 10px 20px;
-    clear: both;
-    font-size: 14px;
-    color: @gray-3;
-    background: @gray-10;
-    border-radius: 15px;
 }
 
 .umb-nested-content__doctypepicker table input, 

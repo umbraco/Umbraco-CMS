@@ -1,13 +1,14 @@
 <div ng-controller="Umbraco.Overlays.MediaTypePickerController">
 
-  	<ul class="umb-card-grid">
+  	<ul class="umb-card-grid -three-in-row">
       <li
 	  	ng-repeat="mediatype in model.acceptedMediatypes | orderBy:'name'"
-        ng-click="select(mediatype)"
-        class="-three-in-row">
+        ng-click="select(mediatype)">
         <a class="umb-card-grid-item" href="" title="{{mediatype.name}}">
-            <i class="{{ mediatype.icon }}"></i>
-            {{ mediatype.name }}
+            <span>
+                <i class="{{ mediatype.icon }}"></i>
+                {{ mediatype.name }}
+            </span>
         </a>
       </li>
     </ul>

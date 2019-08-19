@@ -8,9 +8,25 @@
         user-select: none;
     }
     
-    &:hover ins {
+    &:hover .umb-tree-item__arrow {
         visibility: visible;
         cursor: pointer
+    }
+}
+
+.umb-tree-item__arrow {
+    position: relative;
+    margin-left: -16px;
+    width: 16px;
+    height: 16px;
+    visibility: hidden;
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 12px;
+    transition: color 120ms;
+
+    &:hover {
+        color: @ui-option-type-hover;
     }
 }
 
@@ -41,19 +57,20 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        flex: 1 0 auto;
+        flex: 1 1 auto;
     }
 }
 
 // active is equivilant to selected, its the item that is begin affected by the actions performed in the right-click-dialog.
 .umb-tree-item.active > .umb-tree-item__inner {
+    border-color: @ui-selected-border;
+    box-shadow: 0 0 2px 0 fade(@ui-selected-border, 80%);
     color: @ui-selected-type;
+
     a {
         color: @ui-selected-type;
     }
-    
-    border-color: @ui-selected-border;
-    box-shadow: 0 0 2px 0 fade(@ui-selected-border, 80%);
+
     &::before {
         content: "";
         position: absolute;
@@ -63,8 +80,10 @@
         bottom: 0;
         border: 2px solid fade(white, 80%);
     }
+
     &:hover {
         color: @ui-selected-type-hover;
+
         a {
             color: @ui-selected-type-hover;
         }
@@ -72,7 +91,6 @@
 }
 
 .umb-tree-item.current > .umb-tree-item__inner {
-
     background: @ui-active;
     color:@ui-active-type;
     
@@ -95,7 +113,7 @@
 
     a,
     .umb-tree-icon,
-    ins {
+    .umb-tree-item__arrow {
         color: @ui-active-type !important;
     }
 }

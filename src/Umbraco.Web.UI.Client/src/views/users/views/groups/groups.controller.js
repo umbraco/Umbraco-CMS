@@ -1,8 +1,8 @@
 (function () {
     "use strict";
 
-    function UserGroupsController($scope, $timeout, $location, userService, userGroupsResource, 
-        formHelper, localizationService, listViewHelper) {
+    function UserGroupsController($scope, $timeout, $location, $filter, userService, userGroupsResource, 
+        formHelper, localizationService, listViewHelper, overlayService) {
 
         var vm = this;
 
@@ -31,6 +31,7 @@
                         ug.hasAccess = user.userGroups.indexOf(ug.alias) !== -1 || user.userGroups.indexOf("admin") !== -1;
                         return ug;
                     });
+                    vm.filteredUserGroups = vm.userGroups;
 
                     vm.loading = false;
                 });
@@ -94,18 +95,26 @@
 
             if(vm.selection.length > 0) {
 
-                localizationService.localize("defaultdialogs_confirmdelete")
-                    .then(function(value) {
-
-                        var confirmResponse = confirm(value);
-
-                        if (confirmResponse === true) {
-                            userGroupsResource.deleteUserGroups(vm.selection).then(function (data) {
-                                clearSelection();
-                                onInit();
-                            }, angular.noop);
-                        }
-
+                localizationService.localizeMany(["general_delete", "defaultdialogs_confirmdelete", "general_cancel", "contentTypeEditor_yesDelete"])
+                    .then(function (data) {
+                        const overlay = {
+                            title: data[0],
+                            content: data[1] + "?",
+                            closeButtonLabel: data[2],
+                            submitButtonLabel: data[3],
+                            submitButtonStyle: "danger",
+                            close: function () {
+                                overlayService.close();
+                            },
+                            submit: function () {
+                                userGroupsResource.deleteUserGroups(_.pluck(vm.selection, "id")).then(function (data) {
+                                    clearSelection();
+                                    onInit();
+                                }, angular.noop);
+                                overlayService.close();
+                            }
+                        };
+                        overlayService.open(overlay);
                     });
 
             }
@@ -117,6 +126,14 @@
             });
             vm.selection = [];
         }
+
+        var unbindFilterWatcher = $scope.$watch("vm.filter", function (newVal, oldVal) {
+            vm.filteredUserGroups = $filter('filter')(vm.userGroups, vm.filter);
+        });
+
+        $scope.$on("$destroy", function () {
+            unbindFilterWatcher();
+        });
 
         onInit();
 

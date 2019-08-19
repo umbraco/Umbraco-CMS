@@ -23,14 +23,15 @@
                                 umb-auto-focus
                                 no-dirty-check />
                     </div>
-                    
-                    <ul class="umb-card-grid">
+
+                    <ul class="umb-card-grid -three-in-row">
                         <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm"
-                            ng-click="vm.selectItem(availableItem)"
-                            class="-three-in-row">
+                            ng-click="vm.selectItem(availableItem)">
                             <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
-                                <i class="{{ availableItem.icon }}"></i>
-                                {{ availableItem.name }}
+                                <span>
+                                    <i class="{{ availableItem.icon }}"></i>
+                                    {{ availableItem.name }}
+                                </span>
                             </a>
                         </li>
                     </ul>

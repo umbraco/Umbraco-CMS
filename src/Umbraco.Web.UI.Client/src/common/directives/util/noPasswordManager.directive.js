@@ -1,6 +1,6 @@
 ﻿/**
 * @ngdoc directive
-* @name umbraco.directives.directive:no-password-manager
+* @name umbraco.directives.directive:noPasswordManager
 * @attribte
 * @function
 * @description

@@ -5,10 +5,14 @@ using System.Web;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web
 {
@@ -228,7 +232,7 @@ namespace Umbraco.Web
 
         #endregion
 
-       
+
 
         #region Member/Content/Media from Udi
 
@@ -495,7 +499,7 @@ namespace Umbraco.Web
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(IEnumerable<Udi> ids)
-        {          
+        {
             return ids.Select(id => ContentQuery.Content(id)).WhereNotNull();
         }
 
@@ -809,11 +813,37 @@ namespace Umbraco.Web
         }
 
         #endregion
+        internal static bool DecryptAndValidateEncryptedRouteString(string ufprt, out IDictionary<string, string> parts)
+        {
+            string decryptedString;
+            try
+            {
+                decryptedString = ufprt.DecryptWithMachineKey();
+            }
+            catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
+            {
+                Current.Logger.Warn(typeof(UmbracoHelper), "A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
+                parts = null;
+                return false;
+            }
+            var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
+            parts = new Dictionary<string, string>();
+            foreach (var key in parsedQueryString.AllKeys)
+            {
+                parts[key] = parsedQueryString[key];
+            }
+            //validate all required keys exist
+            //the controller
+            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Controller))
+                return false;
+            //the action
+            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Action))
+                return false;
+            //the area
+            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Area))
+                return false;
 
-       
-
-        
-
-        
+            return true;
+        }
     }
 }
