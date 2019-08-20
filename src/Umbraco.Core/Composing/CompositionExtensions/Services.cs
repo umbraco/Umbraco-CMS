@@ -96,7 +96,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
                 : appPlugins.GetDirectories()
-                    .SelectMany(x => x.GetDirectories("Lang"))
+                    .SelectMany(x => x.GetDirectories("Lang", SearchOption.AllDirectories))
                     .SelectMany(x => x.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, false));
 
