@@ -28,7 +28,6 @@ using Umbraco.Web.JavaScript;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
-using System.Text;
 
 namespace Umbraco.Web.Editors
 {
