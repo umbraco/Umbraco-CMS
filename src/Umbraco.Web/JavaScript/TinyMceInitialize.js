@@ -1,8 +1,6 @@
 ﻿[
     'lib/tinymce/tinymce.min.js',
 
-    'lib/tinymce/langs/en_us.js',
-
     'lib/tinymce/plugins/paste/plugin.min.js',
     'lib/tinymce/plugins/anchor/plugin.min.js',
     'lib/tinymce/plugins/charmap/plugin.min.js',
