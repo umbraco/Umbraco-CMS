@@ -77,11 +77,10 @@ namespace Umbraco.Tests.Scoping
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
-            var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeService>());
+            var contentTypeFactory = Factory.GetInstance<IPublishedContentTypeFactory>();
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
-            var contentTypeServiceBaseFactory = Current.Services.ContentTypeBaseServices;
 
             return new PublishedSnapshotService(
                 options,
