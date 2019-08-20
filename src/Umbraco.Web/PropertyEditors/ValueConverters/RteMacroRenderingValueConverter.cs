@@ -71,11 +71,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return new HtmlString(converted == null ? string.Empty : converted);
         }
 
-        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-        {
-            return Convert(inter, preview);
-        }
-
         private string Convert(object source, bool preview)
         {
             if (source == null)
