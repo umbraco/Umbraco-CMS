@@ -27,7 +27,7 @@
                        </a>
 
                        <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
-                           <umb-dropdown-item ng-repeat="blueprint in listViewAllowedTypes[0].blueprints | orderBy:'name':false">
+                           <umb-dropdown-item ng-repeat="blueprint in listViewAllowedTypes[0].blueprints | orderBy:'name':false track by $index">
                                <a ng-click="createFromBlueprint(entityType, listViewAllowedTypes[0].alias, blueprint.id)">
                                    <i class="{{::listViewAllowedTypes[0].icon}}"></i>
                                    {{::blueprint.name}}
