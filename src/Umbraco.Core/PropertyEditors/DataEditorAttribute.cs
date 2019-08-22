@@ -121,7 +121,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets or sets an optional group.
         /// </summary>
         /// <remarks>The group can be used for example to group the editors by category.</remarks>
-        public string Group { get; set; } = "common";
+        public string Group { get; set; } = Constants.PropertyEditors.Groups.Common;
 
         /// <summary>
         /// Gets or sets a value indicating whether the value editor is deprecated.
