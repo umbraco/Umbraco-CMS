@@ -27,7 +27,7 @@
                        </a>
 
                        <ul class="dropdown-menu">
-                           <li ng-repeat="(key, value) in listViewAllowedTypes[0].blueprints">
+                           <li ng-repeat="(key, value) in listViewAllowedTypes[0].blueprints track by $index">
                                <a ng-click="createFromBlueprint(entityType, listViewAllowedTypes[0].blueprints.alias, key)">
                                    <i class="{{listViewAllowedTypes[0].icon}}"></i>
                                    {{value}}
