@@ -347,13 +347,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>8200</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8200</IISUrl>
-          <DevelopmentServerPort>8120</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8120</IISUrl>
-          <DevelopmentServerPort>7152</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7152</IISUrl>
+          <IISUrl>http://localhost:8200/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
