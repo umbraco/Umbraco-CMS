@@ -62,11 +62,13 @@
         function init() {
 
             var content = $scope.content;
-
             if (content.id && content.isChildOfListView && content.trashed === false) {
-                $scope.page.listViewPath = ($routeParams.page) ?
-                    "/content/content/edit/" + content.parentId + "?page=" + $routeParams.page :
-                    "/content/content/edit/" + content.parentId;
+                $scope.page.listViewPath = "/content/content/edit/" + content.parentId
+                    + "?list=" + $routeParams.list
+                    + "&page=" + $routeParams.page 
+                    + "&filter=" + $routeParams.filter
+                    + "&orderBy=" + $routeParams.orderBy
+                    + "&orderDirection=" + $routeParams.orderDirection;
             }
 
             // we need to check wether an app is present in the current data, if not we will present the default app.
