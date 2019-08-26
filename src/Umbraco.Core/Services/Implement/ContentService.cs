@@ -761,7 +761,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (content.Name != null && content.Name.Length > 255)
             {
-                throw new InvalidOperationException($"Content with the name "{content.Name}" cannot be more than 255 characters in length.");
+                throw new InvalidOperationException($"Content with the name {content.Name} cannot be more than 255 characters in length.");
             }
 
             var evtMsgs = EventMessagesFactory.Get();
