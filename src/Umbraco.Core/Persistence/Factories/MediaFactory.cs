@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -130,7 +131,7 @@ namespace Umbraco.Core.Persistence.Factories
             return nodeDto;
         }
 
-        private static readonly Regex MediaPathPattern = new Regex(@"(/media/.+?)(?:['""]|$)", RegexOptions.Compiled);
+        private static readonly Regex MediaPathPattern = new Regex($@"({SystemDirectories.Media.TrimStart("~")}/.+?)(?:['""]|$)", RegexOptions.Compiled);
 
         /// <summary>
         /// Try getting a media path out of the string being stored for media
