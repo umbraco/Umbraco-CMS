@@ -56,11 +56,11 @@ namespace Umbraco.Web.PropertyEditors
                         }
                     }
 
+                    //First save the raw value to a raw field
+                    result.Add(new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineIndex.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
+
                     if (sb.Length > 0)
                     {
-                        //First save the raw value to a raw field
-                        result.Add(new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineIndex.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
-
                         //index the property with the combined/cleaned value
                         result.Add(new KeyValuePair<string, IEnumerable<object>>(property.Alias, new[] { sb.ToString() }));
                     }
