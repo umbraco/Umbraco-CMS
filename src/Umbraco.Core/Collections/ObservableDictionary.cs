@@ -275,7 +275,7 @@ namespace Umbraco.Core.Collections
             public DuplicateKeyException(string key, Exception innerException)
                 : base("Attempted to insert duplicate key \"" + key + "\" in collection.", innerException)
             {
-                this.Key = key;
+                Key = key;
             }
 
             /// <summary>
@@ -286,7 +286,7 @@ namespace Umbraco.Core.Collections
             protected DuplicateKeyException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-                this.Key = info.GetString(nameof(this.Key));
+                Key = info.GetString(nameof(Key));
             }
 
             /// <summary>
@@ -302,7 +302,7 @@ namespace Umbraco.Core.Collections
                     throw new ArgumentNullException(nameof(info));
                 }
 
-                info.AddValue(nameof(this.Key), this.Key);
+                info.AddValue(nameof(Key), Key);
 
                 base.GetObjectData(info, context);
             }

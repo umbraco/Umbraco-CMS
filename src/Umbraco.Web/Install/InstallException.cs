@@ -58,8 +58,8 @@ namespace Umbraco.Web.Install
         public InstallException(string message, string view, object viewModel)
             : base(message)
         {
-            this.View = view;
-            this.ViewModel = viewModel;
+            View = view;
+            ViewModel = viewModel;
         }
 
         /// <summary>
@@ -79,8 +79,8 @@ namespace Umbraco.Web.Install
         protected InstallException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            this.View = info.GetString(nameof(this.View));
-            this.ViewModel = info.GetValue(nameof(this.ViewModel), typeof(object));
+            View = info.GetString(nameof(View));
+            ViewModel = info.GetValue(nameof(ViewModel), typeof(object));
         }
 
         /// <summary>
@@ -96,8 +96,8 @@ namespace Umbraco.Web.Install
                 throw new ArgumentNullException(nameof(info));
             }
 
-            info.AddValue(nameof(this.View), this.View);
-            info.AddValue(nameof(this.ViewModel), this.ViewModel, typeof(object));
+            info.AddValue(nameof(View), View);
+            info.AddValue(nameof(ViewModel), ViewModel, typeof(object));
 
             base.GetObjectData(info, context);
         }

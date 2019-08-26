@@ -58,7 +58,7 @@ namespace Umbraco.Core.Exceptions
         public DataOperationException(T operation, string message)
             : base(message)
         {
-            this.Operation = operation;
+            Operation = operation;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Exceptions
         protected DataOperationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            this.Operation = (T)info.GetValue(nameof(this.Operation), typeof(T));
+            Operation = (T)info.GetValue(nameof(Operation), typeof(T));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Exceptions
                 throw new ArgumentNullException(nameof(info));
             }
 
-            info.AddValue(nameof(this.Operation), this.Operation);
+            info.AddValue(nameof(Operation), Operation);
 
             base.GetObjectData(info, context);
         }
