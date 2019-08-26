@@ -47,7 +47,7 @@
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
 
-        <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
+        <div id="mainwrapper" class="clearfix" ng-mousedown="closeDialogs($event)">
 
             <umb-navigation></umb-navigation>
 
