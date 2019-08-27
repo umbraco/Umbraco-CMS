@@ -484,7 +484,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             var savedVariants = [];
             if (origContent.variants) {
                 isContent = true;
-                //it's contnet so assign the variants as they exist
+                //it's content so assign the variants as they exist
                 origVariants = origContent.variants;
                 savedVariants = savedContent.variants;
             }
@@ -510,7 +510,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
                 //special case for content, don't sync this variant if it wasn't tagged
                 //for saving in the first place
-                if (!origVariant.save) {
+                if (isContent && !origVariant.save) {
                     continue;
                 }
 
