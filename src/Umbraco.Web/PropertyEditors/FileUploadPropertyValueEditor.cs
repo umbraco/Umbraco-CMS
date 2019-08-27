@@ -13,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// The value editor for the file upload property editor.
     /// </summary>
-    internal class FileUploadPropertyValueEditor : DataValueEditor
+    internal class FileUploadPropertyValueEditor : DataValueEditor, IDataValueEditorWithMediaPath
     {
         private readonly IMediaFileSystem _mediaFileSystem;
 
@@ -93,6 +93,11 @@ namespace Umbraco.Web.PropertyEditors
             return filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
 
             
+        }
+
+        public string ToMediaPath(Core.Models.Property property)
+        {
+            return property?.GetValue()?.ToString();
         }
 
         private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)

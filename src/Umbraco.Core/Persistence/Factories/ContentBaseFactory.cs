@@ -293,37 +293,15 @@ namespace Umbraco.Core.Persistence.Factories
 
         private static MediaVersionDto BuildMediaVersionDto(IMedia entity, ContentDto contentDto)
         {
-            // try to get a path from the string being stored for media
-            // TODO: only considering umbracoFile
-
-            TryMatch(entity.GetValue<string>("umbracoFile"), out var path);
-
             var dto = new MediaVersionDto
             {
                 Id = entity.VersionId,
-                Path = path,
+                Path = null,
 
                 ContentVersionDto = BuildContentVersionDto(entity, contentDto)
             };
 
             return dto;
-        }
-
-        // TODO: this should NOT be here?!
-        // more dark magic ;-(
-        internal static bool TryMatch(string text, out string path)
-        {
-            // In v8 we should allow exposing this via the property editor in a much nicer way so that the property editor
-            // can tell us directly what any URL is for a given property if it contains an asset
-
-            path = null;
-            if (string.IsNullOrWhiteSpace(text)) return false;
-
-            var m = MediaPathPattern.Match(text);
-            if (!m.Success || m.Groups.Count != 2) return false;
-
-            path = m.Groups[1].Value;
-            return true;
         }
     }
 }

@@ -67,4 +67,9 @@ namespace Umbraco.Core.PropertyEditors
         XNode ConvertDbToXml(PropertyType propertyType, object value, IDataTypeService dataTypeService);
         string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService);
     }
+
+    public interface IDataValueEditorWithMediaPath : IDataValueEditor
+    {
+        string ToMediaPath(Property property);
+    }
 }

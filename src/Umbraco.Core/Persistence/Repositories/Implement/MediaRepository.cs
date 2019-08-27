@@ -12,6 +12,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
@@ -26,13 +27,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
+        private readonly IDataTypeService _dataTypeService;
 
-        public MediaRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, ILanguageRepository languageRepository)
+        public MediaRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IDataTypeService dataTypeService)
             : base(scopeAccessor, cache, languageRepository, logger)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, logger);
+            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
         }
 
         protected override MediaRepository This => this;
@@ -229,6 +232,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // create the dto
             var dto = ContentBaseFactory.BuildDto(entity);
+            dto.MediaVersionDto.Path = GetPath(entity);
 
             // derive path and level from parent
             var parent = GetParentNodeDto(entity.ParentId);
@@ -318,6 +322,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // create the dto
             var dto = ContentBaseFactory.BuildDto(entity);
+            dto.MediaVersionDto.Path = GetPath(entity);
 
             // update the node dto
             var nodeDto = dto.ContentDto.NodeDto;
@@ -542,6 +547,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             media.ResetDirtyProperties(false);
             return media;
         }
-        
+
+        private string GetPath(IMedia media)
+        {
+            foreach(var p in media.Properties)
+            {
+                var dt = _dataTypeService.GetDataType(p.PropertyType.DataTypeId);
+                var path = (dt?.Editor?.GetValueEditor(dt?.Configuration) as IDataValueEditorWithMediaPath)?.ToMediaPath(p);
+                
+                if ( path != null)
+                {
+                    return path;
+                }
+            }
+
+            return null;
+        }
     }
 }

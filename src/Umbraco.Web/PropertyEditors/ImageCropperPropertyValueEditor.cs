@@ -10,13 +10,14 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using File = System.IO.File;
+using System.Linq;
 
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// The value editor for the image cropper property editor.
     /// </summary>
-    internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
+    internal class ImageCropperPropertyValueEditor : DataValueEditor, IDataValueEditorWithMediaPath // TODO: core vs web?
     {
         private readonly ILogger _logger;
         private readonly IMediaFileSystem _mediaFileSystem;
@@ -180,6 +181,24 @@ namespace Umbraco.Web.PropertyEditors
                 src = val,
                 crops = crops
             });
+        }
+
+        public string ToMediaPath(Property property)
+        {
+            string value = property.GetValue()?.ToString();
+
+            if (value != null)
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<ImageCropperValue>(value)?.Src;
+                }
+                catch
+                {
+                }                
+            }
+
+            return null;
         }
     }
 }
