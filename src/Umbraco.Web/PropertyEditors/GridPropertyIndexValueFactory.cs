@@ -43,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
 
                             // TODO: If it's not a string, then it's a json formatted value -
                             // we cannot really index this in a smart way since it could be 'anything'
-                            if (controlVal.Type == JTokenType.String)
+                            if (controlVal?.Type == JTokenType.String)
                             {
                                 var str = controlVal.Value<string>();
                                 str = XmlHelper.CouldItBeXml(str) ? str.StripHtml() : str;
