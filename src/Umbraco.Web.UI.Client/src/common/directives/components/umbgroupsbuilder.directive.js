@@ -576,17 +576,6 @@
         // remove property
         tab.properties.splice(propertyIndex, 1);
 
-        // if the last property in group is an placeholder - remove add new tab placeholder
-        if(tab.properties.length === 1 && tab.properties[0].propertyState === "init") {
-
-          angular.forEach(scope.model.groups, function(group, index, groups){
-            if(group === tab) {
-              groups.splice(index, 1);
-            }
-            });
-
-        }
-
         notifyChanged();
       };
 
