@@ -37,7 +37,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFifteen
 	                            )";
 
                 var paths = new List<MediaDto>();
-               
+                var versionsDone = new HashSet<Guid>();
+
                 foreach (var row in database.Query<dynamic>(sql, new { propertyEditorAlias = "Umbraco.UploadField", nodeObjectType = Constants.ObjectTypes.Media }))
                 {
                     var id = (int)row.contentNodeId;
@@ -45,7 +46,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFifteen
 
                     string mediaPath = (string)(String.IsNullOrEmpty(row.dataNvarchar) ? row.dataNtext : row.dataNvarchar);
 
-                    if (!String.IsNullOrWhiteSpace(mediaPath))
+                    if (!String.IsNullOrWhiteSpace(mediaPath) && versionsDone.Add(versionId))
                     {
                         paths.Add(new MediaDto
                         {
@@ -64,7 +65,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFifteen
                     string value = (string)(String.IsNullOrEmpty(row.dataNvarchar) ? row.dataNtext : row.dataNvarchar);
 
                     var match = SrcPathPattern.Match(value ?? "");
-                    if (match.Success)
+                    if (match.Success && versionsDone.Add(versionId))
                     {
                         paths.Add(new MediaDto
                         {
