@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFifteen
 	                            SELECT id
 	                            FROM cmsPropertyType
 	                            INNER JOIN cmsDataType ON cmsDataType.nodeId = cmsPropertyType.dataTypeId
-	                            WHERE cmsDataType.propertyEditorAlias IN (@propertyEditorAlias)
+	                            WHERE cmsDataType.propertyEditorAlias = (@propertyEditorAlias)
 	                            )";
 
                 var paths = new List<MediaDto>();
@@ -75,8 +75,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFifteen
                         });
                     }
                 }
-
-                Logger.Info<PopulateCmsMediaTable>($"Populated cmsMedia for {paths.Count} media items");
 
                 database.BulkInsertRecords(paths, SqlSyntax);
 
