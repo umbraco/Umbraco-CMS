@@ -94,7 +94,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 if (culture) {
                     query += "&culture=" + culture;
                 }
-                $scope.pageUrl = "frame?" + query;
+                $scope.pageUrl = "/umbraco/preview/frame?" + query;
             }
         }
         /*****************************************************************************/
