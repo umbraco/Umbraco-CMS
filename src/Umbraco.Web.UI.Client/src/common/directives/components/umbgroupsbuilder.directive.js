@@ -381,6 +381,8 @@
         // activate group
         scope.activateGroup(group);
 
+        // push new init tab to the scope
+        addInitGroup(scope.model.groups);
       };
 
       scope.activateGroup = function(selectedGroup) {
@@ -399,7 +401,6 @@
 
       scope.removeGroup = function(groupIndex) {
         scope.model.groups.splice(groupIndex, 1);
-        addInitGroup(scope.model.groups);
       };
 
       scope.updateGroupTitle = function(group) {
@@ -528,9 +529,6 @@
               // set focus on init property
               var numberOfProperties = group.properties.length;
               group.properties[numberOfProperties - 1].focus = true;
-  
-              // push new init tab to the scope
-              addInitGroup(scope.model.groups);
 
               notifyChanged();
             },
@@ -582,10 +580,10 @@
         if(tab.properties.length === 1 && tab.properties[0].propertyState === "init") {
 
           angular.forEach(scope.model.groups, function(group, index, groups){
-            if(group.tabState === 'init') {
+            if(group === tab) {
               groups.splice(index, 1);
             }
-          });
+            });
 
         }
 
