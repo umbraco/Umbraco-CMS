@@ -848,14 +848,14 @@
             // Chromes popup blocker will kick in if a window is opened
             // without the initial scoped request. This trick will fix that.
             //
-            var previewWindow = $window.open('preview/?init=true', 'umbpreview');
+            var previewWindow = $window.open('preview?init=true', 'umbpreview');
 
             // Build the correct path so both /#/ and #/ work.
             var query = 'id=' + content.id;
             if ($scope.culture) {
                 query += "#?culture=" + $scope.culture;
             }
-            var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
+            var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview?' + query;
 
             //The user cannot save if they don't have access to do that, in which case we just want to preview
             //and that's it otherwise they'll get an unauthorized access message

@@ -10,7 +10,6 @@
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
 
     Html.RequiresCss("assets/css/canvasdesigner.css", "Umbraco");
-    Html.RequiresJs("lib/lazyload-js/lazyload.min.js", "Umbraco");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -38,9 +37,9 @@
     <div class="canvasdesigner" ng-init="showDevicesPreview = true; showDevices = !@(disableDevicePreview);" ng-mouseenter="positionSelectedHide()">
         <div class="fix-left-menu selected">
             <div class="avatar">
-                <img ng-src="/umbraco/assets/img/application/logo.png"
-                     ng-srcset="/umbraco/assets/img/application/logo@2x.png 2x,
-                    /umbraco/assets/img/application/logo@3x.png 3x" />
+                <img ng-src="assets/img/application/logo.png"
+                     ng-srcset="assets/img/application/logo@2x.png 2x,
+                    assets/img/application/logo@3x.png 3x" />
             </div>
             <ul class="sections" ng-class="{selected: showDevicesPreview && showDevices}">
                 <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }">
@@ -64,8 +63,8 @@
         </div>
 
     </div>
-    
-    @Html.RenderJsHere(new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+
+    <script src="lib/lazyload-js/lazyload.min.js"></script>
     <script src="@Url.GetUrlWithCacheBust("Application", "Preview")"></script>
 
 </body>

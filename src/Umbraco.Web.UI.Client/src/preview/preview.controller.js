@@ -94,7 +94,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 if (culture) {
                     query += "&culture=" + culture;
                 }
-                $scope.pageUrl = "/umbraco/preview/frame?" + query;
+                $scope.pageUrl = "preview/frame?" + query;
             }
         }
         /*****************************************************************************/
@@ -117,7 +117,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             if (culture) {
                 relativeUrl += '?culture=' + culture;
             }
-            window.top.location.href = "../preview/end?redir=" + encodeURIComponent(relativeUrl);
+            window.top.location.href = "preview/end?redir=" + encodeURIComponent(relativeUrl);
         };
 
         $scope.onFrameLoaded = function (iframe) {
