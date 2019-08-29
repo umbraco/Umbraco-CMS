@@ -70,8 +70,14 @@ namespace Umbraco.Web.Models.Mapping
 
             dest.Culture = culture;
 
+            var segment = context.GetSegment();
+
+            // The current segment can always be null, even if the propertyType *can* be varied by segment
+            // so the nullcheck like with culture is not performed here.
+            dest.Segment = segment;
+
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
-            dest.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
+            dest.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture, segment);
         }
     }
 }

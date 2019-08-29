@@ -21,27 +21,35 @@ namespace Umbraco.Web.Models.Mapping
 
         public IEnumerable<ContentVariantDisplay> Map(IContent source, MapperContext context)
         {
-            var result = new List<ContentVariantDisplay>();
-            if (!source.ContentType.VariesByCulture())
+            var variants = new List<ContentVariantDisplay>();
+
+            var variesByCulture = source.ContentType.VariesByCulture();
+            var variesBySegment = source.ContentType.VariesBySegment();
+
+            if (!variesByCulture && !variesBySegment)
             {
                 //this is invariant so just map the IContent instance to ContentVariationDisplay
-                result.Add(context.Map<ContentVariantDisplay>(source));
+                variants.Add(context.Map<ContentVariantDisplay>(source));
+                return variants;
             }
-            else
+
+            if (variesByCulture && !variesBySegment)
             {
+                // Culture only
+
                 var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
                 if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariantDisplay>(); //this should never happen
 
                 var langs = context.MapEnumerable<ILanguage, Language>(allLanguages).ToList();
 
                 //create a variant for each language, then we'll populate the values
-                var variants = langs.Select(x =>
+                variants.AddRange(langs.Select(x =>
                 {
                     //We need to set the culture in the mapping context since this is needed to ensure that the correct property values
                     //are resolved during the mapping
                     context.SetCulture(x.IsoCode);
                     return context.Map<ContentVariantDisplay>(source);
-                }).ToList();
+                }));
 
                 for (int i = 0; i < langs.Count; i++)
                 {
@@ -63,10 +71,49 @@ namespace Umbraco.Web.Models.Mapping
 
                 //Insert the default language as the first item
                 variants.Insert(0, defaultLang);
-
-                return variants;
             }
-            return result;
+            else if (variesBySegment && !variesByCulture)
+            {
+                // Segment only
+                throw new NotSupportedException("ContentVariantMapper not implemented for segment only!");
+            }
+            else
+            {
+                // Culture and segment
+
+                var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
+                if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariantDisplay>(); //this should never happen
+
+                var langs = context.MapEnumerable<ILanguage, Language>(allLanguages).ToList();
+
+                // All segments, including the unsegmented (= NULL) segment.
+                // TODO: The NULl segment might have to be changed to be empty string?
+                var segments = source.Properties
+                    .SelectMany(p => p.Values.Select(v => v.Segment))
+                    .Distinct();
+
+                // Add all variants
+                foreach (var language in langs)
+                {
+                    foreach (var segment in segments)
+                    {
+                        context.SetCulture(language.IsoCode);
+                        context.SetSegment(segment);
+
+                        var variantDisplay = context.Map<ContentVariantDisplay>(source);
+
+                        variantDisplay.Language = language;
+                        variantDisplay.Segment = segment;
+                        variantDisplay.Name = source.GetCultureName(language.IsoCode);
+
+                        variants.Add(variantDisplay);
+                    }
+                }
+
+                // TODO: Sorting
+            }
+
+            return variants;
         }
     }
 }
