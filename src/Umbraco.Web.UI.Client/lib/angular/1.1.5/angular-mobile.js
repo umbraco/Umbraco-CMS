@@ -293,7 +293,7 @@ ngMobile.directive('ngClick', ['$parse', '$timeout', '$rootElement',
  * A leftward swipe is a quick, right-to-left slide of the finger.
  * Though ngSwipeLeft is designed for touch-based devices, it will work with a mouse click and drag too.
  *
- *                      [well, it did until we disabled that feature to avoid problems with selecting text]
+ *                  [well, it did until we disabled that feature to avoid problems with selecting text]
  *
  * @element ANY
  * @param {expression} ngSwipeLeft {@link guide/expression Expression} to evaluate
