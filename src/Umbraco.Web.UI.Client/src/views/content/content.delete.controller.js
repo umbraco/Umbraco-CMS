@@ -50,7 +50,7 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
                 $location.path(location);
             }
 
-            navigationService.hideMenu();
+            $scope.success = true;
         }, function(err) {
 
             $scope.currentNode.loading = false;
