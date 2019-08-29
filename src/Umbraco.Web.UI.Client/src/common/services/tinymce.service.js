@@ -156,6 +156,55 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
     }
 
+    function uploadImageHandler(blobInfo, success, failure, progress){
+
+        //TODO: Worth refactoring to Angular $http calls
+        //Rather than XHR??
+
+        let xhr, formData;
+
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
+
+        xhr.upload.onprogress = function (e) {
+            progress(e.loaded / e.total * 100);
+        };
+
+        xhr.onerror = function () {
+            failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+        };
+
+        xhr.onload = function () {
+            let json;
+
+            if (xhr.status < 200 || xhr.status >= 300) {
+                failure('HTTP Error: ' + xhr.status);
+                return;
+            }
+
+            json = JSON.parse(xhr.responseText);
+
+            if (!json || typeof json.location !== 'string') {
+                failure('Invalid JSON: ' + xhr.responseText);
+                return;
+            }
+
+            // TODO: The JSON contains location & udi
+            // Need to add UDI as attr
+
+            success(json.location);
+        };
+
+        formData = new FormData();
+        formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+
+        //TODO: Send Media Parent ID from config
+        //TODO: How will each RTE pass in this value to this function?!
+        formData.append('mediaParent', -1);
+
+        xhr.send(formData);
+    }
+
     return {
 
         /**
@@ -237,13 +286,19 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     insert_toolbar: toolbars.insertToolbar,
                     selection_toolbar: toolbars.selectionToolbar,
 
-                    body_class: 'umb-rte',
+                    body_class: "umb-rte",
                     //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
                     cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster,
 
                     //this is used to style the inline macro bits, sorry hard coding this form now since we don't have a standalone
                     //stylesheet to load in for this with only these styles (the color is @pinkLight)
                     content_style: ".mce-content-body .umb-macro-holder { border: 3px dotted #f5c1bc; padding: 7px; display: block; margin: 3px; } .umb-rte .mce-content-body .umb-macro-holder.loading {background: url(assets/img/loader.gif) right no-repeat; background-size: 18px; background-position-x: 99%;}"
+                    
+                    // This allows images to be pasted in & stored as Base64 until they get uploaded to server
+                    paste_data_images: true
+
+                    images_upload_handler: uploadImageHandler,
+                    automatic_uploads: false,
                 };
 
                 if (tinyMceConfig.customConfig) {
@@ -280,7 +335,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     angular.extend(config, tinyMceConfig.customConfig);
                 }
-
 
                 return $q.when(config);
 
@@ -428,7 +482,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     id: '__mcenew',
                     'data-udi': img.udi
                 };
-                
+
                 editor.selection.setContent(editor.dom.createHTML('img', data));
 
                 $timeout(function () {
@@ -447,9 +501,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
                     }
 				    editor.dom.setAttrib(imgElm, 'id', null);
-                    
+
                     editor.fire('Change');
-                    
+
                 }, 500);
             }
         },
@@ -521,7 +575,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 onPostRender: function () {
 
                     let ctrl = this;
-                    
+
 					/**
 					 * Check if the macro is currently selected and toggle the menu button
 					 */
@@ -1134,7 +1188,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     };
                     editorService.linkPicker(linkPicker);
                 });
-             
+
             });
 
             //Create the insert media plugin
