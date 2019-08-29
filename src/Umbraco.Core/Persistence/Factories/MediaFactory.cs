@@ -126,7 +126,7 @@ namespace Umbraco.Core.Persistence.Factories
             return nodeDto;
         }
 
-        private static readonly Regex SrcPathPattern = new Regex(@"['""]src['""]:\s*['""](.+?)['""]", RegexOptions.Compiled);
+        private static readonly Regex SrcPathPattern = new Regex(@"['""{, ]src['""]?:\s*['""](.+?)['""]", RegexOptions.Compiled);
 
         internal static string GetMediaPath(IMedia entity)
         {
