@@ -410,7 +410,7 @@
                         _.each(tab.properties, function (property, propIndex) {
                             //in theory if there's more than 1 variant, that means they would all have a language
                             //but we'll do our safety checks anyways here
-                            if (firstVariant.language && !property.culture) {
+                            if (firstVariant.language && !property.culture && !property.segment) {
                                 invariantProperties.push({
                                     tabIndex: tabIndex,
                                     propIndex: propIndex,
@@ -426,7 +426,15 @@
                         var variant = displayModel.variants[j];
 
                         _.each(invariantProperties, function (invProp) {
-                            variant.tabs[invProp.tabIndex].properties[invProp.propIndex] = invProp.property;
+                            var tab = variant.tabs[invProp.tabIndex];
+                            var prop = tab.properties[invProp.propIndex];
+
+                            if (prop.segment) {
+                                // Do not touch segmented properties
+                                return;
+                            }
+
+                            tab.properties[invProp.propIndex] = invProp.property;
                         });
                     }
                 }
