@@ -208,8 +208,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     function initEvents(editor){
 
         editor.on('SetContent', function (e) {
-            console.log('setcontent', e);
-
             var content = e.content;
 
             // Upload BLOB images (dragged/pasted ones)
