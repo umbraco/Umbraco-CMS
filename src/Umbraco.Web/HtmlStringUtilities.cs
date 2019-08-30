@@ -27,7 +27,7 @@ namespace Umbraco.Web
         }
         
         /// <summary>
-        /// Html encodes the text and replaces text line breaks with HTML line breaks.
+        /// HTML encodes the text and replaces text line breaks with HTML line breaks.
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).</returns>
