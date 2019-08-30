@@ -214,25 +214,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             // Upload BLOB images (dragged/pasted ones)
             if(content.indexOf('<img src="blob:') > -1){
-                console.log('found img');
 
                 editor.uploadImages(function(data) {
-                    console.log("data", data);
-
                     data.forEach(function(item) {
-                        console.log("item", item);
-
                         //Select img element
                         var img = item.element;
 
                         //Get img src
                         var imgSrc = img.getAttribute("src");
-                        console.log('img src', imgSrc);
 
                         //Try & find in localstorage
                         var udi = localStorage.getItem(`tinymce__${imgSrc}`);
-                        console.log('imgsrc key', `tinymce__${imgSrc}`)
-                        console.log('UDI', udi);
 
                         //Select the img & update is attr
                         tinymce.activeEditor.$(img).attr({ "data-udi": udi });
