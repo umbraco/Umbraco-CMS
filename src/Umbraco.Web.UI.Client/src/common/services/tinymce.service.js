@@ -189,8 +189,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 return;
             }
 
-            // TODO: The JSON contains location & udi
-            // Need to add UDI as attr
+            // Put UDI into localstorage (used to update the img with data-udi later on)
+            localStorage.setItem(`tinymce__${json.location}`, json.udi);
 
             success(json.location);
         };
@@ -203,6 +203,46 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         formData.append('mediaParent', -1);
 
         xhr.send(formData);
+    }
+
+    function initEvents(editor){
+
+        editor.on('SetContent', function (e) {
+            console.log('setcontent', e);
+
+            var content = e.content;
+
+            // Upload BLOB images (dragged/pasted ones)
+            if(content.indexOf('<img src="blob:') > -1){
+                console.log('found img');
+
+                editor.uploadImages(function(data) {
+                    console.log("data", data);
+
+                    data.forEach(function(item) {
+                        console.log("item", item);
+
+                        //Select img element
+                        var img = item.element;
+
+                        //Get img src
+                        var imgSrc = img.getAttribute("src");
+                        console.log('img src', imgSrc);
+
+                        //Try & find in localstorage
+                        var udi = localStorage.getItem(`tinymce__${imgSrc}`);
+                        console.log('imgsrc key', `tinymce__${imgSrc}`)
+                        console.log('UDI', udi);
+
+                        //Select the img & update is attr
+                        tinymce.activeEditor.$(img).attr({ "data-udi": udi });
+
+                        //Remove key
+                        localStorage.removeItem(`tinymce__${imgSrc}`);
+                    });
+                });
+            }
+        });
     }
 
     return {
@@ -292,13 +332,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     //this is used to style the inline macro bits, sorry hard coding this form now since we don't have a standalone
                     //stylesheet to load in for this with only these styles (the color is @pinkLight)
-                    content_style: ".mce-content-body .umb-macro-holder { border: 3px dotted #f5c1bc; padding: 7px; display: block; margin: 3px; } .umb-rte .mce-content-body .umb-macro-holder.loading {background: url(assets/img/loader.gif) right no-repeat; background-size: 18px; background-position-x: 99%;}"
-                    
+                    content_style: ".mce-content-body .umb-macro-holder { border: 3px dotted #f5c1bc; padding: 7px; display: block; margin: 3px; } .umb-rte .mce-content-body .umb-macro-holder.loading {background: url(assets/img/loader.gif) right no-repeat; background-size: 18px; background-position-x: 99%;}",
+
                     // This allows images to be pasted in & stored as Base64 until they get uploaded to server
-                    paste_data_images: true
+                    paste_data_images: true,
 
                     images_upload_handler: uploadImageHandler,
                     automatic_uploads: false,
+                    init_instance_callback: initEvents
                 };
 
                 if (tinyMceConfig.customConfig) {
