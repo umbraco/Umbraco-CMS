@@ -33,7 +33,7 @@ namespace Umbraco.Web
         /// <returns>The html encoded text with text line breaks replaced with HTML line breaks (<br/>)</returns>
         public HtmlString ReplaceLineBreaks(string text)
         {
-            var value = HttpUtility.HtmlEncode(text ?? string.Empty)
+            var value = HttpUtility.HtmlEncode(text)?
                 .Replace("\r\n", "<br />")
                 .Replace("\r", "<br />")
                 .Replace("\n", "<br />");
