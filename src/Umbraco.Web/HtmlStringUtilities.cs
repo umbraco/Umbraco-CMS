@@ -19,7 +19,7 @@ namespace Umbraco.Web
         /// Replaces text line breaks with HTML line breaks
         /// </summary>
         /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with HTML line breaks (<br/>)</returns>
+        /// <returns>The text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
         [Obsolete("This method doesn't HTML encode the text. Use ReplaceLineBreaks instead.")]
         public HtmlString ReplaceLineBreaksForHtml(string text)
         {
