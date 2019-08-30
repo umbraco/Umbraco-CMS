@@ -39,7 +39,7 @@
                     </ng-form>
 
                     <a ng-if="content.variants.length > 0 && hideChangeVariant !== true" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" ng-class="{'--error': vm.errorsOnOtherVariants}">
-                        <span ng-bind="getVariantDisplayName(variant)"></span>
+                        <span ng-bind="getVariantDisplayName(vm.currentVariant)"></span>
                         <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
                     </a>
                     
