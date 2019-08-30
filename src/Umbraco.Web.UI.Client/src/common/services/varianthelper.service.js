@@ -41,7 +41,8 @@ function variantHelper() {
         }
 
         if (variant.segment) {
-            parts.push(variant.segment);
+            var capitalized = variant.segment.split(" ").map(p => p[0].toUpperCase() + p.substring(1)).join(" ");
+            parts.push(capitalized);
         }
 
         if (parts.length === 0) {
