@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PublishController($scope, localizationService, contentEditingHelper) {
+    function PublishController($scope, localizationService, contentEditingHelper, variantHelper) {
 
         var vm = this;
         vm.loading = true;
@@ -12,31 +12,7 @@
         vm.dirtyVariantFilter = dirtyVariantFilter;
         vm.pristineVariantFilter = pristineVariantFilter;
 
-        $scope.getVariantDisplayName = getVariantDisplayName;
-
-        // TODO: Move to some variantService / helper
-        function getVariantDisplayName(variant) {
-            if (variant == null) {
-                return "";
-            }
-
-            var parts = [];
-
-            if (variant.language && variant.language.name) {
-                parts.push(variant.language.name);
-            }
-
-            if (variant.segment) {
-                parts.push(variant.segment);
-            }
-
-            if (parts.length === 0) {
-                // Invariant
-                parts.push("Default");
-            }
-
-            return parts.join(" - ");
-        }
+        $scope.getVariantDisplayName = variantHelper.getDisplayName;
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
         function canPublish() {

@@ -19,7 +19,7 @@
         controller: umbVariantContentEditorsController
     };
 
-    function umbVariantContentEditorsController($scope, $location, $timeout) {
+    function umbVariantContentEditorsController($scope, $location, $timeout, variantHelper) {
 
         var prevContentDateUpdated = null;
 
@@ -41,7 +41,7 @@
         vm.editors = [];
         //Used to track the open variants across the split views
         // The values are the variant ids of the currently open variants. 
-        // See getVariantId() for the current format.
+        // See variantHelper.getId() for the current format.
         vm.openVariants = [];
 
         /** Called when the component initializes */
@@ -87,7 +87,7 @@
             // set the active variant
             var activeVariant = null;                     
             _.each(vm.content.variants, function (v) {
-                if (getVariantId(v) === vm.variantId) {
+                if (variantHelper.getId(v) === vm.variantId) {
                     v.active = true;
                     activeVariant = v;
                 }
@@ -107,10 +107,10 @@
             if (vm.editors.length > 1) {
                 //now re-sync any other editor content (i.e. if split view is open)
                 for (var s = 1; s < vm.editors.length; s++) {
-                    var editorVariantId = getVariantId(vm.editors[s].content);
+                    var editorVariantId = variantHelper.getId(vm.editors[s].content);
                     //get the variant from the scope model
                     var variant = _.find(vm.content.variants, function (v) {
-                        return getVariantId(v) === editorVariantId;
+                        return variantHelper.getId(v) === editorVariantId;
                     });
                     vm.editors[s].content = initVariant(variant, s);
                 }
@@ -125,7 +125,7 @@
          */
         function insertVariantEditor(index, variant) {
 
-            var variantId = getVariantId(variant);
+            var variantId = variantHelper.getId(variant);
 
             //check if the variant at the index is the same, if it's null an editor will be added            
             var currentVariantId = vm.editors.length === 0 || vm.editors.length <= index ? null : vm.editors[index].variantId;
@@ -143,27 +143,6 @@
             else {
                 //replace the editor for the same culture
                 vm.editors[index].content = variant;
-            }
-        }
-
-        function getVariantId(variant) {
-            var hasLanguage = variant.language && !!variant.language.culture;
-            var hasSegment = !!variant.segment;
-
-            var sep = ";";
-
-            if (!hasLanguage && !hasSegment) {
-                // Invariant
-                return "";
-            } else if (hasLanguage && !hasSegment) {
-                // Culture only
-                return variant.language.culture;
-            } else if (!hasLanguage && hasSegment) {
-                // Segment only
-                return sep + variant.segment;
-            } else {
-                // Culture and Segment
-                return variant.language.culture + sep + variant.segment;
             }
         }
 
@@ -208,7 +187,7 @@
                     }
                 }
 
-                var variantId = getVariantId(variant);
+                var variantId = variantHelper.getId(variant);
                 // keep track of the open variants across the different split views
                 // push the first variant then update the variant index based on the editor index
                 if (vm.openVariants && vm.openVariants.length === 0) {
@@ -247,11 +226,11 @@
          * @param {any} selectedVariant
          */
         function openSplitView(selectedVariant) {
-            var variant = getVariantId(selectedVariant);
+            var variant = variantHelper.getId(selectedVariant);
 
             //Find the whole variant model based on the culture that was chosen
             var variant = _.find(vm.content.variants, function (v) {
-                return getVariantId(v) === variant;
+                return variantHelper.getId(v) === variant;
             });
 
             insertVariantEditor(vm.editors.length, initVariant(variant, vm.editors.length));
@@ -308,7 +287,7 @@
          */
         function selectVariant(variant, editorIndex) {
 
-            var variantId = getVariantId(variant);
+            var variantId = variantHelper.getId(variant);
 
             // prevent variants already open in a split view to be opened
             if (vm.openVariants.indexOf(variantId) !== -1)  {
@@ -335,7 +314,7 @@
                 //get the variant content model and initialize the editor with that
                 var contentVariant = _.find(vm.content.variants,
                     function (v) {
-                        return getVariantId(v) === variantId;
+                        return variantHelper.getId(v) === variantId;
                     });
                 editor.content = initVariant(contentVariant, editorIndex);
 

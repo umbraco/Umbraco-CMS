@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader(serverValidationManager, localizationService, editorState) {
+    function EditorContentHeader(serverValidationManager, localizationService, editorState, variantHelper) {
 
         function link(scope, el, attr, ctrl) {
             
@@ -91,29 +91,6 @@
                 
             }
 
-            function getVariantDisplayName(variant) {
-                if (variant == null) {
-                    return "";
-                }
-
-                var parts = [];
-
-                if (variant.language && variant.language.name) {
-                    parts.push(variant.language.name);
-                }
-
-                if (variant.segment) {
-                    parts.push(variant.segment);
-                }
-
-                if (parts.length === 0) {
-                    // Invariant
-                    parts.push("Default");
-                }
-
-                return parts.join(" - ");
-            }
-
             function setCurrentVariant() {
                 angular.forEach(scope.content.variants, function (variant) {
                     if (variant.active) {
@@ -123,7 +100,7 @@
                 });
             }
 
-            scope.getVariantDisplayName = getVariantDisplayName;
+            scope.getVariantDisplayName = variantHelper.getDisplayName;
 
             scope.goBack = function () {
                 if (scope.onBack) {
@@ -164,33 +141,12 @@
                 }
             };
 
-            function getVariantId(variant) {
-                var hasLanguage = variant.language && !!variant.language.culture;
-                var hasSegment = !!variant.segment;
-
-                var sep = ";";
-
-                if (!hasLanguage && !hasSegment) {
-                    // Invariant
-                    return "";
-                } else if (hasLanguage && !hasSegment) {
-                    // Culture only
-                    return variant.language.culture;
-                } else if (!hasLanguage && hasSegment) {
-                    // Segment only
-                    return sep + variant.segment;
-                } else {
-                    // Culture and Segment
-                    return variant.language.culture + sep + variant.segment;
-                }
-            }
-
             /**
              * keep track of open variants - this is used to prevent the same variant to be open in more than one split view
              * @param {any} culture
              */
             scope.variantIsOpen = function (variant) {
-                var variantId = getVariantId(variant);
+                var variantId = variantHelper.getId(variant);
                 return (scope.openVariants.indexOf(variantId) !== -1);
             }
             
