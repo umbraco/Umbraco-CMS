@@ -471,7 +471,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
-                stateSelector: 'img',
+                stateSelector: 'img[data-udi]',
                 onclick: function () {
 
 
