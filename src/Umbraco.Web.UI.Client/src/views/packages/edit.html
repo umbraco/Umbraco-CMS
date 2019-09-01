@@ -161,73 +161,102 @@
                         <umb-control-group label="@treeHeaders_templates">
                             <div ng-repeat="template in ::vm.templates | orderBy:'name'">
                                 <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.templates"
-                                        checklist-value="template.id" />
+                                    <umb-checkbox model="template.selected"
+                                                  on-change="vm.selectTemplate(template)"
+                                                  text="{{template.name}}" />
+
+                                    <br />
+                                    <input type="checkbox"
+                                           checklist-model="vm.package.templates"
+                                           checklist-value="template.id" />
                                     {{template.name}}
                                 </label>
                             </div>
+                            <pre>{{vm.package.templates | json }}</pre>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_stylesheets">
                             <div ng-repeat="stylesheet in ::vm.stylesheets | orderBy:'name'">
                                 <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.stylesheets"
-                                        checklist-value="stylesheet.name" />
+                                    <umb-checkbox model="stylesheet.selected"
+                                                  on-change="vm.selectStyleSheet(stylesheet)"
+                                                  text="{{stylesheet.path}}" />
+
+                                    <input type="checkbox"
+                                           checklist-model="vm.package.stylesheets"
+                                           checklist-value="stylesheet.name" />
                                     {{stylesheet.path}}
                                 </label>
                             </div>
+                            <pre>{{vm.package.stylesheets | json }}</pre>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_macros">
                             <div ng-repeat="macro in ::vm.macros | orderBy:'name'">
                                 <label>
+                                    <umb-checkbox model="macro.selected"
+                                                  on-change="vm.selectMacro(macro)"
+                                                  text="{{macro.name}}" />
+
+                                    <br />
                                     <input type="checkbox"
                                            checklist-model="vm.package.macros"
                                            checklist-value="macro.id" />
                                     {{macro.name}}
                                 </label>
                             </div>
-
+                            <pre>{{vm.package.macros | json }}</pre>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_languages">
                             <div ng-repeat="language in ::vm.languages | orderBy:'name'">
                                 <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.languages"
-                                        checklist-value="language.id" />
+                                    <umb-checkbox model="language.selected"
+                                                  on-change="vm.selectLanguage(language)"
+                                                  text="{{language.name}}" />
+
+                                    <br />
+
+                                    <input type="checkbox"
+                                           checklist-model="vm.package.languages"
+                                           checklist-value="language.id" />
                                     {{language.name}}
                                 </label>
                             </div>
+                            <pre>{{vm.package.languages | json }}</pre>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_dictionary">
                             <div ng-repeat="dictionaryItem in ::vm.dictionaryItems | orderBy:'name'">
                                 <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.dictionaryItems"
-                                        checklist-value="dictionaryItem.id" />
+                                    <umb-checkbox model="dictionaryItem.selected"
+                                                  on-change="vm.selectDictionaryItem(dictionaryItem)"
+                                                  text="{{dictionaryItem.name}}" />
+
+                                    <input type="checkbox"
+                                           checklist-model="vm.package.dictionaryItems"
+                                           checklist-value="dictionaryItem.id" />
                                     {{dictionaryItem.name}}
                                 </label>
                             </div>
+                            <pre>{{vm.package.dictionaryItems | json }}</pre>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_dataTypes">
                             <div ng-repeat="dataType in ::vm.dataTypes | orderBy:'name'">
                                 <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.dataTypes"
-                                        checklist-value="dataType.id" />
+                                    <umb-checkbox model="dataType.selected"
+                                                  on-change="vm.selectDataType(dataType)"
+                                                  text="{{dataType.name}}" />
+
+                                    <br />
+                                    <input type="checkbox"
+                                           checklist-model="vm.package.dataTypes"
+                                           checklist-value="dataType.id" />
                                     {{dataType.name}}
                                 </label>
                             </div>
+                            <pre>{{vm.package.dataTypes | json }}</pre>
                         </umb-control-group>
 
                     </div>

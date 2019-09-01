@@ -28,6 +28,12 @@
         vm.contributorsEditor = null;
 
         vm.selectDocumentType = selectDocumentType;
+        vm.selectTemplate = selectTemplate;
+        vm.selectStyleSheet = selectStyleSheet;
+        vm.selectMacro = selectMacro;
+        vm.selectLanguage = selectLanguage;
+        vm.selectDictionaryItem = selectDictionaryItem;
+        vm.selectDataType = selectDataType;
 
         vm.buttonLabel = "";
 
@@ -36,7 +42,7 @@
         function onInit() {
 
             if (create) {
-                //pre populate package with some values
+                // Pre populate package with some values
                 packageResource.getEmpty().then(scaffold => {
                     vm.package = scaffold;
 
@@ -49,14 +55,15 @@
                     vm.buttonLabel = value;
                 });
             } else {
-                // load package
+                // Load package
                 packageResource.getCreatedById(packageId).then(createdPackage => {
                     vm.package = createdPackage;
 
                     buildContributorsEditor(vm.package);
 
                     vm.loading = false;
-                    // get render model for content node
+
+                    // Get render model for content node
                     if(vm.package.contentNodeId) {
                         entityResource.getById(vm.package.contentNodeId, "Document")
                             .then((entity) => {
@@ -71,66 +78,76 @@
                 });
             }
 
-            // get all doc types
+            // Get all document types
             entityResource.getAll("DocumentType").then(documentTypes => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 documentTypes.forEach(documentType => {
                     documentType.id = documentType.id.toString();
+                    documentType.selected = vm.package.documentTypes.indexOf(documentType.id) >= 0;
                 });
                 vm.documentTypes = documentTypes;
             });
 
-            // get all templates
+            // Get all templates
             entityResource.getAll("Template").then(templates => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 templates.forEach(template => {
                     template.id = template.id.toString();
+                    template.selected = vm.package.templates.indexOf(template.id) >= 0;
                 });
                 vm.templates = templates;
             });
 
-            // get all stylesheets
+            // Get all stylesheets
             entityResource.getAll("Stylesheet").then(stylesheets => {
+                stylesheets.forEach(stylesheet => {
+                    stylesheet.selected = vm.package.stylesheets.indexOf(stylesheet.name) >= 0;
+                });
                 vm.stylesheets = stylesheets;
             });
 
+            // Get all macros
             entityResource.getAll("Macro").then(macros => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 macros.forEach(macro => {
                     macro.id = macro.id.toString();
+                    macro.selected = vm.package.macros.indexOf(macro.id) >= 0;
                 });
                 vm.macros = macros;
             });
 
-            // get all languages
+            // Get all languages
             entityResource.getAll("Language").then(languages => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 languages.forEach(language => {
                     language.id = language.id.toString();
+                    language.selected = vm.package.languagues.indexOf(language.id) >= 0;
                 });
                 vm.languages = languages;
             });
 
-            // get all dictionary items
+            // Get all dictionary items
             entityResource.getAll("DictionaryItem").then(dictionaryItems => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 dictionaryItems.forEach(dictionaryItem => {
                     dictionaryItem.id = dictionaryItem.id.toString();
+                    dictionaryItem.selected = vm.package.dictionaryItems.indexOf(dictionaryItem.id) >= 0;
                 });
                 vm.dictionaryItems = dictionaryItems;
             });
 
-            // get all data types items
+            // Get all data types
             entityResource.getAll("DataType").then(dataTypes => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 dataTypes.forEach(dataType => {
                     dataType.id = dataType.id.toString();
+                    dataType.selected = vm.package.dataTypes.indexOf(dataType.id) >= 0;
                 });
                 vm.dataTypes = dataTypes;
             });
@@ -282,6 +299,78 @@
                 vm.package.documentTypes.push(doctype.id);
             } else {
                 vm.package.documentTypes.splice(index, 1);
+            }
+        }
+
+        function selectTemplate(template) {
+
+            // Check if the template is already selected.
+            var index = vm.package.templates.indexOf(template.id);
+
+            if (index === -1) {
+                vm.package.templates.push(template.id);
+            } else {
+                vm.package.templates.splice(index, 1);
+            }
+        }
+
+        function selectStyleSheet(stylesheet) {
+
+            // Check if the style sheet is already selected.
+            var index = vm.package.stylesheets.indexOf(stylesheet.name);
+
+            if (index === -1) {
+                vm.package.stylesheets.push(stylesheet.name);
+            } else {
+                vm.package.stylesheets.splice(index, 1);
+            }
+        }
+
+        function selectMacro(macro) {
+
+            // Check if the macro is already selected.
+            var index = vm.package.macros.indexOf(macro.id);
+
+            if (index === -1) {
+                vm.package.macros.push(macro.id);
+            } else {
+                vm.package.macros.splice(index, 1);
+            }
+        }
+
+        function selectLanguage(language) {
+
+            // Check if the language is already selected.
+            var index = vm.package.languages.indexOf(language.id);
+
+            if (index === -1) {
+                vm.package.languages.push(language.id);
+            } else {
+                vm.package.languages.splice(index, 1);
+            }
+        }
+
+        function selectDictionaryItem(dictionaryItem) {
+
+            // Check if the dictionary item is already selected.
+            var index = vm.package.dictionaryItems.indexOf(dictionaryItem.id);
+
+            if (index === -1) {
+                vm.package.dictionaryItems.push(dictionaryItem.id);
+            } else {
+                vm.package.dictionaryItems.splice(index, 1);
+            }
+        }
+
+        function selectDataType(dataType) {
+
+            // Check if the dictionary item is already selected.
+            var index = vm.package.dataTypes.indexOf(dataType.id);
+
+            if (index === -1) {
+                vm.package.dataTypes.push(dataType.id);
+            } else {
+                vm.package.dataTypes.splice(index, 1);
             }
         }
 
