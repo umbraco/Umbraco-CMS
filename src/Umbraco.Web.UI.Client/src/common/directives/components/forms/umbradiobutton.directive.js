@@ -27,6 +27,7 @@
 @param {string} text Set the text for the radiobutton label.
 @param {boolean} disabled Set the radiobutton to be disabled.
 @param {boolean} required Set the radiobutton to be required.
+@param {string} onChange Callback when the value of the radiobutton change by interaction.
 
 **/
 
@@ -36,6 +37,12 @@
     function UmbRadiobuttonController() {
 
         var vm = this;
+
+        if (vm.onChange) {
+            $timeout(function () {
+                vm.onChange({ model: vm.model, value: vm.value });
+            }, 0);
+        }
         
     }
 
@@ -49,7 +56,8 @@
             name: "@",
             text: "@",
             disabled: "=",
-            required: "="
+            required: "=",
+            onChange: "&"
         }
     };
 
