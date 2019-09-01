@@ -343,7 +343,12 @@ namespace Umbraco.Core.Mapping
 
             if (ctor == null) return null;
 
-            _ctors[sourceType] = sourceCtor;
+            if (_ctors.ContainsKey(sourceType))
+                foreach (var c in sourceCtor)
+                    _ctors[sourceType].Add(c.Key, c.Value);
+            else
+                _ctors[sourceType] = sourceCtor;
+            
             return ctor;
         }
 
@@ -368,7 +373,12 @@ namespace Umbraco.Core.Mapping
 
             if (map == null) return null;
 
-            _maps[sourceType] = sourceMap;
+            if (_maps.ContainsKey(sourceType))
+                foreach(var m in sourceMap)
+                    _maps[sourceType].Add(m.Key, m.Value);
+            else
+                _maps[sourceType] = sourceMap;
+            
             return map;
         }
 
