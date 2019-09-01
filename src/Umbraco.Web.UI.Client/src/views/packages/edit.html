@@ -131,18 +131,21 @@
                                 <localize key="general_add">Add</localize>
                             </a>
 
-                            <umb-checkbox model="vm.package.contentLoadChildNodes"
-                                            disabled="!vm.package.contentNodeId"
-                                            text="{{vm.labels.includeAllChildNodes}}" />
+                            <label>
+                                <umb-checkbox model="vm.package.contentLoadChildNodes"
+                                              disabled="!vm.package.contentNodeId"
+                                              text="{{vm.labels.includeAllChildNodes}}" />
+                            </label>
 
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_documentTypes">
                             <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
-
-                                <umb-checkbox model="doctype.selected"
-                                                on-change="vm.selectDocumentType(doctype)"
-                                                text="{{doctype.name}}" />
+                                <label>
+                                    <umb-checkbox model="doctype.selected"
+                                                  on-change="vm.selectDocumentType(doctype)"
+                                                  text="{{doctype.name}}" />
+                                </label>
                             </div>
                         </umb-control-group>
 
