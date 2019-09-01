@@ -49,7 +49,6 @@
         
     }
     
-    
     var component = {
         templateUrl: 'views/components/forms/umb-checkbox.html',
         controller: UmbCheckboxController,
@@ -63,7 +62,7 @@
             serverValidationField: "@",
             disabled: "<",
             required: "<",
-            onChange: "&"
+            onChange: "&?"
         }
     };
 
