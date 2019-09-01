@@ -131,11 +131,13 @@
                                 <localize key="general_add">Add</localize>
                             </a>
 
-                            <label>
-                                <umb-checkbox model="vm.package.contentLoadChildNodes"
-                                              disabled="!vm.package.contentNodeId"
-                                              text="{{vm.labels.includeAllChildNodes}}" />
-                            </label>
+                            <div>
+                                <label>
+                                    <umb-checkbox model="vm.package.contentLoadChildNodes"
+                                                  disabled="!vm.package.contentNodeId"
+                                                  text="{{vm.labels.includeAllChildNodes}}" />
+                                </label>
+                            </div>
 
                         </umb-control-group>
 
