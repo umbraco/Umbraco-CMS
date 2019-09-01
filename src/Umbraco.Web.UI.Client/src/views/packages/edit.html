@@ -131,14 +131,11 @@
                                 <localize key="general_add">Add</localize>
                             </a>
 
-                            <div>
-                                <label>
-                                    <umb-checkbox model="vm.package.contentLoadChildNodes"
-                                                  disabled="!vm.package.contentNodeId"
-                                                  text="{{vm.labels.includeAllChildNodes}}" />
-                                </label>
-                            </div>
-
+                            <label style="padding-left: 0;">
+                                <umb-checkbox model="vm.package.contentLoadChildNodes"
+                                                disabled="!vm.package.contentNodeId"
+                                                text="{{vm.labels.includeAllChildNodes}}" />
+                            </label>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_documentTypes">
