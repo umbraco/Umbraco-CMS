@@ -40,8 +40,8 @@
     function UmbCheckboxController($timeout) {
         
         var vm = this;
-        
-        vm.callOnChange = function() {
+
+        if (vm.onChange) {
             $timeout(function() {
                 vm.onChange({model:vm.model, value:vm.value});
             }, 0);
