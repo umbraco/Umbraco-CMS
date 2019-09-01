@@ -46,6 +46,8 @@
                 packageResource.getEmpty().then(scaffold => {
                     vm.package = scaffold;
 
+                    loadResources();
+
                     buildContributorsEditor(vm.package);
 
                     vm.loading = false;
@@ -59,12 +61,14 @@
                 packageResource.getCreatedById(packageId).then(createdPackage => {
                     vm.package = createdPackage;
 
+                    loadResources();
+
                     buildContributorsEditor(vm.package);
 
                     vm.loading = false;
 
                     // Get render model for content node
-                    if(vm.package.contentNodeId) {
+                    if (vm.package.contentNodeId) {
                         entityResource.getById(vm.package.contentNodeId, "Document")
                             .then((entity) => {
                                 vm.contentNodeDisplayModel = entity;
@@ -77,6 +81,9 @@
                     vm.buttonLabel = value;
                 });
             }
+        }
+
+        function loadResources() {
 
             // Get all document types
             entityResource.getAll("DocumentType").then(documentTypes => {
@@ -84,7 +91,7 @@
                 // need to convert all ids to string for comparison
                 documentTypes.forEach(documentType => {
                     documentType.id = documentType.id.toString();
-                    documentType.selected = vm.package.documentTypes.indexOf(documentType.id) >= 0;
+                    documentType.selected = vm.package.documentTypes.indexOf(documentType.id) !== -1;
                 });
                 vm.documentTypes = documentTypes;
             });
@@ -114,7 +121,7 @@
                 // need to convert all ids to string for comparison
                 macros.forEach(macro => {
                     macro.id = macro.id.toString();
-                    macro.selected = vm.package.macros.indexOf(macro.id) >= 0;
+                    macro.selected = vm.package.macros.indexOf(macro.id) !== -1;
                 });
                 vm.macros = macros;
             });
@@ -125,7 +132,7 @@
                 // need to convert all ids to string for comparison
                 languages.forEach(language => {
                     language.id = language.id.toString();
-                    language.selected = vm.package.languagues.indexOf(language.id) >= 0;
+                    language.selected = vm.package.languages.indexOf(language.id) !== -1;
                 });
                 vm.languages = languages;
             });
@@ -136,7 +143,7 @@
                 // need to convert all ids to string for comparison
                 dictionaryItems.forEach(dictionaryItem => {
                     dictionaryItem.id = dictionaryItem.id.toString();
-                    dictionaryItem.selected = vm.package.dictionaryItems.indexOf(dictionaryItem.id) >= 0;
+                    dictionaryItem.selected = vm.package.dictionaryItems.indexOf(dictionaryItem.id) !== -1;
                 });
                 vm.dictionaryItems = dictionaryItems;
             });
@@ -147,7 +154,7 @@
                 // need to convert all ids to string for comparison
                 dataTypes.forEach(dataType => {
                     dataType.id = dataType.id.toString();
-                    dataType.selected = vm.package.dataTypes.indexOf(dataType.id) >= 0;
+                    dataType.selected = vm.package.dataTypes.indexOf(dataType.id) !== -1;
                 });
                 vm.dataTypes = dataTypes;
             });
