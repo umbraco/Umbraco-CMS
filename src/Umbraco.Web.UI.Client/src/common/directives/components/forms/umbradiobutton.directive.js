@@ -33,25 +33,26 @@
 (function () {
     'use strict';
 
-    function RadiobuttonDirective() {
-        var directive = {
-            restrict: 'E',
-            replace: true,
-            templateUrl: 'views/components/forms/umb-radiobutton.html',
-            scope: {
-                model: "=",
-                value: "@",
-                name: "@",
-                text: "@",
-                disabled: "=",
-                required: "="
-            }
-        };
+    function UmbRadiobuttonController() {
 
-        return directive;
-
+        var vm = this;
+        
     }
 
-    angular.module('umbraco.directives').directive('umbRadiobutton', RadiobuttonDirective);
+    var component = {
+        templateUrl: 'views/components/forms/umb-radiobutton.html',
+        controller: UmbRadiobuttonController,
+        controllerAs: 'vm',
+        scope: {
+            model: "=",
+            value: "@",
+            name: "@",
+            text: "@",
+            disabled: "=",
+            required: "="
+        }
+    };
+
+    angular.module('umbraco.directives').component('umbRadiobutton', component);
 
 })();
