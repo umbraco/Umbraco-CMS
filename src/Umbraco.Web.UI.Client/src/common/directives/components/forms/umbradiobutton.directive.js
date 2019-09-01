@@ -57,7 +57,7 @@
             text: "@",
             disabled: "=",
             required: "=",
-            onChange: "&"
+            onChange: "&?"
         }
     };
 
