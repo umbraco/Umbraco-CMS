@@ -131,20 +131,18 @@
                                 <localize key="general_add">Add</localize>
                             </a>
 
-                            <label style="padding-left: 0;">
-                                <input type="checkbox" ng-model="vm.package.contentLoadChildNodes" ng-disabled="!vm.package.contentNodeId" />
-                                <localize key="packager_includeAllChildNodes">Include all child nodes</localize>
-                            </label>
+                            <umb-checkbox model="vm.package.contentLoadChildNodes"
+                                            disabled="!vm.package.contentNodeId"
+                                            text="{{vm.labels.includeAllChildNodes}}" />
 
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_documentTypes">
                             <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
-                                <label>
-                                    <umb-checkbox model="doctype.selected"
-                                                  on-change="vm.selectDocumentType(doctype)"
-                                                  text="{{doctype.name}}" />
-                                </label>
+
+                                <umb-checkbox model="doctype.selected"
+                                                on-change="vm.selectDocumentType(doctype)"
+                                                text="{{doctype.name}}" />
                             </div>
                         </umb-control-group>
 
@@ -310,7 +308,7 @@
                                 action="vm.createOrUpdatePackage(editPackageForm)"
                                 state="vm.buttonState"
                                 button-style="success"
-                                label="{{vm.buttonLabel}}"
+                                label="{{vm.labels.button}}"
                                 disabled="vm.loading">
                     </umb-button>
 

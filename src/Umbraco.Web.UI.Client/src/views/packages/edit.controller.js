@@ -35,7 +35,7 @@
         vm.selectDictionaryItem = selectDictionaryItem;
         vm.selectDataType = selectDataType;
 
-        vm.buttonLabel = "";
+        vm.labels = {};
 
         vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;  
 
@@ -53,8 +53,8 @@
                     vm.loading = false;
                 });
 
-                localizationService.localize("general_create").then(function(value) {
-                    vm.buttonLabel = value;
+                localizationService.localize("general_create").then(function (value) {
+                    vm.labels.button = value;
                 });
             } else {
                 // Load package
@@ -77,9 +77,11 @@
 
                 });
 
-                localizationService.localize("buttons_save").then(function (value) {
-                    vm.buttonLabel = value;
+                localizationService.localizeMany(["buttons_save", "packager_includeAllChildNodes"]).then(function (values) {
+                    vm.labels.button = values[0];
+                    vm.labels.includeAllChildNodes = values[1];
                 });
+
             }
         }
 
