@@ -141,6 +141,11 @@
                         <umb-control-group label="@treeHeaders_documentTypes">
                             <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
                                 <label>
+                                    <umb-checkbox model="doctype.selected"
+                                                  on-change="vm.selectDocumentType(doctype)"
+                                                  text="{{doctype.name}}" />
+
+                                    <br />
                                     <input
                                         type="checkbox"
                                         ng-model="doctype.selected"
@@ -149,6 +154,8 @@
                                     {{doctype.name}}
                                 </label>
                             </div>
+
+                            <pre>{{vm.package.documentTypes | json }}</pre>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_templates">

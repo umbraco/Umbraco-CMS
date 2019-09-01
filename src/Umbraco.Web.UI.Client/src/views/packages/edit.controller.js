@@ -5,6 +5,9 @@
 
         const vm = this;
 
+        const packageId = $routeParams.id;
+        const create = $routeParams.create;
+
         vm.showBackButton = true;
 
         // open all expansion panels
@@ -24,12 +27,11 @@
         vm.downloadFile = downloadFile;
         vm.contributorsEditor = null;
 
+        vm.selectDocumentType = selectDocumentType;
+
         vm.buttonLabel = "";
 
-        vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;
-
-        const packageId = $routeParams.id;
-        const create = $routeParams.create;
+        vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;  
 
         function onInit() {
 
@@ -269,6 +271,18 @@
 
         function removePackageView() {
             vm.package.packageView = null;
+        }
+
+        function selectDocumentType(doctype) {
+
+            // Check if the document type is already selected.
+            var index = vm.package.documentTypes.indexOf(doctype.id);
+
+            if (index === -1) {
+                vm.package.documentTypes.push(doctype.id);
+            } else {
+                vm.package.documentTypes.splice(index, 1);
+            }
         }
 
         function buildContributorsEditor(pkg) {
