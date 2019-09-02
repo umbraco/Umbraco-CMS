@@ -1,70 +1,50 @@
 /**
-    * @ngdoc service
-    * @name umbraco.resources.logViewerResource
-    * @description Retrives Umbraco log items (by default from JSON files on disk)
-    *
-    *
-    **/
-   function logViewerResource($q, $http, umbRequestHelper) {
+ * @ngdoc service
+ * @name umbraco.resources.logViewerResource
+ * @description Retrives Umbraco log items (by default from JSON files on disk)
+ *
+ *
+ **/
+function logViewerResource($q, $http, umbRequestHelper) {
+
+    /**
+     * verb => 'get', 'post',
+     * method => API method to call
+     * params => additional data to send
+     * error => error message when things go wrong...
+     */
+    const request = (verb, method, params, error) =>
+        umbRequestHelper.resourcePromise(
+            (verb === 'GET' ?
+            $http.get(umbRequestHelper.getApiUrl("logViewerApiBaseUrl", method) + (params ? params : '')) : 
+            $http.post(umbRequestHelper.getApiUrl("logViewerApiBaseUrl", method), params)),
+        error); 
 
     //the factory object returned
     return {
 
-        getNumberOfErrors: function () {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "logViewerApiBaseUrl",
-                        "GetNumberOfErrors")),
-                'Failed to retrieve number of errors in logs');
-        },
+        getNumberOfErrors: (startDate, endDate) => 
+            request('GET', 'GetNumberOfErrors', '?startDate=' + startDate + '&endDate=' + endDate, 'Failed to retrieve number of errors in logs'),    
 
-        getLogLevelCounts: function () {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "logViewerApiBaseUrl",
-                        "GetLogLevelCounts")),
-                'Failed to retrieve log level counts');
-        },
+        getLogLevel: () =>
+            request('GET', 'GetLogLevel', null, 'Failed to retrieve log level'),        
 
-        getMessageTemplates: function () {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "logViewerApiBaseUrl",
-                        "GetMessageTemplates")),
-                'Failed to retrieve log templates');
-        },
+        getLogLevelCounts: (startDate, endDate) =>
+            request('GET', 'GetLogLevelCounts', '?startDate=' + startDate + '&endDate=' + endDate, 'Failed to retrieve log level counts'),  
 
-        getSavedSearches: function () {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "logViewerApiBaseUrl",
-                        "GetSavedSearches")),
-                'Failed to retrieve saved searches');
-        },
+        getMessageTemplates: (startDate, endDate) => 
+            request('GET', 'GetMessageTemplates', '?startDate=' + startDate + '&endDate=' + endDate, 'Failed to retrieve log templates'), 
 
-        postSavedSearch: function (name, query) {
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "logViewerApiBaseUrl",
-                        "PostSavedSearch"), { 'name': name, 'query': query }),
-                'Failed to add new saved search');
-        },
+        getSavedSearches: () =>
+            request('GET', 'GetSavedSearches', null, 'Failed to retrieve saved searches'),      
 
-        deleteSavedSearch: function (name, query) {
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "logViewerApiBaseUrl",
-                        "DeleteSavedSearch"), { 'name': name, 'query': query }),
-                'Failed to delete saved search');
-        },
+        postSavedSearch: (name, query) =>
+            request('POST', 'PostSavedSearch', { 'name': name, 'query': query }, 'Failed to add new saved search'),
 
-        getLogs: function (options) {
+        deleteSavedSearch: (name, query) =>
+            request('POST', 'DeleteSavedSearch', { 'name': name, 'query': query }, 'Failed to delete saved search'),
+
+        getLogs: options => {
 
             var defaults = {
                 pageSize: 100,
@@ -83,7 +63,6 @@
             //now copy back to the options we will use
             options = defaults;
 
-
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -93,15 +72,8 @@
                 'Failed to retrieve common log messages');
         },
 
-        canViewLogs: function () {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "logViewerApiBaseUrl",
-                        "GetCanViewLogs")),
-                'Failed to retrieve state if logs can be viewed');
-        }
-
+        canViewLogs: (startDate, endDate) => 
+            request('GET', 'GetCanViewLogs', '?startDate=' + startDate + '&endDate=' + endDate, 'Failed to retrieve state if logs can be viewed')    
     };
 }
 

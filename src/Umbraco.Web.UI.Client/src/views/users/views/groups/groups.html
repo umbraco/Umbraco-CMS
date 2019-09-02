@@ -70,7 +70,7 @@
         </div>
     </div>
 
-    <div class="umb-table" ng-if="!vm.loading">
+    <div class="umb-table" ng-if="!vm.loading && vm.filteredUserGroups.length">
 
         <div class="umb-table-head">
             <div class="umb-table-row">
@@ -84,7 +84,7 @@
 
         <div class="umb-table-body">
             <div class="umb-table-row"
-                ng-repeat="group in vm.userGroups | filter:vm.filter track by $index"
+                ng-repeat="group in vm.filteredUserGroups track by $index"
                 ng-click="vm.selectUserGroup(group, $index, $event)"
                 ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && group.alias !== 'admin' && group.alias !== 'translator'}">
 
@@ -118,5 +118,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Empty states -->
+    <umb-empty-state ng-if="!vm.loading && !vm.filteredUserGroups.length" position="center">
+        <localize key="general_searchNoResult"></localize>
+    </umb-empty-state>
 
 </div>

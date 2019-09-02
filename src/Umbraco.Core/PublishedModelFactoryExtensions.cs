@@ -9,7 +9,14 @@ namespace Umbraco.Core
     public static class PublishedModelFactoryExtensions
     {
         /// <summary>
-        /// Executes an action with a safe live factory/
+        /// Returns true if the current <see cref="IPublishedModelFactory"/> is an implementation of <see cref="ILivePublishedModelFactory"/>
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        public static bool IsLiveFactory(this IPublishedModelFactory factory) => factory is ILivePublishedModelFactory;
+
+        /// <summary>
+        /// Executes an action with a safe live factory
         /// </summary>
         /// <remarks>
         /// <para>If the factory is a live factory, ensures it is refreshed and locked while executing the action.</para>
@@ -20,6 +27,7 @@ namespace Umbraco.Core
             {
                 lock (liveFactory.SyncRoot)
                 {
+                    //Call refresh on the live factory to re-compile the models
                     liveFactory.Refresh();
                     action();
                 }

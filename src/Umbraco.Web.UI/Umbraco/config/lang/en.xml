@@ -38,6 +38,7 @@
     <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="wasMovedTo">was moved to</key>
     <key alias="wasCopiedTo">was copied to</key>
+    <key alias="wasDeleted">was deleted</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -304,7 +305,7 @@
     <key alias="createdBlueprintHeading">Content Template created</key>
     <key alias="createdBlueprintMessage">A Content Template was created from '%0%'</key>
     <key alias="duplicateBlueprintMessage">Another Content Template with the same name already exists</key>
-    <key alias="blueprintDescription">A Content Template is pre-defined content that an editor can select to use as the basis for creating new content</key>
+    <key alias="blueprintDescription">A Content Template is predefined content that an editor can select to use as the basis for creating new content</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
@@ -317,6 +318,7 @@
     <key alias="copyFailed">Failed to copy media</key>
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -329,8 +331,12 @@
     <key alias="createContentBlueprint">Select the document type you want to make a content template for</key>
     <key alias="enterFolderName">Enter a folder name</key>
     <key alias="updateData">Choose a type and a title</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
-    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
+    <key alias="noDocumentTypesWithNoSettingsAccess">The selected page in the content tree doesn't allow for any pages to be created below it.</key>
+    <key alias="noDocumentTypesEditPermissions">Edit permissions for this document type</key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
+    <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
+    <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
@@ -447,6 +453,7 @@
     <key alias="selectLink">Select link</key>
     <key alias="selectMacro">Select macro</key>
     <key alias="selectContent">Select content</key>
+    <key alias="selectContentType">Select content type</key>
     <key alias="selectMediaStartNode">Select media start node</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
@@ -472,7 +479,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left
+      Edit the different language versions for the dictionary item '<em>%0%</em>' below
    ]]></key>
     <key alias="displayName">Culture Name</key>
     <key alias="changeKeyError"><![CDATA[
@@ -522,6 +529,9 @@
     <key alias="anchor">#value or ?key=value</key>
         <key alias="enterAlias">Enter alias...</key>
         <key alias="generatingAlias">Generating alias...</key>
+        <key alias="a11yCreateItem">Create item</key>
+        <key alias="a11yEdit">Edit</key>
+        <key alias="a11yName">Name</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
@@ -1595,6 +1605,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="elementHeading">Is an Element type</key>
     <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
     <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
+    <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2038,7 +2049,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noSniffSetHeaderInConfigSuccess">A setting to create a header protecting against MIME sniffing vulnerabilities has been added to your web.config file.</key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[The header <strong>Strict-Transport-Security</strong> was not found.]]></key>
-    <key alias="hSTSSetHeaderInConfigDescription">Adds the header 'Strict-Transport-Security' with the value 'max-age=10886400; preload' to the httpProtocol/customHeaders section of web.config. Use this fix only if you will have your domains running with https for the next 18 weeks (minimum).</key>
+    <key alias="hSTSSetHeaderInConfigDescription">Adds the header 'Strict-Transport-Security' with the value 'max-age=10886400' to the httpProtocol/customHeaders section of web.config. Use this fix only if you will have your domains running with https for the next 18 weeks (minimum).</key>
     <key alias="hSTSSetHeaderInConfigSuccess">The HSTS header has been added to your web.config file.</key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
@@ -2115,7 +2126,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="settingsPublishedStatus">Published Status</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
-  </area>>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Go back</key>
+  </area>
 </language>

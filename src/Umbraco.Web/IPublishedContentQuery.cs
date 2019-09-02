@@ -39,10 +39,14 @@ namespace Umbraco.Web
         /// <param name="culture">Optional culture.</param>
         /// <param name="indexName">Optional index name.</param>
         /// <remarks>
-        /// <para>When the <paramref name="culture"/> is not specified, all cultures are searched.</para>
+        /// <para>
+        /// When the <paramref name="culture"/> is not specified or is *, all cultures are searched.
+        /// To search for only invariant documents and fields use null.
+        /// When searching on a specific culture, all culture specific fields are searched for the provided culture and all invariant fields for all documents.
+        /// </para>
         /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
         /// </remarks>
-        IEnumerable<PublishedSearchResult> Search(string term, string culture = null, string indexName = null);
+        IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = null);
 
         /// <summary>
         /// Searches content.
@@ -54,10 +58,14 @@ namespace Umbraco.Web
         /// <param name="culture">Optional culture.</param>
         /// <param name="indexName">Optional index name.</param>
         /// <remarks>
-        /// <para>When the <paramref name="culture"/> is not specified, all cultures are searched.</para>
+        /// <para>
+        /// When the <paramref name="culture"/> is not specified or is *, all cultures are searched.
+        /// To search for only invariant documents and fields use null.
+        /// When searching on a specific culture, all culture specific fields are searched for the provided culture and all invariant fields for all documents.
+        /// </para>
         /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
         /// </remarks>
-        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = null, string indexName = null);
+        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = null);
 
         /// <summary>
         /// Executes the query and converts the results to PublishedSearchResult.

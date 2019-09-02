@@ -129,7 +129,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureName.IsNullOrWhiteSpace())
                 throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
 
-            ((EntityBase) entity).AddingEntity();
+            entity.AddingEntity();
 
             // deal with entity becoming the new default entity
             if (entity.IsDefault)
@@ -156,7 +156,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureName.IsNullOrWhiteSpace())
                 throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
 
-            ((EntityBase) entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             if (entity.IsDefault)
             {
@@ -250,7 +250,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             lock (_codeIdMap)
             {
                 if (_codeIdMap.TryGetValue(isoCode, out var id)) return id;
-                if (isoCode.Contains('-') && _codeIdMap.TryGetValue(isoCode.Split('-').First(), out var invariantId)) return invariantId;
             }
             if (throwOnNotFound)
                 throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));

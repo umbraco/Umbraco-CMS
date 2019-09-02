@@ -135,6 +135,8 @@ namespace Umbraco.Web.Editors
 
             //They've successfully set their password, we can now update their user account to be approved
             Security.CurrentUser.IsApproved = true;
+            //They've successfully set their password, and will now get fully logged into the back office, so the lastlogindate is set so the backoffice shows they have logged in
+            Security.CurrentUser.LastLoginDate = DateTime.UtcNow;
             Services.UserService.Save(Security.CurrentUser);
 
             //now we can return their full object since they are now really logged into the back office

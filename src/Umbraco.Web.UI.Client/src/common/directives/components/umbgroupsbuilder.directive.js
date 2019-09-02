@@ -3,7 +3,7 @@
 
   function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, 
       dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, 
-      localizationService, editorService, eventsService) {
+      localizationService, editorService, eventsService, overlayService) {
     
     function link(scope, el, attr, ctrl) {
         
@@ -17,6 +17,7 @@
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
       scope.sortingButtonKey = "general_reorder";
+      scope.compositionsButtonState = "init";
 
       function activate() {
 
@@ -47,6 +48,7 @@
       function setSortingOptions() {
 
         scope.sortableOptionsGroup = {
+          axis: 'y',
           distance: 10,
           tolerance: "pointer",
           opacity: 0.7,
@@ -65,6 +67,7 @@
         };
 
         scope.sortableOptionsProperty = {
+          axis: 'y',
           distance: 10,
           tolerance: "pointer",
           connectWith: ".umb-group-builder__properties",
@@ -335,6 +338,7 @@
         })), function(f) {
             return f !== null && f !== undefined;
         });
+        scope.compositionsButtonState = "busy";
         $q.all([
             //get available composite types
             availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
@@ -354,6 +358,7 @@
         ]).then(function() {
             //resolves when both other promises are done, now show it
             editorService.open(scope.compositionsDialogModel);
+            scope.compositionsButtonState = "init";
         });
 
       };
@@ -474,10 +479,16 @@
         if (!property.inherited) {
 
           var oldPropertyModel = angular.copy(property);
+          if (oldPropertyModel.allowCultureVariant === undefined) {
+            // this is necessary for comparison when detecting changes to the property
+            oldPropertyModel.allowCultureVariant = scope.model.allowCultureVariant;
+            oldPropertyModel.alias = "";
+          }
+          var propertyModel = angular.copy(property);
 
           var propertySettings = {
             title: "Property settings",
-            property: property,
+            property: propertyModel,
             contentType: scope.contentType,
             contentTypeName: scope.model.name,
             contentTypeAllowCultureVariant: scope.model.allowCultureVariant,
@@ -487,7 +498,25 @@
 
               property.inherited = false;
               property.dialogIsOpen = false;
-  
+              property.propertyState = "active";
+
+              // apply all property changes
+              property.label = propertyModel.label;
+              property.alias = propertyModel.alias;
+              property.description = propertyModel.description;
+              property.config = propertyModel.config;
+              property.editor = propertyModel.editor;
+              property.view = propertyModel.view;
+              property.dataTypeId = propertyModel.dataTypeId;
+              property.dataTypeIcon = propertyModel.dataTypeIcon;
+              property.dataTypeName = propertyModel.dataTypeName;
+              property.validation.mandatory = propertyModel.validation.mandatory;
+              property.validation.pattern = propertyModel.validation.pattern;
+              property.showOnMemberProfile = propertyModel.showOnMemberProfile;
+              property.memberCanEdit = propertyModel.memberCanEdit;
+              property.isSensitiveValue = propertyModel.isSensitiveValue;
+              property.allowCultureVariant = propertyModel.allowCultureVariant;
+
               // update existing data types
               if(model.updateSameDataTypes) {
                 updateSameDataTypes(property);
@@ -506,44 +535,40 @@
               // push new init tab to the scope
               addInitGroup(scope.model.groups);
 
+              notifyChanged();
             },
             close: function() {
+              if(_.isEqual(oldPropertyModel, propertyModel) === false) {
+                localizationService.localizeMany(["general_confirm", "contentTypeEditor_propertyHasChanges", "general_cancel", "general_ok"]).then(function (data) {
+	              const overlay = {
+		            title: data[0],
+		            content: data[1],
+		            closeButtonLabel: data[2],
+		            submitButtonLabel: data[3],
+		            submitButtonStyle: "danger",
+		            close: function () {
+			          overlayService.close();
+		            },
+		            submit: function () {
+                      // close the confirmation
+			          overlayService.close();
+                      // close the editor
+                      editorService.close();
+		            }
+	              };
 
-              // reset all property changes
-              property.label = oldPropertyModel.label;
-              property.alias = oldPropertyModel.alias;
-              property.description = oldPropertyModel.description;
-              property.config = oldPropertyModel.config;
-              property.editor = oldPropertyModel.editor;
-              property.view = oldPropertyModel.view;
-              property.dataTypeId = oldPropertyModel.dataTypeId;
-              property.dataTypeIcon = oldPropertyModel.dataTypeIcon;
-              property.dataTypeName = oldPropertyModel.dataTypeName;
-              property.validation.mandatory = oldPropertyModel.validation.mandatory;
-              property.validation.pattern = oldPropertyModel.validation.pattern;
-              property.showOnMemberProfile = oldPropertyModel.showOnMemberProfile;
-              property.memberCanEdit = oldPropertyModel.memberCanEdit;
-              property.isSensitiveValue = oldPropertyModel.isSensitiveValue;
-
-              // because we set state to active, to show a preview, we have to check if has been filled out
-              // label is required so if it is not filled we know it is a placeholder
-              if(oldPropertyModel.editor === undefined || oldPropertyModel.editor === null || oldPropertyModel.editor === "") {
-                property.propertyState = "init";
-              } else {
-                property.propertyState = oldPropertyModel.propertyState;
+	              overlayService.open(overlay);
+                });
               }
-
-              // remove the editor
-              editorService.close();
-              
+              else {
+                // remove the editor
+                editorService.close();
+              }
             }
           };
 
           // open property settings editor
           editorService.open(propertySettings);
-
-          // set state to active to access the preview
-          property.propertyState = "active";
 
           // set property states
           property.dialogIsOpen = true;
@@ -567,7 +592,12 @@
 
         }
 
+        notifyChanged();
       };
+
+      function notifyChanged() {
+        eventsService.emit("editors.groupsBuilder.changed");
+      }
 
       function addInitProperty(group) {
 

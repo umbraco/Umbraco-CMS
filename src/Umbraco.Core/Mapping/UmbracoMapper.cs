@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Mapping
 {
@@ -191,7 +192,7 @@ namespace Umbraco.Core.Mapping
         private TTarget Map<TTarget>(object source, Type sourceType, MapperContext context)
         {
             if (source == null)
-                throw new ArgumentNullException(nameof(source));
+                return default;
 
             var targetType = typeof(TTarget);
 
@@ -259,7 +260,7 @@ namespace Umbraco.Core.Mapping
             if (typeof(TTarget).IsArray)
             {
                 var elementType = typeof(TTarget).GetElementType();
-                if (elementType == null) throw new Exception("panic");
+                if (elementType == null) throw new PanicException("elementType == null which should never occur");
                 var targetArray = Array.CreateInstance(elementType, targetList.Count);
                 targetList.CopyTo(targetArray, 0);
                 target = targetArray;
@@ -382,7 +383,7 @@ namespace Umbraco.Core.Mapping
         {
             if (type.IsArray) return type.GetElementType();
             if (type.IsGenericType) return type.GenericTypeArguments[0];
-            throw new Exception("panic");
+            throw new PanicException($"Could not get enumerable or array type from {type}");
         }
 
         /// <summary>

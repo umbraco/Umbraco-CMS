@@ -134,7 +134,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IRelation entity)
         {
-            ((EntityBase)entity).AddingEntity();
+            entity.AddingEntity();
 
             var factory = new RelationFactory(entity.RelationType);
             var dto = factory.BuildDto(entity);
@@ -147,7 +147,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IRelation entity)
         {
-            ((EntityBase)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             var factory = new RelationFactory(entity.RelationType);
             var dto = factory.BuildDto(entity);
