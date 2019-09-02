@@ -1,8 +1,14 @@
-(function() {
+// TODO: Make sure this does not break anything.
+var require = { paths: { 'vs': 'lib/monaco-editor' } };
+//var require = { paths: { 'vs': '../node_modules/monaco-editor/min/vs' } };
+
+(function ()
+{
     'use strict';
 
-    function AceEditorDirective(umbAceEditorConfig, assetsService, angularHelper) {
-
+    function MonacoEditorDirective(umbMonacoEditorConfig, assetsService, angularHelper)
+    {
+        console.log('love');
         /**
          * Sets editor options such as the wrapping mode or the syntax checker.
          *
@@ -20,164 +26,187 @@
          * @param session ACE editor session
          * @param {object} opts Options to be set
          */
-        var setOptions = function(acee, session, opts) {
+        var setOptions = function (monacoEditor, opts)
+        {
 
             // sets the ace worker path, if running from concatenated
             // or minified source
-            if (angular.isDefined(opts.workerPath)) {
-                var config = window.ace.require('ace/config');
-                config.set('workerPath', opts.workerPath);
-            }
+            // if (angular.isDefined(opts.workerPath)) {
+            //     // var config = window.ace.require('ace/config');
+            //     // config.set('workerPath', opts.workerPath);
+            // }
+
 
             // ace requires loading
-            if (angular.isDefined(opts.require)) {
-                opts.require.forEach(function(n) {
-                    window.ace.require(n);
-                });
-            }
+            // if (angular.isDefined(opts.require)) {
+            //     opts.require.forEach(function(n) {
+            //         window.ace.require(n);
+            //     });
+            // }
 
-            // Boolean options
-            if (angular.isDefined(opts.showGutter)) {
-                acee.renderer.setShowGutter(opts.showGutter);
-            }
-            if (angular.isDefined(opts.useWrapMode)) {
-                session.setUseWrapMode(opts.useWrapMode);
-            }
-            if (angular.isDefined(opts.showInvisibles)) {
-                acee.renderer.setShowInvisibles(opts.showInvisibles);
-            }
-            if (angular.isDefined(opts.showIndentGuides)) {
-                acee.renderer.setDisplayIndentGuides(opts.showIndentGuides);
-            }
-            if (angular.isDefined(opts.useSoftTabs)) {
-                session.setUseSoftTabs(opts.useSoftTabs);
-            }
-            if (angular.isDefined(opts.showPrintMargin)) {
-                acee.setShowPrintMargin(opts.showPrintMargin);
-            }
+            monacoEditor.updateOptions({
+                lineNumbers: "on",
+                language: opts.mode ? opts.mode : null,
+                wordWrap: opts.useWrapMode ? "on" : "off" // "off" | "on" | "wordWrapColumn" | "bounded"
+            });
+
+            // // Boolean options
+            // if (angular.isDefined(opts.showGutter)) {
+            //     acee.renderer.setShowGutter(opts.showGutter);
+            // }
+            // if (angular.isDefined(opts.useWrapMode)) {
+            //     session.setUseWrapMode(opts.useWrapMode);
+            // }
+            // if (angular.isDefined(opts.showInvisibles)) {
+            //     acee.renderer.setShowInvisibles(opts.showInvisibles);
+            // }
+            // if (angular.isDefined(opts.showIndentGuides)) {
+            //     acee.renderer.setDisplayIndentGuides(opts.showIndentGuides);
+            // }
+            // if (angular.isDefined(opts.useSoftTabs)) {
+            //     session.setUseSoftTabs(opts.useSoftTabs);
+            // }
+            // if (angular.isDefined(opts.showPrintMargin)) {
+            //     acee.setShowPrintMargin(opts.showPrintMargin);
+            // }
 
             // commands
-            if (angular.isDefined(opts.disableSearch) && opts.disableSearch) {
-                acee.commands.addCommands([{
-                    name: 'unfind',
-                    bindKey: {
-                        win: 'Ctrl-F',
-                        mac: 'Command-F'
-                    },
-                    exec: function() {
-                        return false;
-                    },
-                    readOnly: true
-                }]);
+            if (angular.isDefined(opts.disableSearch) && opts.disableSearch)
+            {
+                // monacoEditor.commands.addCommands([{
+                //     name: 'unfind',
+                //     bindKey: {
+                //         win: 'Ctrl-F',
+                //         mac: 'Command-F'
+                //     },
+                //     exec: function() {
+                //         return false;
+                //     },
+                //     readOnly: true
+                // }]);
             }
 
             // Basic options
-            if (angular.isString(opts.theme)) {
-                acee.setTheme('ace/theme/' + opts.theme);
+            if (angular.isString(opts.theme))
+            {
+                monacoEditor.updateOptions({ theme: opts.theme }); // vs | vs-dark
             }
-            if (angular.isString(opts.mode)) {
-                session.setMode('ace/mode/' + opts.mode);
+            if (angular.isString(opts.mode))
+            {
+                monacoEditor.updateOptions({ language: opts.mode })
             }
             // Advanced options
-            if (angular.isDefined(opts.firstLineNumber)) {
-                if (angular.isNumber(opts.firstLineNumber)) {
-                    session.setOption('firstLineNumber', opts.firstLineNumber);
-                } else if (angular.isFunction(opts.firstLineNumber)) {
-                    session.setOption('firstLineNumber', opts.firstLineNumber());
-                }
-            }
+            // if (angular.isDefined(opts.firstLineNumber))
+            // {
+            //     if (angular.isNumber(opts.firstLineNumber))
+            //     {
+            //         session.setOption('firstLineNumber', opts.firstLineNumber);
+            //     } else if (angular.isFunction(opts.firstLineNumber))
+            //     {
+            //         session.setOption('firstLineNumber', opts.firstLineNumber());
+            //     }
+            // }
 
             // advanced options
             var key, obj;
-            if (angular.isDefined(opts.advanced)) {
-                for (key in opts.advanced) {
+            if (angular.isDefined(opts.advanced))
+            {
+                for (key in opts.advanced)
+                {
                     // create a javascript object with the key and value
                     obj = {
                         name: key,
                         value: opts.advanced[key]
                     };
                     // try to assign the option to the ace editor
-                    acee.setOption(obj.name, obj.value);
+                    monacoEditor.updateOptions({ [obj.name]: obj.value });
                 }
             }
 
             // advanced options for the renderer
-            if (angular.isDefined(opts.rendererOptions)) {
-                for (key in opts.rendererOptions) {
-                    // create a javascript object with the key and value
-                    obj = {
-                        name: key,
-                        value: opts.rendererOptions[key]
-                    };
-                    // try to assign the option to the ace editor
-                    acee.renderer.setOption(obj.name, obj.value);
-                }
-            }
+            // if (angular.isDefined(opts.rendererOptions))
+            // {
+            //     for (key in opts.rendererOptions)
+            //     {
+            //         // create a javascript object with the key and value
+            //         obj = {
+            //             name: key,
+            //             value: opts.rendererOptions[key]
+            //         };
+            //         // try to assign the option to the ace editor
+            //         monacoEditor.updateOptions({ [obj.name]: obj.value });
+            //     }
+            // }
 
             // onLoad callbacks
-            angular.forEach(opts.callbacks, function(cb) {
-                if (angular.isFunction(cb)) {
-                    cb(acee);
+            angular.forEach(opts.callbacks, function (cb)
+            {
+                if (angular.isFunction(cb))
+                {
+                    cb(monacoEditor);
                 }
             });
         };
 
-        function link(scope, el, attr, ngModel) {
+        function link(scope, el, attr, ngModel)
+        {
+            assetsService.load([
+                "lib/monaco-editor/loader.js"], scope)
+                .then(function ()
+                {
+                    window.require.config({ paths: { 'vs': 'lib/monaco-editor' } });
+                    window.require(['vs/editor/editor.main'], function ()
+                    {
+                        setTimeout(() =>
+                        {
+                            if (angular.isUndefined(window.monaco))
+                            {
+                                throw new Error('Monaco editor is not defined.');
+                            }
+                            else
+                            {
+                                // init editor
+                                init();
+                            }
+                        }, 200);
+                    });
+                });
 
-            // Load in ace library
-            assetsService.load(['lib/ace-builds/src-min-noconflict/ace.js', 'lib/ace-builds/src-min-noconflict/ext-language_tools.js'], scope).then(function () {
-                if (angular.isUndefined(window.ace)) {
-                    throw new Error('ui-ace need ace to work... (o rly?)');
-                } else {
-                    // init editor
-                    init();
-                }
-            });
-
-            function init() {
-
-                /**
-                 * Corresponds the umbAceEditorConfig ACE configuration.
-                 * @type object
-                 */
-                var options = umbAceEditorConfig.ace || {};
-
-                /**
-                 * umbAceEditorConfig merged with user options via json in attribute or data binding
-                 * @type object
-                 */
-                var opts = angular.extend({}, options, scope.umbAceEditor);
-
-
-                //load ace libraries here... 
+            function init()
+            {
 
                 /**
-                 * ACE editor
+                 * Corresponds the umbMonacoEditorConfig ACE configuration.
                  * @type object
                  */
-                var acee = window.ace.edit(el[0]);
-                acee.$blockScrolling = Infinity;
+                const options = umbMonacoEditorConfig || {};
 
                 /**
-                 * ACE editor session.
+                 * umbMonacoEditorConfig merged with user options via json in attribute or data binding
                  * @type object
-                 * @see [EditSession]{@link https://ace.c9.io/#nav=api&api=edit_session}
                  */
-                var session = acee.getSession();
+                let opts = angular.extend({}, options, scope.umbMonacoEditor);
+
+
+                /**
+                 * Monaco editor
+                 * @type object https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.istandalonecodeeditor.html
+                 */
+                let editor = monaco.editor.create(el[0], opts);
 
                 /**
                  * Reference to a change listener created by the listener factory.
                  * @function
                  * @see listenerFactory.onChange
                  */
-                var onChangeListener;
+                let onChangeListener;
 
                 /**
                  * Reference to a blur listener created by the listener factory.
                  * @function
                  * @see listenerFactory.onBlur
                  */
-                var onBlurListener;
+                let onBlurListener;
 
                 /**
                  * Calls a callback by checking its existing. The argument list
@@ -185,7 +214,8 @@
                  * object.
                  * @throws {Error} If the callback isn't a function
                  */
-                var executeUserCallback = function() {
+                var executeUserCallback = function ()
+                {
 
                     /**
                      * The callback function grabbed from the array-like arguments
@@ -206,11 +236,15 @@
                      */
                     var args = Array.prototype.slice.call(arguments, 1);
 
-                    if (angular.isDefined(callback)) {
-                        scope.$evalAsync(function() {
-                            if (angular.isFunction(callback)) {
+                    if (angular.isDefined(callback))
+                    {
+                        scope.$evalAsync(function ()
+                        {
+                            if (angular.isFunction(callback))
+                            {
                                 callback(args);
-                            } else {
+                            } else
+                            {
                                 throw new Error('ui-ace use a function as callback.');
                             }
                         });
@@ -233,13 +267,16 @@
                      * @param callback callback function defined in the user options
                      * @see onChangeListener
                      */
-                    onChange: function(callback) {
-                        return function(e) {
-                            var newValue = session.getValue();
-                            angularHelper.safeApply(scope, function () {
+                    onChange: function (callback)
+                    {
+                        return function (e)
+                        {
+                            var newValue = editor.getValue();
+                            angularHelper.safeApply(scope, function ()
+                            {
                                 scope.model = newValue;
                             });
-                            executeUserCallback(callback, e, acee);
+                            executeUserCallback(callback, e, editor);
                         };
                     },
                     /**
@@ -251,78 +288,84 @@
                      * @param callback callback function defined in the user options
                      * @see onBlurListener
                      */
-                    onBlur: function(callback) {
-                        return function() {
-                            executeUserCallback(callback, acee);
+                    onBlur: function (callback)
+                    {
+                        return function ()
+                        {
+                            executeUserCallback(callback, editor);
                         };
                     }
                 };
 
-                attr.$observe('readonly', function(value) {
-                    acee.setReadOnly(!!value || value === '');
+                attr.$observe('readonly', function (value)
+                {
+                    monaco.setReadOnly(!!value || value === '');
                 });
 
                 // Value Blind
-                if(scope.model) {
-                    session.setValue(scope.model);
+                if (scope.model)
+                {
+                    editor.setValue(scope.model);
                 }
 
                 // Listen for option updates
-                var updateOptions = function(current, previous) {
-                    if (current === previous) {
+                const updateOptions = function (current, previous)
+                {
+                    if (current === previous)
+                    {
                         return;
                     }
 
-                    opts = angular.extend({}, options, scope.umbAceEditor);
+                    opts = angular.extend({}, options, scope.umbMonacoEditor);
 
                     opts.callbacks = [opts.onLoad];
-                    if (opts.onLoad !== options.onLoad) {
+                    if (opts.onLoad !== options.onLoad)
+                    {
                         // also call the global onLoad handler
                         opts.callbacks.unshift(options.onLoad);
                     }
 
-                    if (opts.autoFocus === true) {
-                        acee.focus();
+                    if (opts.autoFocus === true)
+                    {
+                        editor.focus();
                     }
 
                     // EVENTS
 
-                    // unbind old change listener
-                    session.removeListener('change', onChangeListener);
-
                     // bind new change listener
                     onChangeListener = listenerFactory.onChange(opts.onChange);
-                    session.on('change', onChangeListener);
-
-                    // unbind old blur listener
-                    //session.removeListener('blur', onBlurListener);
-                    acee.removeListener('blur', onBlurListener);
+                    editor.onDidChangeModelContent(onChangeListener);
 
                     // bind new blur listener
                     onBlurListener = listenerFactory.onBlur(opts.onBlur);
-                    acee.on('blur', onBlurListener);
+                    editor.onDidBlurEditorText(onBlurListener);
 
-                    setOptions(acee, session, opts);
+                    setOptions(editor, opts);
                 };
 
-                scope.$watch(scope.umbAceEditor, updateOptions, /* deep watch */ true);
+                scope.$watch(scope.umbMonacoEditor, updateOptions, /* deep watch */ true);
 
                 // set the options here, even if we try to watch later, if this
                 // line is missing things go wrong (and the tests will also fail)
                 updateOptions(options);
 
-                el.on('$destroy', function() {
-                    acee.session.$stopWorker();
-                    acee.destroy();
+                el.on('$destroy', function ()
+                {
+                    editor.dispose();
                 });
 
-                scope.$watch(function() {
+                scope.$watch(function ()
+                {
                     return [el[0].offsetWidth, el[0].offsetHeight];
-                }, function() {
-                    acee.resize();
-                    acee.renderer.updateFull();
-                }, true);
+                }, function ()
+                    {
+                        editor.layout();
+                    }, true);
 
+                window.onresize = function ()
+                {
+                    editor.layout();
+                };
             }
 
         }
@@ -330,7 +373,7 @@
         var directive = {
             restrict: 'EA',
             scope: {
-                "umbAceEditor": "=",
+                "umbMonacoEditor": "=",
                 "model": "="
             },
             link: link
@@ -340,7 +383,7 @@
     }
 
     angular.module('umbraco.directives')
-        .constant('umbAceEditorConfig', {})
-        .directive('umbAceEditor', AceEditorDirective);
+        .constant('umbMonacoEditorConfig', {})
+        .directive('umbMonacoEditor', MonacoEditorDirective);
 
 })();

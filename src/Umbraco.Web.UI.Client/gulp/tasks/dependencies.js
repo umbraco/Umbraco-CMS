@@ -19,23 +19,11 @@ gulp.task('dependencies', function () {
     // so we don't just ship with a lot of files that aren't needed
     const nodeModules = [
         {
-            "name": "ace-builds",
-            "src":  [
-                "./node_modules/ace-builds/src-min-noconflict/ace.js",
-                "./node_modules/ace-builds/src-min-noconflict/ext-language_tools.js",
-                "./node_modules/ace-builds/src-min-noconflict/ext-searchbox.js",
-                "./node_modules/ace-builds/src-min-noconflict/ext-settings_menu.js",
-                "./node_modules/ace-builds/src-min-noconflict/snippets/text.js",
-                "./node_modules/ace-builds/src-min-noconflict/snippets/javascript.js",
-                "./node_modules/ace-builds/src-min-noconflict/snippets/css.js",
-                "./node_modules/ace-builds/src-min-noconflict/theme-chrome.js",
-                "./node_modules/ace-builds/src-min-noconflict/mode-razor.js",
-                "./node_modules/ace-builds/src-min-noconflict/mode-javascript.js",
-                "./node_modules/ace-builds/src-min-noconflict/mode-css.js",
-                "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js",
-                "./node_modules/ace-builds/src-min-noconflict/worker-css.js"
+            "name": "monaco-editor",
+            "src": [
+                "./node_modules/monaco-editor/min/vs/**/*.*"
             ],
-            "base": "./node_modules/ace-builds"
+            "base": "./node_modules/monaco-editor/min/vs"
         },
         {
             "name": "angular",
@@ -252,7 +240,7 @@ gulp.task('dependencies', function () {
 
     //Copies all static assets into /root / assets folder
     //css, fonts and image files
-    
+
     var assetsTask = gulp.src(config.sources.globs.assets);
     if (global.isProd === true) {
         assetsTask = assetsTask.pipe(imagemin([
@@ -268,7 +256,7 @@ gulp.task('dependencies', function () {
         ]));
     }
     assetsTask = assetsTask.pipe(gulp.dest(config.root + config.targets.assets));
-    
+
     stream.add(assetsTask);
 
     // Copies all the less files related to the preview into their folder

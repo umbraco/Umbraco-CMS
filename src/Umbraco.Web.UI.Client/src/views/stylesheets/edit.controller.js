@@ -182,7 +182,7 @@
 
             vm.aceOption = {
                 mode: "css",
-                theme: "chrome",
+                theme: "vs",
                 showPrintMargin: false,
                 advanced: {
                     fontSize: '14px',
