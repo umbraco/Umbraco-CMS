@@ -27,7 +27,7 @@
 @param {string} text Set the text for the radiobutton label.
 @param {boolean} disabled Set the radiobutton to be disabled.
 @param {boolean} required Set the radiobutton to be required.
-@param {string} onChange Callback when the value of the radiobutton change by interaction.
+@param {callback} onChange Callback when the value of the radiobutton change by interaction.
 
 **/
 
