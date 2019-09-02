@@ -29,7 +29,7 @@
 @param {string} serverValidationField Set the <code>val-server-field</code> of the checkbox.
 @param {boolean} disabled Set the checkbox to be disabled.
 @param {boolean} required Set the checkbox to be required.
-@param {string} onChange Callback when the value of the checkbox change by interaction.
+@param {callback} onChange Callback when the value of the checkbox change by interaction.
 
 **/
 
