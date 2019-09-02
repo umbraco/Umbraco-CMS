@@ -50,7 +50,7 @@
         templateUrl: 'views/components/forms/umb-radiobutton.html',
         controller: UmbRadiobuttonController,
         controllerAs: 'vm',
-        scope: {
+        bindings: {
             model: "=",
             value: "@",
             name: "@",
