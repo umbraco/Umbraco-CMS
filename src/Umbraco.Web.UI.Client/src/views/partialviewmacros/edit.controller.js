@@ -178,7 +178,7 @@
                 },
                 close: function () {
                     editorService.close();
-                    vm.editor.focus();                    
+                    vm.editor.focus();
                 }
             };
             editorService.insertField(insertFieldEditor);
@@ -281,13 +281,8 @@
             }
 
             // ace configuration
-            vm.aceOption = {
-                mode: "razor",
-                theme: "chrome",
-                showPrintMargin: false,
-                advanced: {
-                    fontSize: '14px'
-                },
+            vm.monacoEditorOptions = {
+                language: "chsmtl",
                 onLoad: function(_editor) {
                     vm.editor = _editor;
 
@@ -296,16 +291,17 @@
                     // else set the cursor at the bottom of the code editor
                     if(!$routeParams.create) {
                         $timeout(function(){
-                            vm.editor.navigateFileEnd();
+                            // TODO: Get end of file, and reveal
+                            // https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.istandalonecodeeditor.html#revealline
+                            // vm.editor.navigateFileEnd();
                             vm.editor.focus();
-                            persistCurrentLocation();
+                            persistEditorViewState();
                         });
                     }
 
                     //change on blur, focus
-                    vm.editor.on("blur", persistCurrentLocation);
-                    vm.editor.on("focus", persistCurrentLocation);
-                    vm.editor.on("change", changeAceEditor);
+                    vm.editor.onDidChangeCursorPosition(persistEditorViewState);
+                    vm.editor.onDidChangeModelContent(changeAceEditor);
 
             	}
             }
@@ -314,15 +310,24 @@
 
         function insert(str) {
             vm.editor.focus();
-            vm.editor.moveCursorToPosition(vm.currentPosition);
-            vm.editor.insert(str);
+            vm.editor.restoreViewState(vm.codeEditorViewState);
+            const editOperations = []
+            const selections = vm.editor.getSelections();
+            for (let index = 0; index < selections.length; index++) {
+                editOperations.push({
+                    forceMoveMarkers: false,
+                    range: selections[index],
+                    text: str
+                });
+            }
+            vm.editor.executeEdits("partialviewmacros", editOperations);
 
             // set form state to $dirty
             setFormState("dirty");
         }
 
-        function persistCurrentLocation() {
-            vm.currentPosition = vm.editor.getCursorPosition();
+        function persistEditorViewState() {
+            vm.codeEditorViewState = vm.editor.saveViewState();
         }
 
         function changeAceEditor() {
