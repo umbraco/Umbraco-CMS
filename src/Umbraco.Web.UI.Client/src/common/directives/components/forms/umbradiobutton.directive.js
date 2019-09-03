@@ -34,7 +34,7 @@
 (function () {
     'use strict';
 
-    function UmbRadiobuttonController() {
+    function UmbRadiobuttonController($timeout) {
 
         var vm = this;
 
