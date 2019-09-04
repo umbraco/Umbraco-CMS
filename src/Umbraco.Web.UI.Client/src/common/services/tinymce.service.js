@@ -6,7 +6,8 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource) {
+function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
+    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, localStorageService) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -190,7 +191,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
 
             // Put UDI into localstorage (used to update the img with data-udi later on)
-            localStorage.setItem(`tinymce__${json.location}`, json.udi);
+            localStorageService.set(`tinymce__${json.location}`, json.udi);
 
             success(json.location);
         };
@@ -222,13 +223,13 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         var imgSrc = img.getAttribute("src");
 
                         //Try & find in localstorage
-                        var udi = localStorage.getItem(`tinymce__${imgSrc}`);
+                        var udi = localStorageService.get(`tinymce__${imgSrc}`);
 
                         //Select the img & update is attr
                         tinymce.activeEditor.$(img).attr({ "data-udi": udi });
 
                         //Remove key
-                        localStorage.removeItem(`tinymce__${imgSrc}`);
+                        localStorageService.remove(`tinymce__${imgSrc}`);
                     });
                 });
             }
