@@ -1,7 +1,3 @@
-// TODO: Make sure this does not break anything.
-var require = { paths: { 'vs': 'lib/monaco-editor' } };
-//var require = { paths: { 'vs': '../node_modules/monaco-editor/min/vs' } };
-
 (function ()
 {
     'use strict';
@@ -151,10 +147,10 @@ var require = { paths: { 'vs': 'lib/monaco-editor' } };
         function link(scope, el, attr, ngModel)
         {
             assetsService.load([
-                "lib/monaco-editor/loader.js"], scope)
+                "lib/monaco-editor/vs/loader.js"], scope)
                 .then(function ()
                 {
-                    window.require.config({ paths: { 'vs': 'lib/monaco-editor' } });
+                    window.require.config({ paths: { 'vs': '/umbraco/lib/monaco-editor/vs' } });
                     window.require(['vs/editor/editor.main'], function ()
                     {
                         setTimeout(() =>

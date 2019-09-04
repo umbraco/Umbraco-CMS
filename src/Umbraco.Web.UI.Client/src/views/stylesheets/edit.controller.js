@@ -199,7 +199,8 @@
                     // else set the cursor at the bottom of the code editor
                     if(!$routeParams.create) {
                         $timeout(function(){
-                            vm.editor.navigateFileEnd();
+                            // TODO: Navigate to end of file
+                            // vm.editor.navigateFileEnd();
                             vm.editor.focus();
                         });
                     }

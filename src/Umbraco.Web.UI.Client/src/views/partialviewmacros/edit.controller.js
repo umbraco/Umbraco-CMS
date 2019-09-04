@@ -282,7 +282,7 @@
 
             // ace configuration
             vm.monacoEditorOptions = {
-                language: "chsmtl",
+                language: "razor",
                 onLoad: function(_editor) {
                     vm.editor = _editor;
 

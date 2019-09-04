@@ -21,9 +21,9 @@ gulp.task('dependencies', function () {
         {
             "name": "monaco-editor",
             "src": [
-                "./node_modules/monaco-editor/min/vs/**/*.*"
+                "./node_modules/monaco-editor/min/**/*.*"
             ],
-            "base": "./node_modules/monaco-editor/min/vs"
+            "base": "./node_modules/monaco-editor/min"
         },
         {
             "name": "angular",
