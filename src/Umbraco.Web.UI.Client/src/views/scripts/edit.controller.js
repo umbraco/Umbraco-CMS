@@ -38,7 +38,7 @@
         function save() {
 
             vm.page.saveButtonState = "busy";
-            
+
             vm.script.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
@@ -74,7 +74,7 @@
             }, function (err) {
 
                 vm.page.saveButtonState = "error";
-                
+
                 localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
                     var header = data[0];
                     var message = data[1];
@@ -120,65 +120,57 @@
                 });
             }
 
-            vm.aceOption = {
-                mode: "javascript",
-                theme: "chrome",
-                showPrintMargin: false,
-                advanced: {
-                    fontSize: '14px',
-                    enableSnippets: true,
-                    enableBasicAutocompletion: true,
-                    enableLiveAutocompletion: false
-                },
+            vm.monacoEditorOptions = {
+                language: "javascript",
                 onLoad: function(_editor) {
-                    
+
                     vm.editor = _editor;
 
                     //Update the auto-complete method to use ctrl+alt+space
-                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
-                    
+                    // _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
+
                     //Unassigns the keybinding (That was previously auto-complete)
                     //As conflicts with our own tree search shortcut
-                    _editor.commands.bindKey("ctrl-space", null);
+                    // _editor.commands.bindKey("ctrl-space", null);
 
-                    // TODO: Move all these keybinding config out into some helper/service
-                    _editor.commands.addCommands([
-                        //Disable (alt+shift+K)
-                        //Conflicts with our own show shortcuts dialog - this overrides it
-                        {
-                            name: 'unSelectOrFindPrevious',
-                            bindKey: 'Alt-Shift-K',
-                            exec: function() {
-                                //Toggle the show keyboard shortcuts overlay
-                                $scope.$apply(function(){
-                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
-                                });
-                            },
-                            readOnly: true
-                        }
-                    ]);
-                    
+                    // // TODO: Move all these keybinding config out into some helper/service
+                    // _editor.commands.addCommands([
+                    //     //Disable (alt+shift+K)
+                    //     //Conflicts with our own show shortcuts dialog - this overrides it
+                    //     {
+                    //         name: 'unSelectOrFindPrevious',
+                    //         bindKey: 'Alt-Shift-K',
+                    //         exec: function() {
+                    //             //Toggle the show keyboard shortcuts overlay
+                    //             $scope.$apply(function(){
+                    //                 vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
+                    //             });
+                    //         },
+                    //         readOnly: true
+                    //     }
+                    // ]);
+
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new script
                     // else set the cursor at the bottom of the code editor
                     if(!$routeParams.create) {
                         $timeout(function(){
-                            vm.editor.navigateFileEnd();
+                            // vm.editor.navigateFileEnd();
                             vm.editor.focus();
                         });
                     }
 
-                    vm.editor.on("change", changeAceEditor);
+                    vm.editor.onDidChangeModelContent(editorChange);
 
             	}
             }
 
-            function changeAceEditor() {
+            function editorChange() {
                 setFormState("dirty");
             }
 
             function setFormState(state) {
-                
+
                 // get the current form
                 var currentForm = angularHelper.getCurrentForm($scope);
 
@@ -189,8 +181,6 @@
                     currentForm.$setPristine();
                 }
             }
-
-
         }
 
         init();
