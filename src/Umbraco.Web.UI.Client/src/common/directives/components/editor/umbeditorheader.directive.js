@@ -204,13 +204,31 @@ Use this directive to construct a header inside the main editor window.
 (function () {
     'use strict';
 
-    function EditorHeaderDirective(editorService) {
+    function EditorHeaderDirective(editorService, localizationService, editorState) {
 
         function link(scope) {
 
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
+
+            scope.isNew = editorState.current.id=== 0;
+
+            localizationService.localizeMany([
+                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
+                    "placeholders_a11yName"]
+            ).then(function (data) {
+                scope.a11yMessage = data[0];
+                scope.a11yName = data[1];
+                if (!scope.isNew) {
+                    scope.a11yMessage += " " + scope.name;
+
+                } else {
+                    var name = editorState.current.contentTypeName;
+                    scope.a11yMessage += " " + name;
+                    scope.a11yName = name + " " + scope.a11yName;
+                }
+            });
 
             scope.goBack = function () {
                 if (scope.onBack) {

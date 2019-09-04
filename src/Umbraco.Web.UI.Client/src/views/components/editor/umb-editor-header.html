@@ -22,12 +22,19 @@
             </ng-form>
 
             <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1 1 auto;">
+                <div>
+                    <p tabindex="0" class="sr-only">
+                        {{a11yMessage}}
+                    </p>
+                </div>
                 <div class="umb-editor-header__name-wrapper" ng-show="!nameLocked || !hideAlias">
+                    <label for="headerName" class="sr-only">{{a11yName}}</label>
                     <ng-form name="headerNameForm">
                         <input data-element="editor-name-field"
                                no-password-manager
                                title="{{key}}"
                                type="text"
+                               id="headerName"
                                class="umb-editor-header__name-input"
                                localize="placeholder"
                                placeholder="@placeholders_entername"
@@ -38,7 +45,10 @@
                                umb-auto-focus
                                val-server-field="Name"
                                required
-                               autocomplete="off" />
+                               aria-required="true"
+                               aria-invalid="{{contentForm.headerNameForm.headerName.$invalid ? true : false}}"
+                               autocomplete="off"
+                               maxlength="255"/>
                     </ng-form>
 
                     <umb-generate-alias data-element="editor-alias"
@@ -62,7 +72,7 @@
                        localize="placeholder"
                        placeholder="@placeholders_enterDescription"
                        ng-if="!hideDescription && !descriptionLocked"
-                       ng-model="$parent.description" />
+                       ng-model="$parent.description"/>
 
                 <div class="umb-panel-header-locked-description" ng-if="descriptionLocked">{{ description }}</div>
 
