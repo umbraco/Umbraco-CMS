@@ -378,7 +378,7 @@ function mediaHelper(umbRequestHelper, $log) {
         getFileExtension: function (filePath) {
 
             if (!filePath) {
-                return false;
+                return null;
             }
 
             var lowered = filePath.toLowerCase();

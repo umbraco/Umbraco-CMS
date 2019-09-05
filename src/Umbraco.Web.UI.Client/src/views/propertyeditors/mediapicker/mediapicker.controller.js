@@ -69,9 +69,18 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
                     _.each(medias,
                         function (media, i) {
+
+                            if (!media.extension && media.id && media.metaData) {
+                                media.extension = mediaHelper.getFileExtension(media.metaData.MediaPath);
+                            }
+
                             // if there is no thumbnail, try getting one if the media is not a placeholder item
                             if (!media.thumbnail && media.id && media.metaData) {
                                 media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+
+                                if (!media.thumbnail && media.extension === "svg") {
+                                    media.thumbnail = media.metaData.MediaPath;
+                                }
                             }
 
                             $scope.mediaItems.push(media);
