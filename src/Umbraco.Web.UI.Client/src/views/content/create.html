@@ -10,7 +10,7 @@
                 <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noDocumentTypesWithNoSettingsAccess"/></p>
                 <div ng-if="hasSettingsAccess">
                     <p class="abstract"><localize key="create_noDocumentTypes" /></p>
-                    <button class="btn umb-outline" href="#settings/documentTypes/edit/{{contentTypeId}}?view=permissions" ng-click="close()">
+                    <button class="btn umb-outline" ng-click="editContentType()">
                         <localize key="create_noDocumentTypesEditPermissions"/>
                     </button>
                 </div>
@@ -42,7 +42,7 @@
             </ul>
             <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint">
 
-                <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false">
+                <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false track by $index">
                     <button class="umb-action-link umb-outline btn-reset" ng-click="createFromBlueprint(blueprint.id)">
                         <i class="large icon {{docType.icon}}"></i>
                         <span class="menu-label">

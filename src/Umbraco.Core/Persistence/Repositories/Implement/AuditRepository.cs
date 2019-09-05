@@ -174,7 +174,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             totalRecords = page.TotalItems;
 
             var items = page.Items.Select(
-                dto => new AuditItem(dto.Id, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters)).ToList();
+                dto => new AuditItem(dto.NodeId, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters)).ToList();
 
             // map the DateStamp
             for (var i = 0; i < items.Count; i++)

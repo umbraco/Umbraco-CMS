@@ -13,6 +13,9 @@
 @import "../../lib/bootstrap/less/thumbnails.less";
 @import "../../lib/bootstrap/less/media.less";
 
+// Umbraco Components
+@import "components/umb-loader.less";
+
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
@@ -165,44 +168,16 @@ input.ng-dirty.ng-invalid{border-color: #b94a48; color: #b94a48;}
     opacity:1;
 }
 
+.umb-installer-loader {
+    margin: 0;
+    width: 0;
+    z-index: 777;
 
-.umb-loader{
-    background-color: @white;
-    margin-top:0;
-    margin-left:-100%;
-    animation-name:bounce_loadingProgressG;
-    animation-duration:1s;
-    animation-iteration-count:infinite;
-    animation-timing-function:linear;
-    width:100%;
-    height: 5px;
-}
-
-@keyframes bounce_loadingProgressG{
-    0%{
-        margin-left:-100%;
-    }
-    100%{
-        margin-left:100%;
+    .umb-loader {
+        background-color: @white;
+        height: 5px;
     }
 }
-
-//loader defaults
-.umb-loader-container, .umb-loader-done{
-	height: 3px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  overflow: hidden;
-  width: 0%;
-  z-index: 777;
-}
-
-.umb-loader-done{
-   right: 0%;
-   background: @white;
-}
-
 
 .permissions-report {
     overflow:auto;

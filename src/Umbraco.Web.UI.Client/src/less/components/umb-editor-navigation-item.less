@@ -2,12 +2,16 @@
     position: relative;
     display: block;
 }
+
+.umb-sub-views-nav-item__action,
 .umb-sub-views-nav-item > a {
+  background: transparent;
   text-align: center;
   cursor: pointer;
   display: block;
   padding: 4px 10px 0 10px;
   min-width: 70px;
+  border: 0 none;
   border-right: 1px solid @gray-9;
   box-sizing: border-box;
   display: flex;
@@ -19,6 +23,7 @@
   
   color: @ui-active-type;
   
+  &:focus,
   &:hover {
       color: @ui-active-type-hover !important;
   }
@@ -37,18 +42,23 @@
   }
 }
 
+.umb-sub-views-nav-item__action:focus,
+.umb-sub-views-nav-item__action:active,
 .umb-sub-views-nav-item > a:active {
   .box-shadow(~"inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05)");
 }
+.umb-sub-views-nav-item__action:focus,
 .umb-sub-views-nav-item > a:focus {
   outline: none;
 }
 
+.umb-sub-views-nav-item__action:hover,
+.umb-sub-views-nav-item__action:focus,
 .umb-sub-views-nav-item > a:hover,
 .umb-sub-views-nav-item > a:focus {
   text-decoration: none;
 }
-
+.umb-sub-views-nav-item__action.is-active,
 .umb-sub-views-nav-item > a.is-active {
     
     color: @ui-light-active-type;
@@ -59,6 +69,7 @@
     }
 }
 
+.umb-sub-views-nav-item__action.-has-error,
 .show-validation .umb-sub-views-nav-item > a.-has-error {
   color: @red;
   &::after {
@@ -114,11 +125,19 @@
     // center align horizontal
     left: 50%;
     transform: translateX(-50%);
-    
-    visibility:hidden;
     opacity: 0;
-    transition: visibility 0s 500ms, opacity 250ms 250ms;
+    transition: opacity 250ms 250ms;
 }
+
+// Currently Edge 18 does unfortunately not support :focus-within so for now we will use the "old" behavior - Support is coming with the upcoming release of Edge 76
+// See https://caniuse.com/#search=focus-within
+@supports (-ms-ime-align:auto) { 
+    .umb-sub-views-nav-item__anchor_dropdown {
+        visibility: hidden;
+        transition: visibility 0 500ms, opacity 250ms 250ms;
+    }
+}
+
 .umb-sub-views-nav-item__anchor_dropdown li a {
     border-left: 4px solid transparent;
 }
@@ -126,12 +145,20 @@
     border-left-color: @ui-selected-border;
 }
 
+.umb-sub-views-nav-item:focus-within .umb-sub-views-nav-item__anchor_dropdown,
 .umb-sub-views-nav-item:hover .umb-sub-views-nav-item__anchor_dropdown {
     visibility:visible;
     opacity: 1;
-    transition: visibility 0s 0s, opacity 20ms 0s;
+    transition: opacity 20ms 0;
 }
 
+// Currently Edge 18 does unfortunately not support :focus-within so for now we will use the "old" behavior - Support is coming with the upcoming release of Edge 76
+// See https://caniuse.com/#search=focus-within
+@supports (-ms-ime-align:auto) { 
+    .umb-sub-views-nav-item:hover .umb-sub-views-nav-item__anchor_dropdown {
+        transition: visibility 0 0, opacity 20ms 0;
+    }
+}
 
 
 // --------------------------------
