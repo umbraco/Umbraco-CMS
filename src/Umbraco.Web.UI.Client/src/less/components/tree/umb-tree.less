@@ -33,12 +33,6 @@
             display: none;
         }
     }
-    
-    //loader defaults
-    .umb-loader {
-        height: 10px;
-        margin: 10px 10px 10px 10px;
-    }
 
     .search-subtitle {
         color: @gray-7;
@@ -72,8 +66,7 @@ body.touch .umb-tree {
     overflow: hidden;
     display: flex;
     flex-wrap: nowrap;
-    align-items: center;
-    
+    align-items: center;  
     border:2px solid transparent;
     
     color: @ui-option-type;
@@ -183,7 +176,6 @@ body.touch .umb-tree {
     &:hover {
         background: @btnBackgroundHighlight;
     }
-
     // NOTE - We're having to repeat ourselves here due to an .sr-only class appearing in umbraco/lib/font-awesome/css/font-awesome.min.css
     &.sr-only--hoverable:hover,
     &.sr-only--focusable:focus {

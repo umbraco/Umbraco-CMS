@@ -245,9 +245,6 @@ angular.module('umbraco.directives')
                 var leaveExpr = $attrs.deepBlur,
                     dom = $element[0];
 
-                    window.console.log('leave expression: ', leaveExpr);
-                    window.console.log('dom: ', dom);
-
                 function containsDom(parent, dom) {
                     while (dom) {
                         if (dom === parent) {
@@ -260,9 +257,6 @@ angular.module('umbraco.directives')
 
                 function onBlur(e) {
                     var targetElement = e.relatedTarget;
-
-                    var isInDomWhatever = containsDom(dom, targetElement);
-                    window.console.log(isInDomWhatever);
 
                     if (!containsDom(dom, targetElement)) {
                         $timeout(function () {

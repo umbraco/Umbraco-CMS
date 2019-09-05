@@ -10,7 +10,7 @@
  */
 function MainController($scope, $location, appState, treeService, notificationsService, 
     userService, historyService, updateChecker, navigationService, eventsService, 
-    tmhDynamicLocale, localStorageService, editorService, overlayService) {
+    tmhDynamicLocale, localStorageService, editorService, overlayService, assetsService, tinyMceAssets) {
 
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
@@ -21,7 +21,13 @@ function MainController($scope, $location, appState, treeService, notificationsS
     $scope.search = {};
     $scope.login = {};
     $scope.tabbingActive = false;
-    
+
+    // Load TinyMCE assets ahead of time in the background for the user
+    // To help with first load of the RTE
+    tinyMceAssets.forEach(function (tinyJsAsset) {
+        assetsService.loadJs(tinyJsAsset, $scope);
+    });
+
     // There are a number of ways to detect when a focus state should be shown when using the tab key and this seems to be the simplest solution. 
     // For more information about this approach, see https://hackernoon.com/removing-that-ugly-focus-ring-and-keeping-it-too-6c8727fefcd2
     function handleFirstTab(evt) {
