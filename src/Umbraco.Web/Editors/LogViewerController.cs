@@ -130,5 +130,11 @@ namespace Umbraco.Web.Editors
         {
             return _logViewer.DeleteSavedSearch(item.Name, item.Query);
         }
+
+        [HttpGet]
+        public string GetLogLevel()
+        {
+            return _logViewer.GetLogLevel();
+        }
     }
 }

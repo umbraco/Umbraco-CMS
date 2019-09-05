@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService) {
+    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper) {
 
         var vm = {
             labels: {
@@ -69,9 +69,18 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
                     _.each(medias,
                         function (media, i) {
+
+                            if (!media.extension && media.id && media.metaData) {
+                                media.extension = mediaHelper.getFileExtension(media.metaData.MediaPath);
+                            }
+
                             // if there is no thumbnail, try getting one if the media is not a placeholder item
                             if (!media.thumbnail && media.id && media.metaData) {
                                 media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+
+                                if (!media.thumbnail && media.extension === "svg") {
+                                    media.thumbnail = media.metaData.MediaPath;
+                                }
                             }
 
                             $scope.mediaItems.push(media);
@@ -91,6 +100,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         function sync() {
             $scope.model.value = $scope.ids.join();
         };
+
+        function setDirty() {
+            angularHelper.getCurrentForm($scope).$setDirty();
+        }
 
         function reloadUpdatedMediaItems(updatedMediaNodes) {
             // because the images can be edited through the media picker we need to 
@@ -152,6 +165,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.mediaItems.splice(index, 1);
             $scope.ids.splice(index, 1);
             sync();
+            setDirty();
         };
 
         $scope.editItem = function (item) {
@@ -215,6 +229,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     });
                     sync();
                     reloadUpdatedMediaItems(model.updatedMediaNodes);
+                    setDirty();
                 },
                 close: function (model) {
                     editorService.close();
@@ -229,10 +244,11 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
 
         $scope.sortableOptions = {
-            disabled: !$scope.isMultiPicker,
+            disabled: !multiPicker,
             items: "li:not(.add-wrapper)",
             cancel: ".unsortable",
             update: function (e, ui) {
+                setDirty();
                 var r = [];
                 // TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the
                 // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the

@@ -20,7 +20,8 @@ public class PreValueMigratorComposer : ICoreComposer
             .Append<DecimalPreValueMigrator>()
             .Append<ListViewPreValueMigrator>()
             .Append<DropDownFlexiblePreValueMigrator>()
-            .Append<ValueListPreValueMigrator>();
+            .Append<ValueListPreValueMigrator>()
+            .Append<MarkdownEditorPreValueMigrator>();
     }
 }
 }

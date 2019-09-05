@@ -17,6 +17,7 @@
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
       scope.sortingButtonKey = "general_reorder";
+      scope.compositionsButtonState = "init";
 
       function activate() {
 
@@ -47,6 +48,7 @@
       function setSortingOptions() {
 
         scope.sortableOptionsGroup = {
+          axis: 'y',
           distance: 10,
           tolerance: "pointer",
           opacity: 0.7,
@@ -65,6 +67,7 @@
         };
 
         scope.sortableOptionsProperty = {
+          axis: 'y',
           distance: 10,
           tolerance: "pointer",
           connectWith: ".umb-group-builder__properties",
@@ -335,6 +338,7 @@
         })), function(f) {
             return f !== null && f !== undefined;
         });
+        scope.compositionsButtonState = "busy";
         $q.all([
             //get available composite types
             availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
@@ -354,6 +358,7 @@
         ]).then(function() {
             //resolves when both other promises are done, now show it
             editorService.open(scope.compositionsDialogModel);
+            scope.compositionsButtonState = "init";
         });
 
       };
@@ -379,6 +384,8 @@
         // activate group
         scope.activateGroup(group);
 
+        // push new init tab to the scope
+        addInitGroup(scope.model.groups);
       };
 
       scope.activateGroup = function(selectedGroup) {
@@ -397,7 +404,6 @@
 
       scope.removeGroup = function(groupIndex) {
         scope.model.groups.splice(groupIndex, 1);
-        addInitGroup(scope.model.groups);
       };
 
       scope.updateGroupTitle = function(group) {
@@ -526,10 +532,8 @@
               // set focus on init property
               var numberOfProperties = group.properties.length;
               group.properties[numberOfProperties - 1].focus = true;
-  
-              // push new init tab to the scope
-              addInitGroup(scope.model.groups);
 
+              notifyChanged();
             },
             close: function() {
               if(_.isEqual(oldPropertyModel, propertyModel) === false) {
@@ -575,18 +579,12 @@
         // remove property
         tab.properties.splice(propertyIndex, 1);
 
-        // if the last property in group is an placeholder - remove add new tab placeholder
-        if(tab.properties.length === 1 && tab.properties[0].propertyState === "init") {
-
-          angular.forEach(scope.model.groups, function(group, index, groups){
-            if(group.tabState === 'init') {
-              groups.splice(index, 1);
-            }
-          });
-
-        }
-
+        notifyChanged();
       };
+
+      function notifyChanged() {
+        eventsService.emit("editors.groupsBuilder.changed");
+      }
 
       function addInitProperty(group) {
 

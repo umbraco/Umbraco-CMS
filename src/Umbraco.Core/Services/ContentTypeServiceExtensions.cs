@@ -8,6 +8,21 @@ namespace Umbraco.Core.Services
     public static class ContentTypeServiceExtensions
     {
         /// <summary>
+        /// Gets all of the element types (e.g. content types that have been marked as an element type).
+        /// </summary>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <returns>Returns all the element types.</returns>
+        public static IEnumerable<IContentType> GetAllElementTypes(this IContentTypeService contentTypeService)
+        {
+            if (contentTypeService == null)
+            {
+                return Enumerable.Empty<IContentType>();
+            }
+
+            return contentTypeService.GetAll().Where(x => x.IsElement);
+        }
+
+        /// <summary>
         /// Returns the available composite content types for a given content type
         /// </summary>
         /// <param name="allContentTypes"></param>
