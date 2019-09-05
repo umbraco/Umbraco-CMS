@@ -712,9 +712,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var id = content.FirstChildContentId;
             while (id > 0)
             {
-                var link = GetLinkedNode(id, "child");
-                ClearBranchLocked(link.Value);
-                id = link.Value.NextSiblingContentId;
+                var child = GetLinkedNode(id, "child").Value;
+                ClearBranchLocked(child);
+                id = child.NextSiblingContentId;
             }
         }
 
