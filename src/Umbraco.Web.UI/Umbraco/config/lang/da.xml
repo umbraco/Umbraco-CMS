@@ -1611,4 +1611,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberIntro">Kom godt i gang</key>
     <key alias="formsInstall">Installer Umbraco Forms</key>
   </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Gå tilbage</key>
+    <key alias="activeListLayout">Aktivt layout:</key>
+  </area>  
 </language>
