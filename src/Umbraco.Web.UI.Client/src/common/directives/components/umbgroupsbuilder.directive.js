@@ -17,6 +17,7 @@
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
       scope.sortingButtonKey = "general_reorder";
+      scope.compositionsButtonState = "init";
 
       function activate() {
 
@@ -47,6 +48,7 @@
       function setSortingOptions() {
 
         scope.sortableOptionsGroup = {
+          axis: 'y',
           distance: 10,
           tolerance: "pointer",
           opacity: 0.7,
@@ -65,6 +67,7 @@
         };
 
         scope.sortableOptionsProperty = {
+          axis: 'y',
           distance: 10,
           tolerance: "pointer",
           connectWith: ".umb-group-builder__properties",
@@ -335,6 +338,7 @@
         })), function(f) {
             return f !== null && f !== undefined;
         });
+        scope.compositionsButtonState = "busy";
         $q.all([
             //get available composite types
             availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
@@ -354,6 +358,7 @@
         ]).then(function() {
             //resolves when both other promises are done, now show it
             editorService.open(scope.compositionsDialogModel);
+            scope.compositionsButtonState = "init";
         });
 
       };
@@ -530,6 +535,7 @@
               // push new init tab to the scope
               addInitGroup(scope.model.groups);
 
+              notifyChanged();
             },
             close: function() {
               if(_.isEqual(oldPropertyModel, propertyModel) === false) {
@@ -586,7 +592,12 @@
 
         }
 
+        notifyChanged();
       };
+
+      function notifyChanged() {
+        eventsService.emit("editors.groupsBuilder.changed");
+      }
 
       function addInitProperty(group) {
 

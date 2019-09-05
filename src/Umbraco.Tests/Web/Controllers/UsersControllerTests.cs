@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Reflection;
+using System.Security.Cryptography;
 using System.Web.Http;
 using Moq;
 using Newtonsoft.Json;
@@ -155,7 +157,7 @@ namespace Umbraco.Tests.Web.Controllers
             var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Users", "GetPagedUsers", HttpMethod.Get);
 
-            var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);
+            var obj = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(response.Item2);
             Assert.AreEqual(0, obj.TotalItems);
         }
 
@@ -190,9 +192,100 @@ namespace Umbraco.Tests.Web.Controllers
             var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Users", "GetPagedUsers", HttpMethod.Get);
 
-            var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);
+            var obj = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(response.Item2);
             Assert.AreEqual(10, obj.TotalItems);
             Assert.AreEqual(10, obj.Items.Count());
+        }
+
+        [Test]
+        public async System.Threading.Tasks.Task GetPagedUsers_Fips()
+        {
+            await RunFipsTest("GetPagedUsers", mock =>
+            {
+                var users = MockedUser.CreateMulipleUsers(10);
+                long outVal = 10;
+                mock.Setup(service => service.GetAll(
+                        It.IsAny<long>(), It.IsAny<int>(), out outVal, It.IsAny<string>(), It.IsAny<Direction>(),
+                        It.IsAny<UserState[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<IQuery<IUser>>()))
+                    .Returns(() => users);
+            }, response =>
+            {
+                var obj = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(response.Item2);
+                Assert.AreEqual(10, obj.TotalItems);
+                Assert.AreEqual(10, obj.Items.Count());
+            });
+        }
+
+        [Test]
+        public async System.Threading.Tasks.Task GetById_Fips()
+        {
+            const int mockUserId = 1234;
+            var user = MockedUser.CreateUser();
+
+            await RunFipsTest("GetById", mock =>
+            {
+                mock.Setup(service => service.GetUserById(1234))
+                    .Returns((int i) => i == mockUserId ? user : null);
+            }, response =>
+            {
+                var obj = JsonConvert.DeserializeObject<UserDisplay>(response.Item2);
+                Assert.AreEqual(user.Username, obj.Username);
+                Assert.AreEqual(user.Email, obj.Email);
+            }, new { controller = "Users", action = "GetById" }, $"Users/GetById/{mockUserId}");
+        }
+
+
+        private async System.Threading.Tasks.Task RunFipsTest(string action, Action<Mock<IUserService>> userServiceSetup,
+            Action<Tuple<HttpResponseMessage, string>> verification,
+            object routeDefaults = null, string url = null)
+        {
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            {
+                //setup some mocks
+                var userServiceMock = Mock.Get(Current.Services.UserService);
+                userServiceSetup(userServiceMock);
+
+                var usersController = new UsersController(
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContextAccessor,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
+                return usersController;
+            }
+
+            // Testing what happens if the system were configured to only use FIPS-compliant algorithms
+            var typ = typeof(CryptoConfig);
+            var flds = typ.GetFields(BindingFlags.Static | BindingFlags.NonPublic);
+            var haveFld = flds.FirstOrDefault(f => f.Name == "s_haveFipsAlgorithmPolicy");
+            var isFld = flds.FirstOrDefault(f => f.Name == "s_fipsAlgorithmPolicy");
+            var originalFipsValue = CryptoConfig.AllowOnlyFipsAlgorithms;
+
+            try
+            {
+                if (!originalFipsValue)
+                {
+                    haveFld.SetValue(null, true);
+                    isFld.SetValue(null, true);
+                }
+
+                MockForGetPagedUsers();
+
+                var runner = new TestRunner(CtrlFactory);
+                var response = await runner.Execute("Users", action, HttpMethod.Get, routeDefaults: routeDefaults, url: url);
+                verification(response);
+            }
+            finally
+            {
+                if (!originalFipsValue)
+                {
+                    haveFld.SetValue(null, false);
+                    isFld.SetValue(null, false);
+                }
+            }
         }
     }
 }

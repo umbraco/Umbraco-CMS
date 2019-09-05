@@ -233,17 +233,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     //this would be for a theme other than inlite
                     toolbar: args.toolbar.join(" "),
+
                     //these are for the inlite theme to work
                     insert_toolbar: toolbars.insertToolbar,
                     selection_toolbar: toolbars.selectionToolbar,
 
                     body_class: 'umb-rte',
+
                     //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
                     cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster,
 
                     //this is used to style the inline macro bits, sorry hard coding this form now since we don't have a standalone
                     //stylesheet to load in for this with only these styles (the color is @pinkLight)
-                    content_style: ".mce-content-body .umb-macro-holder { border: 3px dotted #f5c1bc; padding: 7px; display: block; margin: 3px; } .umb-rte .mce-content-body .umb-macro-holder.loading {background: url(assets/img/loader.gif) right no-repeat; background-size: 18px; background-position-x: 99%;}"
+                    content_style: ".mce-content-body .umb-macro-holder { border: 3px dotted #f5c1bc; padding: 7px; display: block; margin: 3px; } .umb-rte .mce-content-body .umb-macro-holder.loading {background: url(assets/img/loader.gif) right no-repeat; background-size: 18px; background-position-x: 99%;}",
+
+                    // This allows images to be pasted in & stored as Base64 until they get uploaded to server
+                    paste_data_images: true
                 };
 
                 if (tinyMceConfig.customConfig) {

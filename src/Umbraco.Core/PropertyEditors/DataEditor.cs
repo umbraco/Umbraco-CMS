@@ -30,7 +30,7 @@ namespace Umbraco.Core.PropertyEditors
             // defaults
             Type = type;
             Icon = Constants.Icons.PropertyEditor;
-            Group = "common";
+            Group = Constants.PropertyEditors.Groups.Common;
 
             // assign properties based on the attribute, if it is found
             Attribute = GetType().GetCustomAttribute<DataEditorAttribute>(false);

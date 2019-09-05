@@ -27,7 +27,7 @@
                        </a>
 
                        <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
-                           <umb-dropdown-item ng-repeat="blueprint in listViewAllowedTypes[0].blueprints | orderBy:'name':false">
+                           <umb-dropdown-item ng-repeat="blueprint in listViewAllowedTypes[0].blueprints | orderBy:'name':false track by $index">
                                <a ng-click="createFromBlueprint(entityType, listViewAllowedTypes[0].alias, blueprint.id)">
                                    <i class="{{::listViewAllowedTypes[0].icon}}"></i>
                                    {{::blueprint.name}}
@@ -95,9 +95,8 @@
                    <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} <localize key="general_of">of</localize> {{ listViewResultSet.items.length }} <localize key="general_selected">selected</localize></strong>
                    <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
 
-                   <div class="umb-loader-wrapper -bottom" ng-show="actionInProgress">
-                       <div class="umb-loader"></div>
-                   </div>
+                   <umb-loader position="bottom" ng-show="actionInProgress"></umb-loader>
+
                </umb-editor-sub-header-section>
 
            </umb-editor-sub-header-content-left>

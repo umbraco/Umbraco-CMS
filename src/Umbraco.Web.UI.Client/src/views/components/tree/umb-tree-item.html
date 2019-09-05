@@ -15,7 +15,8 @@
 
         <!-- NOTE: These are the 'option' elipses -->
         <button data-element="tree-item-options" class="umb-options btn-reset sr-only sr-only--focusable sr-only--hoverable" ng-click="options(node, $event)" ng-if="::node.menuUrl"><i></i><i></i><i></i></button>
-        <div ng-show="node.loading" class="l"><div></div></div>
+
+        <umb-loader ng-show="node.loading" position="bottom" class="umb-tree-item__loader"></umb-loader>
     </div>
 
     <ul ng-class="{collapsed: !node.expanded}">
