@@ -38,8 +38,8 @@
                                         <span ng-class="{'strike': tour.completed}" class="umb-help-list-item__title">{{ tour.name }}</span>
                                     </div>
                                     <div>
-                                        <umb-button ng-if="!tour.completed && vm.showTourButton($index, tourGroup)" button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>
-                                        <umb-button ng-if="tour.completed" size="xxs" type="button" label="Rerun" action="vm.startTour(tour)"></umb-button>
+                                        <umb-button ng-if="!tour.completed && vm.showTourButton($index, tourGroup)" button-style="primary" type="button" label="Start" action="vm.startTour(tour)"></umb-button>
+                                        <umb-button ng-if="tour.completed" type="button" label="Rerun" action="vm.startTour(tour)"></umb-button>
                                     </div>
                                 </div>
                             </div>
