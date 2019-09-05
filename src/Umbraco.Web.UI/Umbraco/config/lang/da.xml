@@ -146,6 +146,7 @@
     <key alias="deleteTag">Slet tag</key>
     <key alias="confirmActionCancel">Fortryd</key>
     <key alias="confirmActionConfirm">Bekræft</key>
+	<key alias="morePublishingOptions">Flere publiseringsmuligheder</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>

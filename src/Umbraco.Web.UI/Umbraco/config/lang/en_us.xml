@@ -150,6 +150,7 @@
     <key alias="deleteTag">Delete tag</key>
     <key alias="confirmActionCancel">Cancel</key>
     <key alias="confirmActionConfirm">Confirm</key>
+	<key alias="morePublishingOptions">More publishing options</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
