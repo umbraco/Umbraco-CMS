@@ -1,0 +1,53 @@
+﻿.umb-file-icon {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .file-icon {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        > .icon {
+            font-size: 50px;
+            line-height: 50px;
+            color: @gray-4;
+            display: block;
+            text-align: center;
+        }
+
+        > span {
+            color: @white;
+            background: @ui-active;
+            padding: 1px 3px;
+            font-size: 10px;
+            line-height: 130%;
+            display: block;
+            margin-top: -25px;
+            min-width: 2em;
+        }
+
+        & + small {
+            display: block;
+            margin-top: 1em;
+        }
+    }
+}
+
+.umb-file-icon--s {
+    .file-icon {
+        > .icon {
+
+        }
+    }
+}
+
+.umb-file-icon--m {
+    .file-icon {
+        > .icon {
+            font-size: 70px;
+            line-height: 1.1;
+        }
+    }
+}

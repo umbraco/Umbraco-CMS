@@ -22,10 +22,17 @@
             <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail && item.extension !== 'svg'" src="assets/img/transparent.png" alt="{{item.name}}" draggable="false" />
 
             <!-- Icon for files -->
-            <span class="umb-media-grid__item-file-icon" ng-if="!item.thumbnail && item.extension !== 'svg'">
+            <!--<span class="umb-media-grid__item-file-icon" ng-if="!item.thumbnail && item.extension !== 'svg'">
                 <i class="umb-media-grid__item-icon {{item.icon}}"></i>
                 <span ng-if="item.extension">.{{item.extension}}</span>
-            </span>
+            </span>-->
+            <umb-file-icon ng-if="!item.thumbnail && item.extension !== 'svg'" class="umb-media-grid__item-file-icon"
+                           extension="{{item.extension}}"
+                           icon="{{item.icon}}"
+                           size="s">
+            </umb-file-icon>
+
+            <umb-file-icon ng-if="!item.thumbnail && item.extension !== 'svg'" extension="{{item.extension}}" size="s" class="umb-media-grid__item-file-icon"></umb-file-icon>
         </div>
     </div>
 </div>
