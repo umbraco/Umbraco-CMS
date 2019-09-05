@@ -1,13 +1,12 @@
 <div ng-controller="Umbraco.PrevalueEditors.RteController" class="rte-editor-preval">
 
-    <umb-control-group label="Toolbar" hide-label="false">
+    <umb-control-group label="Toolbar" description="Pick the toolbar options that should be available when editing">
         <div ng-repeat="cmd in tinyMceConfig.commands">
             <label>
-                <input type="checkbox"
-                       ng-checked="selected(cmd, cmd.alias, model.value.toolbar)"
-                       ng-model="cmd.selected"
-                       ng-change="selectCommand(cmd)" />
-
+                <umb-checkbox model="cmd.selected"
+                              on-change="selectCommand(cmd)"
+                              class="mce-cmd" />
+                
                 <!--<img ng-src="{{cmd.icon}}" />-->
                 <i class="mce-ico" ng-class="(cmd.isCustom ? ' mce-i-custom ' : ' mce-i-') + cmd.fontIcon"></i>
 
@@ -16,28 +15,27 @@
         </div>
     </umb-control-group>
 
-    <umb-control-group label="Stylesheets" hide-label="0">
+    <umb-control-group label="Stylesheets" description="Pick the stylesheets whose editor styles should be available when editing">
         <div ng-repeat="css in stylesheets">
-            <label>
-                <input type="checkbox"
-                       ng-checked="selected(css, css.name, model.value.stylesheets)"
-                       ng-model="css.selected"
-                       ng-change="selectStylesheet(css)" />
-                {{css.name}}
-            </label>
+
+            <umb-checkbox
+                model="css.selected"
+                on-change="selectStylesheet(css)"
+                text="{{css.name}}"/>
+        </div>
+    </umb-control-group>
+    </umb-control-group>
+
+    <umb-control-group label="Dimensions" description="Set the editor dimensions">
+        <div class="vertical-align-items">
+            <input type="number" min="0" ng-model="model.value.dimensions.width" class="umb-property-editor-small" title="Width" placeholder="Width" /> &times;
+            <input type="number" min="0" ng-model="model.value.dimensions.height" class="umb-property-editor-small" title="Height" placeholder="Height" /> Pixels
         </div>
     </umb-control-group>
 
-    <umb-control-group label="Dimensions" description="Width x Height">
+    <umb-control-group label="Maximum size for inserted images" description="Maximum width or height - enter 0 to disable resizing">
         <div class="vertical-align-items">
-            <input type="number" min="0" ng-model="model.value.dimensions.width" class="umb-property-editor-tiny" placeholder="Width" /> &times;
-            <input type="number" min="0" ng-model="model.value.dimensions.height" class="umb-property-editor-tiny" placeholder="Height" /> Pixels
-        </div>
-    </umb-control-group>
-
-    <umb-control-group label="Maximum size for inserted images" description="0 to disable resizing">
-        <div class="vertical-align-items">
-            <input type="number" min="0" ng-model="model.value.maxImageSize" class="umb-property-editor-tiny" placeholder="Width/Height" /> Pixels
+            <input type="number" min="0" ng-model="model.value.maxImageSize" class="umb-property-editor-small" title="Maximum width or height" placeholder="Maximum width or height" /> Pixels
         </div>
     </umb-control-group>
 
@@ -49,4 +47,5 @@
             </select>
         </div>
     </umb-control-group>
+
 </div>

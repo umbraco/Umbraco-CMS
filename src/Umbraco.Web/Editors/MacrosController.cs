@@ -62,6 +62,11 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse("Macro with this alias already exists");
             }
 
+            if (name == null || name.Length > 255)
+            {
+                return this.ReturnErrorResponse("Name cannnot be more than 255 characters in length.");
+            }
+
             try
             {
                 var macro = new Macro
@@ -147,6 +152,11 @@ namespace Umbraco.Web.Editors
             if (macroDisplay == null)
             {
                 return this.ReturnErrorResponse($"No macro data found in request");
+            }
+
+            if (macroDisplay.Name == null || macroDisplay.Name.Length > 255)
+            {
+                return this.ReturnErrorResponse("Name cannnot be more than 255 characters in length.");
             }
 
             var macro = _macroService.GetById(int.Parse(macroDisplay.Id.ToString()));

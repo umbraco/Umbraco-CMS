@@ -18,5 +18,6 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
         public string ConstraintName { get; set; }
         public string TableName { get; set; }
         public ICollection<string> Columns = new HashSet<string>();
+        public bool IsPrimaryKeyClustered { get; set; }
     }
 }

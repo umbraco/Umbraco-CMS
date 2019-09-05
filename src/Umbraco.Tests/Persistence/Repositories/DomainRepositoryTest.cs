@@ -22,8 +22,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var accessor = (IScopeAccessor) provider;
             var templateRepository = new TemplateRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
             var tagRepository = new TagRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, templateRepository);
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
             languageRepository = new LanguageRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, commonRepository, languageRepository);
             documentRepository = new DocumentRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             var domainRepository = new DomainRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
             return domainRepository;

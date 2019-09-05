@@ -30,7 +30,7 @@ namespace Umbraco.Core.PropertyEditors
             // defaults
             Type = type;
             Icon = Constants.Icons.PropertyEditor;
-            Group = "common";
+            Group = Constants.PropertyEditors.Groups.Common;
 
             // assign properties based on the attribute, if it is found
             Attribute = GetType().GetCustomAttribute<DataEditorAttribute>(false);
@@ -173,7 +173,13 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         protected virtual IConfigurationEditor CreateConfigurationEditor()
         {
-            return new ConfigurationEditor();
+            var editor = new ConfigurationEditor();
+            // pass the default configuration if this is not a property value editor
+            if((Type & EditorType.PropertyValue) == 0)
+            {
+                editor.DefaultConfiguration = _defaultConfiguration;
+            }
+            return editor;
         }
 
         /// <summary>

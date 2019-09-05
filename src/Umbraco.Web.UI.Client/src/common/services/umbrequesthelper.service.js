@@ -384,6 +384,8 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     // Get the filename from the x-filename header or default to "download.bin"
                     var filename = headers['x-filename'] || 'download.bin';
 
+                    filename = decodeURIComponent(filename);
+
                     // Determine the content type from the header or default to "application/octet-stream"
                     var contentType = headers['content-type'] || octetStreamMime;
 

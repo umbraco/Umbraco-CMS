@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper) {
+        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, tinyMceAssets) {
 
             // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
@@ -9,9 +9,7 @@ angular.module("umbraco")
             //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
             // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
             // we have this mini content editor panel that can be launched with MNTP.
-            var d = new Date();
-            var n = d.getTime();
-            $scope.textAreaHtmlId = $scope.model.alias + "_" + n + "_rte";
+            $scope.textAreaHtmlId = $scope.model.alias + "_" + String.CreateGuid();
 
             var editorConfig = $scope.model.config ? $scope.model.config.editor : null;
             if (!editorConfig || angular.isString(editorConfig)) {
@@ -22,12 +20,19 @@ angular.module("umbraco")
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
 
+            var width = editorConfig.dimensions ? parseInt(editorConfig.dimensions.width, 10) || null : null;
+            var height = editorConfig.dimensions ? parseInt(editorConfig.dimensions.height, 10) || null : null;
+
+            $scope.containerWidth = editorConfig.mode === "distraction-free" ? (width ? width : "auto") : "auto";
+            $scope.containerHeight = editorConfig.mode === "distraction-free" ? (height ? height : "auto") : "auto";
+            $scope.containerOverflow = editorConfig.mode === "distraction-free" ? (height ? "auto" : "inherit") : "inherit";
+
             var promises = [];
 
             //queue file loading
-            if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
-                promises.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope));
-            }
+            tinyMceAssets.forEach(function (tinyJsAsset) {
+                promises.push(assetsService.loadJs(tinyJsAsset, $scope));
+            });
 
             //stores a reference to the editor
             var tinyMceEditor = null;
@@ -43,10 +48,19 @@ angular.module("umbraco")
             $q.all(promises).then(function (result) {
 
                 var standardConfig = result[promises.length - 1];
-
+                
+                if (height !== null) {
+                    standardConfig.plugins.splice(standardConfig.plugins.indexOf("autoresize"), 1);
+                }
+                
                 //create a baseline Config to extend upon
                 var baseLineConfigObj = {
-                    maxImageSize: editorConfig.maxImageSize
+                    maxImageSize: editorConfig.maxImageSize,
+                    width: width,
+                    height: height,
+                    init_instance_callback: function(editor){
+                        $scope.isLoading = false;
+                    }
                 };
 
                 angular.extend(baseLineConfigObj, standardConfig);
@@ -73,9 +87,6 @@ angular.module("umbraco")
                     $timeout(function () {
                         tinymce.DOM.events.domLoaded = true;
                         tinymce.init(baseLineConfigObj);
-
-                        $scope.isLoading = false;
-
                     }, 200);
                 }
 

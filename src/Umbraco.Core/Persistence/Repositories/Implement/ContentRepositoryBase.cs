@@ -292,7 +292,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     if (psql.Arguments[i] is string s && s == "[[[ISOCODE]]]")
                     {
                         psql.Arguments[i] = ordering.Culture;
-                        break;
                     }
                 }
             }
@@ -378,6 +377,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // previously, we inserted the join+select *here* so we were sure to have it,
                 // but now that's not the case anymore!
                 return "variantName";
+            }
+
+            // content type alias is invariant
+            if(ordering.OrderBy.InvariantEquals("contentTypeAlias"))
+            {
+                var joins = Sql()
+                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype");
+
+                // see notes in ApplyOrdering: the field MUST be selected + aliased
+                sql = Sql(InsertBefore(sql, "FROM", ", " + SqlSyntax.GetFieldName<ContentTypeDto>(x => x.Alias, "ctype") + " AS ordering "), sql.Arguments);
+
+                sql = InsertJoins(sql, joins);
+
+                return "ordering";
             }
 
             // previously, we'd accept anything and just sanitize it - not anymore
@@ -499,31 +512,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var a in allPropertyDataDtos)
                 a.PropertyTypeDto = indexedPropertyTypeDtos[a.PropertyTypeId];
 
-            // prefetch configuration for tag properties
-            var tagEditors = new Dictionary<string, TagConfiguration>();
-            foreach (var propertyTypeDto in indexedPropertyTypeDtos.Values)
-            {
-                var editorAlias = propertyTypeDto.DataTypeDto.EditorAlias;
-                var editorAttribute = PropertyEditors[editorAlias].GetTagAttribute();
-                if (editorAttribute == null) continue;
-                var tagConfigurationSource = propertyTypeDto.DataTypeDto.Configuration;
-                var tagConfiguration = string.IsNullOrWhiteSpace(tagConfigurationSource)
-                    ? new TagConfiguration()
-                    : JsonConvert.DeserializeObject<TagConfiguration>(tagConfigurationSource);
-                if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = editorAttribute.Delimiter;
-                tagEditors[editorAlias] = tagConfiguration;
-            }
-
             // now we have
             // - the definitions
             // - all property data dtos
-            // - tag editors
+            // - tag editors (Actually ... no we don't since i removed that code, but we don't need them anyways it seems)
             // and we need to build the proper property collections
 
-            return GetPropertyCollections(temps, allPropertyDataDtos, tagEditors);
+            return GetPropertyCollections(temps, allPropertyDataDtos);
         }
 
-        private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos, Dictionary<string, TagConfiguration> tagConfigurations)
+        private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos)
             where T : class, IContentBase
         {
             var result = new Dictionary<int, PropertyCollection>();

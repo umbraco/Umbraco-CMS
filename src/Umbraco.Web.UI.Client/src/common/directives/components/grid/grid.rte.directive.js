@@ -4,7 +4,9 @@ angular.module("umbraco.directives")
             scope: {
                 uniqueId: '=',
                 value: '=',
-                configuration: "="
+                configuration: "=", //this is the RTE configuration
+                datatypeKey: '@',
+                ignoreUserStartNodes: '@'
             },
             templateUrl: 'views/components/grid/grid-rte.html',
             replace: true,
@@ -12,8 +14,15 @@ angular.module("umbraco.directives")
 
                 // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
-                var promises = [];
+                scope.isLoading = true;
 
+                var promises = [];
+                
+                //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
+                // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
+                // we have this mini content editor panel that can be launched with MNTP.
+                scope.textAreaHtmlId = scope.uniqueId + "_" + String.CreateGuid();
+                
                 //queue file loading
                 if (typeof (tinymce) === "undefined") {
                     promises.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
@@ -30,11 +39,19 @@ angular.module("umbraco.directives")
                     editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
                 }
 
+                //ensure the grid's global config is being passed up to the RTE, these 2 properties need to be in this format
+                //since below we are just passing up `scope` as the actual model and for 2 way binding to work with `value` that
+                //is the way it needs to be unless we start adding watchers. We'll just go with this for now but it's super ugly.
+                scope.config = {
+                    ignoreUserStartNodes: scope.ignoreUserStartNodes === "true"
+                }
+                scope.dataTypeKey = scope.datatypeKey; //Yes - this casing is rediculous, but it's because the var starts with `data` so it can't be `data-type-id` :/
+
                 //stores a reference to the editor
                 var tinyMceEditor = null;
 
                 promises.push(tinyMceService.getTinyMceEditorConfig({
-                    htmlId: scope.uniqueId,
+                    htmlId: scope.textAreaHtmlId,
                     stylesheets: editorConfig.stylesheets,
                     toolbar: editorConfig.toolbar,
                     mode: editorConfig.mode
@@ -75,6 +92,10 @@ angular.module("umbraco.directives")
 
                         //custom initialization for this editor within the grid
                         editor.on('init', function (e) {
+
+                            // Used this init event - as opposed to property init_instance_callback
+                            // to turn off the loader
+                            scope.isLoading = false;
 
                             //force overflow to hidden to prevent no needed scroll
                             editor.getBody().style.overflow = "hidden";
@@ -145,17 +166,11 @@ angular.module("umbraco.directives")
                         }
 
                     });
-
-                    //listen for formSubmitting event (the result is callback used to remove the event subscription)
-                    var formSubmittingListener = scope.$on("formSubmitting", function () {
-                        scope.value = tinyMceEditor ? tinyMceEditor.getContent() : null;
-                    });
-
+                    
                     //when the element is disposed we need to unsubscribe!
                     // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                     // element might still be there even after the modal has been hidden.
                     scope.$on('$destroy', function () {
-                        formSubmittingListener();
                         eventsService.unsubscribe(tabShownListener);
                         //ensure we unbind this in case the blur doesn't fire above
                         $('.umb-panel-body').off('scroll', pinToolbar);

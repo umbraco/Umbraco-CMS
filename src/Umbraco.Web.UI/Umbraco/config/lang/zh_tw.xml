@@ -52,9 +52,6 @@
     <key alias="domainExists">功能變數名稱 '%0%' 已使用</key>
     <key alias="domainUpdated">功能變數名稱 '%0%' 已更新</key>
     <key alias="orEdit">編輯當前功能變數名稱</key>
-    <key alias="domainHelp"><![CDATA[合格的網域名稱："example.com"，"www.example.com"，"example.com:8080" 或
-        "https://www.example.com/"。也可以使用一層路徑，如： "example.com/en"。但是，最好避免。
-        建議使用上面的文化設定。]]></key>
     <key alias="inherit">繼承</key>
     <key alias="setLanguage">語言</key>
     <key alias="setLanguageHelp"><![CDATA[改變目前節點以下其餘節點的文化設定，<br />或從父節點繼承文化設定。<br />
@@ -314,13 +311,6 @@
     <key alias="email">輸入您的電子郵件</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">允許子項節點類型</key>
-    <key alias="create">創建</key>
-    <key alias="deletetab">刪除選項卡</key>
-    <key alias="description">描述</key>
-    <key alias="newtab">新建選項卡</key>
-    <key alias="tab">選項卡</key>
-    <key alias="thumbnail">縮略圖</key>
     <key alias="createListView" version="7.2">新增自訂清單檢視</key>
     <key alias="removeListView" version="7.2">移除自訂清單檢視</key>
   </area>

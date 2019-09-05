@@ -4,41 +4,51 @@
         <umb-load-indicator></umb-load-indicator>
     </div>
 
-    <p>You are running the brand new NuCache!</p>
-
-    <p style="min-height: 120px; background: #f8f8f8; padding: 10px;">
-        <span ng-show="vm.working">NuCache is working.</span>
-        <span ng-show="!vm.working">NuCache says: {{vm.status}}</span>
-    </p>
-
-    <p>This lets you refresh the status, or collect snapshots (after running a CLR GC).</p>
-
-    <div>
-        <button type="button" ng-click="vm.verify()" class="btn btn-warning">Refresh</button>
-        <button type="button" ng-click="vm.collect()" class="btn btn-warning">Collect</button>
-    </div>
-
-    <br>
-
-    <p>
-        This lets you rebuild the database cache (status above), ie the content of the cmsContentNu table.
-        Rebuilding can be expensive.
+    <p style="min-height: 120px; background: #f8f8f8; padding: 10px; margin-bottom: 4px;">
+        <span ng-show="vm.working">(wait)</span>
+        <span ng-show="!vm.working">{{vm.status}}</span>
     </p>
 
     <div>
-        <button type="button" ng-click="vm.rebuild()" class="btn btn-warning">Rebuild</button>
+        <button type="button" ng-click="vm.verify($event)" class="btn btn-warning">Refresh status</button>
     </div>
 
-    <br>
+    <h4 class="mt4">Memory Cache</h4>
 
     <p>
-        This lets you reload the in-memory and local file cache by entirely reloading it from
-        the data in the cmsContentNu table, but it does not rebuild that table. This is relatively
-        fast. Triggers the reload on all servers in an LB environment.
+        This button lets you reload the in-memory cache, by entirely reloading it from the database
+        cache (but it does not rebuild that database cache). This is relatively fast.
+        Use it when you think that the memory cache has not been properly refreshed, after some events
+        triggered&mdash;which would indicate a minor Umbraco issue.
+        (note: triggers the reload on all servers in an LB environment).
     </p>
 
     <div>
         <button type="button" ng-click="vm.reload($event)" class="btn btn-warning">Reload</button>
+    </div>
+
+    <h4 class="mt4">Database Cache</h4>
+
+    <p>
+        This button lets you rebuild the database cache, ie the content of the cmsContentNu table.
+        <strong>Rebuilding can be expensive.</strong>
+        Use it when reloading is not enough, and you think that the database cache has not been
+        properly generated&mdash;which would indicate some critical Umbraco issue.
+    </p>
+
+    <div>
+        <button type="button" ng-click="vm.rebuild($event)" class="btn btn-warning">Rebuild</button>
+    </div>
+
+    <h4 class="mt4">Internals</h4>
+
+    <p>
+        This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC).
+        Unless you know what that means, you probably do <em>not</em> need to use it.
+    </p>
+
+    <div>
+        <button type="button" ng-click="vm.collect($event)" class="btn btn-warning">Collect</button>
     </div>
 
 </div>

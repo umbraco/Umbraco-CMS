@@ -8,13 +8,21 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Macros;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// Represents a rich text property editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.TinyMce, "Rich Text Editor", "rte", ValueType = ValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.TinyMce,
+        "Rich Text Editor",
+        "rte",
+        ValueType = ValueTypes.Text,
+        HideLabel = false,
+        Group = Constants.PropertyEditors.Groups.RichContent,
+        Icon = "icon-browser-window")]
     public class RichTextPropertyEditor : DataEditor
     {
         /// <summary>
@@ -73,7 +81,8 @@ namespace Umbraco.Web.PropertyEditors
                 if (val == null)
                     return null;
 
-                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(val.ToString(), new Dictionary<string, string>());
+                var propertyValueWithMediaResolved = TemplateUtilities.ResolveMediaFromTextString(val.ToString());
+                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(propertyValueWithMediaResolved, new Dictionary<string, string>());
                 return parsed;
             }
 
@@ -88,7 +97,8 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
-                var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValue.Value.ToString());
+                var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(editorValue.Value.ToString());
+                var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
                 return parsed;
             }
         }

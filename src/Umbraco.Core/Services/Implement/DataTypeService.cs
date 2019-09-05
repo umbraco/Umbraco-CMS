@@ -349,6 +349,11 @@ namespace Umbraco.Core.Services.Implement
                     throw new ArgumentException("Cannot save datatype with empty name.");
                 }
 
+                if (dataType.Name != null && dataType.Name.Length > 255)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
+
                 _dataTypeRepository.Save(dataType);
 
                 saveEventArgs.CanCancel = false;
@@ -423,7 +428,6 @@ namespace Umbraco.Core.Services.Implement
                     scope.Complete();
                     return;
                 }
-
 
                 // find ContentTypes using this IDataTypeDefinition on a PropertyType, and delete
                 // TODO: media and members?!

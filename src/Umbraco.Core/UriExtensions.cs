@@ -23,21 +23,21 @@ namespace Umbraco.Core
         /// <returns></returns>
         ///  <remarks>
         ///  There are some special routes we need to check to properly determine this:
-        /// 
+        ///
         ///      If any route has an extension in the path like .aspx = back office
-        /// 
+        ///
         ///      These are def back office:
         ///          /Umbraco/BackOffice     = back office
         ///          /Umbraco/Preview        = back office
         ///      If it's not any of the above, and there's no extension then we cannot determine if it's back office or front-end
         ///      so we can only assume that it is not back office. This will occur if people use an UmbracoApiController for the backoffice
         ///      but do not inherit from UmbracoAuthorizedApiController and do not use [IsBackOffice] attribute.
-        /// 
+        ///
         ///      These are def front-end:
         ///          /Umbraco/Surface        = front-end
         ///          /Umbraco/Api            = front-end
         ///      But if we've got this far we'll just have to assume it's front-end anyways.
-        /// 
+        ///
         ///  </remarks>
         internal static bool IsBackOfficeRequest(this Uri url, string applicationPath, IGlobalSettings globalSettings)
         {
@@ -152,9 +152,9 @@ namespace Umbraco.Core
                 var toInclude = new[] {".aspx", ".ashx", ".asmx", ".axd", ".svc"};
                 return toInclude.Any(ext.InvariantEquals) == false;
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Current.Logger.Error(typeof(UriExtensions), ex, "Failed to determine if request was client side");
+                Current.Logger.Debug(typeof(UriExtensions), "Failed to determine if request was client side (invalid chars in path \"{Path}\"?)", url.LocalPath);
                 return false;
             }
         }

@@ -148,7 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IDictionaryItem entity)
         {
-            ((EntityBase)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             foreach (var translation in entity.Translations)
                 translation.Value = translation.Value.ToValidXmlString();

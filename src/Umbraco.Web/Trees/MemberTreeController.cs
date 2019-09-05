@@ -80,7 +80,7 @@ namespace Umbraco.Web.Trees
                     "-1",
                     queryStrings,
                     member.Name,
-                    "icon-user",
+                    Constants.Icons.Member,
                     false,
                     "",
                     Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.Member), member.Key));
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Trees
                     "-1",
                     queryStrings,
                     member.UserName,
-                    "icon-user",
+                    Constants.Icons.Member,
                     false);
 
                 return node;
@@ -121,17 +121,17 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 nodes.Add(
-                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), "icon-users", true,
+                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), Constants.Icons.MemberType, true,
                             queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
 
                 if (_isUmbracoProvider)
                 {
                     nodes.AddRange(Services.MemberTypeService.GetAll()
                         .Select(memberType =>
-                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, "icon-users", true,
+                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, Constants.Icons.MemberType, true,
                                 queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
                 }
             }
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 // root actions
                 if (_provider.IsUmbracoMembershipProvider())

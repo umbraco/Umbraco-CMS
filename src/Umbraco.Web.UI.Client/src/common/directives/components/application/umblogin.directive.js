@@ -13,10 +13,9 @@
             }
         });
 
-    function UmbLoginController($scope, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, $q) {
+    function UmbLoginController($scope, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, $q, $route) {
 
         const vm = this;
-        let twoFactorloginDialog = null;
 
         vm.invitedUser = null;
 
@@ -61,7 +60,6 @@
         vm.loginSubmit = loginSubmit;
         vm.requestPasswordResetSubmit = requestPasswordResetSubmit;
         vm.setPasswordSubmit = setPasswordSubmit;
-
         vm.labels = {};
         localizationService.localizeMany([
             vm.usernameIsEmail ? "general_email" : "general_username", 
@@ -69,12 +67,16 @@
         ).then(function (data) {
             vm.labels.usernameLabel = data[0];
             vm.labels.usernamePlaceholder = data[1];
-        })                        
+        });
+        
+        vm.twoFactor = {};
 
         function onInit() {
 
             // Check if it is a new user
             const inviteVal = $location.search().invite;
+
+            vm.baseTitle = $scope.$root.locationTitle;
             //1 = enter password, 2 = password set, 3 = invalid token
             if (inviteVal && (inviteVal === "1" || inviteVal === "2")) {
 
@@ -121,11 +123,13 @@
                 vm.showLogin();
             }
 
+            SetTitle();
         }
 
         function togglePassword() {
             var elem = $("form[name='vm.loginForm'] input[name='password']");
             elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
+            elem.focus();
             $(".password-text.show, .password-text.hide").toggle();
         }
 
@@ -171,6 +175,7 @@
             vm.errorMsg = "";
             resetInputValidation();
             vm.view = "login";
+            SetTitle();
         }
 
         function showRequestPasswordReset() {
@@ -178,23 +183,28 @@
             resetInputValidation();
             vm.view = "request-password-reset";
             vm.showEmailResetConfirmation = false;
+            SetTitle();
         }
 
         function showSetPassword() {
             vm.errorMsg = "";
             resetInputValidation();
             vm.view = "set-password";
+            SetTitle();
         }
 
-        function loginSubmit(login, password) {
-
+        function loginSubmit() {
+            
+            // make sure that we are returning to the login view.
+            vm.view = "login";
+            
             // TODO: Do validation properly like in the invite password update
 
             //if the login and password are not empty we need to automatically
             // validate them - this is because if there are validation errors on the server
             // then the user has to change both username & password to resubmit which isn't ideal,
             // so if they're not empty, we'll just make sure to set them to valid.
-            if (login && password && login.length > 0 && password.length > 0) {
+            if (vm.login && vm.password && vm.login.length > 0 && vm.password.length > 0) {
                 vm.loginForm.username.$setValidity('auth', true);
                 vm.loginForm.password.$setValidity('auth', true);
             }
@@ -205,7 +215,7 @@
 
             vm.loginStates.submitButton = "busy";
 
-            userService.authenticate(login, password)
+            userService.authenticate(vm.login, vm.password)
                 .then(function (data) {
                     vm.loginStates.submitButton = "success";
                     userService._retryRequestQueue(true);
@@ -218,7 +228,7 @@
                     //is Two Factor required?
                     if (reason.status === 402) {
                         vm.errorMsg = "Additional authentication required";
-                        show2FALoginDialog(reason.data.twoFactorView, submit);
+                        show2FALoginDialog(reason.data.twoFactorView);
                     }
                     else {
                         vm.loginStates.submitButton = "error";
@@ -402,8 +412,13 @@
             });
         }
 
-        function show2FALoginDialog(view, callback) {
-            // TODO: show 2FA window
+        function show2FALoginDialog(viewPath) {
+            vm.twoFactor.submitCallback = function submitCallback() {
+                vm.onLogin();
+            }
+            vm.twoFactor.view = viewPath;
+            vm.view = "2fa-login";
+            SetTitle();
         }
 
         function resetInputValidation() {
@@ -424,7 +439,28 @@
         }
 
 
+        function SetTitle() {
+            var title = null;
+            switch (vm.view.toLowerCase()) {
+                case "login":
+                    title = "Login";
+                    break;
+                case "password-reset-code-expired":
+                case "request-password-reset":
+                    title = "Password Reset";
+                    break;
+                case "set-password":
+                    title = "Change Password";
+                    break;
+                case "2fa-login":
+                    title = "Two Factor Authentication";
+                    break;
+            } 
 
+            if (title != null) {
+                $scope.$root.locationTitle = title + " - " + vm.baseTitle;
+            }
+        }
 
     }
 

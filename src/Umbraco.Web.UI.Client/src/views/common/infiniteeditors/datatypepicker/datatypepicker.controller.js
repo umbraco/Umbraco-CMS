@@ -10,7 +10,7 @@
 (function() {
     "use strict";
 
-    function DataTypePicker($scope, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService, editorService) {
+    function DataTypePicker($scope, $filter, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService, editorService) {
 
         var vm = this;
 
@@ -119,13 +119,28 @@
             $scope.model.itemDetails = null;
 
             if (vm.searchTerm) {
-                vm.showFilterResult = true;
                 vm.showTabs = false;
+
+                var regex = new RegExp(vm.searchTerm, "i");
+                vm.filterResult = {
+                    userConfigured: filterCollection(vm.userConfigured, regex),
+                    typesAndEditors: filterCollection(vm.typesAndEditors, regex)
+                };
             } else {
-                vm.showFilterResult = false;
+                vm.filterResult = null;
                 vm.showTabs = true;
             }
+        }
 
+        function filterCollection(collection, regex) {
+            return _.map(_.keys(collection), function (key) {
+                return {
+                    group: key,
+                    dataTypes: $filter('filter')(collection[key], function (dataType) {
+                        return regex.test(dataType.name) || regex.test(dataType.alias);
+                    })
+                }
+            });
         }
 
         function showDetailsOverlay(property) {

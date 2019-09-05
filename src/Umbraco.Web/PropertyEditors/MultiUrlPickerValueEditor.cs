@@ -64,7 +64,6 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     GuidUdi udi = null;
                     var icon = "icon-link";
-                    var isMedia = false;
                     var published = true;
                     var trashed = false;
                     var url = dto.Url;
@@ -82,16 +81,15 @@ namespace Umbraco.Web.PropertyEditors
                             icon = documentEntity.ContentTypeIcon;
                             published = culture == null ? documentEntity.Published : documentEntity.PublishedCultures.Contains(culture);
                             udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(entity.Key)?.Url ?? "#";
+                            url = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(entity.Key)?.Url() ?? "#";
                             trashed = documentEntity.Trashed;
                         }
                         else if(entity is IContentEntitySlim contentEntity)
                         {
                             icon = contentEntity.ContentTypeIcon;
-                            isMedia = true;
                             published = !contentEntity.Trashed;
                             udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(entity.Key)?.Url ?? "#";
+                            url = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(entity.Key)?.Url() ?? "#";
                             trashed = contentEntity.Trashed;
                         }
                         else
@@ -104,7 +102,6 @@ namespace Umbraco.Web.PropertyEditors
                     result.Add(new LinkDisplay
                     {
                         Icon = icon,
-                        IsMedia = isMedia,
                         Name = dto.Name,
                         Target = dto.Target,
                         Trashed = trashed,

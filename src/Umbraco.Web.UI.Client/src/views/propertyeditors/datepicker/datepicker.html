@@ -4,7 +4,7 @@
 
         <div id="datepicker{{model.alias}}">
 
-            <umb-flatpickr
+            <umb-date-time-picker
                 ng-model="model.value"
                 options="datePickerConfig"
                 on-setup="datePickerSetup(fpItem)"
@@ -16,6 +16,7 @@
                         id="{{model.alias}}"
                         type="text"
                         ng-model="model.datetimePickerValue"
+                        ng-blur="inputChanged()"
                         ng-required="model.validation.mandatory"
                         val-server="value"
                         class="datepickerinput">
@@ -27,7 +28,7 @@
                     </span>
                 </div>
 
-            </umb-flatpickr>
+            </umb-date-time-picker>
 
         </div>
 

@@ -14,15 +14,18 @@
     margin: 0 0 20px 0;
     position: relative;
     transition: height 0.8s;
+
     .illustration {
       width: 300px;
     }
+
     &.is-small {
       height: 100px;
       .illustration {
         width: 200px;
       }
     }
+    
     &.drag-over {
       border: 1px dashed @gray-1;
     }
@@ -35,19 +38,23 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
+    display: flex;
+    flex-direction: column;
   }
 
 
   // file select link
   .file-select {
+    background: transparent;
+    border: 0;
+    padding: 0;
     font-size: 15px;
-    color: @ui-action-disgrete-type;
+    color: @ui-action-discreet-type;
     cursor: pointer;
-
     margin-top: 10px;
 
     &:hover {
-        color: @ui-action-disgrete-type-hover;
+        color: @ui-action-discreet-type-hover;
         text-decoration: none;
     }
   }

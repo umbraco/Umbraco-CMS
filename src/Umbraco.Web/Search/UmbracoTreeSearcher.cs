@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using AutoMapper;
 using Examine;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
-using SearchResult = Examine.SearchResult;
 
 namespace Umbraco.Web.Search
 {
@@ -24,21 +21,21 @@ namespace Umbraco.Web.Search
     {
         private readonly IExamineManager _examineManager;
         private readonly UmbracoContext _umbracoContext;
-        private readonly UmbracoHelper _umbracoHelper;
         private readonly ILocalizationService _languageService;
         private readonly IEntityService _entityService;
+        private readonly UmbracoMapper _mapper;
 
         public UmbracoTreeSearcher(IExamineManager examineManager,
             UmbracoContext umbracoContext,
-            UmbracoHelper umbracoHelper,
             ILocalizationService languageService,
-            IEntityService entityService)
+            IEntityService entityService,
+            UmbracoMapper mapper)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
             _umbracoContext = umbracoContext;
-            _umbracoHelper = umbracoHelper ?? throw new ArgumentNullException(nameof(umbracoHelper));
             _languageService = languageService;
             _entityService = entityService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -52,21 +49,22 @@ namespace Umbraco.Web.Search
         /// </param>
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         public IEnumerable<SearchResultEntity> ExamineSearch(
             string query,
             UmbracoEntityTypes entityType,
             int pageSize,
-            long pageIndex, out long totalFound, string searchFrom = null)
+            long pageIndex, out long totalFound, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             var sb = new StringBuilder();
 
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = new[] { "id", "__NodeId" };
-            
+
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
-            // manipulation for things like start paths, member types, etc... 
+            // manipulation for things like start paths, member types, etc...
             //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
             //{
 
@@ -88,12 +86,12 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Media:
                     type = "media";
                     var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
-                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, _entityService);
+                    AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
                     var allContentStartNodes = _umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
-                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, _entityService);
+                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
@@ -201,7 +199,7 @@ namespace Umbraco.Web.Search
                     AppendNodeNameExactWithBoost(sb, query, allLangs);
 
                     AppendNodeNameWithWildcards(sb, querywords, allLangs);
-                   
+
                     foreach (var f in fields)
                     {
                         //additional fields normally
@@ -291,7 +289,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[] startNodeIds, string searchFrom, IEntityService entityService)
+        private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[] startNodeIds, string searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
             if (entityService == null) throw new ArgumentNullException(nameof(entityService));
@@ -314,7 +312,7 @@ namespace Umbraco.Web.Search
                 // make sure we don't find anything
                 sb.Append("+__Path:none ");
             }
-            else if (startNodeIds.Contains(-1) == false) // -1 = no restriction
+            else if (startNodeIds.Contains(-1) == false && ignoreUserStartNodes == false) // -1 = no restriction
             {
                 var entityPaths = entityService.GetAllPaths(objectType, startNodeIds);
 
@@ -356,14 +354,14 @@ namespace Umbraco.Web.Search
             //add additional data
             foreach (var result in results)
             {
-                var m = Mapper.Map<SearchResultEntity>(result);
+                var m = _mapper.Map<SearchResultEntity>(result);
 
                 //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
+                if (m.Icon == Constants.Icons.DefaultIcon)
                 {
-                    m.Icon = "icon-user";
+                    m.Icon = Constants.Icons.Member;
                 }
-                
+
                 if (result.Values.ContainsKey("email") && result.Values["email"] != null)
                 {
                     m.AdditionalData["Email"] = result.Values["email"];
@@ -386,19 +384,7 @@ namespace Umbraco.Web.Search
         /// <param name="results"></param>
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
-        {
-            //add additional data
-            foreach (var result in results)
-            {
-                var m = Mapper.Map<SearchResultEntity>(result);
-                //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
-                {
-                    m.Icon = "icon-picture";
-                }
-                yield return m;
-            }
-        }
+            => _mapper.Map<IEnumerable<SearchResultEntity>>(results);
 
         /// <summary>
         /// Returns a collection of entities for content based on search results
@@ -411,7 +397,7 @@ namespace Umbraco.Web.Search
 
             foreach (var result in results)
             {
-                var entity = Mapper.Map<SearchResultEntity>(result);
+                var entity = _mapper.Map<SearchResultEntity>(result);
 
                 var intId = entity.Id.TryConvertTo<int>();
                 if (intId.Success)

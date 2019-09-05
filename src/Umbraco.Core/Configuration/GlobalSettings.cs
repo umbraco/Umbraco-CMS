@@ -315,7 +315,7 @@ namespace Umbraco.Core.Configuration
                         var hash = hashString.GenerateHash();
                         var siteTemp = System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", hash);
 
-                        return _localTempPath = System.IO.Path.Combine(siteTemp, "umbraco.config");
+                        return _localTempPath = siteTemp;
 
                     //case LocalTempStorage.Default:
                     //case LocalTempStorage.Unknown:

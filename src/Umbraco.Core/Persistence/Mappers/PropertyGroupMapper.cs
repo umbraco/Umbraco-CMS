@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -11,16 +12,16 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(PropertyGroup))]
     public sealed class PropertyGroupMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public PropertyGroupMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        protected override void DefineMaps()
         {
-            CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.Id, dto => dto.Id);
-            CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.SortOrder, dto => dto.SortOrder);
-            CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.Name, dto => dto.Text);
+            DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Id), nameof(PropertyTypeGroupDto.Id));
+            DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Key), nameof(PropertyTypeGroupDto.UniqueId));
+            DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.SortOrder), nameof(PropertyTypeGroupDto.SortOrder));
+            DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Name), nameof(PropertyTypeGroupDto.Text));
         }
     }
 }

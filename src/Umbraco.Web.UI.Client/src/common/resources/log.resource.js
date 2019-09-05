@@ -53,7 +53,7 @@ function logResource($q, $http, umbRequestHelper) {
         * 
         * @param {Object} options options object
         * @param {Int} options.id the id of the entity
-        * @param {Int} options.pageSize if paging data, number of nodes per page, default = 10, set to 0 to disable paging
+        * @param {Int} options.pageSize if paging data, number of nodes per page, default = 10
         * @param {Int} options.pageNumber if paging data, current page index, default = 1
         * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Descending`
         * @param {Date} options.sinceDate if provided this will only get log entries going back to this date
@@ -122,7 +122,7 @@ function logResource($q, $http, umbRequestHelper) {
          * </pre> 
          * 
          * @param {Object} options options object
-         * @param {Int} options.pageSize if paging data, number of nodes per page, default = 10, set to 0 to disable paging
+         * @param {Int} options.pageSize if paging data, number of nodes per page, default = 10
          * @param {Int} options.pageNumber if paging data, current page index, default = 1
          * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Descending`
          * @param {Date} options.sinceDate if provided this will only get log entries going back to this date

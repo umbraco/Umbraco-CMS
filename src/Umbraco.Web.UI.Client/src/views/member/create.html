@@ -6,13 +6,13 @@
             <ul class="umb-actions umb-actions-child">
 
                 <li class="umb-action" ng-repeat="docType in allowedTypes">
-                    <a class="umb-action-link" href="#member/member/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+                    <button class="umb-action-link umb-outline btn-reset" ng-click="createMemberType(docType)">
                         <i class="large icon {{docType.icon}}"></i>
                         <span class="menu-label">
                             {{docType.name}}
                             <small>{{docType.description}}</small>
                         </span>
-                    </a>
+                    </button>
                 </li>
             </ul>
 

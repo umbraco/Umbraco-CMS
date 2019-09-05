@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
+    function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService, entityResource) {
 
         function link(scope) {
 
@@ -16,8 +16,12 @@
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             scope.allowChangeDocumentType = false;
             scope.allowChangeTemplate = false;
+            scope.allTemplates = [];
 
             function onInit() {
+                entityResource.getAll("Template").then(function (templates) {
+                    scope.allTemplates = templates;
+                });
 
                 // set currentVariant
                 scope.currentVariant = _.find(scope.node.variants, (v) => v.active);
@@ -147,7 +151,7 @@
                     id: documentType.id,
                     submit: function (model) {
                         const args = { node: scope.node };
-                        eventsService.emit('editors.content.reload', args);
+                        eventsService.emit("editors.content.reload", args);
                         editorService.close();
                     },
                     close: function () {
@@ -158,8 +162,12 @@
             }
 
             scope.openTemplate = function () {
+                var template = _.findWhere(scope.allTemplates, {alias: scope.node.template})
+                if (!template) {
+                    return;
+                }
                 var templateEditor = {
-                    id: scope.node.templateId,
+                    id: template.id,
                     submit: function (model) {
                         editorService.close();
                     },
@@ -328,6 +336,8 @@
                         isInfoTab = true;
                         loadAuditTrail();
                         loadRedirectUrls();
+                        setNodePublishStatus();
+                        formatDatesToLocal();
                     } else {
                         isInfoTab = false;
                     }
@@ -344,6 +354,7 @@
                     loadAuditTrail(true);
                     loadRedirectUrls();
                     setNodePublishStatus();
+                    formatDatesToLocal();
                 }
                 updateCurrentUrls();
             });

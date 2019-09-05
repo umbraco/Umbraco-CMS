@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Routing
             // trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
             //
-            // also, OnPrepared() will make the PublishedContentRequest readonly, so nothing can change
+            // also, OnPrepared() will make the PublishedRequest readonly, so nothing can change
             //
             request.OnPrepared();
 
@@ -244,7 +244,7 @@ namespace Umbraco.Web.Routing
         #region Domain
 
         /// <summary>
-        /// Finds the site root (if any) matching the http request, and updates the PublishedContentRequest accordingly.
+        /// Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
         /// </summary>
         /// <returns>A value indicating whether a domain was found.</returns>
         internal bool FindDomain(PublishedRequest request)
@@ -284,7 +284,7 @@ namespace Umbraco.Web.Routing
             var defaultCulture = domainsCache.DefaultCulture;
 
             // try to find a domain matching the current request
-            var domainAndUri = DomainHelper.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
+            var domainAndUri = DomainUtilities.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
 
             // handle domain - always has a contentId and a culture
             if (domainAndUri != null)
@@ -328,7 +328,7 @@ namespace Umbraco.Web.Routing
             var nodePath = request.PublishedContent.Path;
             _logger.Debug<PublishedRouter>("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
             var rootNodeId = request.HasDomain ? request.Domain.ContentId : (int?)null;
-            var domain = DomainHelper.FindWildcardDomainInPath(request.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
+            var domain = DomainUtilities.FindWildcardDomainInPath(request.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
 
             // always has a contentId and a culture
             if (domain != null)
@@ -375,7 +375,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Finds the Umbraco document (if any) matching the request, and updates the PublishedContentRequest accordingly.
+        /// Finds the Umbraco document (if any) matching the request, and updates the PublishedRequest accordingly.
         /// </summary>
         /// <returns>A value indicating whether a document and template were found.</returns>
         private void FindPublishedContentAndTemplate(PublishedRequest request)
@@ -517,7 +517,7 @@ namespace Umbraco.Web.Routing
             {
                 // try and get the redirect node from a legacy integer ID
                 valid = true;
-                internalRedirectNode = request.UmbracoContext.ContentCache.GetById(internalRedirectId);
+                internalRedirectNode = request.UmbracoContext.Content.GetById(internalRedirectId);
             }
             else
             {
@@ -526,7 +526,7 @@ namespace Umbraco.Web.Routing
                 {
                     // try and get the redirect node from a UDI Guid
                     valid = true;
-                    internalRedirectNode = request.UmbracoContext.ContentCache.GetById(udiInternalRedirectId.Guid);
+                    internalRedirectNode = request.UmbracoContext.Content.GetById(udiInternalRedirectId.Guid);
                 }
             }
 

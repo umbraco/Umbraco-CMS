@@ -1,3 +1,4 @@
-﻿<div class="umb-rte">
-    <div id="{{uniqueId}}"></div>
+﻿<div>
+    <umb-load-indicator ng-if="isLoading"></umb-load-indicator>
+    <div class="umb-rte" id="{{textAreaHtmlId}}" ng-style="{ visibility :  isLoading ? 'hidden' : 'visible' }"></div>
 </div>

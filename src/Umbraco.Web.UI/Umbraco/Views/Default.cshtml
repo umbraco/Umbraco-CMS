@@ -43,7 +43,7 @@
     @Html.RenderCssHere(
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
 </head>
-<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
+<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
     <noscript>
         <div style="margin: 10px;">
@@ -112,13 +112,15 @@
         on-login="hideLoginScreen()">
     </umb-login>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }), Model.Features, Current.Configs.Global())
+    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Current.Configs.Global())
 
     <script>
 
         document.angularReady = function(app) {
-            @Html.AngularValueExternalLoginInfoScript((IEnumerable<string>)ViewBag.ExternalSignInError)
+            @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
+            @Html.AngularValueTinyMceAssets()
+
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
         }

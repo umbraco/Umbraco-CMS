@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
@@ -71,12 +70,12 @@ namespace Umbraco.Web.Editors
                         return;
                     }
                     // map the model to the persisted instance
-                    Mapper.Map(dataType, persisted);
+                    Current.Mapper.Map(dataType, persisted);
                     break;
 
                 case ContentSaveAction.SaveNew:
                     // create the persisted model from mapping the saved model
-                    persisted = Mapper.Map<IDataType>(dataType);
+                    persisted = Current.Mapper.Map<IDataType>(dataType);
                     ((DataType) persisted).ResetIdentity();
                     break;
 

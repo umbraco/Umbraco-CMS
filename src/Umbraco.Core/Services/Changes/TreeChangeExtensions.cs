@@ -2,9 +2,9 @@
 
 namespace Umbraco.Core.Services.Changes
 {
-    internal static class TreeChangeExtensions
+    public static class TreeChangeExtensions
     {
-        public static TreeChange<TItem>.EventArgs ToEventArgs<TItem>(this IEnumerable<TreeChange<TItem>> changes)
+        internal static TreeChange<TItem>.EventArgs ToEventArgs<TItem>(this IEnumerable<TreeChange<TItem>> changes)
         {
             return new TreeChange<TItem>.EventArgs(changes);
         }

@@ -10,10 +10,13 @@
 
       <div class="umb-content-grid__content">
 
-        <div class="umb-content-grid__item-name" ng-click="clickItemName(item, $event, $index)" ng-class="{'-light': !item.published && item.updater != null}">
+        <a class="umb-content-grid__item-name"
+           ng-href="{{'#' + item.editPath}}"
+           ng-click="clickItemName(item, $event, $index)"
+           ng-class="{'-light': !item.published && item.updater != null}">
             <i class="umb-content-grid__icon {{ item.icon }}"></i>
             <span>{{ item.name }}</span>
-        </div>
+        </a>
 
         <ul class="umb-content-grid__details-list" ng-class="{'-light': !item.published && item.updater != null}">
             <li class="umb-content-grid__details-item" ng-if="item.state">

@@ -22,7 +22,7 @@ namespace Umbraco.Core.Compose
 
         private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
         {
-            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinContent.ToInvariantString())))
+            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinContentString)))
             {
                 var relationService = Current.Services.RelationService;
                 const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Compose
 
         private static void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e)
         {
-            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinMedia.ToInvariantString())))
+            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinMediaString)))
             {
                 var relationService = Current.Services.RelationService;
                 const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
