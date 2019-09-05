@@ -21,15 +21,9 @@
 
     margin: 10px;
     position: relative;
-    //overflow: hidden;
-    
-    user-select: none;
-    
+    user-select: none; 
     cursor: pointer;
-    
     box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
-    //border: 2px solid transparent;
-    
     transition: box-shadow 150ms ease-in-out;
 }
 
@@ -104,34 +98,27 @@
 }
 
 .umb-media-grid__item-image {
-   //max-width: 100% !important;
-   //height: auto;
    position: relative;
-   
    object-fit: contain;
    height: 100%;
 }
 
 .umb-media-grid__item-image-placeholder {
     width: 100%;
-    //max-width: 100%;
-    //height: auto;
     position: relative;
-    
     object-fit: contain;
     height: 100%;
 }
 
 .umb-media-grid__image-background {
     content: "";
-    background: url("../img/checkered-background.png");
-    background-repeat: repeat;
     opacity: 0.5;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
     position: absolute;
+    .checkeredBackground();
 }
 
 .umb-media-grid__item-overlay {
@@ -157,19 +144,6 @@
    }
 }
 
-/*
-.umb-media-grid__item.-file .umb-media-grid__item-overlay {
-    opacity: 1;
-    color: @gray-4;
-    background: @white;
-}
-
-.umb-media-grid__item.-file:hover .umb-media-grid__item-overlay,
-.umb-media-grid__item.-file.-selected .umb-media-grid__item-overlay {
-    color: @white;
-    background: @blueExtraDark;
-}
-*/
 .umb-media-grid__info {
     margin-right: 5px;
 }
@@ -191,25 +165,7 @@
    text-overflow: ellipsis;
 }
 
-/*
-.umb-media-grid__checkmark {
-    position: absolute;
-    z-index: 2;
-    top: 10px;
-    left: 10px;
-    width: 26px;
-    height: 26px;
-    border: 2px solid @white;
-    background: @green;
-    border-radius: 50px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: @white;
-    transition: background 100ms;
-}
-*/
+
 .umb-media-grid__edit {
     position: absolute;
     opacity: 0;

@@ -10,6 +10,7 @@ using Umbraco.Examine;
 
 namespace Umbraco.Web.Search
 {
+
     /// <summary>
     /// Configures and installs Examine.
     /// </summary>
@@ -43,6 +44,7 @@ namespace Umbraco.Web.Search
                     false));
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
+            composition.RegisterUnique<BackgroundIndexRebuilder>();
 
             //We want to manage Examine's AppDomain shutdown sequence ourselves so first we'll disable Examine's default behavior
             //and then we'll use MainDom to control Examine's shutdown - this MUST be done in Compose ie before ExamineManager

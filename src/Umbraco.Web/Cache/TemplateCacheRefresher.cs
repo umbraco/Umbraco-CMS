@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Cache
@@ -8,11 +9,13 @@ namespace Umbraco.Web.Cache
     public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
     {
         private readonly IdkMap _idkMap;
+        private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
 
-        public TemplateCacheRefresher(AppCaches appCaches, IdkMap idkMap)
+        public TemplateCacheRefresher(AppCaches appCaches, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
             : base(appCaches)
         {
             _idkMap = idkMap;
+            _contentTypeCommonRepository = contentTypeCommonRepository;
         }
 
         #region Define
@@ -45,6 +48,7 @@ namespace Umbraco.Web.Cache
             // it has an associated template.
             ClearAllIsolatedCacheByEntityType<IContent>();
             ClearAllIsolatedCacheByEntityType<IContentType>();
+            _contentTypeCommonRepository.ClearCache();
 
             base.Remove(id);
         }
