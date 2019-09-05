@@ -1615,5 +1615,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="visuallyHiddenTexts">
     <key alias="goBack">Gå tilbage</key>
     <key alias="activeListLayout">Aktivt layout:</key>
+    <key alias="jumpTo">Gå til</key>
+    <key alias="group">gruppe</key>    
   </area>
 </language>
