@@ -4,13 +4,12 @@ using Umbraco.Core;
 using System.Web.Helpers;
 using System.Web;
 using Newtonsoft.Json;
-using Umbraco.Web.Composing;
+using System.ComponentModel;
 
 namespace Umbraco.Web.Security
 {
-    /// <summary>
-    /// A custom <see cref="IAntiForgeryAdditionalDataProvider"/> to create a unique antiforgery token/validator per form created with BeginUmbracoForm
-    /// </summary>
+    [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class UmbracoAntiForgeryAdditionalDataProvider : IAntiForgeryAdditionalDataProvider
     {
         private readonly IAntiForgeryAdditionalDataProvider _defaultProvider;

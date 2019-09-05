@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -575,12 +574,11 @@ namespace Umbraco.Core.Packaging
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
 
-            //NOTE AllowAtRoot is a new property in the package xml so we need to verify it exists before using it.
+            //NOTE AllowAtRoot, IsListView, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
             var allowAtRoot = infoElement.Element("AllowAtRoot");
             if (allowAtRoot != null)
                 contentType.AllowedAsRoot = allowAtRoot.Value.InvariantEquals("true");
 
-            //NOTE IsListView is a new property in the package xml so we need to verify it exists before using it.
             var isListView = infoElement.Element("IsListView");
             if (isListView != null)
                 contentType.IsContainer = isListView.Value.InvariantEquals("true");
@@ -588,6 +586,10 @@ namespace Umbraco.Core.Packaging
             var isElement = infoElement.Element("IsElement");
             if (isElement != null)
                 contentType.IsElement = isElement.Value.InvariantEquals("true");
+
+            var variationsElement = infoElement.Element("Variations");
+            if (variationsElement != null)
+                contentType.Variations = (ContentVariation)Enum.Parse(typeof(ContentVariation), variationsElement.Value);
 
             //Name of the master corresponds to the parent and we need to ensure that the Parent Id is set
             var masterElement = infoElement.Element("Master");
@@ -614,7 +616,7 @@ namespace Umbraco.Core.Packaging
                         var compositionContentType = importedContentTypes.ContainsKey(compositionAlias)
                             ? importedContentTypes[compositionAlias]
                             : _contentTypeService.Get(compositionAlias);
-                        var added = contentType.AddContentType(compositionContentType);
+                        contentType.AddContentType(compositionContentType);
                     }
                 }
             }
@@ -748,9 +750,14 @@ namespace Umbraco.Core.Packaging
                 {
                     Name = property.Element("Name").Value,
                     Description = (string)property.Element("Description"),
-                    Mandatory = property.Element("Mandatory") != null ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true") : false,
+                    Mandatory = property.Element("Mandatory") != null
+                        ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true")
+                        : false,
                     ValidationRegExp = (string)property.Element("Validation"),
-                    SortOrder = sortOrder
+                    SortOrder = sortOrder,
+                    Variations = property.Element("Variations") != null
+                        ? (ContentVariation)Enum.Parse(typeof(ContentVariation), property.Element("Variations").Value)
+                        : ContentVariation.Nothing
                 };
 
                 var tab = (string)property.Element("Tab");

@@ -163,7 +163,8 @@ a, a:hover{
     background-clip: padding-box;
 }
 
-.dropdown-menu > li > a {
+.dropdown-menu > li > a,
+.dropdown-menu > li > button {
     display: block;
     padding: 3px 20px;
     clear: both;
@@ -174,7 +175,12 @@ a, a:hover{
     cursor:pointer;
 }
 
-.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-submenu:hover > a, .dropdown-submenu:focus > a {
+.dropdown-menu > li > a:hover, 
+.dropdown-menu > li > a:focus, 
+.dropdown-menu > li > button:hover, 
+.dropdown-menu > li > button:focus, 
+.dropdown-submenu:hover > a, 
+.dropdown-submenu:focus > a {
     color: #000000;
     background: #e4e0dd;
 }
