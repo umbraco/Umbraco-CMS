@@ -22,7 +22,7 @@
                 position: 'left'
             }
         };
-
+        
         let querystring = $location.search();
         if (querystring.startDate) {
             vm.startDate = querystring.startDate;
@@ -122,9 +122,15 @@
             var commonMsgs = logViewerResource.getMessageTemplates(vm.startDate, vm.endDate).then(function (data) {
                 vm.commonLogMessages = data;
             });
+            
+            var logLevel = logViewerResource.getLogLevel().then(function(data) {
+                vm.logLevel = data; 
+                const index = vm.logTypeLabels.findIndex(x => vm.logLevel.startsWith(x));
+                vm.logLevelColor = index > -1 ? vm.logTypeColors[index] : '#000';
+            });
 
             //Set loading indicator to false when these 3 queries complete
-            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function () {
+            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs, logLevel]).then(function () {
                 vm.loading = false;
             });
 

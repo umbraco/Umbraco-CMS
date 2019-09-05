@@ -1,9 +1,8 @@
 <div class="umb-dialog" ng-controller="Umbraco.Editors.Content.EmptyRecycleBinController">
     <div class="umb-dialog-body">
         <umb-pane>
-            <div class="umb-loader-wrapper" ng-show="busy">
-                <div class="umb-loader"></div>
-            </div>
+
+            <umb-loader ng-show="busy"></umb-loader>
 
             <p class="abstract">
                 <localize key="defaultdialogs_recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</localize>.
