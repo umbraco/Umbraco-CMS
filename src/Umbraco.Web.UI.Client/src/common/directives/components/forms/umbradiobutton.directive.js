@@ -27,31 +27,40 @@
 @param {string} text Set the text for the radiobutton label.
 @param {boolean} disabled Set the radiobutton to be disabled.
 @param {boolean} required Set the radiobutton to be required.
+@param {callback} onChange Callback when the value of the radiobutton change by interaction.
 
 **/
 
 (function () {
     'use strict';
 
-    function RadiobuttonDirective() {
-        var directive = {
-            restrict: 'E',
-            replace: true,
-            templateUrl: 'views/components/forms/umb-radiobutton.html',
-            scope: {
-                model: "=",
-                value: "@",
-                name: "@",
-                text: "@",
-                disabled: "=",
-                required: "="
-            }
-        };
+    function UmbRadiobuttonController($timeout) {
 
-        return directive;
+        var vm = this;
 
+        if (vm.onChange) {
+            $timeout(function () {
+                vm.onChange({ model: vm.model, value: vm.value });
+            }, 0);
+        }
+        
     }
 
-    angular.module('umbraco.directives').directive('umbRadiobutton', RadiobuttonDirective);
+    var component = {
+        templateUrl: 'views/components/forms/umb-radiobutton.html',
+        controller: UmbRadiobuttonController,
+        controllerAs: 'vm',
+        bindings: {
+            model: "=",
+            value: "@",
+            name: "@",
+            text: "@",
+            disabled: "=",
+            required: "=",
+            onChange: "&?"
+        }
+    };
+
+    angular.module('umbraco.directives').component('umbRadiobutton', component);
 
 })();
