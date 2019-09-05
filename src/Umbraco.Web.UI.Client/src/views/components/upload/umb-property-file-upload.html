@@ -15,7 +15,7 @@
 
                 <div class="umb-fileupload clearfix" ng-repeat="file in vm.files">
 
-                    <div class="" ng-if="file.isImage || file.extension == 'svg'">
+                    <div ng-if="file.isImage || file.extension === 'svg'">
                         <div class="gravity-container">
                             <div class="viewport">
                                 <img ng-if="file.isClientSide" ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}"/>
@@ -26,21 +26,21 @@
                         </div>
                     </div>
 
-                    <div ng-if="!file.isImage && file.extension != 'svg'">
+                    <div ng-if="!file.isImage && file.extension !== 'svg'">
                         <a class="span6 thumbnail tc" ng-show="!file.isClientSide" ng-href="{{file.fileName}}" target="_blank">
-                            <span class="file-icon-wrap">
+                            <span class="umb-icon-holder">
                                 <span class="file-icon">
                                     <i class="icon icon-document"></i>
-                                    <span>.{{file.extension}}</span>
+                                    <span ng-if="file.extension">.{{file.extension}}</span>
                                 </span>
                             </span>
                             <div>{{file.fileName}}</div>
                         </a>
                         <div class="span6 thumbnail tc" ng-show="file.isClientSide">
-                            <span class="file-icon-wrap">
+                            <span class="umb-icon-holder">
                                 <span class="file-icon">
                                     <i class="icon icon-document"></i>
-                                    <span>.{{file.extension}}</span>
+                                    <span ng-if="file.extension">.{{file.extension}}</span>
                                 </span>
                             </span>
                             <div>{{file.fileName}}</div>

@@ -38,6 +38,7 @@
     <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="wasMovedTo">was moved to</key>
     <key alias="wasCopiedTo">was copied to</key>
+    <key alias="wasDeleted">was deleted</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -149,6 +150,7 @@
     <key alias="deleteTag">Delete tag</key>
     <key alias="confirmActionCancel">Cancel</key>
     <key alias="confirmActionConfirm">Confirm</key>
+	<key alias="morePublishingOptions">More publishing options</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -2131,5 +2133,8 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="visuallyHiddenTexts">
     <key alias="goBack">Go back</key>
+    <key alias="activeListLayout">Active layout:</key>
+    <key alias="jumpTo">Jump to</key>
+    <key alias="group">group</key>    
   </area>
 </language>

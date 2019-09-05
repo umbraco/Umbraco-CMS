@@ -42,7 +42,7 @@
             </ul>
             <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint">
 
-                <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false">
+                <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false track by $index">
                     <button class="umb-action-link umb-outline btn-reset" ng-click="createFromBlueprint(blueprint.id)">
                         <i class="large icon {{docType.icon}}"></i>
                         <span class="menu-label">
