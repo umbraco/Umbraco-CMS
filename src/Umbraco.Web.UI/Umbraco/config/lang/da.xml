@@ -1614,5 +1614,6 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="visuallyHiddenTexts">
     <key alias="goBack">Gå tilbage</key>
+    <key alias="activeListLayout">Aktivt layout:</key>
   </area>
 </language>

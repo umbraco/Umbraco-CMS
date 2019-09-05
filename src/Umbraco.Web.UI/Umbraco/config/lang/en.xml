@@ -2132,5 +2132,6 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="visuallyHiddenTexts">
     <key alias="goBack">Go back</key>
+    <key alias="activeListLayout">Active layout:</key>
   </area>
 </language>
