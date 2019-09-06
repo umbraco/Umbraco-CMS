@@ -12,13 +12,14 @@ Use this directive to render a file icon.
     <div>
 
         <umb-file-icon
-            size="60">
+            extension="pdf"
+            size="s">
         </umb-file-icon>
 
 	</div>
 </pre>
 
-@param {string} size (<code>attribute</code>): This parameter defines the size of the file icon in pixels.
+@param {string} size (<code>attribute</code>): This parameter defines the size of the file icon (s, m).
 **/
 
 (function () {
