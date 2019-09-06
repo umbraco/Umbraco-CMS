@@ -79,10 +79,8 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
 
                 //get the lengths of each array for each key in the $error collection
                 var validatorLengths = _.map(formCtrl.$error, function (val, key) {
-                    var innerErrorCount = 0;
                     // if there are child ng-forms, include the $error collections in those as well
-                    if (val.$error && val.$error.length) {
-                        innerErrorCount = _.reduce(
+                    var innerErrorCount = _.reduce(
                             _.map(val, v =>
                                 _.reduce(
                                     _.map(v.$error, e => e.length),
@@ -91,7 +89,6 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                             ),
                             (memo, num) => memo + num
                         );
-                    }
                     return val.length + innerErrorCount;
                 });
                 //sum up all numbers in the resulting array
