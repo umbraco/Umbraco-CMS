@@ -26,13 +26,13 @@
                 <i class="umb-media-grid__item-icon {{item.icon}}"></i>
                 <span ng-if="item.extension">.{{item.extension}}</span>
             </span>-->
-            <umb-file-icon ng-if="!item.thumbnail && item.extension !== 'svg'" class="umb-media-grid__item-file-icon"
+            <umb-file-icon ng-if="!item.thumbnail && item.extension !== 'svg'"
+                           class="umb-media-grid__item-file-icon"
                            extension="{{item.extension}}"
                            icon="{{item.icon}}"
                            size="s">
             </umb-file-icon>
 
-            <umb-file-icon ng-if="!item.thumbnail && item.extension !== 'svg'" extension="{{item.extension}}" size="s" class="umb-media-grid__item-file-icon"></umb-file-icon>
         </div>
     </div>
 </div>
