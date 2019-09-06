@@ -28,13 +28,6 @@
                      title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
 
                 <!-- FILE -->
-                <!--<div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail">
-                    <span class="file-icon">
-                        <i class="icon {{media.icon}}"></i>
-                        <span ng-if="media.extension">.{{media.extension}}</span>
-                    </span>
-                    <small>{{media.name}}</small>
-                </div>-->
                 <umb-file-icon ng-hide="media.thumbnail" ng-class="{'trashed': media.trashed}"
                                extension="{{media.extension}}"
                                size="s"
