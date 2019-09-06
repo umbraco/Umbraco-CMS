@@ -8,29 +8,32 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        position: relative;
 
         > .icon {
             font-size: 50px;
-            line-height: 50px;
+            line-height: 100%;
             color: @gray-4;
             display: block;
             text-align: center;
         }
 
         > span {
+            position: absolute;
             color: @white;
             background: @ui-active;
             padding: 1px 3px;
             font-size: 10px;
             line-height: 130%;
             display: block;
-            margin-top: -25px;
-            min-width: 2em;
+            margin-bottom: 0.75rem;
+            min-width: 1.2rem;
+            bottom: 0;
         }
 
         & + small {
             display: block;
-            margin-top: 1em;
+            margin-top: 0.25rem;
         }
     }
 }
@@ -47,7 +50,10 @@
     .file-icon {
         > .icon {
             font-size: 70px;
-            line-height: 1.1;
+        }
+        > span {
+            font-size: 14px;
+            margin-bottom: 0.95rem;
         }
     }
 }
