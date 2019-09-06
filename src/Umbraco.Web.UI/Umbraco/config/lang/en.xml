@@ -592,6 +592,7 @@
     <key alias="stylesNoStylesOnPage">No active styles available</key>
     <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
+    <key alias="propertyHasErrors">This property is invalid</key>
   </area>
   <area alias="general">
     <key alias="about">About</key>

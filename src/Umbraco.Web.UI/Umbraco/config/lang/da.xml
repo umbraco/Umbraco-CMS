@@ -565,6 +565,7 @@
     <key alias="stylesNoStylesOnPage">Der er ingen aktive styles eller formatteringer på denne side</key>
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
+    <key alias="propertyHasErrors">Denne egenskab er ugyldig</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
