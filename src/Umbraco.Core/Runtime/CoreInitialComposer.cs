@@ -55,7 +55,7 @@ namespace Umbraco.Core.Runtime
             composition.Register<DatabaseBuilder>();
 
             // register manifest parser, will be injected in collection builders where needed
-            composition.RegisterUnique<ManifestParser>();
+            composition.RegisterUnique<ManifestParser, ManifestParserImpl>();
 
             // register our predefined validators
             composition.ManifestValueValidators()

@@ -12,24 +12,32 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
 {
+    internal class ManifestParserImpl : ManifestParser
+    {
+        public ManifestParserImpl(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger)
+            : base(appCaches, validators, filters, logger)
+        {
+        }
+    }
+
     /// <summary>
     /// Parses the Main.js file and replaces all tokens accordingly.
     /// </summary>
-    public class ManifestParser
+    public abstract class ManifestParser
     {
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
-        private readonly IAppPolicyCache _cache;
-        private readonly ILogger _logger;
-        private readonly ManifestValueValidatorCollection _validators;
-        private readonly ManifestFilterCollection _filters;
+        protected readonly IAppPolicyCache Cache;
+        protected readonly ILogger Logger;
+        protected readonly ManifestValueValidatorCollection Validators;
+        protected readonly ManifestFilterCollection Filters;
 
         private string _path;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger)
+        protected ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger)
             : this(appCaches, validators, filters, "~/App_Plugins", logger)
         { }
 
@@ -39,15 +47,15 @@ namespace Umbraco.Core.Manifest
         private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
-            _cache = appCaches.RuntimeCache;
-            _validators = validators ?? throw new ArgumentNullException(nameof(validators));
-            _filters = filters ?? throw new ArgumentNullException(nameof(filters));
+            Cache = appCaches.RuntimeCache;
+            Validators = validators ?? throw new ArgumentNullException(nameof(validators));
+            Filters = filters ?? throw new ArgumentNullException(nameof(filters));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
             Path = path;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public string Path
+        public virtual string Path
         {
             get => _path;
             set => _path = value.StartsWith("~/") ? IOHelper.MapPath(value) : value;
@@ -57,8 +65,8 @@ namespace Umbraco.Core.Manifest
         /// Gets all manifests, merged into a single manifest object.
         /// </summary>
         /// <returns></returns>
-        public PackageManifest Manifest
-            => _cache.GetCacheItem<PackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
+        public virtual PackageManifest Manifest
+            => Cache.GetCacheItem<PackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
             {
                 var manifests = GetManifests();
                 return MergeManifests(manifests);
@@ -67,7 +75,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Gets all manifests.
         /// </summary>
-        private IEnumerable<PackageManifest> GetManifests()
+        protected virtual IEnumerable<PackageManifest> GetManifests()
         {
             var manifests = new List<PackageManifest>();
 
@@ -85,11 +93,11 @@ namespace Umbraco.Core.Manifest
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<ManifestParser>(e, "Failed to parse manifest at '{Path}', ignoring.", path);
+                    Logger.Error<ManifestParser>(e, "Failed to parse manifest at '{Path}', ignoring.", path);
                 }
             }
 
-            _filters.Filter(manifests);
+            Filters.Filter(manifests);
 
             return manifests;
         }
@@ -97,7 +105,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Merges all manifests into one.
         /// </summary>
-        private static PackageManifest MergeManifests(IEnumerable<PackageManifest> manifests)
+        protected static PackageManifest MergeManifests(IEnumerable<PackageManifest> manifests)
         {
             var scripts = new HashSet<string>();
             var stylesheets = new HashSet<string>();
@@ -153,14 +161,14 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Parses a manifest.
         /// </summary>
-        internal PackageManifest ParseManifest(string text)
+        public virtual PackageManifest ParseManifest(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentNullOrEmptyException(nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
-                new DataEditorConverter(_logger),
-                new ValueValidatorConverter(_validators),
+                new DataEditorConverter(Logger),
+                new ValueValidatorConverter(Validators),
                 new DashboardAccessRuleConverter());
 
             // scripts and stylesheets are raw string, must process here
