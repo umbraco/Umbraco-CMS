@@ -5,7 +5,10 @@
         button-style="white"
         action="dropdown.isOpen = !dropdown.isOpen"
         label-key="general_actions"
-        show-caret="true">
+        show-caret="true"
+        hasPopup="true"
+        isExpanded="dropdown.isOpen"
+        >
     </umb-button>
 
     <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false">
