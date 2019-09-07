@@ -11,7 +11,7 @@
         >
     </umb-button>
 
-    <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false">
+    <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false" deep-blur="dropdown.isOpen = false">
         <umb-dropdown-item class="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
             <button type="button" ng-click="executeMenuItem(action)">
                 <i class="icon icon-{{action.cssclass}}" aria-hidden="true"></i>
