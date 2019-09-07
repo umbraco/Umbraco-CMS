@@ -12,7 +12,9 @@
         <umb-dropdown-item class="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
             <a href="" ng-click="executeMenuItem(action)" prevent-default>
                 <i class="icon icon-{{action.cssclass}}"></i>
+                <span class="sr-only">{{action.textBefore}}</span>
                 <span class="menu-label">{{action.name}}</span>
+                <span class="sr-only">{{action.textAfter}}</span>
             </a>
         </umb-dropdown-item>
     </umb-dropdown>
