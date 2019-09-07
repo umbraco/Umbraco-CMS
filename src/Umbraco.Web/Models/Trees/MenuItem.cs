@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using System.Threading;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -28,12 +29,17 @@ namespace Umbraco.Web.Models.Trees
             Name = name;
         }
 
-
         public MenuItem(string alias, ILocalizedTextService textService)
             : this()
         {
+            var values = textService.GetAllStoredValues(Thread.CurrentThread.CurrentUICulture);
+            values.TryGetValue($"actions/{alias}_after", out var textAfter);
+            values.TryGetValue($"actions/{alias}_before", out var textBefore);
+
             Alias = alias;
             Name = textService.Localize($"actions/{Alias}");
+            TextBefore = textBefore;
+            TextAfter = textAfter;
         }
 
         /// <summary>
@@ -73,6 +79,12 @@ namespace Umbraco.Web.Models.Trees
         [DataMember(Name = "alias", IsRequired = true)]
         [Required]
         public string Alias { get; set; }
+
+        [DataMember(Name = "textBefore")]
+        public string TextBefore { get; set; }
+
+        [DataMember(Name = "textAfter")]
+        public string TextAfter { get; set; }
 
         /// <summary>
         /// Ensures a menu separator will exist before this menu item
