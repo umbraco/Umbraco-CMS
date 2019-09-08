@@ -26,6 +26,8 @@
             ng-click="openCurrentPicker()"
             id="{{model.alias}}"
             aria-label="{{model.label}}: {{labels.general_add}}"
+            aria-haspopup="true"
+            aria-expanded="{{currentPickerIsOpen}}"
         >
             <localize key="general_add">Add</localize>
         </button>
