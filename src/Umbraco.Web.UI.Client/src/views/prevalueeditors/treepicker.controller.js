@@ -61,7 +61,6 @@ angular.module('umbraco')
                 } else {
                     populate(model.selection[0]);
                 }
-                $scope.isOpen = false;
                 editorService.close();
             };
 
