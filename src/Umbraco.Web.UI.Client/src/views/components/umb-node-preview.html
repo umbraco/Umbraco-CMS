@@ -56,6 +56,7 @@
             title="Open {{name}}"
             ng-if="allowOpen && !openUrl"
             ng-click="onOpen()"
+            aria-haspopup="true"
         >
             <localize key="general_open">Open</localize>
             <span class="sr-only">{{name}}</span>
