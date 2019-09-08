@@ -10,6 +10,7 @@ angular.module('umbraco')
         $scope.allowRemove = true;
         $scope.allowEdit = true;
         $scope.sortable = false;
+        $scope.isOpen = false;
 
         var config = {
             multiPicker: false,
@@ -52,6 +53,7 @@ angular.module('umbraco')
         $scope.openContentPicker = function () {
             var treePicker = config;
             treePicker.section = config.type;
+            $scope.isOpen = true;
 
             treePicker.submit = function (model) {
                 if (config.multiPicker) {
@@ -59,10 +61,12 @@ angular.module('umbraco')
                 } else {
                     populate(model.selection[0]);
                 }
+                $scope.isOpen = false;
                 editorService.close();
             };
 
             treePicker.close = function () {
+                $scope.isOpen = false;
                 editorService.close();
             };
 
