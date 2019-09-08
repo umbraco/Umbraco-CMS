@@ -204,7 +204,7 @@ Use this directive to construct a header inside the main editor window.
 (function () {
     'use strict';
 
-    function EditorHeaderDirective(editorService, localizationService, editorState) {
+    function EditorHeaderDirective(editorService, localizationService, editorState, $location, navigationService, appState,  contentTypeResource, formHelper,  notificationsService,  iconHelper) {
 
         function link(scope) {
 
@@ -224,9 +224,12 @@ Use this directive to construct a header inside the main editor window.
                     scope.a11yMessage += " " + scope.name;
 
                 } else {
-                    var name = editorState.current.contentTypeName;
-                    scope.a11yMessage += " " + name;
-                    scope.a11yName = name + " " + scope.a11yName;
+                    var name = "";
+                    if (editorState.current.contentTypeName) {
+                        name = editorState.current.contentTypeName+=" ";
+                    }
+                    scope.a11yMessage += name;
+                    scope.a11yName += scope.a11yName;
                 }
             });
 
