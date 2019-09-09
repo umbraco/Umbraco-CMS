@@ -1,26 +1,21 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
-using Umbraco.Web.PublishedCache;
-
 
 namespace Umbraco.Web.Cache
 {
+
     public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresher, DataTypeCacheRefresher.JsonPayload>
     {
-        private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IPublishedModelFactory _publishedModelFactory;
+        private readonly BackgroundSafeLiveFactory _backgroundModelFactory;
         private readonly IdkMap _idkMap;
 
-        public DataTypeCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IdkMap idkMap)
+        public DataTypeCacheRefresher(AppCaches appCaches, BackgroundSafeLiveFactory backgroundModelFactory, IdkMap idkMap)
             : base(appCaches)
         {
-            _publishedSnapshotService = publishedSnapshotService;
-            _publishedModelFactory = publishedModelFactory;
+            _backgroundModelFactory = backgroundModelFactory;
             _idkMap = idkMap;
         }
 
@@ -62,12 +57,8 @@ namespace Umbraco.Web.Cache
             TagsValueConverter.ClearCaches();
             SliderValueConverter.ClearCaches();
 
-            // we have to refresh models before we notify the published snapshot
-            // service of changes, else factories may try to rebuild models while
-            // we are using the database to load content into caches
-
-            _publishedModelFactory.WithSafeLiveFactory(() =>
-                _publishedSnapshotService.Notify(payloads));
+            // refresh the models and cache
+            _backgroundModelFactory.Execute(payloads);
 
             base.Refresh(payloads);
         }
