@@ -32,6 +32,8 @@
                 
                 function init() {
                     
+                    console.log("init")
+                    
                     // if we have some content, apply it to the Trix RTE.
                     if (ngModel.$modelValue) {
                         editorElement.editor.loadHTML(ngModel.$modelValue);
@@ -39,7 +41,8 @@
                     
                     editorElement.addEventListener('trix-change', update);
                     
-                    addUploadFeature();
+                    addMediaUploadFeature();
+                    addAttachmentFeature();
                     
                 }
                 
@@ -64,7 +67,7 @@
                 
                 // Apply upload-dialog:
                 
-                function addUploadFeature() {
+                function addMediaUploadFeature() {
                     var toolbar = editorElement.toolbarElement;
                     var ttools  = toolbar.querySelector(".trix-button-group--text-tools");
                     var dialogs = toolbar.querySelector(".trix-dialogs");
@@ -73,14 +76,14 @@
                     var buttonContent = `
                       <button type="button"
                         class="trix-button trix-button--icon trix-button--icon-attach"
-                        data-trix-attribute="attach"
+                        data-trix-attribute="attachMedia"
                         data-trix-key="+" title="Attach file" tabindex="-1">
                       </button>
                     `;
 
                     var dialogContent = `
-                      <div class="trix-dialog trix-dialog--attach" data-trix-dialog="attach" data-trix-dialog-attribute="attach">
-                        <div class="trix-dialog__attach-fields">
+                      <div class="trix-dialog trix-dialog--attach-media" data-trix-dialog="attachMedia" data-trix-dialog-attribute="attachMedia">
+                        <div class="trix-dialog__attach-media-fields">
                           <input type="file" class="trix-input trix-input--dialog">
                           <div class="trix-button-group">
                             <input type="button" class="trix-button trix-button--dialog"
@@ -105,6 +108,8 @@
                     // add dialog
                     dialogs.insertAdjacentHTML("beforeend", dialogContent);
                 }
+                
+                
                 
                 // handling of file uploads
                 
@@ -291,6 +296,51 @@
                             uploadNextAttachment();
                         });
                 }
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                function addAttachmentFeature() {
+                    
+                    
+                    editorElement.addEventListener("trix-action-invoke", function(event) {
+                        
+                        console.log("trix-action-invoke");
+                        
+                        if(event.actionName === "attachYouTube") {
+                            
+                            console.log("attachYouTube");
+                            
+                            var embed = '<iframe width="420" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>';
+                            var attachment = new Trix.Attachment({content: embed});
+                            editorElement.editor.insertAttachment(attachment);
+                        }
+                    });
+                    
+                    
+                    var toolbar = editorElement.toolbarElement;
+                    var ttools  = toolbar.querySelector(".trix-button-group--text-tools");
+                    var trixId  = editorElement.trixId;
+                    
+                    var buttonContent = `
+                      <button type="button"
+                        class="trix-button trix-button--icon trix-button--icon-attach"
+                        data-trix-attribute="attachYouTube"
+                        data-trix-key="y" title="Attach youtube" tabindex="-1">
+                      </button>
+                    `;
+                    
+                    // add attach icon button
+                    ttools.insertAdjacentHTML("beforeend", buttonContent);
+                    
+                    
+                }
+                
                 
                 
                 /*
