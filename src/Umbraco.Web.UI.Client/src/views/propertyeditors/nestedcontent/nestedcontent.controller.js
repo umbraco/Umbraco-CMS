@@ -232,13 +232,15 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         };
 
         $scope.deleteNode = function (idx) {
-            if ($scope.nodes.length > $scope.model.config.minItems) {
-                $scope.nodes.splice(idx, 1);
-                $scope.setDirty();
-                updateModel();
-            }
+            $scope.nodes.splice(idx, 1);
+            $scope.setDirty();
+            updateModel();
         };
         $scope.requestDeleteNode = function (idx) {
+            if ($scope.nodes.length <= $scope.model.config.minItems) {
+                return;
+            }
+
             if ($scope.model.config.confirmDeletes === true) {
                 localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
                     const overlay = {
