@@ -264,7 +264,7 @@ namespace Umbraco.Web
                 case RuntimeLevel.Unknown:
                 case RuntimeLevel.Boot:
                 case RuntimeLevel.BootFailed:
-                    throw new Exception($"panic: Unexpected runtime level: {level}.");
+                    throw new PanicException($"Unexpected runtime level: {level}.");
 
                 case RuntimeLevel.Run:
                     // ok
