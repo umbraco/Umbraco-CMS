@@ -80,7 +80,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.sortableModel = [];
 
     $scope.labels = vm.labels;
-    $scope.currentPickerIsOpen = false;
 
     $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
 
@@ -230,7 +229,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     //dialog
     $scope.openCurrentPicker = function () {
         $scope.currentPicker = dialogOptions;
-        $scope.currentPickerIsOpen = true;
 
         $scope.currentPicker.submit = function (model) {
             if (angular.isArray(model.selection)) {
@@ -244,7 +242,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
 
         $scope.currentPicker.close = function () {
-            $scope.currentPickerIsOpen = false;
             editorService.close();
         }
 
