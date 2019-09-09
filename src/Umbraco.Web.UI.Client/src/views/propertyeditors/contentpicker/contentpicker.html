@@ -5,7 +5,6 @@
 
     <ng-form name="contentPickerForm">
 
-        {{isOpen}}
         <div ui-sortable="sortableOptions" ng-model="sortableModel">
             <umb-node-preview ng-repeat="node in renderModel track by node.id"
                               icon="node.icon"
@@ -16,8 +15,7 @@
                               allow-remove="allowRemoveButton"
                               allow-open="model.config.showOpenButton && allowOpenButton && !dialogEditor"
                               on-remove="remove($index)"
-                              on-open="openContentEditor(node)"
-                              is-open-expanded="isContentEditorOpen">
+                              on-open="openContentEditor(node)">
             </umb-node-preview>
         </div>
 

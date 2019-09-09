@@ -91,8 +91,6 @@
 @param {string} openUrl (<code>binding</code>): Fallback URL for <code>onOpen</code> (Added in version 7.12.0).
 @param {string} editUrl (<code>binding</code>): Fallback URL for <code>onEdit</code> (Added in version 7.12.0).
 @param {string} removeUrl (<code>binding</code>): Fallback URL for <code>onRemove</code> (Added in version 7.12.0).
-@param {boolean} isEditExpanded (<code>biding</code>): Determines whether a popup is visible or not (Accessibility option) (Added in version 8.2.0)
-@param {boolean} isOpenExpanded (<code>biding</code>): Determines whether a popup is expanded/open or not (Accessibility option) (Added in version 8.2.0)
 **/
 
 (function () {
@@ -130,9 +128,7 @@
                 onEdit: "&?",
                 openUrl: '=?',
                 editUrl: '=?',
-                removeUrl: '=?',
-                isEditExpanded: '=?',
-                isOpenExpanded: '=?'
+                removeUrl: '=?'
             },
             link: link
         };

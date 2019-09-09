@@ -31,8 +31,7 @@
             title="Edit {{name}}"
             ng-if="allowEdit && !editUrl"
             ng-click="onEdit()"
-            aria-haspopup="true"
-            aria-expanded="{{isEditExpanded}}"
+            aria-haspopup="dialog"
         >
             <localize key="general_edit">Edit</localize>
             <span class="sr-only">{{name}}</span>
@@ -56,7 +55,7 @@
             title="Open {{name}}"
             ng-if="allowOpen && !openUrl"
             ng-click="onOpen()"
-            aria-haspopup="true"
+            aria-haspopup="dialog"
         >
             <localize key="general_open">Open</localize>
             <span class="sr-only">{{name}}</span>
