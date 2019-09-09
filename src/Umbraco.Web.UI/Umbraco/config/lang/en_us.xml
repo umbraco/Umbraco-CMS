@@ -38,6 +38,7 @@
     <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="wasMovedTo">was moved to</key>
     <key alias="wasCopiedTo">was copied to</key>
+    <key alias="wasDeleted">was deleted</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -149,6 +150,7 @@
     <key alias="deleteTag">Delete tag</key>
     <key alias="confirmActionCancel">Cancel</key>
     <key alias="confirmActionConfirm">Confirm</key>
+	<key alias="morePublishingOptions">More publishing options</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -323,6 +325,7 @@
     <key alias="copyFailed">Failed to copy media</key>
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -531,6 +534,9 @@
     <key alias="anchor">#value or ?key=value</key>
     <key alias="enterAlias">Enter alias...</key>
     <key alias="generatingAlias">Generating alias...</key>
+    <key alias="a11yCreateItem">Create item</key>
+    <key alias="a11yEdit">Edit</key>
+    <key alias="a11yName">Name</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
@@ -2139,5 +2145,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Go back</key>
+    <key alias="activeListLayout">Active layout:</key>
+    <key alias="jumpTo">Jump to</key>
+    <key alias="group">group</key>    
   </area>
 </language>

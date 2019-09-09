@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
@@ -711,9 +712,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var id = content.FirstChildContentId;
             while (id > 0)
             {
-                var link = GetLinkedNode(id, "child");
-                ClearBranchLocked(link.Value);
-                id = link.Value.NextSiblingContentId;
+                var child = GetLinkedNode(id, "child").Value;
+                ClearBranchLocked(child);
+                id = child.NextSiblingContentId;
             }
         }
 
@@ -1044,7 +1045,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (_genObj == null)
                         _genObjs.Enqueue(_genObj = new GenObj(snapGen));
                     else if (_genObj.Gen != snapGen)
-                        throw new Exception("panic");
+                        throw new PanicException($"The generation {_genObj.Gen} does not equal the snapshot generation {snapGen}");
                 }
                 else
                 {

@@ -1,19 +1,19 @@
-<a data-element="sub-view-{{vm.item.alias}}"
-   tabindex="-1"
-   ng-href=""
+<button data-element="sub-view-{{vm.item.alias}}"
+   type="button"
    ng-click="vm.clicked()"
    hotkey="{{::vm.hotkey}}"
    hotkey-when-hidden="true"
-   ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}">
-    <i class="icon {{ vm.item.icon }}"></i>
+   ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}"
+   class="umb-sub-views-nav-item__action">
+    <i class="icon {{ vm.item.icon }}" aria-hidden="true"></i>
     <span class="umb-sub-views-nav-item-text">{{ vm.item.name }}</span>
     <div ng-show="vm.item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
-</a>
+</button>
 
 <ul class="dropdown-menu umb-sub-views-nav-item__anchor_dropdown" ng-if="vm.item.anchors && vm.item.anchors.length > 1">
     <li ng-repeat="anchor in vm.item.anchors" ng-class="{'is-active': vm.item.active && anchor.active}">
-        <a href="" ng-click="vm.anchorClicked(anchor, $event)">
-            {{anchor.label}}
+        <a href="#group-{{anchor.id}}" ng-click="vm.anchorClicked(anchor, $event)" prevent-default>
+            <span class="sr-only"><localize key="visuallyHiddenTexts_jumpTo">Jump to</localize></span> {{anchor.label}} <span class="sr-only"><localize key="visuallyHiddenTexts_group"> group</localize></span>
         </a>
     </li>
 </ul>

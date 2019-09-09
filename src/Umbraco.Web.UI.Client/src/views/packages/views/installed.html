@@ -33,7 +33,6 @@
 
                             <umb-button type="button"
                                         button-style="danger"
-                                        size="xxs"
                                         label-key="packager_packageUninstallHeader"
                                         action="vm.confirmUninstall(installedPackage)">
                             </umb-button>
@@ -58,7 +57,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.state = 'list'">&larr; <localize key="general_back">Back</localize></a>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.state = 'list'" prevent-default><span aria-hidden="true">&larr;</span> <localize key="general_back">Back</localize></button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
