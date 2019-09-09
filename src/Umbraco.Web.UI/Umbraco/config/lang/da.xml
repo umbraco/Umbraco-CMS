@@ -37,6 +37,7 @@
     <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
     <key alias="wasMovedTo">blev flyttet til</key>
     <key alias="wasCopiedTo">blev kopieret til</key>
+    <key alias="wasDeleted">blev slettet</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -145,6 +146,7 @@
     <key alias="deleteTag">Slet tag</key>
     <key alias="confirmActionCancel">Fortryd</key>
     <key alias="confirmActionConfirm">Bekræft</key>
+	<key alias="morePublishingOptions">Flere publiseringsmuligheder</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
@@ -308,6 +310,7 @@
     <key alias="copyFailed">Kopiering af mediet fejlede</key>
     <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
     <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Træk og slip dine filer ind i dropzonen</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -582,6 +585,7 @@
     <key alias="closewindow">Luk vindue</key>
     <key alias="comment">Kommentar</key>
     <key alias="confirm">Bekræft</key>
+    <key alias="constrain">Proportioner</key>
     <key alias="constrainProportions">Behold proportioner</key>
     <key alias="content">Indhold</key>
     <key alias="continue">Fortsæt</key>
@@ -1610,5 +1614,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Kom godt i gang</key>
     <key alias="formsInstall">Installer Umbraco Forms</key>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Gå tilbage</key>
+    <key alias="activeListLayout">Aktivt layout:</key>
+    <key alias="jumpTo">Gå til</key>
+    <key alias="group">gruppe</key>    
   </area>
 </language>

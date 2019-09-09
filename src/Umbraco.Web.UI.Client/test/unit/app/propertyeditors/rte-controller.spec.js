@@ -1,7 +1,9 @@
 describe('RTE controller tests', function () {
     var scope, controllerFactory;
     
-    beforeEach(module('umbraco'));
+    beforeEach(module('umbraco', function ($provide) {
+        $provide.value('tinyMceAssets', []);
+    }));
 
     beforeEach(inject(function ($rootScope, $controller) {
         controllerFactory = $controller;
@@ -21,3 +23,4 @@ describe('RTE controller tests', function () {
         
     });
 });
+

@@ -8,7 +8,13 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Content property editor that stores UDI
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.ContentPicker, EditorType.PropertyValue | EditorType.MacroParameter, "Content Picker", "contentpicker", ValueType = ValueTypes.String, Group = "Pickers")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.ContentPicker,
+        EditorType.PropertyValue | EditorType.MacroParameter,
+        "Content Picker",
+        "contentpicker",
+        ValueType = ValueTypes.String,
+        Group = Constants.PropertyEditors.Groups.Pickers)]
     public class ContentPickerPropertyEditor : DataEditor
     {
         public ContentPickerPropertyEditor(ILogger logger)

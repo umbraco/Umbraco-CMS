@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Mapping
 {
@@ -259,7 +260,7 @@ namespace Umbraco.Core.Mapping
             if (typeof(TTarget).IsArray)
             {
                 var elementType = typeof(TTarget).GetElementType();
-                if (elementType == null) throw new Exception("panic");
+                if (elementType == null) throw new PanicException("elementType == null which should never occur");
                 var targetArray = Array.CreateInstance(elementType, targetList.Count);
                 targetList.CopyTo(targetArray, 0);
                 target = targetArray;
@@ -342,7 +343,12 @@ namespace Umbraco.Core.Mapping
 
             if (ctor == null) return null;
 
-            _ctors[sourceType] = sourceCtor;
+            if (_ctors.ContainsKey(sourceType))
+                foreach (var c in sourceCtor)
+                    _ctors[sourceType].Add(c.Key, c.Value);
+            else
+                _ctors[sourceType] = sourceCtor;
+            
             return ctor;
         }
 
@@ -367,7 +373,12 @@ namespace Umbraco.Core.Mapping
 
             if (map == null) return null;
 
-            _maps[sourceType] = sourceMap;
+            if (_maps.ContainsKey(sourceType))
+                foreach(var m in sourceMap)
+                    _maps[sourceType].Add(m.Key, m.Value);
+            else
+                _maps[sourceType] = sourceMap;
+            
             return map;
         }
 
@@ -382,7 +393,7 @@ namespace Umbraco.Core.Mapping
         {
             if (type.IsArray) return type.GetElementType();
             if (type.IsGenericType) return type.GenericTypeArguments[0];
-            throw new Exception("panic");
+            throw new PanicException($"Could not get enumerable or array type from {type}");
         }
 
         /// <summary>
