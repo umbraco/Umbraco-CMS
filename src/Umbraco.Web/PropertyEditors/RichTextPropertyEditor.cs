@@ -1,12 +1,15 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Templates;
 
@@ -25,18 +28,23 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-browser-window")]
     public class RichTextPropertyEditor : DataEditor
     {
+        private IMediaService _mediaService;
+        private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RichTextPropertyEditor(ILogger logger) : base(logger)
+        public RichTextPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider) : base(logger)
         {
+            _mediaService = mediaService;
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
@@ -47,9 +55,15 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class RichTextPropertyValueEditor : DataValueEditor
         {
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute)
+            private IMediaService _mediaService;
+            private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
                 : base(attribute)
-            { }
+            {
+                _mediaService = mediaService;
+                _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            }
 
             /// <inheritdoc />
             public override object Configuration
@@ -71,10 +85,9 @@ namespace Umbraco.Web.PropertyEditors
             /// Format the data for the editor
             /// </summary>
             /// <param name="property"></param>
-            /// <param name="dataTypeService"></param>
+            /// <param name="dataTypeService"></param>Rte
             /// <param name="culture"></param>
-            /// <param name="segment"></param>
-            /// <returns></returns>
+            /// <param name="segment"></param>te
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
@@ -99,7 +112,65 @@ namespace Umbraco.Web.PropertyEditors
 
                 var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(editorValue.Value.ToString());
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
+
+                // HTML content when being persisted may j
+                parsed = FindPastedTempImages(parsed);
+                
                 return parsed;
+            }
+
+            private string FindPastedTempImages(string html)
+            {
+                // Find all img's that has data-tmpimg attribute
+                // Use HTML Agility Pack - https://html-agility-pack.net
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(html);
+
+                var tmpImages = htmlDoc.DocumentNode.SelectNodes("//img[@data-tmpimg]");
+                if (tmpImages == null || tmpImages.Count == 0)
+                    return html;
+
+                var userId = Current.UmbracoContext.Security.CurrentUser.Id;
+
+                foreach (var img in tmpImages)
+                {
+                    // The data attribute contains the path to the tmp img to persist as a media item
+                    var tmpImgPath = img.GetAttributeValue("data-tmpimg", string.Empty);
+
+                    if (string.IsNullOrEmpty(tmpImgPath))
+                        continue;
+
+                    var absTmpImgPath = IOHelper.MapPath(tmpImgPath);
+                    var fileName = Path.GetFileName(absTmpImgPath);
+                    var safeFileName = fileName.ToSafeFileName();
+
+                    // TODO: In future task (get the parent folder from this config) to save the media into
+                    var mediaItemName = safeFileName.ToFriendlyName();
+                    var f = _mediaService.CreateMedia(mediaItemName, -1, Constants.Conventions.MediaTypes.Image, userId);
+                    var fileInfo = new FileInfo(absTmpImgPath);
+
+                    var fs = fileInfo.OpenReadWithRetry();
+                    if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
+                    using (fs)
+                    {
+                        f.SetValue(_contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fs);
+                    }
+
+                    _mediaService.Save(f, userId);
+
+                    // Add the UDI to the img element as new data attribute
+                    var udi = f.GetUdi();
+                    img.SetAttributeValue("data-udi", udi.ToString());
+
+                    //Get the new persisted image url
+                    var mediaTyped = Current.UmbracoHelper.Media(f.Id);
+                    var location = mediaTyped.Url;
+
+                    // Remove the data attribute (so we do not re-process this)
+                    img.Attributes.Remove("data-tmpimg");
+                }
+
+                return htmlDoc.DocumentNode.OuterHtml;
             }
         }
 

@@ -158,10 +158,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     }
 
     function uploadImageHandler(blobInfo, success, failure, progress){
-
-        //TODO: Worth refactoring to Angular $http calls
-        //Rather than XHR??
-
         let xhr, formData;
 
         xhr = new XMLHttpRequest();
@@ -185,23 +181,19 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             json = JSON.parse(xhr.responseText);
 
-            if (!json || typeof json.location !== 'string') {
+            if (!json || typeof json.tmpLocation !== 'string') {
                 failure('Invalid JSON: ' + xhr.responseText);
                 return;
             }
 
-            // Put UDI into localstorage (used to update the img with data-udi later on)
-            localStorageService.set(`tinymce__${json.location}`, json.udi);
+            // Put temp location into localstorage (used to update the img with data-tmpimg later on)
+            localStorage.setItem(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
 
-            success(json.location);
+            success();
         };
 
         formData = new FormData();
         formData.append('file', blobInfo.blob(), blobInfo.blob().name);
-
-        //TODO: Send Media Parent ID from config
-        //TODO: How will each RTE pass in this value to this function?!
-        formData.append('mediaParent', -1);
 
         xhr.send(formData);
     }
@@ -215,21 +207,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             if(content.indexOf('<img src="blob:') > -1){
 
                 editor.uploadImages(function(data) {
+                    // Once all images have been uploaded
                     data.forEach(function(item) {
-                        //Select img element
+                        // Select img element
                         var img = item.element;
 
-                        //Get img src
+                        // Get img src
                         var imgSrc = img.getAttribute("src");
+                        var tmpLocation = localStorage.getItem(`tinymce__${imgSrc}`);
 
-                        //Try & find in localstorage
-                        var udi = localStorageService.get(`tinymce__${imgSrc}`);
+                        // Select the img & add new attr which we can search for
+                        // When its being persisted in RTE property editor
+                        // To create a media item & delete this tmp one etc
+                        tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
 
-                        //Select the img & update is attr
-                        tinymce.activeEditor.$(img).attr({ "data-udi": udi });
-
-                        //Remove key
-                        localStorageService.remove(`tinymce__${imgSrc}`);
+                        // Be a boy scout & cleanup after ourselves
+                        localStorage.removeItem(`tinymce__${imgSrc}`);
                     });
                 });
             }
@@ -330,6 +323,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     images_upload_handler: uploadImageHandler,
                     automatic_uploads: false,
+                    images_replace_blob_uris: false,
                     init_instance_callback: initEvents
                 };
 

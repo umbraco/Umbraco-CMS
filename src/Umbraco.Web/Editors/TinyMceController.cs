@@ -1,10 +1,8 @@
 ﻿using System.Net;
 using System.Net.Http;
-using System.Web;
 using System.Web.Http;
 using Umbraco.Core.Services;
 using Umbraco.Web.WebApi;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.IO;
@@ -14,7 +12,6 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using System.Linq;
 using System;
-using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Editors
 {
@@ -39,12 +36,22 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = IOHelper.MapPath(SystemDirectories.TempFileUploads);
+            // Backoffice user ID (needed for unique folder path) to help with concurrent users
+            // to avoid filename clash along with UTC current time
+            var userId = Security.CurrentUser.Id;
+            var imageTempPath = IOHelper.MapPath(SystemDirectories.TempImageUploads + "/" + userId + "_" + DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
-            // Ensure it exists
-            Directory.CreateDirectory(root);
-            var provider = new MultipartFormDataStreamProvider(root);
+            // Temp folderpath (Files come in as bodypart & will need to move/saved into imgTempPath
+            var folderPath = IOHelper.MapPath(SystemDirectories.TempFileUploads);
 
+            // Ensure image temp path exists
+            if(Directory.Exists(imageTempPath) == false)
+            {
+                Directory.CreateDirectory(imageTempPath);
+            }
+
+            // File uploaded will be saved as bodypart into TEMP folder
+            var provider = new MultipartFormDataStreamProvider(folderPath);
             var result = await Request.Content.ReadAsMultipartAsync(provider);
 
             // Must have a file
@@ -59,17 +66,8 @@ namespace Umbraco.Web.Editors
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Only one file can be uploaded at a time");
             }
 
-            // Check we have mediaParent as posted data
-            if (string.IsNullOrEmpty(result.FormData["mediaParent"]))
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Missing the Media Parent folder to save this image");
-            }
-
             // Really we should only have one file per request to this endpoint
             var file = result.FileData[0];
-
-            var parentFolder = Convert.ToInt32(result.FormData["mediaParent"]);
-
             var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
@@ -80,28 +78,26 @@ namespace Umbraco.Web.Editors
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "This is not an image filetype extension that is approved");
             }
 
-            var mediaItemName = fileName.ToFriendlyName();
-            var f = _mediaService.CreateMedia(mediaItemName, parentFolder, Constants.Conventions.MediaTypes.Image, Security.CurrentUser.Id);
-            var fileInfo = new FileInfo(file.LocalFileName);
-            var fs = fileInfo.OpenReadWithRetry();
-            if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
-            using (fs)
+            //var mediaItemName = fileName.ToFriendlyName();
+            var currentFile = file.LocalFileName;
+            var newFilePath = imageTempPath +  IOHelper.DirSepChar + safeFileName;
+            var relativeNewFilePath = IOHelper.GetRelativePath(newFilePath);
+
+            try
             {
-                f.SetValue(Services.ContentTypeBaseServices, Constants.Conventions.Media.File, fileName, fs);
+                // Move the file from bodypart to a real filename
+                // This is what we return from this API so RTE updates img src path
+                // Until we fully persist & save the media item when persisting
+                // If we find <img data-temp-img /> data attribute
+                File.Move(currentFile, newFilePath);
             }
+            catch (Exception ex)
+            {
+                // Could be a file permission ex
+                throw;
+            }            
 
-            _mediaService.Save(f, Security.CurrentUser.Id);
-
-            // Need to get URL to the media item and its UDI
-            var udi = f.GetUdi();
-
-
-            // TODO: Check this is the BEST way to get the URL
-            // Ensuring if they use some CDN & blob storage?!
-            var mediaTyped = Umbraco.Media(f.Id);
-            var location = mediaTyped.Url;
-
-            return Request.CreateResponse(HttpStatusCode.OK, new { location = location, udi = udi });
+            return Request.CreateResponse(HttpStatusCode.OK, new { tmpLocation = relativeNewFilePath });
         }
     }
 }
