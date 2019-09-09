@@ -10,11 +10,11 @@ namespace Umbraco.Web.Cache
 {
     public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresher, ContentTypeCacheRefresher.JsonPayload>
     {
-        private readonly BackgroundSafeLiveFactory _backgroundModelFactory;
+        private readonly BackgroundPublishedSnapshotServiceNotifier _backgroundModelFactory;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
         private readonly IdkMap _idkMap;
 
-        public ContentTypeCacheRefresher(AppCaches appCaches, BackgroundSafeLiveFactory backgroundModelFactory, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
+        public ContentTypeCacheRefresher(AppCaches appCaches, BackgroundPublishedSnapshotServiceNotifier backgroundModelFactory, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
             : base(appCaches)
         {
             _backgroundModelFactory = backgroundModelFactory;
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Cache
                 MemberCacheRefresher.RefreshMemberTypes(AppCaches);
 
             // refresh the models and cache
-            _backgroundModelFactory.Execute(payloads);
+            _backgroundModelFactory.NotifyWithSafeLiveFactory(payloads);
 
             // now we can trigger the event
             base.Refresh(payloads);

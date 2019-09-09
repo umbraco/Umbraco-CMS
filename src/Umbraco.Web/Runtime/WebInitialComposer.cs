@@ -125,7 +125,7 @@ namespace Umbraco.Web.Runtime
             // register distributed cache
             composition.RegisterUnique(f => new DistributedCache());
 
-            composition.RegisterUnique<BackgroundSafeLiveFactory>();
+            composition.RegisterUnique<BackgroundPublishedSnapshotServiceNotifier>();
 
             // replace some services
             composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();

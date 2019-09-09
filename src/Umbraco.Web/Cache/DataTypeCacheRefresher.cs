@@ -9,10 +9,10 @@ namespace Umbraco.Web.Cache
 
     public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresher, DataTypeCacheRefresher.JsonPayload>
     {
-        private readonly BackgroundSafeLiveFactory _backgroundModelFactory;
+        private readonly BackgroundPublishedSnapshotServiceNotifier _backgroundModelFactory;
         private readonly IdkMap _idkMap;
 
-        public DataTypeCacheRefresher(AppCaches appCaches, BackgroundSafeLiveFactory backgroundModelFactory, IdkMap idkMap)
+        public DataTypeCacheRefresher(AppCaches appCaches, BackgroundPublishedSnapshotServiceNotifier backgroundModelFactory, IdkMap idkMap)
             : base(appCaches)
         {
             _backgroundModelFactory = backgroundModelFactory;
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Cache
             SliderValueConverter.ClearCaches();
 
             // refresh the models and cache
-            _backgroundModelFactory.Execute(payloads);
+            _backgroundModelFactory.NotifyWithSafeLiveFactory(payloads);
 
             base.Refresh(payloads);
         }

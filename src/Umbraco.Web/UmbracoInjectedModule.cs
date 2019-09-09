@@ -18,6 +18,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Web
 {
@@ -48,6 +49,7 @@ namespace Umbraco.Web
         private readonly IPublishedRouter _publishedRouter;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
+        private readonly BackgroundPublishedSnapshotServiceNotifier _backgroundNotifier;
 
         public UmbracoInjectedModule(
             IGlobalSettings globalSettings,
@@ -59,7 +61,8 @@ namespace Umbraco.Web
             ILogger logger,
             IPublishedRouter publishedRouter,
             IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextFactory umbracoContextFactory)
+            IUmbracoContextFactory umbracoContextFactory,
+            BackgroundPublishedSnapshotServiceNotifier backgroundNotifier)
         {
             _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
 
@@ -73,6 +76,7 @@ namespace Umbraco.Web
             _publishedRouter = publishedRouter;
             _variationContextAccessor = variationContextAccessor;
             _umbracoContextFactory = umbracoContextFactory;
+            _backgroundNotifier = backgroundNotifier;
         }
 
         #region HttpModule event handlers
@@ -135,6 +139,10 @@ namespace Umbraco.Web
 
             // do not process if this request is not a front-end routable page
             var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
+
+            // If this page is probably front-end routable, block here until the backround notifier isn't busy
+            if (isRoutableAttempt)                
+                _backgroundNotifier.Wait(); 
 
             // raise event here
             UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));

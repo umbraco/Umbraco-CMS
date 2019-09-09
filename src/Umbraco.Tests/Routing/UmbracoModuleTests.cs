@@ -46,7 +46,11 @@ namespace Umbraco.Tests.Routing
                 logger,
                 null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IVariationContextAccessor>(),
-                Mock.Of<IUmbracoContextFactory>()
+                Mock.Of<IUmbracoContextFactory>(),
+                new Umbraco.Web.Cache.BackgroundPublishedSnapshotServiceNotifier(
+                    Factory.GetInstance<IPublishedModelFactory>(),
+                    Factory.GetInstance<IPublishedSnapshotService>(),
+                    Logger)
             );
 
             runtime.Level = RuntimeLevel.Run;
