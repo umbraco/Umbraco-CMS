@@ -189,7 +189,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             // Put temp location into localstorage (used to update the img with data-tmpimg later on)
             localStorage.setItem(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
 
-            success();
+            // We set the img src url to be the same as we started
+            // The Blob URI is stored in TinyMce's cache
+            // so the img still shows in the editor
+            success(blobInfo.blobUri());
         };
 
         formData = new FormData();
