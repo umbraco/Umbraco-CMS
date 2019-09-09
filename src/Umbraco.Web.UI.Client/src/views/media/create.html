@@ -17,13 +17,13 @@
 			<ul class="umb-actions umb-actions-child">
 
 				<li data-element="action-{{docType.alias}}" class="umb-action" ng-repeat="docType in allowedTypes">
-					<a ng-href="" ng-click="createMediaItem(docType)" class="umb-action-link" prevent-default>
+					<button ng-click="createMediaItem(docType)" class="umb-action-link umb-outline btn-reset" prevent-default>
 						<i class="large icon {{docType.icon}}"></i>
 						<span class="menu-label">
 							{{docType.name}}
 							<small>{{docType.description}}</small>
 						</span>
-					</a>
+					</button>
 				</li>
 				<!--
 					<li class="add">

@@ -58,7 +58,7 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
                 $location.path(location);
             }
 
-            navigationService.hideMenu();
+            $scope.success = true;
         }, function(err) {
 
             toggleDeleting(false);
@@ -74,7 +74,11 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
 
     $scope.cancel = function() {
         toggleDeleting(false);
-        navigationService.hideDialog();        
+        $scope.close();
+    };
+
+    $scope.close = function () {
+        navigationService.hideDialog();
     };
 }
 

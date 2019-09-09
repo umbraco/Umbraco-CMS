@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
-            WebFinalComponent.CreateRoutes(
+            WebInitialComponent.CreateRoutes(
                 new TestUmbracoContextAccessor(),
                 TestObjects.GetGlobalSettings(),
                 new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
