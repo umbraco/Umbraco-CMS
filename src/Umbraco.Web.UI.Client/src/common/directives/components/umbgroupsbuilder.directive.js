@@ -17,6 +17,7 @@
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
       scope.sortingButtonKey = "general_reorder";
+      scope.compositionsButtonState = "init";
 
       function activate() {
 
@@ -256,7 +257,7 @@
             view: "views/common/infiniteeditors/compositions/compositions.html",
             size: "small",
             submit: function() {
-              
+
               // make sure that all tabs has an init property
               if (scope.model.groups.length !== 0) {
                 angular.forEach(scope.model.groups, function(group) {
@@ -337,9 +338,10 @@
         })), function(f) {
             return f !== null && f !== undefined;
         });
+        scope.compositionsButtonState = "busy";
         $q.all([
             //get available composite types
-            availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
+            availableContentTypeResource(scope.model.id, [], propAliasesExisting, scope.model.isElement).then(function (result) {
                 setupAvailableContentTypesModel(result); 
             }),
                 //get where used document types
@@ -356,6 +358,7 @@
         ]).then(function() {
             //resolves when both other promises are done, now show it
             editorService.open(scope.compositionsDialogModel);
+            scope.compositionsButtonState = "init";
         });
 
       };
@@ -381,6 +384,8 @@
         // activate group
         scope.activateGroup(group);
 
+        // push new init tab to the scope
+        addInitGroup(scope.model.groups);
       };
 
       scope.activateGroup = function(selectedGroup) {
@@ -399,7 +404,6 @@
 
       scope.removeGroup = function(groupIndex) {
         scope.model.groups.splice(groupIndex, 1);
-        addInitGroup(scope.model.groups);
       };
 
       scope.updateGroupTitle = function(group) {
@@ -528,10 +532,8 @@
               // set focus on init property
               var numberOfProperties = group.properties.length;
               group.properties[numberOfProperties - 1].focus = true;
-  
-              // push new init tab to the scope
-              addInitGroup(scope.model.groups);
 
+              notifyChanged();
             },
             close: function() {
               if(_.isEqual(oldPropertyModel, propertyModel) === false) {
@@ -577,18 +579,12 @@
         // remove property
         tab.properties.splice(propertyIndex, 1);
 
-        // if the last property in group is an placeholder - remove add new tab placeholder
-        if(tab.properties.length === 1 && tab.properties[0].propertyState === "init") {
-
-          angular.forEach(scope.model.groups, function(group, index, groups){
-            if(group.tabState === 'init') {
-              groups.splice(index, 1);
-            }
-          });
-
-        }
-
+        notifyChanged();
       };
+
+      function notifyChanged() {
+        eventsService.emit("editors.groupsBuilder.changed");
+      }
 
       function addInitProperty(group) {
 

@@ -15,6 +15,10 @@
             });
         }
 
+        $scope.canAdd = function () {
+            return !$scope.model.docTypes || !$scope.model.value || $scope.model.value.length < $scope.model.docTypes.length;
+        }
+
         $scope.remove = function (index) {
             $scope.model.value.splice(index, 1);
         }
@@ -57,10 +61,20 @@
 
         ncResources.getContentTypes().then(function (docTypes) {
             $scope.model.docTypes = docTypes;
+
+            // Count doctype name occurrences
+            var docTypeNameOccurrences = _.countBy(docTypes, 'name');
             
             // Populate document type tab dictionary
+            // And append alias to name if multiple doctypes have the same name
             docTypes.forEach(function (value) {
                 $scope.docTypeTabs[value.alias] = value.tabs;
+
+                value.displayName = value.name;
+
+                if (docTypeNameOccurrences[value.name] > 1) {
+                    value.displayName += " (" + value.alias + ")";
+                }
             });
         });
 

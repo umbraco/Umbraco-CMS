@@ -223,7 +223,6 @@ namespace Umbraco.Web
                 _method = method;
 			    _controllerName = controllerName;
                 _encryptedString = UrlHelperRenderExtensions.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
-
             }
 
 

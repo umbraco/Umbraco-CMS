@@ -29,7 +29,7 @@ namespace Umbraco.Web.Search
         {
             if (!_mainDom.IsMainDom) return;
 
-            _examineManager.EnsureUnlocked(_mainDom, _logger);
+            _examineManager.ConfigureIndexes(_mainDom, _logger);
 
             // TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
             _indexRebuilder.RebuildIndexes(true, 5000);

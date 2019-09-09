@@ -44,7 +44,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             return selected.id;
         };
         createEditUrlCallback = function (item) {
-            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id + "?page=" + $scope.options.pageNumber;
+            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id 
+                + "?list=" + $routeParams.id + "&page=" + $scope.options.pageNumber + "&filter=" + $scope.options.filter 
+                + "&orderBy=" + $scope.options.orderBy + "&orderDirection=" + $scope.options.orderDirection;
         };
     }
 
@@ -53,7 +55,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     $scope.actionInProgress = false;
     $scope.selection = [];
     $scope.folders = [];
-    $scope.page = {};
+    $scope.page = {
+        createDropdownOpen: false
+    };
     $scope.listViewResultSet = {
         totalPages: 0,
         items: []
@@ -141,12 +145,13 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     }
 
+    var listParamsForCurrent = $routeParams.id == $routeParams.list;
     $scope.options = {
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
-        pageNumber: ($routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
-        filter: '',
-        orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
-        orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection.trim() : "desc",
+        pageNumber: (listParamsForCurrent && $routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
+        filter: (listParamsForCurrent && $routeParams.filter ? $routeParams.filter : '').trim(),
+        orderBy: (listParamsForCurrent && $routeParams.orderBy ? $routeParams.orderBy : $scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
+        orderDirection: (listParamsForCurrent && $routeParams.orderDirection ? $routeParams.orderDirection : $scope.model.config.orderDirection ? $scope.model.config.orderDirection : "desc").trim(),
         orderBySystemField: true,
         includeProperties: $scope.model.config.includeProperties ? $scope.model.config.includeProperties : [
             { alias: 'updateDate', header: 'Last edited', isSystem: 1 },
@@ -795,8 +800,18 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             .search("blueprintId", blueprintId);
     }
 
+    function toggleDropdown () {
+        $scope.page.createDropdownOpen = !$scope.page.createDropdownOpen;
+    }
+
+    function leaveDropdown () {
+        $scope.page.createDropdownOpen = false;
+    }
+
     $scope.createBlank = createBlank;
     $scope.createFromBlueprint = createFromBlueprint;
+    $scope.toggleDropdown = toggleDropdown;
+    $scope.leaveDropdown = leaveDropdown;
 
     //GO!
     initView();
