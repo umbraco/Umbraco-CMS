@@ -25,6 +25,7 @@
 
         vm.currentNode = null;
         vm.contentType = {};
+        vm.editorfor = "documentType";
         vm.labels = {};
         vm.submitButtonKey = "buttons_save";
         vm.generateModelsKey = "buttons_saveAndGenerateModels";
@@ -33,7 +34,7 @@
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.page.navigation = [];
-
+     
         var labelKeys = [
             "general_design",
             "general_listView",

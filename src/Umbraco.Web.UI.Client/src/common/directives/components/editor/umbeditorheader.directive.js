@@ -204,9 +204,9 @@ Use this directive to construct a header inside the main editor window.
 (function () {
     'use strict';
 
-    function EditorHeaderDirective(editorService, localizationService, editorState, $location, navigationService, appState,  contentTypeResource, formHelper,  notificationsService,  iconHelper) {
-
-        function link(scope) {
+    function EditorHeaderDirective(editorService, localizationService, editorState, $routeParams ) {
+        
+        function link(scope, $injector) {
 
             scope.vm = {};
             scope.vm.dropdownOpen = false;
@@ -214,22 +214,38 @@ Use this directive to construct a header inside the main editor window.
 
             scope.isNew = editorState.current.id=== 0;
 
-            localizationService.localizeMany([
-                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
-                    "placeholders_a11yName"]
-            ).then(function (data) {
+            var localizeVars = [
+                scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
+                "placeholders_a11yName",
+                scope.isNew ? "general_new" : "general_edit"
+            ];
+
+            if (scope.editorfor) {
+                localizeVars.push("content_" + scope.editorfor);
+            }
+            localizationService.localizeMany(localizeVars).then(function (data) {
                 scope.a11yMessage = data[0];
                 scope.a11yName = data[1];
+                var title = data[2] + ":";
                 if (!scope.isNew) {
                     scope.a11yMessage += " " + scope.name;
-
+                    title += " " + scope.name;
                 } else {
                     var name = "";
                     if (editorState.current.contentTypeName) {
-                        name = editorState.current.contentTypeName+=" ";
+                        name = editorState.current.contentTypeName;
                     }
-                    scope.a11yMessage += name;
-                    scope.a11yName += scope.a11yName;
+                    else if (scope.editorfor) {
+                        name = data[3];
+                    }
+                    if (name!=="") {
+                        scope.a11yMessage += " " + name;
+                        scope.a11yName = name + " " + scope.a11yName;
+                        title += " " + name;
+                    }
+                }
+                if (title !== data[2] + ":") {
+                    scope.$root.locationTitle = title + " - " + scope.$root.locationTitle;
                 }
             });
 
@@ -291,7 +307,8 @@ Use this directive to construct a header inside the main editor window.
                 onSelectNavigationItem: "&?",
                 key: "=",
                 onBack: "&?",
-                showBackButton: "<?"
+                showBackButton: "<?",
+                editorfor: "="
             },
             link: link
         };
