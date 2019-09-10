@@ -113,64 +113,11 @@ namespace Umbraco.Web.PropertyEditors
                 var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(editorValue.Value.ToString());
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 
-                // HTML content when being persisted may j
-                parsed = FindPastedTempImages(parsed);
-                
-                return parsed;
-            }
-
-            private string FindPastedTempImages(string html)
-            {
-                // Find all img's that has data-tmpimg attribute
-                // Use HTML Agility Pack - https://html-agility-pack.net
-                var htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(html);
-
-                var tmpImages = htmlDoc.DocumentNode.SelectNodes("//img[@data-tmpimg]");
-                if (tmpImages == null || tmpImages.Count == 0)
-                    return html;
-
                 var userId = Current.UmbracoContext.Security.CurrentUser.Id;
 
-                foreach (var img in tmpImages)
-                {
-                    // The data attribute contains the path to the tmp img to persist as a media item
-                    var tmpImgPath = img.GetAttributeValue("data-tmpimg", string.Empty);
-
-                    if (string.IsNullOrEmpty(tmpImgPath))
-                        continue;
-
-                    var absTmpImgPath = IOHelper.MapPath(tmpImgPath);
-                    var fileName = Path.GetFileName(absTmpImgPath);
-                    var safeFileName = fileName.ToSafeFileName();
-
-                    // TODO: In future task (get the parent folder from this config) to save the media into
-                    var mediaItemName = safeFileName.ToFriendlyName();
-                    var f = _mediaService.CreateMedia(mediaItemName, -1, Constants.Conventions.MediaTypes.Image, userId);
-                    var fileInfo = new FileInfo(absTmpImgPath);
-
-                    var fs = fileInfo.OpenReadWithRetry();
-                    if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
-                    using (fs)
-                    {
-                        f.SetValue(_contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fs);
-                    }
-
-                    _mediaService.Save(f, userId);
-
-                    // Add the UDI to the img element as new data attribute
-                    var udi = f.GetUdi();
-                    img.SetAttributeValue("data-udi", udi.ToString());
-
-                    //Get the new persisted image url
-                    var mediaTyped = Current.UmbracoHelper.Media(f.Id);
-                    var location = mediaTyped.Url;
-
-                    // Remove the data attribute (so we do not re-process this)
-                    img.Attributes.Remove("data-tmpimg");
-                }
-
-                return htmlDoc.DocumentNode.OuterHtml;
+                // TODO: In future task(get the parent folder from this config) to save the media into
+                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, -1, userId, _mediaService, _contentTypeBaseServiceProvider);
+                return parsed;
             }
         }
 
