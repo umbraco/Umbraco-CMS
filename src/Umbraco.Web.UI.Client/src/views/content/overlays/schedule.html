@@ -15,7 +15,7 @@
 
                 <div class="btn-group flex" style="font-size: 15px;">
 
-                    <umb-flatpickr ng-model="vm.variants[0].releaseDate"
+                    <umb-date-time-picker ng-model="vm.variants[0].releaseDate"
                                    options="vm.variants[0].datePickerConfig"
                                    on-setup="vm.datePickerSetup(vm.variants[0], 'publish', fpItem)"
                                    on-change="vm.datePickerChange(vm.variants[0], dateStr, 'publish')"
@@ -32,7 +32,7 @@
                             </a>
                         </div>
 
-                    </umb-flatpickr>
+                    </umb-date-time-picker>
 
                     <a ng-show="vm.variants[0].releaseDate" ng-click="vm.clearPublishDate(vm.variants[0])" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                         <span class="icon icon-wrong"></span>
@@ -47,7 +47,7 @@
                 </label>
 
                 <div class="btn-group flex" style="font-size: 15px;">
-                    <umb-flatpickr ng-model="vm.variants[0].expireDate"
+                    <umb-date-time-picker ng-model="vm.variants[0].expireDate"
                                    options="vm.variants[0].datePickerConfig"
                                    on-setup="vm.datePickerSetup(vm.variants[0], 'unpublish', fpItem)"
                                    on-change="vm.datePickerChange(vm.variants[0], dateStr, 'unpublish')"
@@ -64,7 +64,7 @@
                             </a>
                         </div>
 
-                    </umb-flatpickr>
+                    </umb-date-time-picker>
 
                     <a ng-show="vm.variants[0].expireDate" ng-click="vm.clearUnpublishDate(vm.variants[0])" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                         <span class="icon icon-wrong"></span>
@@ -112,7 +112,7 @@
                                     <div style="font-size: 13px; margin-right: 5px;">Publish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.releaseDateFormatted}}</em></div>
 
                                     <div class="btn-group flex" style="font-size: 14px; margin-right: 10px;" ng-if="variant.save">
-                                        <umb-flatpickr ng-model="variant.releaseDate"
+                                        <umb-date-time-picker ng-model="variant.releaseDate"
                                                        options="variant.datePickerConfig"
                                                        on-setup="vm.datePickerSetup(variant, 'publish', fpItem)"
                                                        on-change="vm.datePickerChange(variant, dateStr, 'publish')"
@@ -127,7 +127,7 @@
                                                     <localize key="content_setDate">Set date</localize>
                                                 </a>
                                             </div>
-                                        </umb-flatpickr>
+                                        </umb-date-time-picker>
                                         <a ng-show="variant.releaseDate" ng-click="vm.clearPublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                                             <span class="icon icon-wrong"></span>
                                         </a>
@@ -138,7 +138,7 @@
                                     <div style="font-size: 13px; margin-right: 5px;">Unpublish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.expireDateFormatted}}</em></div>
 
                                     <div class="btn-group flex" style="font-size: 14px;" ng-if="variant.save">
-                                        <umb-flatpickr ng-model="variant.expireDate"
+                                        <umb-date-time-picker ng-model="variant.expireDate"
                                                        options="variant.datePickerConfig"
                                                        on-setup="vm.datePickerSetup(variant, 'unpublish', fpItem)"
                                                        on-change="vm.datePickerChange(variant, dateStr, 'unpublish')"
@@ -153,7 +153,7 @@
                                                     <localize key="content_setDate">Set date</localize>
                                                 </a>
                                             </div>
-                                        </umb-flatpickr>
+                                        </umb-date-time-picker>
                                         <a ng-show="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                                             <span class="icon icon-wrong"></span>
                                         </a>

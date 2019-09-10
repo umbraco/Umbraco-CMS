@@ -117,6 +117,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
         //merge the server config on top of the default config, then set the server config to use the result
         $scope.model.config = angular.extend(defaultConfig, $scope.model.config);
+
+        // if the property is mandatory, set the minCount config to 1 (unless of course it is set to something already),
+        // that way the minCount/maxCount validation handles the mandatory as well
+        if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
+            $scope.model.config.minNumber = 1;
+        }
     }
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!

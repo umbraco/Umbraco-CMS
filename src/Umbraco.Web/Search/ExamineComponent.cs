@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -15,41 +14,36 @@ using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Examine;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Web.Scheduling;
-using System.Threading.Tasks;
 using Examine.LuceneEngine.Directories;
 using Umbraco.Core.Composing;
+using System.ComponentModel;
 
 namespace Umbraco.Web.Search
 {
-    public sealed class ExamineComponent : IComponent
+    public sealed class ExamineComponent : Umbraco.Core.Composing.IComponent
     {
         private readonly IExamineManager _examineManager;
         private readonly IContentValueSetBuilder _contentValueSetBuilder;
         private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
-        private static bool _disableExamineIndexing = false;
-        private static volatile bool _isConfigured = false;
-        private static readonly object IsConfiguredLocker = new object();
+        private static object _isConfiguredLocker = new object();
         private readonly IScopeProvider _scopeProvider;
-        private readonly ServiceContext _services;
-        private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
-        private static readonly object RebuildLocker = new object();
+        private readonly ServiceContext _services;        
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
-        private readonly IndexRebuilder _indexRebuilder;
+        
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
-
+        
         public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
-            IndexRebuilder indexRebuilder, ServiceContext services,
+            ServiceContext services,
             IContentValueSetBuilder contentValueSetBuilder,
             IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
@@ -66,7 +60,6 @@ namespace Umbraco.Web.Search
             _mainDom = mainDom;
             _logger = profilingLogger;
             _indexCreator = indexCreator;
-            _indexRebuilder = indexRebuilder;
         }
 
         public void Initialize()
@@ -91,11 +84,10 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                _logger.Debug<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
+                _logger.Info<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers(_logger);
-                _disableExamineIndexing = true;
                 return; //exit, do not continue
             }
 
@@ -116,71 +108,17 @@ namespace Umbraco.Web.Search
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
             ContentCacheRefresher.CacheUpdated += ContentCacheRefresherUpdated;
-            ContentTypeCacheRefresher.CacheUpdated += ContentTypeCacheRefresherUpdated; ;
+            ContentTypeCacheRefresher.CacheUpdated += ContentTypeCacheRefresherUpdated;
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
-
-            EnsureUnlocked(_logger, _examineManager);
-
-            // TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
-            RebuildIndexes(_indexRebuilder, _logger, true, 5000);
         }
 
         public void Terminate()
         { }
 
-        /// <summary>
-        /// Called to rebuild empty indexes on startup
-        /// </summary>
-        /// <param name="indexRebuilder"></param>
-        /// <param name="logger"></param>
-        /// <param name="onlyEmptyIndexes"></param>
-        /// <param name="waitMilliseconds"></param>
-        public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
-        {
-            // TODO: need a way to disable rebuilding on startup
-
-            lock(RebuildLocker)
-            {
-                if (_rebuildOnStartupRunner != null && _rebuildOnStartupRunner.IsRunning)
-                {
-                    logger.Warn<ExamineComponent>("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
-                    return;
-                }
-
-                logger.Info<ExamineComponent>("Starting initialize async background thread.");
-                //do the rebuild on a managed background thread
-                var task = new RebuildOnStartupTask(indexRebuilder, logger, onlyEmptyIndexes, waitMilliseconds);
-
-                _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
-                    "RebuildIndexesOnStartup",
-                    logger);
-
-                _rebuildOnStartupRunner.TryAdd(task);
-            }
-        }
-
-        /// <summary>
-        /// Must be called to each index is unlocked before any indexing occurs
-        /// </summary>
-        /// <remarks>
-        /// Indexing rebuilding can occur on a normal boot if the indexes are empty or on a cold boot by the database server messenger. Before
-        /// either of these happens, we need to configure the indexes.
-        /// </remarks>
-        private static void EnsureUnlocked(ILogger logger, IExamineManager examineManager)
-        {
-            if (_disableExamineIndexing) return;
-            if (_isConfigured) return;
-
-            lock (IsConfiguredLocker)
-            {
-                //double check
-                if (_isConfigured) return;
-
-                _isConfigured = true;
-                examineManager.UnlockLuceneIndexes(logger);
-            }
-        }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method should not be used and will be removed in future versions, rebuilding indexes can be done with the IndexRebuilder or the BackgroundIndexRebuilder")]
+        public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0) => Current.Factory.GetInstance<BackgroundIndexRebuilder>().RebuildIndexes(onlyEmptyIndexes, waitMilliseconds);
 
         #region Cache refresher updated event handlers
 
@@ -746,63 +684,6 @@ namespace Umbraco.Web.Search
         }
         #endregion
 
-        /// <summary>
-        /// Background task used to rebuild empty indexes on startup
-        /// </summary>
-        private class RebuildOnStartupTask : IBackgroundTask
-        {
-            private readonly IndexRebuilder _indexRebuilder;
-            private readonly ILogger _logger;
-            private readonly bool _onlyEmptyIndexes;
-            private readonly int _waitMilliseconds;
-
-            public RebuildOnStartupTask(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
-            {
-                _indexRebuilder = indexRebuilder ?? throw new ArgumentNullException(nameof(indexRebuilder));
-                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _onlyEmptyIndexes = onlyEmptyIndexes;
-                _waitMilliseconds = waitMilliseconds;
-            }
-
-            public bool IsAsync => false;
-
-            public void Dispose()
-            {
-            }
-
-            public void Run()
-            {
-                try
-                {
-                    // rebuilds indexes
-                    RebuildIndexes();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<ExamineComponent>(ex, "Failed to rebuild empty indexes.");
-                }
-            }
-
-            public Task RunAsync(CancellationToken token)
-            {
-                throw new NotImplementedException();
-            }
-
-            /// <summary>
-            /// Used to rebuild indexes on startup or cold boot
-            /// </summary>
-            private void RebuildIndexes()
-            {
-                //do not attempt to do this if this has been disabled since we are not the main dom.
-                //this can be called during a cold boot
-                if (_disableExamineIndexing) return;
-
-                if (_waitMilliseconds > 0)
-                    Thread.Sleep(_waitMilliseconds);
-
-                EnsureUnlocked(_logger, _indexRebuilder.ExamineManager);
-                _indexRebuilder.RebuildIndexes(_onlyEmptyIndexes);
-            }
-        }
+        
     }
 }
