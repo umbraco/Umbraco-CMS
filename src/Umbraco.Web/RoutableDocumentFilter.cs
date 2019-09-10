@@ -5,6 +5,12 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Configuration;
+using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.IO;
+using System.Collections.Concurrent;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web
 {
@@ -16,12 +22,17 @@ namespace Umbraco.Web
     /// </remarks>
     public sealed class RoutableDocumentFilter
     {
-        public RoutableDocumentFilter(ILogger logger, IGlobalSettings globalSettings)
+        public RoutableDocumentFilter(IGlobalSettings globalSettings)
         {
-            _logger = logger;
             _globalSettings = globalSettings;
-            _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
         }
+
+        private static readonly ConcurrentDictionary<string, bool> _routeChecks = new ConcurrentDictionary<string, bool>();
+        private readonly IGlobalSettings _globalSettings;
+        private object _locker = new object();
+        private bool _isInit = false;
+        private int? _routeCount;
+        private HashSet<string> _reservedList;
 
         /// <summary>
         /// Checks if the request is a document request (i.e. one that the module should handle)
@@ -61,7 +72,7 @@ namespace Umbraco.Web
             // at that point, either we have no extension, or it is .aspx
 
             // if the path is reserved then it cannot be a document request
-            if (maybeDoc && _globalSettings.IsReservedPathOrUrl(lpath, httpContext, _combinedRouteCollection.Value))
+            if (maybeDoc && IsReservedPathOrUrl(lpath, httpContext, RouteTable.Routes))
                 maybeDoc = false;
 
             //NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
@@ -73,37 +84,121 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// This is used to be passed into the GlobalSettings.IsReservedPathOrUrl and will include some 'fake' routes
-        /// used to determine if a path is reserved.
+        /// Determines whether the specified URL is reserved or is inside a reserved path.
         /// </summary>
-        /// <remarks>
-        /// This is basically used to reserve paths dynamically
-        /// </remarks>
-        private readonly Lazy<RouteCollection> _combinedRouteCollection;
-        private readonly ILogger _logger;
-        private readonly IGlobalSettings _globalSettings;
-
-        private RouteCollection CreateRouteCollection()
+        /// <param name="globalSettings"></param>
+        /// <param name="url">The URL to check.</param>
+        /// <returns>
+        ///     <c>true</c> if the specified URL is reserved; otherwise, <c>false</c>.
+        /// </returns>
+        internal bool IsReservedPathOrUrl(string url)
         {
-            var routes = new RouteCollection();
-
-            foreach (var route in RouteTable.Routes)
-                routes.Add(route);
-
-            foreach (var reservedPath in UmbracoModule.ReservedPaths)
+            LazyInitializer.EnsureInitialized(ref _reservedList, ref _isInit, ref _locker, () =>
             {
-                try
+                // store references to strings to determine changes
+                var reservedPathsCache = _globalSettings.ReservedPaths;
+                var reservedUrlsCache = _globalSettings.ReservedUrls;
+
+                // add URLs and paths to a new list
+                var newReservedList = new HashSet<string>();
+                foreach (var reservedUrlTrimmed in reservedUrlsCache
+                    .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim().ToLowerInvariant())
+                    .Where(x => x.IsNullOrWhiteSpace() == false)
+                    .Select(reservedUrl => IOHelper.ResolveUrl(reservedUrl).Trim().EnsureStartsWith("/"))
+                    .Where(reservedUrlTrimmed => reservedUrlTrimmed.IsNullOrWhiteSpace() == false))
                 {
-                    routes.Add("_umbreserved_" + reservedPath.ReplaceNonAlphanumericChars(""),
-                        new Route(reservedPath.TrimStart('/'), new StopRoutingHandler()));
+                    newReservedList.Add(reservedUrlTrimmed);
                 }
-                catch (Exception ex)
+
+                foreach (var reservedPathTrimmed in NormalizePaths(reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)))
                 {
-                    _logger.Error<UmbracoModule>("Could not add reserved path route", ex);
+                    newReservedList.Add(reservedPathTrimmed);
+                }
+
+                foreach (var reservedPathTrimmed in NormalizePaths(ReservedPaths))
+                {
+                    newReservedList.Add(reservedPathTrimmed);
+                }
+
+                // use the new list from now on
+                return newReservedList;
+            });
+
+            //The url should be cleaned up before checking:
+            // * If it doesn't contain an '.' in the path then we assume it is a path based URL, if that is the case we should add an trailing '/' because all of our reservedPaths use a trailing '/'
+            // * We shouldn't be comparing the query at all
+            var pathPart = url.Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries)[0].ToLowerInvariant();
+            if (pathPart.Contains(".") == false)
+            {
+                pathPart = pathPart.EnsureEndsWith('/');
+            }
+
+            // return true if url starts with an element of the reserved list
+            return _reservedList.Any(x => pathPart.InvariantStartsWith(x));
+        }
+
+        private IEnumerable<string> NormalizePaths(IEnumerable<string> paths)
+        {
+            return paths
+                .Select(x => x.Trim().ToLowerInvariant())
+                .Where(x => x.IsNullOrWhiteSpace() == false)
+                .Select(reservedPath => IOHelper.ResolveUrl(reservedPath).Trim().EnsureStartsWith("/").EnsureEndsWith("/"))
+                .Where(reservedPathTrimmed => reservedPathTrimmed.IsNullOrWhiteSpace() == false);
+        }
+
+        /// <summary>
+        /// Determines whether the current request is reserved based on the route table and
+        /// whether the specified URL is reserved or is inside a reserved path.
+        /// </summary>
+        /// <param name="globalSettings"></param>
+        /// <param name="url"></param>
+        /// <param name="httpContext"></param>
+        /// <param name="routes">The route collection to lookup the request in</param>
+        /// <returns></returns>
+        internal bool IsReservedPathOrUrl(string url, HttpContextBase httpContext, RouteCollection routes)
+        {
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (routes == null) throw new ArgumentNullException(nameof(routes));
+
+            //This is some rudimentary code to check if the route table has changed at runtime, we're basically just keeping a count
+            //of the routes. This isn't fail safe but there's no way to monitor changes to the route table. Else we need to create a hash
+            //of all routes and then recompare but that will be annoying to do on each request and then we might as well just do the whole MVC
+            //route on each request like we were doing before instead of caching the result of GetRouteData.
+            var changed = false;
+            using (routes.GetReadLock())
+            {
+                if (!_routeCount.HasValue || _routeCount.Value != routes.Count)
+                {
+                    //the counts are not set or have changed, need to reset
+                    changed = true;
+                }   
+            }
+            if (changed)
+            {
+                using (routes.GetWriteLock())
+                {
+                    _routeCount = routes.Count;
+
+                    //try clearing each entry
+                    foreach(var r in _routeChecks.Keys.ToList())
+                        _routeChecks.TryRemove(r, out _);
                 }
             }
 
-            return routes;
+            //check if the current request matches a route, if so then it is reserved.
+            var hasRoute = _routeChecks.GetOrAdd(httpContext.Request.Url.AbsolutePath, x => routes.GetRouteData(httpContext) != null);
+            if (hasRoute)
+                return true;
+
+            //continue with the standard ignore routine
+            return IsReservedPathOrUrl(url);
         }
+
+        /// <summary>
+        /// This is used internally to track any registered callback paths for Identity providers. If the request path matches
+        /// any of the registered paths, then the module will let the request keep executing
+        /// </summary>
+        internal static readonly ConcurrentHashSet<string> ReservedPaths = new ConcurrentHashSet<string>();
     }
 }
