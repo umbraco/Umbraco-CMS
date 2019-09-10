@@ -23,6 +23,20 @@ const { views } = require('./gulp/tasks/views');
 const { watch } = require('./gulp/tasks/watch');
 
 
+
+// ***********************************************************
+// Enables users to have personal configuration without manipulating the config file.
+// Usefull if you dont want to commit your personal configuration.
+// ***********************************************************
+var { readdirSync } = require('fs');
+
+var onlyScripts = require('./gulp/util/scriptFilter');
+var tasks = readdirSync('./gulp/extra/').filter(onlyScripts);
+tasks.forEach(function(task) {
+	require('./gulp/extra/' + task);
+});
+
+
 // ***********************************************************
 // These Exports are the new way of defining Tasks in Gulp 4.x
 // ***********************************************************
