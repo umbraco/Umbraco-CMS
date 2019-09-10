@@ -14,9 +14,9 @@ namespace Umbraco.Web
     /// <remarks>
     /// There are various checks to determine if this is a front-end request such as checking if the request is part of any reserved paths or existing MVC routes.
     /// </remarks>
-    public sealed class RoutableDocumentLookup
+    public sealed class RoutableDocumentFilter
     {
-        public RoutableDocumentLookup(ILogger logger, IGlobalSettings globalSettings)
+        public RoutableDocumentFilter(ILogger logger, IGlobalSettings globalSettings)
         {
             _logger = logger;
             _globalSettings = globalSettings;

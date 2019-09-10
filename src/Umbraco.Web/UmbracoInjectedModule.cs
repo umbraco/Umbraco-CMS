@@ -39,7 +39,7 @@ namespace Umbraco.Web
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly BackgroundPublishedSnapshotNotifier _backgroundNotifier;
-        private readonly RoutableDocumentLookup _routableDocumentLookup;
+        private readonly RoutableDocumentFilter _routableDocumentLookup;
 
         public UmbracoInjectedModule(
             IGlobalSettings globalSettings,
@@ -48,7 +48,7 @@ namespace Umbraco.Web
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
             BackgroundPublishedSnapshotNotifier backgroundNotifier,
-            RoutableDocumentLookup routableDocumentLookup)
+            RoutableDocumentFilter routableDocumentLookup)
         {
             _globalSettings = globalSettings;
             _runtime = runtime;

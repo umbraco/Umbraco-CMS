@@ -308,7 +308,7 @@ namespace Umbraco.Web
         /// <param name="httpContext"></param>
         /// <param name="uri"></param>
         /// <returns></returns>
-        internal bool IsDocumentRequest(RoutableDocumentLookup docLookup)
+        internal bool IsDocumentRequest(RoutableDocumentFilter docLookup)
         {
             if (_isDocumentRequest.HasValue)
                 return _isDocumentRequest.Value;

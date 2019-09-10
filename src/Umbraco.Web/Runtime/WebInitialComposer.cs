@@ -126,7 +126,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique(f => new DistributedCache());
 
             composition.RegisterUnique<BackgroundPublishedSnapshotNotifier>();
-            composition.RegisterUnique<RoutableDocumentLookup>();
+            composition.RegisterUnique<RoutableDocumentFilter>();
 
             // replace some services
             composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
