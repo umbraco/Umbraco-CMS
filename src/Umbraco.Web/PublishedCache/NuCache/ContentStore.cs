@@ -128,7 +128,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 Monitor.Enter(_rlocko, ref rtaken);
 
                 // see SnapDictionary
-                try { } finally
+                try { }
+                finally
                 {
                     _wlocked++;
                     lockInfo.Count = true;
@@ -277,8 +278,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void UpdateContentTypes(IEnumerable<IPublishedContentType> types)
         {
-            //nothing to do if this is empty, no need to lock/allocate/iterate/etc...            
-            if (!types.Any()) return; 
+            //nothing to do if this is empty, no need to lock/allocate/iterate/etc...
+            if (!types.Any()) return;
 
             var lockInfo = new WriteLockInfo();
             try
@@ -392,7 +393,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var visited = new List<int>();
                 foreach (var kit in kits.Where(x =>
                     refreshedIdsA.Contains(x.ContentTypeId) &&
-                    BuildKit(x)))
+                    BuildKit(x, out _)))
                 {
                     // replacing the node: must preserve the parents
                     var node = GetHead(_contentNodes, kit.Node.Id)?.Value;
@@ -466,10 +467,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private bool BuildKit(ContentNodeKit kit)
+        private bool BuildKit(ContentNodeKit kit, out LinkedNode<ContentNode> parent)
         {
             // make sure parent exists
-            if (!ParentExistsLocked(kit))
+            parent = GetParentLink(kit.Node);
+            if (parent == null)
             {
                 _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.");
                 return false;
@@ -531,7 +533,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _contentNodes.TryGetValue(kit.Node.Id, out var link);
                 var existing = link?.Value;
 
-                if (!BuildKit(kit))
+                if (!BuildKit(kit, out var parent))
                     return false;
 
                 // moving?
@@ -549,13 +551,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (existing == null)
                 {
                     // new, add to parent
-                    AddNodeLocked(kit.Node);
+                    AddTreeNodeLocked(kit.Node, parent);
                 }
                 else if (moving || existing.SortOrder != kit.Node.SortOrder)
                 {
                     // moved, remove existing from its parent, add content to its parent
-                    RemoveNodeLocked(existing);
-                    AddNodeLocked(kit.Node);
+                    RemoveTreeNodeLocked(existing);
+                    AddTreeNodeLocked(kit.Node);
                 }
                 else
                 {
@@ -581,8 +583,85 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _root.Value.FirstChildContentId = -1;
         }
 
-        // IMPORTANT kits must be sorted out by LEVEL
-        public bool SetAll(IEnumerable<ContentNodeKit> kits, bool fromLocalDb = false)
+        /// <summary>
+        /// Builds all kits on startup using a fast forward only cursor
+        /// </summary>
+        /// <param name="kits">
+        /// All kits sorted by Level + Parent Id + Sort order
+        /// </param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This requires that the collection is sorted by Level + ParentId + Sort Order. 
+        /// This should be used only on a site startup as the first generations.
+        /// This CANNOT be used after startup since it bypasses all checks for Generations.
+        /// </remarks>
+        internal bool SetAllFastSorted(IEnumerable<ContentNodeKit> kits)
+        {
+            var lockInfo = new WriteLockInfo();
+            var ok = true;
+            try
+            {
+                Lock(lockInfo);
+
+                ClearLocked(_contentNodes);
+                ClearRootLocked();
+
+                // The name of the game here is to populate each kit's
+                //  FirstChildContentId
+                //  LastChildContentId
+                //  NextSiblingContentId
+                //  PreviousSiblingContentId
+
+                ContentNode prev = null;
+                ContentNode currParent = null;
+
+                foreach (var kit in kits)
+                {
+                    if (!BuildKit(kit, out var parentLink)) 
+                    {
+                        ok = false;
+                        continue; // skip that one
+                    }
+
+                    if (currParent != null && currParent.Id != parentLink.Value.Id)
+                    {
+                        //the parent is changing so that means the prev tracked one is the last child
+                        currParent.LastChildContentId = prev.Id;
+                        //changed parent, reset prev
+                        prev = null; 
+                    }
+                    
+                    currParent = parentLink.Value;
+
+                    _logger.Debug<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
+                    SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
+
+                    //if the parent's FirstChildContentId isn't set, then it must be the current one
+                    if (currParent.FirstChildContentId < 0)
+                        currParent.FirstChildContentId = kit.Node.Id;
+
+                    //if there is a previous one on the same level then set it's next sibling id to the current oen
+                    if (prev != null)
+                    {
+                        prev.NextSiblingContentId = kit.Node.Id;
+                        kit.Node.PreviousSiblingContentId = prev.Id;
+                    }   
+
+                    //store the prev
+                    prev = kit.Node;
+
+                    _xmap[kit.Node.Uid] = kit.Node.Id;
+                }
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
+
+            return ok;
+        }
+
+        public bool SetAll(IEnumerable<ContentNodeKit> kits)
         {
             var lockInfo = new WriteLockInfo();
             var ok = true;
@@ -599,7 +678,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 foreach (var kit in kits)
                 {
-                    if (!BuildKit(kit))
+                    if (!BuildKit(kit, out var parent))
                     {
                         ok = false;
                         continue; // skip that one
@@ -607,9 +686,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _logger.Debug<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
-                    // don't refresh _localDb if we are reading from _localDb
-                    if (!fromLocalDb && _localDb != null) RegisterChange(kit.Node.Id, kit);
-                    AddNodeLocked(kit.Node);
+                    if (_localDb != null) RegisterChange(kit.Node.Id, kit);
+                    AddTreeNodeLocked(kit.Node, parent);
 
                     _xmap[kit.Node.Uid] = kit.Node.Id;
                 }
@@ -639,20 +717,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (existing != null)
                 {
                     ClearBranchLocked(existing);
-                    RemoveNodeLocked(existing);
+                    RemoveTreeNodeLocked(existing);
                 }
 
                 // now add them all back
                 foreach (var kit in kits)
                 {
-                    if (!BuildKit(kit))
+                    if (!BuildKit(kit, out var parent))
                     {
                         ok = false;
                         continue; // skip that one
                     }
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
                     if (_localDb != null) RegisterChange(kit.Node.Id, kit);
-                    AddNodeLocked(kit.Node);
+                    AddTreeNodeLocked(kit.Node, parent);
 
                     _xmap[kit.Node.Uid] = kit.Node.Id;
                 }
@@ -684,7 +762,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 ClearBranchLocked(content);
 
                 // manage the tree
-                RemoveNodeLocked(content);
+                RemoveTreeNodeLocked(content);
 
                 return true;
             }
@@ -712,68 +790,91 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var id = content.FirstChildContentId;
             while (id > 0)
             {
-                var child = GetLinkedNode(id, "child").Value;
-                ClearBranchLocked(child);
-                id = child.NextSiblingContentId;
+                var link = GetRequiredLinkedNode(id, "child");
+                ClearBranchLocked(link.Value);
+                id = link.Value.NextSiblingContentId;
             }
         }
 
-        // gets the link node
-        // throws (panic) if not found, or no value
-        private LinkedNode<ContentNode> GetLinkedNode(int id, string description)
+        /// <summary>
+        /// Gets the link node and if it doesn't exist throw a <see cref="PanicException"/>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        private LinkedNode<ContentNode> GetRequiredLinkedNode(int id, string description)
         {
             if (_contentNodes.TryGetValue(id, out var link) && link.Value != null)
                 return link;
 
-            throw new Exception($"panic: failed to get {description} with id={id}");
+            throw new PanicException($"failed to get {description} with id={id}");
         }
 
+        /// <summary>
+        /// Gets the parent link node, may be null or root if ParentContentId is less than 0
+        /// </summary>
         private LinkedNode<ContentNode> GetParentLink(ContentNode content)
         {
-            _contentNodes.TryGetValue(content.ParentContentId, out var link); // else null
-            //if (link == null || link.Value == null)
-            //    throw new Exception("Panic: parent not found.");
+            if (content.ParentContentId < 0) return _root;
+
+            _contentNodes.TryGetValue(content.ParentContentId, out var link);
             return link;
         }
 
-        private void RemoveNodeLocked(ContentNode content)
+        /// <summary>
+        /// Gets the linked parent node and if it doesn't exist throw a <see cref="PanicException"/>
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private LinkedNode<ContentNode> GetRequiredParentLink(ContentNode content)
+        {
+            return content.ParentContentId < 0 ? _root : GetRequiredLinkedNode(content.ParentContentId, "parent");
+        }
+
+        private void RemoveTreeNodeLocked(ContentNode content)
         {
             var parentLink = content.ParentContentId < 0
                 ? _root
-                : GetLinkedNode(content.ParentContentId, "parent");
+                : GetRequiredLinkedNode(content.ParentContentId, "parent");
 
             var parent = parentLink.Value;
 
             // must have children
             if (parent.FirstChildContentId < 0)
-                throw new Exception("panic: no children");
+                throw new PanicException("no children");
 
-            // if first, clone parent + remove first child
             if (parent.FirstChildContentId == content.Id)
             {
+                // if first, clone parent + remove first child
                 parent = GenCloneLocked(parentLink);
                 parent.FirstChildContentId = content.NextSiblingContentId;
             }
-            else
+
+            if (parent.LastChildContentId == content.Id)
             {
-                // iterate children until the previous child
-                var link = GetLinkedNode(parent.FirstChildContentId, "first child");
-
-                while (link.Value.NextSiblingContentId != content.Id)
-                    link = GetLinkedNode(link.Value.NextSiblingContentId, "next child");
-
-                // clone the previous child and replace next child
-                var prevChild = GenCloneLocked(link);
-                prevChild.NextSiblingContentId = content.NextSiblingContentId;
+                // if last, clone parent + remove last child
+                parent = GenCloneLocked(parentLink);
+                parent.LastChildContentId = content.PreviousSiblingContentId;
             }
-        }
 
-        private bool ParentExistsLocked(ContentNodeKit kit)
-        {
-            if (kit.Node.ParentContentId < 0)
-                return true;
-            var link = GetParentLink(kit.Node);
-            return link?.Value != null;
+            // maintain linked list
+
+            if (content.NextSiblingContentId > 0)
+            {
+                var nextLink = GetRequiredLinkedNode(content.NextSiblingContentId, "next sibling");
+                var next = GenCloneLocked(nextLink);
+                next.PreviousSiblingContentId = content.PreviousSiblingContentId;
+            }
+
+            if (content.PreviousSiblingContentId > 0)
+            {
+                var prevLink = GetRequiredLinkedNode(content.PreviousSiblingContentId, "previous sibling");
+                var prev = GenCloneLocked(prevLink);
+                prev.NextSiblingContentId = content.NextSiblingContentId;
+            }
+
+            content.NextSiblingContentId = -1;
+            content.PreviousSiblingContentId = -1;
         }
 
         private bool ParentPublishedLocked(ContentNodeKit kit)
@@ -801,11 +902,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return node;
         }
 
-        private void AddNodeLocked(ContentNode content)
+        /// <summary>
+        /// Adds a node to the tree structure.
+        /// </summary>
+        private void AddTreeNodeLocked(ContentNode content, LinkedNode<ContentNode> parentLink = null)
         {
-            var parentLink = content.ParentContentId < 0
-                ? _root
-                : GetLinkedNode(content.ParentContentId, "parent");
+            parentLink = parentLink ?? GetRequiredParentLink(content);
 
             var parent = parentLink.Value;
 
@@ -814,35 +916,72 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 parent = GenCloneLocked(parentLink);
                 parent.FirstChildContentId = content.Id;
+                parent.LastChildContentId = content.Id;
                 return;
             }
 
             // get parent's first child
-            var childLink = GetLinkedNode(parent.FirstChildContentId, "first child");
+            var childLink = GetRequiredLinkedNode(parent.FirstChildContentId, "first child");
             var child = childLink.Value;
 
             // if first, clone parent + insert as first child
+            // NOTE: Don't perform this check if loading from local DB since we know it's already sorted
             if (child.SortOrder > content.SortOrder)
             {
                 content.NextSiblingContentId = parent.FirstChildContentId;
+                content.PreviousSiblingContentId = -1;
+
                 parent = GenCloneLocked(parentLink);
                 parent.FirstChildContentId = content.Id;
+
+                child = GenCloneLocked(childLink);
+                child.PreviousSiblingContentId = content.Id;
+
                 return;
             }
 
-            // else lookup position
+            // get parent's last child
+            var lastChildLink = GetRequiredLinkedNode(parent.LastChildContentId, "last child");
+            var lastChild = lastChildLink.Value;
+
+            // if last, clone parent + append as last child
+            if (lastChild.SortOrder <= content.SortOrder)
+            {
+                content.PreviousSiblingContentId = parent.LastChildContentId;
+                content.NextSiblingContentId = -1;
+
+                parent = GenCloneLocked(parentLink);
+                parent.LastChildContentId = content.Id;
+
+                lastChild = GenCloneLocked(lastChildLink);
+                lastChild.NextSiblingContentId = content.Id;
+
+                return;
+            }
+
+            // else it's going somewhere in the middle,
+            // and this is bad, perfs-wise - we only do it when moving
+            // inserting in linked list is slow, optimizing would require trees
+            // but... that should not happen very often - and not on large amount of data
             while (child.NextSiblingContentId > 0)
             {
                 // get next child
-                var nextChildLink = GetLinkedNode(child.NextSiblingContentId, "next child");
+                var nextChildLink = GetRequiredLinkedNode(child.NextSiblingContentId, "next child");
                 var nextChild = nextChildLink.Value;
 
                 // if here, clone previous + append/insert
+                // NOTE: Don't perform this check if loading from local DB since we know it's already sorted
                 if (nextChild.SortOrder > content.SortOrder)
                 {
                     content.NextSiblingContentId = nextChild.Id;
+                    content.PreviousSiblingContentId = nextChild.PreviousSiblingContentId;
+
                     child = GenCloneLocked(childLink);
                     child.NextSiblingContentId = content.Id;
+
+                    var nnext = GenCloneLocked(nextChildLink);
+                    nnext.PreviousSiblingContentId = content.Id;
+
                     return;
                 }
 
@@ -850,9 +989,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 child = nextChild;
             }
 
-            // if last, clone previous + append
-            child = GenCloneLocked(childLink);
-            child.NextSiblingContentId = content.Id;
+            // should never get here
+            throw new Exception("panic: no more children.");
         }
 
         // replaces the root node
@@ -946,7 +1084,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             while (id > 0)
             {
-                var link = GetLinkedNode(id, "sibling");
+                var link = GetRequiredLinkedNode(id, "sibling");
                 yield return link.Value;
                 id = link.Value.NextSiblingContentId;
             }
