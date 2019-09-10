@@ -223,9 +223,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         // When its being persisted in RTE property editor
                         // To create a media item & delete this tmp one etc
                         tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
-
-                        // Be a boy scout & cleanup after ourselves
-                        localStorage.removeItem(`tinymce__${imgSrc}`);
                     });
                 });
             }
