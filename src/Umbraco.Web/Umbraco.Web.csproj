@@ -814,11 +814,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheFilePersister.cs" />
     <Compile Include="UmbracoComponentRenderer.cs" />
-    <Compile Include="Web References\org.umbraco.our\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.map</DependentUpon>
-    </Compile>
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
     <Compile Include="WebApi\Binders\BlueprintItemBinder.cs" />
@@ -1830,11 +1825,6 @@
       <Link>Mvc\web.config</Link>
     </None>
     <None Include="packages.config" />
-    <None Include="Web References\org.umbraco.our\Reference.map">
-      <Generator>MSDiscoCodeGenerator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-    <None Include="Web References\org.umbraco.our\repository.disco" />
     <EmbeddedResource Include="UI\JavaScript\Main.js" />
     <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
     <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
@@ -1885,7 +1875,6 @@
     <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
     <None Include="app.config" />
-    <None Include="Web References\org.umbraco.our\repository.wsdl" />
     <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -1979,17 +1968,6 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="https://our.umbraco.com/umbraco/webservices/api/repository.asmx">
-      <UrlBehavior>Dynamic</UrlBehavior>
-      <RelPath>Web References\org.umbraco.our\</RelPath>
-      <UpdateFromURL>https://our.umbraco.com/umbraco/webservices/api/repository.asmx</UpdateFromURL>
-      <ServiceLocationURL>
-      </ServiceLocationURL>
-      <CachedDynamicPropName>
-      </CachedDynamicPropName>
-      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
-      <CachedSettingsPropName>umbraco_org_umbraco_our_Repository</CachedSettingsPropName>
-    </WebReferenceUrl>
     <WebReferenceUrl Include="http://update.umbraco.org/checkforupgrade.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\org.umbraco.update\</RelPath>

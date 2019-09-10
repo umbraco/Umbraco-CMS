@@ -56,6 +56,7 @@ namespace Umbraco.Web.Editors
                     //id is passed in eventually we'll probably want to support GUID + Udi too
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPagedChildren", "id", typeof(int), typeof(string)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPath", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetUrlAndAnchors", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
@@ -281,9 +282,17 @@ namespace Umbraco.Web.Editors
                 publishedContentExists: i => Umbraco.TypedContent(i) != null);
         }
 
+        [HttpGet]
+        public UrlAndAnchors GetUrlAndAnchors(Udi id)
+        {
+            var nodeId = Umbraco.GetIdForUdi(id);
+            var url = Umbraco.Url(nodeId);
+            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(nodeId);
+            return new UrlAndAnchors(url, anchorValues);
+        }
 
         [HttpGet]
-        public UrlAndAnchors GetUrlAndAnchors([FromUri]int id)
+        public UrlAndAnchors GetUrlAndAnchors(int id)
         {
             var url = Umbraco.Url(id);
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id);
