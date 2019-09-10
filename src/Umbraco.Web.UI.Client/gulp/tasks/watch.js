@@ -1,11 +1,12 @@
 'use strict';
 
 var config = require('../config');
-var { watch , run, dest, src } = require('gulp');
+var { watch, dest, src } = require('gulp');
 
 var _ = require('lodash');
 
 var processJs = require('../util/processJs');
+var processLess = require('../util/processLess');
 
 function watching() {
 
@@ -25,9 +26,9 @@ function watching() {
 
         //watch all less files and trigger the less task
     watch(config.sources.globs.less, { ignoreInitial: true, interval: watchInterval }, function () {
-            console.log('Reprocessing the LESS files');
-            run(['less']);
-        })
+        console.log('Reprocessing the LESS files');
+        processLess();
+    })
 
     // watch all views - copy single file changes
     const viewWatcher = watch(config.sources.globs.views, { interval: watchInterval });
