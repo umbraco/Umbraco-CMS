@@ -39,6 +39,7 @@ namespace Umbraco.Web
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly BackgroundPublishedSnapshotNotifier _backgroundNotifier;
+        private readonly RoutableDocumentLookup _routableDocumentLookup;
 
         public UmbracoInjectedModule(
             IGlobalSettings globalSettings,
@@ -46,16 +47,16 @@ namespace Umbraco.Web
             ILogger logger,
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
-            BackgroundPublishedSnapshotNotifier backgroundNotifier)
+            BackgroundPublishedSnapshotNotifier backgroundNotifier,
+            RoutableDocumentLookup routableDocumentLookup)
         {
-            _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
-
             _globalSettings = globalSettings;
             _runtime = runtime;
             _logger = logger;
             _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
             _backgroundNotifier = backgroundNotifier;
+            _routableDocumentLookup = routableDocumentLookup;
         }
 
         #region HttpModule event handlers
@@ -91,13 +92,16 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UmbracoContext_CreatingPublishedSnapshot(object sender, EventArgs e)
+        private void UmbracoContext_CreatingPublishedSnapshot(UmbracoContext sender, EventArgs e)
         {
             // Wait for the notifier to complete if it's in progress, this is required because
             // Pure Live models along with content snapshots are updated on a background thread when schema
             // (doc types, data types) are changed so if that is still processing we need to wait before we access
             // the content snapshot to make sure it's the latest version.
-            if (_backgroundNotifier.Wait())
+            // We only want to wait if this is a front-end request (not a back office request) so need to first check
+            // for that and then wait.
+            
+            if (sender.IsDocumentRequest(_routableDocumentLookup) &&_backgroundNotifier.Wait())
             {
                 _logger.Debug<UmbracoModule>("Request was suspended while waiting for background cache notifications to complete");
             }
@@ -183,18 +187,18 @@ namespace Umbraco.Web
             var reason = EnsureRoutableOutcome.IsRoutable;
 
             // ensure this is a document request
-            if (EnsureDocumentRequest(httpContext, uri) == false)
+            if (!context.IsDocumentRequest(_routableDocumentLookup))
             {
                 reason = EnsureRoutableOutcome.NotDocumentRequest;
             }
             // ensure the runtime is in the proper state
             // and deal with needed redirects, etc
-            else if (EnsureRuntime(httpContext, uri) == false)
+            else if (!EnsureRuntime(httpContext, uri))
             {
                 reason = EnsureRoutableOutcome.NotReady;
             }
             // ensure Umbraco has documents to serve
-            else if (EnsureHasContent(context, httpContext) == false)
+            else if (!EnsureHasContent(context, httpContext))
             {
                 reason = EnsureRoutableOutcome.NoContent;
             }
@@ -202,55 +206,7 @@ namespace Umbraco.Web
             return Attempt.If(reason == EnsureRoutableOutcome.IsRoutable, reason);
         }
 
-        /// <summary>
-        /// Ensures that the request is a document request (i.e. one that the module should handle)
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        private bool EnsureDocumentRequest(HttpContextBase httpContext, Uri uri)
-        {
-            var maybeDoc = true;
-            var lpath = uri.AbsolutePath.ToLowerInvariant();
-
-            // handle directory-urls used for asmx
-            // TODO: legacy - what's the point really?
-            var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
-            if (asmxPos >= 0)
-            {
-                // use uri.AbsolutePath, not path, 'cos path has been lowercased
-                httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
-                    uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
-                    uri.Query.TrimStart('?'));
-                maybeDoc = false;
-            }
-
-            // a document request should be
-            // /foo/bar/nil
-            // /foo/bar/nil/
-            // /foo/bar/nil.aspx
-            // where /foo is not a reserved path
-
-            // if the path contains an extension that is not .aspx
-            // then it cannot be a document request
-            var extension = Path.GetExtension(lpath);
-            if (maybeDoc && extension.IsNullOrWhiteSpace() == false && extension != ".aspx")
-                maybeDoc = false;
-
-            // at that point, either we have no extension, or it is .aspx
-
-            // if the path is reserved then it cannot be a document request
-            if (maybeDoc && _globalSettings.IsReservedPathOrUrl(lpath, httpContext, _combinedRouteCollection.Value))
-                maybeDoc = false;
-
-            //NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
-            //if (!maybeDoc)
-            //{
-            //    Logger.Warn<UmbracoModule>("Not a document");
-            //}
-
-            return maybeDoc;
-        }
+        
 
         private bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
         {
@@ -506,36 +462,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        /// <summary>
-        /// This is used to be passed into the GlobalSettings.IsReservedPathOrUrl and will include some 'fake' routes
-        /// used to determine if a path is reserved.
-        /// </summary>
-        /// <remarks>
-        /// This is basically used to reserve paths dynamically
-        /// </remarks>
-        private readonly Lazy<RouteCollection> _combinedRouteCollection;
-
-        private RouteCollection CreateRouteCollection()
-        {
-            var routes = new RouteCollection();
-
-            foreach (var route in RouteTable.Routes)
-                routes.Add(route);
-
-            foreach (var reservedPath in UmbracoModule.ReservedPaths)
-            {
-                try
-                {
-                    routes.Add("_umbreserved_" + reservedPath.ReplaceNonAlphanumericChars(""),
-                        new Route(reservedPath.TrimStart('/'), new StopRoutingHandler()));
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<UmbracoModule>("Could not add reserved path route", ex);
-                }
-            }
-
-            return routes;
-        }
+        
     }
 }
