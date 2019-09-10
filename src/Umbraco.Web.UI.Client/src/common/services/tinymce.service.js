@@ -306,11 +306,13 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     //this would be for a theme other than inlite
                     toolbar: args.toolbar.join(" "),
+
                     //these are for the inlite theme to work
                     insert_toolbar: toolbars.insertToolbar,
                     selection_toolbar: toolbars.selectionToolbar,
 
                     body_class: "umb-rte",
+
                     //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
                     cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster,
 
