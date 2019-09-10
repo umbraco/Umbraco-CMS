@@ -10,11 +10,11 @@ namespace Umbraco.Web.Cache
 {
     public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresher, ContentTypeCacheRefresher.JsonPayload>
     {
-        private readonly BackgroundPublishedSnapshotServiceNotifier _backgroundModelFactory;
+        private readonly BackgroundPublishedSnapshotNotifier _backgroundModelFactory;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
         private readonly IdkMap _idkMap;
 
-        public ContentTypeCacheRefresher(AppCaches appCaches, BackgroundPublishedSnapshotServiceNotifier backgroundModelFactory, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
+        public ContentTypeCacheRefresher(AppCaches appCaches, BackgroundPublishedSnapshotNotifier backgroundModelFactory, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
             : base(appCaches)
         {
             _backgroundModelFactory = backgroundModelFactory;

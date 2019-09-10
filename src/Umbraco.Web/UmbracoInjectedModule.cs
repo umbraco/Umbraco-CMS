@@ -19,6 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Cache;
+using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Web
 {
@@ -49,7 +50,7 @@ namespace Umbraco.Web
         private readonly IPublishedRouter _publishedRouter;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly BackgroundPublishedSnapshotServiceNotifier _backgroundNotifier;
+        private readonly BackgroundPublishedSnapshotNotifier _backgroundNotifier;
 
         public UmbracoInjectedModule(
             IGlobalSettings globalSettings,
@@ -62,7 +63,7 @@ namespace Umbraco.Web
             IPublishedRouter publishedRouter,
             IVariationContextAccessor variationContextAccessor,
             IUmbracoContextFactory umbracoContextFactory,
-            BackgroundPublishedSnapshotServiceNotifier backgroundNotifier)
+            BackgroundPublishedSnapshotNotifier backgroundNotifier)
         {
             _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
 
@@ -141,8 +142,19 @@ namespace Umbraco.Web
             var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 
             // If this page is probably front-end routable, block here until the backround notifier isn't busy
-            if (isRoutableAttempt)                
-                _backgroundNotifier.Wait(); 
+            if (isRoutableAttempt)
+            {
+                //wait for the notifier to complete if it's in progress
+                if (_backgroundNotifier.Wait())
+                {
+                    // if we were waiting, we need to resync the snapshot
+                    // TODO: This does not belong here! BUT we cannot Resync the snapshot on the background process because there is no snapshot... 
+                    // normally it would do that automatically but on a background thread it is null ... hrm....
+                    ((PublishedSnapshot)_publishedSnapshotService.PublishedSnapshotAccessor.PublishedSnapshot)?.Resync(); 
+                    var done = "done";
+                }
+            }
+                
 
             // raise event here
             UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));
