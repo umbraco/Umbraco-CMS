@@ -59,7 +59,11 @@ namespace Umbraco.Web
             Security = webSecurity;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
-            _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
+            _publishedSnapshot = new Lazy<IPublishedSnapshot>(() =>
+            {
+                CreatingPublishedSnapshot?.Invoke(this, new EventArgs());
+                return publishedSnapshotService.CreatePublishedSnapshot(PreviewToken);
+            });
 
             // set the urls...
             // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
@@ -72,6 +76,11 @@ namespace Umbraco.Web
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
             UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, mediaUrlProviders, variationContextAccessor);
         }
+
+        /// <summary>
+        /// Raised when the published snapshot is being created
+        /// </summary>
+        internal event EventHandler CreatingPublishedSnapshot;
 
         /// <summary>
         /// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this

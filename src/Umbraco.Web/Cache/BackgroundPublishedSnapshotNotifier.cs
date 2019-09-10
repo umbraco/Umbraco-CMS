@@ -109,10 +109,6 @@ namespace Umbraco.Web.Cache
                         _publishedSnapshotService.Notify(_dataTypePayloads);
                     if (_contentTypePayloads != null)
                         _publishedSnapshotService.Notify(_contentTypePayloads);
-
-                    //Thread.Sleep(10000);
-
-                    var asdf = "";
                 });
             }
 

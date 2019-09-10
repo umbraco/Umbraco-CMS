@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
@@ -10,16 +9,10 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Web
 {
@@ -41,41 +34,26 @@ namespace Umbraco.Web
     public class UmbracoInjectedModule : IHttpModule
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IUserService _userService;
-        private readonly UrlProviderCollection _urlProviders;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IPublishedRouter _publishedRouter;
-        private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly BackgroundPublishedSnapshotNotifier _backgroundNotifier;
 
         public UmbracoInjectedModule(
             IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            IPublishedSnapshotService publishedSnapshotService,
-            IUserService userService,
-            UrlProviderCollection urlProviders,
             IRuntimeState runtime,
             ILogger logger,
             IPublishedRouter publishedRouter,
-            IVariationContextAccessor variationContextAccessor,
             IUmbracoContextFactory umbracoContextFactory,
             BackgroundPublishedSnapshotNotifier backgroundNotifier)
         {
             _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
 
             _globalSettings = globalSettings;
-            _umbracoContextAccessor = umbracoContextAccessor;
-            _publishedSnapshotService = publishedSnapshotService;
-            _userService = userService;
-            _urlProviders = urlProviders;
             _runtime = runtime;
             _logger = logger;
             _publishedRouter = publishedRouter;
-            _variationContextAccessor = variationContextAccessor;
             _umbracoContextFactory = umbracoContextFactory;
             _backgroundNotifier = backgroundNotifier;
         }
@@ -104,7 +82,25 @@ namespace Umbraco.Web
             // ensure there's an UmbracoContext registered for the current request
             // registers the context reference so its disposed at end of request
             var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext(httpContext);
+            umbracoContextReference.UmbracoContext.CreatingPublishedSnapshot += UmbracoContext_CreatingPublishedSnapshot;
             httpContext.DisposeOnPipelineCompleted(umbracoContextReference);
+        }
+
+        /// <summary>
+        /// Event handler for when the UmbracoContext creates the published snapshot
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UmbracoContext_CreatingPublishedSnapshot(object sender, EventArgs e)
+        {
+            // Wait for the notifier to complete if it's in progress, this is required because
+            // Pure Live models along with content snapshots are updated on a background thread when schema
+            // (doc types, data types) are changed so if that is still processing we need to wait before we access
+            // the content snapshot to make sure it's the latest version.
+            if (_backgroundNotifier.Wait())
+            {
+                _logger.Debug<UmbracoModule>("Request was suspended while waiting for background cache notifications to complete");
+            }
         }
 
         /// <summary>
@@ -140,21 +136,6 @@ namespace Umbraco.Web
 
             // do not process if this request is not a front-end routable page
             var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
-
-            // If this page is probably front-end routable, block here until the backround notifier isn't busy
-            if (isRoutableAttempt)
-            {
-                //wait for the notifier to complete if it's in progress
-                if (_backgroundNotifier.Wait())
-                {
-                    // if we were waiting, we need to resync the snapshot
-                    // TODO: This does not belong here! BUT we cannot Resync the snapshot on the background process because there is no snapshot... 
-                    // normally it would do that automatically but on a background thread it is null ... hrm....
-                    ((PublishedSnapshot)_publishedSnapshotService.PublishedSnapshotAccessor.PublishedSnapshot)?.Resync(); 
-                    var done = "done";
-                }
-            }
-                
 
             // raise event here
             UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));
