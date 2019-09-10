@@ -13,6 +13,7 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Cache;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
 {
@@ -38,6 +39,7 @@ namespace Umbraco.Web
         private readonly ILogger _logger;
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
+        private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly BackgroundPublishedSnapshotNotifier _backgroundNotifier;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
 
@@ -47,6 +49,7 @@ namespace Umbraco.Web
             ILogger logger,
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
+            IPublishedModelFactory publishedModelFactory,
             BackgroundPublishedSnapshotNotifier backgroundNotifier,
             RoutableDocumentFilter routableDocumentLookup)
         {
@@ -55,6 +58,7 @@ namespace Umbraco.Web
             _logger = logger;
             _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
+            _publishedModelFactory = publishedModelFactory;
             _backgroundNotifier = backgroundNotifier;
             _routableDocumentLookup = routableDocumentLookup;
         }
@@ -83,28 +87,35 @@ namespace Umbraco.Web
             // ensure there's an UmbracoContext registered for the current request
             // registers the context reference so its disposed at end of request
             var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext(httpContext);
-            umbracoContextReference.UmbracoContext.CreatingPublishedSnapshot += UmbracoContext_CreatingPublishedSnapshot;
+            BindCreatingPublishedSnapshot(umbracoContextReference.UmbracoContext);
             httpContext.DisposeOnPipelineCompleted(umbracoContextReference);
         }
 
         /// <summary>
-        /// Event handler for when the UmbracoContext creates the published snapshot
+        /// Bind to the event handler for when the UmbracoContext creates the published snapshot when in PureLive mode
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UmbracoContext_CreatingPublishedSnapshot(UmbracoContext sender, EventArgs e)
+        /// <param name="umbracoContext"></param>
+        /// <remarks>
+        /// When we are not in PureLive mode it is not necessary to do this so we have to have a special check.
+        /// </remarks>
+        private void BindCreatingPublishedSnapshot(UmbracoContext umbracoContext)
         {
-            // Wait for the notifier to complete if it's in progress, this is required because
-            // Pure Live models along with content snapshots are updated on a background thread when schema
-            // (doc types, data types) are changed so if that is still processing we need to wait before we access
-            // the content snapshot to make sure it's the latest version.
-            // We only want to wait if this is a front-end request (not a back office request) so need to first check
-            // for that and then wait.
-            
-            if (sender.IsDocumentRequest(_routableDocumentLookup) &&_backgroundNotifier.Wait())
+            if (!_publishedModelFactory.IsLiveFactory()) return;
+
+            umbracoContext.CreatingPublishedSnapshot += (UmbracoContext sender, EventArgs e) =>
             {
-                _logger.Debug<UmbracoModule>("Request was suspended while waiting for background cache notifications to complete");
-            }
+                // Wait for the notifier to complete if it's in progress, this is required because
+                // Pure Live models along with content snapshots are updated on a background thread when schema
+                // (doc types, data types) are changed so if that is still processing we need to wait before we access
+                // the content snapshot to make sure it's the latest version.
+                // We only want to wait if this is a front-end request (not a back office request) so need to first check
+                // for that and then wait.
+
+                if (sender.IsDocumentRequest(_routableDocumentLookup) && _backgroundNotifier.Wait())
+                {
+                    _logger.Debug<UmbracoModule>("Request was suspended while waiting for background cache notifications to complete");
+                }
+            };
         }
 
         /// <summary>
