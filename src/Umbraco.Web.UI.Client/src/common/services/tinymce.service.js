@@ -7,7 +7,7 @@
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, localStorageService) {
+    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
