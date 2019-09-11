@@ -118,7 +118,9 @@ Use this directive to generate a thumbnail grid of media items.
                     var item = scope.items[i];
                     setItemData(item);
                     setOriginalSize(item, itemMaxHeight);
-
+                    
+                    item.selectable = getSelectableState(item);
+                    
                     // remove non images when onlyImages is set to true
                     if(scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
                         scope.items.splice(i, 1);
@@ -187,6 +189,22 @@ Use this directive to generate a thumbnail grid of media items.
 
                     }
                 }
+            }
+            
+            /**
+            * Returns wether a item should be selectable or not.
+            */
+            function getSelectableState(item) {
+
+                // check if item is a folder or image
+                if (item.isFolder) {
+                    return !scope.disableFolderSelect && !scope.onlyImages;
+                } else {
+                    return !scope.onlyFolders;
+                }
+                
+                return false;
+                
             }
 
             function setOriginalSize(item, maxHeight) {
@@ -331,7 +349,9 @@ Use this directive to generate a thumbnail grid of media items.
                 itemMaxHeight: "@",
                 itemMinWidth: "@",
                 itemMinHeight: "@",
+                disableFolderSelect: "@",
                 onlyImages: "@",
+                onlyFolders: "@",
                 includeSubFolders: "@",
                 currentFolderId: "@"
             },
