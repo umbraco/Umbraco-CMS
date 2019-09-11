@@ -20,6 +20,8 @@ namespace Umbraco.Web.Templates
     /// </summary>
     public static class TemplateUtilities
     {
+        const string TemporaryImageDataAttribute = "data-tmpimg";
+
         internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
         {
             using (umbracoContext.ForcedPreview(preview)) // force for url provider
@@ -194,14 +196,14 @@ namespace Umbraco.Web.Templates
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(html);
 
-            var tmpImages = htmlDoc.DocumentNode.SelectNodes("//img[@data-tmpimg]");
+            var tmpImages = htmlDoc.DocumentNode.SelectNodes($"//img[@{TemporaryImageDataAttribute}]");
             if (tmpImages == null || tmpImages.Count == 0)
                 return html;
             
             foreach (var img in tmpImages)
             {
                 // The data attribute contains the path to the tmp img to persist as a media item
-                var tmpImgPath = img.GetAttributeValue("data-tmpimg", string.Empty);
+                var tmpImgPath = img.GetAttributeValue(TemporaryImageDataAttribute, string.Empty);
 
                 if (string.IsNullOrEmpty(tmpImgPath))
                     continue;
@@ -233,7 +235,7 @@ namespace Umbraco.Web.Templates
                 img.SetAttributeValue("src", location);
 
                 // Remove the data attribute (so we do not re-process this)
-                img.Attributes.Remove("data-tmpimg");
+                img.Attributes.Remove(TemporaryImageDataAttribute);
             }
 
             return htmlDoc.DocumentNode.OuterHtml;
