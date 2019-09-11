@@ -116,7 +116,7 @@ namespace Umbraco.Web.PropertyEditors
                 var userId = Current.UmbracoContext.Security.CurrentUser.Id;
 
                 // TODO: In future task(get the parent folder from this config) to save the media into
-                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, -1, userId, _mediaService, _contentTypeBaseServiceProvider);
+                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider);
                 return parsed;
             }
         }
