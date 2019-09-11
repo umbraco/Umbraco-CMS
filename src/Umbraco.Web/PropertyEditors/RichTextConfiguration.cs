@@ -21,8 +21,8 @@ namespace Umbraco.Web.PropertyEditors
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }
 
-        [ConfigurationField("mediaParentId", "Store Pasted Images Folder", "MediaFolderPicker",
-            Description = "Choose where images dragged or pasted into the editor get uploaded to")]
+        [ConfigurationField("mediaParentId", "Image Upload Folder", "MediaFolderPicker",
+            Description = "Choose the upload location of pasted images")]
         public GuidUdi MediaParentId { get; set; }
     }
 }
