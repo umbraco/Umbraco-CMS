@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
@@ -213,7 +214,13 @@ namespace Umbraco.Web.Templates
                 var safeFileName = fileName.ToSafeFileName();
 
                 var mediaItemName = safeFileName.ToFriendlyName();
-                var mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+                IMedia mediaFile;
+
+                if(mediaParentFolder == Guid.Empty)
+                    mediaFile = mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+                else
+                    mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+                               
                 var fileInfo = new FileInfo(absoluteTempImagePath);
 
                 var fileStream = fileInfo.OpenReadWithRetry();
