@@ -31,6 +31,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -90,6 +91,8 @@ namespace Umbraco.Tests.TestHelpers
                 factory.ResetForTests();
                 return factory;
             });
+
+            Composition.RegisterUnique<BackgroundPublishedSnapshotNotifier>();
         }
 
         [OneTimeTearDown]
