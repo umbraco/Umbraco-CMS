@@ -187,7 +187,7 @@ namespace Umbraco.Web.Templates
             // see comment in ResolveMediaFromTextString for group reference
             => ResolveImgPattern.Replace(text, "$1$3$4$5");
 
-        internal static string FindAndPersistPastedTempImages(string html, int mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        internal static string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             // Find all img's that has data-tmpimg attribute
             // Use HTML Agility Pack - https://html-agility-pack.net
