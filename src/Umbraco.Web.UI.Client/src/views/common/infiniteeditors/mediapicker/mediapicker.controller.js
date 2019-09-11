@@ -3,6 +3,7 @@ angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
         function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
             
+            
             if (!$scope.model.title) {
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
                     .then(function (data) {
@@ -15,10 +16,10 @@ angular.module("umbraco")
 
             var dialogOptions = $scope.model;
             
-            $scope.disableFolderSelect = dialogOptions.disableFolderSelect;
-            $scope.onlyImages = dialogOptions.onlyImages;
-            $scope.onlyFolders = dialogOptions.onlyFolders;
-            $scope.showDetails = dialogOptions.showDetails;
+            $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
+            $scope.onlyImages = (dialogOptions.onlyImages && dialogOptions.onlyImages !== "0") ? true : false;
+            $scope.onlyFolders = (dialogOptions.onlyFolders && dialogOptions.onlyFolders !== "0") ? true : false;
+            $scope.showDetails = (dialogOptions.showDetails && dialogOptions.showDetails !== "0") ? true : false;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;

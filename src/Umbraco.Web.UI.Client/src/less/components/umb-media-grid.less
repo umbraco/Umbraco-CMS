@@ -27,7 +27,17 @@
 }
 
 .umb-media-grid__item.-unselectable {
-    
+    &::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(230, 230, 230, .5);
+        pointer-events: none;
+    }
 }
 
 .umb-media-grid__item.-selectable {
