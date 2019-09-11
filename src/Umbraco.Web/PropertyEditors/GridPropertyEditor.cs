@@ -8,6 +8,7 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Services;
+using System;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -69,6 +70,15 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
+                var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
+                var mediaParent = config?.MediaParentId;
+                Guid mediaParentId;
+
+                if (mediaParent == null)
+                    mediaParentId = Guid.Empty;
+                else
+                    mediaParentId = mediaParent.Guid;
+
                 // editorValue.Value is a JSON string of the grid
                 var rawJson = editorValue.Value.ToString();
                 var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
@@ -84,8 +94,7 @@ namespace Umbraco.Web.PropertyEditors
                     
                     var userId = Current.UmbracoContext.Security.CurrentUser.Id;
 
-                    // TODO: In future task(get the parent folder from this config) to save the media into
-                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, -1, userId, _mediaService, _contentTypeBaseServiceProvider);
+                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider);
                     rte.Value = parsedHtml;
                 }
 
