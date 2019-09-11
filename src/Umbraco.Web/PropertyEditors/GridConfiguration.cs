@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -20,5 +21,9 @@ namespace Umbraco.Web.PropertyEditors
             "Ignore User Start Nodes", "boolean",
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }
+
+        [ConfigurationField("mediaParentId", "Store Pasted Images Folder", "MediaPicker",
+            Description = "Choose where images dragged or pasted into the editor get uploaded to")]
+        public GuidUdi MediaParentId { get; set; }
     }
 }
