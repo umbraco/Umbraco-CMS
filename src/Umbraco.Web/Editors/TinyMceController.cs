@@ -36,10 +36,8 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            // Backoffice user ID (needed for unique folder path) to help with concurrent users
-            // to avoid filename clash along with UTC current time
-            var userId = Security.CurrentUser.Id;
-            var imageTempPath = IOHelper.MapPath(SystemDirectories.TempImageUploads + "/" + userId + "_" + DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            // Create an unique folder path to help with concurrent users to avoid filename clash
+            var imageTempPath = IOHelper.MapPath(SystemDirectories.TempImageUploads + "/" + Guid.NewGuid().ToString());
 
             // Temp folderpath (Files come in as bodypart & will need to move/saved into imgTempPath
             var folderPath = IOHelper.MapPath(SystemDirectories.TempFileUploads);
