@@ -46,11 +46,13 @@ namespace Umbraco.Tests.Configurations
         [TestCase("~/some-wacky/nestedPath", "/MyVirtualDir/NestedVDir/", "some-wacky-nestedpath")]
         public void Umbraco_Mvc_Area(string path, string rootPath, string outcome)
         {
-            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettingsMock.Setup(x => x.Path).Returns(IOHelper.ResolveUrl(path));
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+
+            var globalSettingsMock = Mock.Get(globalSettings);
+            globalSettingsMock.Setup(x => x.Path).Returns(() => IOHelper.ResolveUrl(path));
 
             SystemDirectories.Root = rootPath;
-            Assert.AreEqual(outcome, Current.Configs.Global().GetUmbracoMvcArea());
+            Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache());
         }
 
         

@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration
     public static class GlobalSettingsExtensions
     {
         private static string _mvcArea;
-        
+
 
         /// <summary>
         /// This returns the string of the MVC Area route.
@@ -29,6 +29,13 @@ namespace Umbraco.Core.Configuration
         {
             if (_mvcArea != null) return _mvcArea;
 
+            _mvcArea = GetUmbracoMvcAreaNoCache(globalSettings);
+
+            return _mvcArea;
+        }
+
+        internal static string GetUmbracoMvcAreaNoCache(this IGlobalSettings globalSettings)
+        {
             if (globalSettings.Path.IsNullOrWhiteSpace())
             {
                 throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
@@ -37,8 +44,8 @@ namespace Umbraco.Core.Configuration
             var path = globalSettings.Path;
             if (path.StartsWith(SystemDirectories.Root)) // beware of TrimStart, see U4-2518
                 path = path.Substring(SystemDirectories.Root.Length);
-            _mvcArea = path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
-            return _mvcArea;
+            return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
         }
+
     }
 }
