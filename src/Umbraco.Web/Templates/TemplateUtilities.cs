@@ -206,29 +206,29 @@ namespace Umbraco.Web.Templates
                 if (string.IsNullOrEmpty(tmpImgPath))
                     continue;
 
-                var absTmpImgPath = IOHelper.MapPath(tmpImgPath);
-                var fileName = Path.GetFileName(absTmpImgPath);
+                var absoluteTempImagePath = IOHelper.MapPath(tmpImgPath);
+                var fileName = Path.GetFileName(absoluteTempImagePath);
                 var safeFileName = fileName.ToSafeFileName();
 
                 var mediaItemName = safeFileName.ToFriendlyName();
-                var f = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
-                var fileInfo = new FileInfo(absTmpImgPath);
+                var mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+                var fileInfo = new FileInfo(absoluteTempImagePath);
 
-                var fs = fileInfo.OpenReadWithRetry();
-                if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
-                using (fs)
+                var fileStream = fileInfo.OpenReadWithRetry();
+                if (fileStream == null) throw new InvalidOperationException("Could not acquire file stream");
+                using (fileStream)
                 {
-                    f.SetValue(contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fs);
+                    mediaFile.SetValue(contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
                 }
 
-                mediaService.Save(f, userId);
+                mediaService.Save(mediaFile, userId);
 
                 // Add the UDI to the img element as new data attribute
-                var udi = f.GetUdi();
+                var udi = mediaFile.GetUdi();
                 img.SetAttributeValue("data-udi", udi.ToString());
 
                 //Get the new persisted image url
-                var mediaTyped = Current.UmbracoHelper.Media(f.Id);
+                var mediaTyped = Current.UmbracoHelper.Media(mediaFile.Id);
                 var location = mediaTyped.Url;
                 img.SetAttributeValue("src", location);
 
