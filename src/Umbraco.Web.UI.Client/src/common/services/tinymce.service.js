@@ -223,6 +223,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         // When its being persisted in RTE property editor
                         // To create a media item & delete this tmp one etc
                         tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
+
+                        // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly 
+                        // same image twice
+                        tinymce.activeEditor.editorUpload.blobCache.removeByUri(imgSrc);
                     });
                 });
             }
