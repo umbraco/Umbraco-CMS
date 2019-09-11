@@ -442,10 +442,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
                         var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
-
-                        var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
-                        editor.dom.setAttrib(imgElm, 'style', s);
-
+                        
+                        editor.dom.setAttrib(imgElm, 'width', newSize.width);
+                        editor.dom.setAttrib(imgElm, 'height', newSize.height);
+                        
                         if (img.url) {
                             var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
                             editor.dom.setAttrib(imgElm, 'data-mce-src', src);
