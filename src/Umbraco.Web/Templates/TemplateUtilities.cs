@@ -20,6 +20,8 @@ namespace Umbraco.Web.Templates
     /// </summary>
     public static class TemplateUtilities
     {
+        const string TemporaryImageDataAttribute = "data-tmpimg";
+
         internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
         {
             using (umbracoContext.ForcedPreview(preview)) // force for url provider
@@ -194,46 +196,46 @@ namespace Umbraco.Web.Templates
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(html);
 
-            var tmpImages = htmlDoc.DocumentNode.SelectNodes("//img[@data-tmpimg]");
+            var tmpImages = htmlDoc.DocumentNode.SelectNodes($"//img[@{TemporaryImageDataAttribute}]");
             if (tmpImages == null || tmpImages.Count == 0)
                 return html;
             
             foreach (var img in tmpImages)
             {
                 // The data attribute contains the path to the tmp img to persist as a media item
-                var tmpImgPath = img.GetAttributeValue("data-tmpimg", string.Empty);
+                var tmpImgPath = img.GetAttributeValue(TemporaryImageDataAttribute, string.Empty);
 
                 if (string.IsNullOrEmpty(tmpImgPath))
                     continue;
 
-                var absTmpImgPath = IOHelper.MapPath(tmpImgPath);
-                var fileName = Path.GetFileName(absTmpImgPath);
+                var absoluteTempImagePath = IOHelper.MapPath(tmpImgPath);
+                var fileName = Path.GetFileName(absoluteTempImagePath);
                 var safeFileName = fileName.ToSafeFileName();
 
                 var mediaItemName = safeFileName.ToFriendlyName();
-                var f = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
-                var fileInfo = new FileInfo(absTmpImgPath);
+                var mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+                var fileInfo = new FileInfo(absoluteTempImagePath);
 
-                var fs = fileInfo.OpenReadWithRetry();
-                if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
-                using (fs)
+                var fileStream = fileInfo.OpenReadWithRetry();
+                if (fileStream == null) throw new InvalidOperationException("Could not acquire file stream");
+                using (fileStream)
                 {
-                    f.SetValue(contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fs);
+                    mediaFile.SetValue(contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
                 }
 
-                mediaService.Save(f, userId);
+                mediaService.Save(mediaFile, userId);
 
                 // Add the UDI to the img element as new data attribute
-                var udi = f.GetUdi();
+                var udi = mediaFile.GetUdi();
                 img.SetAttributeValue("data-udi", udi.ToString());
 
                 //Get the new persisted image url
-                var mediaTyped = Current.UmbracoHelper.Media(f.Id);
+                var mediaTyped = Current.UmbracoHelper.Media(mediaFile.Id);
                 var location = mediaTyped.Url;
                 img.SetAttributeValue("src", location);
 
                 // Remove the data attribute (so we do not re-process this)
-                img.Attributes.Remove("data-tmpimg");
+                img.Attributes.Remove(TemporaryImageDataAttribute);
             }
 
             return htmlDoc.DocumentNode.OuterHtml;
