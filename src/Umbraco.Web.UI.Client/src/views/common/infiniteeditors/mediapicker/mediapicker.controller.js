@@ -2,7 +2,7 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
         function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
-
+            
             if (!$scope.model.title) {
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
                     .then(function (data) {
@@ -14,9 +14,10 @@ angular.module("umbraco")
             }
 
             var dialogOptions = $scope.model;
-
+            
             $scope.disableFolderSelect = dialogOptions.disableFolderSelect;
             $scope.onlyImages = dialogOptions.onlyImages;
+            $scope.onlyFolders = dialogOptions.onlyFolders;
             $scope.showDetails = dialogOptions.showDetails;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
@@ -188,26 +189,25 @@ angular.module("umbraco")
             };
 
             $scope.clickHandler = function (image, event, index) {
+                
                 if (image.isFolder) {
                     if ($scope.disableFolderSelect) {
                         $scope.gotoFolder(image);
                     } else {
-                        eventsService.emit("dialogs.mediaPicker.select", image);
                         selectImage(image);
                     }
                 } else {
-                    eventsService.emit("dialogs.mediaPicker.select", image);
                     if ($scope.showDetails) {
-
+                        
                         $scope.target = image;
-
+                        
                         // handle both entity and full media object
                         if (image.image) {
                             $scope.target.url = image.image;
                         } else {
                             $scope.target.url = mediaHelper.resolveFile(image);
                         }
-
+                        
                         $scope.openDetailsDialog();
                     } else {
                         selectImage(image);
@@ -222,6 +222,9 @@ angular.module("umbraco")
             };
 
             function selectImage(image) {
+                if(!image.selectable) {
+                    return;
+                }
                 if (image.selected) {
                     for (var i = 0; $scope.model.selection.length > i; i++) {
                         var imageInSelection = $scope.model.selection[i];
@@ -234,6 +237,7 @@ angular.module("umbraco")
                     if (!$scope.multiPicker) {
                         deselectAllImages($scope.model.selection);
                     }
+                    eventsService.emit("dialogs.mediaPicker.select", image);
                     image.selected = true;
                     $scope.model.selection.push(image);
                 }
