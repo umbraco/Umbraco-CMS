@@ -232,6 +232,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
         });
     }
+    
+    function cleanupPastedData(plugin, args) {
+        
+        // Remove spans
+        var spanRemoveRegex = new RegExp("<\/?span[^>]*>([^<\/span]*)<\/span([^>]*)", "g");
+        args.content = args.content.replace(spanRemoveRegex,"");
+        
+        // Convert b to strong.
+        args.content = args.content.replace(/<b([^>]*)>([^<\/b]*)<\/b([^>]*)>/g, "<strong$1>$2</strong$3>");
+        
+    }
 
     return {
 
@@ -332,7 +343,38 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     images_replace_blob_uris: false,
                     init_instance_callback: initEvents
                 };
-
+                
+                if (tinyMceConfig.pasteTidying) {
+                    plugins.push("paste");
+                    
+                    // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later.
+                    var validElements = "-b,-strong,-i,-em,span,p,a,table,th,thead,tbody,tr,td,ul,ol,li,dl,dt,dd,iframe,svg,img,hr,abbr,sub,sup,figure,picture";
+                    
+                    // add valid elements from styleFormats.
+                    var style, i = 0;
+                    for(; i < styles.styleFormats.length; i++) {
+                        style = styles.styleFormats[i];
+                        if(style.block) {
+                            validElements += "," + style.block;
+                        }
+                    }
+                    
+                    var pasteConfig = {
+                        
+                        paste_remove_styles: true,
+                        paste_text_linebreaktype: true,
+                        paste_strip_class_attributes: "all",
+                        paste_retain_style_properties: "all",
+                        
+                        paste_word_valid_elements: validElements,
+                        
+                        paste_preprocess: prepaste
+                        
+                    };
+                    
+                    angular.extend(config, cleanupPastedData);
+                }
+                
                 if (tinyMceConfig.customConfig) {
 
                     //if there is some custom config, we need to see if the string value of each item might actually be json and if so, we need to
