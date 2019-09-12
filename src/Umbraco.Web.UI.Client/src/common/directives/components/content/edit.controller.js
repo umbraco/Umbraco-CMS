@@ -21,6 +21,12 @@
         $scope.page.menu.currentSection = appState.getSectionState("currentSection");
         $scope.page.listViewPath = null;
         $scope.page.isNew = $scope.isNew ? true : false;
+
+        if (infiniteMode) {
+            $scope.page.allowInfinitePublishAndClose = $scope.infiniteModel.allowPublishAndClose;
+            $scope.page.allowInfiniteSaveAndClose = $scope.infiniteModel.allowSaveAndClose;
+        }
+
         $scope.page.buttonGroupState = "init";
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
         $scope.page.hideChangeVariant = false;
@@ -56,11 +62,13 @@
         function init() {
 
             var content = $scope.content;
-
             if (content.id && content.isChildOfListView && content.trashed === false) {
-                $scope.page.listViewPath = ($routeParams.page) ?
-                    "/content/content/edit/" + content.parentId + "?page=" + $routeParams.page :
-                    "/content/content/edit/" + content.parentId;
+                $scope.page.listViewPath = "/content/content/edit/" + content.parentId
+                    + "?list=" + $routeParams.list
+                    + "&page=" + $routeParams.page 
+                    + "&filter=" + $routeParams.filter
+                    + "&orderBy=" + $routeParams.orderBy
+                    + "&orderDirection=" + $routeParams.orderDirection;
             }
 
             // we need to check wether an app is present in the current data, if not we will present the default app.
@@ -93,6 +101,10 @@
             if (isAppPresent === false && content.apps.length) {
                 content.apps[0].active = true;
                 $scope.appChanged(content.apps[0]);
+            }
+            // otherwise make sure the save options are up to date with the current content state
+            else {
+                createButtons($scope.content);
             }
 
             editorState.set(content);
@@ -365,12 +377,17 @@
                 saveMethod: args.saveMethod,
                 scope: $scope,
                 content: $scope.content,
+                create: $scope.page.isNew,
                 action: args.action,
                 showNotifications: args.showNotifications,
                 softRedirect: true
             }).then(function (data) {
                 //success
                 init();
+
+                //needs to be manually set for infinite editing mode
+                $scope.page.isNew = false;
+
                 syncTreeNode($scope.content, data.path);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });

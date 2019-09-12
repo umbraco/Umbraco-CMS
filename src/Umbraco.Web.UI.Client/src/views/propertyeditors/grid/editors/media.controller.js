@@ -7,10 +7,16 @@ angular.module("umbraco")
         
         
         if (!$scope.model.config.startNodeId) {
-            userService.getCurrentUser().then(function (userData) {
-                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-            });
+            if ($scope.model.config.ignoreUserStartNodes === true) {
+                $scope.model.config.startNodeId = -1;
+                $scope.model.config.startNodeIsVirtual = true;
+
+            } else {
+                userService.getCurrentUser().then(function (userData) {
+                    $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                    $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                });
+            }
         }
         
         $scope.setImage = function(){
@@ -24,6 +30,7 @@ angular.module("umbraco")
                 showDetails: true,
                 disableFolderSelect: true,
                 onlyImages: true,
+                dataTypeKey: $scope.model.dataTypeKey,
                 submit: function(model) {
                     var selectedImage = model.selection[0];
                    

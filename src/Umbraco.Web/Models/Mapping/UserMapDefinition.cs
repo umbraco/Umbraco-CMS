@@ -179,7 +179,7 @@ namespace Umbraco.Web.Models.Mapping
             target.DefaultPermissions = MapUserGroupDefaultPermissions(source);
 
             if (target.Icon.IsNullOrWhiteSpace())
-                target.Icon = "icon-users";
+                target.Icon = Constants.Icons.UserGroup;
         }
 
         // Umbraco.Code.MapAll -Trashed -Alias -AssignedPermissions
@@ -194,7 +194,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
 
             if (source.NodeObjectType == Constants.ObjectTypes.Member && target.Icon.IsNullOrWhiteSpace())
-                target.Icon = "icon-user";
+                target.Icon = Constants.Icons.Member;
         }
 
         // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications -Udi
@@ -301,7 +301,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache);
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
-            target.EmailHash = source.Email.ToLowerInvariant().Trim().ToMd5();
+            target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
             target.Id = source.Id;
             target.Key = source.Key;
             target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?) source.LastLoginDate;
@@ -350,7 +350,7 @@ namespace Umbraco.Web.Models.Mapping
                 target.ContentStartNode = CreateRootNode(_textService.Localize("content/contentRoot"));
 
             if (target.Icon.IsNullOrWhiteSpace())
-                target.Icon = "icon-users";
+                target.Icon = Constants.Icons.UserGroup;
         }
 
         private IDictionary<string, IEnumerable<Permission>> MapUserGroupDefaultPermissions(IUserGroup source)

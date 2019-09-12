@@ -4,13 +4,17 @@ angular.module("umbraco.directives")
             scope: {
                 uniqueId: '=',
                 value: '=',
-                configuration: "="
+                configuration: "=", //this is the RTE configuration
+                datatypeKey: '@',
+                ignoreUserStartNodes: '@'
             },
             templateUrl: 'views/components/grid/grid-rte.html',
             replace: true,
             link: function (scope, element, attrs) {
 
                 // TODO: A lot of the code below should be shared between the grid rte and the normal rte
+
+                scope.isLoading = true;
 
                 var promises = [];
                 
@@ -34,6 +38,14 @@ angular.module("umbraco.directives")
                 if (!scope.configuration.maxImageSize && scope.configuration.maxImageSize !== 0) {
                     editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
                 }
+
+                //ensure the grid's global config is being passed up to the RTE, these 2 properties need to be in this format
+                //since below we are just passing up `scope` as the actual model and for 2 way binding to work with `value` that
+                //is the way it needs to be unless we start adding watchers. We'll just go with this for now but it's super ugly.
+                scope.config = {
+                    ignoreUserStartNodes: scope.ignoreUserStartNodes === "true"
+                }
+                scope.dataTypeKey = scope.datatypeKey; //Yes - this casing is rediculous, but it's because the var starts with `data` so it can't be `data-type-id` :/
 
                 //stores a reference to the editor
                 var tinyMceEditor = null;
@@ -80,6 +92,10 @@ angular.module("umbraco.directives")
 
                         //custom initialization for this editor within the grid
                         editor.on('init', function (e) {
+
+                            // Used this init event - as opposed to property init_instance_callback
+                            // to turn off the loader
+                            scope.isLoading = false;
 
                             //force overflow to hidden to prevent no needed scroll
                             editor.getBody().style.overflow = "hidden";

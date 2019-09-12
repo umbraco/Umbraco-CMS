@@ -79,12 +79,16 @@ namespace Umbraco.Tests.PublishedContent
                 _contentTypeVariant
             };
 
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            Mock.Get(contentTypeService).Setup(x => x.GetAll()).Returns(contentTypes);
-            Mock.Get(contentTypeService).Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
+            var contentTypeService = new Mock<IContentTypeService>();
+            contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
+            contentTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
 
-            var contentTypeServiceBaseFactory = Mock.Of<IContentTypeBaseServiceProvider>();
-            Mock.Get(contentTypeServiceBaseFactory).Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService);
+            var mediaTypeService = new Mock<IMediaTypeService>();
+            mediaTypeService.Setup(x => x.GetAll()).Returns(Enumerable.Empty<IMediaType>());
+            mediaTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(Enumerable.Empty<IMediaType>());
+
+            var contentTypeServiceBaseFactory = new Mock<IContentTypeBaseServiceProvider>();
+            contentTypeServiceBaseFactory.Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService.Object);
 
             var dataTypeService = Mock.Of<IDataTypeService>();
             Mock.Get(dataTypeService).Setup(x => x.GetAll()).Returns(dataTypes);
@@ -94,8 +98,10 @@ namespace Umbraco.Tests.PublishedContent
                 dataTypeService: dataTypeService,
                 memberTypeService: Mock.Of<IMemberTypeService>(),
                 memberService: Mock.Of<IMemberService>(),
-                contentTypeService: contentTypeService,
-                localizationService: Mock.Of<ILocalizationService>()
+                contentTypeService: contentTypeService.Object,
+                mediaTypeService: mediaTypeService.Object,
+                localizationService: Mock.Of<ILocalizationService>(),
+                domainService: Mock.Of<IDomainService>()
             );
 
             // create a scope provider
@@ -124,7 +130,7 @@ namespace Umbraco.Tests.PublishedContent
             _source = new TestDataSource(kits);
 
             // at last, create the complete NuCache snapshot service!
-            var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
+            var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
                 null,
                 runtime,
@@ -133,7 +139,7 @@ namespace Umbraco.Tests.PublishedContent
                 null,
                 _snapshotAccessor,
                 _variationAccesor,
-                Mock.Of<ILogger>(),
+                Mock.Of<IProfilingLogger>(),
                 scopeProvider,
                 Mock.Of<IDocumentRepository>(),
                 Mock.Of<IMediaRepository>(),
@@ -151,57 +157,142 @@ namespace Umbraco.Tests.PublishedContent
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
 
+        private IEnumerable<ContentNodeKit> GetNestedVariantKits()
+        {
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+            //1x variant (root)
+            yield return CreateVariantKit(1, -1, 1, paths);
+            
+            //1x invariant under root
+            yield return CreateInvariantKit(4, 1, 1, paths);
+
+            //1x variant under root
+            yield return CreateVariantKit(7, 1, 4, paths);
+
+            //2x mixed under invariant
+            yield return CreateVariantKit(10, 4, 1, paths);
+            yield return CreateInvariantKit(11, 4, 2, paths);
+
+            //2x mixed under variant
+            yield return CreateVariantKit(12, 7, 1, paths);
+            yield return CreateInvariantKit(13, 7, 2, paths);
+        }
+
         private IEnumerable<ContentNodeKit> GetInvariantKits()
         {
             var paths = new Dictionary<int, string> { { -1, "-1" } };
 
-            ContentNodeKit CreateKit(int id, int parentId, int sortOrder)
+            yield return CreateInvariantKit(1, -1, 1, paths);
+            yield return CreateInvariantKit(2, -1, 2, paths);
+            yield return CreateInvariantKit(3, -1, 3, paths);
+
+            yield return CreateInvariantKit(4, 1, 1, paths);
+            yield return CreateInvariantKit(5, 1, 2, paths);
+            yield return CreateInvariantKit(6, 1, 3, paths);
+
+            yield return CreateInvariantKit(7, 2, 3, paths);
+            yield return CreateInvariantKit(8, 2, 2, paths);
+            yield return CreateInvariantKit(9, 2, 1, paths);
+
+            yield return CreateInvariantKit(10, 3, 1, paths);
+
+            yield return CreateInvariantKit(11, 4, 1, paths);
+            yield return CreateInvariantKit(12, 4, 2, paths);
+        }
+
+        private ContentNodeKit CreateInvariantKit(int id, int parentId, int sortOrder, Dictionary<int, string> paths)
+        {
+            if (!paths.TryGetValue(parentId, out var parentPath))
+                throw new Exception("Unknown parent.");
+
+            var path = paths[id] = parentPath + "," + id;
+            var level = path.Count(x => x == ',');
+            var now = DateTime.Now;
+
+            return new ContentNodeKit
             {
-                if (!paths.TryGetValue(parentId, out var parentPath))
-                    throw new Exception("Unknown parent.");
-
-                var path = paths[id] = parentPath + "," + id;
-                var level = path.Count(x => x == ',');
-                var now = DateTime.Now;
-
-                return new ContentNodeKit
+                ContentTypeId = _contentTypeInvariant.Id,
+                Node = new ContentNode(id, Guid.NewGuid(), level, path, sortOrder, parentId, DateTime.Now, 0),
+                DraftData = null,
+                PublishedData = new ContentData
                 {
-                    ContentTypeId = _contentTypeInvariant.Id,
-                    Node = new ContentNode(id, Guid.NewGuid(), level, path, sortOrder, parentId, DateTime.Now, 0),
-                    DraftData = null,
-                    PublishedData = new ContentData
-                    {
-                        Name = "N" + id,
-                        Published = true,
-                        TemplateId = 0,
-                        VersionId = 1,
-                        VersionDate = now,
-                        WriterId = 0,
-                        Properties = new Dictionary<string, PropertyData[]>(),
-                        CultureInfos = new Dictionary<string, CultureVariation>()
-                    }
-                };
-            }
-
-            yield return CreateKit(1, -1, 1);
-            yield return CreateKit(2, -1, 2);
-            yield return CreateKit(3, -1, 3);
-
-            yield return CreateKit(4, 1, 1);
-            yield return CreateKit(5, 1, 2);
-            yield return CreateKit(6, 1, 3);
-
-            yield return CreateKit(7, 2, 3);
-            yield return CreateKit(8, 2, 2);
-            yield return CreateKit(9, 2, 1);
-
-            yield return CreateKit(10, 3, 1);
-
-            yield return CreateKit(11, 4, 1);
-            yield return CreateKit(12, 4, 2);
+                    Name = "N" + id,
+                    Published = true,
+                    TemplateId = 0,
+                    VersionId = 1,
+                    VersionDate = now,
+                    WriterId = 0,
+                    Properties = new Dictionary<string, PropertyData[]>(),
+                    CultureInfos = new Dictionary<string, CultureVariation>()
+                }
+            };
         }
 
         private IEnumerable<ContentNodeKit> GetVariantKits()
+        {
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+            yield return CreateVariantKit(1, -1, 1, paths);
+            yield return CreateVariantKit(2, -1, 2, paths);
+            yield return CreateVariantKit(3, -1, 3, paths);
+
+            yield return CreateVariantKit(4, 1, 1, paths);
+            yield return CreateVariantKit(5, 1, 2, paths);
+            yield return CreateVariantKit(6, 1, 3, paths);
+
+            yield return CreateVariantKit(7, 2, 3, paths);
+            yield return CreateVariantKit(8, 2, 2, paths);
+            yield return CreateVariantKit(9, 2, 1, paths);
+
+            yield return CreateVariantKit(10, 3, 1, paths);
+
+            yield return CreateVariantKit(11, 4, 1, paths);
+            yield return CreateVariantKit(12, 4, 2, paths);
+        }
+
+        private static Dictionary<string, CultureVariation> GetCultureInfos(int id, DateTime now)
+        {
+            var en = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            var fr = new[] { 1, 3, 4, 6, 7, 9, 10, 12 };
+
+            var infos = new Dictionary<string, CultureVariation>();
+            if (en.Contains(id))
+                infos["en-US"] = new CultureVariation { Name = "N" + id + "-" + "en-US", Date = now, IsDraft = false };
+            if (fr.Contains(id))
+                infos["fr-FR"] = new CultureVariation { Name = "N" + id + "-" + "fr-FR", Date = now, IsDraft = false };
+            return infos;
+        }
+
+        private ContentNodeKit CreateVariantKit(int id, int parentId, int sortOrder, Dictionary<int, string> paths)
+        {
+            if (!paths.TryGetValue(parentId, out var parentPath))
+                throw new Exception("Unknown parent.");
+
+            var path = paths[id] = parentPath + "," + id;
+            var level = path.Count(x => x == ',');
+            var now = DateTime.Now;
+
+            return new ContentNodeKit
+            {
+                ContentTypeId = _contentTypeVariant.Id,
+                Node = new ContentNode(id, Guid.NewGuid(), level, path, sortOrder, parentId, DateTime.Now, 0),
+                DraftData = null,
+                PublishedData = new ContentData
+                {
+                    Name = "N" + id,
+                    Published = true,
+                    TemplateId = 0,
+                    VersionId = 1,
+                    VersionDate = now,
+                    WriterId = 0,
+                    Properties = new Dictionary<string, PropertyData[]>(),
+                    CultureInfos = GetCultureInfos(id, now)
+                }
+            };
+        }
+
+        private IEnumerable<ContentNodeKit> GetVariantWithDraftKits()
         {
             var paths = new Dictionary<int, string> { { -1, "-1" } };
 
@@ -227,22 +318,27 @@ namespace Umbraco.Tests.PublishedContent
                 var level = path.Count(x => x == ',');
                 var now = DateTime.Now;
 
+                ContentData CreateContentData(bool published) => new ContentData
+                {
+                    Name = "N" + id,
+                    Published = published,
+                    TemplateId = 0,
+                    VersionId = 1,
+                    VersionDate = now,
+                    WriterId = 0,
+                    Properties = new Dictionary<string, PropertyData[]>(),
+                    CultureInfos = GetCultureInfos(id, now)
+                };
+
+                var withDraft = id%2==0;
+                var withPublished = !withDraft;
+
                 return new ContentNodeKit
                 {
                     ContentTypeId = _contentTypeVariant.Id,
                     Node = new ContentNode(id, Guid.NewGuid(), level, path, sortOrder, parentId, DateTime.Now, 0),
-                    DraftData = null,
-                    PublishedData = new ContentData
-                    {
-                        Name = "N" + id,
-                        Published = true,
-                        TemplateId = 0,
-                        VersionId = 1,
-                        VersionDate = now,
-                        WriterId = 0,
-                        Properties = new Dictionary<string, PropertyData[]>(),
-                        CultureInfos = GetCultureInfos(id, now)
-                    }
+                    DraftData = withDraft ? CreateContentData(false) : null,
+                    PublishedData = withPublished ? CreateContentData(true) : null
                 };
             }
 
@@ -593,6 +689,96 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        public void NestedVariationChildrenTest()
+        {
+            var mixedKits = GetNestedVariantKits();
+            Init(mixedKits);
+
+            var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
+            _snapshotAccessor.PublishedSnapshot = snapshot;
+
+            //TEST with en-us variation context
+
+            _variationAccesor.VariationContext = new VariationContext("en-US");
+
+            var documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1-en-US");
+
+            documents = snapshot.Content.GetById(1).Children().ToArray();
+            AssertDocuments(documents, "N4", "N7-en-US");
+
+            //Get the invariant and list children, there's a variation context so it should return invariant AND en-us variants
+            documents = snapshot.Content.GetById(4).Children().ToArray();
+            AssertDocuments(documents, "N10-en-US", "N11");
+
+            //Get the variant and list children, there's a variation context so it should return invariant AND en-us variants
+            documents = snapshot.Content.GetById(7).Children().ToArray();
+            AssertDocuments(documents, "N12-en-US", "N13");
+
+            //TEST with fr-fr variation context
+
+            _variationAccesor.VariationContext = new VariationContext("fr-FR");
+
+            documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1-fr-FR");
+
+            documents = snapshot.Content.GetById(1).Children().ToArray();
+            AssertDocuments(documents, "N4", "N7-fr-FR");
+
+            //Get the invariant and list children, there's a variation context so it should return invariant AND en-us variants
+            documents = snapshot.Content.GetById(4).Children().ToArray();
+            AssertDocuments(documents, "N10-fr-FR", "N11");
+
+            //Get the variant and list children, there's a variation context so it should return invariant AND en-us variants
+            documents = snapshot.Content.GetById(7).Children().ToArray();
+            AssertDocuments(documents, "N12-fr-FR", "N13");
+
+            //TEST specific cultures
+
+            documents = snapshot.Content.GetAtRoot("fr-FR").ToArray();
+            AssertDocuments(documents, "N1-fr-FR");
+
+            documents = snapshot.Content.GetById(1).Children("fr-FR").ToArray();
+            AssertDocuments(documents, "N4", "N7-fr-FR"); //NOTE: Returns invariant, this is expected
+            documents = snapshot.Content.GetById(1).Children("").ToArray();
+            AssertDocuments(documents, "N4"); //Only returns invariant since that is what was requested
+
+            documents = snapshot.Content.GetById(4).Children("fr-FR").ToArray();
+            AssertDocuments(documents, "N10-fr-FR", "N11"); //NOTE: Returns invariant, this is expected
+            documents = snapshot.Content.GetById(4).Children("").ToArray();
+            AssertDocuments(documents, "N11"); //Only returns invariant since that is what was requested
+
+            documents = snapshot.Content.GetById(7).Children("fr-FR").ToArray();
+            AssertDocuments(documents, "N12-fr-FR", "N13"); //NOTE: Returns invariant, this is expected
+            documents = snapshot.Content.GetById(7).Children("").ToArray();
+            AssertDocuments(documents, "N13"); //Only returns invariant since that is what was requested
+
+            //TEST without variation context
+            // This will actually convert the culture to "" which will be invariant since that's all it will know how to do
+            // This will return a NULL name for culture specific entities because there is no variation context
+
+            _variationAccesor.VariationContext = null;
+
+            documents = snapshot.Content.GetAtRoot().ToArray();
+            //will return nothing because there's only variant at root
+            Assert.AreEqual(0, documents.Length);
+            //so we'll continue to getting the known variant, do not fully assert this because the Name will NULL
+            documents = snapshot.Content.GetAtRoot("fr-FR").ToArray();
+            Assert.AreEqual(1, documents.Length);
+
+            documents = snapshot.Content.GetById(1).Children().ToArray();
+            AssertDocuments(documents, "N4");
+
+            //Get the invariant and list children
+            documents = snapshot.Content.GetById(4).Children().ToArray();
+            AssertDocuments(documents, "N11");
+
+            //Get the variant and list children
+            documents = snapshot.Content.GetById(7).Children().ToArray();
+            AssertDocuments(documents, "N13");
+        }
+
+        [Test]
         public void VariantChildrenTest()
         {
             Init(GetVariantKits());
@@ -745,6 +931,25 @@ namespace Umbraco.Tests.PublishedContent
 
             documents = snapshot.Content.GetById(2).Children().ToArray();
             AssertDocuments(documents, "N9", "N8", "N7");
+        }
+
+        [Test]
+        public void AtRootTest()
+        {
+            Init(GetVariantWithDraftKits());
+
+            var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
+            _snapshotAccessor.PublishedSnapshot = snapshot;
+
+            _variationAccesor.VariationContext = new VariationContext("en-US");
+
+            // N2 is draft only
+
+            var documents = snapshot.Content.GetAtRoot().ToArray();
+            AssertDocuments(documents, "N1-en-US", /*"N2-en-US",*/ "N3-en-US");
+
+            documents = snapshot.Content.GetAtRoot(true).ToArray();
+            AssertDocuments(documents, "N1-en-US", "N2-en-US", "N3-en-US");
         }
 
         private void AssertDocuments(IPublishedContent[] documents, params string[] names)

@@ -24,6 +24,7 @@
         vm.showLayoutSelector = true;
         vm.pickLayout = pickLayout;
         vm.toggleLayoutDropdown = toggleLayoutDropdown;
+        vm.leaveLayoutDropdown = leaveLayoutDropdown;
         vm.closeLayoutDropdown = closeLayoutDropdown;
 
         function onInit() {
@@ -36,6 +37,10 @@
 
         function toggleLayoutDropdown() {
             vm.layoutDropDownIsOpen = !vm.layoutDropDownIsOpen;
+        }
+
+        function leaveLayoutDropdown() {
+            vm.layoutDropDownIsOpen = false;
         }
 
         function pickLayout(selectedLayout) {
