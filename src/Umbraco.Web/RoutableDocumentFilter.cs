@@ -86,7 +86,6 @@ namespace Umbraco.Web
         /// <summary>
         /// Determines whether the specified URL is reserved or is inside a reserved path.
         /// </summary>
-        /// <param name="globalSettings"></param>
         /// <param name="url">The URL to check.</param>
         /// <returns>
         ///     <c>true</c> if the specified URL is reserved; otherwise, <c>false</c>.
