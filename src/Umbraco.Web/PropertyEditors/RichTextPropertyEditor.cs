@@ -27,6 +27,7 @@ namespace Umbraco.Web.PropertyEditors
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private IUmbracoContextAccessor _umbracoContextAccessor;
+        private ILogger _logger;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
@@ -36,13 +37,14 @@ namespace Umbraco.Web.PropertyEditors
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _logger = logger;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
@@ -56,13 +58,15 @@ namespace Umbraco.Web.PropertyEditors
             private IMediaService _mediaService;
             private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
             private IUmbracoContextAccessor _umbracoContextAccessor;
+            private ILogger _logger;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
                 : base(attribute)
             {
                 _mediaService = mediaService;
                 _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
                 _umbracoContextAccessor = umbracoContextAccessor;
+                _logger = logger;
             }
 
             /// <inheritdoc />
@@ -116,7 +120,7 @@ namespace Umbraco.Web.PropertyEditors
                 var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? -1;
 
                 // TODO: In future task(get the parent folder from this config) to save the media into
-                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider);
+                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                 return parsed;
             }
         }

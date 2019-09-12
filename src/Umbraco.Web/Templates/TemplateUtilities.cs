@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
@@ -188,7 +189,7 @@ namespace Umbraco.Web.Templates
             // see comment in ResolveMediaFromTextString for group reference
             => ResolveImgPattern.Replace(text, "$1$3$4$5");
 
-        internal static string FindAndPersistPastedTempImages(string html, int mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        internal static string FindAndPersistPastedTempImages(string html, int mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ILogger logger)
         {
             // Find all img's that has data-tmpimg attribute
             // Use HTML Agility Pack - https://html-agility-pack.net
@@ -247,7 +248,7 @@ namespace Umbraco.Web.Templates
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error(typeof(TemplateUtilities), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+                    logger.Error(typeof(TemplateUtilities), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
                 }
                 
             }

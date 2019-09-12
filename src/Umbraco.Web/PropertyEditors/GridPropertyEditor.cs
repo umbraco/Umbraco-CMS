@@ -26,6 +26,7 @@ namespace Umbraco.Web.PropertyEditors
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private IUmbracoContextAccessor _umbracoContextAccessor;
+        private ILogger _logger;
 
         public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
             : base(logger)
@@ -33,6 +34,7 @@ namespace Umbraco.Web.PropertyEditors
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _logger = logger;
         }
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
@@ -41,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
@@ -50,13 +52,15 @@ namespace Umbraco.Web.PropertyEditors
             private IMediaService _mediaService;
             private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
             private IUmbracoContextAccessor _umbracoContextAccessor;
+            private ILogger _logger;
 
-            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
+            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
                 : base(attribute)
             {
                 _mediaService = mediaService;
                 _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
                 _umbracoContextAccessor = umbracoContextAccessor;
+                _logger = logger;
             }
 
             /// <summary>
@@ -88,7 +92,7 @@ namespace Umbraco.Web.PropertyEditors
                     var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? -1;
 
                     // TODO: In future task(get the parent folder from this config) to save the media into
-                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider);
+                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                     rte.Value = parsedHtml;
                 }
 
