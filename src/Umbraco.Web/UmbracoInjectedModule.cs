@@ -113,7 +113,7 @@ namespace Umbraco.Web
 
                 if (sender.IsDocumentRequest(_routableDocumentLookup) && _backgroundNotifier.Wait())
                 {
-                    _logger.Debug<UmbracoModule>("Request was suspended while waiting for background cache notifications to complete");
+                    _logger.Debug<UmbracoModule>("Request was suspended while waiting for background cache notifications to complete {RequestUrl}", umbracoContext.CleanedUmbracoUrl);
                 }
             };
         }
