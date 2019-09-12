@@ -35,7 +35,6 @@ namespace Umbraco.Web.Editors
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
         }
 
-        [UmbracoApplicationAuthorize(Constants.Applications.Content)]
         [HttpPost]
         public async Task<HttpResponseMessage> UploadImage()
         {
