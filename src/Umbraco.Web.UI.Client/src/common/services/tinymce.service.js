@@ -6,7 +6,8 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource) {
+function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
+    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -156,6 +157,82 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
     }
 
+    function uploadImageHandler(blobInfo, success, failure, progress){
+        let xhr, formData;
+
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
+
+        xhr.upload.onprogress = function (e) {
+            progress(e.loaded / e.total * 100);
+        };
+
+        xhr.onerror = function () {
+            failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+        };
+
+        xhr.onload = function () {
+            let json;
+
+            if (xhr.status < 200 || xhr.status >= 300) {
+                failure('HTTP Error: ' + xhr.status);
+                return;
+            }
+
+            json = JSON.parse(xhr.responseText);
+
+            if (!json || typeof json.tmpLocation !== 'string') {
+                failure('Invalid JSON: ' + xhr.responseText);
+                return;
+            }
+
+            // Put temp location into localstorage (used to update the img with data-tmpimg later on)
+            localStorage.setItem(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
+
+            // We set the img src url to be the same as we started
+            // The Blob URI is stored in TinyMce's cache
+            // so the img still shows in the editor
+            success(blobInfo.blobUri());
+        };
+
+        formData = new FormData();
+        formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+
+        xhr.send(formData);
+    }
+
+    function initEvents(editor){
+
+        editor.on('SetContent', function (e) {
+            var content = e.content;
+
+            // Upload BLOB images (dragged/pasted ones)
+            if(content.indexOf('<img src="blob:') > -1){
+
+                editor.uploadImages(function(data) {
+                    // Once all images have been uploaded
+                    data.forEach(function(item) {
+                        // Select img element
+                        var img = item.element;
+
+                        // Get img src
+                        var imgSrc = img.getAttribute("src");
+                        var tmpLocation = localStorage.getItem(`tinymce__${imgSrc}`);
+
+                        // Select the img & add new attr which we can search for
+                        // When its being persisted in RTE property editor
+                        // To create a media item & delete this tmp one etc
+                        tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
+
+                        // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly 
+                        // same image twice
+                        tinymce.activeEditor.editorUpload.blobCache.removeByUri(imgSrc);
+                    });
+                });
+            }
+        });
+    }
+
     return {
 
         /**
@@ -238,7 +315,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     insert_toolbar: toolbars.insertToolbar,
                     selection_toolbar: toolbars.selectionToolbar,
 
-                    body_class: 'umb-rte',
+                    body_class: "umb-rte",
 
                     //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
                     cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster,
@@ -248,7 +325,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     content_style: ".mce-content-body .umb-macro-holder { border: 3px dotted #f5c1bc; padding: 7px; display: block; margin: 3px; } .umb-rte .mce-content-body .umb-macro-holder.loading {background: url(assets/img/loader.gif) right no-repeat; background-size: 18px; background-position-x: 99%;}",
 
                     // This allows images to be pasted in & stored as Base64 until they get uploaded to server
-                    paste_data_images: true
+                    paste_data_images: true,
+
+                    images_upload_handler: uploadImageHandler,
+                    automatic_uploads: false,
+                    images_replace_blob_uris: false,
+                    init_instance_callback: initEvents
                 };
 
                 if (tinyMceConfig.customConfig) {
@@ -285,7 +367,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     angular.extend(config, tinyMceConfig.customConfig);
                 }
-
 
                 return $q.when(config);
 
@@ -389,7 +470,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
-                stateSelector: 'img',
+                stateSelector: 'img[data-udi]',
                 onclick: function () {
 
 
@@ -433,7 +514,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     id: '__mcenew',
                     'data-udi': img.udi
                 };
-                
+
                 editor.selection.setContent(editor.dom.createHTML('img', data));
 
                 $timeout(function () {
@@ -452,9 +533,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
                     }
 				    editor.dom.setAttrib(imgElm, 'id', null);
-                    
+
                     editor.fire('Change');
-                    
+
                 }, 500);
             }
         },
@@ -526,7 +607,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 onPostRender: function () {
 
                     let ctrl = this;
-                    
+
 					/**
 					 * Check if the macro is currently selected and toggle the menu button
 					 */
@@ -1139,7 +1220,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     };
                     editorService.linkPicker(linkPicker);
                 });
-             
+
             });
 
             //Create the insert media plugin

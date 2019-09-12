@@ -1,8 +1,11 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -17,6 +20,8 @@ namespace Umbraco.Web.Templates
     /// </summary>
     public static class TemplateUtilities
     {
+        const string TemporaryImageDataAttribute = "data-tmpimg";
+
         internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
         {
             using (umbracoContext.ForcedPreview(preview)) // force for url provider
@@ -183,5 +188,57 @@ namespace Umbraco.Web.Templates
         internal static string RemoveMediaUrlsFromTextString(string text)
             // see comment in ResolveMediaFromTextString for group reference
             => ResolveImgPattern.Replace(text, "$1$3$4$5");
+
+        internal static string FindAndPersistPastedTempImages(string html, int mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        {
+            // Find all img's that has data-tmpimg attribute
+            // Use HTML Agility Pack - https://html-agility-pack.net
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(html);
+
+            var tmpImages = htmlDoc.DocumentNode.SelectNodes($"//img[@{TemporaryImageDataAttribute}]");
+            if (tmpImages == null || tmpImages.Count == 0)
+                return html;
+            
+            foreach (var img in tmpImages)
+            {
+                // The data attribute contains the path to the tmp img to persist as a media item
+                var tmpImgPath = img.GetAttributeValue(TemporaryImageDataAttribute, string.Empty);
+
+                if (string.IsNullOrEmpty(tmpImgPath))
+                    continue;
+
+                var absoluteTempImagePath = IOHelper.MapPath(tmpImgPath);
+                var fileName = Path.GetFileName(absoluteTempImagePath);
+                var safeFileName = fileName.ToSafeFileName();
+
+                var mediaItemName = safeFileName.ToFriendlyName();
+                var mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+                var fileInfo = new FileInfo(absoluteTempImagePath);
+
+                var fileStream = fileInfo.OpenReadWithRetry();
+                if (fileStream == null) throw new InvalidOperationException("Could not acquire file stream");
+                using (fileStream)
+                {
+                    mediaFile.SetValue(contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
+                }
+
+                mediaService.Save(mediaFile, userId);
+
+                // Add the UDI to the img element as new data attribute
+                var udi = mediaFile.GetUdi();
+                img.SetAttributeValue("data-udi", udi.ToString());
+
+                //Get the new persisted image url
+                var mediaTyped = Current.UmbracoHelper.Media(mediaFile.Id);
+                var location = mediaTyped.Url;
+                img.SetAttributeValue("src", location);
+
+                // Remove the data attribute (so we do not re-process this)
+                img.Attributes.Remove(TemporaryImageDataAttribute);
+            }
+
+            return htmlDoc.DocumentNode.OuterHtml;
+        }
     }
 }
