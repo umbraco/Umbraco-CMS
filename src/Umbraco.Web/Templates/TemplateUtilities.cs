@@ -252,24 +252,6 @@ namespace Umbraco.Web.Templates
                 
             }
 
-            // Now remove all old files so that the temp folder(s) never grow
-            // Anything older than one day gets deleted
-            var files = Directory.GetFiles(SystemDirectories.TempFileUploads, "*", SearchOption.AllDirectories);
-            foreach (var file in files)
-            {
-                if (DateTime.UtcNow - File.GetLastWriteTimeUtc(file) > TimeSpan.FromDays(1))
-                {
-                    try
-                    {
-                        File.Delete(file);
-                    }
-                    catch (Exception ex)
-                    {
-                        Current.Logger.Error(typeof(TemplateUtilities), ex, "Could not delete temp file {FileName}", file);
-                    }
-                }
-            }
-
             return htmlDoc.DocumentNode.OuterHtml;
         }
     }
