@@ -33,10 +33,6 @@ namespace Umbraco.Web.Cache
         {
             _publishedModelFactory = publishedModelFactory;
             _publishedSnapshotService = publishedSnapshotService;
-
-            // TODO: We have the option to check if we are in live mode and only run on a background thread if that is the case, else run normally?
-            // IMO I think we should just always run on a background thread, then no matter what state the app is in, it's always doing a consistent operation.
-
             _runner = new BackgroundTaskRunner<IBackgroundTask>("RebuildModelsAndCache", logger);
         }
 
