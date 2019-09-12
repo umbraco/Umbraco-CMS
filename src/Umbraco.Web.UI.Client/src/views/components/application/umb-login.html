@@ -162,24 +162,26 @@
                             </div>
                             <div class="control-group" ng-class="{error: vm.loginForm.username.$invalid}">
                                 <label>{{vm.labels.usernameLabel}}</label>
-                                        <input type="text" ng-model="vm.login" name="username" class="-full-width-input" required val-server-field="value" placeholder="{{vm.labels.usernamePlaceholder}}" focus-when="{{vm.view === 'login'}}" aria-required="true" aria-invalid="false" />
-                                        <div ng-messages="vm.loginForm.username.$error" show-validation-on-submit aria-live="assertive">
-<p class="help-inline" ng-message="required"  tabindex="0">{{vm.labels.usernameError}}</p>
+                                <input type="text" ng-model="vm.login" name="username" class="-full-width-input" required val-server-field="value" placeholder="{{vm.labels.usernamePlaceholder}}" focus-when="{{vm.view === 'login'}}" aria-required="true" aria-invalid="false" />
+
+                                <div ng-messages="vm.loginForm.username.$error" class="mb3" show-validation-on-submit aria-live="assertive">
+                                    <span class="help-inline" ng-message="required"  tabindex="0">{{vm.labels.usernameError}}</span>
                                 </div>
                             </div>
-
 
                             <div class="control-group" ng-class="{error: vm.loginForm.password.$invalid}">
                                 <label><localize key="general_password">Password</localize></label>
                                 <input type="password" ng-model="vm.password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" aria-required="true" required val-server-field="value" aria-invalid="false"/>
-                                <div ng-messages="vm.loginForm.password.$error" show-validation-on-submit aria-live="assertive">
-                                    <p class="help-inline" ng-message="required" tabindex="0">{{vm.labels.passwordError}}</p>
-                                </div>
-                                <div class="password-toggle">
-                                    <a href="#" prevent-default ng-click="vm.togglePassword()">
-                                        <span class="password-text show"><localize key="login_showPassword">Show password</localize></span>
-                                        <span class="password-text hide"><localize key="login_hidePassword">Hide password</localize></span>
-                                    </a>
+                                <div class="flex justify-between items-start">
+                                    <div ng-messages="vm.loginForm.password.$error" class="mb3" show-validation-on-submit aria-live="assertive">
+                                        <span class="help-inline" ng-message="required" tabindex="0" style="vertical-align: unset;">{{vm.labels.passwordError}}</span>
+                                    </div>
+                                    <div class="password-toggle">
+                                        <a href="#" prevent-default ng-click="vm.togglePassword()">
+                                            <span class="password-text show"><localize key="login_showPassword">Show password</localize></span>
+                                            <span class="password-text hide"><localize key="login_hidePassword">Hide password</localize></span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
