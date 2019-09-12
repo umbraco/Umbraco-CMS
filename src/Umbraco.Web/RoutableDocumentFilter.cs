@@ -27,7 +27,7 @@ namespace Umbraco.Web
             _globalSettings = globalSettings;
         }
 
-        private static readonly ConcurrentDictionary<string, bool> _routeChecks = new ConcurrentDictionary<string, bool>();
+        private static readonly ConcurrentDictionary<string, bool> RouteChecks = new ConcurrentDictionary<string, bool>();
         private readonly IGlobalSettings _globalSettings;
         private object _locker = new object();
         private bool _isInit = false;
@@ -179,13 +179,18 @@ namespace Umbraco.Web
                     _routeCount = routes.Count;
 
                     //try clearing each entry
-                    foreach(var r in _routeChecks.Keys.ToList())
-                        _routeChecks.TryRemove(r, out _);
+                    foreach(var r in RouteChecks.Keys.ToList())
+                        RouteChecks.TryRemove(r, out _);
                 }
             }
 
+            var absPath = httpContext?.Request?.Url.AbsolutePath;
+
+            if (absPath.IsNullOrWhiteSpace())
+                return false;
+
             //check if the current request matches a route, if so then it is reserved.
-            var hasRoute = _routeChecks.GetOrAdd(httpContext.Request.Url.AbsolutePath, x => routes.GetRouteData(httpContext) != null);
+            var hasRoute = RouteChecks.GetOrAdd(absPath, x => routes.GetRouteData(httpContext) != null);
             if (hasRoute)
                 return true;
 
