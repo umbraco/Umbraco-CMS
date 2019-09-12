@@ -150,7 +150,6 @@ namespace Umbraco.Web
         /// Determines whether the current request is reserved based on the route table and
         /// whether the specified URL is reserved or is inside a reserved path.
         /// </summary>
-        /// <param name="globalSettings"></param>
         /// <param name="url"></param>
         /// <param name="httpContext"></param>
         /// <param name="routes">The route collection to lookup the request in</param>
