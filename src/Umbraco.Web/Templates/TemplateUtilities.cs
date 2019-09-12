@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
@@ -236,6 +235,39 @@ namespace Umbraco.Web.Templates
 
                 // Remove the data attribute (so we do not re-process this)
                 img.Attributes.Remove(TemporaryImageDataAttribute);
+
+                // Delete folder & image now its saved in media
+                // The folder should contain one image - as a unique guid folder created
+                // for each image uploaded from TinyMceController
+                var folderName = Path.GetDirectoryName(absoluteTempImagePath);
+                try
+                {
+                    File.Delete(absoluteTempImagePath);
+                    Directory.Delete(folderName);
+                }
+                catch (Exception ex)
+                {
+                    Current.Logger.Error(typeof(TemplateUtilities), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+                }
+                
+            }
+
+            // Now remove all old files so that the temp folder(s) never grow
+            // Anything older than one day gets deleted
+            var files = Directory.GetFiles(SystemDirectories.TempFileUploads, "*", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                if (DateTime.UtcNow - File.GetLastWriteTimeUtc(file) > TimeSpan.FromDays(1))
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception ex)
+                    {
+                        Current.Logger.Error(typeof(TemplateUtilities), ex, "Could not delete temp file {FileName}", file);
+                    }
+                }
             }
 
             return htmlDoc.DocumentNode.OuterHtml;
