@@ -1,13 +1,12 @@
-﻿using System.Linq;
-using Umbraco.Core.Logging;
+﻿using Newtonsoft.Json;
+using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
-using Newtonsoft.Json;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
-using Umbraco.Web.Templates;
-using Umbraco.Web.Composing;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -26,12 +25,14 @@ namespace Umbraco.Web.PropertyEditors
     {
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
             : base(logger)
         {
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
@@ -40,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
@@ -48,12 +49,14 @@ namespace Umbraco.Web.PropertyEditors
         {
             private IMediaService _mediaService;
             private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+            private IUmbracoContextAccessor _umbracoContextAccessor;
 
-            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
                 : base(attribute)
             {
                 _mediaService = mediaService;
                 _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+                _umbracoContextAccessor = umbracoContextAccessor;
             }
 
             /// <summary>
@@ -81,8 +84,8 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     // Parse the HTML
                     var html = rte.Value?.ToString();
-                    
-                    var userId = Current.UmbracoContext.Security.CurrentUser.Id;
+
+                    var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? -1;
 
                     // TODO: In future task(get the parent folder from this config) to save the media into
                     var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider);
