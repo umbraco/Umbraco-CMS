@@ -436,7 +436,21 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         },
 
         insertEmbeddedMediaInEditor: function (editor, preview) {
-            editor.insertContent(preview);
+            // Wrap HTML preview content here in a DIV with non-editable class of .mceNonEditable
+            // This turns it into a selectable/cutable block to move about
+
+            // TODO: Fix/discuss with Niels L that instagram & others seem will
+            // make their content clickable & navigate away from Umbraco
+
+            // TODO: Do we add data attributes here - so the button can be re-clicked to edit/modify the item
+            // or double/tripple clicked to bring the infinite editor back open
+            // data-embed-url="instagram.com/xyz" data-embed-width="300" data-emebed-height="200"
+
+            // TODO: Added extra CSS class of embeditem wonderting if we can
+            // highlight/show easier things that are not editable
+
+            var wrapper = tinymce.activeEditor.dom.create('div', {'class': 'mceNonEditable embeditem'}, preview);
+            editor.selection.setNode(wrapper);
         },
 
 
