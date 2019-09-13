@@ -1,7 +1,7 @@
 /**
  * @ngdoc filter
- * @name umbraco.filters.filter:advancedTruncate
- * @namespace advancedTruncateFilter
+ * @name umbraco.filters.filter:truncate
+ * @namespace truncateFilter
  * 
  * param {any} wordwise if true, the string will be cut after last fully displayed word.
  * param {any} max max length of the outputtet string
@@ -10,7 +10,7 @@
  * @description
  * Limits the length of a string, if a cut happens only the string will be appended with three dots to indicate that more is available.
  */
-angular.module("umbraco.filters").filter('advancedTruncate', 
+angular.module("umbraco.filters").filter('truncate', 
     function () {
         return function (value, wordwise, max, tail) {
             if (!value) return '';
