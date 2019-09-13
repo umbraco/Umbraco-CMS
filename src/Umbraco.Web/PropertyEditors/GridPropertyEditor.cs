@@ -77,7 +77,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
-                var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
+                var config = editorValue.DataTypeConfiguration as GridConfiguration;
                 var mediaParent = config?.MediaParentId;
                 Guid mediaParentId;
 

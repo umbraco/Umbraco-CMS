@@ -106,7 +106,7 @@ namespace Umbraco.Web.Editors
 
             // Now remove all old files so that the temp folder(s) never grow
             // Anything older than one day gets deleted
-            var tempFiles = Directory.GetFiles(SystemDirectories.TempFileUploads, "*", SearchOption.AllDirectories);
+            var tempFiles = Directory.GetFiles(IOHelper.MapPath(SystemDirectories.TempFileUploads), "*", SearchOption.AllDirectories);
             foreach (var tempFile in tempFiles)
             {
                 if (DateTime.UtcNow - File.GetLastWriteTimeUtc(tempFile) > TimeSpan.FromDays(1))
