@@ -35,6 +35,11 @@
 
 // displays property inline with preceeding
 .umb-property {
+    
+    .umb-el-wrap {
+        position:relative;
+    }
+    
 	&--pull {
 		float:left;
 		width:60%;
@@ -51,7 +56,51 @@
 			width:100%;
 		}
 	}
+    
+    .umb-property__inheriting-from-default {
+        background-color: @gray-11;
+        color:@gray-3;
+        padding: 4px 8px;
+        border-radius: 3px;
+        transition: background-color 120ms, color 120ms;
+        
+        @media (min-width: 768px) {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
+    &.--disabled {
+        
+        user-select: none;
+        cursor: not-allowed;
+        
+        .control-label {
+            pointer-events: none;
+        }
+        
+        .controls {
+            opacity: 0.4;
+            pointer-events: none;
+            transition: opacity 240ms;
+        }
+        
+        &:hover {
+            /*.controls {
+                opacity: 0.3;
+            }*/
+            .umb-property__inheriting-from-default {
+                background-color: @gray-10;
+                color: black;
+            }
+        }
+    }
+    
 }
+.hidelabel > div > .umb-property__stickers .umb-property__inheriting-from-default {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 
 .umb-property .alert {
 	border-radius: 3px;

@@ -7,24 +7,28 @@
             <div class="umb-el-wrap">
 
                 <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
-                    
-                    <small ng-if="showInherit" class="db" style="padding-top: 0; margin-bottom: 5px;">
-                        <localize key="contentTypeEditor_inheritedFrom"></localize> {{inheritsFrom}}
-                    </small>
 
                     {{property.label}}
 
                     <span ng-if="property.validation.mandatory">
-                        <strong class="umb-control-required">*</strong>
+                        <strong class="umb-control-required" ng-class="{'--as-grey': showInherit}">*</strong>
                     </span>
 
                     <a class="icon-documents umb-property__copy" ng-show="!showInherit && property.canCopy" ng-click="onCopy()" prevent-default></a>
 
                     <small ng-bind-html="property.description | preserveNewLineInHtml"></small>
+
                 </label>
+
+                <div class="umb-property__stickers">
+                    <small ng-if="showInherit" class="umb-property__inheriting-from-default" on-click="openDefaultVariant();">
+                        <localize key="contentTypeEditor_invariantValueInheritedFrom" tokens="[inheritsFrom.language.name]" watchTokens="true"></localize>
+                    </small>
+                </div>
 
                 <div class="controls" ng-transclude>
                 </div>
+
             </div>
         </div>
     </ng-form>

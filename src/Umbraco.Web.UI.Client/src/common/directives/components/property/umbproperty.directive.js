@@ -9,7 +9,8 @@ angular.module("umbraco.directives")
             scope: {
                 property: "=",
                 showInherit: "<",
-                inheritsFrom: "<"
+                inheritsFrom: "<",
+                onSelectVariant: "&?"
             },
             transclude: true,
             restrict: 'E',
@@ -27,7 +28,10 @@ angular.module("umbraco.directives")
                 var self = this;
 
                 //set the API properties/methods
-
+                
+                self.openDefaultVariant = function() {
+                    console.log("Hello")
+                };
                 self.property = $scope.property;
                 self.setPropertyError = function (errorMsg) {
                     $scope.property.propertyErrorMessage = errorMsg;

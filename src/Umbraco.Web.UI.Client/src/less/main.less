@@ -195,6 +195,9 @@ label:not([for]) {
 /* CONTROL VALIDATION */
 .umb-control-required {
     color: @controlRequiredColor;
+    &.--as-grey {
+        color:@gray-6;
+    }
 }
 
 .controls-row {
@@ -219,7 +222,7 @@ label:not([for]) {
    padding-top: 0;
 }
 
-.hidelabel > div > .controls-row, .hidelabel > .controls-row, .hidelabel > div > .controls {
+.hidelabel > div > .controls-row, .hidelabel > .controls-row, .hidelabel > div > .controls, .hidelabel > div > .umb-property__stickers {
   padding: 0;
   border: none;
   margin: 0 !important;
