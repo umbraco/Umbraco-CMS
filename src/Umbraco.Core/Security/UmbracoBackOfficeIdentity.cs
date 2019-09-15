@@ -227,7 +227,17 @@ namespace Umbraco.Core.Security
             //The security stamp claim is also required... this is because this claim type is hard coded
             // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
             if (HasClaim(x => x.Type == Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType) == false)
-                AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, SecurityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
+            {
+                if (ApplicationContext.Current.IsUpgrading && SecurityStamp == null)
+                {
+                    // if upgrading from a pre-7.3.0 version, SecurityStamp will be null
+                    AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, Guid.Empty.ToString(), ClaimValueTypes.String, Issuer, Issuer, this));
+                }
+                else
+                {
+                    AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, SecurityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
+                }
+            }
 
             //Add each app as a separate claim
             if (HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false)
