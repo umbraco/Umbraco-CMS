@@ -36,17 +36,17 @@
 (function () {
     'use strict';
     
-    
     function UmbCheckboxController($timeout) {
         
         var vm = this;
 
-        if (vm.onChange) {
-            $timeout(function() {
-                vm.onChange({model:vm.model, value:vm.value});
+        vm.change = change;
+
+        function change() {
+            $timeout(function () {
+                vm.onChange({ model: vm.model, value: vm.value });
             }, 0);
         }
-        
     }
     
     var component = {
