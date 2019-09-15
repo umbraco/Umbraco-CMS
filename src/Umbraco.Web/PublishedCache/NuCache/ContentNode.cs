@@ -12,7 +12,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public ContentNode()
         {
             FirstChildContentId = -1;
+            LastChildContentId = -1;
             NextSiblingContentId = -1;
+            PreviousSiblingContentId = -1;
         }
 
         // special ctor with no content data - for members
@@ -58,7 +60,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             SortOrder = sortOrder;
             ParentContentId = parentContentId;
             FirstChildContentId = -1;
+            LastChildContentId = -1;
             NextSiblingContentId = -1;
+            PreviousSiblingContentId = -1;
             CreateDate = createDate;
             CreatorId = creatorId;
         }
@@ -95,7 +99,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             SortOrder = origin.SortOrder;
             ParentContentId = origin.ParentContentId;
             FirstChildContentId = origin.FirstChildContentId;
+            LastChildContentId = origin.LastChildContentId;
             NextSiblingContentId = origin.NextSiblingContentId;
+            PreviousSiblingContentId = origin.PreviousSiblingContentId;
             CreateDate = origin.CreateDate;
             CreatorId = origin.CreatorId;
 
@@ -119,7 +125,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public readonly int SortOrder;
         public readonly int ParentContentId;
         public int FirstChildContentId;
+        public int LastChildContentId;
         public int NextSiblingContentId;
+        public int PreviousSiblingContentId;
         public readonly DateTime CreateDate;
         public readonly int CreatorId;
 

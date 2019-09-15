@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -25,18 +24,27 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-browser-window")]
     public class RichTextPropertyEditor : DataEditor
     {
+        private IMediaService _mediaService;
+        private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private IUmbracoContextAccessor _umbracoContextAccessor;
+        private ILogger _logger;
+
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RichTextPropertyEditor(ILogger logger) : base(logger)
+        public RichTextPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor) : base(logger)
         {
+            _mediaService = mediaService;
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _logger = logger;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
@@ -47,9 +55,19 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class RichTextPropertyValueEditor : DataValueEditor
         {
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute)
+            private IMediaService _mediaService;
+            private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+            private IUmbracoContextAccessor _umbracoContextAccessor;
+            private ILogger _logger;
+
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
                 : base(attribute)
-            { }
+            {
+                _mediaService = mediaService;
+                _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+                _umbracoContextAccessor = umbracoContextAccessor;
+                _logger = logger;
+            }
 
             /// <inheritdoc />
             public override object Configuration
@@ -74,7 +92,6 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="dataTypeService"></param>
             /// <param name="culture"></param>
             /// <param name="segment"></param>
-            /// <returns></returns>
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
@@ -99,6 +116,11 @@ namespace Umbraco.Web.PropertyEditors
 
                 var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(editorValue.Value.ToString());
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
+
+                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? -1;
+
+                // TODO: In future task(get the parent folder from this config) to save the media into
+                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                 return parsed;
             }
         }
