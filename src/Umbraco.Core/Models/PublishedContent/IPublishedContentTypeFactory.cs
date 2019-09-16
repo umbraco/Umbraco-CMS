@@ -31,6 +31,16 @@
         IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations);
 
         /// <summary>
+        /// Creates a core (non-user) published property type.
+        /// </summary>
+        /// <param name="contentType">The published content type owning the property.</param>
+        /// <param name="propertyTypeAlias">The property type alias.</param>
+        /// <param name="dataTypeId">The datatype identifier.</param>
+        /// <param name="variations">The variations.</param>
+        /// <remarks>Is used by <see cref="PublishedContentType"/> constructor to create special property types.</remarks>
+        IPublishedPropertyType CreateCorePropertyType(IPublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations);
+
+        /// <summary>
         /// Gets a published datatype.
         /// </summary>
         PublishedDataType GetDataType(int id);

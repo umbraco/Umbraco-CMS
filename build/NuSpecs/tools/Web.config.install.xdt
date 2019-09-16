@@ -128,6 +128,7 @@
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Data.SqlServerCe')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.ValueTuple')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http.Formatting')" xdt:Transform="Remove" />
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Collections.Immutable')" xdt:Transform="Remove" />
     </assemblyBinding>
   </runtime>
 

@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper) {
+        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, tinyMceAssets) {
 
             // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
@@ -30,9 +30,9 @@ angular.module("umbraco")
             var promises = [];
 
             //queue file loading
-            if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
-                promises.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope));
-            }
+            tinyMceAssets.forEach(function (tinyJsAsset) {
+                promises.push(assetsService.loadJs(tinyJsAsset, $scope));
+            });
 
             //stores a reference to the editor
             var tinyMceEditor = null;
