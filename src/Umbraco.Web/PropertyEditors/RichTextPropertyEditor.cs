@@ -117,7 +117,7 @@ namespace Umbraco.Web.PropertyEditors
                 var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(editorValue.Value.ToString());
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 
-                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? -1;
+                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
 
                 var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
                 var mediaParent = config?.MediaParentId;
