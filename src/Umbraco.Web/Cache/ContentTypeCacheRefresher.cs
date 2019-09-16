@@ -91,7 +91,8 @@ namespace Umbraco.Web.Cache
             // we are using the database to load content into caches
 
             //_publishedModelFactory.WithSafeLiveFactory(() =>
-                _publishedSnapshotService.Notify(payloads);
+            _publishedModelFactory.WithSafeLiveFactoryRefreshSet(() =>
+                _publishedSnapshotService.Notify(payloads));
 
             // now we can trigger the event
             base.Refresh(payloads);

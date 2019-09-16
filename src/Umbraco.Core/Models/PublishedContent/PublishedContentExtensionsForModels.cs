@@ -25,15 +25,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
             // get model
             // if factory returns nothing, throw
-            var model = Current.PublishedModelFactory.CreateModel(content);
-            if (model == null)
-                throw new Exception("Factory returned null.");
-
-            // if factory returns a different type, throw
-            if (!(model is IPublishedContent publishedContent))
-                throw new Exception($"Factory returned model of type {model.GetType().FullName} which does not implement IPublishedContent.");
-
-            return publishedContent;
+            return Current.PublishedModelFactory.CreateModelWithSafeLiveFactoryRefreshCheck(content);
         }
     }
 }

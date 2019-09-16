@@ -47,6 +47,62 @@ namespace Umbraco.Core
             }
         }
 
+        /// <summary>
+        /// Creates a strongly typed model while checking if the factory is <see cref="ILivePublishedModelFactory"/> and if a refresh flag has been set, in which
+        /// case the models will be recompiled before model creation
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        internal static IPublishedContent CreateModelWithSafeLiveFactoryRefreshCheck(this IPublishedModelFactory factory, IPublishedContent content)
+        {
+            if (factory is ILivePublishedModelFactory liveFactory && _refresh)
+            {
+                lock (liveFactory.SyncRoot)
+                {
+                    if (_refresh)
+                    {
+                        _refresh = false;
+                        //Call refresh on the live factory to re-compile the models
+                        liveFactory.Refresh();
+                    }
+                }
+            }
+
+            var model = factory.CreateModel(content);
+            if (model == null)
+                throw new Exception("Factory returned null.");
+
+            // if factory returns a different type, throw
+            if (!(model is IPublishedContent publishedContent))
+                throw new Exception($"Factory returned model of type {model.GetType().FullName} which does not implement IPublishedContent.");
+
+            return publishedContent;
+        }
+
+        /// <summary>
+        /// Sets a flag to re-compile the models if the <see cref="IPublishedModelFactory"/> is <see cref="ILivePublishedModelFactory"/>
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="action"></param>
+        internal static void WithSafeLiveFactoryRefreshSet(this IPublishedModelFactory factory, Action action)
+        {
+            if (factory is ILivePublishedModelFactory liveFactory)
+            {
+                lock (liveFactory.SyncRoot)
+                {
+                    _refresh = true;
+                    action();
+                }
+            }
+            else
+            {
+                action();
+            }
+        }
+
+        private static volatile bool _refresh = false;
+
         public static IDisposable SuspendSafeLiveFactory(this IPublishedModelFactory factory)
         {
             if (factory is ILivePublishedModelFactory liveFactory)
