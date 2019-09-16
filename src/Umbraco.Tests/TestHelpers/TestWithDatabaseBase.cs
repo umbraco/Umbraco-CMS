@@ -91,8 +91,6 @@ namespace Umbraco.Tests.TestHelpers
                 factory.ResetForTests();
                 return factory;
             });
-
-            Composition.RegisterUnique<BackgroundPublishedSnapshotNotifier>();
         }
 
         [OneTimeTearDown]

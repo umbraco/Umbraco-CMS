@@ -42,11 +42,6 @@ namespace Umbraco.Tests.Routing
                 logger,
                 null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IUmbracoContextFactory>(),
-                Mock.Of<IPublishedModelFactory>(),
-                new Umbraco.Web.Cache.BackgroundPublishedSnapshotNotifier(
-                    Factory.GetInstance<IPublishedModelFactory>(),
-                    Factory.GetInstance<IPublishedSnapshotService>(),
-                    Logger),
                 new RoutableDocumentFilter(globalSettings)
             );
 

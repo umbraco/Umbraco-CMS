@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
@@ -12,8 +11,6 @@ using Umbraco.Web.Routing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Cache;
-using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
 {
@@ -39,8 +36,6 @@ namespace Umbraco.Web
         private readonly ILogger _logger;
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly IPublishedModelFactory _publishedModelFactory;
-        private readonly BackgroundPublishedSnapshotNotifier _backgroundNotifier;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
 
         public UmbracoInjectedModule(
@@ -49,8 +44,6 @@ namespace Umbraco.Web
             ILogger logger,
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
-            IPublishedModelFactory publishedModelFactory,
-            BackgroundPublishedSnapshotNotifier backgroundNotifier,
             RoutableDocumentFilter routableDocumentLookup)
         {
             _globalSettings = globalSettings;
@@ -58,8 +51,6 @@ namespace Umbraco.Web
             _logger = logger;
             _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
-            _publishedModelFactory = publishedModelFactory;
-            _backgroundNotifier = backgroundNotifier;
             _routableDocumentLookup = routableDocumentLookup;
         }
 

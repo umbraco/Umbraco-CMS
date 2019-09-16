@@ -125,7 +125,6 @@ namespace Umbraco.Web.Runtime
             // register distributed cache
             composition.RegisterUnique(f => new DistributedCache());
 
-            composition.RegisterUnique<BackgroundPublishedSnapshotNotifier>();
             composition.RegisterUnique<RoutableDocumentFilter>();
 
             // replace some services
