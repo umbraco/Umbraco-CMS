@@ -38,15 +38,16 @@ namespace Umbraco.Tests.Routing
             _module = new UmbracoInjectedModule
             (
                 globalSettings,
-                Mock.Of<IUmbracoContextAccessor>(),
-                Factory.GetInstance<IPublishedSnapshotService>(),
-                Factory.GetInstance<IUserService>(),
-                new UrlProviderCollection(new IUrlProvider[0]),
                 runtime,
                 logger,
                 null, // FIXME: PublishedRouter complexities...
-                Mock.Of<IVariationContextAccessor>(),
-                Mock.Of<IUmbracoContextFactory>()
+                Mock.Of<IUmbracoContextFactory>(),
+                Mock.Of<IPublishedModelFactory>(),
+                new Umbraco.Web.Cache.BackgroundPublishedSnapshotNotifier(
+                    Factory.GetInstance<IPublishedModelFactory>(),
+                    Factory.GetInstance<IPublishedSnapshotService>(),
+                    Logger),
+                new RoutableDocumentFilter(globalSettings)
             );
 
             runtime.Level = RuntimeLevel.Run;

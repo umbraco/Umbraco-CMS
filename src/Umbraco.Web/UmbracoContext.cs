@@ -1,16 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Web;
+using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
+
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
@@ -284,6 +289,23 @@ namespace Umbraco.Web
             }
 
             _previewing = _previewToken.IsNullOrWhiteSpace() == false;
+        }
+
+        private bool? _isDocumentRequest;
+
+        /// <summary>
+        /// Checks if the request is a document request (i.e. one that the module should handle)
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        internal bool IsDocumentRequest(RoutableDocumentFilter docLookup)
+        {
+            if (_isDocumentRequest.HasValue)
+                return _isDocumentRequest.Value;
+
+            _isDocumentRequest = docLookup.IsDocumentRequest(HttpContext, OriginalRequestUrl);
+            return _isDocumentRequest.Value;
         }
 
         // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,

@@ -115,6 +115,7 @@
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
+    <Compile Include="Cache\BackgroundPublishedSnapshotNotifier.cs" />
     <Compile Include="Cache\DistributedCacheBinder.cs" />
     <Compile Include="Cache\DistributedCacheBinderComposer.cs" />
     <Compile Include="Cache\DistributedCacheBinder_Handlers.cs" />
@@ -230,6 +231,7 @@
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
+    <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
     <Compile Include="Routing\IMediaUrlProvider.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
