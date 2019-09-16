@@ -161,7 +161,7 @@ namespace Umbraco.Web
             var reason = EnsureRoutableOutcome.IsRoutable;
 
             // ensure this is a document request
-            if (!context.IsDocumentRequest(_routableDocumentLookup))
+            if (!_routableDocumentLookup.IsDocumentRequest(httpContext, context.OriginalRequestUrl))
             {
                 reason = EnsureRoutableOutcome.NotDocumentRequest;
             }

@@ -290,24 +290,7 @@ namespace Umbraco.Web
 
             _previewing = _previewToken.IsNullOrWhiteSpace() == false;
         }
-
-        private bool? _isDocumentRequest;
-
-        /// <summary>
-        /// Checks if the request is a document request (i.e. one that the module should handle)
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        internal bool IsDocumentRequest(RoutableDocumentFilter docLookup)
-        {
-            if (_isDocumentRequest.HasValue)
-                return _isDocumentRequest.Value;
-
-            _isDocumentRequest = docLookup.IsDocumentRequest(HttpContext, OriginalRequestUrl);
-            return _isDocumentRequest.Value;
-        }
-
+        
         // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
         // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
         // default 'preview' mode - somehow we have to force it. and that could be recursive.
