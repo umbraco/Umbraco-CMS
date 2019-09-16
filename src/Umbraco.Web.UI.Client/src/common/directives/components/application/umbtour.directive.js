@@ -327,10 +327,21 @@ In the following example you see how to run some custom logic before a step goes
                     }
 
                     var scrollParent = element.scrollParent();
-                    var scrollToCenterOfContainer = element[0].offsetTop - (scrollParent[0].clientHeight / 2 ) + (element[0].clientHeight / 2);
+                    var el = element;
+                    var offsetTop = 0;
+                    if (scrollParent[0] === document) {
+                        offsetTop = el[0].offsetTop;
+                    } else {
+                        while ($.contains(scrollParent[0], el[0])) {
+                            offsetTop += el[0].offsetTop;
+                            el = el.offsetParent();
+                        }
+                    }
+                    
+                    var scrollToCenterOfContainer = offsetTop - (scrollParent[0].clientHeight / 2) + (element[0].clientHeight / 2);
 
                     // Detect if scroll is needed
-                    if (element[0].offsetTop > scrollParent[0].clientHeight) {
+                    if (offsetTop > scrollParent[0].clientHeight) {
                         scrollParent.animate({
                             scrollTop: scrollToCenterOfContainer
                         }, function () {
