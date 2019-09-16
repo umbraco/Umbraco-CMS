@@ -64,7 +64,7 @@ namespace Umbraco.Core.Packaging
             var removedDataTypes = new List<IDataType>();
             var removedLanguages = new List<ILanguage>();
 
-            using(_publishedModelFactory.SuspendSafeLiveFactory()) //ensure that any PureLive models are not regenerated until after the bulk operation
+            //using(_publishedModelFactory.SuspendSafeLiveFactory()) //ensure that any PureLive models are not regenerated until after the bulk operation
             using (var scope = _scopeProvider.CreateScope())
             {
                 //Uninstall templates

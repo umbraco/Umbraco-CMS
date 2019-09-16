@@ -28,17 +28,17 @@ namespace Umbraco.Core
             {
                 lock (liveFactory.SyncRoot)
                 {
-                    if (_suspend != null)
-                    {
-                        //if we are currently suspended, queue the action
-                        _suspend.Queue(action);
-                    }
-                    else
-                    {
+                    //if (_suspend != null)
+                    //{
+                    //    //if we are currently suspended, queue the action
+                    //    _suspend.Queue(action);
+                    //}
+                    //else
+                    //{
                         //Call refresh on the live factory to re-compile the models
                         liveFactory.Refresh();
                         action();
-                    }
+                    //}
                 }
             }
             else
@@ -103,28 +103,28 @@ namespace Umbraco.Core
 
         private static volatile bool _refresh = false;
 
-        public static IDisposable SuspendSafeLiveFactory(this IPublishedModelFactory factory)
-        {
-            if (factory is ILivePublishedModelFactory liveFactory)
-            {
-                lock (liveFactory.SyncRoot)
-                {
-                    if (_suspend == null)
-                    {
-                        _suspend = new SuspendSafeLiveFactory(
-                            factory,
-                            () => _suspend = null); //reset when it's done
-                    }
-                    return _suspend;
-                }
-            }
-            else
-            {
-                return new SuspendSafeLiveFactory(factory); //returns a noop version of IDisposable, this won't actually do anything
-            }
-        }
+        //public static IDisposable SuspendSafeLiveFactory(this IPublishedModelFactory factory)
+        //{
+        //    if (factory is ILivePublishedModelFactory liveFactory)
+        //    {
+        //        lock (liveFactory.SyncRoot)
+        //        {
+        //            if (_suspend == null)
+        //            {
+        //                _suspend = new SuspendSafeLiveFactory(
+        //                    factory,
+        //                    () => _suspend = null); //reset when it's done
+        //            }
+        //            return _suspend;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return new SuspendSafeLiveFactory(factory); //returns a noop version of IDisposable, this won't actually do anything
+        //    }
+        //}
 
-        private static SuspendSafeLiveFactory _suspend;
+        //private static SuspendSafeLiveFactory _suspend;
     }
 
     internal class SuspendSafeLiveFactory : IDisposable
