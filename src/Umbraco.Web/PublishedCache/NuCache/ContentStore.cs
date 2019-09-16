@@ -883,7 +883,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return true;
             var link = GetParentLink(kit.Node);
             var node = link?.Value;
-            return node?.PublishedModel != null;
+            return node != null && node.HasPublished;
         }
 
         private ContentNode GenCloneLocked(LinkedNode<ContentNode> link)
