@@ -49,7 +49,6 @@ namespace Umbraco.Web.Editors
         private readonly IEntityXmlSerializer _serializer;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IPublishedModelFactory _publishedModelFactory;
 
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionaryFactory cultureDictionaryFactory,
@@ -58,13 +57,12 @@ namespace Umbraco.Web.Editors
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
             ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
-            IScopeProvider scopeProvider, IPublishedModelFactory publishedModelFactory)
+            IScopeProvider scopeProvider)
             : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _serializer = serializer;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
-            _publishedModelFactory = publishedModelFactory;
         }
 
         public int GetCount()
@@ -527,7 +525,7 @@ namespace Umbraco.Web.Editors
             }
 
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
-                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, _publishedModelFactory);
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

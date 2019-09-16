@@ -790,8 +790,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
-            //TODO: I don't think this is necessary with the changes to nucache now that calls to `CreateModel` are lazy?
-            // but I may be dreaming here, if i remove this call and save a content type, then the cache doesn't render a lot of the content. hrm.
             if (_publishedModelFactory.IsLiveFactory())
             {
                 //In the case of Pure Live - we actually need to refresh all of the content and the media

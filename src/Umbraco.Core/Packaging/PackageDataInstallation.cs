@@ -28,15 +28,13 @@ namespace Umbraco.Core.Packaging
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
 
         public PackageDataInstallation(ILogger logger, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
-            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider,
-            IPublishedModelFactory publishedModelFactory)
+            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider)
         {
             _logger = logger;
             _fileService = fileService;
@@ -45,7 +43,6 @@ namespace Umbraco.Core.Packaging
             _dataTypeService = dataTypeService;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
-            _publishedModelFactory = publishedModelFactory;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
