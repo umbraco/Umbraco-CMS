@@ -99,7 +99,7 @@ namespace Umbraco.Web.PropertyEditors
                     // Parse the HTML
                     var html = rte.Value?.ToString();
 
-                    var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? -1;
+                    var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
 
                     var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                     rte.Value = parsedHtml;
