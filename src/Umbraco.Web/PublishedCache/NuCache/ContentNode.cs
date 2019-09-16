@@ -101,6 +101,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _draftData = origin._draftData;
             _publishedData = origin._publishedData;
+            _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
+            _variationContextAccessor = origin._variationContextAccessor;
         }
 
         // everything that is common to both draft and published versions
