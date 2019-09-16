@@ -51,7 +51,7 @@ namespace Umbraco.Core.Packaging
             _contentService = contentService;
         }
 
-        #region Uninstall
+        #region Install/Uninstall
 
         public UninstallationSummary UninstallPackageData(PackageDefinition package, int userId)
         {
@@ -174,6 +174,30 @@ namespace Umbraco.Core.Packaging
             return summary;
 
 
+        }
+
+        public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
+        {
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                var installationSummary = new InstallationSummary
+                {
+                    DataTypesInstalled = ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
+                    LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
+                    DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
+                    MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
+                    TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
+                    DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId)
+                };
+
+                //we need a reference to the imported doc types to continue
+                var importedDocTypes = installationSummary.DocumentTypesInstalled.ToDictionary(x => x.Alias, x => x);
+
+                installationSummary.StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId);
+                installationSummary.ContentInstalled = ImportContent(compiledPackage.Documents, importedDocTypes, userId);
+                
+                return installationSummary;
+            }
         }
 
         #endregion
