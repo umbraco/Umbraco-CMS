@@ -40,50 +40,28 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Creates a strongly typed model while checking if the factory is <see cref="ILivePublishedModelFactory"/> and if a refresh flag has been set, in which
-        /// case the models will be recompiled before model creation
-        /// </summary>
-        /// <param name="factory"></param>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        internal static IPublishedContent CreateModelWithSafeLiveFactoryRefreshCheck(this IPublishedModelFactory factory, IPublishedContent content)
-        {
-            if (factory is ILivePublishedModelFactory liveFactory && _refresh)
-            {
-                lock (liveFactory.SyncRoot)
-                {
-                    if (_refresh)
-                    {
-                        _refresh = false;
-                        //Call refresh on the live factory to re-compile the models
-                        liveFactory.Refresh();
-                    }
-                }
-            }
-
-            var model = factory.CreateModel(content);
-            if (model == null)
-                throw new Exception("Factory returned null.");
-
-            // if factory returns a different type, throw
-            if (!(model is IPublishedContent publishedContent))
-                throw new Exception($"Factory returned model of type {model.GetType().FullName} which does not implement IPublishedContent.");
-
-            return publishedContent;
-        }
-
-        /// <summary>
-        /// Sets a flag to re-compile the models if the <see cref="IPublishedModelFactory"/> is <see cref="ILivePublishedModelFactory"/>
+        /// Sets a flag to reset the ModelsBuilder models if the <see cref="IPublishedModelFactory"/> is <see cref="ILivePublishedModelFactory"/>
         /// </summary>
         /// <param name="factory"></param>
         /// <param name="action"></param>
-        internal static void WithSafeLiveFactoryRefreshSet(this IPublishedModelFactory factory, Action action)
+        /// <remarks>
+        /// This does not recompile the pure live models, only sets a flag to tell models builder to recompile when they are requested.
+        /// </remarks>
+        internal static void WithSafeLiveFactoryReset(this IPublishedModelFactory factory, Action action)
         {
             if (factory is ILivePublishedModelFactory liveFactory)
             {
                 lock (liveFactory.SyncRoot)
                 {
-                    _refresh = true;
+                    // TODO: Fix this in 8.3! - We need to change the ILivePublishedModelFactory interface to have a Reset method and then when we have an embedded MB
+                    // version we will publicize the ResetModels (and change the name to Reset).
+                    // For now, this will suffice and we'll use reflection, there should be no other implementation of ILivePublishedModelFactory.
+                    // Calling ResetModels resets the MB flag so that the next time EnsureModels is called (which is called when nucache lazily calls CreateModel) it will
+                    // trigger the recompiling of pure live models.
+                    var resetMethod = liveFactory.GetType().GetMethod("ResetModels", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                    if (resetMethod != null)
+                        resetMethod.Invoke(liveFactory, null);
+
                     action();
                 }
             }
@@ -92,8 +70,6 @@ namespace Umbraco.Core
                 action();
             }
         }
-
-        private static volatile bool _refresh = false;
 
     }
 }

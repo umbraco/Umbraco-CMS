@@ -66,7 +66,7 @@ namespace Umbraco.Web.Cache
             // service of changes, else factories may try to rebuild models while
             // we are using the database to load content into caches
 
-            _publishedModelFactory.WithSafeLiveFactoryRefreshSet(() =>
+            _publishedModelFactory.WithSafeLiveFactoryReset(() =>
                 _publishedSnapshotService.Notify(payloads));
 
             base.Refresh(payloads);
