@@ -57,16 +57,16 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         macroAlias,
                         umbracoContext.PublishedRequest?.PublishedContent,
                         //needs to be explicitly casted to Dictionary<string, object>
-                        macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
+                        macroAttributes.ConvertTo(x => (string)x, x => x)).GetAsText()));
 
                 return sb.ToString();
             }
          }
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            if (source == null) return null;
-            var sourceString = source.ToString();
+            if (inter == null) return null;
+            var sourceString = inter.ToString();
 
             // ensure string is parsed for macros and macros are executed correctly
             sourceString = RenderMacros(sourceString, preview);
