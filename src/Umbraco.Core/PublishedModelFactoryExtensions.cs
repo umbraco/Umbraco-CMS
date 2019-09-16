@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core
@@ -16,12 +17,8 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static bool IsLiveFactory(this IPublishedModelFactory factory) => factory is ILivePublishedModelFactory;
 
-        /// <summary>
-        /// Executes an action with a safe live factory
-        /// </summary>
-        /// <remarks>
-        /// <para>If the factory is a live factory, ensures it is refreshed and locked while executing the action.</para>
-        /// </remarks>
+        [Obsolete("This method is no longer used or necessary and will be removed from future")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void WithSafeLiveFactory(this IPublishedModelFactory factory, Action action)
         {
             if (factory is ILivePublishedModelFactory liveFactory)
