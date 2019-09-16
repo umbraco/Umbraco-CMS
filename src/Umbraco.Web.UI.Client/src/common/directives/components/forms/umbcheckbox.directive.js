@@ -43,9 +43,11 @@
         vm.change = change;
 
         function change() {
-            $timeout(function () {
-                vm.onChange({ model: vm.model, value: vm.value });
-            }, 0);
+            if (vm.onChange) {
+                $timeout(function () {
+                    vm.onChange({ model: vm.model, value: vm.value });
+                }, 0);
+            }
         }
     }
     
