@@ -17,9 +17,11 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -46,6 +48,8 @@ namespace Umbraco.Web.Editors
     {
         private readonly IEntityXmlSerializer _serializer;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly IPublishedModelFactory _publishedModelFactory;
 
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionaryFactory cultureDictionaryFactory,
@@ -53,11 +57,14 @@ namespace Umbraco.Web.Editors
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
             ServiceContext services, AppCaches appCaches,
-            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
+            IScopeProvider scopeProvider, IPublishedModelFactory publishedModelFactory)
             : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _serializer = serializer;
             _propertyEditors = propertyEditors;
+            _scopeProvider = scopeProvider;
+            _publishedModelFactory = publishedModelFactory;
         }
 
         public int GetCount()
@@ -520,7 +527,7 @@ namespace Umbraco.Web.Editors
             }
 
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
-                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors);
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, _publishedModelFactory);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

@@ -11,7 +11,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Packaging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
@@ -25,13 +27,16 @@ namespace Umbraco.Core.Packaging
         private readonly ILocalizationService _localizationService;
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
 
         public PackageDataInstallation(ILogger logger, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
-            IContentService contentService, PropertyEditorCollection propertyEditors)
+            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider,
+            IPublishedModelFactory publishedModelFactory)
         {
             _logger = logger;
             _fileService = fileService;
@@ -39,6 +44,8 @@ namespace Umbraco.Core.Packaging
             _localizationService = localizationService;
             _dataTypeService = dataTypeService;
             _propertyEditors = propertyEditors;
+            _scopeProvider = scopeProvider;
+            _publishedModelFactory = publishedModelFactory;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
@@ -57,93 +64,98 @@ namespace Umbraco.Core.Packaging
             var removedDataTypes = new List<IDataType>();
             var removedLanguages = new List<ILanguage>();
 
-
-            //Uninstall templates
-            foreach (var item in package.Templates.ToArray())
+            using(_publishedModelFactory.SuspendSafeLiveFactory()) //ensure that any PureLive models are not regenerated until after the bulk operation
+            using (var scope = _scopeProvider.CreateScope())
             {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var found = _fileService.GetTemplate(nId);
-                if (found != null)
+                //Uninstall templates
+                foreach (var item in package.Templates.ToArray())
                 {
-                    removedTemplates.Add(found);
-                    _fileService.DeleteTemplate(found.Alias, userId);
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var found = _fileService.GetTemplate(nId);
+                    if (found != null)
+                    {
+                        removedTemplates.Add(found);
+                        _fileService.DeleteTemplate(found.Alias, userId);
+                    }
+                    package.Templates.Remove(nId.ToString());
                 }
-                package.Templates.Remove(nId.ToString());
-            }
 
-            //Uninstall macros
-            foreach (var item in package.Macros.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var macro = _macroService.GetById(nId);
-                if (macro != null)
+                //Uninstall macros
+                foreach (var item in package.Macros.ToArray())
                 {
-                    removedMacros.Add(macro);
-                    _macroService.Delete(macro, userId);
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var macro = _macroService.GetById(nId);
+                    if (macro != null)
+                    {
+                        removedMacros.Add(macro);
+                        _macroService.Delete(macro, userId);
+                    }
+                    package.Macros.Remove(nId.ToString());
                 }
-                package.Macros.Remove(nId.ToString());
-            }
 
-            //Remove Document Types
-            var contentTypes = new List<IContentType>();
-            var contentTypeService = _contentTypeService;
-            foreach (var item in package.DocumentTypes.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var contentType = contentTypeService.Get(nId);
-                if (contentType == null) continue;
-                contentTypes.Add(contentType);
-                package.DocumentTypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
-            }
-
-            //Order the DocumentTypes before removing them
-            if (contentTypes.Any())
-            {
-                // TODO: I don't think this ordering is necessary
-                var orderedTypes = (from contentType in contentTypes
-                                    orderby contentType.ParentId descending, contentType.Id descending
-                                    select contentType).ToList();
-                removedContentTypes.AddRange(orderedTypes);
-                contentTypeService.Delete(orderedTypes, userId);
-            }
-
-            //Remove Dictionary items
-            foreach (var item in package.DictionaryItems.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var di = _localizationService.GetDictionaryItemById(nId);
-                if (di != null)
+                //Remove Document Types
+                var contentTypes = new List<IContentType>();
+                var contentTypeService = _contentTypeService;
+                foreach (var item in package.DocumentTypes.ToArray())
                 {
-                    removedDictionaryItems.Add(di);
-                    _localizationService.Delete(di, userId);
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var contentType = contentTypeService.Get(nId);
+                    if (contentType == null) continue;
+                    contentTypes.Add(contentType);
+                    package.DocumentTypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
                 }
-                package.DictionaryItems.Remove(nId.ToString());
-            }
 
-            //Remove Data types
-            foreach (var item in package.DataTypes.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var dtd = _dataTypeService.GetDataType(nId);
-                if (dtd != null)
+                //Order the DocumentTypes before removing them
+                if (contentTypes.Any())
                 {
-                    removedDataTypes.Add(dtd);
-                    _dataTypeService.Delete(dtd, userId);
+                    // TODO: I don't think this ordering is necessary
+                    var orderedTypes = (from contentType in contentTypes
+                                        orderby contentType.ParentId descending, contentType.Id descending
+                                        select contentType).ToList();
+                    removedContentTypes.AddRange(orderedTypes);
+                    contentTypeService.Delete(orderedTypes, userId);
                 }
-                package.DataTypes.Remove(nId.ToString());
-            }
 
-            //Remove Langs
-            foreach (var item in package.Languages.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var lang = _localizationService.GetLanguageById(nId);
-                if (lang != null)
+                //Remove Dictionary items
+                foreach (var item in package.DictionaryItems.ToArray())
                 {
-                    removedLanguages.Add(lang);
-                    _localizationService.Delete(lang, userId);
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var di = _localizationService.GetDictionaryItemById(nId);
+                    if (di != null)
+                    {
+                        removedDictionaryItems.Add(di);
+                        _localizationService.Delete(di, userId);
+                    }
+                    package.DictionaryItems.Remove(nId.ToString());
                 }
-                package.Languages.Remove(nId.ToString());
+
+                //Remove Data types
+                foreach (var item in package.DataTypes.ToArray())
+                {
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var dtd = _dataTypeService.GetDataType(nId);
+                    if (dtd != null)
+                    {
+                        removedDataTypes.Add(dtd);
+                        _dataTypeService.Delete(dtd, userId);
+                    }
+                    package.DataTypes.Remove(nId.ToString());
+                }
+
+                //Remove Langs
+                foreach (var item in package.Languages.ToArray())
+                {
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var lang = _localizationService.GetLanguageById(nId);
+                    if (lang != null)
+                    {
+                        removedLanguages.Add(lang);
+                        _localizationService.Delete(lang, userId);
+                    }
+                    package.Languages.Remove(nId.ToString());
+                }
+
+                scope.Complete();
             }
 
             // create a summary of what was actually removed, for PackagingService.UninstalledPackage

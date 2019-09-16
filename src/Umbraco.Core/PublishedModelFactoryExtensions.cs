@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core
@@ -27,9 +28,17 @@ namespace Umbraco.Core
             {
                 lock (liveFactory.SyncRoot)
                 {
-                    //Call refresh on the live factory to re-compile the models
-                    liveFactory.Refresh();
-                    action();
+                    if (_suspend != null)
+                    {
+                        //if we are currently suspended, queue the action
+                        _suspend.Queue(action);
+                    }
+                    else
+                    {
+                        //Call refresh on the live factory to re-compile the models
+                        liveFactory.Refresh();
+                        action();
+                    }
                 }
             }
             else
@@ -37,5 +46,86 @@ namespace Umbraco.Core
                 action();
             }
         }
+
+        public static IDisposable SuspendSafeLiveFactory(this IPublishedModelFactory factory)
+        {
+            if (factory is ILivePublishedModelFactory liveFactory)
+            {
+                lock (liveFactory.SyncRoot)
+                {
+                    if (_suspend == null)
+                    {
+                        _suspend = new SuspendSafeLiveFactory(
+                            factory,
+                            () => _suspend = null); //reset when it's done
+                    }
+                    return _suspend;
+                }
+            }
+            else
+            {
+                return new SuspendSafeLiveFactory(factory); //returns a noop version of IDisposable, this won't actually do anything
+            }
+        }
+
+        private static SuspendSafeLiveFactory _suspend;
+    }
+
+    internal class SuspendSafeLiveFactory : IDisposable
+    {
+        private readonly IPublishedModelFactory _factory;
+        private readonly Action _reset;
+        private readonly List<Action> _actions = new List<Action>();
+
+        public SuspendSafeLiveFactory(IPublishedModelFactory factory, Action reset = null)
+        {
+            _factory = factory;
+            _reset = reset;
+        }
+
+        /// <summary>
+        /// Queue an action to execute on disposal after rebuild
+        /// </summary>
+        /// <param name="action"></param>
+        public void Queue(Action action)
+        {
+            _actions.Add(action);
+        }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (_factory is ILivePublishedModelFactory liveFactory)
+                    {
+                        lock (liveFactory.SyncRoot)
+                        {
+                            //Call refresh on the live factory to re-compile the models
+                            liveFactory.Refresh();
+
+                            //then we need to call all queued actions
+                            foreach(var action in _actions)
+                                action();
+                        }
+                    }
+                    _reset?.Invoke();
+                }
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+        }
+        #endregion
+
     }
 }
