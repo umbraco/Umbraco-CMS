@@ -450,6 +450,7 @@
     <key alias="linkToMedia">Link to media</key>
     <key alias="selectContentStartNode">Select content start node</key>
     <key alias="selectMedia">Select media</key>
+    <key alias="selectMediaType">Select media type</key>
     <key alias="selectIcon">Select icon</key>
     <key alias="selectItem">Select item</key>
     <key alias="selectLink">Select link</key>
@@ -459,6 +460,7 @@
     <key alias="selectMediaStartNode">Select media start node</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
+    <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
     <key alias="selectSections">Select sections</key>
     <key alias="selectUsers">Select users</key>
