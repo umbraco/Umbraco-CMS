@@ -117,10 +117,13 @@ namespace Umbraco.Web.PropertyEditors
                 var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(editorValue.Value.ToString());
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 
-                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? -1;
+                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
 
-                // TODO: In future task(get the parent folder from this config) to save the media into
-                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
+                var mediaParent = config?.MediaParentId;
+                var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+
+                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                 return parsed;
             }
         }
