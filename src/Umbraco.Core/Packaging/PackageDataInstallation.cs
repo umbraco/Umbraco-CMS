@@ -61,7 +61,6 @@ namespace Umbraco.Core.Packaging
             var removedDataTypes = new List<IDataType>();
             var removedLanguages = new List<ILanguage>();
 
-            //using(_publishedModelFactory.SuspendSafeLiveFactory()) //ensure that any PureLive models are not regenerated until after the bulk operation
             using (var scope = _scopeProvider.CreateScope())
             {
                 //Uninstall templates
@@ -202,9 +201,9 @@ namespace Umbraco.Core.Packaging
         #region Content
 
 
-        public IEnumerable<IContent> ImportContent(IEnumerable<CompiledPackageDocument> docs, IDictionary<string, IContentType> importedDocumentTypes, int userId)
+        public IReadOnlyList<IContent> ImportContent(IEnumerable<CompiledPackageDocument> docs, IDictionary<string, IContentType> importedDocumentTypes, int userId)
         {
-            return docs.SelectMany(x => ImportContent(x, -1, importedDocumentTypes, userId));
+            return docs.SelectMany(x => ImportContent(x, -1, importedDocumentTypes, userId)).ToList();
         }
 
         /// <summary>
@@ -385,7 +384,7 @@ namespace Umbraco.Core.Packaging
 
         #region DocumentTypes
 
-        public IEnumerable<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
+        public IReadOnlyList<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
         {
             return ImportDocumentTypes(new[] { docTypeElement }, userId);
         }
@@ -396,7 +395,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="docTypeElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
+        public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
         {
             return ImportDocumentTypes(docTypeElements.ToList(), true, userId);
         }
@@ -408,7 +407,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="importStructure">Boolean indicating whether or not to import the </param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportDocumentTypes(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId)
+        public IReadOnlyList<IContentType> ImportDocumentTypes(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId)
         {
             var importedContentTypes = new Dictionary<string, IContentType>();
 
@@ -857,7 +856,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="dataTypeElements">Xml to import</param>
         /// <param name="userId">Optional id of the user</param>
         /// <returns>An enumerable list of generated DataTypeDefinitions</returns>
-        public IEnumerable<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId)
+        public IReadOnlyList<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId)
         {
             var dataTypes = new List<IDataType>();
 
@@ -986,13 +985,13 @@ namespace Umbraco.Core.Packaging
         /// <param name="dictionaryItemElementList">Xml to import</param>
         /// <param name="userId"></param>
         /// <returns>An enumerable list of dictionary items</returns>
-        public IEnumerable<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, int userId)
+        public IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, int userId)
         {
             var languages = _localizationService.GetAllLanguages().ToList();
             return ImportDictionaryItems(dictionaryItemElementList, languages, null, userId);
         }
 
-        private IEnumerable<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, List<ILanguage> languages, Guid? parentId, int userId)
+        private IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, List<ILanguage> languages, Guid? parentId, int userId)
         {
             var items = new List<IDictionaryItem>();
             foreach (var dictionaryItemElement in dictionaryItemElementList)
@@ -1069,7 +1068,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="languageElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <returns>An enumerable list of generated languages</returns>
-        public IEnumerable<ILanguage> ImportLanguages(IEnumerable<XElement> languageElements, int userId)
+        public IReadOnlyList<ILanguage> ImportLanguages(IEnumerable<XElement> languageElements, int userId)
         {
             var list = new List<ILanguage>();
             foreach (var languageElement in languageElements)
@@ -1098,7 +1097,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="macroElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <returns></returns>
-        public IEnumerable<IMacro> ImportMacros(IEnumerable<XElement> macroElements, int userId)
+        public IReadOnlyList<IMacro> ImportMacros(IEnumerable<XElement> macroElements, int userId)
         {
             var macros = macroElements.Select(ParseMacroElement).ToList();
 
@@ -1188,7 +1187,7 @@ namespace Umbraco.Core.Packaging
 
         #region Stylesheets
 
-        public IEnumerable<IFile> ImportStylesheets(IEnumerable<XElement> stylesheetElements, int userId)
+        public IReadOnlyList<IFile> ImportStylesheets(IEnumerable<XElement> stylesheetElements, int userId)
         {
             var result = new List<IFile>();
 
@@ -1256,7 +1255,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="templateElements">Xml to import</param>
         /// <param name="userId">Optional user id</param>
         /// <returns>An enumerable list of generated Templates</returns>
-        public IEnumerable<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
+        public IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
         {
             var templates = new List<ITemplate>();
 
