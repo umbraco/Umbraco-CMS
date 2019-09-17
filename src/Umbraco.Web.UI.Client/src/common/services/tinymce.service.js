@@ -94,6 +94,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
 
         return $q.all(promises).then(function() {
+            // Always push our Umbraco RTE stylesheet
+            // So we can style macros, embed items etc...
+            stylesheets.push(`${Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath}/assets/css/rte-content.css`);
+
             return $q.when({ stylesheets: stylesheets, styleFormats: styleFormats});
         });
     }
@@ -319,10 +323,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
                     cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster,
-
-                    //this is used to style the inline macro bits, sorry hard coding this form now since we don't have a standalone
-                    //stylesheet to load in for this with only these styles (the color is @pinkLight)
-                    content_style: ".mce-content-body .umb-macro-holder { border: 3px dotted #f5c1bc; padding: 7px; display: block; margin: 3px; } .umb-rte .mce-content-body .umb-macro-holder.loading {background: url(assets/img/loader.gif) right no-repeat; background-size: 18px; background-position-x: 99%;}",
 
                     // This allows images to be pasted in & stored as Base64 until they get uploaded to server
                     paste_data_images: true,
