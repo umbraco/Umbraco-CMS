@@ -425,32 +425,64 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             editor.addButton('umbembeddialog', {
                 icon: 'custom icon-tv',
                 tooltip: 'Embed',
+                stateSelector: 'div[data-embed-url]',
                 onclick: function () {
+
+                    // Get the selected element
+                    // Check nodename is a DIV and the claslist contains 'embeditem'
+                    var selectedElm = editor.selection.getNode();
+                    var nodeName = selectedElm.nodeName;
+                    var embed = {};
+
+                    if(nodeName.toUpperCase() === "DIV" && selectedElm.classList.contains("embeditem")){
+                        // See if we can go and get the attributes
+                        var embedUrl = editor.dom.getAttrib(selectedElm, "data-embed-url");
+                        var embedWidth = editor.dom.getAttrib(selectedElm, "data-embed-width");
+                        var embedHeight = editor.dom.getAttrib(selectedElm, "data-embed-height");
+                        var embedConstrain = editor.dom.getAttrib(selectedElm, "data-embed-constrain");
+
+                        embed = {
+                            url: embedUrl,
+                            width: embedWidth,
+                            height: embedHeight,
+                            constrain: embedConstrain
+                        };
+                    }
+
                     if (callback) {
                         angularHelper.safeApply($rootScope, function() {
-                            callback();
+                            // pass the active element along so we can retrieve it later
+                            callback(selectedElm, embed);
                         });
                     }
                 }
             });
         },
 
-        insertEmbeddedMediaInEditor: function (editor, preview) {
+        insertEmbeddedMediaInEditor: function (editor, embed, activeElement) {
             // Wrap HTML preview content here in a DIV with non-editable class of .mceNonEditable
             // This turns it into a selectable/cutable block to move about
-
-            // TODO: Fix/discuss with Niels L that instagram & others seem will
-            // make their content clickable & navigate away from Umbraco
 
             // TODO: Do we add data attributes here - so the button can be re-clicked to edit/modify the item
             // or double/tripple clicked to bring the infinite editor back open
             // data-embed-url="instagram.com/xyz" data-embed-width="300" data-emebed-height="200"
 
-            // TODO: Added extra CSS class of embeditem wonderting if we can
-            // highlight/show easier things that are not editable
+            var wrapper = tinymce.activeEditor.dom.create('div',
+            {
+                'class': 'mceNonEditable embeditem',
+                'data-embed-url': embed.url,
+                'data-embed-height': embed.height,
+                'data-embed-width': embed.width,
+                'data-embed-constrain': embed.constrain
+            },
+            embed.preview);
 
-            var wrapper = tinymce.activeEditor.dom.create('div', {'class': 'mceNonEditable embeditem'}, preview);
-            editor.selection.setNode(wrapper);
+            if (activeElement) {
+                activeElement.replaceWith(wrapper); // directly replaces the html node
+            }
+            else {
+                editor.selection.setNode(wrapper);
+            }
         },
 
 
@@ -1272,10 +1304,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             //Create the embedded plugin
-            self.createInsertEmbeddedMedia(args.editor, function () {
+            self.createInsertEmbeddedMedia(args.editor, function (activeElement, embed) {
                 var embed = {
+                    embed: embed,
                     submit: function (model) {
-                        self.insertEmbeddedMediaInEditor(args.editor, model.embed.preview);
+                        self.insertEmbeddedMediaInEditor(args.editor, model.embed, activeElement);
                         editorService.close();
                     },
                     close: function () {
