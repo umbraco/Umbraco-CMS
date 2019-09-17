@@ -506,6 +506,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public int Count => _contentNodes.Count;
 
+        /// <summary>
+        /// Get the most recent version of the LinkedNode stored in the dictionary for the supplied key
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         private static LinkedNode<TValue> GetHead<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict, TKey key)
             where TValue : class
         {
@@ -855,12 +863,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <param name="link"></param>
         /// <param name="gen">The generation requested, use null to avoid the lookup</param>
         /// <returns></returns>
-        private LinkedNode<ContentNode> GetLinkedNodeGen(LinkedNode<ContentNode> link, long? gen)
+        private LinkedNode<TValue> GetLinkedNodeGen<TValue>(LinkedNode<TValue> link, long? gen)
+            where TValue : class
         {
             if (!gen.HasValue) return link;
 
-            //find the correct snapshot
-            while (link != null && link.Gen != gen)
+            //find the correct snapshot, find the first that is <= the requested gen
+            while (link != null && link.Gen > gen)
             {
                 link = link.Next;
             }
@@ -1105,17 +1114,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public IEnumerable<ContentNode> GetAtRoot(long gen)
         {
-            var z = _root;
-            while (z != null)
-            {
-                if (z.Gen <= gen)
-                    break;
-                z = z.Next;
-            }
-            if (z == null)
+            var root = GetLinkedNodeGen(_root, gen);            
+            if (root == null)
                 yield break;
 
-            var id = z.Value.FirstChildContentId;
+            var id = root.Value.FirstChildContentId;
 
             while (id > 0)
             {
@@ -1130,13 +1133,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             // look ma, no lock!
             var link = GetHead(dict, key);
-            while (link != null)
-            {
-                if (link.Gen <= gen)
-                    return link.Value; // may be null
-                link = link.Next;
-            }
-            return null;
+            link = GetLinkedNodeGen(link, gen);
+            return link?.Value; // may be null
         }
 
         public IEnumerable<ContentNode> GetAll(long gen)
@@ -1146,17 +1144,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var links = _contentNodes.Values.ToArray();
             foreach (var l in links)
             {
-                var link = l;
-                while (link != null)
-                {
-                    if (link.Gen <= gen)
-                    {
-                        if (link.Value != null)
-                            yield return link.Value;
-                        break;
-                    }
-                    link = link.Next;
-                }
+                var link = GetLinkedNodeGen(l, gen);
+                if (link?.Value != null)
+                    yield return link.Value;
             }
         }
 
@@ -1164,14 +1154,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var has = _contentNodes.Any(x =>
             {
-                var link = x.Value;
-                while (link != null)
-                {
-                    if (link.Gen <= gen && link.Value != null)
-                        return true;
-                    link = link.Next;
-                }
-                return false;
+                var link = GetLinkedNodeGen(x.Value, gen);
+                return link?.Value != null;
             });
             return has == false;
         }
