@@ -250,9 +250,8 @@ namespace Umbraco.Web.Templates
                 // for each image uploaded from TinyMceController
                 var folderName = Path.GetDirectoryName(absoluteTempImagePath);
                 try
-                {
-                    File.Delete(absoluteTempImagePath);
-                    Directory.Delete(folderName);
+                {   
+                    Directory.Delete(folderName, true);
                 }
                 catch (Exception ex)
                 {
