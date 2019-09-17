@@ -470,7 +470,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private bool BuildKit(ContentNodeKit kit, out LinkedNode<ContentNode> parent)
         {
             // make sure parent exists
-            parent = GetParentLink(kit.Node, _liveGen);
+            parent = GetParentLink(kit.Node, null);
             if (parent == null)
             {
                 _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.");
@@ -795,7 +795,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var id = content.FirstChildContentId;
             while (id > 0)
             {
-                var link = GetRequiredLinkedNode(id, "child", _liveGen);
+                var link = GetRequiredLinkedNode(id, "child", null);
                 ClearBranchLocked(link.Value);
                 id = link.Value.NextSiblingContentId;
             }
@@ -806,21 +806,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// </summary>
         /// <param name="id"></param>
         /// <param name="description"></param>
+        /// <param name="gen">the generation requested, null for the latest stored</param>
         /// <returns></returns>
-        private LinkedNode<ContentNode> GetRequiredLinkedNode(int id, string description, long gen)
+        private LinkedNode<ContentNode> GetRequiredLinkedNode(int id, string description, long? gen)
         {
             if (_contentNodes.TryGetValue(id, out var link))
             {
-                //find the correct snapshot
-                while (link != null && link.Gen != gen)
-                {
-                    link = link.Next;
-                }
-
-                if (link.Value != null)
+                link = GetLinkedNodeGen(link, gen);                
+                if (link != null && link.Value != null)
                     return link;
-            }
-                
+            }   
 
             throw new PanicException($"failed to get {description} with id={id}");
         }
@@ -828,27 +823,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <summary>
         /// Gets the parent link node, may be null or root if ParentContentId is less than 0
         /// </summary>
-        private LinkedNode<ContentNode> GetParentLink(ContentNode content, long gen)
+        /// <param name="gen">the generation requested, null for the latest stored</param>
+        private LinkedNode<ContentNode> GetParentLink(ContentNode content, long? gen)
         {
             if (content.ParentContentId < 0)
             {
-                var root = _root;
-                //find the correct snapshot
-                while (root != null && root.Gen != gen)
-                {
-                    root = root.Next;
-                }
+                var root = GetLinkedNodeGen(_root, gen);                
                 return root;
             }
 
             if (_contentNodes.TryGetValue(content.ParentContentId, out var link))
-            {
-                //find the correct snapshot
-                while (link != null && link.Gen != gen)
-                {
-                    link = link.Next;
-                }
-            }
+                link = GetLinkedNodeGen(link, gen);
+                
             return link;
         }
 
@@ -856,17 +842,36 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// Gets the linked parent node and if it doesn't exist throw a <see cref="PanicException"/>
         /// </summary>
         /// <param name="content"></param>
+        /// <param name="gen">the generation requested, null for the latest stored</param>
         /// <returns></returns>
-        private LinkedNode<ContentNode> GetRequiredParentLink(ContentNode content, long gen)
+        private LinkedNode<ContentNode> GetRequiredParentLink(ContentNode content, long? gen)
         {
             return content.ParentContentId < 0 ? _root : GetRequiredLinkedNode(content.ParentContentId, "parent", gen);
+        }
+
+        /// <summary>
+        /// Iterates over the LinkedNode's generations to find the correct one
+        /// </summary>
+        /// <param name="link"></param>
+        /// <param name="gen">The generation requested, use null to avoid the lookup</param>
+        /// <returns></returns>
+        private LinkedNode<ContentNode> GetLinkedNodeGen(LinkedNode<ContentNode> link, long? gen)
+        {
+            if (!gen.HasValue) return link;
+
+            //find the correct snapshot
+            while (link != null && link.Gen != gen)
+            {
+                link = link.Next;
+            }
+            return link;
         }
 
         private void RemoveTreeNodeLocked(ContentNode content)
         {
             var parentLink = content.ParentContentId < 0
                 ? _root
-                : GetRequiredLinkedNode(content.ParentContentId, "parent", _liveGen);
+                : GetRequiredLinkedNode(content.ParentContentId, "parent", null);
 
             var parent = parentLink.Value;
 
@@ -889,14 +894,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (content.NextSiblingContentId > 0)
             {
-                var nextLink = GetRequiredLinkedNode(content.NextSiblingContentId, "next sibling", _liveGen);
+                var nextLink = GetRequiredLinkedNode(content.NextSiblingContentId, "next sibling", null);
                 var next = GenCloneLocked(nextLink);
                 next.PreviousSiblingContentId = content.PreviousSiblingContentId;
             }
 
             if (content.PreviousSiblingContentId > 0)
             {
-                var prevLink = GetRequiredLinkedNode(content.PreviousSiblingContentId, "previous sibling", _liveGen);
+                var prevLink = GetRequiredLinkedNode(content.PreviousSiblingContentId, "previous sibling", null);
                 var prev = GenCloneLocked(prevLink);
                 prev.NextSiblingContentId = content.NextSiblingContentId;
             }
@@ -909,7 +914,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (kit.Node.ParentContentId < 0)
                 return true;
-            var link = GetParentLink(kit.Node, _liveGen);
+            var link = GetParentLink(kit.Node, null);
             var node = link?.Value;
             return node != null && node.HasPublished;
         }
@@ -935,7 +940,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// </summary>
         private void AddTreeNodeLocked(ContentNode content, LinkedNode<ContentNode> parentLink = null)
         {
-            parentLink = parentLink ?? GetRequiredParentLink(content, _liveGen);
+            parentLink = parentLink ?? GetRequiredParentLink(content, null);
 
             var parent = parentLink.Value;
 

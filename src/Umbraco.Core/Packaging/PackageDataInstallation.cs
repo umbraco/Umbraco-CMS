@@ -191,7 +191,9 @@ namespace Umbraco.Core.Packaging
 
                 installationSummary.StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId);
                 installationSummary.ContentInstalled = ImportContent(compiledPackage.Documents, importedDocTypes, userId);
-                
+
+                scope.Complete();
+
                 return installationSummary;
             }
         }
