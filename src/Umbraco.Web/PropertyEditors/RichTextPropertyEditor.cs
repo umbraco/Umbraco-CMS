@@ -121,13 +121,8 @@ namespace Umbraco.Web.PropertyEditors
 
                 var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
                 var mediaParent = config?.MediaParentId;
-                Guid mediaParentId;
+                var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                if (mediaParent == null)
-                    mediaParentId = Guid.Empty;
-                else
-                    mediaParentId = mediaParent.Guid;
-                
                 parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                 return parsed;
             }

@@ -79,12 +79,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 var config = editorValue.DataTypeConfiguration as GridConfiguration;
                 var mediaParent = config?.MediaParentId;
-                Guid mediaParentId;
-
-                if (mediaParent == null)
-                    mediaParentId = Guid.Empty;
-                else
-                    mediaParentId = mediaParent.Guid;
+                var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
                 // editorValue.Value is a JSON string of the grid
                 var rawJson = editorValue.Value.ToString();
