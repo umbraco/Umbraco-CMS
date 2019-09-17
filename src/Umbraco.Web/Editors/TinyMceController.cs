@@ -1,25 +1,33 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using Umbraco.Core.Services;
-using Umbraco.Web.WebApi;
-using Umbraco.Core;
-using Umbraco.Web.Mvc;
-using Umbraco.Core.IO;
+﻿using System;
 using System.IO;
-using System.Threading.Tasks;
-using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using System.Linq;
-using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web.Http;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
+    [UmbracoApplicationAuthorize(
+        Constants.Applications.Content,
+        Constants.Applications.Media,
+        Constants.Applications.Members)]
     public class TinyMceController : UmbracoAuthorizedApiController
     {
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+
 
         public TinyMceController(IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
@@ -91,9 +99,28 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                // Could be a file permission ex
-                throw;
-            }            
+                // IOException, PathTooLong, DirectoryNotFound, UnathorizedAccess
+                Logger.Error<TinyMceController>(ex, "Error when trying to move {CurrentFilePath} to {NewFilePath}", currentFile, newFilePath);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, $"Error when trying to move {currentFile} to {newFilePath}", ex);
+            }
+
+            // Now remove all old files so that the temp folder(s) never grow
+            // Anything older than one day gets deleted
+            var tempFiles = Directory.GetFiles(IOHelper.MapPath(SystemDirectories.TempFileUploads), "*", SearchOption.AllDirectories);
+            foreach (var tempFile in tempFiles)
+            {
+                if (DateTime.UtcNow - File.GetLastWriteTimeUtc(tempFile) > TimeSpan.FromDays(1))
+                {
+                    try
+                    {
+                        File.Delete(tempFile);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error<TinyMceController>(ex, "Could not delete temp file {FileName}", tempFile);
+                    }
+                }
+            }
 
             return Request.CreateResponse(HttpStatusCode.OK, new { tmpLocation = relativeNewFilePath });
         }

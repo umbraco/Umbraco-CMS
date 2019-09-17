@@ -3,12 +3,14 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using File = System.IO.File;
 
 namespace Umbraco.Web.Templates
 {
@@ -189,7 +191,7 @@ namespace Umbraco.Web.Templates
             // see comment in ResolveMediaFromTextString for group reference
             => ResolveImgPattern.Replace(text, "$1$3$4$5");
 
-        internal static string FindAndPersistPastedTempImages(string html, int mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        internal static string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ILogger logger)
         {
             // Find all img's that has data-tmpimg attribute
             // Use HTML Agility Pack - https://html-agility-pack.net
@@ -213,7 +215,13 @@ namespace Umbraco.Web.Templates
                 var safeFileName = fileName.ToSafeFileName();
 
                 var mediaItemName = safeFileName.ToFriendlyName();
-                var mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+                IMedia mediaFile;
+
+                if(mediaParentFolder == Guid.Empty)
+                    mediaFile = mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+                else
+                    mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+                               
                 var fileInfo = new FileInfo(absoluteTempImagePath);
 
                 var fileStream = fileInfo.OpenReadWithRetry();
@@ -236,6 +244,20 @@ namespace Umbraco.Web.Templates
 
                 // Remove the data attribute (so we do not re-process this)
                 img.Attributes.Remove(TemporaryImageDataAttribute);
+
+                // Delete folder & image now its saved in media
+                // The folder should contain one image - as a unique guid folder created
+                // for each image uploaded from TinyMceController
+                var folderName = Path.GetDirectoryName(absoluteTempImagePath);
+                try
+                {   
+                    Directory.Delete(folderName, true);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(typeof(TemplateUtilities), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+                }
+                
             }
 
             return htmlDoc.DocumentNode.OuterHtml;

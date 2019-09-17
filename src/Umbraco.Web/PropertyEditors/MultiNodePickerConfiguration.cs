@@ -11,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("startNode", "Node type", "treesource")]
         public MultiNodePickerConfigurationTreeSource TreeSource { get; set; }
 
-        [ConfigurationField("filter", "Allow items of type", "contenttypepicker", Description = "Select the applicable content types")]
+        [ConfigurationField("filter", "Allow items of type", "treesourcetypepicker", Description = "Select the applicable types")]
         public string Filter { get; set; }
 
         [ConfigurationField("minNumber", "Minimum number of items", "number")]
