@@ -5,7 +5,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
         
         vm.configItems = [];
         vm.viewItems = [];
-        vm.changed = changed;
+        vm.change = change;
         
         function init() {
             
@@ -74,7 +74,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             
         }
 
-        function changed(model, value) {
+        function change(model, value) {
             
             var index = $scope.model.value.indexOf(value);
             

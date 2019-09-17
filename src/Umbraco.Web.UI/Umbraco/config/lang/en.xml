@@ -450,6 +450,7 @@
     <key alias="linkToMedia">Link to media</key>
     <key alias="selectContentStartNode">Select content start node</key>
     <key alias="selectMedia">Select media</key>
+    <key alias="selectMediaType">Select media type</key>
     <key alias="selectIcon">Select icon</key>
     <key alias="selectItem">Select item</key>
     <key alias="selectLink">Select link</key>
@@ -459,6 +460,7 @@
     <key alias="selectMediaStartNode">Select media start node</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
+    <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
     <key alias="selectSections">Select sections</key>
     <key alias="selectUsers">Select users</key>
@@ -593,6 +595,7 @@
     <key alias="stylesNoStylesOnPage">No active styles available</key>
     <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
+    <key alias="propertyHasErrors">This property is invalid</key>
   </area>
   <area alias="general">
     <key alias="about">About</key>
