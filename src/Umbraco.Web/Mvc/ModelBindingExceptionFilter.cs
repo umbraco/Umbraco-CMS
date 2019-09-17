@@ -3,6 +3,8 @@ using System.Configuration;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Umbraco.Core;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -10,13 +12,17 @@ namespace Umbraco.Web.Mvc
     ///     An exception filter checking if we get a <see cref="ModelBindingException" /> or <see cref="InvalidCastException" /> with the same model.
     ///     In which case it returns a redirect to the same page after 1 sec if not in debug mode.
     /// </summary>
+    /// <remarks>
+    /// This is only enabled when running PureLive
+    /// </remarks>
     internal class ModelBindingExceptionFilter : FilterAttribute, IExceptionFilter
     {
         private static readonly Regex GetPublishedModelsTypesRegex = new Regex("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);
 
         public void OnException(ExceptionContext filterContext)
         {
-            if (ConfigurationManager.AppSettings["Umbraco.Web.DisableModelBindingExceptionFilter"] != "true"
+            if (Current.PublishedModelFactory.IsLiveFactory()
+                && ConfigurationManager.AppSettings["Umbraco.Web.DisableModelBindingExceptionFilter"] != "true"
                 && !filterContext.ExceptionHandled
                 && ((filterContext.Exception is ModelBindingException || filterContext.Exception is InvalidCastException)
                     && IsMessageAboutTheSameModelType(filterContext.Exception.Message)))
