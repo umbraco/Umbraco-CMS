@@ -6,7 +6,8 @@ using System.Web.Mvc;
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    ///     An exception filter checking if we get a <see cref="ModelBindingException" /> or <see cref="InvalidCastException" /> with the same model. in which case it returns a redirect to the same page after 1 sec.
+    ///     An exception filter checking if we get a <see cref="ModelBindingException" /> or <see cref="InvalidCastException" /> with the same model.
+    ///     In which case it returns a redirect to the same page after 1 sec if not in debug mode.
     /// </summary>
     internal class ModelBindingExceptionFilter : FilterAttribute, IExceptionFilter
     {
@@ -14,7 +15,8 @@ namespace Umbraco.Web.Mvc
 
         public void OnException(ExceptionContext filterContext)
         {
-            if (!filterContext.ExceptionHandled
+            if (!filterContext.HttpContext.IsDebuggingEnabled
+                && !filterContext.ExceptionHandled
                 && ((filterContext.Exception is ModelBindingException || filterContext.Exception is InvalidCastException)
                     && IsMessageAboutTheSameModelType(filterContext.Exception.Message)))
             {
