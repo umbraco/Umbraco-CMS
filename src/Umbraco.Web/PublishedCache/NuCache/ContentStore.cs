@@ -612,43 +612,48 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //  NextSiblingContentId
                 //  PreviousSiblingContentId
 
-                ContentNode prev = null;
-                ContentNode currParent = null;
+                ContentNode previousNode = null;
+                ContentNode parent = null;
 
                 foreach (var kit in kits)
                 {
-                    if (!BuildKit(kit, out var parentLink)) 
+                    if (!BuildKit(kit, out var parentLink))
                     {
                         ok = false;
                         continue; // skip that one
                     }
 
-                    if (currParent != null && currParent.Id != parentLink.Value.Id)
+                    var thisNode = kit.Node;
+
+                    if (parent == null)
                     {
-                        //the parent is changing so that means the prev tracked one is the last child
-                        currParent.LastChildContentId = prev.Id;
-                        //changed parent, reset prev
-                        prev = null; 
+                        // first parent
+                        parent = parentLink.Value;
+                        parent.FirstChildContentId = thisNode.Id; // this node is the first node
                     }
-                    
-                    currParent = parentLink.Value;
-
-                    _logger.Debug<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
-                    SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-
-                    //if the parent's FirstChildContentId isn't set, then it must be the current one
-                    if (currParent.FirstChildContentId < 0)
-                        currParent.FirstChildContentId = kit.Node.Id;
-
-                    //if there is a previous one on the same level then set it's next sibling id to the current oen
-                    if (prev != null)
+                    else if (parent.Id != parentLink.Value.Id)
                     {
-                        prev.NextSiblingContentId = kit.Node.Id;
-                        kit.Node.PreviousSiblingContentId = prev.Id;
-                    }   
+                        // new parent
+                        parent = parentLink.Value;
+                        parent.FirstChildContentId = thisNode.Id; // this node is the first node
+                        previousNode = null; // there is no previous sibling
+                    }
 
-                    //store the prev
-                    prev = kit.Node;
+                    _logger.Debug<ContentStore>($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
+                    SetValueLocked(_contentNodes, thisNode.Id, thisNode);
+
+                    // this node is always the last child
+                    parent.LastChildContentId = thisNode.Id;
+
+                    // wire previous node as previous sibling
+                    if (previousNode != null)
+                    {
+                        previousNode.NextSiblingContentId = thisNode.Id;
+                        thisNode.PreviousSiblingContentId = previousNode.Id;
+                    }
+
+                    // this node becomes the previous node
+                    previousNode = thisNode;
 
                     _xmap[kit.Node.Uid] = kit.Node.Id;
                 }
@@ -843,19 +848,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (parent.FirstChildContentId < 0)
                 throw new PanicException("no children");
 
-            if (parent.FirstChildContentId == content.Id)
-            {
-                // if first, clone parent + remove first child
+            // if first/last, clone parent, then remove
+
+            if (parent.FirstChildContentId == content.Id || parent.LastChildContentId == content.Id)
                 parent = GenCloneLocked(parentLink);
+
+            if (parent.FirstChildContentId == content.Id)
                 parent.FirstChildContentId = content.NextSiblingContentId;
-            }
 
             if (parent.LastChildContentId == content.Id)
-            {
-                // if last, clone parent + remove last child
-                parent = GenCloneLocked(parentLink);
                 parent.LastChildContentId = content.PreviousSiblingContentId;
-            }
 
             // maintain linked list
 

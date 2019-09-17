@@ -432,6 +432,7 @@
     <key alias="linkToMedia">Link til medie</key>
     <key alias="selectContentStartNode">Vælg indhold startnode</key>
     <key alias="selectMedia">Vælg medie</key>
+    <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
     <key alias="selectItem">Vælg item</key>
     <key alias="selectLink">Vælg link</key>
@@ -441,6 +442,7 @@
     <key alias="selectMediaStartNode">Vælg medie startnode</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
+    <key alias="selectMemberType">Vælg medlemstype</key>
     <key alias="selectNode">Vælg node</key>
     <key alias="selectSections">Vælg sektioner</key>
     <key alias="selectUsers">Vælg brugere</key>
@@ -565,6 +567,7 @@
     <key alias="stylesNoStylesOnPage">Der er ingen aktive styles eller formatteringer på denne side</key>
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
+    <key alias="propertyHasErrors">Denne egenskab er ugyldig</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
