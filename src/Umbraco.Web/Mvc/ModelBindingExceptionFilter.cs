@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Mvc
 
         public void OnException(ExceptionContext filterContext)
         {
-            if (!filterContext.HttpContext.IsDebuggingEnabled
+            if (ConfigurationManager.AppSettings["Umbraco.Web.DisableModelBindingExceptionFilter"] != "true"
                 && !filterContext.ExceptionHandled
                 && ((filterContext.Exception is ModelBindingException || filterContext.Exception is InvalidCastException)
                     && IsMessageAboutTheSameModelType(filterContext.Exception.Message)))
