@@ -171,6 +171,18 @@
                 }
             }));
 
+            evts.push(eventsService.on("rte.file.uploading", function(){
+                notificationsService.info("Saving Disabled", "The node cannot be saved until the image/s has finished uploading")
+
+                $scope.page.saveButtonState = "busy";
+                $scope.page.buttonGroupState = "busy";
+
+            }));
+
+            evts.push(eventsService.on("rte.file.uploaded", function(){
+                $scope.page.saveButtonState = "success";
+                $scope.page.buttonGroupState = "success";
+            }));
         }
 
         /**
