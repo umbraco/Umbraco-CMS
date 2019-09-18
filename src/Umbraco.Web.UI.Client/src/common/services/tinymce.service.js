@@ -242,6 +242,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
          */
         getTinyMceEditorConfig: function (args) {
 
+            //global defaults, called before/during init
+            tinymce.DOM.events.domLoaded = true;
+            tinymce.baseURL = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + "/lib/tinymce/"; // trailing slash important
+
             var promises = [
                 this.configuration(),
                 getStyles(args.stylesheets)
