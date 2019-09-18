@@ -338,10 +338,13 @@ In the following example you see how to run some custom logic before a step goes
                         }
                     }
                     
-                    var scrollToCenterOfContainer = offsetTop - (scrollParent[0].clientHeight / 2) + (element[0].clientHeight / 2);
+                    var scrollToCenterOfContainer = offsetTop - (scrollParent[0].clientHeight / 2);
+                    if (element[0].clientHeight < scrollParent[0].clientHeight) {
+                        scrollToCenterOfContainer += (element[0].clientHeight / 2);
+                    }
 
                     // Detect if scroll is needed
-                    if (offsetTop > scrollParent[0].clientHeight) {
+                    if (offsetTop > scrollParent[0].clientHeight - 200) {
                         scrollParent.animate({
                             scrollTop: scrollToCenterOfContainer
                         }, function () {
@@ -402,7 +405,7 @@ In the following example you see how to run some custom logic before a step goes
                         }
 
                         if (position === "right") {
-                            if (offset.top < documentHeight / 2) {
+                            if (offset.top + popoverHeight < documentHeight) {
                                 css.top = offset.top;
                                 css.left = offset.left + width + margin;
                             } else {
@@ -422,7 +425,7 @@ In the following example you see how to run some custom logic before a step goes
                         }
 
                         if (position === "left") {
-                            if (offset.top < documentHeight / 2) {
+                            if (offset.top + popoverHeight < documentHeight) {
                                 css.top = offset.top;
                                 css.left = offset.left - popoverWidth - margin;
                             } else {
