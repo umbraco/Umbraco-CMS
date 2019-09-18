@@ -432,7 +432,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     // Check nodename is a DIV and the claslist contains 'embeditem'
                     var selectedElm = editor.selection.getNode();
                     var nodeName = selectedElm.nodeName;
-                    var embed = {};
+                    var modify = null;
 
                     if(nodeName.toUpperCase() === "DIV" && selectedElm.classList.contains("embeditem")){
                         // See if we can go and get the attributes
@@ -441,10 +441,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         var embedHeight = editor.dom.getAttrib(selectedElm, "data-embed-height");
                         var embedConstrain = editor.dom.getAttrib(selectedElm, "data-embed-constrain");
 
-                        embed = {
+                        modify = {
                             url: embedUrl,
-                            width: embedWidth,
-                            height: embedHeight,
+                            width: parseInt(embedWidth) || 0,
+                            height: parseInt(embedHeight) || 0,
                             constrain: embedConstrain
                         };
                     }
@@ -452,7 +452,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     if (callback) {
                         angularHelper.safeApply($rootScope, function() {
                             // pass the active element along so we can retrieve it later
-                            callback(selectedElm, embed);
+                            callback(selectedElm, modify);
                         });
                     }
                 }
@@ -469,11 +469,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             var wrapper = tinymce.activeEditor.dom.create('div',
             {
-                'class': 'mceNonEditable embeditem',
+                'class': 'embeditem',
                 'data-embed-url': embed.url,
                 'data-embed-height': embed.height,
                 'data-embed-width': embed.width,
-                'data-embed-constrain': embed.constrain
+                'data-embed-constrain': embed.constrain,
+                'contenteditable': false
             },
             embed.preview);
 
@@ -1304,9 +1305,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             //Create the embedded plugin
-            self.createInsertEmbeddedMedia(args.editor, function (activeElement, embed) {
+            self.createInsertEmbeddedMedia(args.editor, function (activeElement, modify) {
                 var embed = {
-                    embed: embed,
+                    modify: modify,
                     submit: function (model) {
                         self.insertEmbeddedMediaInEditor(args.editor, model.embed, activeElement);
                         editorService.close();
