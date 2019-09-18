@@ -462,14 +462,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         insertEmbeddedMediaInEditor: function (editor, embed, activeElement) {
             // Wrap HTML preview content here in a DIV with non-editable class of .mceNonEditable
             // This turns it into a selectable/cutable block to move about
-
-            // TODO: Do we add data attributes here - so the button can be re-clicked to edit/modify the item
-            // or double/tripple clicked to bring the infinite editor back open
-            // data-embed-url="instagram.com/xyz" data-embed-width="300" data-emebed-height="200"
-
             var wrapper = tinymce.activeEditor.dom.create('div',
             {
-                'class': 'embeditem',
+                'class': 'mceNonEditable embeditem',
                 'data-embed-url': embed.url,
                 'data-embed-height': embed.height,
                 'data-embed-width': embed.width,
