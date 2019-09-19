@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Logging;
+﻿using System;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFifteenFour
@@ -13,7 +14,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFifteen
         public override void Up()
         {
             // A user with a NULL securityStampToken can't log in after v7.8.0
-            Execute.Sql(@"UPDATE umbracoUser SET securityStampToken = NEWID() WHERE securityStampToken IS NULL");
+            Execute.Sql($@"UPDATE umbracoUser SET securityStampToken = '{Guid.NewGuid().ToString()}' WHERE securityStampToken IS NULL");
         }
 
         public override void Down()
