@@ -119,7 +119,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.setPackageViewState('packageList');">&larr; <localize key="general_back">Back</localize></a>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.setPackageViewState('packageList');" prevent-default><span aria-hidden="true">&larr;</span> <localize key="general_back">Back</localize></button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
@@ -185,7 +185,7 @@
                                     img-src="{{ 'https://our.umbraco.org' + vm.package.ownerInfo.ownerAvatar }}">
                                 </umb-avatar>
                                 </div>
-    
+
                                 <div>
                                     <div class="umb-package-details__owner-profile-name">{{ vm.package.ownerInfo.owner }}</div>
                                     <div class="umb-package-details__owner-profile-karma">
@@ -287,7 +287,7 @@
     <div ng-if="vm.packageViewState === 'packageInstall' && vm.loading === false">
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.setPackageViewState('packageDetails');">&larr; <localize key="general_back">Back</localize></a>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.setPackageViewState('packageDetails');" prevent-default><span aria-hidden="true">&larr;</span> <localize key="general_back">Back</localize></button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 

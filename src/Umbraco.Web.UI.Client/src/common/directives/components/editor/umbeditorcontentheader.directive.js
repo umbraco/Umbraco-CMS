@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader(serverValidationManager) {
+    function EditorContentHeader(serverValidationManager, localizationService, editorState) {
 
         function link(scope, el, attr, ctrl) {
             
@@ -13,7 +13,28 @@
             if (!scope.serverValidationAliasField) {
                 scope.serverValidationAliasField = "Alias";
             }
-            
+
+            scope.isNew = scope.content.state == "NotCreated";
+
+            localizationService.localizeMany([
+                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
+                "placeholders_a11yName",
+                    scope.isNew?"general_new":"general_edit"]
+            ).then(function (data) {
+                scope.a11yMessage = data[0];
+                scope.a11yName = data[1];
+                var title = data[2] +":";
+                if (!scope.isNew) {
+                    scope.a11yMessage += " " + scope.content.name;
+                    title += scope.content.name;
+                } else {
+                    var name = editorState.current.contentTypeName;
+                    scope.a11yMessage += " " + name;
+                    scope.a11yName = name + " " + scope.a11yName;
+                    title += name;
+                }
+                scope.$root.locationTitle = title + " - " + scope.$root.locationTitle ;
+            });
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";

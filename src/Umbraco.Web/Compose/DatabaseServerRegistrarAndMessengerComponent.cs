@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Threading;
 using Umbraco.Core;
-using Umbraco.Core.Compose;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;

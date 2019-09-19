@@ -90,6 +90,7 @@
                                       ng-repeat="node in model.user.startContentIds"
                                       icon="node.icon"
                                       name="node.name"
+                                      allow-remove="true"
                                       on-remove="model.removeSelectedItem($index, model.user.startContentIds)">
                     </umb-node-preview>
 
@@ -114,6 +115,7 @@
                                       ng-repeat="node in model.user.startMediaIds"
                                       icon="node.icon"
                                       name="node.name"
+                                      allow-remove="true"
                                       on-remove="model.removeSelectedItem($index, model.user.startMediaIds)">
                     </umb-node-preview>
 
