@@ -208,6 +208,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     function initEvents(editor){
 
         editor.on('SetContent', function (e) {
+            
             var content = e.content;
 
             // Upload BLOB images (dragged/pasted ones)
@@ -235,6 +236,20 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 });
             }
         });
+    }
+    
+    function cleanupPasteData(plugin, args) {
+        
+        // Remove spans
+        args.content = args.content.replace(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g, "$1");
+        
+        // Convert b to strong.
+        args.content = args.content.replace(/<\s*b([^>]*)>(.*?)<\s*\/\s*b([^>]*)>/g, "<strong$1>$2</strong$3>");
+        
+        // convert i to em
+        args.content = args.content.replace(/<\s*i([^>]*)>(.*?)<\s*\/\s*i([^>]*)>/g, "<em$1>$2</em$3>");
+        
+        
     }
 
     return {
@@ -336,7 +351,35 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     images_replace_blob_uris: false,
                     init_instance_callback: initEvents
                 };
-
+                
+                // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later.
+                var validPasteElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li,hr,pre,dl,dt,figure,figcaption,wbr"
+                
+                // add elements from user configurated styleFormats to our list of validPasteElements.
+                // (This means that we only allow H3-element if its configured as a styleFormat on this specific propertyEditor.)
+                var style, i = 0;
+                for(; i < styles.styleFormats.length; i++) {
+                    style = styles.styleFormats[i];
+                    if(style.block) {
+                        validPasteElements += "," + style.block;
+                    }
+                }
+                
+                var pasteConfig = {
+                    
+                    paste_remove_styles: true,
+                    paste_text_linebreaktype: true, //Converts plaintext linebreaks to br or p elements.
+                    paste_strip_class_attributes: "all",
+                    
+                    paste_word_valid_elements: validPasteElements,
+                    
+                    paste_preprocess: cleanupPasteData
+                    
+                };
+                
+                angular.extend(config, pasteConfig);
+                
+                
                 if (tinyMceConfig.customConfig) {
 
                     //if there is some custom config, we need to see if the string value of each item might actually be json and if so, we need to
