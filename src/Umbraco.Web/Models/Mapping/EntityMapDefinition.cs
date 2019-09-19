@@ -46,10 +46,19 @@ namespace Umbraco.Web.Models.Mapping
                 target.Icon = Constants.Icons.Member;
 
             if (source is IContentEntitySlim contentSlim)
+            {
                 source.AdditionalData["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
+            }
+
+            if (source is IDocumentEntitySlim documentSlim)
+            {
+                source.AdditionalData["IsPublished"] = documentSlim.Published;
+            }
 
             if (source is IMediaEntitySlim mediaSlim)
+            {
                 source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
+            }
 
             // NOTE: we're mapping the objects in AdditionalData by object reference here.
             // it works fine for now, but it's something to keep in mind in the future

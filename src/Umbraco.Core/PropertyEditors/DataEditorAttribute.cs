@@ -112,6 +112,11 @@ namespace Umbraco.Core.PropertyEditors
         public bool HideLabel { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the editor value can be copied
+        /// </summary>
+        public bool CanCopy { get; set; }
+
+        /// <summary>
         /// Gets or sets an optional icon.
         /// </summary>
         /// <remarks>The icon can be used for example when presenting datatypes based upon the editor.</remarks>
@@ -121,7 +126,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets or sets an optional group.
         /// </summary>
         /// <remarks>The group can be used for example to group the editors by category.</remarks>
-        public string Group { get; set; } = "common";
+        public string Group { get; set; } = Constants.PropertyEditors.Groups.Common;
 
         /// <summary>
         /// Gets or sets a value indicating whether the value editor is deprecated.

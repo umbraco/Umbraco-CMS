@@ -135,13 +135,16 @@ namespace Umbraco.Web.Mvc
             msg.Append(modelType.FullName);
             msg.Append(".");
 
-// raise event, to give model factories a chance at reporting
+            // raise event, to give model factories a chance at reporting
             // the error with more details, and optionally request that
             // the application restarts.
 
             var args = new ModelBindingArgs(sourceType, modelType, msg);
             ModelBindingException?.Invoke(Instance, args);
 
+            // TODO: with all of the tests I've done i don't think restarting the app here is required anymore,
+            // when I don't have this code enabled and i get a model binding error and just refresh, it fixes itself.
+            // We'll leave this for now though.
             if (args.Restart)
             {
                 msg.Append(" The application is restarting now.");
