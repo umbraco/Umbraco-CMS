@@ -45,6 +45,7 @@ namespace Umbraco.Examine
                     {"icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {UmbracoExamineIndex.PublishedFieldName, new object[] {c.Published ? "y" : "n"}},   //Always add invariant published value
                     {"id", new object[] {c.Id}},
+                    {"udi", new object[] { c.GetUdi() } },
                     {UmbracoExamineIndex.NodeKeyFieldName, new object[] {c.Key}},
                     {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
                     {"level", new object[] {c.Level}},

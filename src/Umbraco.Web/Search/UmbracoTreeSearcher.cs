@@ -61,7 +61,7 @@ namespace Umbraco.Web.Search
 
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
-            var fields = new[] { "id", "__NodeId" };
+            var fields = new[] { "id", "__NodeId", "udi" };
 
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc...
@@ -196,6 +196,8 @@ namespace Umbraco.Web.Search
 
                     sb.Append("+(");
 
+                    AppendUdiExactWithBoost(sb, query);
+
                     AppendNodeNameExactWithBoost(sb, query, allLangs);
 
                     AppendNodeNameWithWildcards(sb, querywords, allLangs);
@@ -224,6 +226,16 @@ namespace Umbraco.Web.Search
             sb.Append(type);
 
             return true;
+        }
+
+        private void AppendUdiExactWithBoost(StringBuilder sb, string query)
+        {
+            //udi exactly boost x 10
+            sb.Append("udi:");
+            sb.Append("\"");
+            sb.Append(query.ToLower());
+            sb.Append("\"");
+            sb.Append("^10.0 ");
         }
 
         private void AppendNodeNamePhraseWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)

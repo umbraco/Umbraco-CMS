@@ -33,6 +33,7 @@ namespace Umbraco.Examine
                 {
                     {"icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {"id", new object[] {m.Id}},
+                    {"udi", new object[] { m.GetUdi() } },
                     {UmbracoExamineIndex.NodeKeyFieldName, new object[] {m.Key}},
                     {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
                     {"level", new object[] {m.Level}},
