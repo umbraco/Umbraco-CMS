@@ -184,6 +184,8 @@ namespace Umbraco.Core
 
             // if it does not vary by segment
             // the segment cannot have a value
+            // segment may always be null, even when the ContentVariation.Segment flag is set for this variation,
+            // therefore the exact parameter is not used in segment validation.
             if (!variation.VariesBySegment() && segment != null && !(wildcards && segment == "*"))
             {
                 if (throwIfInvalid)

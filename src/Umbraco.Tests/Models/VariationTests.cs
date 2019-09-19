@@ -83,37 +83,95 @@ namespace Umbraco.Tests.Models
                 Assert.AreEqual(nw, v.ValidateVariation(c, s, false, true, false));
             }
 
-            // always support invariant,neutral
-            Assert4A(ContentVariation.Nothing, null, null, true);
+            // All tests:
+            // 1. if exact is set to true: culture cannot be null when the ContentVariation.Culture flag is set
+            // 2. if wildcards is set to false: fail when "*" is passed in as either culture or segment.
+            // 3. ContentVariation flag is ignored when wildcards are used.
+            // 4. Empty string is considered the same as null            
 
-            // never support culture and/or segment
-            Assert4A(ContentVariation.Nothing, "culture", null, false);
+            #region Nothing
+
+            Assert4A(ContentVariation.Nothing, null, null, true);
+            Assert4A(ContentVariation.Nothing, null, "", true);
+            Assert4B(ContentVariation.Nothing, null, "*", true, false, false, true);
             Assert4A(ContentVariation.Nothing, null, "segment", false);
+            Assert4A(ContentVariation.Nothing, "", null, true);
+            Assert4A(ContentVariation.Nothing, "", "", true);
+            Assert4B(ContentVariation.Nothing, "", "*", true, false, false, true);
+            Assert4A(ContentVariation.Nothing, "", "segment", false);
+            Assert4B(ContentVariation.Nothing, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.Nothing, "*", "", true, false, false, true);
+            Assert4B(ContentVariation.Nothing, "*", "*", true, false, false, true);
+            Assert4A(ContentVariation.Nothing, "*", "segment", false);
+            Assert4A(ContentVariation.Nothing, "culture", null, false);
+            Assert4A(ContentVariation.Nothing, "culture", "", false);
+            Assert4A(ContentVariation.Nothing, "culture", "*", false);
             Assert4A(ContentVariation.Nothing, "culture", "segment", false);
 
-            // support '*' only when wildcards are supported
-            Assert4B(ContentVariation.Nothing, "*", null, true, false, false, true);
-            Assert4B(ContentVariation.Nothing, null, "*", true, false, false, true);
-            Assert4B(ContentVariation.Nothing, "*", "*", true, false, false, true);
+            #endregion
 
+            #region Culture
 
-            // support invariant if not exact
             Assert4B(ContentVariation.Culture, null, null, false, true, false, true);
-
-            // support invariant if not exact, '*' when wildcards are supported
-            Assert4B(ContentVariation.Culture, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.Culture, null, "", false, true, false, true);
             Assert4B(ContentVariation.Culture, null, "*", false, false, false, true);
-            Assert4B(ContentVariation.Culture, "*", "*", true, false, false, true);
-
-            // never support segment
             Assert4A(ContentVariation.Culture, null, "segment", false);
-            Assert4A(ContentVariation.Culture, "culture", "segment", false);
+            Assert4B(ContentVariation.Culture, "", null, false, true, false, true);
+            Assert4B(ContentVariation.Culture, "", "", false, true, false, true);
+            Assert4B(ContentVariation.Culture, "", "*", false, false, false, true);
+            Assert4A(ContentVariation.Culture, "", "segment", false);
+            Assert4B(ContentVariation.Culture, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.Culture, "*", "", true, false, false, true);
+            Assert4B(ContentVariation.Culture, "*", "*", true, false, false, true);
             Assert4A(ContentVariation.Culture, "*", "segment", false);
-
-            Assert4B(ContentVariation.Culture, null, "*", false, false, false, true);
+            Assert4A(ContentVariation.Culture, "culture", null, true);
+            Assert4A(ContentVariation.Culture, "culture", "", true);
             Assert4B(ContentVariation.Culture, "culture", "*", true, false, false, true);
+            Assert4A(ContentVariation.Culture, "culture", "segment", false);
 
-            // could do the same with .Segment, and .CultureAndSegment
+            #endregion
+
+            #region Segment
+
+            Assert4B(ContentVariation.Segment, null, null, true, true, true, true);
+            Assert4B(ContentVariation.Segment, null, "", true, true, true, true);
+            Assert4B(ContentVariation.Segment, null, "*", true, false, false, true);
+            Assert4A(ContentVariation.Segment, null, "segment", true);
+            Assert4B(ContentVariation.Segment, "", null, true, true, true, true);
+            Assert4B(ContentVariation.Segment, "", "", true, true, true, true);
+            Assert4B(ContentVariation.Segment, "", "*", true, false, false, true);
+            Assert4A(ContentVariation.Segment, "", "segment", true);
+            Assert4B(ContentVariation.Segment, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.Segment, "*", "", true, false, false, true);
+            Assert4B(ContentVariation.Segment, "*", "*", true, false, false, true);
+            Assert4B(ContentVariation.Segment, "*", "segment", true, false, false, true);
+            Assert4A(ContentVariation.Segment, "culture", null, false);
+            Assert4A(ContentVariation.Segment, "culture", "", false);
+            Assert4A(ContentVariation.Segment, "culture", "*", false);
+            Assert4A(ContentVariation.Segment, "culture", "segment", false);
+
+            #endregion
+
+            #region CultureAndSegment
+            
+            Assert4B(ContentVariation.CultureAndSegment, null, null, false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, null, "", false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, null, "*", false, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, null, "segment", false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "", null, false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "", "", false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "", "*", false, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "", "segment", false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "*", "", true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "*", "*", true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "*", "segment", true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "culture", null, true, true, true, true);
+            Assert4B(ContentVariation.CultureAndSegment, "culture", "", true, true, true, true);
+            Assert4B(ContentVariation.CultureAndSegment, "culture", "*", true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "culture", "segment", true, true, true, true);
+
+            #endregion
         }
 
         [Test]
