@@ -168,11 +168,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
         xhr.onloadstart = function(e) {
-            eventsService.emit("rte.file.uploading");
+            angularHelper.safeApply($rootScope, function() {
+                eventsService.emit("rte.file.uploading");
+            });
         };
 
         xhr.onloadend = function(e) {
-            eventsService.emit("rte.file.uploaded");
+            angularHelper.safeApply($rootScope, function() {
+                eventsService.emit("rte.file.uploaded");
+            });
         };
 
         xhr.upload.onprogress = function (e) {
