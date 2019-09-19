@@ -365,7 +365,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     paste_remove_styles: true,
                     paste_text_linebreaktype: true,
                     paste_strip_class_attributes: "all",
-                    paste_retain_style_properties: "all",
                     
                     paste_word_valid_elements: validElements,
                     
