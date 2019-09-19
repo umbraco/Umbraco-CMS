@@ -205,8 +205,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         editor.on('SetContent', function (e) {
             
-            console.log("> setcontent", e)
-            
             var content = e.content;
 
             // Upload BLOB images (dragged/pasted ones)
@@ -238,11 +236,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     
     function cleanupPasteData(plugin, args) {
         
-        console.log("cleanupPasteData", args.content);
-        
         // Remove spans
-        //var spanRemoveRegex = new RegExp("</?span[^>]*>([^</span]*)</span([^>]*)", "g");
-        //args.content = args.content.replace(spanRemoveRegex, "$1");
         args.content = args.content.replace(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g, "$1");
         
         // Convert b to strong.
@@ -251,7 +245,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         // convert i to em
         args.content = args.content.replace(/<\s*i([^>]*)>(.*?)<\s*\/\s*i([^>]*)>/g, "<em$1>$2</em$3>");
         
-        console.log(args.content);
         
     }
 
@@ -283,7 +276,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 //plugins that must always be active
                 plugins.push("autoresize");
                 plugins.push("noneditable");
-                plugins.push("image");
 
                 var modeTheme = '';
                 var modeInline = false;
@@ -356,43 +348,33 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     init_instance_callback: initEvents
                 };
                 
-                //if (tinyMceConfig.pasteTidying) {
-                    plugins.splice(plugins.indexOf("paste"), 1);
-                    plugins.push("umbpaste");
-                    
-                    console.log("plugins:", plugins)
-                    
-                    // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later.
-                    var validElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li"
-                    
-                    // add valid elements from styleFormats.
-                    var style, i = 0;
-                    for(; i < styles.styleFormats.length; i++) {
-                        style = styles.styleFormats[i];
-                        if(style.block) {
-                            validElements += "," + style.block;
-                        }
+                // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later.
+                var validElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li"
+                
+                // add valid elements from styleFormats.
+                var style, i = 0;
+                for(; i < styles.styleFormats.length; i++) {
+                    style = styles.styleFormats[i];
+                    if(style.block) {
+                        validElements += "," + style.block;
                     }
+                }
+                
+                var pasteConfig = {
                     
-                    var pasteConfig = {
-                        
-                        //paste_block_drop: false,
-                        //paste_filter_drop: true,
-                        //paste_enable_default_filters: false, // to avoid stripping img tags from word.
-                        
-                        paste_remove_styles: true,
-                        paste_text_linebreaktype: true,
-                        paste_strip_class_attributes: "all",
-                        paste_retain_style_properties: "all",
-                        
-                        paste_word_valid_elements: validElements,
-                        
-                        paste_preprocess: cleanupPasteData
-                        
-                    };
+                    paste_remove_styles: true,
+                    paste_text_linebreaktype: true,
+                    paste_strip_class_attributes: "all",
+                    paste_retain_style_properties: "all",
                     
-                    angular.extend(config, pasteConfig);
-                //}
+                    paste_word_valid_elements: validElements,
+                    
+                    paste_preprocess: cleanupPasteData
+                    
+                };
+                
+                angular.extend(config, pasteConfig);
+                
                 
                 if (tinyMceConfig.customConfig) {
 

@@ -54,12 +54,5 @@ gulp.task('watch', function () {
         .pipe(gulp.dest(config.root + config.targets.js))
     );
     
-    
-    //watch all lib files that will not be merged - copy single file changes
-    stream.add(
-        watch(config.sources.globs.lib, { interval: watchInterval })
-        .pipe(gulp.dest(config.root + config.targets.lib))
-    );
-
     return stream;
 });
