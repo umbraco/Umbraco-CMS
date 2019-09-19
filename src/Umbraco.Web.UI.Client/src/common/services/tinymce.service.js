@@ -349,24 +349,24 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 };
                 
                 // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later.
-                var validElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li,hr,pre,dl,dt,figure,figcaption,wbr"
+                var validPasteElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li,hr,pre,dl,dt,figure,figcaption,wbr"
                   
-                // add valid elements from styleFormats.
+                // add elements from user configurated styleFormats to our list of validPasteElements.
                 var style, i = 0;
                 for(; i < styles.styleFormats.length; i++) {
                     style = styles.styleFormats[i];
                     if(style.block) {
-                        validElements += "," + style.block;
+                        validPasteElements += "," + style.block;
                     }
                 }
                 
                 var pasteConfig = {
                     
                     paste_remove_styles: true,
-                    paste_text_linebreaktype: true,
+                    paste_text_linebreaktype: true, //Converts plaintext linebreaks to br or p elements.
                     paste_strip_class_attributes: "all",
                     
-                    paste_word_valid_elements: validElements,
+                    paste_word_valid_elements: validPasteElements,
                     
                     paste_preprocess: cleanupPasteData
                     
