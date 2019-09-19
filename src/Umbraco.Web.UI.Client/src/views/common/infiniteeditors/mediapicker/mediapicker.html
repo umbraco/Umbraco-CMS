@@ -127,7 +127,8 @@
                     <div ng-if="target.url">
                         <umb-image-gravity
                             src="target.url"
-                            center="target.focalPoint">
+                            center="target.focalPoint"
+							on-value-changed="focalPointChanged(left, top)">
                         </umb-image-gravity>
                     </div>
 
