@@ -257,7 +257,10 @@ angular.module("umbraco")
                     // Update model on change, i.e. copy/pasted text, plugins altering content
                     editor.on('SetContent', function (e) {
                         if (!e.initial) {
-                            syncContent(editor);
+                              // sync content if editor is dirty
+                              if (!editor.isNotDirty) {
+                                syncContent(editor);
+                            }
                         }
                     });
 
