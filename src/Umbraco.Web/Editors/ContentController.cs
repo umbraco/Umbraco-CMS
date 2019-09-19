@@ -665,7 +665,8 @@ namespace Umbraco.Web.Editors
 
             //initialize this to successful
             var publishStatus = Attempt<PublishStatus>.Succeed();
-            var wasCancelled = false;
+            var wasCancelled = false;   //tracks if the operation was cancelled
+            var noop = false;           //tracks if the operation performed no operation (nothing to save)
 
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
@@ -673,6 +674,7 @@ namespace Umbraco.Web.Editors
                 var saveResult = saveMethod(contentItem.PersistedContent);
 
                 wasCancelled = saveResult.Success == false && saveResult.Result.StatusType == OperationStatusType.FailedCancelledByEvent;
+                noop = saveResult.Result.StatusType == OperationStatusType.NoOperation;
             }
             else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
             {
@@ -697,32 +699,34 @@ namespace Umbraco.Web.Editors
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    if (wasCancelled == false)
+                    if (wasCancelled)
+                    {
+                        AddCancelMessage(display);
+                        
+                    }
+                    else if (noop == false)
                     {
                         display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
                             contentItem.ReleaseDate.HasValue
-                                ? Services.TextService.Localize("speechBubbles/editContentSavedWithReleaseDateText", new [] { contentItem.ReleaseDate.Value.ToLongDateString(), contentItem.ReleaseDate.Value.ToShortTimeString() })
+                                ? Services.TextService.Localize("speechBubbles/editContentSavedWithReleaseDateText", new[] { contentItem.ReleaseDate.Value.ToLongDateString(), contentItem.ReleaseDate.Value.ToShortTimeString() })
                                 : Services.TextService.Localize("speechBubbles/editContentSavedText")
                         );
-                    }
-                    else
-                    {
-                        AddCancelMessage(display);
                     }
                     break;
                 case ContentSaveAction.SendPublish:
                 case ContentSaveAction.SendPublishNew:
-                    if (wasCancelled == false)
+                    if (wasCancelled)
+                    {
+                        AddCancelMessage(display);
+                    }
+                    else if (noop == false)
                     {
                         display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
                             Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
                     }
-                    else
-                    {
-                        AddCancelMessage(display);
-                    }
+
                     break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
