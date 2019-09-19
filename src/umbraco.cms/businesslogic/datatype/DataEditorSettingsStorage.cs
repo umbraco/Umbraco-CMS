@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using umbraco.DataLayer;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -14,7 +15,7 @@ namespace umbraco.cms.businesslogic.datatype
 
         public DataEditorSettingsStorage()
         {
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
 
             init(DataLayerHelper.CreateSqlHelper(dataHelper.ConnectionString, false));

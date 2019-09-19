@@ -49,7 +49,10 @@ namespace Umbraco.Core.Models
             return path
                 .Replace('\\', System.IO.Path.DirectorySeparatorChar)
                 .Replace('/', System.IO.Path.DirectorySeparatorChar);
-                //.TrimStart(System.IO.Path.DirectorySeparatorChar);
+
+            //Don't strip the start - this was a bug fixed in 7.3, see ScriptRepositoryTests.PathTests
+            //.TrimStart(System.IO.Path.DirectorySeparatorChar)
+            //.TrimStart('/');
         }
 
         /// <summary>

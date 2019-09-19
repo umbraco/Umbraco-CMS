@@ -8,9 +8,10 @@ using Umbraco.Web.Media.ImageUrlProviders;
 
 namespace Umbraco.Web.Media
 {
-    internal sealed class ImageUrlProviderResolver : ManyObjectsResolverBase<ImageUrlProviderResolver, IImageUrlProvider>
+    [Obsolete("IImageUrlProvider is no longer used and will be removed in future versions")]
+    internal sealed class ImageUrlProviderResolver : LazyManyObjectsResolverBase<ImageUrlProviderResolver, IImageUrlProvider>
     {
-        internal ImageUrlProviderResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> value)
+        internal ImageUrlProviderResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> value)
             : base(serviceProvider, logger, value)
         {
         }

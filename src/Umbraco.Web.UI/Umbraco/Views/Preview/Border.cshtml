@@ -1,0 +1,20 @@
+@inherits System.Web.Mvc.WebViewPage
+<div ng-controller="Umbraco.canvasdesigner.border" class="bordereditor">
+
+    <div class="box-slider">
+        <ul class="box-preview">
+            <li ng-repeat="border in borderList" class="border-{{border}}" ng-class="{selected: selectedBorder.name == border}" ng-click="setselectedBorder(border)"></li>
+        </ul>
+    </div>
+
+    <div class="box-slider" ng-repeat="border in borderList" ng-show="selectedBorder.name == border">
+        <div colorpicker ng-model="item.values[(border !== 'all' ? border : '') + 'bordercolor']"></div>
+        <select class="borderStyleSelect" ng-model="selectedBorder.type" ng-options="bordertype for bordertype in bordertypes"></select>
+        <!--<i ng-if="selectedBorder.color != ''" ng-click="selectedBorder.color= ''" class="icon icon-delete colorPickerDelete"></i>-->
+    </div>
+
+    <div class="box-slider">
+        <div ui-slider min="0" max="40" step="1" ng-model="selectedBorder.size"></div>
+    </div>
+
+</div>

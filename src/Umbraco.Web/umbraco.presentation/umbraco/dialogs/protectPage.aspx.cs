@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -41,7 +42,7 @@ namespace umbraco.presentation.umbraco.dialogs
         protected void selectMode(object sender, EventArgs e)
         {
             p_mode.Visible = false;
-            p_buttons.Visible = true;
+            p_setup.Visible = true;
 
             if (rb_simple.Checked)
             {
@@ -124,14 +125,15 @@ namespace umbraco.presentation.umbraco.dialogs
                         bt_protect.CommandName = "advanced";
                     }
 
-                    p_buttons.Visible = true;
                     p_mode.Visible = false;
+                    p_setup.Visible = true;
                 }
             }
 
             // Load up membergrouops
             _memberGroups.ID = "Membergroups";
             _memberGroups.Width = 175;
+            _memberGroups.Height = 165;
             var selectedGroups = "";
 
             // get roles from the membership provider
@@ -160,7 +162,8 @@ namespace umbraco.presentation.umbraco.dialogs
             groupsSelector.Controls.Add(_memberGroups);
 
 
-            bt_protect.Text = ui.Text("update");
+            bt_selectMode.Text = ui.Text("buttons", "select");
+            bt_protect.Text = ui.Text("save");
             bt_buttonRemoveProtection.Text = ui.Text("paRemoveProtection");
 
             // Put user code to initialize the page here
@@ -266,37 +269,33 @@ namespace umbraco.presentation.umbraco.dialogs
                 }
             }
 
-            feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+            feedback_text.Text = HttpUtility.HtmlEncode(ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text));
 
-            p_buttons.Visible = false;
-            pane_advanced.Visible = false;
-            pane_simple.Visible = false;
+            p_setup.Visible = false;
+            p_feedback.Visible = true;
             var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
             //reloads the current node in the tree
             ClientTools.SyncTree(content.Path, true);
             //reloads the current node's children in the tree
             ClientTools.ReloadActionNode(false, true);
-            feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
         }
 
 
         protected void buttonRemoveProtection_Click(object sender, System.EventArgs e)
         {
             int pageId = int.Parse(helper.Request("nodeId"));
-            p_buttons.Visible = false;
-            pane_advanced.Visible = false;
-            pane_simple.Visible = false;
+            p_setup.Visible = false;
 
             Access.RemoveProtection(pageId);
 
-            feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+            feedback_text.Text = HttpUtility.HtmlEncode(ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text));
+            p_feedback.Visible = true;
 
             var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
             //reloads the current node in the tree
             ClientTools.SyncTree(content.Path, true);
             //reloads the current node's children in the tree
             ClientTools.ReloadActionNode(false, true);
-            feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
         }
 
         protected CustomValidator SimpleLoginNameValidator;
@@ -312,13 +311,13 @@ namespace umbraco.presentation.umbraco.dialogs
         protected global::System.Web.UI.HtmlControls.HtmlInputHidden tempFile;
 
         /// <summary>
-        /// feedback control.
+        /// p_feedback control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback feedback;
+        protected global::System.Web.UI.WebControls.Panel p_feedback;
 
         /// <summary>
         /// p_mode control.
@@ -328,6 +327,15 @@ namespace umbraco.presentation.umbraco.dialogs
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel p_mode;
+
+        /// <summary>
+        /// p_setup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel p_setup;
 
         /// <summary>
         /// pane_chooseMode control.
@@ -465,15 +473,6 @@ namespace umbraco.presentation.umbraco.dialogs
         protected global::System.Web.UI.WebControls.PlaceHolder groupsSelector;
 
         /// <summary>
-        /// p_buttons control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel p_buttons;
-
-        /// <summary>
         /// pane_pages control.
         /// </summary>
         /// <remarks>
@@ -580,6 +579,15 @@ namespace umbraco.presentation.umbraco.dialogs
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder js;
+
+        /// <summary>
+        /// feedback_text control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal feedback_text;
 
 
     }

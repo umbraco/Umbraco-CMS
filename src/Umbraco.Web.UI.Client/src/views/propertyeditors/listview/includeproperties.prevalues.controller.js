@@ -4,6 +4,9 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         $scope.model.value = [];
     }
 
+    $scope.hasError = false;
+    $scope.errorMsg = "";
+
     $scope.propertyAliases = [];
     $scope.selectedField = null;
     $scope.systemFields = [
@@ -45,6 +48,11 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         return alias;
     }
 
+    $scope.changeField = function () {
+        $scope.hasError = false;
+        $scope.errorMsg = "";
+    }
+
     $scope.removeField = function(e) {
         $scope.model.value = _.reject($scope.model.value, function (x) {
             return x.alias === e.alias;
@@ -77,14 +85,14 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
 
     // Return a helper with preserved width of cells
     var fixHelper = function (e, ui) {
-        var h = ui.clone();
-
-        h.children().each(function () {
-            $(this).width($(this).width());            
+        ui.children().each(function () {
+            $(this).width($(this).width());
         });
-        h.css("background-color", "lightgray");
 
-        return h;
+        var row = ui.clone();
+        row.css("background-color", "lightgray");
+
+        return row;
     };
 
     $scope.sortableOptions = {
@@ -96,6 +104,10 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         cursor: 'move',
         items: '> tr',
         tolerance: 'pointer',
+        forcePlaceholderSize: true,
+        start: function(e, ui){
+            ui.placeholder.height(ui.item.height());
+        },
         update: function (e, ui) {
             
             // Get the new and old index for the moved element (using the text as the identifier)
@@ -119,19 +131,34 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
     $scope.addField = function () {
 
         var val = $scope.selectedField;
-        var isSystem = val.startsWith("_system_");
-        if (isSystem) {
-            val = val.trimStart("_system_");
-        }
+        if (val) {
+            var isSystem = val.startsWith("_system_");
+            if (isSystem) {
+                val = val.trimStart("_system_");
+            }
 
-        var exists = _.find($scope.model.value, function (i) {
-            return i.alias === val;
-        });
-        if (!exists) {
-            $scope.model.value.push({
-                alias: val,
-                isSystem: isSystem ? 1 : 0
+            var exists = _.find($scope.model.value, function (i) {
+                return i.alias === val;
             });
+
+            if (!exists) {
+                $scope.hasError = false;
+                $scope.errorMsg = "";
+
+                $scope.model.value.push({
+                    alias: val,
+                    isSystem: isSystem ? 1 : 0
+                });
+            }
+            else {
+                //there was an error, do the highlight (will be set back by the directive)
+                $scope.hasError = true;
+                $scope.errorMsg = "Property is already added";
+            }
+        }
+        else {
+            $scope.hasError = true;
+            $scope.errorMsg = "No property selected";
         }
     }
 

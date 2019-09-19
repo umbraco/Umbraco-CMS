@@ -6,7 +6,7 @@ namespace Umbraco.Core.Exceptions
     {
         public ConnectionException(string message, Exception innerException) : base(message, innerException)
         {
-
+            
         }
     }
 }

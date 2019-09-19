@@ -7,7 +7,8 @@ using Umbraco.Core;
 
 namespace umbraco.controls.Images
 {
-	public partial class ImageViewer : UserControl
+    [Obsolete("This is no longer used and will be removed in future versions")]
+    public partial class ImageViewer : UserControl
 	{
 
 		public ImageViewer()

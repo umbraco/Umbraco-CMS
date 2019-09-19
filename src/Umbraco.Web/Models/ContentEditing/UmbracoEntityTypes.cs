@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Web.Models.ContentEditing
+﻿using System;
+using System.ComponentModel;
+
+namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
     /// Represents the type's of Umbraco entities that can be resolved from the EntityController
@@ -53,6 +56,8 @@
         /// <summary>
         /// Content Item
         /// </summary>
+        [Obsolete("This is not used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         ContentItem,
 
         /// <summary>

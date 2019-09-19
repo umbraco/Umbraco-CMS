@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService) {
 
     //the null is important because we do an explicit bool check on this in the view
     //the avatar is by default the umbraco logo    
@@ -54,13 +54,33 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         $scope.user = null;
     }));
 
-    //when the app is read/user is logged in, setup the data
+    evts.push(eventsService.on("app.userRefresh", function(evt) {
+        userService.refreshCurrentUser().then(function(data) {
+            $scope.user = data;
+
+            //Load locale file
+            if ($scope.user.locale) {
+                tmhDynamicLocale.set($scope.user.locale);
+            }
+
+            if ($scope.user.avatars) {
+                $scope.avatar = [];
+                if (angular.isArray($scope.user.avatars)) {
+                    for (var i = 0; i < $scope.user.avatars.length; i++) {
+                        $scope.avatar.push({ value: $scope.user.avatars[i] });
+                    }
+                }
+            }
+        });
+    }));
+
+    //when the app is ready/user is logged in, setup the data
     evts.push(eventsService.on("app.ready", function (evt, data) {
 
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
 
-        updateChecker.check().then(function(update) {
+        updateChecker.check().then(function (update) {
             if (update && update !== "null") {
                 if (update.type !== "None") {
                     var notification = {
@@ -87,7 +107,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         }
 
         //if this is a new login (i.e. the user entered credentials), then clear out local storage - could contain sensitive data
-        if (data.loginType === "credentials") {            
+        if (data.loginType === "credentials") {
             localStorageService.clearAll();
         }
 
@@ -96,30 +116,15 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             tmhDynamicLocale.set($scope.user.locale);
         }
 
-        if ($scope.user.emailHash) {
+        if ($scope.user.avatars) {
 
-            //let's attempt to load the avatar, it might not exist or we might not have 
-            // internet access, well get an empty string back
-            $http.get(umbRequestHelper.getApiUrl("gravatarApiBaseUrl", "GetCurrentUserGravatarUrl"))
-                .then(
-                    function successCallback(response) {
-                        // if we can't download the gravatar for some reason, an null gets returned, we cannot do anything
-                        if (response.data !== "null") {
-                            if ($scope.user && $scope.user.emailHash) {
-                                var avatarBaseUrl = "https://www.gravatar.com/avatar/";
-                                var hash = $scope.user.emailHash;
+            $scope.avatar = [];
+            if (angular.isArray($scope.user.avatars)) {
+                for (var i = 0; i < $scope.user.avatars.length; i++) {
+                    $scope.avatar.push({ value: $scope.user.avatars[i] });
+                }
+            }
 
-                                $scope.avatar = [
-                                    { value: avatarBaseUrl + hash + ".jpg?s=30&d=mm" },
-                                    { value: avatarBaseUrl + hash + ".jpg?s=60&d=mm" },
-                                    { value: avatarBaseUrl + hash + ".jpg?s=90&d=mm" }
-                                ];
-                            }
-                        }
-
-                    }, function errorCallback(response) {
-                        //cannot load it from the server so we cannot do anything
-                    });
         }
     }));
 
@@ -129,6 +134,40 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             error: error,
             show: true
         };
+    }));
+
+    // manage the help dialog by subscribing to the showHelp appState
+    $scope.drawer = {};
+    evts.push(eventsService.on("appState.drawerState.changed", function (e, args) {
+        // set view
+        if (args.key === "view") {
+            $scope.drawer.view = args.value;
+        }
+        // set custom model
+        if (args.key === "model") {
+            $scope.drawer.model = args.value;
+        }
+        // show / hide drawer
+        if (args.key === "showDrawer") {
+            $scope.drawer.show = args.value;
+        }
+    }));
+
+    evts.push(eventsService.on("appState.tour.start", function (name, args) {
+        $scope.tour = args;
+        $scope.tour.show = true;
+    }));
+
+    evts.push(eventsService.on("appState.tour.end", function () {
+        $scope.tour = null;
+    }));
+
+    evts.push(eventsService.on("appState.tour.complete", function () {
+        $scope.tour = null;
+    }));
+
+    evts.push(eventsService.on("appState.backdrop", function (name, args) {
+        $scope.backdrop = args;
     }));
 
     //ensure to unregister from all events!
@@ -143,7 +182,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
 
 //register it
 angular.module('umbraco').controller("Umbraco.MainController", MainController).
-        config(function (tmhDynamicLocaleProvider) {
-            //Set url for locale files
-            tmhDynamicLocaleProvider.localeLocationPattern('lib/angular/1.1.5/i18n/angular-locale_{{locale}}.js');
-        });
+    config(function (tmhDynamicLocaleProvider) {
+        //Set url for locale files
+        tmhDynamicLocaleProvider.localeLocationPattern('lib/angular/1.1.5/i18n/angular-locale_{{locale}}.js');
+    });

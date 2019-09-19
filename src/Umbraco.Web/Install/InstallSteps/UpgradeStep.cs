@@ -14,6 +14,13 @@ namespace Umbraco.Web.Install.InstallSteps
         "Upgrade", "upgrade", 1, "Upgrading Umbraco to the latest and greatest version.")]
     internal class UpgradeStep : InstallSetupStep<object>
     {
+        private readonly ApplicationContext _appCtx;
+
+        public UpgradeStep(ApplicationContext appCtx)
+        {
+            _appCtx = appCtx;
+        }
+
         public override bool RequiresExecution(object model)
         {
             return true;
@@ -28,9 +35,9 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                var currentVersion = CurrentVersion().GetVersion(3).ToString();
+                var currentVersion = _appCtx.CurrentVersion().GetVersion(3).ToString();
                 var newVersion = UmbracoVersion.Current.ToString();
-                var reportUrl = string.Format("https://our.umbraco.org/contribute/releases/compare?from={0}&to={1}&notes=1", currentVersion, newVersion);
+                var reportUrl = string.Format("https://our.umbraco.com/contribute/releases/compare?from={0}&to={1}&notes=1", currentVersion, newVersion);
 
                 return new
                 {
@@ -42,47 +49,5 @@ namespace Umbraco.Web.Install.InstallSteps
             }
         }
 
-        /// <summary>
-        /// Gets the Current Version of the Umbraco Site before an upgrade
-        /// by using the last/most recent Umbraco Migration that has been run
-        /// </summary>
-        /// <returns>A SemVersion of the latest Umbraco DB Migration run</returns>
-        private SemVersion CurrentVersion()
-        {
-            //Set a default version of 0.0.0
-            var version = new SemVersion(0);
-
-            //If we have a db context available, if we don't then we are not installed anyways
-            if (ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured && ApplicationContext.Current.DatabaseContext.CanConnect)
-                version = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema().DetermineInstalledVersionByMigrations(ApplicationContext.Current.Services.MigrationEntryService);
-
-            if (version != new SemVersion(0))
-                return version;
-
-            // If we aren't able to get a result from the umbracoMigrations table then use the version in web.config, if it's available
-            if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus))
-                return version;
-
-            var configuredVersion = GlobalSettings.ConfigurationStatus;
-
-            string currentComment = null;
-
-            var current = configuredVersion.Split('-');
-            if (current.Length > 1)
-                currentComment = current[1];
-
-            Version currentVersion;
-            if (Version.TryParse(current[0], out currentVersion))
-            {
-                version = new SemVersion(
-                    currentVersion.Major,
-                    currentVersion.Minor,
-                    currentVersion.Build,
-                    string.IsNullOrWhiteSpace(currentComment) ? null : currentComment,
-                    currentVersion.Revision > 0 ? currentVersion.Revision.ToString() : null);
-            }
-
-            return version;
-        }
     }
 }

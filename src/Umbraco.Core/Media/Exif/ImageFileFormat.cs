@@ -17,5 +17,9 @@
         /// The file is a TIFF File.
         /// </summary>
         TIFF,
+        /// <summary>
+        /// The file is a SVG File.
+        /// </summary>
+        SVG,
     }
 }

@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="sv" intName="Swedish" localName="Svenska" lcid="29" culture="sv-SE">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Hantera domännamn</key>
@@ -12,7 +12,6 @@
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
     <key alias="createPackage">Skapa paket</key>
-    <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
     <key alias="emptyTrashcan">Töm papperskorgen</key>
@@ -32,7 +31,6 @@
     <key alias="sendtopublish">Skicka för publicering</key>
     <key alias="sendToTranslate">Skicka för översättning</key>
     <key alias="sort">Sortera</key>
-    <key alias="toPublish">Skicka för publicering</key>
     <key alias="translate">Översätt</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
@@ -82,6 +80,7 @@
     <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
     <key alias="saveAndPublish">Spara och publicera</key>
+    <key alias="saveAndSchedule">Spara och schemalägg</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
     <key alias="select">Välj</key>
     <key alias="selectCurrentFolder">Välj aktuell mapp</key>
@@ -413,7 +412,7 @@
     <key alias="showPageOnSend">Vilken sida skall visas när formuläret är skickat</key>
     <key alias="size">Storlek</key>
     <key alias="sort">Sortera</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Skicka</key>
     <key alias="type">Skriv</key>
     <key alias="typeToSearch">Skriv för att söka...</key>
     <key alias="up">Upp</key>
@@ -428,8 +427,17 @@
     <key alias="width">Bredd</key>
     <key alias="view">Titta på</key>
     <key alias="yes">Ja</key>
-    <key alias="reorder">Reorder</key>
-    <key alias="reorderDone">I am done reordering</key>
+    <key alias="reorder">Sortera</key>
+    <key alias="reorderDone">Avsluta sortering</key>
+    <key alias="preview">Förhandsvisning</key>
+    <key alias="changePassword">Ändra lösenord</key>
+    <key alias="to">till</key>
+    <key alias="listView">Listvy</key>
+    <key alias="saving">Sparar...</key>
+    <key alias="current">nuvarande</key>
+    <key alias="embed">Inbäddning</key>
+    <key alias="retrieve">Hämta</key>
+    <key alias="selected">valda</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrundsfärg</key>
@@ -448,7 +456,7 @@
     <key alias="databaseHeader">Databaskonfiguration</key>
     <key alias="databaseInstall"><![CDATA[För att installera Umbraco %0% databasen, tryck på knappen <strong>installera</strong>]]></key>
     <key alias="databaseInstallDone"><![CDATA[Nu har Umbraco %0% kopierats till din databas. Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br />><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Mer information om att redigera web.config hittar du här.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br />><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Mer information om att redigera web.config hittar du här.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[För att avsluta det här steget måste du veta lite information om din databasserver ("connection string").<br /> Eventuellt kan du behöva kontakta ditt webb-hotell. Om du installerar på en lokal maskin eller server kan du få informationen från din systemadministratör.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Tryck <strong>Uppgradera</strong> knappen för att uppgradera din databas till Umbraco %0%</p> <p> Du behöver inte vara orolig. Inget innehåll kommer att raderas och efteråt kommer allt att fungera som vanligt! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din databas har nu uppgraderats till den senaste versionen %0%.<br />Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
@@ -457,7 +465,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>Standardanvändaren har avaktiverats eller har inte åtkomst till Umbraco!</strong></p><p>Du behöver inte göra något ytterligare här. Klicka <b>Next</b> för att fortsätta.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Standardanvändarens lösenord har ändrats sedan installationen!</strong></p><p>Du behöver inte göra något ytterligare här. Klicka <strong>Nästa</strong> för att fortsätta.]]></key>
     <key alias="defaultUserPasswordChanged">Lösenordet är ändrat!</key>
-    <key alias="defaultUserText"><![CDATA[<p> Umbraco skapar en standardanvändare med login <strong>('admin')</strong> och lösenordet <strong>('default')</strong>. Det är <strong>viktigt</strong> att lösenordet ändras till något unikt. </p> <p> Det här steget kommer kontrollera standardanvändarens lösenord och låta dig vet om det behöver ändras. </p>]]></key>
     <key alias="greatStart">Få en flygande start, kolla på våra introduktionsvideor</key>
     <key alias="licenseText">Genom att klicka på Nästa knappen (eller redigera UmbracoConfigurationStatus i web.config), accepterar du licensavtalet för den här mjukvaran som det är skrivet i rutan nedan. Observera att den här Umbracodistributionen består av två olika licensavtal, "the open source MIT license" för ramverket och "the Umbraco freeware license" som täcker användargränssnittet.</key>
     <key alias="None">Inte installerad än.</key>
@@ -594,11 +601,12 @@
     <key alias="search">Skriv för att söka...</key>
     <key alias="username">Fyll i ditt lösenord</key>
     <key alias="enterTags">Skriv för att lägga till taggar (och tryck enter efter varje tagg)...</key>
+    <key alias="usernamehint">Ditt användarnamn är vanligtvis din e-postadress</key>
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollbaserat lösenordsskydd</key>
     <key alias="paAdvancedHelp"><![CDATA[Välj detta alternativ om du vill skydda sidan med hjälp av rollbaserat lösenordsskydd.<br /> Då används Umbracos medlemsgrupper.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Du måste skapa en medlemsgrupp innan du kan använda <br />rollbaserat lösenordsskydd.]]></key>
+    <key alias="paAdvancedNoGroups">Du måste skapa en medlemsgrupp innan du kan använda rollbaserat lösenordsskydd.</key>
     <key alias="paErrorPage">Sida med felmeddelande</key>
     <key alias="paErrorPageHelp">Används när en användare är inloggad, men saknar rättigheter att se sidan</key>
     <key alias="paHowWould">Välj hur du vill lösenordsskydda sidan</key>
@@ -637,8 +645,10 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Återställ</key>
+    <key alias="saveCrop">spara beskärning</key>
+    <key alias="addCrop">Lägg till ny beskärning</key>
   </area>
-  <area alias="rollback">
+    <area alias="rollback">
     <key alias="currentVersion">Nuvarande version</key>
     <key alias="diffHelp"><![CDATA[Här visas skillnaderna mellan nuvarande version och vald version<br /><del>Röd</del> text kommer inte att synas i den valda versionen. , <ins>Grön betyder att den har tillkommit</ins>]]></key>
     <key alias="documentRolledBack">Dokumentet har återgått till en tidigare version</key>
@@ -692,7 +702,7 @@
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sortering klar</key>
     <key alias="sortHelp">Välj i vilken ordning du vill ha sidorna genom att dra dem upp eller ner i listan. Du kan också klicka på kolumnrubrikerna för att sortera grupper av sidor</key>
-    <key alias="sortPleaseWait"><![CDATA[Vänta medan sidorna sorteras. Det kan ta en stund.<br/><br/>Stäng inte fönstret under tiden sidorna sorteras.]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Vänta medan sidorna sorteras. Det kan ta en stund.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">Publiceringen avbröts av ett tredjepartstillägg</key>
@@ -769,6 +779,12 @@
     <key alias="template">Sidmall</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Lägg till</key>
     <key alias="chooseLayout">Choose layout</key>
     <key alias="addRows">Lägg till rad</key>
@@ -819,8 +835,6 @@
     <key alias="postContent">Infoga efter fält</key>
     <key alias="preContent">Infoga före fält</key>
     <key alias="recursive">Rekursiv</key>
-    <key alias="removeParagraph">Avlägsna stycke-taggar</key>
-    <key alias="removeParagraphHelp">Kommer att avlägsna alla &amp;lt;P&amp;gt; i början och slutet av texten</key>
     <key alias="standardFields">Standardfält</key>
     <key alias="uppercase">Versaler</key>
     <key alias="urlEncode">URL-koda</key>
@@ -930,8 +944,6 @@
     <key alias="startnode">Startnod i innehåll</key>
     <key alias="username">Användarens namn</key>
     <key alias="userPermissions">Användarrättigheter</key>
-    <key alias="usertype">Användartyp</key>
-    <key alias="userTypes">Användartyper</key>
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="translator">Översättare</key>

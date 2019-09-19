@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
@@ -49,20 +49,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             return repository;
         }
 
-        private ContentTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private ContentTypeRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, templateRepository);
             return contentTypeRepository;
         }
 
-        private MediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork unitOfWork)
+        private MediaTypeRepository CreateMediaTypeRepository(IScopeUnitOfWork unitOfWork)
         {
             var contentTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
             return contentTypeRepository;
         }
 
-        private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork, Guid containerEntityType)
+        private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork, Guid containerEntityType)
         {
             return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, containerEntityType);
         }
@@ -332,6 +332,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType2("test", "Test", propertyGroupName: "testGroup");
 
                 Assert.AreEqual(4, contentType.PropertyTypes.Count());
+
+                // remove all templates - since they are not saved, they would break the (wtf) mapping code
+                contentType.AllowedTemplates = new ITemplate[0];
 
                 // there is NO mapping from display to contentType, but only from save
                 // to contentType, so if we want to test, let's to it properly!

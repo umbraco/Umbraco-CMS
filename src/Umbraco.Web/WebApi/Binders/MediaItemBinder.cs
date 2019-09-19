@@ -3,7 +3,6 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.WebApi.Binders
 {
@@ -29,12 +28,12 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override IMedia CreateNew(MediaItemSave model)
         {
-            var contentType = ApplicationContext.Services.ContentTypeService.GetMediaType(model.ContentTypeAlias);
-            if (contentType == null)
+            var mediaType = ApplicationContext.Services.ContentTypeService.GetMediaType(model.ContentTypeAlias);
+            if (mediaType == null)
             {
-                throw new InvalidOperationException("No content type found wth alias " + model.ContentTypeAlias);
+                throw new InvalidOperationException("No media type found with alias " + model.ContentTypeAlias);
             }
-            return new Core.Models.Media(model.Name, model.ParentId, contentType);
+            return new Core.Models.Media(model.Name, model.ParentId, mediaType);
         }
 
         protected override ContentItemDto<IMedia> MapFromPersisted(MediaItemSave model)

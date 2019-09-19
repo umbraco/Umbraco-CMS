@@ -6,7 +6,11 @@ namespace Umbraco.Web
     {
         public HttpContextBase Value
         {
-            get { return new HttpContextWrapper(HttpContext.Current); }
+            get
+            {
+                var httpContext = HttpContext.Current;
+                return httpContext == null ? null : new HttpContextWrapper(httpContext);
+            }
         }
     }
 }

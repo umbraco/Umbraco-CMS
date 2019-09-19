@@ -102,15 +102,24 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
             //clear the status
             args.scope[args.statusPropertyName] = null;
 
-            if (angular.isArray(args.notifications)) {
-                for (var i = 0; i < args.notifications.length; i++) {
-                    notificationsService.showNotification(args.notifications[i]);
-                }
-            }
+            this.showNotifications(args);            
 
             args.scope.$broadcast("formSubmitted", { scope: args.scope });
         },
-        
+
+        showNotifications: function (args) {
+          if (!args || !args.notifications) {
+            return false;
+          }
+          if (angular.isArray(args.notifications)) {
+            for (var i = 0; i < args.notifications.length; i++) {
+              notificationsService.showNotification(args.notifications[i]);
+            }
+            return true;
+          }
+          return false;
+        },
+
         /**
          * @ngdoc function
          * @name umbraco.services.formHelper#handleError
@@ -141,9 +150,7 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                     dialogService.ysodDialog(err);
                 }
             }
-            else {
-                dialogService.ysodDialog(err);
-            }
+            
         },
 
         /**

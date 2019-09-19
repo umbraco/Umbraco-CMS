@@ -115,6 +115,27 @@ angular.module('umbraco.services')
 		 */
 		getCurrent: function(){
 			return nArray;
-		}
+        },
+
+        /**
+		 * @ngdoc method
+		 * @name umbraco.services.historyService#getLastAccessedItemForSection
+		 * @methodOf umbraco.services.historyService
+		 *
+		 * @description
+		 * Method to return the item that was last accessed in the given section
+		 *
+         * @param {string} sectionAlias Alias of the section to return the last accessed item for.
+		 */
+        getLastAccessedItemForSection: function (sectionAlias) {
+            for (var i = 0, len = nArray.length; i < len; i++) {
+                var item = nArray[i];
+                if (item.link.indexOf(sectionAlias + "/") === 0) {
+                    return item;
+                }
+            }
+
+            return null;
+        }
 	};
 });

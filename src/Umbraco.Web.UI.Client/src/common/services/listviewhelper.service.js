@@ -269,12 +269,20 @@
             var isSelected = false;
             for (var i = 0; selection.length > i; i++) {
                 var selectedItem = selection[i];
-                if (item.id === selectedItem.id) {
+                // if item.id is 2147483647 (int.MaxValue) use item.key
+                if ((item.id !== 2147483647 && item.id === selectedItem.id) || (item.key && item.key === selectedItem.key)) {
                     isSelected = true;
                 }
             }
             if (!isSelected) {
-                selection.push({ id: item.id });
+                var obj = {
+                    id: item.id
+                };
+                if (item.key) {
+                    obj.key = item.key;
+                }
+
+                selection.push(obj);
                 item.selected = true;
             }
         }
@@ -294,7 +302,8 @@
         function deselectItem(item, selection) {
             for (var i = 0; selection.length > i; i++) {
                 var selectedItem = selection[i];
-                if (item.id === selectedItem.id) {
+                // if item.id is 2147483647 (int.MaxValue) use item.key
+                if ((item.id !== 2147483647 && item.id === selectedItem.id) || (item.key && item.key === selectedItem.key)) {
                     selection.splice(i, 1);
                     item.selected = false;
                 }
@@ -364,9 +373,15 @@
             for (var i = 0; i < items.length; i++) {
 
                 var item = items[i];
+                var obj = {
+                    id: item.id
+                };
+                if (item.key) {
+                    obj.key = item.key
+                }
 
                 if (checkbox.checked) {
-                    selection.push({ id: item.id });
+                    selection.push(obj);
                 } else {
                     clearSelection = true;
                 }
@@ -405,7 +420,8 @@
                 for (var selectedIndex = 0; selection.length > selectedIndex; selectedIndex++) {
                     var selectedItem = selection[selectedIndex];
 
-                    if (item.id === selectedItem.id) {
+                    // if item.id is 2147483647 (int.MaxValue) use item.key
+                    if ((item.id !== 2147483647 && item.id === selectedItem.id) || (item.key && item.key === selectedItem.key)) {
                         numberOfSelectedItem++;
                     }
                 }
@@ -479,7 +495,7 @@
             });
 
             //we need to use 'apply' to call intersection with an array of arrays,
-            //see: http://stackoverflow.com/a/16229480/694494
+            //see: https://stackoverflow.com/a/16229480/694494
             var intersectPermissions = _.intersection.apply(_, arr);
 
             return {
@@ -488,7 +504,7 @@
                 canDelete: _.contains(intersectPermissions, 'D'), //Magic Char = D
                 canMove: _.contains(intersectPermissions, 'M'), //Magic Char = M
                 canPublish: _.contains(intersectPermissions, 'U'), //Magic Char = U
-                canUnpublish: _.contains(intersectPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
+                canUnpublish: _.contains(intersectPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
             };
         }
 

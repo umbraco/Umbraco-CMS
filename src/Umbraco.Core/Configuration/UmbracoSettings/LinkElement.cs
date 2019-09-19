@@ -1,7 +1,11 @@
-﻿using System.Configuration;
+﻿using System;
+using System.ComponentModel;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This is no longer used and will be removed in future versions")]
     internal class LinkElement : ConfigurationElement, ILink
     {
         [ConfigurationProperty("application")]

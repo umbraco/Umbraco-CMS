@@ -12,7 +12,7 @@ angular.module("Umbraco.canvasdesigner")
             fontFamily: '',
             fontType: '',
             fontWeight: '',
-            fontStyle: '',
+            fontStyle: ''
         }
     }
 
@@ -74,7 +74,7 @@ angular.module("Umbraco.canvasdesigner")
             fontType: "safe",
             fontFamily: value,
             fontWeight: "normal",
-            fontStyle: "normal",
+            fontStyle: "normal"
         });
     });
 
@@ -121,7 +121,7 @@ angular.module("Umbraco.canvasdesigner")
                     fontFamily: $scope.selectedFont.fontFamily,
                     fontType: $scope.selectedFont.fontType,
                     fontWeight: $scope.selectedFont.fontWeight,
-                    fontStyle: $scope.selectedFont.fontStyle,
+                    fontStyle: $scope.selectedFont.fontStyle
                 });
             }
         });
@@ -161,7 +161,7 @@ angular.module("Umbraco.canvasdesigner")
                 fontFamily: $scope.selectedFont.fontFamily,
                 fontType: $scope.selectedFont.fontType,
                 fontWeight: $scope.selectedFont.fontWeight,
-                fontStyle: $scope.selectedFont.fontStyle,
+                fontStyle: $scope.selectedFont.fontStyle
             });
         }
 
@@ -178,7 +178,7 @@ angular.module("Umbraco.canvasdesigner")
             fontFamily: $scope.selectedFont.fontFamily,
             fontType: $scope.selectedFont.fontType,
             fontWeight: $scope.selectedFont.fontWeight,
-            fontStyle: $scope.selectedFont.fontStyle,
+            fontStyle: $scope.selectedFont.fontStyle
         });
     };
 

@@ -34,12 +34,11 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="lastLockoutDate">The last lockout date.</param>
         /// <param name="fullName">The full name.</param>
         /// <param name="language">The language.</param>
-        /// <param name="userType">Type of the user.</param>
         /// <param name="user"></param>
         public UmbracoMembershipUser(string providerName, string name, object providerUserKey, string email, 
             string passwordQuestion, string comment, bool isApproved, bool isLockedOut, 
             DateTime creationDate, DateTime lastLoginDate, DateTime lastActivityDate, DateTime lastPasswordChangedDate,
-            DateTime lastLockoutDate, string fullName, string language, IUserType userType, T user) 
+            DateTime lastLockoutDate, string fullName, string language, T user) 
             : base( providerName, name, providerUserKey, email, passwordQuestion, comment, isApproved, isLockedOut, 
                 creationDate, lastLoginDate, lastActivityDate, lastPasswordChangedDate, lastLockoutDate)
         {

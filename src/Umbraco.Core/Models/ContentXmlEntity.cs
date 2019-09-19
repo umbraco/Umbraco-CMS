@@ -42,6 +42,7 @@ namespace Umbraco.Core.Models
         public Guid Key { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
+        public DateTime? DeletedDate { get; set; }
 
         /// <summary>
         /// Special case, always return false, this will cause the repositories managing 
@@ -60,5 +61,7 @@ namespace Umbraco.Core.Models
             DeepCloneHelper.DeepCloneRefProperties(this, clone);
             return clone;
         }
+
+        
     }
 }

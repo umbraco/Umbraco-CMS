@@ -18,7 +18,10 @@ namespace Umbraco.Core.Sync
         // need this public, parameter-less constructor so the web service messenger
         // can de-serialize the instructions it receives
         public RefreshInstruction()
-        { }
+        {
+            //set default - this value is not used for reading after it's been deserialized, it's only used for persisting the instruction to the db
+            JsonIdCount = 1;
+        }
 
         // need this public one so it can be de-serialized - used by the Json thing
         // otherwise, should use GetInstructions(...)
@@ -30,12 +33,16 @@ namespace Umbraco.Core.Sync
             IntId = intId;
             JsonIds = jsonIds;
             JsonPayload = jsonPayload;
+            //set default - this value is not used for reading after it's been deserialized, it's only used for persisting the instruction to the db
+            JsonIdCount = 1;
         }
 
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType)
         {
             RefresherId = refresher.UniqueIdentifier;
             RefreshType = refreshType;
+            //set default - this value is not used for reading after it's been deserialized, it's only used for persisting the instruction to the db
+            JsonIdCount = 1;
         }
 
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, Guid guidId)
@@ -50,9 +57,21 @@ namespace Umbraco.Core.Sync
             IntId = intId;
         }
 
-        private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, string json)
+        /// <summary>
+        /// A private constructor to create a new instance
+        /// </summary>
+        /// <param name="refresher"></param>
+        /// <param name="refreshType"></param>
+        /// <param name="json"></param>
+        /// <param name="idCount">
+        /// When the refresh method is <see cref="RefreshMethodType.RefreshByIds"/> we know how many Ids are being refreshed so we know the instruction
+        /// count which will be taken into account when we store this count in the database. 
+        /// </param>
+        private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, string json, int idCount = 1)
             : this(refresher, refreshType)
         {
+            JsonIdCount = idCount;
+
             if (refreshType == RefreshMethodType.RefreshByJson)
                 JsonPayload = json;
             else
@@ -77,8 +96,12 @@ namespace Umbraco.Core.Sync
                 case MessageType.RefreshById:
                     if (idType == null)
                         throw new InvalidOperationException("Cannot refresh by id if idType is null.");
-                    if (idType == typeof (int)) // bulk of ints is supported
-                        return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshByIds, JsonConvert.SerializeObject(ids.Cast<int>().ToArray())) };
+                    if (idType == typeof(int))
+                    {
+                        // bulk of ints is supported
+                        var intIds = ids.Cast<int>().ToArray();
+                        return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshByIds, JsonConvert.SerializeObject(intIds), intIds.Length) };
+                    }
                     // else must be guids, bulk of guids is not supported, iterate
                     return ids.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RefreshByGuid, (Guid) x));
 
@@ -120,6 +143,14 @@ namespace Umbraco.Core.Sync
         /// Gets or sets the ids data value.
         /// </summary>
         public string JsonIds { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of Ids contained in the JsonIds json value
+        /// </summary>
+        /// <remarks>
+        /// This is used to determine the instruction count per row
+        /// </remarks>
+        public int JsonIdCount { get; set; }
 
         /// <summary>
         /// Gets or sets the payload data value.

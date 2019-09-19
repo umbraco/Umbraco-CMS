@@ -5,7 +5,6 @@ using System.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core.Services
@@ -14,7 +13,7 @@ namespace Umbraco.Core.Services
     /// These are used currently to return the temporary 'operation' interfaces for services
     /// which are used to return a status from operational methods so we can determine if things are
     /// cancelled, etc...
-    /// 
+    ///
     /// These will be obsoleted in v8 since all real services methods will be changed to have the correct result.
     /// </summary>
     public static class ServiceWithResultExtensions
@@ -36,11 +35,11 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
-        private Lazy<IMigrationEntryService> _migrationEntryService; 
-        private Lazy<IPublicAccessService> _publicAccessService; 
-        private Lazy<ITaskService> _taskService; 
-        private Lazy<IDomainService> _domainService; 
-        private Lazy<IAuditService> _auditService; 
+        private Lazy<IMigrationEntryService> _migrationEntryService;
+        private Lazy<IPublicAccessService> _publicAccessService;
+        private Lazy<ITaskService> _taskService;
+        private Lazy<IDomainService> _domainService;
+        private Lazy<IAuditService> _auditService;
         private Lazy<ILocalizedTextService> _localizedTextService;
         private Lazy<ITagService> _tagService;
         private Lazy<IContentService> _contentService;
@@ -63,36 +62,13 @@ namespace Umbraco.Core.Services
         private Lazy<INotificationService> _notificationService;
         private Lazy<IExternalLoginService> _externalLoginService;
         private Lazy<IRedirectUrlService> _redirectUrlService;
+        private Lazy<IConsentService> _consentService;
+
+        internal IdkMap IdkMap { get; private set; }
 
         /// <summary>
         /// public ctor - will generally just be used for unit testing all items are optional and if not specified, the defaults will be used
         /// </summary>
-        /// <param name="contentService"></param>
-        /// <param name="mediaService"></param>
-        /// <param name="contentTypeService"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="fileService"></param>
-        /// <param name="localizationService"></param>
-        /// <param name="packagingService"></param>
-        /// <param name="entityService"></param>
-        /// <param name="relationService"></param>
-        /// <param name="memberGroupService"></param>
-        /// <param name="memberTypeService"></param>
-        /// <param name="memberService"></param>
-        /// <param name="userService"></param>
-        /// <param name="sectionService"></param>
-        /// <param name="treeService"></param>
-        /// <param name="tagService"></param>
-        /// <param name="notificationService"></param>
-        /// <param name="localizedTextService"></param>
-        /// <param name="auditService"></param>
-        /// <param name="domainService"></param>
-        /// <param name="taskService"></param>
-        /// <param name="macroService"></param>
-        /// <param name="publicAccessService"></param>
-        /// <param name="externalLoginService"></param>
-        /// <param name="migrationEntryService"></param>
-        /// <param name="redirectUrlService"></param>
         public ServiceContext(
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -119,7 +95,8 @@ namespace Umbraco.Core.Services
             IPublicAccessService publicAccessService = null,
             IExternalLoginService externalLoginService = null,
             IMigrationEntryService migrationEntryService = null,
-            IRedirectUrlService redirectUrlService = null)
+            IRedirectUrlService redirectUrlService = null,
+            IConsentService consentService = null)
         {
             if (migrationEntryService != null) _migrationEntryService = new Lazy<IMigrationEntryService>(() => migrationEntryService);
             if (externalLoginService != null) _externalLoginService = new Lazy<IExternalLoginService>(() => externalLoginService);
@@ -147,54 +124,51 @@ namespace Umbraco.Core.Services
             if (macroService != null) _macroService = new Lazy<IMacroService>(() => macroService);
             if (publicAccessService != null) _publicAccessService = new Lazy<IPublicAccessService>(() => publicAccessService);
             if (redirectUrlService != null) _redirectUrlService = new Lazy<IRedirectUrlService>(() => redirectUrlService);
+            if (consentService != null) _consentService = new Lazy<IConsentService>(() => consentService);
         }
 
         /// <summary>
         /// Creates a service context with a RepositoryFactory which is used to construct Services
         /// </summary>
         /// <param name="repositoryFactory"></param>
-        /// <param name="dbUnitOfWorkProvider"></param>
-        /// <param name="fileUnitOfWorkProvider"></param>
-        /// <param name="publishingStrategy"></param>
+        /// <param name="provider"></param>
         /// <param name="cache"></param>
         /// <param name="logger"></param>
         /// <param name="eventMessagesFactory"></param>
         public ServiceContext(
             RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
-            IUnitOfWorkProvider fileUnitOfWorkProvider, 
-            BasePublishingStrategy publishingStrategy, 
-            CacheHelper cache, 
+            IScopeUnitOfWorkProvider provider,
+            CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
         {
             if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
-            if (dbUnitOfWorkProvider == null) throw new ArgumentNullException("dbUnitOfWorkProvider");
-            if (fileUnitOfWorkProvider == null) throw new ArgumentNullException("fileUnitOfWorkProvider");
-            if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
+            if (provider == null) throw new ArgumentNullException("provider");
             if (cache == null) throw new ArgumentNullException("cache");
             if (logger == null) throw new ArgumentNullException("logger");
             if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
 
-            BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
+            EventMessagesFactory = eventMessagesFactory;
+
+            IdkMap = new IdkMap(provider);
+
+            BuildServiceCache(provider, cache,
                               repositoryFactory,
-                              logger, eventMessagesFactory);
+                              logger, eventMessagesFactory, IdkMap);
         }
 
         /// <summary>
         /// Builds the various services
         /// </summary>
         private void BuildServiceCache(
-            IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
-            IUnitOfWorkProvider fileUnitOfWorkProvider,
-            BasePublishingStrategy publishingStrategy,
+            IScopeUnitOfWorkProvider provider,
             CacheHelper cache,
             RepositoryFactory repositoryFactory,
             ILogger logger,
-            IEventMessagesFactory eventMessagesFactory)
+            IEventMessagesFactory eventMessagesFactory, 
+            IdkMap idkMap)
         {
-            var provider = dbUnitOfWorkProvider;
-            var fileProvider = fileUnitOfWorkProvider;
+            EventMessagesFactory = eventMessagesFactory;
 
             if (_migrationEntryService == null)
                 _migrationEntryService = new Lazy<IMigrationEntryService>(() => new MigrationEntryService(provider, repositoryFactory, logger, eventMessagesFactory));
@@ -216,7 +190,7 @@ namespace Umbraco.Core.Services
 
             if (_localizedTextService == null)
             {
-                
+
                 _localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
                     {
@@ -249,7 +223,7 @@ namespace Umbraco.Core.Services
                     }),
                     logger));
             }
-                
+
 
             if (_notificationService == null)
                 _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value, logger));
@@ -264,7 +238,7 @@ namespace Umbraco.Core.Services
                 _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory, logger, eventMessagesFactory, _memberGroupService.Value, _dataTypeService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, publishingStrategy, _dataTypeService.Value, _userService.Value));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value));
 
             if (_mediaService == null)
                 _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value));
@@ -276,7 +250,7 @@ namespace Umbraco.Core.Services
                 _dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, repositoryFactory, logger, eventMessagesFactory));
 
             if (_fileService == null)
-                _fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory, logger, eventMessagesFactory));
+                _fileService = new Lazy<IFileService>(() => new FileService(provider, repositoryFactory, logger, eventMessagesFactory));
 
             if (_localizationService == null)
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory, logger, eventMessagesFactory));
@@ -285,9 +259,8 @@ namespace Umbraco.Core.Services
                 _entityService = new Lazy<IEntityService>(() => new EntityService(
                     provider, repositoryFactory, logger, eventMessagesFactory,
                     _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _memberService.Value, _memberTypeService.Value,
-                    //TODO: Consider making this an isolated cache instead of using the global one
-                    cache.RuntimeCache));
-            
+                    idkMap));
+
             if (_packagingService == null)
                 _packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _entityService.Value, _userService.Value, repositoryFactory, provider));
 
@@ -314,7 +287,12 @@ namespace Umbraco.Core.Services
 
             if (_redirectUrlService == null)
                 _redirectUrlService = new Lazy<IRedirectUrlService>(() => new RedirectUrlService(provider, repositoryFactory, logger, eventMessagesFactory));
+
+            if (_consentService == null)
+                _consentService = new Lazy<IConsentService>(() => new ConsentService(provider, repositoryFactory, logger, eventMessagesFactory));
         }
+
+        internal IEventMessagesFactory EventMessagesFactory { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IMigrationEntryService"/>
@@ -528,5 +506,10 @@ namespace Umbraco.Core.Services
         {
             get { return _redirectUrlService.Value; }
         }
+
+        /// <summary>
+        /// Gets the <see cref="IConsentService"/> implementation.
+        /// </summary>
+        public IConsentService ConsentService => _consentService.Value;
     }
 }

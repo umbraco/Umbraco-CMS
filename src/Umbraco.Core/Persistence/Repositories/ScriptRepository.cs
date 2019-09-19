@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -107,6 +108,25 @@ namespace Umbraco.Core.Persistence.Repositories
             var validExts = _contentConfig.ScriptFileTypes.ToList();
             var isValidExtension = IOHelper.VerifyFileExtension(script.Path, validExts);
             return isValidPath && isValidExtension;
+        }
+
+        public Stream GetFileContentStream(string filepath)
+        {
+            if (FileSystem.FileExists(filepath) == false) return null;
+
+            try
+            {
+                return FileSystem.OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
+        }
+
+        public void SetFileContent(string filepath, Stream content)
+        {
+            FileSystem.AddFile(filepath, content, true);
         }
 
         #endregion

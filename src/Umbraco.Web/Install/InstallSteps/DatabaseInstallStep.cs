@@ -48,13 +48,13 @@ namespace Umbraco.Web.Install.InstallSteps
         internal static void HandleConnectionStrings()
         {
             // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
-            if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
+            if (ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName] != null)
             {
-                GlobalSettings.RemoveSetting(GlobalSettings.UmbracoConnectionName);
+                GlobalSettings.RemoveSetting(Constants.System.UmbracoConnectionName);
             }
             else
             {
-                var ex = new ArgumentNullException(string.Format("ConfigurationManager.ConnectionStrings[{0}]", GlobalSettings.UmbracoConnectionName), "Install / upgrade did not complete successfully, umbracoDbDSN was not set in the connectionStrings section");
+                var ex = new ArgumentNullException(string.Format("ConfigurationManager.ConnectionStrings[{0}]", Constants.System.UmbracoConnectionName), "Install / upgrade did not complete successfully, umbracoDbDSN was not set in the connectionStrings section");
                 LogHelper.Error<DatabaseInstallStep>("", ex);
                 throw ex;
             }

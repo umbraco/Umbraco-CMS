@@ -26,7 +26,7 @@ namespace Umbraco.Core.PropertyEditors
 
         public PropertyEditorAttribute(string alias, string name)
         {
-            Mandate.ParameterNotNullOrEmpty(alias, "id");
+            Mandate.ParameterNotNullOrEmpty(alias, "alias");
             Mandate.ParameterNotNullOrEmpty(name, "name");
 
             Alias = alias;
@@ -59,6 +59,12 @@ namespace Umbraco.Core.PropertyEditors
         public string EditorView { get; private set; }
         public string ValueType { get; set; }
         public bool IsParameterEditor { get; set; }
+
+        /// <summary>
+        /// If set to true, this property editor will not show up in the DataType's drop down list
+        /// if there is not already one of them chosen for a DataType
+        /// </summary>
+        public bool IsDeprecated { get; set; }
 
         /// <summary>
         /// If this is is true than the editor will be displayed full width without a label

@@ -5,7 +5,7 @@ namespace Umbraco.Core.Events
     /// <summary>
     /// Event messages collection
     /// </summary>
-    public sealed class EventMessages : DisposableObject
+    public sealed class EventMessages : DisposableObjectSlim
     {
         private readonly List<EventMessage> _msgs = new List<EventMessage>();
 

@@ -12,14 +12,18 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class UmbracoEntityFactory 
     {
+        private static readonly Lazy<string[]> EntityProperties = new Lazy<string[]>(() => typeof(IUmbracoEntity).GetPublicProperties().Select(x => x.Name).ToArray());
+
+        /// <summary>
+        /// Figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="originalEntityProperties"></param>
         internal void AddAdditionalData(UmbracoEntity entity, IDictionary<string, object> originalEntityProperties)
-        {
-            var entityProps = typeof(IUmbracoEntity).GetPublicProperties().Select(x => x.Name).ToArray();
-            
-            //figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
+        {   
             foreach (var k in originalEntityProperties.Keys
                 .Select(x => new { orig = x, title = x.ToCleanString(CleanStringType.PascalCase | CleanStringType.Ascii | CleanStringType.ConvertCase) })
-                .Where(x => entityProps.InvariantContains(x.title) == false))
+                .Where(x => EntityProperties.Value.InvariantContains(x.title) == false))
             {
                 entity.AdditionalData[k.title] = originalEntityProperties[k.orig];
             }
@@ -36,7 +40,7 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.DisableChangeTracking();
 
                 entity.CreateDate = d.createDate;
-                entity.CreatorId = d.nodeUser;
+                entity.CreatorId = d.nodeUser == null ? 0 : d.nodeUser;
                 entity.Id = d.id;
                 entity.Key = d.uniqueID;
                 entity.Level = d.level;
@@ -51,7 +55,7 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.ContentTypeThumbnail = asDictionary.ContainsKey("thumbnail") ? (d.thumbnail ?? string.Empty) : string.Empty;
 
                 var publishedVersion = default(Guid);
-                //some content items don't have a published version
+                //some content items don't have a published/newest version
                 if (asDictionary.ContainsKey("publishedVersion") && asDictionary["publishedVersion"] != null)
                 {
                     Guid.TryParse(d.publishedVersion.ToString(), out publishedVersion);

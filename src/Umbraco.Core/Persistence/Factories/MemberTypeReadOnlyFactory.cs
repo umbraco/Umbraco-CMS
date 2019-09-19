@@ -9,9 +9,10 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class MemberTypeReadOnlyFactory 
     {
-        public IMemberType BuildEntity(MemberTypeReadOnlyDto dto)
+        public IMemberType BuildEntity(MemberTypeReadOnlyDto dto, out bool needsSaving)
         {
             var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            needsSaving = false;
 
             var memberType = new MemberType(dto.ParentId);
 
@@ -47,12 +48,18 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     if (dto.PropertyTypes.Any(x => x.Alias.Equals(standardPropertyType.Key))) continue;
 
+                    // beware!
+                    // means that we can return a memberType "from database" that has some property types
+                    // that do *not* come from the database and therefore are incomplete eg have no key,
+                    // no id, no dataTypeDefinitionId - ouch! - better notify caller of the situation
+                    needsSaving = true;
+
                     //Add the standard PropertyType to the current list
                     propertyTypes.Add(standardPropertyType.Value);
-
-                    //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
+                    
+                    //Internal dictionary for adding "MemberCanEdit", "VisibleOnProfile", "IsSensitive" properties to each PropertyType
                     memberType.MemberTypePropertyTypes.Add(standardPropertyType.Key,
-                        new MemberTypePropertyProfileAccess(false, false));
+                        new MemberTypePropertyProfileAccess(false, false, false));
                 }
                 memberType.NoGroupPropertyTypes = propertyTypes;
 
@@ -95,7 +102,7 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
                     memberType.MemberTypePropertyTypes.Add(typeDto.Alias,
-                        new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit));
+                        new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit, typeDto.IsSensitive));
 
                     var tempGroupDto = groupDto;
 
@@ -150,7 +157,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
                 memberType.MemberTypePropertyTypes.Add(typeDto.Alias,
-                    new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit));
+                    new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit, typeDto.IsSensitive));
 
                 //ensures that any built-in membership properties have their correct dbtype assigned no matter
                 //what the underlying data type is

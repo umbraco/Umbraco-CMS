@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.Configuration;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
@@ -31,10 +32,9 @@ namespace Umbraco.Core.Configuration
 
         #region Private static fields
 
-        private static Version _version;
         private static readonly object Locker = new object();
         //make this volatile so that we can ensure thread safety with a double check lock
-    	private static volatile string _reservedUrlsCache;
+        private static volatile string _reservedUrlsCache;
         private static string _reservedPathsCache;
         private static HashSet<string> _reservedList = new HashSet<string>();
         private static string _reservedPaths;
@@ -42,7 +42,6 @@ namespace Umbraco.Core.Configuration
         //ensure the built on (non-changeable) reserved paths are there at all times
         private const string StaticReservedPaths = "~/app_plugins/,~/install/,";
         private const string StaticReservedUrls = "~/config/splashes/booting.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd,";
-
         #endregion
 
         /// <summary>
@@ -53,6 +52,7 @@ namespace Umbraco.Core.Configuration
             _reservedUrlsCache = null;
             _reservedPaths = null;
             _reservedUrls = null;
+            HasSmtpServer = null;
         }
 
         /// <summary>
@@ -64,7 +64,27 @@ namespace Umbraco.Core.Configuration
             ResetInternal();
         }
 
-    	/// <summary>
+        public static bool HasSmtpServerConfigured(string appPath)
+        {
+            if (HasSmtpServer.HasValue) return HasSmtpServer.Value;
+
+            var config = WebConfigurationManager.OpenWebConfiguration(appPath);
+            var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
+            // note: "noreply@example.com" is/was the sample SMTP from email - we'll regard that as "not configured"
+            if (settings == null || settings.Smtp == null || "noreply@example.com".Equals(settings.Smtp.From, StringComparison.OrdinalIgnoreCase)) return false;
+            if (settings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(settings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
+                return true;
+            if (settings.Smtp.Network != null && string.IsNullOrEmpty(settings.Smtp.Network.Host) == false)
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// For testing only
+        /// </summary>
+        internal static bool? HasSmtpServer { get; set; }
+
+        /// <summary>
         /// Gets the reserved urls from web.config.
         /// </summary>
         /// <value>The reserved urls.</value>
@@ -170,7 +190,7 @@ namespace Umbraco.Core.Configuration
         /// This will return the MVC area that we will route all custom routes through like surface controllers, etc...
         /// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
         /// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
-		/// 
+        /// 
         /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
         /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
         /// </remarks>
@@ -185,7 +205,7 @@ namespace Umbraco.Core.Configuration
                 var path = Path;
                 if (path.StartsWith(SystemDirectories.Root)) // beware of TrimStart, see U4-2518
                     path = path.Substring(SystemDirectories.Root.Length);
-			    return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
+                return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
             }
         }
 
@@ -212,7 +232,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                var settings = ConfigurationManager.ConnectionStrings[UmbracoConnectionName];
+                var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
                 var connectionString = string.Empty;
 
                 if (settings != null)
@@ -241,10 +261,7 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
-
-        //TODO: Move these to constants!
-        public const string UmbracoConnectionName = "umbracoDbDSN";
-        public const string UmbracoMigrationName = "Umbraco";
+        
 
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
@@ -295,7 +312,7 @@ namespace Umbraco.Core.Configuration
                 SetMembershipProvidersLegacyEncoding(UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider, value);
             }
         }
-		
+        
         /// <summary>
         /// Saves a setting into the configuration file.
         /// </summary>
@@ -486,7 +503,7 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Returns a string value to determine if umbraco should skip version-checking.
+        /// Returns the number of days that should take place between version checks.
         /// </summary>
         /// <value>The version check period in days (0 = never).</value>
         public static int VersionCheckPeriod
@@ -521,24 +538,41 @@ namespace Umbraco.Core.Configuration
 
         internal static bool ContentCacheXmlStoredInCodeGen
         {
-            get { return ContentCacheXmlStorageLocation == ContentXmlStorage.AspNetTemp; }
+            get { return LocalTempStorageLocation == LocalTempStorage.AspNetTemp; }
         }
 
-        internal static ContentXmlStorage ContentCacheXmlStorageLocation
+        /// <summary>
+        /// This is the location type to store temporary files such as cache files or other localized files for a given machine
+        /// </summary>
+        /// <remarks>
+        /// Currently used for the xml cache file and the plugin cache files
+        /// </remarks>
+        internal static LocalTempStorage LocalTempStorageLocation
         {
             get
             {
+                //there's a bunch of backwards compat config checks here....
+
+                //This is the current one
+                if (ConfigurationManager.AppSettings.ContainsKey("umbracoLocalTempStorage"))
+                {
+                    return Enum<LocalTempStorage>.Parse(ConfigurationManager.AppSettings["umbracoLocalTempStorage"]);
+                }
+
+                //This one is old
                 if (ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLStorage"))
                 {
-                    return Enum<ContentXmlStorage>.Parse(ConfigurationManager.AppSettings["umbracoContentXMLStorage"]);
+                    return Enum<LocalTempStorage>.Parse(ConfigurationManager.AppSettings["umbracoContentXMLStorage"]);
                 }
+
+                //This one is older
                 if (ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLUseLocalTemp"))
                 {
                     return bool.Parse(ConfigurationManager.AppSettings["umbracoContentXMLUseLocalTemp"]) 
-                        ? ContentXmlStorage.AspNetTemp 
-                        : ContentXmlStorage.Default;
+                        ? LocalTempStorage.AspNetTemp 
+                        : LocalTempStorage.Default;
                 }
-                return ContentXmlStorage.Default;
+                return LocalTempStorage.Default;
             }
         }
 

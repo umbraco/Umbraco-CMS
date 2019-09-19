@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Services
@@ -18,8 +19,7 @@ namespace Umbraco.Core.Services
         /// Id of the user once its been created.</remarks>
         /// <param name="username">Username of the User to create</param>
         /// <param name="email">Email of the User to create</param>
-        /// <param name="userType"><see cref="IUserType"/> which the User should be based on</param>
         /// <returns><see cref="IUser"/></returns>
-        IUser CreateUserWithIdentity(string username, string email, IUserType userType);
+        IUser CreateUserWithIdentity(string username, string email);
     }
 }

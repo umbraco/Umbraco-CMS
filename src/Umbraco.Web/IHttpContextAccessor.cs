@@ -1,5 +1,3 @@
-using System.Web;
-
 namespace Umbraco.Web
 {
     /// <summary>
@@ -8,8 +6,6 @@ namespace Umbraco.Web
     /// <remarks>
     /// NOTE: This has a singleton lifespan
     /// </remarks>
-    public interface IHttpContextAccessor
-    {
-        HttpContextBase Value { get; }
-    }
+    public interface IHttpContextAccessor : Core.IHttpContextAccessor
+    { }
 }

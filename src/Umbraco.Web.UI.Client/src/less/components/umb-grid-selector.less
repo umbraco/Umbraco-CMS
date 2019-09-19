@@ -8,8 +8,8 @@
   width: 125px;
   height: 150px;
   padding: 20px;
-  background: #f8f8f8;
-  border: 1px solid #CCCCCC;
+  background: @gray-10;
+  border: 1px solid @gray-8;
   text-align: center;
   margin: 0 20px 20px 0;
   display: flex;
@@ -17,6 +17,7 @@
   justify-content: center;
   animation: fadeIn 0.5s;
   position: relative;
+  border-radius: 3px;
 }
 
 .umb-grid-selector__item.-default {
@@ -24,7 +25,7 @@
 }
 
 .umb-grid-selector__item.-placeholder {
-  border: 1px dashed #d9d9d9;
+  border: 1px dashed @gray-8;
   background: none;
   cursor: pointer;
 }
@@ -35,10 +36,10 @@
 
 .umb-grid-selector__item-icon {
   font-size: 50px;
-  color: #d9d9d9;
+  color: @gray-8;
   display: block;
   line-height: 50px;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
 }
 
 .umb-grid-selector__item-label {
@@ -47,7 +48,7 @@
 }
 
 .umb-grid-selector__item-label.-blue {
-  color: @blue;
+  color: @turquoise-d1;
 }
 
 .umb-grid-selector__item-remove {
@@ -58,17 +59,14 @@
 }
 
 .umb-grid-selector__item-default-label {
-  font-size: 10px;
-  color: @gray;
-  font-weight: bold;
-  position: relative;
-  top: -3px;
+  font-size: 13px;
+  color: @gray-3;
 }
 
 .umb-grid-selector__item-default-label.-blue {
-  color: @blue;
+  color: @turquoise-d1;
 }
 
 .umb-grid-selector__item-add {
-  color: @blue;
+  color: @turquoise-d1;
 }

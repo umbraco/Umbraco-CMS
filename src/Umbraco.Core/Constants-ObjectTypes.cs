@@ -68,11 +68,21 @@ namespace Umbraco.Core
             /// Guid for a Document object.
             /// </summary>
             public const string Document = "C66BA18E-EAF3-4CFF-8A22-41B16D66A972";
-
+            
             /// <summary>
             /// Guid for a Document object.
             /// </summary>
             public static readonly Guid DocumentGuid = new Guid(Document);
+
+            /// <summary>
+            /// Guid for a Document Blueprint object.
+            /// </summary>
+            public const string DocumentBlueprint = "6EBEF410-03AA-48CF-A792-E1C1CB087ACA";
+
+            /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public static readonly Guid DocumentBlueprintGuid = new Guid(DocumentBlueprint);
 
             /// <summary>
             /// Guid for a Document Type object.
@@ -88,6 +98,11 @@ namespace Umbraco.Core
             /// Guid for a Media object.
             /// </summary>
             public const string Media = "B796F64C-1F99-4FFB-B886-4BF4BC011A9C";
+
+            /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public static readonly Guid MediaGuid = new Guid(Media);
 
             /// <summary>
             /// Guid for the Media Recycle Bin.
@@ -110,9 +125,19 @@ namespace Umbraco.Core
             public const string Member = "39EB0F98-B348-42A1-8662-E7EB18487560";
 
             /// <summary>
+            /// Guid for a Media Type object.
+            /// </summary>
+            public static readonly Guid MemberGuid = new Guid(Member);
+
+            /// <summary>
             /// Guid for a Member Group object.
             /// </summary>
             public const string MemberGroup = "366E63B9-880F-4E13-A61C-98069B029728";
+
+            /// <summary>
+            /// Guid for a Member Group object.
+            /// </summary>
+            public static readonly Guid MemberGroupGuid = new Guid(MemberGroup);
 
             /// <summary>
             /// Guid for a Member Type object.
@@ -144,6 +169,11 @@ namespace Umbraco.Core
             public const string Template = "6FBDE604-4178-42CE-A10B-8A2600A2F07D";
 
             /// <summary>
+            /// Guid for a Template object.
+            /// </summary>
+            public static readonly Guid TemplateTypeGuid = new Guid(Template);
+
+            /// <summary>
             /// Guid for a Lock object.
             /// </summary>
             public const string LockObject = "87A9F1FF-B1E4-4A25-BABB-465A4A47EC41";
@@ -152,6 +182,66 @@ namespace Umbraco.Core
             /// Guid for a Lock object.
             /// </summary>
             public static readonly Guid LockObjectGuid = new Guid(LockObject);
+
+            /// <summary>
+            /// Guid for a relation type.
+            /// </summary>
+            public const string RelationType = "B1988FAD-8675-4F47-915A-B3A602BC5D8D";
+
+            /// <summary>
+            /// Guid for a relation type.
+            /// </summary>
+            public static readonly Guid RelationTypeGuid = new Guid(RelationType);
+
+            /// <summary>
+            /// Guid for a Forms Form.
+            /// </summary>
+            public const string FormsForm = "F5A9F787-6593-46F0-B8FF-BFD9BCA9F6BB";
+
+            /// <summary>
+            /// Guid for a Forms Form.
+            /// </summary>
+            public static readonly Guid FormsFormGuid = new Guid(FormsForm);
+
+            /// <summary>
+            /// Guid for a Forms PreValue Source.
+            /// </summary>
+            public const string FormsPreValue = "42D7BF9B-A362-4FEE-B45A-674D5C064B70";
+
+            /// <summary>
+            /// Guid for a Forms PreValue Source.
+            /// </summary>
+            public static readonly Guid FormsPreValueGuid = new Guid(FormsPreValue);
+
+            /// <summary>
+            /// Guid for a Forms DataSource.
+            /// </summary>
+            public const string FormsDataSource = "CFED6CE4-9359-443E-9977-9956FEB1D867";
+
+            /// <summary>
+            /// Guid for a Forms DataSource.
+            /// </summary>
+            public static readonly Guid FormsDataSourceGuid = new Guid(FormsDataSource);
+
+            /// <summary>
+            /// Guid for a Language.
+            /// </summary>
+            public const string Language = "6B05D05B-EC78-49BE-A4E4-79E274F07A77";
+
+            /// <summary>
+            /// Guid for a Forms DataSource.
+            /// </summary>
+            public static readonly Guid LanguageGuid = new Guid(Language);
+
+            /// <summary>
+            /// Guid for an Identifier Reservation.
+            /// </summary>
+            public const string IdReservation = "92849B1E-3904-4713-9356-F646F87C25F4";
+
+            /// <summary>
+            /// Guid for an Identifier Reservation.
+            /// </summary>
+            public static readonly Guid IdReservationGuid = new Guid(IdReservation);
         }
     }
 }

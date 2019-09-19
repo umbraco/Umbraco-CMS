@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Web.Http;
 using System.Web.Http.Controllers;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -34,9 +33,11 @@ namespace Umbraco.Web.WebApi.Filters
                 return true;
             }
 
-            return UmbracoContext.Current.Security.CurrentUser != null
-                   && _appNames.Any(app => UmbracoContext.Current.Security.UserHasAppAccess(
+            var authorized = UmbracoContext.Current.Security.CurrentUser != null
+                   && _appNames.Any(app => UmbracoContext.Current.Security.UserHasSectionAccess(
                        app, UmbracoContext.Current.Security.CurrentUser));
+
+            return authorized;
         }
     }
 }

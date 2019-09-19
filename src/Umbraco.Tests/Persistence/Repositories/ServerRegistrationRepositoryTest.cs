@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private ServerRegistrationRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private ServerRegistrationRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             return new ServerRegistrationRepository(unitOfWork, _staticCache, Mock.Of<ILogger>(), SqlSyntax);
         }

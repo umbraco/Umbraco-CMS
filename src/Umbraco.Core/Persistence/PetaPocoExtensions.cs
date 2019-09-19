@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.Linq;
 using System.Text.RegularExpressions;
-using MySql.Data.MySqlClient;
 using StackExchange.Profiling.Data;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -105,8 +101,8 @@ namespace Umbraco.Core.Persistence
 
             // try to update
             var rowCount = updateCommand.IsNullOrWhiteSpace()
-                    ? db.Update(poco)
-                    : db.Update<T>(updateCommand, updateArgs);
+                ? db.Update(poco)
+                : db.Update<T>(updateCommand, updateArgs);
             if (rowCount > 0)
                 return RecordPersistenceType.Update;
 
@@ -162,7 +158,7 @@ namespace Umbraco.Core.Persistence
 
         [Obsolete("Use the DatabaseSchemaHelper instead")]
         public static void CreateTable<T>(this Database db)
-          where T : new()
+            where T : new()
         {
             var creator = new DatabaseSchemaHelper(db, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider);
             creator.CreateTable<T>();
@@ -170,7 +166,7 @@ namespace Umbraco.Core.Persistence
 
         [Obsolete("Use the DatabaseSchemaHelper instead")]
         public static void CreateTable<T>(this Database db, bool overwrite)
-           where T : new()
+            where T : new()
         {
             var creator = new DatabaseSchemaHelper(db, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider);
             creator.CreateTable<T>(overwrite);
@@ -183,16 +179,31 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="T"></typeparam>
         /// <param name="db"></param>
         /// <param name="collection"></param>
+        [Obsolete("Use the method that specifies an SqlSyntaxContext instance instead")]
         public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection)
         {
-            //don't do anything if there are no records.
-            if (collection.Any() == false)
-                return;
+            db.BulkInsertRecords(collection, null, SqlSyntaxContext.SqlSyntaxProvider, true, false);
+        }
 
-            using (var tr = db.GetTransaction())
-            {
-                db.BulkInsertRecords(collection, tr, SqlSyntaxContext.SqlSyntaxProvider, true, true); // use native, commit
-            }
+
+        /// <summary>
+        /// Performs the bulk insertion
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="db"></param>
+        /// <param name="collection"></param>
+        /// <param name="syntaxProvider"></param>
+        /// <param name="useNativeSqlPlatformBulkInsert">
+        /// If this is false this will try to just generate bulk insert statements instead of using the current SQL platform's bulk
+        /// insert logic. For SQLCE, bulk insert statements do not work so if this is false it will insert one at a time.
+        /// </param>
+        /// <returns>The number of items inserted</returns>
+        public static int BulkInsertRecords<T>(this Database db,
+            IEnumerable<T> collection,
+            ISqlSyntaxProvider syntaxProvider,
+            bool useNativeSqlPlatformBulkInsert = true)
+        {
+            return BulkInsertRecords<T>(db, collection, null, syntaxProvider, useNativeSqlPlatformBulkInsert, false);
         }
 
         /// <summary>
@@ -217,6 +228,26 @@ namespace Umbraco.Core.Persistence
             bool useNativeSqlPlatformBulkInsert = true,
             bool commitTrans = false)
         {
+            db.OpenSharedConnection();
+            try
+            {
+                return BulkInsertRecordsTry(db, collection, tr, syntaxProvider, useNativeSqlPlatformBulkInsert, commitTrans);
+            }
+            finally
+            {
+                db.CloseSharedConnection();
+            }
+        }
+
+        public static int BulkInsertRecordsTry<T>(this Database db,
+            IEnumerable<T> collection,
+            Transaction tr,
+            ISqlSyntaxProvider syntaxProvider,
+            bool useNativeSqlPlatformBulkInsert = true,
+            bool commitTrans = false)
+        {
+            if (commitTrans && tr == null)
+                throw new ArgumentNullException("tr", "The transaction cannot be null if commitTrans is true.");
 
             //don't do anything if there are no records.
             if (collection.Any() == false)
@@ -224,15 +255,15 @@ namespace Umbraco.Core.Persistence
                 return 0;
             }
 
-            var pd = Database.PocoData.ForType(typeof(T));
-            if (pd == null) throw new InvalidOperationException("Could not find PocoData for " + typeof(T));
+            var pd = Database.PocoData.ForType(typeof (T));
+            if (pd == null) throw new InvalidOperationException("Could not find PocoData for " + typeof (T));
 
             try
             {
                 int processed = 0;
 
                 var usedNativeSqlPlatformInserts = useNativeSqlPlatformBulkInsert
-                    && NativeSqlPlatformBulkInsertRecords(db, syntaxProvider, pd, collection, out processed);
+                                                   && NativeSqlPlatformBulkInsertRecords(db, syntaxProvider, pd, collection, out processed);
 
                 if (usedNativeSqlPlatformInserts == false)
                 {
@@ -266,17 +297,13 @@ namespace Umbraco.Core.Persistence
                 }
 
                 if (commitTrans)
-                {
                     tr.Complete();
-                }
                 return processed;
             }
             catch
             {
                 if (commitTrans)
-                {
                     tr.Dispose();
-                }
                 throw;
             }
 
@@ -318,13 +345,16 @@ namespace Umbraco.Core.Persistence
             IEnumerable<T> collection,
             out string[] sql)
         {
+            if (db == null) throw new ArgumentNullException("db");
+            if (db.Connection == null) throw new ArgumentException("db.Connection is null.");
+
             var tableName = db.EscapeTableName(pd.TableInfo.TableName);
 
             //get all columns to include and format for sql
             var cols = string.Join(", ",
                 pd.Columns
-                .Where(c => IncludeColumn(pd, c))
-                .Select(c => tableName + "." + db.EscapeSqlIdentifier(c.Key)).ToArray());
+                    .Where(c => IncludeColumn(pd, c))
+                    .Select(c => tableName + "." + db.EscapeSqlIdentifier(c.Key)).ToArray());
 
             var itemArray = collection.ToArray();
 
@@ -338,9 +368,9 @@ namespace Umbraco.Core.Persistence
             // 4168 / 262 = 15.908... = there will be 16 trans in total
 
             //all items will be included if we have disabled db parameters
-            var itemsPerTrans = Math.Floor(2000.00 / paramsPerItem);
+            var itemsPerTrans = Math.Floor(2000.00/paramsPerItem);
             //there will only be one transaction if we have disabled db parameters
-            var numTrans = Math.Ceiling(itemArray.Length / itemsPerTrans);
+            var numTrans = Math.Ceiling(itemArray.Length/itemsPerTrans);
 
             var sqlQueries = new List<string>();
             var commands = new List<IDbCommand>();
@@ -348,8 +378,8 @@ namespace Umbraco.Core.Persistence
             for (var tIndex = 0; tIndex < numTrans; tIndex++)
             {
                 var itemsForTrans = itemArray
-                    .Skip(tIndex * (int)itemsPerTrans)
-                    .Take((int)itemsPerTrans);
+                    .Skip(tIndex*(int) itemsPerTrans)
+                    .Take((int) itemsPerTrans);
 
                 var cmd = db.CreateCommand(db.Connection, string.Empty);
                 var pocoValues = new List<string>();
@@ -399,7 +429,6 @@ namespace Umbraco.Core.Persistence
         /// <param name="processed">The number of records inserted</param>
         private static bool NativeSqlPlatformBulkInsertRecords<T>(Database db, ISqlSyntaxProvider syntaxProvider, Database.PocoData pd, IEnumerable<T> collection, out int processed)
         {
-
             var dbConnection = db.Connection;
 
             //unwrap the profiled connection if there is one
@@ -428,7 +457,6 @@ namespace Umbraco.Core.Persistence
             //could not use the SQL server's specific bulk insert operations
             processed = 0;
             return false;
-
         }
 
         /// <summary>

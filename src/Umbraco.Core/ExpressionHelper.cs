@@ -217,8 +217,21 @@ namespace Umbraco.Core
 		public static MemberInfo GetMemberInfo<T, TReturn>(Expression<Func<T, TReturn>> fromExpression)
 		{
 			if (fromExpression == null) return null;
-			var body = fromExpression.Body as MemberExpression;
-			return body != null ? body.Member : null;
+
+		    MemberExpression me;
+		    switch (fromExpression.Body.NodeType)
+		    {
+		        case ExpressionType.Convert:
+		        case ExpressionType.ConvertChecked:
+		            var ue = fromExpression.Body as UnaryExpression;
+		            me = ((ue != null) ? ue.Operand : null) as MemberExpression;
+		            break;
+		        default:
+		            me = fromExpression.Body as MemberExpression;
+		            break;
+		    }
+
+		    return me != null ? me.Member : null;
 		}
 
 		/// <summary>

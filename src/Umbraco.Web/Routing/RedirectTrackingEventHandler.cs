@@ -177,11 +177,13 @@ namespace Umbraco.Web.Routing
                     // change the IUrlSegmentProvider to support being able to determine if a
                     // segment is going to change for an entity. See notes in IUrlSegmentProvider.
 
-                    var oldEntity = ApplicationContext.Current.Services.ContentService.GetById(entity.Id);
-                    if (oldEntity == null) continue;
-                    var oldSegment = oldEntity.GetUrlSegment();
+                    // we want the last published version, not the last saved
+                    // otherwise redirects aren't created if content is saved, with save+publish happening later
+                    var publishedEntity = ApplicationContext.Current.Services.ContentService.GetPublishedVersion(entity.Id);
+                    if (publishedEntity == null) continue;
+                    var publishedSegment = publishedEntity.GetUrlSegment();
                     var newSegment = entity.GetUrlSegment();
-                    process = oldSegment != newSegment;
+                    process = publishedSegment != newSegment;
                 }
 
                 // skip if no segment change
@@ -241,8 +243,8 @@ namespace Umbraco.Web.Routing
         /// <param name="cacheRefresherEventArgs"></param>
         private void PageCacheRefresher_CacheUpdated(PageCacheRefresher sender, CacheRefresherEventArgs cacheRefresherEventArgs)
         {
-            // only on master / single, not on slaves!
-            if (IsSlaveServer) return;
+            // only on master / single, not on replicas!
+            if (IsReplicaServer) return;
 
             // simply getting OldRoutes will register it in the request cache,
             // so whatever we do with it, try/finally it to ensure it's cleared
@@ -271,6 +273,7 @@ namespace Umbraco.Web.Routing
 
         private static void ContentService_Moving(IContentService sender, MoveEventArgs<IContent> e)
         {
+            //TODO: Use the new e.EventState to track state between Moving/Moved events!
             Moving = true;
         }
 
@@ -298,8 +301,8 @@ namespace Umbraco.Web.Routing
             return route == null;
         }
 
-        // gets a value indicating whether server is 'slave'
-        private static bool IsSlaveServer
+        // gets a value indicating whether server is 'replica'
+        private static bool IsReplicaServer
         {
             get
             {

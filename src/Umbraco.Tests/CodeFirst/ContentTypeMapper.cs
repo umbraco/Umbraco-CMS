@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.CodeFirst
@@ -32,7 +31,7 @@ namespace Umbraco.Tests.CodeFirst
                     value = DateTime.Parse(property.Value.ToString());
                 else if (propertyInfo.PropertyType == typeof(Boolean))
                 {
-                    if (String.IsNullOrEmpty(property.Value.ToString()) || property.Value == "0")
+                    if (String.IsNullOrEmpty(property.Value.ToString()) || (string)property.Value == "0")
                     {
                         value = false;
                     }

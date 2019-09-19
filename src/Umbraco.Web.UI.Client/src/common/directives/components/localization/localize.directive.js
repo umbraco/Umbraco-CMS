@@ -5,7 +5,27 @@ angular.module("umbraco.directives")
     * @name umbraco.directives.directive:localize
     * @restrict EA
     * @function
-    * @description Localize directive
+    * @description
+    * <div>
+    *   <strong>Component</strong><br />
+    *   Localize a specific token to put into the HTML as an item
+    * </div>
+    * <div>
+    *   <strong>Attribute</strong><br />
+    *   Add a HTML attribute to an element containing the HTML attribute name you wish to localise
+    *   Using the format of '@section_key' or 'section_key'
+    * </div>
+    * ##Usage
+    * <pre>
+    * <!-- Component -->
+    * <localize key="general_close">Close</localize>
+    * <localize key="section_key">Fallback value</localize>
+    *
+    * <!-- Attribute -->
+    * <input type="text" localize="placeholder" placeholder="@placeholders_entername" />
+    * <input type="text" localize="placeholder,title" title="@section_key" placeholder="@placeholders_entername" />
+    * <div localize="title" title="@section_key"></div>
+    * </pre>
     **/
     .directive('localize', function ($log, localizationService) {
         return {
@@ -28,6 +48,7 @@ angular.module("umbraco.directives")
         return {
             restrict: 'A',
             link: function (scope, element, attrs) {
+                //Support one or more attribute properties to update
                 var keys = attrs.localize.split(',');
 
                 angular.forEach(keys, function(value, key){
@@ -35,13 +56,15 @@ angular.module("umbraco.directives")
 
                     if(attr){
                         if(attr[0] === '@'){
-
-                            var t = localizationService.tokenize(attr.substring(1), scope);
-                            localizationService.localize(t.key, t.tokens).then(function(val){
-                                    element.attr(value, val);
-                            });
-
+                            //If the translation key starts with @ then remove it
+                            attr = attr.substring(1);
                         }
+
+                        var t = localizationService.tokenize(attr, scope);
+                        
+                        localizationService.localize(t.key, t.tokens).then(function(val){
+                                element.attr(value, val);
+                        });
                     }
                 });
             }

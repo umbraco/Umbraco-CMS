@@ -18,6 +18,20 @@ namespace Umbraco.Core.Models
         IEnumerable<ITemplate> AllowedTemplates { get; set; }
 
         /// <summary>
+        /// Determines if AllowedTemplates contains templateId
+        /// </summary>
+        /// <param name="templateId">The template id to check</param>
+        /// <returns>True if AllowedTemplates contains the templateId else False</returns>
+        bool IsAllowedTemplate(int templateId);
+
+        /// <summary>
+        /// Determines if AllowedTemplates contains templateId
+        /// </summary>
+        /// <param name="templateAlias">The template alias to check</param>
+        /// <returns>True if AllowedTemplates contains the templateAlias else False</returns>
+        bool IsAllowedTemplate(string templateAlias);
+
+        /// <summary>
         /// Sets the default template for the ContentType
         /// </summary>
         /// <param name="template">Default <see cref="ITemplate"/></param>

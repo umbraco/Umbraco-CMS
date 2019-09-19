@@ -22,16 +22,6 @@ function RowConfigController($scope) {
         return ((spans / $scope.columns) * 100).toFixed(8);
     };
 
-    $scope.toggleCollection = function(collection, toggle) {
-        if (toggle) {
-            collection = [];
-        }
-        else {
-            delete collection;
-        }
-    };
-
-
     /****************
         area
     *****************/
@@ -55,8 +45,18 @@ function RowConfigController($scope) {
                 row.areas.push(cell);
             }
             $scope.currentCell = cell;
+            $scope.currentCell.allowAll = cell.allowAll || !cell.allowed || !cell.allowed.length;
         }
     };
+
+    $scope.toggleAllowed = function (cell) {
+        if (cell.allowed) {
+            delete cell.allowed;
+        }
+        else {
+            cell.allowed = [];
+        }
+    }
 
     $scope.deleteArea = function (cell, row) {
     	if ($scope.currentCell === cell) {

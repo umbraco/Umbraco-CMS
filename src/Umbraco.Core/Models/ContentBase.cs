@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -264,7 +263,7 @@ namespace Umbraco.Core.Models
         /// <returns><see cref="Property"/> Value as an <see cref="object"/></returns>
         public virtual object GetValue(string propertyTypeAlias)
         {
-            return Properties[propertyTypeAlias].Value;
+            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].Value : null;
         }
 
         /// <summary>
@@ -275,6 +274,11 @@ namespace Umbraco.Core.Models
         /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
         public virtual TPassType GetValue<TPassType>(string propertyTypeAlias)
         {
+            if (Properties.Contains(propertyTypeAlias) == false)
+            {
+                return default(TPassType);
+            }
+
             var convertAttempt = Properties[propertyTypeAlias].Value.TryConvertTo<TPassType>();
             return convertAttempt.Success ? convertAttempt.Result : default(TPassType);
         }
@@ -538,6 +542,28 @@ namespace Umbraco.Core.Models
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Returns both instance dirty properties and property type properties
+        /// </summary>
+        /// <returns></returns>
+        public override IEnumerable<string> GetDirtyProperties()
+        {
+            var instanceProperties = base.GetDirtyProperties();
+            var propertyTypes = Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
+            return instanceProperties.Concat(propertyTypes);
+        }
+
+        /// <summary>
+        /// Returns both instance dirty properties and property type properties
+        /// </summary>
+        /// <returns></returns>
+        internal override IEnumerable<string> GetPreviouslyDirtyProperties()
+        {
+            var instanceProperties = base.GetPreviouslyDirtyProperties();
+            var propertyTypes = Properties.Where(x => x.WasDirty()).Select(x => x.Alias);
+            return instanceProperties.Concat(propertyTypes);
         }
 
         #endregion

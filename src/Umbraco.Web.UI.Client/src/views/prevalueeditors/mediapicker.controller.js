@@ -9,12 +9,22 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
 
     $scope.renderModel = [];   
 
+    $scope.allowRemove = true;
+    $scope.allowEdit = true;
+    $scope.sortable = false;
+
     var dialogOptions = {
         multiPicker: false,
         entityType: "Media",
         section: "media",
-        treeAlias: "media"
+        treeAlias: "media",
+        idType: "int"
     };
+
+    //combine the dialogOptions with any values returned from the server
+    if ($scope.model.config) {
+        angular.extend(dialogOptions, $scope.model.config);
+    }
 
     $scope.openContentPicker = function() {
       $scope.contentPickerOverlay = dialogOptions;
@@ -43,8 +53,7 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
       };
     }
 
-    $scope.remove =function(index, event){
-        event.preventDefault();
+    $scope.remove =function(index){
         $scope.renderModel.splice(index, 1);
     };
 
@@ -53,18 +62,30 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
     };
 
     $scope.add = function (item) {
+
+        var itemId = dialogOptions.idType === "udi" ? item.udi : item.id;
+
         var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
+            return dialogOptions.idType === "udi" ? i.udi : i.id;
         });
-        if (currIds.indexOf(item.id) < 0) {
+        if (currIds.indexOf(itemId) < 0) {
+                
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
+            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
+
+            // store the index of the new item in the renderModel collection so we can find it again
+            var itemRenderIndex = $scope.renderModel.length - 1;
+			// get and update the path for the picked node
+            entityResource.getUrl(item.id, dialogOptions.entityType).then(function(data){
+			    $scope.renderModel[itemRenderIndex].path = data;
+            });
+
         }	
     };
 
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
+            return dialogOptions.idType === "udi" ? i.udi : i.id;
         });
         $scope.model.value = trim(currIds.join(), ",");
     });
@@ -76,13 +97,24 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
 
     //load media data
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
-    entityResource.getByIds(modelIds, dialogOptions.entityType).then(function (data) {
-        _.each(data, function (item, i) {
-            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
+    if (modelIds.length > 0) {
+        entityResource.getByIds(modelIds, dialogOptions.entityType).then(function (data) {
+            _.each(data, function (item, i) {
+
+                item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+                $scope.renderModel.push({ name: item.name, id: item.id,  icon: item.icon, udi: item.udi });
+                
+                // store the index of the new item in the renderModel collection so we can find it again
+                var itemRenderIndex = $scope.renderModel.length - 1;
+                // get and update the path for the picked node
+                entityResource.getUrl(item.id, dialogOptions.entityType).then(function(data){
+                    $scope.renderModel[itemRenderIndex].path = data;
+                });
+
+            });
         });
-    });
-    
+    }
+        
 }
 
 angular.module('umbraco').controller("Umbraco.PrevalueEditors.MediaPickerController",mediaPickerController);

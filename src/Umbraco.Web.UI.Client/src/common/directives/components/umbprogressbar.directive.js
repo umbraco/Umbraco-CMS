@@ -16,6 +16,8 @@ Use this directive to generate a progress bar.
 </pre>
 
 @param {number} percentage (<code>attribute</code>): The progress in percentage.
+@param {string} size (<code>attribute</code>): The size (s, m).
+
 **/
 
 (function() {
@@ -28,7 +30,8 @@ Use this directive to generate a progress bar.
             replace: true,
             templateUrl: 'views/components/umb-progress-bar.html',
             scope: {
-                percentage: "@"
+                percentage: "@",
+                size: "@?"
             }
         };
 

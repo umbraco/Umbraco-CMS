@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveFiv
     /// <summary>
     /// See: http://issues.umbraco.org/issue/U4-4196
     /// </summary>
-    [Migration("7.5.5", 1, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.5.5", 1, Constants.System.UmbracoMigrationName)]
     public class UpdateAllowedMediaTypesAtRoot : MigrationBase
     {
         public UpdateAllowedMediaTypesAtRoot(ISqlSyntaxProvider sqlSyntax, ILogger logger)

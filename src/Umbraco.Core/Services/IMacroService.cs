@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
@@ -15,7 +16,7 @@ namespace Umbraco.Core.Services
         /// <param name="alias">Alias to retrieve an <see cref="IMacro"/> for</param>
         /// <returns>An <see cref="IMacro"/> object</returns>
         IMacro GetByAlias(string alias);
-        
+
         ///// <summary>
         ///// Gets a list all available <see cref="IMacro"/> objects
         ///// </summary>
@@ -23,9 +24,15 @@ namespace Umbraco.Core.Services
         ///// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
         //IEnumerable<IMacro> GetAll(params string[] aliases);
 
+        IEnumerable<IMacro> GetAll();
+
         IEnumerable<IMacro> GetAll(params int[] ids);
 
+        IEnumerable<IMacro> GetAll(params Guid[] ids);
+
         IMacro GetById(int id);
+
+        IMacro GetById(Guid id);
 
         /// <summary>
         /// Deletes an <see cref="IMacro"/>

@@ -12,6 +12,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using Umbraco.Core;
 
 namespace umbraco.presentation.plugins.tinymce3
 {
@@ -91,7 +92,7 @@ namespace umbraco.presentation.plugins.tinymce3
 					key += item.Data;
 			}
 
-			key = MD5(key);
+			key = Hash(key);
 			if (this.NoCompression) {
 				this.SendPlainText(key, to_stream);
 				return;
@@ -224,12 +225,10 @@ namespace umbraco.presentation.plugins.tinymce3
 			}
 		}
 
-		private string MD5(string str) {
-			MD5 md5 = new MD5CryptoServiceProvider();
-			byte[] result = md5.ComputeHash(Encoding.ASCII.GetBytes(str));
-			str = BitConverter.ToString(result);
+		private string Hash(string str)
+		{
+		    return str.GenerateHash();
 
-			return str.Replace("-", "");
 		}
 
 		#endregion

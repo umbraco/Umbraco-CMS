@@ -13,28 +13,59 @@
             public const int Root = -1;
 
             /// <summary>
+            /// The string identifier for global system root node.
+            /// </summary>
+            /// <remarks>Use this instead of re-creating the string everywhere.</remarks>
+            public const string RootString = "-1";
+
+            /// <summary>
             /// The integer identifier for content's recycle bin.
             /// </summary>
             public const int RecycleBinContent = -20;
+
+            /// <summary>
+            /// The string identifier for content's recycle bin.
+            /// </summary>
+            /// <remarks>Use this instead of re-creating the string everywhere.</remarks>
+            public const string RecycleBinContentString = "-20";
+
+            /// <summary>
+            /// The string path prefix of the content's recycle bin.
+            /// </summary>
+            /// <remarks>
+            /// <para>Everything that is in the content recycle bin, has a path that starts with the prefix.</para>
+            /// <para>Use this instead of re-creating the string everywhere.</para>
+            /// </remarks>
+            public const string RecycleBinContentPathPrefix = "-1,-20,";
 
             /// <summary>
             /// The integer identifier for media's recycle bin.
             /// </summary>
             public const int RecycleBinMedia = -21;
 
+            /// <summary>
+            /// The string identifier for media's recycle bin.
+            /// </summary>
+            /// <remarks>Use this instead of re-creating the string everywhere.</remarks>
+            public const string RecycleBinMediaString = "-21";
+
+            /// <summary>
+            /// The string path prefix of the media's recycle bin.
+            /// </summary>
+            /// <remarks>
+            /// <para>Everything that is in the media recycle bin, has a path that starts with the prefix.</para>
+            /// <para>Use this instead of re-creating the string everywhere.</para>
+            /// </remarks>
+            public const string RecycleBinMediaPathPrefix = "-1,-21,";
+
             public const int DefaultContentListViewDataTypeId = -95;
             public const int DefaultMediaListViewDataTypeId = -96;
             public const int DefaultMembersListViewDataTypeId = -97;
+            public const int DefaultLabelDataTypeId = -92;
 
-            // identifiers for lock objects
-            public const int ServersLock = -331;
+            public const string UmbracoConnectionName = "umbracoDbDSN";
+            public const string UmbracoMigrationName = "Umbraco";
         }
 
-        public static class DatabaseProviders
-        {
-            public const string SqlCe = "System.Data.SqlServerCe.4.0";
-            public const string SqlServer = "System.Data.SqlClient";
-            public const string MySql = "MySql.Data.MySqlClient";
-        }
     }
 }

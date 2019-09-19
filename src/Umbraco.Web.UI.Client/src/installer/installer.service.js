@@ -16,25 +16,25 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 	};
 
 	//add to umbraco installer facts here
-	var facts = ['Umbraco helped millions of people watch a man jump from the edge of space',
-					'Over 370 000 websites are currently powered by Umbraco',
+	var facts = ["Umbraco helped millions of people watch a man jump from the edge of space",
+					"Over 500 000 websites are currently powered by Umbraco",
 					"At least 2 people have named their cat 'Umbraco'",
-					'On an average day, more than 1000 people download Umbraco',
-					'<a target="_blank" href="http://umbraco.tv">umbraco.tv</a> is the premier source of Umbraco video tutorials to get you started',
-					'You can find the world\'s friendliest CMS community at <a target="_blank" href="http://our.umbraco.org">our.umbraco.org</a>',
-					'You can become a certified Umbraco developer by attending one of the official courses',
-					'Umbraco works really well on tablets',
-					'You have 100% control over your markup and design when crafting a website in Umbraco',
-					'Umbraco is the best of both worlds: 100% free and open source, and backed by a professional and profitable company',
-					"There's a pretty big chance, you've visited a website powered by Umbraco today",
+					"On an average day more than 1000 people download Umbraco",
+					"<a target='_blank' href='https://umbraco.tv/'>umbraco.tv</a> is the premier source of Umbraco video tutorials to get you started",
+					"You can find the world's friendliest CMS community at <a target='_blank' href='https://our.umbraco.com/'>our.umbraco.com</a>",
+					"You can become a certified Umbraco developer by attending one of the official courses",
+					"Umbraco works really well on tablets",
+					"You have 100% control over your markup and design when crafting a website in Umbraco",
+					"Umbraco is the best of both worlds: 100% free and open source, and backed by a professional and profitable company",
+					"There's a pretty big chance you've visited a website powered by Umbraco today",
 					"'Umbraco-spotting' is the game of spotting big brands running Umbraco",
 					"At least 4 people have the Umbraco logo tattooed on them",
-					"'Umbraco' is the danish name for an allen key",
+					"'Umbraco' is the Danish name for an allen key",
 					"Umbraco has been around since 2005, that's a looong time in IT",
-					"More than 400 people from all over the world meet each year in Denmark in June for our annual conference <a target='_blank' href='http://codegarden15.com'>CodeGarden</a>", 
+					"More than 600 people from all over the world meet each year in Denmark in May for our annual conference <a target='_blank' href='https://umbra.co/codegarden'>CodeGarden</a>", 
 					"While you are installing Umbraco someone else on the other side of the planet is probably doing it too",
 					"You can extend Umbraco without modifying the source code using either JavaScript or C#",
-					"Umbraco was installed in more than 165 countries in 2015"
+					"Umbraco has been installed in more than 198 countries"
 					 ];
 
     /**
@@ -121,7 +121,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 			}
 		},
 
-		//loads available packages from our.umbraco.org
+		//loads available packages from our.umbraco.com
 		getPackages : function(){
 			return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetPackages");
 		},

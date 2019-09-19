@@ -1,9 +1,11 @@
-﻿namespace Umbraco.Core.Persistence.Migrations
+﻿using umbraco.interfaces;
+
+namespace Umbraco.Core.Persistence.Migrations
 {
     /// <summary>
     /// Marker interface for database migrations
     /// </summary>
-    public interface IMigration
+    public interface IMigration : IDiscoverable
     {
         void Up();
         void Down();

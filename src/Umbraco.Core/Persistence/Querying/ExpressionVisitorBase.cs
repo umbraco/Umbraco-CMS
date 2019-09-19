@@ -10,49 +10,6 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Core.Persistence.Querying
 {
     /// <summary>
-    /// Represents an expression which caches the visitor's result.
-    /// </summary>
-    internal class CachedExpression : Expression
-    {
-        private string _visitResult;
-
-        /// <summary>
-        /// Gets or sets the inner Expression.
-        /// </summary>
-        public Expression InnerExpression { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the compiled SQL statement output.
-        /// </summary>
-        public string VisitResult
-        {
-            get { return _visitResult; }
-            set
-            {
-                if (Visited)
-                    throw new InvalidOperationException("Cached expression has already been visited.");
-                _visitResult = value;
-                Visited = true;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the cache Expression has been compiled already.
-        /// </summary>
-        public bool Visited { get; private set; }
-
-        /// <summary>
-        /// Replaces the inner expression.
-        /// </summary>
-        /// <param name="expression">expression.</param>
-        /// <remarks>The new expression is assumed to have different parameter but produce the same SQL statement.</remarks>
-        public void Wrap(Expression expression)
-        {
-            InnerExpression = expression;
-        }
-    }
-
-    /// <summary>
     /// An expression tree parser to create SQL statements and SQL parameters based on a strongly typed expression.
     /// </summary>
     /// <remarks>This object is stateful and cannot be re-used to parse an expression.</remarks>
@@ -581,8 +538,8 @@ namespace Umbraco.Core.Persistence.Querying
                 case "InvariantContains":
                 case "InvariantEquals":
 
-                    //special case, if it is 'Contains' and the argument that Contains is being called on is 
-                    //Enumerable and the methodArgs is the actual member access, then it's an SQL IN clause
+                    //special case, if it is 'Contains' and the argumet that Contains is being called on is 
+                    //Enumerable and the methodArgs is the actual member access, then it's an SQL IN claus
                     if (m.Object == null 
                         && m.Arguments[0].Type != typeof(string)
                         && m.Arguments.Count == 2

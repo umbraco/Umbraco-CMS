@@ -6,6 +6,7 @@ using Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.ForeignKey;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Index;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Table;
+using Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -25,6 +26,24 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
             _context = context;
             _sqlSyntax = sqlSyntax;
             _databaseProviders = databaseProviders;
+        }
+
+        public void Table<T>()
+        {
+            var tableDefinition = DefinitionFactory.GetTableDefinition(_sqlSyntax, typeof(T));
+
+            AddSql(_sqlSyntax.Format(tableDefinition));
+            AddSql(_sqlSyntax.FormatPrimaryKey(tableDefinition));
+            foreach (var sql in _sqlSyntax.Format(tableDefinition.ForeignKeys))
+                AddSql(sql);
+            foreach (var sql in _sqlSyntax.Format(tableDefinition.Indexes))
+                AddSql(sql);
+        }
+
+        private void AddSql(string sql)
+        {
+            var expression = new ExecuteSqlStatementExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax) { SqlStatement = sql };
+            _context.Expressions.Add(expression);
         }
 
         public ICreateTableWithColumnSyntax Table(string tableName)

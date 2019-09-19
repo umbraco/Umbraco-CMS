@@ -13,8 +13,8 @@ function valTab() {
         link: function (scope, element, attr, ctrs) {
 
             var valFormManager = ctrs[1];
-            var tabId = "tab" + scope.tab.id;                        
-            scope.tabHasError = false;
+            var tabId = "tab" + scope.tab.id;
+            scope.tabHasError = false;            
 
             //listen for form validation changes
             valFormManager.onValidationStatusChanged(function (evt, args) {
@@ -31,7 +31,6 @@ function valTab() {
                     scope.tabHasError = false;
                 }
             });
-
         }
     };
 }

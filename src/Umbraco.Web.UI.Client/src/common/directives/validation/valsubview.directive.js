@@ -12,6 +12,11 @@
 
     function link(scope, el, attr, ctrl) {
 
+      //if there are no containing form or valFormManager controllers, then we do nothing
+      if (!ctrl || !angular.isArray(ctrl) || ctrl.length !== 2 || !ctrl[0] || !ctrl[1]) {
+        return;
+      }
+
       var valFormManager = ctrl[1];
       scope.subView.hasError = false;
 
@@ -36,7 +41,7 @@
     }
 
     var directive = {
-      require: ['^form', '^valFormManager'],
+      require: ['?^form', '?^valFormManager'],
       restrict: "A",
       link: link
     };

@@ -29,7 +29,7 @@ namespace umbraco.cms.businesslogic.media
             var propertyId = media.getProperty(Constants.Conventions.Media.File).Id;
 
             // Get paths
-            var destFilePath = FileSystem.GetRelativePath(propertyId, uploadedFile.FileName);
+            var destFilePath = GetRelativePath(propertyId, uploadedFile.FileName);
             var ext = Path.GetExtension(destFilePath).Substring(1);
 
             //var absoluteDestPath = HttpContext.Current.Server.MapPath(destPath);

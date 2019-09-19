@@ -9,7 +9,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MacroContainerAlias, "Macro container", "macrocontainer", ValueType = PropertyEditorValueTypes.Text, Group="rich content", Icon="icon-settings-alt")]
+    [PropertyEditor(Constants.PropertyEditors.MacroContainerAlias, "Macro Picker", "macrocontainer", ValueType = PropertyEditorValueTypes.Text, Group="rich content", Icon="icon-settings-alt", IsDeprecated = true)]
     public class MacroContainerPropertyEditor : PropertyEditor
     {
         /// <summary>

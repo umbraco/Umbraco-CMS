@@ -12,6 +12,17 @@ namespace Umbraco.Tests.Dependencies
     [TestFixture]
     public class NuGet
     {
+        // note
+        // these tests assume that the test suite runs from the project's ~/bin directory
+        // instead, we want to be able to pass the required paths as parameters
+        // NUnit 3.x supports TestContext.TestParameters, alas we are still running 2.x
+        //
+        // so instead
+        //
+        // furthermore, all these tests should be parts of the build and fail the build
+        // in case the NuGet things are not consisted. Also, v8 uses <PackageReference>
+        // wherever possible so we will also have to deal with it eventually.
+
         [Test]
         public void NuGet_Package_Versions_Are_The_Same_In_All_Package_Config_Files()
         {
@@ -40,21 +51,20 @@ namespace Umbraco.Tests.Dependencies
         [Test]
         public void NuSpec_File_Matches_Installed_Dependencies()
         {
-            var solutionDirectory = GetSolutionDirectory();
-            Assert.NotNull(solutionDirectory);
-            Assert.NotNull(solutionDirectory.Parent);
-
-            var nuSpecPath = solutionDirectory.Parent.FullName + "\\build\\NuSpecs\\";
-            Assert.IsTrue(Directory.Exists(nuSpecPath));
+            var nuspecsDirectory = NuSpecsDirectory;
+            Assert.IsNotNull(nuspecsDirectory);
 
             var packagesAndVersions = GetNuGetPackagesInSolution();
-            var failTest = false;
+            Assert.IsTrue(packagesAndVersions.Any());
 
-            var nuSpecFiles = Directory.GetFiles(nuSpecPath);
-            foreach (var fileName in nuSpecFiles.Where(x => x.EndsWith("nuspec")))
+            Console.WriteLine("NuSpecs: " + nuspecsDirectory.FullName);
+
+            var failTest = false;
+            var nuspecFiles = nuspecsDirectory.GetFiles().Where(x => x.Extension == ".nuspec").Select(x => x.FullName);
+            foreach (var filename in nuspecFiles)
             {
                 var serializer = new XmlSerializer(typeof(NuSpec));
-                using (var reader = new StreamReader(fileName))
+                using (var reader = new StreamReader(filename))
                 {
                     var nuspec = (NuSpec)serializer.Deserialize(reader);
                     var dependencies = nuspec.MetaData.dependencies;
@@ -64,13 +74,13 @@ namespace Umbraco.Tests.Dependencies
                     {
                         var dependencyVersionRange = dependency.Version.Replace("[", string.Empty).Replace("(", string.Empty).Split(',');
                         var dependencyMinimumVersion = dependencyVersionRange.First().Trim();
-                        
+
                         var matchingPackages = packagesAndVersions.Where(x => string.Equals(x.PackageName, dependency.Id,
                                         StringComparison.InvariantCultureIgnoreCase)).ToList();
                         if (matchingPackages.Any() == false)
                             continue;
 
-                        // NuGet_Package_Versions_Are_The_Same_In_All_Package_Config_Files test 
+                        // NuGet_Package_Versions_Are_The_Same_In_All_Package_Config_Files test
                         // guarantees that all packages have one version, solutionwide, so it's okay to take First() here
                         if (dependencyMinimumVersion != matchingPackages.First().PackageVersion)
                         {
@@ -88,15 +98,13 @@ namespace Umbraco.Tests.Dependencies
         private List<PackageVersionMatcher> GetNuGetPackagesInSolution()
         {
             var packagesAndVersions = new List<PackageVersionMatcher>();
-            var solutionDirectory = GetSolutionDirectory();
-            if (solutionDirectory == null)
-                return packagesAndVersions;
+            var sourceDirectory = SourceDirectory;
+            if (sourceDirectory == null) return packagesAndVersions;
 
             var packageConfigFiles = new List<FileInfo>();
             var packageDirectories =
-                solutionDirectory.GetDirectories().Where(x =>
-                            x.Name.StartsWith("Umbraco.Tests") == false &&
-                            x.Name.StartsWith("Umbraco.MSBuild.Tasks") == false).ToArray();
+                sourceDirectory.GetDirectories().Where(x =>
+                            x.Name.StartsWith("Umbraco.Tests") == false).ToArray();
 
             foreach (var directory in packageDirectories)
             {
@@ -123,15 +131,53 @@ namespace Umbraco.Tests.Dependencies
             return packagesAndVersions;
         }
 
-        private DirectoryInfo GetSolutionDirectory()
+        private DirectoryInfo SourceDirectory
         {
-            var testsDirectory = new FileInfo(TestHelper.MapPathForTest("~/"));
-            if (testsDirectory.Directory == null)
-                return null;
-            if (testsDirectory.Directory.Parent == null || testsDirectory.Directory.Parent.Parent == null)
-                return null;
-            var solutionDirectory = testsDirectory.Directory.Parent.Parent.Parent;
-            return solutionDirectory;
+            get
+            {
+                // UMBRACO_TMP is set by VSTS and points to build.tmp
+                var tmp = Environment.GetEnvironmentVariable("UMBRACO_TMP");
+                if (tmp == null) return SolutionDirectory;
+
+                var path = Path.Combine(tmp, "..\\src");
+                path = Path.GetFullPath(path); // sanitize
+                var dir = new DirectoryInfo(path);
+                return dir.Exists ? dir : null;
+            }
+        }
+
+        private DirectoryInfo NuSpecsDirectory
+        {
+            get
+            {
+                // UMBRACO_TMP is set by VSTS and points to build.tmp
+                var tmp = Environment.GetEnvironmentVariable("UMBRACO_TMP");
+                if (tmp == null)
+                {
+                    var solutionDirectory = SolutionDirectory;
+                    if (solutionDirectory == null) return null;
+                    return new DirectoryInfo(Path.Combine(solutionDirectory.FullName, "..\\build\\NuSpecs"));
+                }
+
+                var path = Path.Combine(tmp, "..\\build\\NuSpecs");
+                path = Path.GetFullPath(path); // sanitize
+                var dir = new DirectoryInfo(path);
+                return dir.Exists ? dir : null;
+            }
+        }
+
+        private DirectoryInfo SolutionDirectory
+        {
+            get
+            {
+                var testsDirectory = new FileInfo(TestHelper.MapPathForTest("~/"));
+                if (testsDirectory.Directory == null)
+                    return null;
+                if (testsDirectory.Directory.Parent == null || testsDirectory.Directory.Parent.Parent == null)
+                    return null;
+                var solutionDirectory = testsDirectory.Directory.Parent.Parent.Parent;
+                return solutionDirectory;
+            }
         }
     }
 
@@ -159,7 +205,7 @@ namespace Umbraco.Tests.Dependencies
         [XmlAttribute(AttributeName = "version")]
         public string Version { get; set; }
     }
-    
+
 
     [XmlType(AnonymousType = true, Namespace = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd")]
     [XmlRoot(Namespace = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd", IsNullable = false, ElementName = "package")]
@@ -168,7 +214,7 @@ namespace Umbraco.Tests.Dependencies
         [XmlElement("metadata")]
         public Metadata MetaData { get; set; }
     }
-    
+
     [XmlType(AnonymousType = true, Namespace = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd", TypeName = "metadata")]
     public class Metadata
     {
@@ -182,9 +228,8 @@ namespace Umbraco.Tests.Dependencies
     {
         [XmlAttribute(AttributeName = "id")]
         public string Id { get; set; }
-        
+
         [XmlAttribute(AttributeName = "version")]
         public string Version { get; set; }
     }
-
 }

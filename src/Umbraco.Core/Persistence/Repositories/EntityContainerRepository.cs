@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, Guid containerObjectType) 
+        public EntityContainerRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, Guid containerObjectType) 
             : base(work, cache, logger, sqlSyntax)
         {
             var allowedContainers = new[] {Constants.ObjectTypes.DocumentTypeContainerGuid, Constants.ObjectTypes.MediaTypeContainerGuid, Constants.ObjectTypes.DataTypeContainerGuid};
@@ -29,12 +29,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new InvalidOperationException("No container type exists with ID: " + _containerObjectType);
         }
 
-        /// <summary>
-        /// Do not cache anything
-        /// </summary>
-        protected override IRuntimeCacheProvider RuntimeCache
+        // never cache
+        private static readonly IRuntimeCacheProvider NullCache = new NullCacheProvider();
+        protected override IRuntimeCacheProvider GetIsolatedCache(IsolatedRuntimeCache provider)
         {
-            get { return new NullCacheProvider(); }
+            return NullCache;
         }
 
         protected override EntityContainer PerformGet(int id)
@@ -168,6 +167,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // delete
             Database.Delete(nodeDto);
+
+            entity.DeletedDate = DateTime.Now;
         }
 
         protected override void PersistNewItem(EntityContainer entity)

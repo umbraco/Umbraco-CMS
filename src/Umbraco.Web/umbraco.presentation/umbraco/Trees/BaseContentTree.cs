@@ -360,7 +360,7 @@ function openContent(id) {
             }
             else if (!this.IsDialog || (this.DialogMode == TreeDialogModes.id))
             {
-                if (CurrentUser.GetPermissions(dd.Path).Contains(ActionUpdate.Instance.Letter.ToString()))
+                if (CurrentUser.GetPermissions(dd.Path).Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
                 {
                     treeElement.Action = String.Format("javascript:openContent({0});", dd.Id);
                 }

@@ -6,10 +6,9 @@
 
             <li ng-repeat="docType in allowedTypes">
                 <a href="#member/member/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
-
-                    <i class="large icon-users"></i>
-
-                    <span class="menu-label">{{docType.name}}
+                    <i class="large {{docType.icon}}"></i>
+                    <span class="menu-label">
+                        {{docType.name}}
                         <small>{{docType.description}}</small>
                     </span>
                 </a>
@@ -20,8 +19,7 @@
 </div>
 
 <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" >
-    <button type="button" class="btn" ng-click="nav.hideDialog()">
+    <button type="button" class="btn btn-info" ng-click="nav.hideDialog(true)">
         <localize key="buttons_somethingElse">Do something else</localize>
     </button>
 </div>
-

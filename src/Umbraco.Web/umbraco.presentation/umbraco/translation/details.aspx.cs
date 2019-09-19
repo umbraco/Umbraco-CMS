@@ -1,24 +1,10 @@
 ﻿using System;
 using System.Data;
-using System.IO;
-using System.Text;
-using System.Xml;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.translation;
 using umbraco.cms.businesslogic.web;
-
-using ICSharpCode.SharpZipLib.BZip2;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Zip.Compression;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using ICSharpCode.SharpZipLib.GZip;
 
 namespace umbraco.presentation.umbraco.translation {
     public partial class details : BasePages.UmbracoEnsuredPage {
@@ -98,14 +84,19 @@ namespace umbraco.presentation.umbraco.translation {
             pageRow[ui.Text("name")] = ui.Text("nodeName");
             pageRow[ui.Text("value")] = page.Text;
             pageTable.Rows.Add(pageRow);
-            
-            foreach (PropertyType pt in page.ContentType.PropertyTypes) {
+
+            foreach (PropertyType pt in page.ContentType.PropertyTypes)
+            {
                 pageRow = pageTable.NewRow();
                 pageRow[ui.Text("name")] = pt.Name;
-                pageRow[ui.Text("value")] = page.getProperty(pt.Alias).Value;
+                var property = page.getProperty(pt.Alias);
+                if (property != null && property.Value != null)
+                {
+                    pageRow[ui.Text("value")] = property.Value;
+                }
                 pageTable.Rows.Add(pageRow);
             }
-            
+
             dg_fields.DataSource = pageTable;
             dg_fields.DataBind();
         }

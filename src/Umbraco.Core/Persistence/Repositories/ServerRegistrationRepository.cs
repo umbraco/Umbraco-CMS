@@ -15,12 +15,16 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
-        private readonly ICacheProvider _staticCache;
+        private readonly ICacheProvider _globalCache;
 
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, ICacheProvider staticCache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax)
+        public ServerRegistrationRepository(IScopeUnitOfWork work, ICacheProvider globalCache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, CacheHelper.NoCache, logger, sqlSyntax)
         {
-            _staticCache = staticCache;
+            // managing the cache our own way (no policy etc)
+            // note: this means that the ServerRegistrationRepository does *not* implement scoped cache,
+            // and this is because the repository is special and should not participate in scopes
+            // (cleanup in v8)
+            _globalCache = globalCache;
         }
 
         protected override int PerformCount(IQuery<IServerRegistration> query)
@@ -49,7 +53,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // the cache is populated by ReloadCache which should only be called from methods
             // that ensure proper locking (at least, read-lock in ReadCommited) of the repo.
 
-            var all = _staticCache.GetCacheItem<IEnumerable<IServerRegistration>>(CacheKey, Enumerable.Empty<IServerRegistration>);
+            var all = _globalCache.GetCacheItem<IEnumerable<IServerRegistration>>(CacheKey, Enumerable.Empty<IServerRegistration>);
             return ids.Length == 0 ? all : all.Where(x => ids.Contains(x.Id));
         }
 
@@ -75,7 +79,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                 {
-                    "DELETE FROM umbracoServer WHERE id = @Id"                               
+                    "DELETE FROM umbracoServer WHERE id = @Id"
                 };
             return list;
         }
@@ -127,8 +131,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select(x => factory.BuildEntity(x))
                 .Cast<IServerRegistration>()
                 .ToArray();
-            _staticCache.ClearCacheItem(CacheKey);
-            _staticCache.GetCacheItem(CacheKey, () => all);
+            _globalCache.ClearCacheItem(CacheKey);
+            _globalCache.GetCacheItem(CacheKey, () => all);
         }
 
         public void DeactiveStaleServers(TimeSpan staleTimeout)

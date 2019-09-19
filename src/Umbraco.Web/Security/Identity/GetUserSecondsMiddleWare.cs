@@ -2,12 +2,15 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
+using System.Web;
+using System.Web.Security;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -82,6 +85,9 @@ namespace Umbraco.Web.Security.Identity
                                 //if it's time to renew, then do it
                                 if (timeRemaining < timeElapsed)
                                 {
+                                    //TODO: This would probably be simpler just to do: context.OwinContext.Authentication.SignIn(context.Properties, identity);
+                                    // this will invoke the default Cookie middleware to basically perform this logic for us.
+
                                     ticket.Properties.IssuedUtc = currentUtc;
                                     var timeSpan = expiresUtc.Value.Subtract(issuedUtc.Value);
                                     ticket.Properties.ExpiresUtc = currentUtc.Add(timeSpan);
@@ -98,7 +104,10 @@ namespace Umbraco.Web.Security.Identity
 
                                     remainingSeconds = (ticket.Properties.ExpiresUtc.Value - currentUtc).TotalSeconds;
                                 }
-                            }                            
+                            }
+
+                            //We also need to re-validate the user's session if we are relying on this ping to keep their session alive
+                            await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _authOptions.CookieManager, _authOptions.SystemClock, issuedUtc, ticket.Identity);
                         }
                         else if (remainingSeconds <= 30)
                         {
@@ -114,6 +123,13 @@ namespace Umbraco.Web.Security.Identity
                         return;
                     }
                 }
+
+                //Hack! we need to suppress the stupid forms authentcation module but we can only do that by using non owin stuff
+                if (HttpContext.Current != null && HttpContext.Current.Response != null)
+                {
+                    HttpContext.Current.Response.SuppressFormsAuthenticationRedirect = true;
+                }
+
                 response.StatusCode = 401;
             }
             else if (Next != null)

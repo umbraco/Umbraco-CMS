@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
@@ -18,6 +19,11 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "contentType", Namespace = "")]
     public class ContentTypeBasic : EntityBasic
     {
+        public ContentTypeBasic()
+        {
+            Blueprints = new Dictionary<int, string>();
+        }
+
         /// <summary>
         /// Overridden to apply our own validation attributes since this is not always required for other classes
         /// </summary>        
@@ -105,5 +111,9 @@ namespace Umbraco.Web.Models.ContentEditing
                            : IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + Thumbnail);
             }
         }
+
+        [DataMember(Name = "blueprints")]
+        [ReadOnly(true)]
+        public IDictionary<int, string> Blueprints { get; set; }
     }
 }

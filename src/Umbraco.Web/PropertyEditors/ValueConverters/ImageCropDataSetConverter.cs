@@ -13,14 +13,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// </summary>
     public class ImageCropDataSetConverter : TypeConverter
     {
+        private static readonly Type[] ConvertableTypes = new[]
+        {
+            typeof(JObject)
+        };
+
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            var convertableTypes = new[]
-            {
-                typeof(JObject)
-            };
-
-            return convertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, destinationType))
+            return ConvertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, destinationType))
                    || base.CanConvertFrom(context, destinationType);
         }
 

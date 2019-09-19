@@ -12,49 +12,58 @@ using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Web.Trees;
+using umbraco.uicontrols;
+using System.Linq;
+using umbraco.cms.businesslogic.language;
 
 namespace umbraco.settings
 {
-	/// <summary>
-	/// Summary description for editLanguage.
-	/// </summary>
+    /// <summary>
+    /// Summary description for editLanguage.
+    /// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Languages)]
-	public partial class editLanguage : BasePages.UmbracoEnsuredPage
-	{
-	    public editLanguage()
-	    {
+    public partial class editLanguage : BasePages.UmbracoEnsuredPage
+    {
+        public editLanguage()
+        {
             CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
 
-	    }
-		protected System.Web.UI.WebControls.TextBox NameTxt;
-		protected System.Web.UI.WebControls.Literal DisplayName;
-		cms.businesslogic.language.Language currentLanguage;
-	
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
-			currentLanguage = new cms.businesslogic.language.Language(int.Parse(helper.Request("id")));
-           
+        }
+        protected System.Web.UI.WebControls.TextBox NameTxt;
+        protected System.Web.UI.WebControls.Literal DisplayName;
+        cms.businesslogic.language.Language currentLanguage;
 
-			// Put user code to initialize the page here
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
+            currentLanguage = new cms.businesslogic.language.Language(int.Parse(helper.Request("id")));
+
+
+            // Put user code to initialize the page here
             Panel1.Text = ui.Text("editlanguage");
             pp_language.Text = ui.Text("language", "displayName", base.getUser());
-            if (!IsPostBack) 
-			{
-				updateCultureList();
+            if (!IsPostBack)
+            {
+                updateCultureList();
 
-				ClientTools
-					.SetActiveTreeType(Constants.Trees.Languages)
-					.SyncTree(helper.Request("id"), false);
-			}
-			
-		}
+                ClientTools
+                    .SetActiveTreeType(Constants.Trees.Languages)
+                    .SyncTree(helper.Request("id"), false);
+            }
 
-		private void updateCultureList() 
-		{
+        }
+
+        private void updateCultureList()
+        {
             SortedList sortedCultures = new SortedList();
             Cultures.Items.Clear();
             Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
-            foreach (CultureInfo ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
+
+            var languagesUsed = Language.GetAllAsList();
+
+            var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures)                
+                .Where(ci => !languagesUsed.Any(lu => lu.CultureAlias == ci.Name) || ci.Name == currentLanguage.CultureAlias);
+
+            foreach (CultureInfo ci in cultures)
                 sortedCultures.Add(ci.DisplayName + "|||" + Guid.NewGuid().ToString(), ci.Name);
 
             IDictionaryEnumerator ide = sortedCultures.GetEnumerator();
@@ -68,40 +77,39 @@ namespace umbraco.settings
             }
         }
 
-		private void save_click(object sender, EventArgs e) 
-		{
-			currentLanguage.CultureAlias = Cultures.SelectedValue;
-		    currentLanguage.Save();
-			updateCultureList();
+        private void save_click(object sender, EventArgs e)
+        {
+            currentLanguage.CultureAlias = Cultures.SelectedValue;
+            currentLanguage.Save();
+            updateCultureList();
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "languageSaved"), "");	
-		}
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "languageSaved"), "");
+        }
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			Panel1.hasMenu = true;
-			var save = Panel1.Menu.NewButton();
-			save.Click += save_click;
-			save.ToolTip = ui.Text("save");
+        #region Web Form Designer generated code
+        override protected void OnInit(EventArgs e)
+        {
+            Panel1.hasMenu = true;
+            var save = Panel1.Menu.NewButton();
+            save.Click += save_click;
             save.Text = ui.Text("save");
-		    save.ID = "save";
-            save.ButtonType = uicontrols.MenuButtonType.Primary;
-	
-			Panel1.Text = ui.Text("language", "editLanguage");
+            save.ButtonType = MenuButtonType.Primary;
+            save.ID = "save";
 
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
+            Panel1.Text = ui.Text("language", "editLanguage");
 
-		}
-		#endregion
-	}
+            InitializeComponent();
+            base.OnInit(e);
+        }
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+
+        }
+        #endregion
+    }
 }

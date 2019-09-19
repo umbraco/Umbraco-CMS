@@ -1,8 +1,8 @@
 .umb-overlay {
     position: fixed;
     overflow: hidden;
-    background: white;
-    z-index: 996660;
+    background: @white;
+    z-index: @zindexUmbOverlay;
     animation: fadeIn 0.2s;
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
@@ -15,8 +15,8 @@
 }
 
 .umb-overlay .umb-overlay-header {
-    background: @grayLighter;
-    border-bottom: 1px solid @grayLight;
+    background: @gray-10;
+    border-bottom: 1px solid @purple-l3;
     padding: 10px;
     margin-top: 0;
     flex-grow: 0;
@@ -28,13 +28,13 @@
     font-size: @fontSizeLarge;
     color: @black;
     font-weight: bold;
-
     margin: 7px 0;
 }
 
 .umb-overlay .umb-overlay__subtitle {
     font-size: @fontSizeSmall;
-    color: @gray;
+    color: @gray-3;
+    margin: 0;
 }
 
 .umb-overlay .umb-overlay-container {
@@ -54,8 +54,8 @@
     padding: 10px 20px;
     margin: 0;
 
-    background: @grayLighter;
-    border-top: 1px solid @grayLight;
+    background: @gray-10;
+    border-top: 1px solid @purple-l3;
 }
 
 .umb-overlay .umb-overlay-drawer.-auto-height {
@@ -136,6 +136,11 @@
     margin-left: 81px;
 }
 
+// push left overlay when drawer is open
+.umb-drawer-is-visible .umb-overlay.umb-overlay-left {
+    left: @drawerWidth;
+}
+
 .umb-overlay.umb-overlay-left .umb-overlay-header {
     flex-basis: 100px;
     padding: 20px;
@@ -155,7 +160,7 @@
 @media (max-width: 500px) {
     .umb-overlay.umb-overlay-left {
         margin-left: 41px;
-        width: ~"(calc(~'100%' - ~'41px'))";
+        width: calc(100% - 41px);
     }
 }
 
@@ -167,8 +172,9 @@
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    border-bottom: 1px solid @grayLight;
-    background: @grayLighter;
+    background: @gray-10;
+    border-bottom: 1px solid @purple-l3;
+    pointer-events: none;
 }
 
 .umb-overlay__item-details-title-wrapper {
@@ -181,7 +187,7 @@
     font-size: 16px;
     margin-right: 10px;
     vertical-align: middle;
-    color: #999;
+    color: @gray-6;
 }
 
 .umb-overlay__item-details-title {

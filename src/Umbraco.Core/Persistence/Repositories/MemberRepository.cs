@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using Microsoft.AspNet.Identity;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
@@ -29,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMember> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMember> _contentPreviewRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection)
+        public MemberRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax, contentSection)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
@@ -37,8 +38,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
-            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.NoCache, logger, sqlSyntax);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.NoCache, logger, sqlSyntax);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -160,7 +161,7 @@ namespace Umbraco.Core.Persistence.Repositories
                            {
                                "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
                                "DELETE FROM umbracoRelation WHERE parentId = @Id",
                                "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
@@ -231,6 +232,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Create the first entry in cmsMember
             dto.NodeId = nodeDto.NodeId;
+
+            //if the password is empty, generate one with the special prefix
+            //this will hash the guid with a salt so should be nicely random
+            if (entity.RawPasswordValue.IsNullOrWhiteSpace())
+            {
+                var aspHasher = new PasswordHasher();
+                dto.Password = Constants.Security.EmptyPasswordPrefix +
+                               aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
+                //re-assign
+                entity.RawPasswordValue = dto.Password;
+            }
+
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
@@ -587,41 +600,18 @@ namespace Umbraco.Core.Persistence.Repositories
         /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using PetaPoco paging (SQL paging)
         /// </remarks>
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMember> filter = null)
         {
-            var args = new List<object>();
-            var sbWhere = new StringBuilder();
-            Func<Tuple<string, object[]>> filterCallback = null;
-            if (filter.IsNullOrWhiteSpace() == false)
+            var filterSql = new Sql();
+            if (filter != null)
             {
-                //This will build up the where clause - even though the same 'filter' is being
-                //applied to both columns, the parameters values passed to PetaPoco need to be 
-                //duplicated, otherwise it gets confused :/ 
-                var columnFilters = new List<Tuple<string, string>>
+                foreach (var filterClause in filter.GetWhereClauses())
                 {
-                    new Tuple<string, string>("umbracoNode", "text"),
-                    new Tuple<string, string>("cmsMember", "LoginName")
-                };
-                sbWhere.Append("AND (");
-                for (int i = 0; i < columnFilters.Count; i++)
-                {
-                    sbWhere
-                        .Append("(")
-                        .Append(SqlSyntax.GetQuotedTableName(columnFilters[i].Item1))
-                        .Append(".")
-                        .Append(SqlSyntax.GetQuotedColumnName(columnFilters[i].Item2))
-                        .Append(" LIKE @")
-                        .Append(args.Count)
-                        .Append(") ");
-                    args.Add(string.Format("%{0}%", filter));
-                    if (i < (columnFilters.Count - 1))
-                    {
-                        sbWhere.Append("OR ");
-                    }
+                    filterSql.Append(string.Format("AND ({0})", filterClause.Item1), filterClause.Item2);
                 }
-                sbWhere.Append(")");
-                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
             }
+
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);            
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsMember", "nodeId"),
@@ -690,7 +680,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // if the cache contains the item, use it
                 if (withCache)
                 {
-                    var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
                     //only use this cached version if the dto returned is the same version - this is just a safety check, members dont 
                     //store different versions, but just in case someone corrupts some data we'll double check to be sure.
                     if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)

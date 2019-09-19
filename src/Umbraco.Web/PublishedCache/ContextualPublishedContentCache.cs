@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.PublishedCache
 {
@@ -19,6 +21,16 @@ namespace Umbraco.Web.PublishedCache
         internal ContextualPublishedContentCache(IPublishedContentCache cache, UmbracoContext umbracoContext)
             : base(umbracoContext, cache)
         { }
+
+        protected override string UdiEntityType => Constants.UdiEntityType.Document;
+
+        public override IPublishedContent GetById(bool preview, Guid contentKey)
+        {
+            if (InnerCache is PublishedContentCache cc)
+                return cc.GetById(UmbracoContext, preview, contentKey);
+
+            return base.GetById(preview, contentKey);
+        }
 
         /// <summary>
         /// Gets content identified by a route.

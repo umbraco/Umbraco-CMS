@@ -16,7 +16,7 @@ namespace Umbraco.Core.Sync
         Single = 1,
 
         /// <summary>
-        /// In a multi-servers environment, the server is a slave server.
+        /// In a multi-servers environment, the server is a replica server.
         /// </summary>
         Slave = 2,
 

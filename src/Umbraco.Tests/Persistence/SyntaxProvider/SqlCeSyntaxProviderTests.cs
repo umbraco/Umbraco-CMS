@@ -89,7 +89,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var sqlSyntax = new SqlServerSyntaxProvider();
 
             var indexDefinition = CreateIndexDefinition();
-            indexDefinition.IsClustered = false;
+            indexDefinition.IndexType = IndexTypes.Clustered;
 
             var actual = sqlSyntax.Format(indexDefinition);
             Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A])", actual);
@@ -119,6 +119,19 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var builder = new CreateIndexBuilder(createExpression);
             builder.OnTable("TheTable").OnColumn("A").Ascending().WithOptions().Unique();
             Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", createExpression.ToString());
+        }
+
+        [Test]
+        public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex_Multi_Columnn()
+        {
+            var sqlSyntax = new SqlServerSyntaxProvider();
+            var createExpression = new CreateIndexExpression(DatabaseProviders.SqlServer, new[] { DatabaseProviders.SqlServer }, sqlSyntax)
+            {
+                Index = { Name = "IX_AB" }
+            };
+            var builder = new CreateIndexBuilder(createExpression);
+            builder.OnTable("TheTable").OnColumn("A").Ascending().OnColumn("B").Ascending().WithOptions().Unique();
+            Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A],[B])", createExpression.ToString());
         }
 
         [Test]

@@ -13,32 +13,36 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class PreValueDisplayResolver : ValueResolver<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>
     {
-        private readonly Lazy<IDataTypeService> _dataTypeService;
+        private readonly IDataTypeService _dataTypeService;
 
-        public PreValueDisplayResolver(Lazy<IDataTypeService> dataTypeService)
+        public PreValueDisplayResolver(IDataTypeService dataTypeService)
         {
             _dataTypeService = dataTypeService;
         }
 
         /// <summary>
-        /// Maps pre-values in the dictionary to the values for the fields
+        /// Maps pre-values in the dictionary to the values for the fields.
         /// </summary>
-        /// <param name="fields"></param>
-        /// <param name="preValues"></param>        
-        internal static void MapPreValueValuesToPreValueFields(PreValueFieldDisplay[] fields, IDictionary<string, object> preValues)
+        /// <param name="fields">The fields.</param>
+        /// <param name="preValues">The pre-values.</param>
+        /// <param name="editorAlias">The editor alias.</param>
+        internal static void MapPreValueValuesToPreValueFields(IEnumerable<PreValueFieldDisplay> fields, IDictionary<string, object> preValues, string editorAlias)
         {
-            if (fields == null) throw new ArgumentNullException("fields");
-            if (preValues == null) throw new ArgumentNullException("preValues");
-            //now we need to wire up the pre-values values with the actual fields defined            
+            if (fields == null) throw new ArgumentNullException(nameof(fields));
+            if (preValues == null) throw new ArgumentNullException(nameof(preValues));
+
+            // Now we need to wire up the pre-values values with the actual fields defined
             foreach (var field in fields)
             {
-                var found = preValues.Any(x => x.Key.InvariantEquals(field.Key));
-                if (found == false)
+                // If the dictionary would be constructed with StringComparer.InvariantCultureIgnoreCase, we could just use TryGetValue
+                var preValue = preValues.SingleOrDefault(x => x.Key.InvariantEquals(field.Key));
+                if (preValue.Key == null)
                 {
-                    LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field " + field.Key);
+                    LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field {0} on property editor {1}", () => field.Key, () => editorAlias);
                     continue;
                 }
-                field.Value = preValues.Single(x => x.Key.InvariantEquals(field.Key)).Value;
+
+                field.Value = preValue.Value;
             }
         }
 
@@ -54,22 +58,32 @@ namespace Umbraco.Web.Models.Mapping
                 }
             }
 
-            //set up the defaults
-            var dataTypeService = _dataTypeService.Value;
+            // Set up the defaults
+            var dataTypeService = _dataTypeService;
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(source.Id);
             IDictionary<string, object> dictionaryVals = preVals.FormatAsDictionary().ToDictionary(x => x.Key, x => (object)x.Value);
-            var result = Enumerable.Empty<PreValueFieldDisplay>().ToArray();
+            var result = Enumerable.Empty<PreValueFieldDisplay>();
 
-            //if we have a prop editor, then format the pre-values based on it and create it's fields.
+            // If we have a prop editor, then format the pre-values based on it and create it's fields
             if (propEd != null)
             {
-                result = propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>).ToArray();
+                result = propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>);
+                if (source.IsBuildInDataType())
+                {
+                    result = RemovePreValuesNotSupportedOnBuildInTypes(result);
+                }
                 dictionaryVals = propEd.PreValueEditor.ConvertDbToEditor(propEd.DefaultPreValues, preVals);
             }
 
-            MapPreValueValuesToPreValueFields(result, dictionaryVals);
+            result = result.ToArray();
+            MapPreValueValuesToPreValueFields(result, dictionaryVals, source.PropertyEditorAlias);
 
             return result;
+        }
+
+        private IEnumerable<PreValueFieldDisplay> RemovePreValuesNotSupportedOnBuildInTypes(IEnumerable<PreValueFieldDisplay> preValues)
+        {
+            return preValues.Where(preValue => string.Equals(preValue.Key, Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes) == false);
         }
 
         protected override IEnumerable<PreValueFieldDisplay> ResolveCore(IDataTypeDefinition source)

@@ -86,8 +86,8 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.contentTypeResource#save
-         * @methodOf umbraco.resources.contentTypeResource
+         * @name umbraco.resources.memberTypeResource#save
+         * @methodOf umbraco.resources.memberTypeResource
          *
          * @description
          * Saves or update a member type

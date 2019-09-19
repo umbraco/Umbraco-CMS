@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
+    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState, entityResource) {
 
         $scope.isLoading = true;
 
@@ -11,20 +11,15 @@ angular.module("umbraco")
         var n = d.getTime();
         $scope.textAreaHtmlId = $scope.model.alias + "_" + n + "_rte";
 
-        var alreadyDirty = false;
         function syncContent(editor){
             editor.save();
             angularHelper.safeApply($scope, function () {
                 $scope.model.value = editor.getContent();
             });
 
-            if (!alreadyDirty) {
-                //make the form dirty manually so that the track changes works, setting our model doesn't trigger
-                // the angular bits because tinymce replaces the textarea.
-                var currForm = angularHelper.getCurrentForm($scope);
-                currForm.$setDirty();
-                alreadyDirty = true;
-            }
+            //make the form dirty manually so that the track changes works, setting our model doesn't trigger
+            // the angular bits because tinymce replaces the textarea.
+            angularHelper.getCurrentForm($scope).$setDirty();
         }
 
         tinyMceService.configuration().then(function (tinyMceConfig) {
@@ -56,6 +51,8 @@ angular.module("umbraco")
             if (!editorConfig.maxImageSize && editorConfig.maxImageSize != 0) {
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
+
+            var dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
 
             //queue file loading
             if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
@@ -100,6 +97,43 @@ angular.module("umbraco")
             //stores a reference to the editor
             var tinyMceEditor = null;
 
+            // these languages are available for localization
+            var availableLanguages = [
+                'da',
+                'de',
+                'en',
+                'en_us',
+                'fi',
+                'fr',
+                'he',
+                'it',
+                'ja',
+                'nl',
+                'no',
+                'pl',
+                'pt',
+                'ru',
+                'sv',
+                'zh'
+            ];
+
+            //define fallback language
+            var language = 'en_us';
+            //get locale from angular and match tinymce format. Angular localization is always in the format of ru-ru, de-de, en-gb, etc.
+            //wheras tinymce is in the format of ru, de, en, en_us, etc.
+            var localeId = $locale.id.replace('-', '_');
+            //try matching the language using full locale format
+            var languageMatch = _.find(availableLanguages, function(o) { return o === localeId; });
+            //if no matches, try matching using only the language
+            if (languageMatch === undefined) {
+                var localeParts = localeId.split('_');
+                languageMatch = _.find(availableLanguages, function(o) { return o === localeParts[0]; });
+            }
+            //if a match was found - set the language
+            if (languageMatch !== undefined) {
+                language = languageMatch;
+            }
+
             //wait for queue to end
             $q.all(await).then(function () {
 
@@ -113,15 +147,17 @@ angular.module("umbraco")
                     extended_valid_elements: extendedValidElements,
                     menubar: false,
                     statusbar: false,
+                    relative_urls: false,
                     height: editorConfig.dimensions.height,
                     width: editorConfig.dimensions.width,
                     maxImageSize: editorConfig.maxImageSize,
                     toolbar: toolbar,
                     content_css: stylesheets,
-                    relative_urls: false,
-                    style_formats: styleFormats
+                    style_formats: styleFormats,
+                    language: language,
+                    //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
+                    cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
                 };
-
 
                 if (tinyMceConfig.customConfig) {
 
@@ -145,6 +181,12 @@ angular.module("umbraco")
                                 catch (e) {
                                     //cannot parse, we'll just leave it
                                 }
+                            }
+                            if (val === "true") {
+                                tinyMceConfig.customConfig[i] = true;
+                            }
+                            if (val === "false") {
+                                tinyMceConfig.customConfig[i] = false;
                             }
                         }
                     }
@@ -221,7 +263,7 @@ angular.module("umbraco")
 
 
                     editor.on('ObjectResized', function (e) {
-                        var qs = "?width=" + e.width + "&height=" + e.height;
+                        var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
                         var srcAttr = $(e.target).attr("src");
                         var path = srcAttr.split("?")[0];
                         $(e.target).attr("data-mce-src", path + qs);
@@ -230,27 +272,46 @@ angular.module("umbraco")
                     });
 
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
-                        $scope.linkPickerOverlay = {
-                            view: "linkpicker",
-                            currentTarget: currentTarget,
-                            show: true,
-                            submit: function(model) {
-                                tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
-                                $scope.linkPickerOverlay.show = false;
-                                $scope.linkPickerOverlay = null;
-                            }
-                        };
+
+                        entityResource.getAnchors($scope.model.value).then(function(anchorValues){
+                            
+                            $scope.linkPickerOverlay = {
+                                view: "linkpicker",
+                                currentTarget: currentTarget,
+                                anchors: anchorValues,
+                                dataTypeId: dataTypeId,
+                                ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes,
+                                show: true,
+                                submit: function(model) {
+                                    tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
+                                    $scope.linkPickerOverlay.show = false;
+                                    $scope.linkPickerOverlay = null;
+                                }
+                            };
+                        });
+
+
+
                     });
 
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
+                        var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                        var startNodeIsVirtual = userData.startMediaIds.length !== 1;
 
+                        if ($scope.model.config.ignoreUserStartNodes === "1") {
+                            startNodeId = -1;
+                            startNodeIsVirtual = true;
+                        }
+                        
                         $scope.mediaPickerOverlay = {
                             currentTarget: currentTarget,
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
-                            startNodeId: userData.startMediaId,
+                            startNodeId: startNodeId,
+                            startNodeIsVirtual: startNodeIsVirtual,
+                            dataTypeId: dataTypeId,
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {
@@ -261,7 +322,7 @@ angular.module("umbraco")
                         };
 
                     });
-                    
+
                     //Create the embedded plugin
                     tinyMceService.createInsertEmbeddedMedia(editor, $scope, function() {
 
@@ -296,9 +357,6 @@ angular.module("umbraco")
                     });
                 };
 
-
-
-
                 /** Loads in the editor */
                 function loadTinyMce() {
 
@@ -322,7 +380,8 @@ angular.module("umbraco")
                 //this is instead of doing a watch on the model.value = faster
                 $scope.model.onValueChanged = function (newVal, oldVal) {
                     //update the display val again if it has changed from the server;
-                    tinyMceEditor.setContent(newVal, { format: 'raw' });
+                    //uses an empty string in the editor when the value is null
+                    tinyMceEditor.setContent(newVal || "", { format: 'raw' });
                     //we need to manually fire this event since it is only ever fired based on loading from the DOM, this
                     // is required for our plugins listening to this event to execute
                     tinyMceEditor.fire('LoadContent', null);
@@ -332,7 +391,9 @@ angular.module("umbraco")
                 var unsubscribe = $scope.$on("formSubmitting", function () {
                     //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
                     // we do parse it out on the server side but would be nice to do that on the client side before as well.
-                    $scope.model.value = tinyMceEditor.getContent();
+                    if (tinyMceEditor !== undefined && tinyMceEditor != null && !$scope.isLoading) {
+                        $scope.model.value = tinyMceEditor.getContent();
+                    }
                 });
 
                 //when the element is disposed we need to unsubscribe!
@@ -340,6 +401,9 @@ angular.module("umbraco")
                 // element might still be there even after the modal has been hidden.
                 $scope.$on('$destroy', function () {
                     unsubscribe();
+					if (tinyMceEditor !== undefined && tinyMceEditor != null) {
+                        tinyMceEditor.destroy();
+                    }
                 });
             });
         });

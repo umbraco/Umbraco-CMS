@@ -28,7 +28,7 @@
 // ------------------
 .tab-focus() {
   // Default
-  outline: thin dotted #333;
+  outline: thin dotted @gray-3;
   // Webkit
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
@@ -163,7 +163,7 @@
 // Mixin for form field states
 //SD: I've had to modify this slightly to work nicely with angular validation , note the
 // additional targetting of the ng-invalid class.
-.formFieldState(@textColor: #555, @borderColor: #ccc, @backgroundColor: #f5f5f5) {
+.formFieldState(@textColor: @gray-4, @borderColor: @gray-7, @backgroundColor: @gray-10) {
   // Set the text color
   .control-label,
   .help-block,
@@ -411,9 +411,8 @@
 }
 
 // Gradient Bar Colors for buttons and alerts
-.gradientBar(@primaryColor, @secondaryColor, @textColor: #fff, @textShadow: 0 -1px 0 rgba(0,0,0,.25)) {
+.gradientBar(@primaryColor, @secondaryColor, @textColor: #fff) {
   color: @textColor;
-  text-shadow: @textShadow;
   #gradient > .vertical(@primaryColor, @secondaryColor);
   border-color: @secondaryColor @secondaryColor darken(@secondaryColor, 15%);
   border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) fadein(rgba(0,0,0,.1), 15%);
@@ -500,7 +499,7 @@
 // Horizontal dividers
 // -------------------------
 // Dividers (basically an hr) within dropdowns and nav lists
-.nav-divider(@top: #e5e5e5, @bottom: @white) {
+.nav-divider(@top: @gray-8, @bottom: @white) {
   // IE7 needs a set width since we gave a height. Restricting just
   // to IE7 to keep the 1px left/right space in other browsers.
   // It is unclear where IE is getting the extra space that we need
@@ -516,9 +515,9 @@
 
 // Button backgrounds
 // ------------------
-.buttonBackground(@startColor, @endColor, @textColor: #fff, @textShadow: 0 -1px 0 rgba(0,0,0,.25)) {
+.buttonBackground(@startColor, @endColor, @textColor: #fff) {
   // gradientBar will set the background to a pleasing blend of these, to support IE<=9
-  .gradientBar(@startColor, @endColor, @textColor, @textShadow);
+  .gradientBar(@startColor, @endColor, @textColor);
   *background-color: @endColor; /* Darken IE7 buttons by default so they stand out more given they won't have borders */
   .reset-filter();
 

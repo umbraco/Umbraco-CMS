@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked when a document is being published
-	/// </summary>
-	public class ActionPublish : IAction
+    /// <summary>
+    /// This action is invoked when a document is being published
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
+    public class ActionPublish : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618

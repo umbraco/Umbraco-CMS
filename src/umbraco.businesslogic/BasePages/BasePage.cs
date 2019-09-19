@@ -1,28 +1,23 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Web;
+using System.ComponentModel;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
-using System.Web.Security;
 using System.Web.UI;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using Umbraco.Core;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 
 namespace umbraco.BasePages
 {
     /// <summary>
     /// umbraco.BasePages.BasePage is the default page type for the umbraco backend.
-    /// The basepage keeps track of the current user and the page context. But does not 
+    /// The basepage keeps track of the current user and the page context. But does not
     /// Restrict access to the page itself.
     /// The keep the page secure, the umbracoEnsuredPage class should be used instead
     /// </summary>
@@ -32,7 +27,7 @@ namespace umbraco.BasePages
         private User _user;
         private bool _userisValidated = false;
         private ClientTools _clientTools;
-        
+
         /// <summary>
         /// The path to the umbraco root folder
         /// </summary>
@@ -52,10 +47,11 @@ namespace umbraco.BasePages
         /// Unused, please do not use
         /// </summary>
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected static ISqlHelper SqlHelper
         {
             get { return BusinessLogic.Application.SqlHelper; }
-        }        
+        }
 
         /// <summary>
         /// Returns the current ApplicationContext
@@ -82,19 +78,20 @@ namespace umbraco.BasePages
         }
 
         /// <summary>
-        /// Returns the current BasePage for the current request. 
+        /// Returns the current BasePage for the current request.
         /// This assumes that the current page is a BasePage, otherwise, returns null;
         /// </summary>
         [Obsolete("Should use the Umbraco.Web.UmbracoContext.Current singleton instead to access common methods and properties")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static BasePage Current
         {
             get
             {
                 var page = HttpContext.Current.CurrentHandler as BasePage;
                 if (page != null) return page;
-                //the current handler is not BasePage but people might be expecting this to be the case if they 
+                //the current handler is not BasePage but people might be expecting this to be the case if they
                 // are using this singleton accesor... which is legacy code now and shouldn't be used. When people
-                // start using Umbraco.Web.UI.Pages.BasePage then this will not be the case! So, we'll just return a 
+                // start using Umbraco.Web.UI.Pages.BasePage then this will not be the case! So, we'll just return a
                 // new instance of BasePage as a hack to make it work.
                 if (HttpContext.Current.Items["umbraco.BasePages.BasePage"] == null)
                 {
@@ -113,7 +110,7 @@ namespace umbraco.BasePages
 		/// </remarks>
 	    public UrlHelper Url
 	    {
-		    get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
+		    get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
 	    }
 
         /// <summary>
@@ -130,6 +127,7 @@ namespace umbraco.BasePages
         }
 
         [Obsolete("Use ClientTools instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void RefreshPage(int Seconds)
         {
             ClientTools.RefreshAdmin(Seconds);
@@ -171,6 +169,7 @@ namespace umbraco.BasePages
         /// <param name="umbracoUserContextID">This is not used</param>
         /// <returns></returns>
         [Obsolete("This method is no longer used, use the GetUserId() method without parameters instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static int GetUserId(string umbracoUserContextID)
         {
             return GetUserId();
@@ -185,7 +184,7 @@ namespace umbraco.BasePages
             var identity = HttpContext.Current.GetCurrentIdentity(
                 //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
                 // Without this check, anything that is using this legacy API, like ui.Text will
-                // automatically log the back office user in even if it is a front-end request (if there is 
+                // automatically log the back office user in even if it is a front-end request (if there is
                 // a back office user logged in. This can cause problems becaues the identity is changing mid
                 // request. For example: http://issues.umbraco.org/issue/U4-4010
                 HttpContext.Current.CurrentHandler is Page);
@@ -202,6 +201,7 @@ namespace umbraco.BasePages
         /// <param name="currentUmbracoUserContextID">This doesn't do anything</param>
         /// <returns></returns>
         [Obsolete("This method is no longer used, use the ValidateCurrentUser() method instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static bool ValidateUserContextID(string currentUmbracoUserContextID)
         {
             return ValidateCurrentUser();
@@ -216,7 +216,7 @@ namespace umbraco.BasePages
             var identity = HttpContext.Current.GetCurrentIdentity(
                 //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
                 // Without this check, anything that is using this legacy API, like ui.Text will
-                // automatically log the back office user in even if it is a front-end request (if there is 
+                // automatically log the back office user in even if it is a front-end request (if there is
                 // a back office user logged in. This can cause problems becaues the identity is changing mid
                 // request. For example: http://issues.umbraco.org/issue/U4-4010
                 HttpContext.Current.CurrentHandler is Page);
@@ -233,7 +233,7 @@ namespace umbraco.BasePages
         {
             var ticket = HttpContext.Current.GetUmbracoAuthTicket();
             if (ticket.Expired) return 0;
-            var ticks = ticket.Expiration.Ticks - DateTime.Now.Ticks;         
+            var ticks = ticket.Expiration.Ticks - DateTime.Now.Ticks;
             return ticks;
         }
 
@@ -243,6 +243,7 @@ namespace umbraco.BasePages
         /// </summary>
         /// <value>The umbraco user context ID.</value>
         [Obsolete("Returns the current user's unique umbraco sesion id - this cannot be set and isn't intended to be used in your code")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static string umbracoUserContextID
         {
             get
@@ -250,7 +251,7 @@ namespace umbraco.BasePages
                 var identity = HttpContext.Current.GetCurrentIdentity(
                     //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
                     // Without this check, anything that is using this legacy API, like ui.Text will
-                    // automatically log the back office user in even if it is a front-end request (if there is 
+                    // automatically log the back office user in even if it is a front-end request (if there is
                     // a back office user logged in. This can cause problems becaues the identity is changing mid
                     // request. For example: http://issues.umbraco.org/issue/U4-4010
                     HttpContext.Current.CurrentHandler is Page);
@@ -263,39 +264,46 @@ namespace umbraco.BasePages
         }
 
 
-        /// <summary>
-        /// Clears the login.
-        /// </summary>
+        [Obsolete("This should not be used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void ClearLogin()
         {
             Context.UmbracoLogout();
         }
 
+        [Obsolete("This should not be used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         private void UpdateLogin()
         {
             Context.RenewUmbracoAuthTicket();
         }
 
+        [Obsolete("This should not be used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RenewLoginTimeout()
         {
-            HttpContext.Current.RenewUmbracoAuthTicket();           
+            HttpContext.Current.RenewUmbracoAuthTicket();
         }
 
-        /// <summary>
-        /// Logs a user in.
-        /// </summary>
-        /// <param name="u">The user</param>
+        [Obsolete("This should not be used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void doLogin(User u)
         {
-            HttpContext.Current.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
+            var httpContextBase = new HttpContextWrapper(HttpContext.Current);
+            
+            //This is legacy code but might still be used by some old webforms things (hopefully not though!), in any case we still need to generate a valid sessionid for
+            //the user so it's stored in the db and the cookie.
+            var sessionId = ApplicationContext.Current.Services.UserService.CreateLoginSession(u.Id, httpContextBase.GetCurrentRequestIpAddress());
+
+            httpContextBase.CreateUmbracoAuthTicket(new UserData(sessionId.ToString("N"))
             {
                 Id = u.Id,
+                SecurityStamp = u.SecurityStamp,
                 AllowedApplications = u.GetApplications().Select(x => x.alias).ToArray(),
                 RealName = u.Name,
-                //currently we only have one user type!
-                Roles = new[] { u.UserType.Alias },
-                StartContentNode = u.StartNodeId,
-                StartMediaNode = u.StartMediaId,
+                Roles = u.GetGroups(),
+                StartContentNodes = u.UserEntity.CalculateContentStartNodeIds(ApplicationContext.Current.Services.EntityService),
+                StartMediaNodes = u.UserEntity.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService),
                 Username = u.LoginName,
                 Culture = ui.Culture(u)
 
@@ -342,7 +350,7 @@ namespace umbraco.BasePages
         }
 
         //[Obsolete("Use ClientTools instead")]
-        //public void reloadParentNode() 
+        //public void reloadParentNode()
         //{
         //    ClientTools.ReloadParentNode(true);
         //}
@@ -379,7 +387,7 @@ namespace umbraco.BasePages
         {
             base.OnInit(e);
 
-            //This must be set on each page to mitigate CSRF attacks which ensures that this unique token 
+            //This must be set on each page to mitigate CSRF attacks which ensures that this unique token
             // is added to the viewstate of each request
             if (umbracoUserContextID.IsNullOrWhiteSpace() == false)
             {

@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Migrations
             conn.Setup(x => x.BeginTransaction(It.IsAny<IsolationLevel>())).Returns(Mock.Of<IDbTransaction>());
             var db = new Mock<Database>(conn.Object);
 
-            var runner1 = new MigrationRunner(Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(1), new SemVersion(2), "Test1",
+            var runner1 = new MigrationRunner(Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(2), new SemVersion(1), "Test1",
                 new IMigration[] { Mock.Of<IMigration>() });
             var result1 = runner1.Execute(db.Object, DatabaseProviders.SqlServerCE, false);
             Assert.AreEqual(1, changed1.CountExecuted);            
@@ -52,13 +52,13 @@ namespace Umbraco.Tests.Persistence.Migrations
             conn.Setup(x => x.BeginTransaction(It.IsAny<IsolationLevel>())).Returns(Mock.Of<IDbTransaction>());
             var db = new Mock<Database>(conn.Object);
 
-            var runner1 = new MigrationRunner(Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(1), new SemVersion(2), "Test1",
+            var runner1 = new MigrationRunner(Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(2), new SemVersion(1), "Test1",
                 new IMigration[] { Mock.Of<IMigration>()});
             var result1 = runner1.Execute(db.Object, DatabaseProviders.SqlServerCE, false);
             Assert.AreEqual(1, changed1.CountExecuted);
             Assert.AreEqual(0, changed2.CountExecuted);
 
-            var runner2 = new MigrationRunner(Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(1), new SemVersion(2), "Test2",
+            var runner2 = new MigrationRunner(Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(2), new SemVersion(1), "Test2",
                 new IMigration[] { Mock.Of<IMigration>() });            
             var result2 = runner2.Execute(db.Object, DatabaseProviders.SqlServerCE, false);
             Assert.AreEqual(1, changed1.CountExecuted);

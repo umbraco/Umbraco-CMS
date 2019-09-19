@@ -11,7 +11,7 @@
  */
 function NavigationController($scope, $rootScope, $location, $log, $routeParams, $timeout, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper) {
 
-    //TODO: Need to think about this and an nicer way to acheive what this is doing.
+    //TODO: Need to think about this and an nicer way to achieve what this is doing.
     //the tree event handler i used to subscribe to the main tree click events
     $scope.treeEventHandler = $({});
     navigationService.setupTreeEvents($scope.treeEventHandler);
@@ -40,7 +40,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         navigationService.showSearch();
     });
 
-    //trigger dialods with a hotkey:
+    //trigger dialogs with a hotkey:
     keyboardService.bind("esc", function () {
         eventsService.emit("app.closeDialogs");
     });
@@ -112,7 +112,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         $scope.authenticated = false;
     }));
 
-    //when the application is ready and the user is authorized setup the data
+    //when the application is ready and the user is authorized, setup the data
     evts.push(eventsService.on("app.ready", function(evt, data) {
         $scope.authenticated = true;
     }));

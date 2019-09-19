@@ -9,7 +9,7 @@
 
 small.umb-detail,
 label small, .guiDialogTiny {
-  color: @grayMed !important;
+  color: @gray-5 !important;
   text-decoration: none;
   display: block;
   font-weight: normal;
@@ -19,11 +19,12 @@ label small, .guiDialogTiny {
 label.control-label, .control-label {
   padding: 0 10px 0 0 !important;
   font-weight: bold;
+  color: @black;
 }
 
 
 .umb-status-label{
-    color: @gray !important;
+    color: @gray-3 !important;
   }
 
 
@@ -55,19 +56,20 @@ label.control-label, .control-label {
     cursor:pointer;
 }
 .form-search a:hover{
-    color: @gray;
+    color: @gray-3;
 }
 .form-search h4 {
-    color: @gray;
+    color: @gray-3;
 }
 .form-search small {
-    color: @grayLight;
+    color: @gray-8;
 }
 .form-search .icon, .form-search .icon-search {
   position: absolute;
+  z-index: 1;
   top: 6px;
-  left: 4px;
-  color: @grayLight;
+  left: 6px;
+  color: @gray-8;
 }
 
 .form-search .icon-search {
@@ -78,22 +80,25 @@ label.control-label, .control-label {
   width: 90%;
   font-size: @fontSizeLarge;
   font-weight: 400;
-  border: 1px solid @grayLight;
+  border: 1px solid @gray-8;
   padding: 4px 0px 4px 16px;
   padding-left: 25px !Important;
   line-height: 22px;
   background: @white
 }
 
+.form-search .icon-search + .search-input {
+    padding-left: 25px !important;
+}
 
 .form-search .search-input {
     font-weight: bold;
-    border-color: @grayLight;
+    border-color: @gray-8;
 
     &:hover,
     &:focus,
     &:focus:hover {
-        border-color: #ccc;
+        border-color: @gray-7;
     }
 
     &:-moz-placeholder {
@@ -136,12 +141,12 @@ legend {
   line-height: @baseLineHeight * 2;
   color: @grayDark;
   border: 0;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid @gray-8;
 
   // Small
   small {
     font-size: @baseLineHeight * .75;
-    color: @grayLight;
+    color: @gray-8;
   }
 }
 
@@ -190,21 +195,21 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input {
   display: inline-block;
-  height: @baseLineHeight;
+  height: @inputHeight;
   padding: 4px 6px;
   margin-bottom: @baseLineHeight / 2;
   font-size: @baseFontSize;
   line-height: @baseLineHeight;
-  color: @gray;
+  color: @gray-3;
   .border-radius(@inputBorderRadius);
   vertical-align: middle;
+  box-sizing: border-box;
 }
 
 input.-full-width-input {
    width: 100%;
    box-sizing: border-box;
    padding: 4px 6px;
-   height: 30px;
 }
 
 // Reset appearance properties for textual inputs and textarea
@@ -303,7 +308,7 @@ input[type="checkbox"]:focus {
 // Make uneditable inputs look inactive
 .uneditable-input,
 .uneditable-textarea {
-  color: @grayLight;
+  color: @gray-8;
   background-color: darken(@inputBackground, 1%);
   border-color: @inputBorder;
   .box-shadow(inset 0 1px 2px rgba(0,0,0,.025));
@@ -329,7 +334,7 @@ input[type="checkbox"]:focus {
 // Placeholder text gets special styles because when browsers invalidate entire lines if it doesn't understand a selector
 input,
 textarea {
-  .placeholder();
+  .placeholder(@gray-6);
 }
 
 
@@ -387,6 +392,8 @@ textarea {
 .input-large      { width: 210px; }
 .input-xlarge     { width: 270px; }
 .input-xxlarge    { width: 530px; }
+
+input.input--no-border { border: none; }
 
 // Grid style input sizes
 input[class*="span"],
@@ -485,7 +492,7 @@ input[type="checkbox"][readonly] {
 //val-highlight directive styling
 .highlight-error {
     color: @formErrorText !important;
-    border-color: #ee5f5b !important;
+    border-color: @red-l1 !important;
 }
 
 //disable the glowing border for the umb-content-name
@@ -511,7 +518,7 @@ input[type="checkbox"][readonly] {
   margin-top: @baseLineHeight;
   margin-bottom: @baseLineHeight;
   background-color: @formActionsBackground;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid @gray-8;
   .clearfix(); // Adding clearfix to allow for .pull-right button containers
 }
 
@@ -537,6 +544,9 @@ input[type="checkbox"][readonly] {
   padding-left: 5px;
 }
 
+div.help {
+    margin-top: 5px;
+}
 
 
 // INPUT GROUPS
@@ -575,16 +585,16 @@ input[type="checkbox"][readonly] {
   .add-on {
     display: inline-block;
     width: auto;
-    height: @baseLineHeight;
-    min-width: 16px;
-    padding: 4px 5px;
+    height: 22px;
+    min-width: 18px;
+    padding: 4px 6px;
     font-size: @baseFontSize;
     font-weight: normal;
     line-height: @baseLineHeight;
     text-align: center;
     text-shadow: 0 1px 0 @white;
-    background-color: @grayLighter;
-    border: 1px solid #ccc;
+    background-color: @gray-10;
+    border: 1px solid @purple-l3;
   }
   .add-on,
   .btn,
@@ -649,29 +659,21 @@ input.search-query {
   padding-left: 14px;
   padding-left: 4px \9; /* IE7-8 doesn't have border-radius, so don't indent the padding */
   margin: 0; // Remove the default margin on all inputs
-  .border-radius(0px);
 }
 
 /* Allow for input prepend/append in search forms */
-.form-search .input-append .search-query,
-.form-search .input-prepend .search-query {
-  .border-radius(0); // Override due to specificity
+.form-search {
+    .input-prepend {
+        .btn {
+            .border-radius(0 @borderRadiusSmall @borderRadiusSmall 0);
+        }
+    }
+    .input-append {
+        .btn {
+            .border-radius(0 @borderRadiusSmall @borderRadiusSmall 0);
+        }
+    } 
 }
-.form-search .input-append .search-query {
-  .border-radius(14px 0 0 14px);
-}
-.form-search .input-append .btn {
-  .border-radius(0 14px 14px 0);
-}
-.form-search .input-prepend .search-query {
-  .border-radius(0 14px 14px 0);
-}
-.form-search .input-prepend .btn {
-  .border-radius(14px 0 0 14px);
-}
-
-
-
 
 // HORIZONTAL & VERTICAL FORMS
 // ---------------------------
@@ -776,6 +778,8 @@ legend + .control-group {
       *padding-left: @horizontalComponentOffset;
     }
   }
+
+ 
   // Remove bottom margin on block level help text since that's accounted for on .control-group
   .help-block {
     margin-bottom: 0;
@@ -796,6 +800,14 @@ legend + .control-group {
     padding-left: @horizontalComponentOffset;
   }
 }
+
+// adjustments for properties tab
+.form-horizontal .block-form .control-label {
+  display: block;
+  float: none;
+  width: 100%;
+}
+
 //make sure buttons are always on top
 .umb-panel-buttons .umb-btn-toolbar .btn {
     position: relative;
@@ -815,3 +827,8 @@ legend + .control-group {
   }
 
 }
+
+/* User/group selector */
+.group-selector .group-selector-list { float: left; }
+.group-selector .group-selector-list div { height: 24px; }
+.group-selector .group-selector-buttons { float: left; margin: 24px 16px; }

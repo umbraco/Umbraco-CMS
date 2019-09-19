@@ -35,14 +35,14 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 catch (Exception)
                 {
                     //if this doesn't work we have to make sure everything is reset! otherwise
-                    // well run into issues because we've already set some things up
+                    // we'll run into issues because we've already set some things up
                     TearDown();
                     throw;
                 }
 
                 //Create the Sql CE database
                 //Get the connectionstring settings from config
-                var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
                 using (var engine = new SqlCeEngine(settings.ConnectionString))
                 {
                     engine.CreateDatabase();

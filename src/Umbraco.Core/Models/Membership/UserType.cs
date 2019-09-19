@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models.Membership
 {
-    /// <summary>
-    /// Represents the Type for a Backoffice User
-    /// </summary>    
+    [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [Serializable]
     [DataContract(IsReference = true)]
     internal class UserType : Entity, IUserType
@@ -19,9 +17,7 @@ namespace Umbraco.Core.Models.Membership
         private string _alias;
         private string _name;
         private IEnumerable<string> _permissions;
-
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
         private class PropertySelectors
         {
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UserType, string>(x => x.Name);
@@ -36,9 +32,9 @@ namespace Umbraco.Core.Models.Membership
             set
             {
                 SetPropertyValueAndDetectChanges(
-                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), 
-                    ref _alias, 
-                    Ps.Value.AliasSelector);                
+                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase),
+                    ref _alias,
+                    Ps.Value.AliasSelector);
             }
         }
 

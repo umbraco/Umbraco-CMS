@@ -1,26 +1,55 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 using System.Web.Http;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Web.Editors;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.HealthCheck
 {
     /// <summary>
     /// The API controller used to display the health check info and execute any actions
     /// </summary>
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
     public class HealthCheckController : UmbracoAuthorizedJsonController
     {
         private readonly IHealthCheckResolver _healthCheckResolver;
+        private readonly IList<Guid> _disabledCheckIds;
 
         public HealthCheckController()
         {
             _healthCheckResolver = HealthCheckResolver.Current;
+
+            var healthCheckConfig = UmbracoConfig.For.HealthCheck();
+            _disabledCheckIds = healthCheckConfig.DisabledChecks
+                .Select(x => x.Id)
+                .ToList();
         }
 
+        [Obsolete("Use the contructor specifying all parameters instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public HealthCheckController(IHealthCheckResolver healthCheckResolver)
         {
             _healthCheckResolver = healthCheckResolver;
+            var healthCheckConfig = UmbracoConfig.For.HealthCheck();
+            _disabledCheckIds = healthCheckConfig.DisabledChecks
+                .Select(x => x.Id)
+                .ToList();
+        }
+
+        public HealthCheckController(IHealthCheckResolver healthCheckResolver, IHealthChecks healthCheckConfig)
+        {
+            if (healthCheckResolver == null) throw new ArgumentNullException("healthCheckResolver");
+            if (healthCheckConfig == null) throw new ArgumentNullException("healthCheckConfig");
+
+            _healthCheckResolver = healthCheckResolver;
+            _disabledCheckIds = healthCheckConfig.DisabledChecks
+                .Select(x => x.Id)
+                .ToList();
         }
 
         /// <summary>
@@ -30,6 +59,7 @@ namespace Umbraco.Web.HealthCheck
         public object GetAllHealthChecks()
         {
             var groups = _healthCheckResolver.HealthChecks
+                .Where(x => _disabledCheckIds.Contains(x.Id) == false)
                 .GroupBy(x => x.Group)
                 .OrderBy(x => x.Key);
             var healthCheckGroups = new List<HealthCheckGroup>();
@@ -51,8 +81,7 @@ namespace Umbraco.Web.HealthCheck
         [HttpGet]
         public object GetStatus(Guid id)
         {
-            var check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == id);
-            if (check == null) throw new InvalidOperationException("No health check found with ID " + id);
+            var check = GetCheckById(id);
 
             try
             {
@@ -69,10 +98,19 @@ namespace Umbraco.Web.HealthCheck
         [HttpPost]
         public HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
-            var check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == action.HealthCheckId);
-            if (check == null) throw new InvalidOperationException("No health check found with id " + action.HealthCheckId);
-
+            var check = GetCheckById(action.HealthCheckId);
             return check.ExecuteAction(action);
+        }
+
+        private HealthCheck GetCheckById(Guid id)
+        {
+            var check = _healthCheckResolver.HealthChecks
+                .Where(x => _disabledCheckIds.Contains(x.Id) == false)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (check == null) throw new InvalidOperationException(string.Format("No health check found with id {0}", id));
+
+            return check;
         }
     }
 }

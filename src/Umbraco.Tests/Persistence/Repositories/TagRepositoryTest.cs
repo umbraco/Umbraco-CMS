@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private TagRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private TagRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
             return tagRepository;
@@ -1032,7 +1032,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         }
 
-        private ContentRepository CreateContentRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
@@ -1041,7 +1041,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             return repository;
         }
 
-        private MediaRepository CreateMediaRepository(IDatabaseUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
+        private MediaRepository CreateMediaRepository(IScopeUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
         {
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
             mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);

@@ -7,7 +7,7 @@ namespace Umbraco.Web.Scheduling
     /// <summary>
     /// Represents a background task.
     /// </summary>
-    internal interface IBackgroundTask : IDisposable
+    public interface IBackgroundTask : IDisposable
     {
         /// <summary>
         /// Runs the background task.

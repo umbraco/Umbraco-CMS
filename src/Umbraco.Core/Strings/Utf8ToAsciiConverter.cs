@@ -17,8 +17,9 @@ namespace Umbraco.Core.Strings
         /// Converts an Utf8 string into an Ascii string.
         /// </summary>
         /// <param name="text">The text to convert.</param>
+        /// <param name="fail">The character to used to replace characters that cannot properly be converted.</param>
         /// <returns>The converted text.</returns>
-        public static string ToAsciiString(string text)
+        public static string ToAsciiString(string text, char fail = '?')
         {
             var input = text.ToCharArray();
 
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Strings
             // but... we should be filtering short strings only...
 
             var output = new char[input.Length * 3]; // *3 because of things such as OE
-            var len = ToAscii(input, output);
+            var len = ToAscii(input, output, fail);
             return new string(output, 0, len);
 
             //var output = new StringBuilder(input.Length + 16); // default is 16, start with at least input length + little extra
@@ -38,8 +39,9 @@ namespace Umbraco.Core.Strings
         /// Converts an Utf8 string into an array of Ascii characters.
         /// </summary>
         /// <param name="text">The text to convert.</param>
+        /// <param name="fail">The character to used to replace characters that cannot properly be converted.</param>
         /// <returns>The converted text.</returns>
-        public static char[] ToAsciiCharArray(string text)
+        public static char[] ToAsciiCharArray(string text, char fail = '?')
         {
             var input = text.ToCharArray();
 
@@ -47,7 +49,7 @@ namespace Umbraco.Core.Strings
             // but... we should be filtering short strings only...
 
             var output = new char[input.Length * 3]; // *3 because of things such as OE
-            var len = ToAscii(input, output);
+            var len = ToAscii(input, output, fail);
             var array = new char[len];
             Array.Copy(output, array, len);
             return array;
@@ -64,10 +66,11 @@ namespace Umbraco.Core.Strings
         /// </summary>
         /// <param name="input">The input array.</param>
         /// <param name="output">The output array.</param>
+        /// <param name="fail">The character to used to replace characters that cannot properly be converted.</param>
         /// <returns>The number of characters in the output array.</returns>
         /// <remarks>The caller must ensure that the output array is big enough.</remarks>
         /// <exception cref="OverflowException">The output array is not big enough.</exception>
-        private static int ToAscii(char[] input, char[] output)
+        private static int ToAscii(char[] input, char[] output, char fail = '?')
         {
             var opos = 0;
 
@@ -75,10 +78,10 @@ namespace Umbraco.Core.Strings
                 if (char.IsSurrogate(input[ipos])) // ignore high surrogate
                 {
                     ipos++; // and skip low surrogate
-                    output[opos++] = '?';
+                    output[opos++] = fail;
                 }
                 else
-                    ToAscii(input, ipos, output, ref opos);
+                    ToAscii(input, ipos, output, ref opos, fail);
 
             return opos;
         }
@@ -109,12 +112,13 @@ namespace Umbraco.Core.Strings
         /// <param name="ipos">The input position.</param>
         /// <param name="output">The output array.</param>
         /// <param name="opos">The output position.</param>
+        /// <param name="fail">The character to used to replace characters that cannot properly be converted.</param>
         /// <remarks>
         /// <para>Adapted from various sources on the 'net including <c>Lucene.Net.Analysis.ASCIIFoldingFilter</c>.</para>
         /// <para>Input should contain Utf8 characters exclusively and NOT Unicode.</para>
         /// <para>Removes controls, normalizes whitespaces, replaces symbols by '?'.</para>
         /// </remarks>
-        private static void ToAscii(char[] input, int ipos, char[] output, ref int opos)
+        private static void ToAscii(char[] input, int ipos, char[] output, ref int opos, char fail = '?')
         {
             var c = input[ipos];
 
@@ -3583,7 +3587,7 @@ namespace Umbraco.Core.Strings
                         //    output[opos++] = c;
 
                         // strict ASCII
-                        output[opos++] = '?';
+                        output[opos++] = fail;
 
                         break;
                 }

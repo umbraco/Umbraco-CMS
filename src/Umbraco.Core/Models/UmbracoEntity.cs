@@ -51,6 +51,8 @@ namespace Umbraco.Core.Models
         private string _contentTypeIcon;
         private string _contentTypeThumbnail;
 
+        public static readonly UmbracoEntity Root = new UmbracoEntity(false) {Path = "-1", Name = "root", HasChildren = true};
+
         public UmbracoEntity()
         {
             AdditionalData = new Dictionary<string, object>();
@@ -223,42 +225,5 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
-        /// <summary>
-        /// A struction that can be contained in the additional data of an UmbracoEntity representing 
-        /// a user defined property
-        /// </summary>
-        public class EntityProperty : IDeepCloneable
-        {
-            public string PropertyEditorAlias { get; set; }
-            public object Value { get; set; }
-            public object DeepClone()
-            {
-                //Memberwise clone on Entity will work since it doesn't have any deep elements
-                // for any sub class this will work for standard properties as well that aren't complex object's themselves.
-                var clone = MemberwiseClone();
-                return clone;
-            }
-
-            protected bool Equals(EntityProperty other)
-            {
-                return PropertyEditorAlias.Equals(other.PropertyEditorAlias) && string.Equals(Value, other.Value);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((EntityProperty) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (PropertyEditorAlias.GetHashCode() * 397) ^ (Value != null ? Value.GetHashCode() : 0);
-                }
-            }
-        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence

@@ -26,12 +26,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.Initialize();
         }
 
-        private MediaTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private MediaTypeRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             return new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
         }
 
-        private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
+        private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork)
         {
             return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Constants.ObjectTypes.MediaTypeContainerGuid);
         }

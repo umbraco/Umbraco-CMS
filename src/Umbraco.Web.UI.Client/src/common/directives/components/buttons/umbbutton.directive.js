@@ -57,79 +57,107 @@ Use this directive to render an umbraco button. The directive can be used to gen
 @param {callback} action The button action which should be performed when the button is clicked.
 @param {string=} href Url/Path to navigato to.
 @param {string=} type Set the button type ("button" or "submit").
-@param {string=} buttonStyle Set the style of the button. The directive uses the default bootstrap styles ("primary", "info", "success", "warning", "danger", "inverse", "link").
+@param {string=} buttonStyle Set the style of the button. The directive uses the default bootstrap styles ("primary", "info", "success", "warning", "danger", "inverse", "link", "block"). Pass in array to add multple styles [success,block].
 @param {string=} state Set a progress state on the button ("init", "busy", "success", "error").
 @param {string=} shortcut Set a keyboard shortcut for the button ("ctrl+c").
 @param {string=} label Set the button label.
 @param {string=} labelKey Set a localization key to make a multi lingual button ("general_buttonText").
-@param {string=} icon Set a button icon. Can only be used when buttonStyle is "link".
+@param {string=} icon Set a button icon.
+@param {string=} size Set a button icon ("xs", "m", "l", "xl").
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
 **/
 
-(function() {
-   'use strict';
+(function () {
+    'use strict';
 
-   function ButtonDirective($timeout) {
+    function ButtonDirective($timeout) {
 
-      function link(scope, el, attr, ctrl) {
+        function link(scope, el, attr, ctrl) {
 
-         scope.style = null;
+            scope.style = null;
+            scope.innerState = "init";
 
-         function activate() {
+            function activate() {
 
-            if (!scope.state) {
-               scope.state = "init";
+                scope.blockElement = false;
+
+                if (scope.buttonStyle) {
+
+                    // make it possible to pass in multiple styles
+                    if (scope.buttonStyle.startsWith("[") && scope.buttonStyle.endsWith("]")) {
+
+                        // when using an attr it will always be a string so we need to remove square brackets
+                        // and turn it into and array
+                        var withoutBrackets = scope.buttonStyle.replace(/[\[\]']+/g, '');
+                        // split array by , + make sure to catch whitespaces
+                        var array = withoutBrackets.split(/\s?,\s?/g);
+
+                        angular.forEach(array, function (item) {
+                            scope.style = scope.style + " " + "btn-" + item;
+                            if (item === "block") {
+                                scope.blockElement = true;
+                            }
+                        });
+
+                    } else {
+                        scope.style = "btn-" + scope.buttonStyle;
+                        if (scope.buttonStyle === "block") {
+                            scope.blockElement = true;
+                        }
+                    }
+
+                }
+
             }
 
-            if (scope.buttonStyle) {
-               scope.style = "btn-" + scope.buttonStyle;
+            activate();
+
+            var unbindStateWatcher = scope.$watch('state', function (newValue, oldValue) {
+                if (newValue) {
+                    scope.innerState = newValue;
+                }
+
+                if (newValue === 'success' || newValue === 'error') {
+                    $timeout(function () {
+                        scope.innerState = 'init';
+                    }, 2000);
+                }
+
+            });
+
+            scope.$on('$destroy', function () {
+                unbindStateWatcher();
+            });
+
+        }
+
+        var directive = {
+            transclude: true,
+            restrict: 'E',
+            replace: true,
+            templateUrl: 'views/components/buttons/umb-button.html',
+            link: link,
+            scope: {
+                action: "&?",
+                href: "@?",
+                type: "@",
+                buttonStyle: "@?",
+                state: "=?",
+                shortcut: "@?",
+                shortcutWhenHidden: "@",
+                label: "@?",
+                labelKey: "@?",
+                icon: "@?",
+                disabled: "=",
+                size: "@?",
+                alias: "@?"
             }
+        };
 
-         }
+        return directive;
 
-         activate();
+    }
 
-         var unbindStateWatcher = scope.$watch('state', function(newValue, oldValue) {
-
-            if (newValue === 'success' || newValue === 'error') {
-               $timeout(function() {
-                  scope.state = 'init';
-               }, 2000);
-            }
-
-         });
-
-         scope.$on('$destroy', function() {
-            unbindStateWatcher();
-         });
-
-      }
-
-      var directive = {
-         transclude: true,
-         restrict: 'E',
-         replace: true,
-         templateUrl: 'views/components/buttons/umb-button.html',
-         link: link,
-         scope: {
-            action: "&?",
-            href: "@?",
-            type: "@",
-            buttonStyle: "@?",
-            state: "=?",
-            shortcut: "@?",
-            shortcutWhenHidden: "@",
-            label: "@?",
-            labelKey: "@?",
-            icon: "@?",
-            disabled: "="
-         }
-      };
-
-      return directive;
-
-   }
-
-   angular.module('umbraco.directives').directive('umbButton', ButtonDirective);
+    angular.module('umbraco.directives').directive('umbButton', ButtonDirective);
 
 })();

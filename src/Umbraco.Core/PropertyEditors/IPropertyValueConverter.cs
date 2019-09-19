@@ -1,11 +1,12 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using umbraco.interfaces;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
     /// Provides published content properties conversion service.
     /// </summary>
-    public interface IPropertyValueConverter
+    public interface IPropertyValueConverter : IDiscoverable
     {
         /// <summary>
         /// Gets a value indicating whether the converter supports a property type.

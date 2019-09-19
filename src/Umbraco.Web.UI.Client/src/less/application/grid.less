@@ -19,6 +19,11 @@ body {
   line-height: @baseLineHeight;
   color: @textColor;
   background-color: @bodyBackground;
+
+  // better font rendering
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 
@@ -35,9 +40,13 @@ body {
 }
 
 #mainwrapper {
-  height: 100%;
-  width: 100%;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
   margin: 0;
+}
+
+body.umb-drawer-is-visible #mainwrapper{
+    left: @drawerWidth;
 }
 
 #contentwrapper, #contentcolumn {
@@ -65,7 +74,7 @@ body {
 
 #leftcolumn {
   height: 100%;
-  z-index: 20;
+  z-index: 1100;
   width: 80px;
   float: left;
   position: absolute;
@@ -78,7 +87,8 @@ body {
   top: 0;
   bottom: 0;
   position: absolute;
-  text-align: center
+  text-align: center;
+  box-shadow: -10px 0px 25px rgba(0, 0, 0, 0.3)
 }
 
 #applications-tray {
@@ -120,7 +130,7 @@ body {
 
 @media (max-width: 500px) {
     #search-form .form-search {
-        width: ~"(calc(~'100%' - ~'80px'))";
+        width: calc(100% - 80px);
     }
 }
 
@@ -142,7 +152,7 @@ body {
     left: 0px;
     right: 0px;
     padding-top: 100px;
-    border-right: 1px solid @grayLight;
+    border-right: 1px solid @purple-l3;
     z-index: 100;
 }
 
@@ -197,8 +207,8 @@ body {
     right: -5px;
     top: 0;
     bottom: 0;
-    background-color: @grayLighter;
-    border: solid 1px @grayLight;
+    background-color: @gray-10;
+    border: solid 1px @purple-l3;
     border-top: none;
     border-bottom: none;
     position:absolute;
@@ -238,13 +248,13 @@ body {
     #applications-tray {
         left: 60px;
     }
-    #navigation {
+    #navigation, #umb-notifications-wrapper {
         left: 60px;
     }
-    #contentwrapper, #contentcolumn, #umb-notifications-wrapper {
+    #contentwrapper, #contentcolumn {
         left: 30px;
     }
-    #umbracoMainPageBody .umb-modal-left.fade.in {
+    #umbracoMainPageBody .umb-modal-left.fade.in { 
         margin-left: 61px;
     }
 }
@@ -267,12 +277,13 @@ body {
     #applications-tray {
         left: 40px;
     }
-    #navigation {
+    #navigation, #umb-notifications-wrapper {
         left: 40px;
     }
-    #contentwrapper, #contentcolumn, #umb-notifications-wrapper {
+    #contentwrapper, #contentcolumn {
         left: 20px;
     }
+
     #umbracoMainPageBody .umb-modal-left.fade.in {
         margin-left: 41px;
         width: 85%!important;

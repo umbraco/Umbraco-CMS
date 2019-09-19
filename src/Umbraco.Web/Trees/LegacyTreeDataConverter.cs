@@ -134,7 +134,7 @@ namespace Umbraco.Web.Trees
                     Attempt
                         .Try(GetUrlAndTitleFromLegacyAction(currentAction, xmlTreeNode.NodeID, xmlTreeNode.NodeType, xmlTreeNode.Text, currentSection),
                              action => menuItem.LaunchDialogUrl(action.Url, action.DialogTitle))
-                        .OnFailure(() => GetLegacyConfirmView(currentAction, currentSection),
+                        .OnFailure(() => GetLegacyConfirmView(currentAction),
                                    view => menuItem.LaunchDialogView(
                                        view,
                                        ui.GetText("defaultdialogs", "confirmdelete") + " '" + xmlTreeNode.Text + "' ?"))
@@ -164,9 +164,8 @@ namespace Umbraco.Web.Trees
         /// This will look at the legacy IAction's JsFunctionName and convert it to a confirmation dialog view if possible
         /// </summary>
         /// <param name="action"></param>
-        /// <param name="currentSection"></param>
         /// <returns></returns>
-        internal static Attempt<string> GetLegacyConfirmView(IAction action, string currentSection)
+        internal static Attempt<string> GetLegacyConfirmView(IAction action)
         {
             if (action.JsFunctionName.IsNullOrWhiteSpace())
             {
@@ -215,11 +214,7 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/sort.aspx?id=" + nodeId + "&nodeType=" + nodeType + "&app=" + currentSection + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "sort")));
-                case "UmbClientMgr.appActions().actionRights()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/cruds.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            ui.GetText("actions", "rights")));
+                
                 case "UmbClientMgr.appActions().actionProtect()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
@@ -265,11 +260,7 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/sendToTranslation.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "sendToTranslate")));
-                case "UmbClientMgr.appActions().actionEmptyTranscan()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/emptyTrashcan.aspx?type=" + currentSection,
-                            ui.GetText("actions", "emptyTrashcan")));
+                
                 case "UmbClientMgr.appActions().actionImport()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
@@ -285,16 +276,7 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/viewAuditTrail.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "auditTrail")));
-                case "UmbClientMgr.appActions().actionMove()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/moveOrCopy.aspx?app=" + currentSection + "&mode=cut&id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            ui.GetText("actions", "move")));
-                case "UmbClientMgr.appActions().actionCopy()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/moveOrCopy.aspx?app=" + currentSection + "&mode=copy&id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            ui.GetText("actions", "copy")));
+              
             }
             return Attempt<LegacyUrlAction>.Fail();
         }

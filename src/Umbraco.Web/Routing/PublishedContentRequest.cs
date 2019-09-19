@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
@@ -63,7 +64,7 @@ namespace Umbraco.Web.Routing
 
             Uri = uri;
             RoutingContext = routingContext;
-            GetRolesForLogin = getRolesForLogin;
+            _getRolesForLoginCallback = getRolesForLogin;
 
             _engine = new PublishedContentRequestEngine(
                 routingConfig,
@@ -447,7 +448,27 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public RoutingContext RoutingContext { get; private set; }
 
-        internal Func<string, IEnumerable<string>> GetRolesForLogin { get; private set; }
+        /// <summary>
+        /// Returns the current members roles if a member is logged in
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This ensures that the callback is only executed once in case this method is accessed a few times
+        /// </remarks>
+        public IEnumerable<string> GetRolesForLogin(string username)
+        {
+            string[] roles;
+            if (_rolesForLogin.TryGetValue(username, out roles))
+                return roles;
+
+            roles = _getRolesForLoginCallback(username).ToArray();
+            _rolesForLogin[username] = roles;
+            return roles;
+        }
+
+        private readonly IDictionary<string, string[]> _rolesForLogin = new Dictionary<string, string[]>();
+        private readonly Func<string, IEnumerable<string>> _getRolesForLoginCallback;
 
         /// <summary>
         /// The "umbraco page" object.
@@ -591,14 +612,14 @@ namespace Umbraco.Web.Routing
         /// </summary>
         // Note: we used to set a default value here but that would then be the default
         // for ALL requests, we shouldn't overwrite it though if people are using [OutputCache] for example
-        // see: https://our.umbraco.org/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
-        internal HttpCacheability Cacheability { get; set; }
+        // see: https://our.umbraco.com/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
+        public HttpCacheability Cacheability { get; set; }
 
         /// <summary>
         /// Gets or sets a list of Extensions to append to the Response.Cache object
         /// </summary>
         private List<string> _cacheExtensions = new List<string>();
-        internal List<string> CacheExtensions
+        public List<string> CacheExtensions
         {
             get { return _cacheExtensions; }
             set { _cacheExtensions = value; }
@@ -608,12 +629,15 @@ namespace Umbraco.Web.Routing
         /// Gets or sets a dictionary of Headers to append to the Response object
         /// </summary>
         private Dictionary<string, string> _headers = new Dictionary<string, string>();
-        internal Dictionary<string, string> Headers
+        public Dictionary<string, string> Headers
         {
             get { return _headers; }
             set { _headers = value; }
         }
 
-
+        /// <summary>
+        /// Gets of sets a value indicating whether the Umbraco Backoffice should ignore a collision for this request.
+        /// </summary>
+        public bool IgnorePublishedContentCollisions { get; set; }
     }
 }

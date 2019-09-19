@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     //We have to target this specifically to ensure this DOES NOT execute if upgrading from a version previous to 6.0,
     // this is because when the 6.0.0 migrations are executed, this primary key get's created so if this migration is also executed
     // we will get exceptions because it is trying to create the PK two times.
-    [Migration("6.0.0", "6.2.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.0.0", "6.2.0", 0, Constants.System.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys2 : MigrationBase
     {
         public AssignMissingPrimaryForMySqlKeys2(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

@@ -9,10 +9,10 @@ namespace Umbraco.Tests.Cache
     public class CacheRefresherTests
     {
         [TestCase("", "123456", "testmachine", true)] //empty hash will continue
-        [TestCase("fffffff28449cf33", "123456", "testmachine", false)] //match, don't continue
-        [TestCase("fffffff28449cf33", "12345", "testmachine", true)] // no match, continue
-        [TestCase("fffffff28449cf33", "123456", "testmachin", true)] // same
-        [TestCase("fffffff28449cf3", "123456", "testmachine", true)] // same
+        [TestCase("2e6deefea4444a69dbd15a01b4c2749d", "123456", "testmachine", false)] //match, don't continue
+        [TestCase("2e6deefea4444a69dbd15a01b4c2749d", "12345", "testmachine", true)] // no match, continue
+        [TestCase("2e6deefea4444a69dbd15a01b4c2749d", "123456", "testmachin", true)] // same
+        [TestCase("2e6deefea4444a69dbd15a01b4c2749", "123456", "testmachine", true)] // same
         public void Continue_Refreshing_For_Request(string hash, string appDomainAppId, string machineName, bool expected)
         {
             if (expected)

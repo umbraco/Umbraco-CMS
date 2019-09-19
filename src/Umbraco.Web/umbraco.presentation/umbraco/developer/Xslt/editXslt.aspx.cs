@@ -33,14 +33,11 @@ namespace umbraco.cms.presentation.developer
 			if (!IsPostBack)
 			{
 				string file = Request.QueryString["file"];
-				string path = DeepLink.GetTreePathFromFilePath(file);
+				string path = DeepLink.GetTreePathFromFilePath(file, false, true);
 				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadXslt>().Tree.Alias)
+					.SetActiveTreeType(Constants.Trees.Xslt)
 					.SyncTree(path, false);
 			}
-
-
-
 		}
 
 		protected override void OnInit(EventArgs e)
@@ -48,7 +45,6 @@ namespace umbraco.cms.presentation.developer
 			base.OnInit(e);
 
             SaveButton = UmbracoPanel1.Menu.NewButton();
-            SaveButton.ToolTip = "Save Xslt File";
             SaveButton.Text = ui.Text("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
@@ -101,7 +97,7 @@ namespace umbraco.cms.presentation.developer
 
 
 			// Add source and filename
-			var file = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Request.QueryString["file"]);
+			var file = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Request.QueryString["file"].CleanForXss().Replace(" ", ""));
 
 			// validate file
 			IOHelper.ValidateEditPath(file, SystemDirectories.Xslt);
@@ -176,24 +172,6 @@ namespace umbraco.cms.presentation.developer
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
 		protected global::System.Web.UI.WebControls.TextBox xsltFileName;
-
-		/// <summary>
-		/// pp_testing control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_testing;
-
-		/// <summary>
-		/// SkipTesting control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.CheckBox SkipTesting;
 
 		/// <summary>
 		/// pp_errorMsg control.

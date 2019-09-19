@@ -1,4 +1,5 @@
 using System;
+using umbraco.interfaces;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -7,8 +8,8 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     // todo: drop IPropertyEditorValueConverter support (when?).
     [Obsolete("Use IPropertyValueConverter.")]
-    public interface IPropertyEditorValueConverter
-	{
+    public interface IPropertyEditorValueConverter : IDiscoverable
+    {
 		/// <summary>
 		/// Returns a value indicating whether this provider applies to the specified property.
 		/// </summary>

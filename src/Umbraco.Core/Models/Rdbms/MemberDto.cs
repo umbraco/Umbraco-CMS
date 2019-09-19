@@ -22,6 +22,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("LoginName")]
         [Length(1000)]
         [Constraint(Default = "''")]
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsMember_LoginName")]
         public string LoginName { get; set; }
 
         [Column("Password")]

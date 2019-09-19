@@ -16,6 +16,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("parentId")]
         [ForeignKey(typeof(NodeDto), Name = "FK_umbracoRelation_umbracoNode")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelation_parentChildType", ForColumns = "parentId,childId,relType")]
         public int ParentId { get; set; }
 
         [Column("childId")]

@@ -6,8 +6,8 @@ namespace umbraco.interfaces
 	/// Summary description for IMacroGuiRendering.
 	/// </summary>
 	[Obsolete("This interface is no longer used and will be removed from the codebase in future versions")]
-	public interface IMacroGuiRendering
-	{
+	public interface IMacroGuiRendering : IDiscoverable
+    {
         /// <summary>
         /// Gets or sets the value.
         /// </summary>

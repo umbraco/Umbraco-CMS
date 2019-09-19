@@ -1,2 +1,0 @@
-# Usage: on line 2 put the release version, on line 3 put the version comment (example: beta)
-7.5.13

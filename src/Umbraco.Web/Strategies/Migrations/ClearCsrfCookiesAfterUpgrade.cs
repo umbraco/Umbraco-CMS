@@ -4,6 +4,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.interfaces;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Strategies.Migrations
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Strategies.Migrations
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
-            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+            if (e.ProductName != Constants.System.UmbracoMigrationName) return;
 
             if (HttpContext.Current == null) return;
 

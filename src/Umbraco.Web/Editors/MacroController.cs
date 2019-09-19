@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Web.Http;
 using System.Web.SessionState;
 using AutoMapper;
@@ -10,6 +13,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Editors
 {
@@ -29,7 +33,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// Note that ALL logged in users have access to this method because editors will need to isnert macros into rte (content/media/members) and it's used for 
+        /// Note that ALL logged in users have access to this method because editors will need to isnert macros into rte (content/media/members) and it's used for
         /// inserting into templates/views/etc... it doesn't expose any sensitive data.
         /// </remarks>
         public IEnumerable<MacroParameter> GetMacroParameters(int macroId)
@@ -50,9 +54,9 @@ namespace Umbraco.Web.Editors
         /// <param name="pageId"></param>
         /// <param name="macroParams">
         /// To send a dictionary as a GET parameter the query should be structured like:
-        /// 
+        ///
         /// ?macroAlias=Test&pageId=3634&macroParams[0].key=myKey&macroParams[0].value=myVal&macroParams[1].key=anotherKey&macroParams[1].value=anotherVal
-        /// 
+        ///
         /// </param>
         /// <returns></returns>
         [HttpGet]
@@ -113,6 +117,17 @@ namespace Umbraco.Web.Editors
             //the 'easiest' way might be to create an IPublishedContent manually and populate the legacy 'page' object with that
             //and then set the legacy parameters.
 
+            // When rendering the macro in the backoffice the default setting would be to use the Culture of the logged in user.
+            // Since a Macro might contain thing thats related to the culture of the "IPublishedContent" (ie Dictionary keys) we want
+            // to set the current culture to the culture related to the content item. This is hacky but it works.
+            var publishedContent = UmbracoContext.ContentCache.GetById(doc.Id);
+            var culture = publishedContent?.GetCulture();
+            if (culture != null)
+            {
+                Thread.CurrentThread.CurrentCulture = culture;
+                Thread.CurrentThread.CurrentUICulture = culture;
+            }
+
             var legacyPage = new global::umbraco.page(doc);
             UmbracoContext.HttpContext.Items["pageID"] = doc.Id;
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
@@ -129,6 +144,31 @@ namespace Umbraco.Web.Editors
                 "text/html");
             return result;
         }
-        
+
+        [HttpPost]
+        public HttpResponseMessage CreatePartialViewMacroWithFile(CreatePartialViewMacroWithFileModel model)
+        {
+            if (model == null) throw new ArgumentNullException("model");
+            if (string.IsNullOrWhiteSpace(model.Filename)) throw new ArgumentException("Filename cannot be null or whitespace", "model.Filename");
+            if (string.IsNullOrWhiteSpace(model.VirtualPath)) throw new ArgumentException("VirtualPath cannot be null or whitespace", "model.VirtualPath");
+
+            var macroName = model.Filename.TrimEnd(".cshtml");
+
+            var macro = new Macro
+            {
+                Alias = macroName.ToSafeAlias(),
+                Name = macroName,
+                ScriptPath = model.VirtualPath.EnsureStartsWith("~")
+            };
+
+            Services.MacroService.Save(macro); // may throw
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        public class CreatePartialViewMacroWithFileModel
+        {
+            public string Filename { get; set; }
+            public string VirtualPath { get; set; }
+        }
     }
 }

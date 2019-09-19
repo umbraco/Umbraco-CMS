@@ -37,7 +37,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          * @function
          *
          * @description
-         * This will turn an array of key/value pairs into a query string
+         * This will turn an array of key/value pairs or a standard dictionary into a query string
          * 
          * @param {Array} queryStrings An array of key/value pairs
          */
@@ -103,15 +103,15 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          * @description
          * This returns a promise with an underlying http call, it is a helper method to reduce
          *  the amount of duplicate code needed to query http resources and automatically handle any 
-         *  500 Http server errors. 
+         *  Http errors. See /docs/source/using-promises-resources.md
          *
-         * @param {object} opts A mixed object which can either be a `string` representing the error message to be
-         *   returned OR an `object` containing either:
+         * @param {object} opts A mixed object which can either be a string representing the error message to be
+         *   returned OR an object containing either:
          *     { success: successCallback, errorMsg: errorMessage }
          *          OR
          *     { success: successCallback, error: errorCallback }
-         *   In both of the above, the successCallback must accept these parameters: `data`, `status`, `headers`, `config`
-         *   If using the errorCallback it must accept these parameters: `data`, `status`, `headers`, `config`
+         *   In both of the above, the successCallback must accept these parameters: data, status, headers, config
+         *   If using the errorCallback it must accept these parameters: data, status, headers, config
          *   The success callback must return the data which will be resolved by the deferred object.
          *   The error callback must return an object containing: {errorMsg: errorMessage, data: originalData, status: status }
          */
@@ -126,12 +126,21 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
             /** The default error callback used if one is not supplied in the opts */
             function defaultError(data, status, headers, config) {
-                return {
+
+                var err = {
                     //NOTE: the default error message here should never be used based on the above docs!
                     errorMsg: (angular.isString(opts) ? opts : 'An error occurred!'),
                     data: data,
                     status: status
                 };
+
+                // if "opts" is a promise, we set "err.errorMsg" to be that promise
+                if (typeof(opts) == "object" && typeof(opts.then) == "function") {
+                    err.errorMsg = opts;
+                }
+
+                return err;
+
             }
 
             //create the callbacs based on whats been passed in.
@@ -230,10 +239,12 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     //success callback
 
                     //reset the tabs and set the active one
-                    _.each(data.tabs, function (item) {
-                        item.active = false;
-                    });
-                    data.tabs[activeTabIndex].active = true;
+                    if(data.tabs && data.tabs.length > 0) {
+                        _.each(data.tabs, function (item) {
+                            item.active = false;
+                        });
+                        data.tabs[activeTabIndex].active = true;
+                    }
 
                     //the data returned is the up-to-date data so the UI will refresh
                     deferred.resolve(data);
@@ -331,6 +342,122 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     failureCallback.apply(this, [data, status, headers, config]);
                 }
             });
+        },
+        
+        /**
+         * Downloads a file to the client using AJAX/XHR
+         * Based on an implementation here: web.student.tuwien.ac.at/~e0427417/jsdownload.html
+         * See https://stackoverflow.com/a/24129082/694494
+         */
+        downloadFile : function (httpPath) {
+
+            var deferred = $q.defer();
+
+            // Use an arraybuffer
+            $http.get(httpPath, { responseType: 'arraybuffer' })
+                .success(function (data, status, headers) {
+
+                    var octetStreamMime = 'application/octet-stream';
+                    var success = false;
+
+                    // Get the headers
+                    headers = headers();
+
+                    // Get the filename from the x-filename header or default to "download.bin"
+                    var filename = headers['x-filename'] || 'download.bin';
+
+                    // Determine the content type from the header or default to "application/octet-stream"
+                    var contentType = headers['content-type'] || octetStreamMime;
+
+                    try {
+                        // Try using msSaveBlob if supported
+                        console.log("Trying saveBlob method ...");
+                        var blob = new Blob([data], { type: contentType });
+                        if (navigator.msSaveBlob)
+                            navigator.msSaveBlob(blob, filename);
+                        else {
+                            // Try using other saveBlob implementations, if available
+                            var saveBlob = navigator.webkitSaveBlob || navigator.mozSaveBlob || navigator.saveBlob;
+                            if (saveBlob === undefined) throw "Not supported";
+                            saveBlob(blob, filename);
+                        }
+                        console.log("saveBlob succeeded");
+                        success = true;
+                    } catch (ex) {
+                        console.log("saveBlob method failed with the following exception:");
+                        console.log(ex);
+                    }
+
+                    if (!success) {
+                        // Get the blob url creator
+                        var urlCreator = window.URL || window.webkitURL || window.mozURL || window.msURL;
+                        if (urlCreator) {
+                            // Try to use a download link
+                            var link = document.createElement('a');
+                            if ('download' in link) {
+                                // Try to simulate a click
+                                try {
+                                    // Prepare a blob URL
+                                    console.log("Trying download link method with simulated click ...");
+                                    var blob = new Blob([data], { type: contentType });
+                                    var url = urlCreator.createObjectURL(blob);
+                                    link.setAttribute('href', url);
+
+                                    // Set the download attribute (Supported in Chrome 14+ / Firefox 20+)
+                                    link.setAttribute("download", filename);
+
+                                    // Simulate clicking the download link
+                                    var event = document.createEvent('MouseEvents');
+                                    event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+                                    link.dispatchEvent(event);
+                                    console.log("Download link method with simulated click succeeded");
+                                    success = true;
+
+                                } catch (ex) {
+                                    console.log("Download link method with simulated click failed with the following exception:");
+                                    console.log(ex);
+                                }
+                            }
+
+                            if (!success) {
+                                // Fallback to window.location method
+                                try {
+                                    // Prepare a blob URL
+                                    // Use application/octet-stream when using window.location to force download
+                                    console.log("Trying download link method with window.location ...");
+                                    var blob = new Blob([data], { type: octetStreamMime });
+                                    var url = urlCreator.createObjectURL(blob);
+                                    window.location = url;
+                                    console.log("Download link method with window.location succeeded");
+                                    success = true;
+                                } catch (ex) {
+                                    console.log("Download link method with window.location failed with the following exception:");
+                                    console.log(ex);
+                                }
+                            }
+
+                        }
+                    }
+
+                    if (!success) {
+                        // Fallback to window.open method
+                        console.log("No methods worked for saving the arraybuffer, using last resort window.open");
+                        window.open(httpPath, '_blank', '');
+                    }
+
+                    deferred.resolve();
+                })
+                .error(function (data, status) {
+                    console.log("Request failed with status: " + status);
+
+                    deferred.reject({
+                        errorMsg: "An error occurred downloading the file",
+                        data: data,
+                        status: status
+                    });
+                });
+
+            return deferred.promise;
         }
     };
 }

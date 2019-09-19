@@ -36,7 +36,6 @@
                 ControlToValidate="packageVersion">*</asp:RequiredFieldValidator>
         </cc2:PropertyPanel>
         <cc2:PropertyPanel runat="server" ID="pp_file" Text="Package file (.zip):">
-            <asp:Button ID="bt_submitButton" runat="server" Text="Submit to repository" Visible="false" />
             <asp:Literal ID="packageUmbFile" runat="server" />
         </cc2:PropertyPanel>
     </cc2:Pane>
@@ -187,7 +186,7 @@
                         during installation and uninstallation.
                         <br />
                         All actions are formed as a xml node, containing data for the action to be performed.
-                        <a href="http://our.umbraco.org/wiki/reference/packaging/package-actions
+                        <a href="https://our.umbraco.com/wiki/reference/packaging/package-actions
 " target="_blank">Package actions documentation</a>
                     </p>
                     <asp:CustomValidator ID="actionsVal" runat="server" OnServerValidate="validateActions"

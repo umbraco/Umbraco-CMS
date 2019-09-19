@@ -18,7 +18,7 @@
    </example>
  */
 angular.module("umbraco.directives")
-.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, $window, treeService, $timeout, localizationService) {
+.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, $window, treeService, $timeout, localizationService, appState) {
     return {
         restrict: 'E',
         replace: true,
@@ -27,6 +27,7 @@ angular.module("umbraco.directives")
             section: '@',
             eventhandler: '=',
             currentNode: '=',
+            enablelistviewexpand: '@',
             node: '=',
             tree: '='
         },
@@ -34,15 +35,15 @@ angular.module("umbraco.directives")
         //TODO: Remove more of the binding from this template and move the DOM manipulation to be manually done in the link function,
         // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches!
 
-        template: '<li ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
-            '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" >' +
+        template: '<li data-element="tree-item-{{node.dataElement}}" ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
+            '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
-            '<ins ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)">&nbsp;</ins>' +
+            '<ins data-element="tree-item-expand" ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
-            '<a href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
+            '<a class="umb-tree-item__label" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
-            '<a class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
+            '<a data-element="tree-item-options" class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
             '<div ng-show="node.loading" class="l"><div></div></div>' +
             '</div>' +
             '</li>',
@@ -74,11 +75,12 @@ angular.module("umbraco.directives")
 
                 //toggle visibility of last 'ins' depending on children
                 //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
-                if (!node.hasChildren) {
-                    element.find("ins").last().css("visibility", "hidden");
+                
+                if (node.hasChildren || node.metaData.isContainer && scope.enablelistviewexpand === "true") {
+                    element.find("ins").last().css("visibility", "visible");
                 }
                 else {
-                    element.find("ins").last().css("visibility", "visible");
+                    element.find("ins").last().css("visibility", "hidden");
                 }
 
                 var icon = element.find("i:first");
@@ -94,6 +96,14 @@ angular.module("umbraco.directives")
                 if (node.style) {
                     element.find("i:first").attr("style", node.style);
                 }
+
+                // add a unique data element to each tree item so it is easy to navigate with code
+                if(!node.metaData.treeAlias) {
+                    node.dataElement = node.name;
+                } else {
+                    node.dataElement = node.metaData.treeAlias;
+                }
+
             }
 
             //This will deleteAnimations to true after the current digest
@@ -110,6 +120,10 @@ angular.module("umbraco.directives")
                 if (!node) {
                     return '';
                 }
+
+                //TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
+                // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
+
                 var css = [];                
                 if (node.cssClasses) {
                     _.each(node.cssClasses, function(c) {
@@ -118,7 +132,24 @@ angular.module("umbraco.directives")
                 }
                 if (node.selected) {
                     css.push("umb-tree-node-checked");
-                }
+				}
+				
+				//is this the current action node (this is not the same as the current selected node!)
+                var actionNode = appState.getMenuState("currentNode");
+				if(actionNode) {
+
+					if(actionNode.id === node.id && actionNode.id !== "-1") {
+						css.push("active");
+                    }
+                    
+                    // special handling of root nodes with id -1 
+                    // as there can be many nodes with id -1 in a tree we need to check the treeAlias instead
+                    if(actionNode.id === "-1" && actionNode.metaData.treeAlias === node.metaData.treeAlias) {
+                        css.push("active");
+                    }
+
+				}
+                
                 return css.join(" ");
             };
 
@@ -153,6 +184,11 @@ angular.module("umbraco.directives")
                     ev.metaKey || // apple
                     (ev.button && ev.button === 1) // middle click, >IE9 + everyone else
                 ) {
+                    return;
+                }
+
+                if (n.metaData && n.metaData.noAccess === true) {
+                    ev.preventDefault();
                     return;
                 }
 
@@ -192,7 +228,7 @@ angular.module("umbraco.directives")
               emits treeNodeCollapsing event if already expanded and treeNodeExpanding if collapsed
             */
             scope.load = function (node) {
-                if (node.expanded) {
+                if (node.expanded && !node.metaData.isContainer) {
                     deleteAnimations = false;
                     emitEvent("treeNodeCollapsing", { tree: scope.tree, node: node, element: element });
                     node.expanded = false;
@@ -227,7 +263,13 @@ angular.module("umbraco.directives")
 
             setupNodeDom(scope.node, scope.tree);
 
-            var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
+            // load the children if the current user don't have access to the node
+            // it is used to auto expand the tree to the start nodes the user has access to
+            if(scope.node.hasChildren && scope.node.metaData.noAccess) {
+                scope.loadChildren(scope.node);
+            }
+
+            var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" enablelistviewexpand="{{enablelistviewexpand}}" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
             var newElement = angular.element(template);
             $compile(newElement)(scope);
             element.append(newElement);

@@ -12,7 +12,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// This inspects the result of the action that returns a collection of content and removes 
+    /// This inspects the result of the action that returns a collection of content and removes
     /// any item that the current user doesn't have access to
     /// </summary>
     internal class FilterAllowedOutgoingMediaAttribute : ActionFilterAttribute
@@ -39,9 +39,9 @@ namespace Umbraco.Web.WebApi.Filters
             get { return true; }
         }
 
-        protected virtual int GetUserStartNode(IUser user)
+        protected virtual int[] GetUserStartNodes(IUser user)
         {
-            return user.StartMediaId;
+            return user.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService);
         }
 
         protected virtual int RecycleBinId
@@ -85,8 +85,8 @@ namespace Umbraco.Web.WebApi.Filters
             var toRemove = new List<dynamic>();
             foreach (dynamic item in items)
             {
-                var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, GetUserStartNode(user), RecycleBinId));
-                if (!hasPathAccess)
+                var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, GetUserStartNodes(user), RecycleBinId));
+                if (hasPathAccess == false)
                 {
                     toRemove.Add(item);
                 }

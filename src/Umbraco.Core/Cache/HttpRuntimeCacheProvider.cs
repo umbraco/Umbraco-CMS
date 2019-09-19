@@ -154,7 +154,7 @@ namespace Umbraco.Core.Cache
 
             value = result.Value; // will not throw (safe lazy)
             var eh = value as ExceptionHolder;
-            if (eh != null) throw eh.Exception; // throw once!
+            if (eh != null) throw new Exception("Exception while creating a value.", eh.Exception); // throw once!
             return value;
         }
 

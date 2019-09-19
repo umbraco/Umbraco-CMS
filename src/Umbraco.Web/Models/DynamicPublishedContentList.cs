@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dynamics;
 using System.Collections;
+using System.ComponentModel;
 using System.Reflection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -16,6 +17,8 @@ namespace Umbraco.Web.Models
     /// <summary>
     /// Represents a collection of DynamicPublishedContent items.
     /// </summary>
+    [Obsolete("The use of dynamics has been deprecated, use strongly typed syntax instead, dynamics will be removed in future versions")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class DynamicPublishedContentList : DynamicObject, IEnumerable<DynamicPublishedContent>
     {
         private readonly List<IPublishedContent> _content;

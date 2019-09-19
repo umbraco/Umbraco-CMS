@@ -1,27 +1,47 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Publishing
 {
-    //TODO: Do we need this anymore??
+    //TODO: Do we need this anymore?? - get rid of it!
+
     /// <summary>
     /// Currently acts as an interconnection between the new public api and the legacy api for publishing
     /// </summary>
-    public class PublishingStrategy : BasePublishingStrategy
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public class PublishingStrategy : BasePublishingStrategy, IPublishingStrategy2
     {
+        private readonly IScopeProvider _scopeProvider;
         private readonly IEventMessagesFactory _eventMessagesFactory;
         private readonly ILogger _logger;
 
+        [Obsolete("This class is not intended to be used, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public PublishingStrategy(IEventMessagesFactory eventMessagesFactory, ILogger logger)
         {
             if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
             if (logger == null) throw new ArgumentNullException("logger");
+            _scopeProvider = new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, logger));
+            _eventMessagesFactory = eventMessagesFactory;
+            _logger = logger;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public PublishingStrategy(IScopeProvider scopeProvider, IEventMessagesFactory eventMessagesFactory, ILogger logger)
+        {
+            if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
+            if (logger == null) throw new ArgumentNullException("logger");
+            _scopeProvider = scopeProvider;
             _eventMessagesFactory = eventMessagesFactory;
             _logger = logger;
         }
@@ -29,14 +49,14 @@ namespace Umbraco.Core.Publishing
         /// <summary>
         /// Publishes a single piece of Content
         /// </summary>
+        /// <param name="uow"></param>
         /// <param name="content"><see cref="IContent"/> to publish</param>
         /// <param name="userId">Id of the User issueing the publish operation</param>
-        internal Attempt<PublishStatus> PublishInternal(IContent content, int userId)
+        Attempt<PublishStatus> IPublishingStrategy2.Publish(IScopeUnitOfWork uow, IContent content, int userId)
         {
             var evtMsgs = _eventMessagesFactory.Get();
 
-            if (Publishing.IsRaisedEventCancelled(
-                new PublishEventArgs<IContent>(content, evtMsgs), this))
+            if (uow.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs), "Publishing"))
             {
                 _logger.Info<PublishingStrategy>(
                         string.Format("Content '{0}' with Id '{1}' will not be published, the event was cancelled.", content.Name, content.Id));
@@ -87,12 +107,17 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the publish operation was successfull and not cancelled, otherwise false</returns>
         public override bool Publish(IContent content, int userId)
         {
-            return PublishInternal(content, userId).Success;
+            using (var uow = new ScopeUnitOfWork(_scopeProvider))
+            {
+                uow.Commit();
+                return ((IPublishingStrategy2)this).Publish(uow, content, userId).Success;
+            }
         }
 
         /// <summary>
         /// Publishes a list of content items
         /// </summary>
+        /// <param name="uow"></param>
         /// <param name="content"></param>
         /// <param name="userId"></param>
         /// <param name="includeUnpublishedDocuments">
@@ -120,8 +145,8 @@ namespace Umbraco.Core.Publishing
         /// the user definitely wants to publish it even if it has never been published before.
         ///
         /// </remarks>
-        internal IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
-            IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true)
+        IEnumerable<Attempt<PublishStatus>> IPublishingStrategy2.PublishWithChildren(IScopeUnitOfWork uow,
+            IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments)
         {
             var statuses = new List<Attempt<PublishStatus>>();
 
@@ -180,8 +205,7 @@ namespace Umbraco.Core.Publishing
                     }
 
                     //Fire Publishing event
-                    if (Publishing.IsRaisedEventCancelled(
-                        new PublishEventArgs<IContent>(item, evtMsgs), this))
+                    if (uow.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(item, evtMsgs), "Publishing"))
                     {
                         //the publishing has been cancelled.
                         _logger.Info<PublishingStrategy>(
@@ -283,13 +307,13 @@ namespace Umbraco.Core.Publishing
             // any document that fails to publish...
             var hasPublishedVersion = ApplicationContext.Current.Services.ContentService.HasPublishedVersion(content.Id);
 
-            if (hasPublishedVersion && !includeUnpublishedDocuments)
+            if (hasPublishedVersion && includeUnpublishedDocuments == false)
             {
                 //it has a published version but our flag tells us to not include un-published documents and therefore we should
                 // not be forcing decendant/child documents to be published if their parent fails.
                 parentsIdsCancelled.Add(content.Id);
             }
-            else if (!hasPublishedVersion)
+            else if (hasPublishedVersion == false)
             {
                 //it doesn't have a published version so we certainly cannot publish it's children.
                 parentsIdsCancelled.Add(content.Id);
@@ -304,15 +328,21 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the publish operation was successfull and not cancelled, otherwise false</returns>
         public override bool PublishWithChildren(IEnumerable<IContent> content, int userId)
         {
-            var result = PublishWithChildrenInternal(content, userId);
+            using (var uow = new ScopeUnitOfWork(_scopeProvider))
+            {
+                var result = ((IPublishingStrategy2)this).PublishWithChildren(uow, content, userId, true);
 
-            //NOTE: This previously always returned true so I've left it that way. It returned true because (from Morten)...
-            // ... if one item couldn't be published it wouldn't be correct to return false.
-            // in retrospect it should have returned a list of with Ids and Publish Status
-            // come to think of it ... the cache would still be updated for a failed item or at least tried updated.
-            // It would call the Published event for the entire list, but if the Published property isn't set to True it
-            // wouldn't actually update the cache for that item. But not really ideal nevertheless...
-            return true;
+                uow.Commit();
+
+                //NOTE: This previously always returned true so I've left it that way. It returned true because (from Morten)...
+                // ... if one item couldn't be published it wouldn't be correct to return false.
+                // in retrospect it should have returned a list of with Ids and Publish Status
+                // come to think of it ... the cache would still be updated for a failed item or at least tried updated. 
+                // It would call the Published event for the entire list, but if the Published property isn't set to True it 
+                // wouldn't actually update the cache for that item. But not really ideal nevertheless...
+                return true;
+            }
+            
         }
 
         /// <summary>
@@ -323,21 +353,26 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
         public override bool UnPublish(IContent content, int userId)
         {
-            return UnPublishInternal(content, userId).Success;
+            using (var uow = new ScopeUnitOfWork(_scopeProvider))
+            {
+                uow.Commit();
+                return ((IPublishingStrategy2)this).UnPublish(uow, content, userId).Success;                
+            }
         }
 
         /// <summary>
         /// Unpublishes a list of Content
         /// </summary>
+        /// <param name="uow"></param>
         /// <param name="content">An enumerable list of <see cref="IContent"/></param>
         /// <param name="userId">Id of the User issueing the unpublish operation</param>
         /// <returns>A list of publish statuses</returns>
-        private IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId)
+        private IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IScopeUnitOfWork uow, IEnumerable<IContent> content, int userId)
         {
-            return content.Select(x => UnPublishInternal(x, userId));
+            return content.Select(x => ((IPublishingStrategy2)this).UnPublish(uow, x, userId));
         }
 
-        private Attempt<PublishStatus> UnPublishInternal(IContent content, int userId)
+        Attempt<PublishStatus> IPublishingStrategy2.UnPublish(IScopeUnitOfWork uow, IContent content, int userId)
         {
             // content should (is assumed to ) be the newest version, which may not be published
             // don't know how to test this, so it's not verified
@@ -348,8 +383,7 @@ namespace Umbraco.Core.Publishing
             var evtMsgs = _eventMessagesFactory.Get();
 
             //Fire UnPublishing event
-            if (UnPublishing.IsRaisedEventCancelled(
-                new PublishEventArgs<IContent>(content, evtMsgs), this))
+            if (uow.Events.DispatchCancelable(UnPublishing, this, new PublishEventArgs<IContent>(content, evtMsgs), "UnPublishing"))
             {
                 _logger.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' will not be unpublished, the event was cancelled.", content.Name, content.Id));
@@ -367,9 +401,10 @@ namespace Umbraco.Core.Publishing
                                   content.Name, content.Id));
             }
 
-            // if newest is published, unpublish
-            if (content.Published)
-                content.ChangePublishedState(PublishedState.Unpublished);
+            // make sure we dirty .Published and always unpublish
+            // the version we have here could be the newest, !Published
+            content.ChangePublishedState(PublishedState.Published);
+            content.ChangePublishedState(PublishedState.Unpublished);
 
             _logger.Info<PublishingStrategy>(
                 string.Format("Content '{0}' with Id '{1}' has been unpublished.",
@@ -386,15 +421,21 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
         public override bool UnPublish(IEnumerable<IContent> content, int userId)
         {
-            var result = UnPublishInternal(content, userId);
+            using (var uow = new ScopeUnitOfWork(_scopeProvider))
+            {
+                var result = UnPublishInternal(uow, content, userId);
+                uow.Commit();
 
-            //NOTE: This previously always returned true so I've left it that way. It returned true because (from Morten)...
-            // ... if one item couldn't be published it wouldn't be correct to return false.
-            // in retrospect it should have returned a list of with Ids and Publish Status
-            // come to think of it ... the cache would still be updated for a failed item or at least tried updated.
-            // It would call the Published event for the entire list, but if the Published property isn't set to True it
-            // wouldn't actually update the cache for that item. But not really ideal nevertheless...
-            return true;
+                //NOTE: This previously always returned true so I've left it that way. It returned true because (from Morten)...
+                // ... if one item couldn't be published it wouldn't be correct to return false.
+                // in retrospect it should have returned a list of with Ids and Publish Status
+                // come to think of it ... the cache would still be updated for a failed item or at least tried updated. 
+                // It would call the Published event for the entire list, but if the Published property isn't set to True it 
+                // wouldn't actually update the cache for that item. But not really ideal nevertheless...
+                return true;
+            }
+
+            
         }
 
         /// <summary>
@@ -407,9 +448,12 @@ namespace Umbraco.Core.Publishing
         /// <param name="content"><see cref="IContent"/> thats being published</param>
         public override void PublishingFinalized(IContent content)
         {
-            var evtMsgs = _eventMessagesFactory.Get();
-            Published.RaiseEvent(
-                new PublishEventArgs<IContent>(content, false, false, evtMsgs), this);
+            using (var uow = new ScopeUnitOfWork(_scopeProvider))
+            {
+                ((IPublishingStrategy2) this).PublishingFinalized(uow, content);
+                uow.Commit();
+            }
+            
         }
 
         /// <summary>
@@ -419,10 +463,11 @@ namespace Umbraco.Core.Publishing
         /// <param name="isAllRepublished">Boolean indicating whether its all content that is republished</param>
         public override void PublishingFinalized(IEnumerable<IContent> content, bool isAllRepublished)
         {
-            var evtMsgs = _eventMessagesFactory.Get();
-            Published.RaiseEvent(
-                new PublishEventArgs<IContent>(content, false, isAllRepublished, evtMsgs), this);
-
+            using (var uow = new ScopeUnitOfWork(_scopeProvider))
+            {
+                ((IPublishingStrategy2)this).PublishingFinalized(uow, content, isAllRepublished);
+                uow.Commit();
+            }
         }
 
         /// <summary>
@@ -431,9 +476,11 @@ namespace Umbraco.Core.Publishing
         /// <param name="content"><see cref="IContent"/> thats being unpublished</param>
         public override void UnPublishingFinalized(IContent content)
         {
-            var evtMsgs = _eventMessagesFactory.Get();
-            UnPublished.RaiseEvent(
-                new PublishEventArgs<IContent>(content, false, false, evtMsgs), this);
+            using (var uow = new ScopeUnitOfWork(_scopeProvider))
+            {
+                ((IPublishingStrategy2)this).UnPublishingFinalized(uow, content);
+                uow.Commit();
+            }
         }
 
         /// <summary>
@@ -442,31 +489,64 @@ namespace Umbraco.Core.Publishing
         /// <param name="content">An enumerable list of <see cref="IContent"/> thats being unpublished</param>
         public override void UnPublishingFinalized(IEnumerable<IContent> content)
         {
-            var evtMsgs = _eventMessagesFactory.Get();
-            UnPublished.RaiseEvent(
-                new PublishEventArgs<IContent>(content, false, false, evtMsgs), this);
+            using (var uow = new ScopeUnitOfWork(_scopeProvider))
+            {
+                ((IPublishingStrategy2)this).UnPublishingFinalized(uow, content);
+                uow.Commit();
+            }            
         }
 
         /// <summary>
         /// Occurs before publish
         /// </summary>
+        [Obsolete("Use events on the ContentService")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> Publishing;
 
         /// <summary>
         /// Occurs after publish
         /// </summary>
+        [Obsolete("Use events on the ContentService")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> Published;
 
         /// <summary>
         /// Occurs before unpublish
         /// </summary>
+        [Obsolete("Use events on the ContentService")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> UnPublishing;
 
         /// <summary>
         /// Occurs after unpublish
         /// </summary>
-        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> UnPublished;
+        [Obsolete("Use events on the ContentService")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> UnPublished;      
+        
+        void IPublishingStrategy2.PublishingFinalized(IScopeUnitOfWork uow, IContent content)
+        {
+            var evtMsgs = _eventMessagesFactory.Get();
+            uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false, evtMsgs), "Published");
+        }
 
+        void IPublishingStrategy2.PublishingFinalized(IScopeUnitOfWork uow, IEnumerable<IContent> content, bool isAllRepublished)
+        {
+            var evtMsgs = _eventMessagesFactory.Get();
+            uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, isAllRepublished, evtMsgs), "Published");
+        }
 
+        void IPublishingStrategy2.UnPublishingFinalized(IScopeUnitOfWork uow, IContent content)
+        {
+            var evtMsgs = _eventMessagesFactory.Get();
+            uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false, evtMsgs), "UnPublished");
+        }
+
+        void IPublishingStrategy2.UnPublishingFinalized(IScopeUnitOfWork uow, IEnumerable<IContent> content)
+        {
+            var evtMsgs = _eventMessagesFactory.Get();
+            uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false, evtMsgs), "UnPublished");
+        }
+        
     }
 }

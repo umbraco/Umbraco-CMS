@@ -11,6 +11,7 @@ namespace Umbraco.Web.Models
 
         [Required]
         [DataMember(Name = "password", IsRequired = true)]
+        [StringLength(maximumLength:256)]
         public string Password { get; set; }
 
     }

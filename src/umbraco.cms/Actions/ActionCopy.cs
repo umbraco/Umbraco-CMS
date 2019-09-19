@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked when copying a document, media, member 
-	/// </summary>
-	public class ActionCopy : IAction
+    /// <summary>
+    /// This action is invoked when copying a document, media, member 
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.StructureCategory)]
+    public class ActionCopy : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618
@@ -89,6 +92,7 @@ namespace umbraco.BusinessLogic.Actions
 				return true;
 			}
 		}
-		#endregion
-	}
+        #endregion
+        
+    }
 }

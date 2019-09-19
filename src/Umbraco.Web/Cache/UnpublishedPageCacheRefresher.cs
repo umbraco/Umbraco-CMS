@@ -5,7 +5,8 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using System.Linq;
-
+using Newtonsoft.Json;
+using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Sync;
 
@@ -40,21 +41,19 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         internal static JsonPayload[] DeserializeFromJsonPayload(string json)
         {
-            var serializer = new JavaScriptSerializer();
-            var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
+            var jsonObject = JsonConvert.DeserializeObject<JsonPayload[]>(json);
             return jsonObject;
         }
 
-      
+
         internal static string SerializeToJsonPayloadForPermanentDeletion(params int[] contentIds)
         {
-            var serializer = new JavaScriptSerializer();
             var items = contentIds.Select(x => new JsonPayload
             {
                 Id = x,
                 Operation = OperationType.Deleted
             }).ToArray();
-            var json = serializer.Serialize(items);
+            var json = JsonConvert.SerializeObject(items);
             return json;
         }
 
@@ -63,12 +62,12 @@ namespace Umbraco.Web.Cache
         #region Sub classes
 
         internal enum OperationType
-        {            
+        {
             Deleted
         }
 
         internal class JsonPayload
-        {            
+        {
             public int Id { get; set; }
             public OperationType Operation { get; set; }
         }
@@ -77,54 +76,56 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            ApplicationContext.Current.Services.IdkMap.ClearCache();
             ClearAllIsolatedCacheByEntityType<IContent>();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            content.Instance.ClearPreviewXmlContent();
             base.RefreshAll();
         }
 
         public override void Refresh(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
             ClearRepositoryCacheItemById(id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(id);
+            var d = new Document(id);
+            content.Instance.UpdateDocumentCache(d);
+            content.Instance.UpdatePreviewXmlContent(d);
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            ApplicationContext.Current.Services.IdkMap.ClearCache(id);
             ClearRepositoryCacheItemById(id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            content.Instance.ClearPreviewXmlContent(id);
             base.Remove(id);
         }
 
 
         public override void Refresh(IContent instance)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
             ClearRepositoryCacheItemById(instance.Id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(instance);
+            var d = new Document(instance);
+            content.Instance.UpdateDocumentCache(d);
+            content.Instance.UpdatePreviewXmlContent(d);
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Refresh(instance);
         }
 
         public override void Remove(IContent instance)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            ApplicationContext.Current.Services.IdkMap.ClearCache(instance.Id);
             ClearRepositoryCacheItemById(instance.Id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            content.Instance.ClearPreviewXmlContent(instance.Id);
             base.Remove(instance);
         }
 
@@ -134,14 +135,14 @@ namespace Umbraco.Web.Cache
         /// <param name="jsonPayload"></param>
         public void Refresh(string jsonPayload)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
 
             foreach (var payload in DeserializeFromJsonPayload(jsonPayload))
             {
+                ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
                 ClearRepositoryCacheItemById(payload.Id);
                 content.Instance.UpdateSortOrder(payload.Id);
+                content.Instance.ClearPreviewXmlContent(payload.Id);
             }
 
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
@@ -157,6 +158,5 @@ namespace Umbraco.Web.Cache
                 contentCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(id));
             }
         }
-        
     }
 }

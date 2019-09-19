@@ -6,7 +6,7 @@ using System.Web.Http.Validation;
 namespace Umbraco.Web.WebApi
 {
     /// <summary>
-    /// Applying this attribute to any webapi controller will ensure that it only contains one json formatter compatible with the angular json vulnerability prevention.
+    /// Applying this attribute to any webapi controller will ensure that the <see cref="IBodyModelValidator"/> is of type <see cref="PrefixlessBodyModelValidator"/>
     /// </summary>
     internal class PrefixlessBodyModelValidatorAttribute : Attribute, IControllerConfiguration
     {

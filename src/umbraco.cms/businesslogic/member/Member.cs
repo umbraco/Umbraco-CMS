@@ -773,14 +773,20 @@ namespace umbraco.cms.businesslogic.member
         {
             var temp = new Hashtable();
 
+            var groupIds = new List<int>();
+
             using (var sqlHelper = Application.SqlHelper)
             using (var dr = sqlHelper.ExecuteReader(
                 "select memberGroup from cmsMember2MemberGroup where member = @id",
                 sqlHelper.CreateParameter("@id", Id)))
             {
                 while (dr.Read())
-                    temp.Add(dr.GetInt("memberGroup"),
-                        new MemberGroup(dr.GetInt("memberGroup")));
+                    groupIds.Add(dr.GetInt("memberGroup"));                    
+            }
+
+            foreach (var groupId in groupIds)
+            {
+                temp.Add(groupId, new MemberGroup(groupId));
             }
             _groups = temp;
         }

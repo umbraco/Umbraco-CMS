@@ -1,27 +1,35 @@
 <div ng-controller="Umbraco.PropertyEditors.TagsController" class="umb-editor umb-tags">
-   
-     <div ng-if="isLoading">
-        <localize key="loading">Loading</localize>...
-    </div>
 
-    <div ng-if="!isLoading">
+    <div ng-if="isLoading">
+       <localize key="loading">Loading</localize>...
+   </div>
 
-        <input type="hidden" name="tagCount" ng-model="model.value.length" val-property-validator="validateMandatory" />
+   <div ng-if="!isLoading">
 
-        <span ng-repeat="tag in model.value" ng-click="$parent.removeTag(tag)" class="label label-primary tag">
-            <span ng-bind-html="tag"></span>
-            <i class="icon icon-delete"></i>
-        </span>
+       <input type="hidden" name="tagCount" ng-model="model.value.length" val-property-validator="validateMandatory" />
 
-        <input type="text"
-               id="{{model.alias}}"
-               class="typeahead tags-{{model.alias}}"
-               ng-model="$parent.tagToAdd"
-               ng-keydown="$parent.addTagOnEnter($event)"
-               on-blur="$parent.addTag()"
-               localize="placeholder"
-               placeholder="@placeholders_enterTags" />
+       <span ng-repeat="tag in model.value track by $index" class="label label-primary tag">
+           <span ng-bind-html="tag"></span>
 
-    </div>
-    
+               <i class="icon-trash" ng-click="$parent.showPrompt($index, tag)" localize="title" title="@buttons_deleteTag"></i>
+
+               <umb-confirm-action
+                   ng-if="$parent.promptIsVisible === $index"
+                   direction="left"
+                   on-confirm="$parent.removeTag(tag)"
+                   on-cancel="$parent.hidePrompt()">
+               </umb-confirm-action>
+       </span>
+
+       <input type="text"
+              id="{{model.alias}}"
+              class="typeahead tags-{{model.alias}}"
+              ng-model="$parent.tagToAdd"
+              ng-keydown="$parent.addTagOnEnter($event)"
+              on-blur="$parent.addTag()"
+              localize="placeholder"
+              placeholder="@placeholders_enterTags" />
+
+   </div>
+
 </div>

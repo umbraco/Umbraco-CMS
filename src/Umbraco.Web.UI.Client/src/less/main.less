@@ -11,7 +11,7 @@
 	min-height: 100%;
 }
 .shadow {
-	box-shadow: 3px 0px 7px #dbdbdb;
+	box-shadow: 3px 0px 7px @gray-8;
 }
 
 .umb-scrollable, .umb-auto-overflow {
@@ -23,19 +23,18 @@
     margin-top: 0px;
     margin-bottom: 15px;
     font-size: 14px;
-    color: #b3b3b3
+    color: @gray-7;
 }
 
 h5{
-  text-transform: uppercase;
-  color: #b3b3b3;
+  color: @gray-1;
   font-weight: bold;
-  font-size: 13px;
+  font-size: 15px;
   margin-top: 15px;
 }
 
 h5.-border-bottom {
-	border-bottom: 1px solid #ECECEC;
+	border-bottom: 1px solid @gray-9;
 	padding-bottom: 5px;
 }
 
@@ -48,10 +47,25 @@ h5.-black {
     background: none;
     border: none
 }
-.datepicker td.active,
-.datepicker td span.active {
-    background: #f3762c !important;
+.bootstrap-datetimepicker-widget {
+    td {
+        &.active, span.active {
+            background: @turquoise !important;
+        }
+        &.today:not(.active):before {
+            border-bottom-color: @purple-l1 !important;
+        }
+        a[data-action] {
+            padding: 0 !important;
+        }
+        .timepicker-hour,
+        .timepicker-minute,
+        .timepicker-second {
+            margin: 8px 0;
+        }
+    }
 }
+
 .umb-datetime-picker div.info {
     vertical-align: middle
 }
@@ -74,14 +88,14 @@ h5.-black {
 }
 
 .umb-plus-btn a {
-  border: 2px dashed @grayLight;
+  border: 2px dashed @gray-8;
   width: 136px;
   height: 136px;
   line-height: 136px;
   text-align: center;
   font-size: 50px;
   display: block;
-  color: @grayLight;
+  color: @gray-8;
   text-decoration: none;
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
@@ -105,7 +119,7 @@ h5.-black {
   margin: 30px 20px;
 }
 .umb-control-group {
-  border-bottom: 1px solid @grayLighter;
+  border-bottom: 1px solid @gray-10;
   padding-bottom: 20px;
   margin-bottom: 15px !important;
 }
@@ -114,11 +128,23 @@ h5.-black {
   border: none;
 }
 
+/* BLOCK MODE */
+.block-form .umb-control-group {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.block-form .umb-control-group label .help-block,
+.block-form .umb-control-group label small {
+  font-size: 13px;
+  padding-top: 2px;
+  margin-bottom: 5px;
+}
 
 /*COMPACT MODE */
 .compact .umb-pane{margin: 0px 0px 15px 0px;}
 .compact .umb-control-group {
-  border-bottom: 1px solid @grayLighter;
+  border-bottom: 1px solid @gray-10;
   padding-bottom: 10px;
   margin-bottom: 5px !important;
 }
@@ -147,13 +173,26 @@ h5.-black {
 }
 .umb-control-group label .help-block,
 .umb-control-group label small {
-  font-size: 11px;
-  color: #a0a0a0;
-  line-height: 13px;
+  font-size: 12px;
+  color: @gray-6;
+  line-height: 1.5em;
   padding-top: 5px;
 }
 .umb-nolabel .controls {
   margin-left: 0;
+}
+
+label[for=""] {
+  cursor: default;
+}
+
+label:not([for]) {
+  cursor: default;
+}
+
+/* CONTROL VALIDATION */
+.umb-control-required {
+    color: @controlRequiredColor;
 }
 
 .controls-row {
@@ -204,7 +243,10 @@ h5.-black {
 }
 
 .umb-version {
-    color: #bbbbbb; position: absolute; bottom: 5px; right: 20px;
+    color: @gray-7;
+    position: absolute;
+    bottom: 5px;
+    right: 20px;
 }
 
 /* DASHBOARD */
@@ -241,7 +283,7 @@ h5.-black {
 }
 
 table thead a {
-  color: #333
+  color: @gray-2;
 }
 
 /* UI interactions */
@@ -280,7 +322,7 @@ table thead a {
 }
 
 .thumbnails > li.umb-thumbnail .umb-icons {
-  background: @grayDarker;
+  background: @gray-1;
   position: absolute;
   top: 0;
   left: 0;
@@ -345,7 +387,7 @@ table thead a {
 }
 
 .umb-image-mask .icon-circle {
-  color: #4285f4;
+  color: @turquoise-d1;
   position: absolute;
   top: 130px;
   left: 115px;
@@ -393,7 +435,7 @@ table thead a {
   border:1px solid @inputBorder;
   border-radius:2px;
   content:"1";
-  background:#f2f2f2;
+  background: @gray-10;
   margin-top: -1px;
 }
 
@@ -418,7 +460,7 @@ table thead a {
 
 /* DICTIONARY */
 #dictionaryItems tr {
-    border-top:solid 1px @grayLight;
+    border-top:solid 1px @gray-8;
 }
 
 #dictionaryItems thead tr {
@@ -455,7 +497,7 @@ table thead a {
 // ------------------------
 
 .umb-loader{
-background-color: @blue;
+background-color: @turquoise-d1;
 margin-top:0;
 margin-left:-100%;
 -moz-animation-name:bounce_loadingProgressG;
@@ -581,7 +623,7 @@ height:1px;
 
 	font-size: 12px;
 	font-weight: bold;
-	color: fade(@black, 70);
+	color: @gray-3;
 
 	&:hover {
 		color: @black;
@@ -589,17 +631,15 @@ height:1px;
 }
 
 input[type=checkbox]:checked + .input-label--small {
-	color: @blue;
+	color: @turquoise-d1;
 }
 
 
 // Use this for headers in the panels
 .panel-dialog--header {
-	border-bottom: 1px solid @gray;
-
+	border-bottom: 1px solid @gray-3;
 	margin: 10px 0;
 	padding-bottom: 10px;
-
 	font-size: @fontSizeLarge;
 	font-weight: bold;
 	line-height: 20px;
@@ -612,4 +652,15 @@ input[type=checkbox]:checked + .input-label--small {
 .bootstrap-datetimepicker-widget th,
 .bootstrap-datetimepicker-widget td span {
 	border-radius: 0 !important;
+}
+
+.visuallyhidden{
+    position: absolute !important;
+	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+	clip: rect(1px, 1px, 1px, 1px);
+	padding:0 !important;
+	border:0 !important;
+	height: 1px !important;
+	width: 1px !important;
+	overflow: hidden;
 }

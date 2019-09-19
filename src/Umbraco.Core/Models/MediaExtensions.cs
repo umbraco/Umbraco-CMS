@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,73 +8,56 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Core.Models
 {
-    internal static class MediaExtensions
+    public static class MediaExtensions
     {
         /// <summary>
-        /// Hack: we need to put this in a real place, this is currently just used to render the urls for a media item in the back office
+        /// Gets the url of a media item.
         /// </summary>
-        /// <returns></returns>
         public static string GetUrl(this IMedia media, string propertyAlias, ILogger logger)
         {
             var propertyType = media.PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
-            if (propertyType != null)
+            if (propertyType == null) return string.Empty;
+
+            var val = media.Properties[propertyType];
+            if (val == null) return string.Empty;
+
+            var jsonString = val.Value as string;
+            if (jsonString == null) return string.Empty;
+
+            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
+                return jsonString;
+
+            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias)
             {
-                var val = media.Properties[propertyType];
-                if (val != null)
+                if (jsonString.DetectIsJson() == false)
+                    return jsonString;
+
+                try
                 {
-                    var jsonString = val.Value as string;
-                    if (jsonString != null)
-                    {
-                        if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias)
-                        {
-                            if (jsonString.DetectIsJson())
-                            {
-                                try
-                                {
-                                    var json = JsonConvert.DeserializeObject<JObject>(jsonString);
-                                    if (json["src"] != null)
-                                    {
-                                        return json["src"].Value<string>();
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    logger.Error<ImageCropperValueConverter>("Could not parse the string " + jsonString + " to a json object", ex);
-                                    return string.Empty;
-                                }
-                            }
-                            else
-                            {
-                                return jsonString;
-                            }
-                        }
-                        else if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
-                        {
-                            return jsonString;
-                        }
-                        //hrm, without knowing what it is, just adding a string here might not be very nice
-                    }
+                    var json = JsonConvert.DeserializeObject<JObject>(jsonString);
+                    if (json["src"] != null)
+                        return json["src"].Value<string>();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error<ImageCropperValueConverter>("Could not parse the string " + jsonString + " to a json object", ex);
+                    return string.Empty;
                 }
             }
+
+            // hrm, without knowing what it is, just adding a string here might not be very nice
             return string.Empty;
         }
 
         /// <summary>
-        /// Hack: we need to put this in a real place, this is currently just used to render the urls for a media item in the back office
+        /// Gets the urls of a media item.
         /// </summary>
-        /// <returns></returns>
         public static string[] GetUrls(this IMedia media, IContentSection contentSection, ILogger logger)
         {
-            var links = new List<string>();
-            var autoFillProperties = contentSection.ImageAutoFillProperties.ToArray();
-            if (autoFillProperties.Any())
-            {
-                links.AddRange(
-                    autoFillProperties
-                        .Select(field => media.GetUrl(field.Alias, logger))
-                        .Where(link => link.IsNullOrWhiteSpace() == false));
-            }
-            return links.ToArray();
+            return contentSection.ImageAutoFillProperties
+                .Select(field => media.GetUrl(field.Alias, logger))
+                .Where(link => string.IsNullOrWhiteSpace(link) == false)
+                .ToArray();
         }
     }
 }

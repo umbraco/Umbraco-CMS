@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentXmlRepository<TContent> : PetaPocoRepositoryBase<int, ContentXmlEntity<TContent>> 
         where TContent : IContentBase
     {
-        public ContentXmlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public ContentXmlRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
@@ -70,6 +70,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Remove 'published' xml from the cmsContentXml table for the unpublished content
             Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+
+            entity.DeletedDate = DateTime.Now;
         }
 
         protected override void PersistNewItem(ContentXmlEntity<TContent> entity)

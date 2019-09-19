@@ -57,7 +57,7 @@
           },
           stop: function(e, ui) {
             updateTabsSortOrder();
-          },
+          }
         };
 
         scope.sortableOptionsProperty = {
@@ -348,9 +348,10 @@
 
             }
         };
-
+          //select which resource methods to use, eg document Type or Media Type versions
         var availableContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
-        var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
+          var whereUsedContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getWhereCompositionIsUsedInContentTypes : mediaTypeResource.getWhereCompositionIsUsedInContentTypes;
+          var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
 
           //get the currently assigned property type aliases - ensure we pass these to the server side filer
           var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, function(g) {
@@ -363,7 +364,14 @@
           $q.all([
               //get available composite types
               availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
-                  setupAvailableContentTypesModel(result);
+                  setupAvailableContentTypesModel(result); 
+              }),
+                  //get where used document types
+                  whereUsedContentTypeResource(scope.model.id).then(function (whereUsed) {
+                  //pass to the dialog model the content type eg documentType or mediaType 
+                  scope.compositionsDialogModel.section = scope.contentType;
+                  //pass the list of 'where used' document types
+                  scope.compositionsDialogModel.whereCompositionUsed = whereUsed;
               }),
               //get content type count
               countContentTypeResource().then(function(result) {
@@ -489,7 +497,7 @@
 
       scope.editPropertyTypeSettings = function(property, group) {
 
-        if (!property.inherited && !property.locked) {
+        if (!property.inherited) {
 
           scope.propertySettingsDialogModel = {};
           scope.propertySettingsDialogModel.title = "Property settings";
@@ -547,6 +555,7 @@
             property.validation.pattern = oldModel.property.validation.pattern;
             property.showOnMemberProfile = oldModel.property.showOnMemberProfile;
             property.memberCanEdit = oldModel.property.memberCanEdit;
+            property.isSensitiveValue = oldModel.property.isSensitiveValue;
 
             // because we set state to active, to show a preview, we have to check if has been filled out
             // label is required so if it is not filled we know it is a placeholder

@@ -1,0 +1,87 @@
+<div ng-controller="Umbraco.Editors.PartialViewMacros.CreateController as vm" ng-cloak>
+
+    <div class="umbracoDialog umb-dialog-body with-footer">
+
+        <div class="umb-pane" ng-if="!vm.creatingFolder">
+
+            <!-- Main options -->
+            <div ng-if="!vm.showSnippets">
+
+                <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+
+                <ul class="umb-actions umb-actions-child">
+                    <li>
+                        <a href="" ng-click="vm.createFile()" umb-auto-focus>
+                            <i class="large icon-article"></i>
+                            <span class="menu-label"><localize key="create_newPartialViewMacro">New partial view macro</localize></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="vm.createFileWithoutMacro()">
+                            <i class="large icon-article"></i>
+                            <span class="menu-label"><localize key="create_newPartialViewMacroNoMacro">New partial view macro (without macro)</localize></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="vm.showCreateFromSnippet()">
+                            <i class="large icon-article"></i>
+                            <span class="menu-label"><localize key="create_newPartialViewMacroFromSnippet">>New partial view macro from snippet</localize></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="vm.showCreateFolder()">
+                            <i class="large icon-folder"></i>
+                            <span class="menu-label"><localize key="general_folder"></localize></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Snippets list -->
+            <div ng-if="vm.showSnippets">
+
+                <h5><localize key="defaultdialogs_selectSnippet">Select snippet</localize></h5>
+
+                <ul class="umb-actions umb-actions-child">
+                    <li ng-repeat="snippet in vm.snippets">
+                        <a href="" ng-click="vm.createFileFromSnippet(snippet)" style="padding-top: 6px; padding-bottom: 6px;">
+                            <i class="icon-article" style="font-size: 20px;"></i>
+                            <span class="menu-label" style="margin-left: 0; padding-left: 5px;">{{ snippet.name }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Create folder -->
+        <div class="umb-pane" ng-if="vm.creatingFolder">
+            <form novalidate name="createFolderForm"
+                    ng-submit="vm.createFolder(createFolderForm)"
+                    val-form-manager>
+
+                <div ng-show="vm.createFolderError">
+                    <div class="alert alert-error">
+                        <div><strong>{{vm.createFolderError.errorMsg}}</strong></div>
+                        <div>{{vm.createFolderError.data.message}}</div>
+                    </div>
+                </div>
+
+                <umb-control-group label="Enter a folder name" hide-label="false">
+                    <input type="text" name="folderName" ng-model="vm.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required no-dirty-check />
+                </umb-control-group>
+
+                <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Dialog footer -->
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <button class="btn btn-info" ng-click="nav.hideDialog(true)">
+            <localize key="buttons_somethingElse">Do something else</localize>
+        </button>
+    </div>
+
+</div>

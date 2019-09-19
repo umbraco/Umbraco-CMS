@@ -14,6 +14,7 @@ using System.Runtime.CompilerServices;
 using umbraco.BusinessLogic;
 using umbraco.cms.helpers;
 using umbraco.cms.businesslogic.datatype.controls;
+using Umbraco.Core.Media;
 using File = System.IO.File;
 using Property = umbraco.cms.businesslogic.property.Property;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
@@ -148,7 +149,7 @@ namespace umbraco.cms.businesslogic
                         {
                             _contentType = new ContentType(contentTypeId);
                         }
-                        catch
+                        catch (Exception)
                         {
                             return null;
                         }
@@ -275,13 +276,12 @@ namespace umbraco.cms.businesslogic
             {
                 if (_version == Guid.Empty)
                 {
-                    string sql = "Select versionId from cmsContentVersion where contentID = " + this.Id +
-                                 " order by id desc ";
-
+                    var sql = string.Format("SELECT versionId FROM cmsDocument where nodeid={0} AND newest = 1 ORDER BY updateDate desc", this.Id);
+                    
                     using (var sqlHelper = Application.SqlHelper)
                     using (IRecordsReader dr = sqlHelper.ExecuteReader(sql))
                     {
-                        if (!dr.Read())
+                        if (dr.Read() == false)
                             _version = Guid.Empty;
                         else
                             _version = dr.GetGuid("versionId");

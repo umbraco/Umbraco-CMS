@@ -40,22 +40,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         public override string RootNodeDisplayName
         {
-            get
-            {
-
-                //if title is defined, return that
-                if(string.IsNullOrEmpty(_attribute.Title) == false)
-                    return _attribute.Title;
-
-
-                //try to look up a tree header matching the tree alias
-                var localizedLabel = Services.TextService.Localize("treeHeaders/" + _attribute.Alias);
-                if (string.IsNullOrEmpty(localizedLabel) == false)
-                    return localizedLabel;
-
-                //is returned to signal that a label was not found
-                return "[" + _attribute.Alias + "]";
-            }
+            get { return _attribute.GetRootNodeDisplayName(Services.TextService); }
         }
 
         /// <summary>
@@ -68,19 +53,7 @@ namespace Umbraco.Web.Trees
 
         private void Initialize()
         {
-            //Locate the tree attribute
-            var treeAttributes = GetType()
-                .GetCustomAttributes(typeof(TreeAttribute), false)
-                .OfType<TreeAttribute>()
-                .ToArray();
-
-            if (treeAttributes.Any() == false)
-            {
-                throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
-            }
-
-            //assign the properties of this object to those of the metadata attribute
-            _attribute = treeAttributes.First();
+            _attribute = GetType().GetTreeAttribute();
         }
     }
 }

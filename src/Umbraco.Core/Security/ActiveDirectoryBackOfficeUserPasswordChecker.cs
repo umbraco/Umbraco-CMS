@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.DirectoryServices.AccountManagement;
 using System.Threading.Tasks;
 using Umbraco.Core.Models.Identity;
@@ -7,8 +8,10 @@ namespace Umbraco.Core.Security
 {
     public class ActiveDirectoryBackOfficeUserPasswordChecker : IBackOfficeUserPasswordChecker
     {
-        public virtual string ActiveDirectoryDomain {
-            get {
+        public virtual string ActiveDirectoryDomain
+        {
+            get
+            {
                 return ConfigurationManager.AppSettings["ActiveDirectoryDomain"];
             }
         }
@@ -18,7 +21,13 @@ namespace Umbraco.Core.Security
             bool isValid;
             using (var pc = new PrincipalContext(ContextType.Domain, ActiveDirectoryDomain))
             {
-                isValid = pc.ValidateCredentials(user.UserName, password);
+                isValid = pc.ValidateCredentials(user.UserName, password);                
+            }
+
+            if (isValid && user.HasIdentity == false)
+            {
+                //TODO: the user will need to be created locally (i.e. auto-linked)
+                throw new NotImplementedException("The user " + user.UserName + " does not exist locally and currently the " + typeof(ActiveDirectoryBackOfficeUserPasswordChecker) + " doesn't support auto-linking, see http://issues.umbraco.org/issue/U4-10181");
             }
 
             var result = isValid

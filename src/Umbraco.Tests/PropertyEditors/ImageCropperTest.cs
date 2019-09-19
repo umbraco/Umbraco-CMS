@@ -21,7 +21,7 @@ namespace Umbraco.Tests.PropertyEditors
     [TestFixture]
     public class ImageCropperTest
     {
-        private const string cropperJson1 = "{\"focalPoint\": {\"left\": 0.96,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";        
+        private const string cropperJson1 = "{\"focalPoint\": {\"left\": 0.96,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
         private const string cropperJson2 = "{\"focalPoint\": {\"left\": 0.98,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0672.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
         private const string cropperJson3 = "{\"focalPoint\": {\"left\": 0.98,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0672.jpg\",\"crops\": []}";
         private const string mediaPath = "/media/1005/img_0671.jpg";
@@ -29,7 +29,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void ImageCropData_Properties_As_Dynamic()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             dynamic d = sourceObj;
 
             var index = 0;
@@ -56,13 +56,13 @@ namespace Umbraco.Tests.PropertyEditors
                 index++;
             }
 
-            Assert.AreEqual(index, 1);            
+            Assert.AreEqual(index, 1);
         }
 
         [Test]
         public void ImageCropFocalPoint_Properties_As_Dynamic()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             dynamic d = sourceObj;
 
             Assert.AreEqual(sourceObj.FocalPoint.Left, d.FocalPoint.Left);
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void ImageCropDataSet_Properties_As_Dynamic()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             dynamic d = sourceObj;
 
             Assert.AreEqual(sourceObj.Src, d.Src);
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void ImageCropDataSet_Methods_As_Dynamic()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             dynamic d = sourceObj;
 
             Assert.AreEqual(sourceObj.HasCrop("thumb"), d.HasCrop("thumb"));
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertImageCropperDataSetSrcToString()
         {
             //cropperJson3 - has not crops
-            var sourceObj = cropperJson3.SerializeToCropDataSet();
+            var sourceObj = cropperJson3.DeserializeToCropDataSet();
             var destObj = sourceObj.TryConvertTo<string>();
             Assert.IsTrue(destObj.Success);
             Assert.AreEqual(destObj.Result, "/media/1005/img_0672.jpg");
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertImageCropperDataSetJObject()
         {
             //cropperJson3 - has not crops
-            var sourceObj = cropperJson3.SerializeToCropDataSet();
+            var sourceObj = cropperJson3.DeserializeToCropDataSet();
             var destObj = sourceObj.TryConvertTo<JObject>();
             Assert.IsTrue(destObj.Success);
             Assert.AreEqual(sourceObj, destObj.Result.ToObject<ImageCropDataSet>());
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void CanConvertImageCropperDataSetJsonToString()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             var destObj = sourceObj.TryConvertTo<string>();
             Assert.IsTrue(destObj.Success);
             Assert.IsTrue(destObj.Result.DetectIsJson());
@@ -136,7 +136,7 @@ namespace Umbraco.Tests.PropertyEditors
         }
 
         [TestCase(cropperJson1, cropperJson1, true)]
-        [TestCase(cropperJson1, cropperJson2, false)]        
+        [TestCase(cropperJson1, cropperJson2, false)]
         public void CanConvertImageCropperPropertyEditor(string val1, string val2, bool expected)
         {
             try
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.PropertyEditors
                 var converter = new Umbraco.Web.PropertyEditors.ValueConverters.ImageCropperValueConverter(dataTypeService.Object);
                 var result = converter.ConvertDataToSource(new PublishedPropertyType("test", 0, "test"), val1, false); // does not use type for conversion
 
-                var resultShouldMatch = val2.SerializeToCropDataSet();
+                var resultShouldMatch = val2.DeserializeToCropDataSet();
                 if (expected)
                 {
                     Assert.AreEqual(resultShouldMatch, result);
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetBaseCropUrlFromModelTest()
         {
-            var cropDataSet = cropperJson1.SerializeToCropDataSet();
+            var cropDataSet = cropperJson1.DeserializeToCropDataSet();
             var urlString = cropDataSet.GetCropUrl("thumb");
             Assert.AreEqual("?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
         }
@@ -266,7 +266,7 @@ namespace Umbraco.Tests.PropertyEditors
             var urlStringPad = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Pad);
             var urlStringMax = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Max);
             var urlStringStretch = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Stretch);
-            
+
             Assert.AreEqual(mediaPath + "?mode=min&width=300&height=150", urlStringMin);
             Assert.AreEqual(mediaPath + "?mode=boxpad&width=300&height=150", urlStringBoxPad);
             Assert.AreEqual(mediaPath + "?mode=pad&width=300&height=150", urlStringPad);
@@ -366,6 +366,18 @@ namespace Umbraco.Tests.PropertyEditors
 
             var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, height: 200);
             Assert.AreEqual(mediaPath + "?anchor=center&mode=crop&height=200", urlString);
+        }
+
+        /// <summary>
+        /// Test to check result when using a background color with padding
+        /// </summary>
+        [Test]
+        public void GetCropUrl_BackgroundColorParameter()
+        {
+            var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"" + mediaPath + "\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
+
+            var urlString = mediaPath.GetCropUrl(400, 400, cropperJson, imageCropMode: ImageCropMode.Pad, furtherOptions: "&bgcolor=fff");
+            Assert.AreEqual(mediaPath + "?mode=pad&width=400&height=400&bgcolor=fff", urlString);
         }
     }
 }

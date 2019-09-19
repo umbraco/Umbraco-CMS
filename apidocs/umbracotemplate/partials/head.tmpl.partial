@@ -8,7 +8,7 @@
   <meta name="title" content="{{#title}}{{title}}{{/title}}{{^title}}{{>partials/title}}{{/title}} {{#_appTitle}}| {{_appTitle}} {{/_appTitle}}">
   <meta name="generator" content="docfx {{_docfxVersion}}">
   {{#_description}}<meta name="description" content="{{_description}}">{{/_description}}
-  <link rel="icon" type="image/png" href="https://our.umbraco.org/assets/images/app-icons/favicon.png">
+  <link rel="icon" type="image/png" href="https://our.umbraco.com/assets/images/app-icons/favicon.png">
   <link rel="stylesheet" href="{{_rel}}styles/docfx.vendor.css">
   <link rel="stylesheet" href="{{_rel}}styles/docfx.css">
   <link rel="stylesheet" href="{{_rel}}styles/main.css">

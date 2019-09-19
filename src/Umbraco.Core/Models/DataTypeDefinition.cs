@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     /// Definition of a DataType/PropertyEditor
     /// </summary>
     /// <remarks>
-    /// The definition exists as a database reference between an actual DataType/PropertyEditor 
+    /// The definition exists as a database reference between an actual DataType/PropertyEditor
     /// (identified by its control id), its prevalues (configuration) and the named DataType in the backoffice UI.
     /// </remarks>
     [Serializable]
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Models
                 _additionalData["Trashed"] = value;
             }
         }
-               
+
         [DataMember]
         public string PropertyEditorAlias
         {
@@ -198,9 +198,9 @@ namespace Umbraco.Core.Models
         public DataTypeDatabaseType DatabaseType
         {
             get { return _databaseType; }
-            set 
+            set
             {
-                SetPropertyValueAndDetectChanges(value, ref _databaseType, Ps.Value.DatabaseTypeSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _databaseType, Ps.Value.DatabaseTypeSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 _additionalData["DatabaseType"] = value;
             }

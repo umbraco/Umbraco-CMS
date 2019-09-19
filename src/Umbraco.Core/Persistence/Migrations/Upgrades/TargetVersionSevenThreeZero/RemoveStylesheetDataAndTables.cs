@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
-    [Migration("7.3.0", 3, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 3, Constants.System.UmbracoMigrationName)]
     public class RemoveStylesheetDataAndTables : MigrationBase
     {
         public RemoveStylesheetDataAndTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)

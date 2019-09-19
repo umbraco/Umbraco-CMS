@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
 
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -94,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_With_Property()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -124,7 +125,7 @@ p{font-size:2em;}"));
         public void Throws_When_Adding_Duplicate_Properties()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
 
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -144,7 +145,7 @@ p{font-size:2em;}"));
         public void Can_Perform_Delete()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -165,7 +166,7 @@ p{font-size:2em;}"));
         public void Can_Perform_Get()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -184,7 +185,7 @@ p{font-size:2em;}"));
         public void Can_Perform_GetAll()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -207,7 +208,7 @@ p{font-size:2em;}"));
         public void Can_Perform_GetAll_With_Params()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -230,7 +231,7 @@ p{font-size:2em;}"));
         public void Can_Perform_Exists()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -247,7 +248,7 @@ p{font-size:2em;}"));
         {
             // unless noted otherwise, no changes / 7.2.8
 
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 

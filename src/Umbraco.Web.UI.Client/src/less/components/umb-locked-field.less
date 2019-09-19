@@ -1,6 +1,6 @@
 .umb-locked-field {
   font-size: 13px;
-  color: #ccc;
+  color: @gray-7;
   position: relative;
   display: block;
 }
@@ -21,13 +21,12 @@
 }
 
 .umb-locked-field__lock-icon {
-  color: #ccc;
+  color: @gray-7;
   transition: color 0.25s;
-  //vertical-align: top;
 }
 
 .umb-locked-field__lock-icon.-unlocked {
-   color: #515151;
+   color: @gray-3;
 }
 
 input.umb-locked-field__input {
@@ -35,9 +34,10 @@ input.umb-locked-field__input {
   border-color: transparent !important;
   font-size: 13px;
   margin-bottom: 0;
-  color: #ccc;
+  color: @gray-6;
   transition: color 0.25s;
   padding: 0;
+  height: auto;
 }
 
 input.umb-locked-field__input:focus {
@@ -45,5 +45,5 @@ input.umb-locked-field__input:focus {
 }
 
 input.umb-locked-field__input.-unlocked {
-   color: #515151;
+   color: @gray-3;
 }

@@ -27,5 +27,9 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("viewOnProfile")]
         [Constraint(Default = "0")]
         public bool ViewOnProfile { get; set; }
+
+        [Column("isSensitive")]
+        [Constraint(Default = "0")]
+        public bool IsSensitive { get; set; }
     }
 }

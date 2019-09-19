@@ -1,23 +1,6 @@
-using System;
-using System.IO;
-using System.Web.Routing;
-using System.Xml;
 using NUnit.Framework;
-using SQLCE4Umbraco;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.cache;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -32,7 +15,7 @@ namespace Umbraco.Tests.TestHelpers
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
-            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] {});
+            var type = new AutoPublishedContentType(0, "anything", "anything", "anything", new PublishedPropertyType[] {});
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
         }
         
@@ -69,6 +52,8 @@ namespace Umbraco.Tests.TestHelpers
 			</Home>
 			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
 			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
+            <CustomDocument id=""1179"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 3 with accént character"" urlName=""custom-sub-3-with-accént-character"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1179"" isDoc="""" />
+            <CustomDocument id=""1180"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 4 with æøå"" urlName=""custom-sub-4-with-æøå"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1180"" isDoc="""" />
 		</Home>
 		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
 		</Home>

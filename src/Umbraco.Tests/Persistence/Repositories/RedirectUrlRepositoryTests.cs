@@ -190,7 +190,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private IRedirectUrlRepository CreateRepository(IDatabaseUnitOfWork uow)
+        private IRedirectUrlRepository CreateRepository(IScopeUnitOfWork uow)
         {
             return new RedirectUrlRepository(uow, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax);
         }

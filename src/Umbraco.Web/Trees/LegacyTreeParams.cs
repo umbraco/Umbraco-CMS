@@ -15,13 +15,16 @@ namespace Umbraco.Web.Trees
 
         public LegacyTreeParams(IEnumerable<KeyValuePair<string, string>> formCollection)
         {
-            var p = TreeRequestParams.FromDictionary(formCollection.ToDictionary(x => x.Key, x => x.Value));
-            NodeKey = p.NodeKey;
-            StartNodeID = p.StartNodeID;
-            ShowContextMenu = p.ShowContextMenu;
-            IsDialog = p.IsDialog;
-            DialogMode = p.DialogMode;
-            FunctionToCall = p.FunctionToCall;
+            if (formCollection != null)
+            {
+                var p = TreeRequestParams.FromDictionary(formCollection.ToDictionary(x => x.Key, x => x.Value));
+                NodeKey = p.NodeKey;
+                StartNodeID = p.StartNodeID;
+                ShowContextMenu = p.ShowContextMenu;
+                IsDialog = p.IsDialog;
+                DialogMode = p.DialogMode;
+                FunctionToCall = p.FunctionToCall;
+            }
         }
 
         public string NodeKey { get; set; }

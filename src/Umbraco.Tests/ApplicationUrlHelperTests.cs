@@ -129,7 +129,7 @@ namespace Umbraco.Tests
         public void SetApplicationUrlFromDcSettingsSsl2()
         {
             // set from distributed call settings
-            // other servers are slave servers
+            // other servers are replica servers
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
                 section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled == true && callSection.Servers == new IServer[]
@@ -224,7 +224,7 @@ namespace Umbraco.Tests
         [Test]
         public void ServerRoleUnknown2()
         {
-            // distributed call enabled, cannot find server, assume it's an undeclared slave
+            // distributed call enabled, cannot find server, assume it's an undeclared replica
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
                 section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Enabled == true && callSection.Servers == new IServer[]

@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked upon viewing audittrailing on a document
-	/// </summary>
-	public class ActionAudit : IAction
+    /// <summary>
+    /// This action is invoked upon viewing audittrailing on a document
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
+    public class ActionAudit : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618
@@ -84,6 +87,7 @@ namespace umbraco.BusinessLogic.Actions
 			}
 		}
 
-		#endregion
-	}
+        #endregion
+        
+    }
 }

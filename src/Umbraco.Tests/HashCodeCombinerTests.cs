@@ -6,7 +6,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Tests
 {
-	[TestFixture]
+    [TestFixture]
 	public class HashCodeCombinerTests 
 	{
 

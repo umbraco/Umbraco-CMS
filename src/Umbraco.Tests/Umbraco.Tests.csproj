@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Umbraco.Tests</RootNamespace>
     <AssemblyName>Umbraco.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -30,6 +30,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <NugetPackages Condition="$(NugetPackages) == '' Or $(NugetPackages) == '*Undefined*'">$(SolutionDir)\packages</NugetPackages>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,20 +59,50 @@
     <Reference Include="AutoMapper.Net4, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.82.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.82\lib\net45\Examine.dll</HintPath>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.4.0.0\lib\net45\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Examine, Version=0.1.89.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.89\lib\net45\Examine.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.8.8.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.8.8\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Examine, Version=0.1.90.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.90\lib\net45\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net-mediumtrust.2.0.0\lib\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Log4Net.Async, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Log4Net.Async.2.0.4\lib\net40\Log4Net.Async.dll</HintPath>
     </Reference>
     <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.2\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.HttpListener, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.HttpListener.4.0.1\lib\net45\Microsoft.Owin.Host.HttpListener.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Hosting, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Hosting.4.0.1\lib\net45\Microsoft.Owin.Hosting.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Testing, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Testing.4.0.1\lib\net45\Microsoft.Owin.Testing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -81,9 +113,8 @@
     <Reference Include="Moq, Version=4.1.1309.919, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.1.1309.0919\lib\net40\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
@@ -92,9 +123,10 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="Semver, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\semver.1.1.2\lib\net45\Semver.dll</HintPath>
+      <HintPath>..\packages\semver.1.1.2\lib\net451\Semver.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -107,8 +139,8 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Caching" />
@@ -116,33 +148,38 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    <Reference Include="System.Web.Http, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.7\lib\net45\System.Web.Http.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Http.SelfHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.SelfHost.4.0.30506.0\lib\net40\System.Web.Http.SelfHost.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Web.Http.Owin, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Owin.5.2.7\lib\net45\System.Web.Http.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    <Reference Include="System.Web.Http.SelfHost, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.SelfHost.5.2.7\lib\net45\System.Web.Http.SelfHost.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    <Reference Include="System.Web.Http.Tracing, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Tracing.5.2.7\lib\net45\System.Web.Http.Tracing.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.7\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -154,18 +191,58 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateTimeExtensionsTests.cs" />
+    <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
+    <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
+    <Compile Include="Packaging\PackageExtractionTests.cs" />
+    <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\Home.cs" />
+    <Compile Include="Services\AuditServiceTests.cs" />
+    <Compile Include="Services\ConsentServiceTests.cs" />
+    <Compile Include="Services\MemberGroupServiceTests.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingMiddleware.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TestControllerActivator.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TestControllerActivatorBase.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TestRunner.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TestStartup.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
+    <Compile Include="Web\Controllers\UserEditorAuthorizationHelperTests.cs" />
+    <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
+    <Compile Include="CallContextTests.cs" />
+    <Compile Include="HashGeneratorTests.cs" />
     <Compile Include="Issues\U9560.cs" />
+    <Compile Include="Collections\OrderedHashSetTests.cs" />
+    <Compile Include="IO\ShadowFileSystemTests.cs" />
+    <Compile Include="TestHelpers\ConsoleLogger.cs" />
+    <Compile Include="Migrations\CreateTableMigrationTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
+    <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\PetaPocoExpressionsTests.cs" />
+    <Compile Include="Persistence\Repositories\LockedRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
+    <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
+    <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
+    <Compile Include="Services\SectionServiceTests.cs" />
+    <Compile Include="Scoping\EventNameExtractorTests.cs" />
+    <Compile Include="Scoping\LeakTests.cs" />
+    <Compile Include="Scoping\ScopedRepositoryTests.cs" />
+    <Compile Include="Scoping\PassThroughEventDispatcherTests.cs" />
+    <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
+    <Compile Include="Scoping\ScopedXmlTests.cs" />
+    <Compile Include="Scoping\ScopeFileSystemsTests.cs" />
+    <Compile Include="Scoping\ScopeTests.cs" />
+    <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
-    <Compile Include="TryConvertToTests.cs" />
+    <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
+    <Compile Include="UdiTests.cs" />
     <Compile Include="UmbracoExamine\RandomIdRAMDirectory.cs" />
     <Compile Include="UmbracoExamine\UmbracoContentIndexerTests.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
@@ -183,9 +260,9 @@
     <Compile Include="Collections\DeepCloneableListTests.cs" />
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="DelegateExtensionsTests.cs" />
-    <Compile Include="Logging\AsyncRollingFileAppenderTest.cs" />
-    <Compile Include="Logging\DebugAppender.cs" />
-    <Compile Include="Logging\ParallelForwarderTest.cs" />
+    <Compile Include="Web\HealthChecks\HealthCheckResultsTests.cs" />
+    <Compile Include="Web\HttpCookieExtensionsTests.cs" />
+    <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
@@ -236,7 +313,6 @@
     <Compile Include="Models\TemplateTests.cs" />
     <Compile Include="Models\UmbracoEntityTests.cs" />
     <Compile Include="Models\UserTests.cs" />
-    <Compile Include="Models\UserTypeTests.cs" />
     <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
@@ -291,12 +367,8 @@
     <Compile Include="Configurations\UmbracoSettings\DeveloperElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\HelpElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\HelpElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementDefaultTests.cs" />
@@ -314,19 +386,19 @@
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
-    <Compile Include="Web\Controllers\WebApiEditors\ContentControllerUnitTests.cs" />
-    <Compile Include="Web\Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />
-    <Compile Include="Web\Controllers\WebApiEditors\MediaControllerUnitTests.cs" />
+    <Compile Include="Web\Controllers\ContentControllerUnitTests.cs" />
+    <Compile Include="Web\Controllers\FilterAllowedOutgoingContentAttributeTests.cs" />
+    <Compile Include="Web\Controllers\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="DynamicsAndReflection\QueryableExtensionTests.cs" />
     <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
     <Compile Include="DynamicsAndReflection\ReflectionTests.cs" />
-    <Compile Include="Integration\CreateContent.cs" />
     <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Migrations\Upgrades\ValidateV7UpgradeTest.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
+    <Compile Include="Web\Mvc\ValidateUmbracoFormRouteStringAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
@@ -337,7 +409,6 @@
     <Compile Include="Persistence\Repositories\NotificationsRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
     <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
     <Compile Include="Persistence\SyntaxProvider\MySqlSyntaxProviderTests.cs" />
     <Compile Include="PropertyEditors\ImageCropperTest.cs" />
@@ -374,8 +445,6 @@
     <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="Templates\TemplateRepositoryTests.cs" />
     <Compile Include="Templates\ViewHelperTests.cs" />
-    <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
-    <Compile Include="Integration\InstallPackage.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Strings\CmsHelperCasingTests.cs" />
@@ -463,12 +532,10 @@
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
-    <Compile Include="Logging\RingBufferTest.cs" />
     <Compile Include="TestHelpers\BaseUmbracoConfigurationTest.cs" />
     <Compile Include="TestHelpers\DatabaseTestBehaviorAttribute.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
-    <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
     <Compile Include="TestHelpers\MockHelper.cs" />
     <Compile Include="TestHelpers\RequiresAutoMapperMappingsAttribute.cs" />
     <Compile Include="TestHelpers\TestProfiler.cs" />
@@ -573,6 +640,7 @@
     <Compile Include="Plugins\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="VersionExtensionTests.cs" />
+    <Compile Include="Web\TemplateUtilitiesTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="XmlExtensionsTests.cs" />
     <Compile Include="XmlHelperTests.cs" />
@@ -746,12 +814,10 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /I /C /D
-xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
+    <PreBuildEvent>xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\amd64\*.*" "$(TargetDir)amd64\" /Y /F /E /I /C /D
+xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\x86\*.*" "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

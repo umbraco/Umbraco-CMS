@@ -1,12 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Services
 {
     public interface IEntityService
     {
+        /// <summary>
+        /// Returns true if the entity exists
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        bool Exists(Guid key);
+
+        /// <summary>
+        /// Returns true if the entity exists
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        bool Exists(int id);
+
         /// <summary>
         /// Returns the integer id for a given GUID
         /// </summary>
@@ -14,6 +30,13 @@ namespace Umbraco.Core.Services
         /// <param name="umbracoObjectType"></param>
         /// <returns></returns>
         Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Returns the integer id for a given Udi
+        /// </summary>
+        /// <param name="udi"></param>
+        /// <returns></returns>
+        Attempt<int> GetIdForUdi(Udi udi);
 
         /// <summary>
         /// Returns the GUID for a given integer id
@@ -30,8 +53,11 @@ namespace Umbraco.Core.Services
         /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
         /// </returns>
         /// <param name="key">Unique Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity GetByKey(Guid key);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true);
 
         /// <summary>
@@ -41,8 +67,11 @@ namespace Umbraco.Core.Services
         /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
         /// </returns>
         /// <param name="id">Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity Get(int id);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         IUmbracoEntity Get(int id, bool loadBaseType = true);
 
         /// <summary>
@@ -53,9 +82,16 @@ namespace Umbraco.Core.Services
         /// </returns>
         /// <param name="key">Unique Id of the object to retrieve</param>
         /// <param name="umbracoObjectType">UmbracoObjectType of the entity to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUmbracoEntity GetByKey<T>(Guid key, bool loadBaseType = true) where T : IUmbracoEntity;
 
         /// <summary>
         /// Gets an UmbracoEntity by its Id and UmbracoObjectType, and optionally loads the complete object graph.
@@ -65,8 +101,11 @@ namespace Umbraco.Core.Services
         /// </returns>
         /// <param name="id">Id of the object to retrieve</param>
         /// <param name="umbracoObjectType">UmbracoObjectType of the entity to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity Get(int id, UmbracoObjectTypes umbracoObjectType);
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         IUmbracoEntity Get(int id, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true);
 
         /// <summary>
@@ -76,21 +115,12 @@ namespace Umbraco.Core.Services
         /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
         /// </returns>
         /// <typeparam name="T">Type of the model to retrieve. Must be based on an <see cref="IUmbracoEntity"/></typeparam>
-        /// <param name="key">Unique Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
-        /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        IUmbracoEntity GetByKey<T>(Guid key, bool loadBaseType = true) where T : IUmbracoEntity;
-
-        /// <summary>
-        /// Gets an UmbracoEntity by its Id and specified Type. Optionally loads the complete object graph.
-        /// </summary>
-        /// <returns>
-        /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
-        /// </returns>
-        /// <typeparam name="T">Type of the model to retrieve. Must be based on an <see cref="IUmbracoEntity"/></typeparam>
         /// <param name="id">Id of the object to retrieve</param>
-        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity Get<T>(int id) where T : IUmbracoEntity;
+
+        [Obsolete("Use the overload that doesn't specify loadBaseType instead, loadBaseType will not affect any results")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         IUmbracoEntity Get<T>(int id, bool loadBaseType = true) where T : IUmbracoEntity;
 
         /// <summary>
@@ -122,6 +152,57 @@ namespace Umbraco.Core.Services
         /// <param name="umbracoObjectType">UmbracoObjectType of the children to retrieve</param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         IEnumerable<IUmbracoEntity> GetChildren(int parentId, UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Returns a paged collection of children
+        /// </summary>
+        /// <param name="parentId">The parent id to return children for</param>
+        /// <param name="umbracoObjectType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedChildren(int parentId, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
+        /// Returns a paged collection of descendants
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="umbracoObjectType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedDescendants(int id, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
+        /// Returns a paged collection of descendants
+        /// </summary>
+        IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
+        /// Returns a paged collection of descendants from the root
+        /// </summary>
+        /// <param name="umbracoObjectType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <param name="includeTrashed">true/false to include trashed objects</param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedDescendantsFromRoot(UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "", bool includeTrashed = true);
 
         /// <summary>
         /// Gets a collection of descendents by the parents Id
@@ -177,6 +258,16 @@ namespace Umbraco.Core.Services
         IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids);
 
         /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids);
+
+        /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys);
+
+        /// <summary>
         /// Gets the UmbracoObjectType from the integer id of an IUmbracoEntity.
         /// </summary>
         /// <param name="id">Id of the entity</param>
@@ -203,5 +294,13 @@ namespace Umbraco.Core.Services
         /// <param name="umbracoObjectType"><see cref="UmbracoObjectTypes"/></param>
         /// <returns>Type of the entity</returns>
         Type GetEntityType(UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Reserves an identifier for a key.
+        /// </summary>
+        /// <param name="key">They key.</param>
+        /// <returns>The identifier.</returns>
+        /// <remarks>When a new content or a media is saved with the key, it will have the reserved identifier.</remarks>
+        int ReserveId(Guid key);
     }
 }

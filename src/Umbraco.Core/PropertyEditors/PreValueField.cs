@@ -15,6 +15,7 @@ namespace Umbraco.Core.PropertyEditors
         public PreValueField()
         {
             Validators = new List<IPropertyValidator>();
+            Config = new Dictionary<string, object>();
 
             //check for an attribute and fill the values
             var att = GetType().GetCustomAttribute<PreValueFieldAttribute>(false);
@@ -79,5 +80,11 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         [JsonProperty("validation", ItemConverterType = typeof(ManifestValidatorConverter))]
         public List<IPropertyValidator> Validators { get; private set; }
+
+        /// <summary>
+        /// This allows for custom configuration to be injected into the pre-value editor
+        /// </summary>        
+        [JsonProperty("config")]
+        public IDictionary<string, object> Config { get; set; }
     }
 }

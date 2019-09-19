@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Web;
 using System.Xml;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
-using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.UI
 {
@@ -125,6 +121,12 @@ namespace Umbraco.Web.UI
         internal static bool UserHasCreateAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+            if (task == null)
+            {
+                //if no task was found it will use the default task and we cannot validate the application assigned so return true
+                return true;
+            }
+
             var dialogTask = task as LegacyDialogTask;
             if (dialogTask != null)
             {
@@ -149,6 +151,12 @@ namespace Umbraco.Web.UI
         internal static bool UserHasDeleteAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
+            if (task == null)
+            {
+                //if no task was found it will use the default task and we cannot validate the application assigned so return true
+                return true;
+            }
+
             var dialogTask = task as LegacyDialogTask;
             if (dialogTask != null)
             {
@@ -160,7 +168,10 @@ namespace Umbraco.Web.UI
         public static void Delete(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
-            
+            if (typeInstance == null)
+                throw new InvalidOperationException(
+                    string.Format("Could not task for operation {0} for node type {1}", Operation.Delete, nodeType));
+
             typeInstance.ParentID = nodeId;
             typeInstance.Alias = text;
 
@@ -170,7 +181,10 @@ namespace Umbraco.Web.UI
         public static string Create(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text, int typeId = 0)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
-            
+            if (typeInstance == null)
+                throw new InvalidOperationException(
+                    string.Format("Could not task for operation {0} for node type {1}", Operation.Create, nodeType));
+
             typeInstance.TypeID = typeId;
             typeInstance.ParentID = nodeId;
             typeInstance.Alias = text;
@@ -187,10 +201,13 @@ namespace Umbraco.Web.UI
         internal static string Create(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text, IDictionary<string, object> additionalValues, int typeId = 0)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+            if (typeInstance == null)
+                throw new InvalidOperationException(
+                    string.Format("Could not task for operation {0} for node type {1}", Operation.Create, nodeType));
 
             typeInstance.TypeID = typeId;
             typeInstance.ParentID = nodeId;
-            typeInstance.Alias = text;
+            typeInstance.Alias = text.CleanForXss();
 
             // check for returning url
             ITaskReturnUrl returnUrlTask = typeInstance as LegacyDialogTask;

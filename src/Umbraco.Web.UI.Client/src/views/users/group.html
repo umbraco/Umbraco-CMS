@@ -1,0 +1,253 @@
+<div ng-controller="Umbraco.Editors.Users.GroupController as vm" class="clearfix">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <form name="editUserForm" novalidate val-form-manager>
+
+        <umb-editor-view ng-if="!vm.loading">
+
+            <umb-editor-header
+                name="vm.userGroup.name"
+                alias="vm.userGroup.alias"
+                icon="vm.userGroup.icon"
+                hide-description="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <div class="umb-packages-view-wrapper" style="padding: 0;">
+
+                    <div class="umb-package-details">
+
+                        <div class="umb-package-details__main-content">
+
+                            <umb-box>
+
+                                <umb-box-header title-key="user_assignAccess"></umb-box-header>
+
+                                <umb-box-content class="block-form">
+
+                                    <umb-control-group style="margin-bottom: 20px;" label="@main_sections" description="@user_sectionsHelp">
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="section in vm.userGroup.sections"
+                                            icon="section.icon"
+                                            name="section.name"
+                                            allow-remove="true"
+                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.sections)">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openSectionPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+                                    </umb-control-group>
+
+                                    <umb-control-group style="margin-bottom: 20px;" label="@user_startnode" description="@user_startnodehelp">
+                                        <umb-node-preview
+                                            ng-if="vm.userGroup.contentStartNode.id"
+                                            style="max-width: 100%;"
+                                            icon="vm.userGroup.contentStartNode.icon"
+                                            name="vm.userGroup.contentStartNode.name"
+                                            allow-edit="true"
+                                            allow-remove="true"
+                                            on-edit="vm.openContentPicker()"
+                                            on-remove="vm.clearStartNode('content')">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            ng-if="!vm.userGroup.contentStartNode"
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openContentPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+
+                                    </umb-control-group>
+
+                                    <umb-control-group label="@user_mediastartnode" description="@user_mediastartnodehelp">
+                                        
+                                        <umb-node-preview
+                                            ng-if="vm.userGroup.mediaStartNode.id"
+                                            style="max-width: 100%;"
+                                            icon="vm.userGroup.mediaStartNode.icon"
+                                            name="vm.userGroup.mediaStartNode.name"
+                                            allow-edit="true"
+                                            allow-remove="true"
+                                            on-edit="vm.openMediaPicker()"
+                                            on-remove="vm.clearStartNode('media')">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            ng-if="!vm.userGroup.mediaStartNode"
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openMediaPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+
+                                    </umb-control-group>
+
+                                </umb-box-content>
+                            </umb-box>
+
+                            <umb-box>
+                                <umb-box-header title-key="user_permissionsDefault"></umb-box-header>
+                                <umb-box-content class="block-form">
+                                    <umb-control-group
+                                        ng-repeat="(category, permissions) in vm.userGroup.defaultPermissions"
+                                        label="{{ category }}">
+                                        <umb-permission
+                                            ng-repeat="permission in permissions"
+                                            name="permission.name"
+                                            description="permission.description"
+                                            selected="permission.checked">
+                                        </umb-permission>
+                                    </umb-control-group>
+                                </umb-box-content>
+                            </umb-box>
+
+                            <umb-box>
+                                <umb-box-header title-key="user_permissionsGranular"></umb-box-header>
+                                <umb-box-content class="block-form">
+                                    <umb-control-group label="Nodes" description="@user_permissionsGranularHelp">
+                                        
+                                        <umb-node-preview
+                                            ng-repeat="node in vm.userGroup.assignedPermissions"
+                                            style="max-width: 100%;"
+                                            icon="node.icon"
+                                            name="node.name"
+                                            permissions="node.allowedPermissions"
+                                            allow-remove="true"
+                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.assignedPermissions)"
+                                            allow-edit="true"
+                                            on-edit="vm.setPermissionsForNode(node)">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openGranularPermissionsPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+                                    </umb-control-group>
+                                    
+                                </umb-box-content>
+                            </umb-box>
+
+                        </div>
+
+                        <div class="umb-package-details__sidebar">
+
+                            <div class="umb-package-details__section">
+
+                                <div class="umb-package-details__section-title"><localize key="sections_users">Users</localize></div>
+
+                                <umb-user-preview
+                                    ng-repeat="user in vm.userGroup.users"
+                                    name="user.name"
+                                    avatars="user.avatars"
+                                    allow-remove="true"
+                                    on-remove="vm.removeSelectedItem($index, vm.userGroup.users)">
+                                </umb-user-preview>
+
+                                <a href=""
+                                    style="max-width: 100%;"
+                                    class="umb-node-preview-add"
+                                    ng-click="vm.openUserPicker()"
+                                    prevent-default>
+                                    <localize key="general_add">Add</localize>
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+
+                    <umb-breadcrumbs
+                        ancestors="vm.breadcrumbs"
+                        allow-on-open="true"
+                        on-open="vm.goToPage(ancestor)">
+                    </umb-breadcrumbs>
+
+                </umb-editor-footer-content-left>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        type="button"
+                        action="vm.goToPage(vm.breadcrumbs[0])"
+                        label="Return to list"
+                        label-key="buttons_returnToList">
+                    </umb-button>
+
+                    <umb-button
+                        type="button"
+                        action="vm.save()"
+                        state="vm.page.saveButtonState"
+                        button-style="success"
+                        shortcut="ctrl+s"
+                        label="Save"
+                        label-key="buttons_save">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+    <umb-overlay
+        ng-if="vm.sectionPicker.show"
+        model="vm.sectionPicker"
+        view="vm.sectionPicker.view"
+        position="right">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.contentPicker.show"
+        model="vm.contentPicker"
+        view="vm.contentPicker.view"
+        position="right">
+    </umb-overlay>
+    
+    <umb-overlay
+        ng-if="vm.mediaPicker.show"
+        model="vm.mediaPicker"
+        view="vm.mediaPicker.view"
+        position="right">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.userPicker.show"
+        model="vm.userPicker"
+        view="vm.userPicker.view"
+        position="right">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.nodePermissions.show"
+        model="vm.nodePermissions"
+        view="vm.nodePermissions.view"
+        position="right">
+    </umb-overlay>
+
+</div>

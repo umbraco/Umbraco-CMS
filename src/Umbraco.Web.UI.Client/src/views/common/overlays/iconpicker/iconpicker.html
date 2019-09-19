@@ -10,38 +10,23 @@
                    localize="placeholder"
                    placeholder="@placeholders_filter"
                    umb-auto-focus
-                   no-dirty-check>
+                   no-dirty-check />
         </div>
     </div>
 
     <div class="umb-control-group">
-        <select ng-model="color" class="input-block-level">
-            <option value="">
-                <localize key="color_black">Black</localize>
-            </option>
-            <option value="color-green">
-                <localize key="color_green">Green</localize>
-            </option>
-            <option value="color-yellow">
-                <localize key="color_yellow">Yellow</localize>
-            </option>
-            <option value="color-orange">
-                <localize key="color_orange">Orange</localize>
-            </option>
-            <option value="color-blue">
-                <localize key="color_blue">Blue</localize>
-            </option>
-            <option value="color-red">
-                <localize key="color_red">Red</localize>
-            </option>
-        </select>
+        <umb-color-swatches colors="colors"
+                            selected-color="color"
+                            size="s"
+                            use-color-class="true">
+        </umb-color-swatches>
     </div>
 
     <umb-load-indicator ng-if="loading"></umb-load-indicator>
 
     <div class="umb-control-group" ng-show="!loading && filtered.length > 0 ">
         <ul class="umb-iconpicker" ng-class="color" ng-show="icons">
-            <li class="umb-iconpicker-item" ng-repeat="icon in filtered = (icons | filter: searchTerm) track by $id(icon)">
+            <li class="umb-iconpicker-item" ng-class="{'-selected': icon == model.icon}" ng-repeat="icon in filtered = (icons | filter: searchTerm) track by $id(icon)">
                 <a href="#" title="{{icon}}" ng-click="selectIcon(icon, color)" prevent-default>
                     <i class="{{icon}} large"></i>
                 </a>

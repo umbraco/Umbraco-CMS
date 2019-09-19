@@ -13,6 +13,10 @@ table {
   border-spacing: 0;
 }
 
+table thead {
+  background-color: @gray-10;
+}
+
 
 // BASELINE STYLES
 // ---------------
@@ -20,13 +24,13 @@ table {
 .table {
   width: 100%;
   margin-bottom: @baseLineHeight;
+  border: 1px solid @gray-8;
   // Cells
   th,
   td {
-    padding: 8px;
+    padding: 10px 8px;
     line-height: @baseLineHeight;
     text-align: left;
-    vertical-align: top;
     border-top: 1px solid @tableBorder;
   }
   th {

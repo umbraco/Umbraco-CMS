@@ -8,14 +8,12 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Xml;
-using Newtonsoft.Json;
-using Umbraco.Core.Configuration;
 using System.Web.Security;
-using Umbraco.Core.Strings;
+using Newtonsoft.Json;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core
 {
@@ -39,6 +37,22 @@ namespace Umbraco.Core
             ToCSharpEscapeChars = new char[escapes.Max(e => e[0]) + 1];
             foreach (var escape in escapes)
                 ToCSharpEscapeChars[escape[0]] = escape[1];
+        }
+
+        /// <summary>
+        /// Convert a path to node ids in the order from right to left (deepest to shallowest)
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        internal static int[] GetIdsFromPathReversed(this string path)
+        {
+            var nodeIds = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.TryConvertTo<int>())
+                .Where(x => x.Success)
+                .Select(x => x.Result)
+                .Reverse()
+                .ToArray();
+            return nodeIds;
         }
 
         /// <summary>
@@ -105,8 +119,8 @@ namespace Umbraco.Core
                     //if the resolution was success, return it, otherwise just return the path, we've detected
                     // it's a path but maybe it's relative and resolution has failed, etc... in which case we're just
                     // returning what was given to us.
-                    return resolvedUrlResult.Success 
-                        ? resolvedUrlResult 
+                    return resolvedUrlResult.Success
+                        ? resolvedUrlResult
                         : Attempt.Succeed(input);
                 }
             }
@@ -120,7 +134,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        internal static bool DetectIsJson(this string input)
+        public static bool DetectIsJson(this string input)
         {
             input = input.Trim();
             return (input.StartsWith("{") && input.EndsWith("}"))
@@ -128,7 +142,7 @@ namespace Umbraco.Core
         }
 
         internal static readonly Regex Whitespace = new Regex(@"\s+", RegexOptions.Compiled);
-        internal static readonly string[] JsonEmpties = new [] { "[]", "{}" };
+        internal static readonly string[] JsonEmpties = new[] { "[]", "{}" };
         internal static bool DetectIsEmptyJson(this string input)
         {
             return JsonEmpties.Contains(Whitespace.Replace(input, string.Empty));
@@ -150,7 +164,7 @@ namespace Umbraco.Core
                 var obj = JsonConvert.DeserializeObject(input);
                 return obj;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return input;
             }
@@ -175,7 +189,6 @@ namespace Umbraco.Core
                 outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
             return new string(outputArray);
         }
-
         private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
 
         /// <summary>
@@ -456,13 +469,13 @@ namespace Umbraco.Core
             return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
         }
 
-        /// <summary>Is null or white space.</summary>
-        /// <param name="str">The str.</param>
-        /// <returns>The is null or white space.</returns>
-        public static bool IsNullOrWhiteSpace(this string str)
-        {
-            return (str == null) || (str.Trim().Length == 0);
-        }
+        /// <summary>Indicates whether a specified string is null, empty, or
+        /// consists only of white-space characters.</summary>
+        /// <param name="value">The value to check.</param>
+        /// <returns>Returns <see langword="true"/> if the value is null,
+        /// empty, or consists only of white-space characters, otherwise
+        /// returns <see langword="false"/>.</returns>
+        public static bool IsNullOrWhiteSpace(this string value) => string.IsNullOrWhiteSpace(value);
 
         public static string IfNullOrWhiteSpace(this string str, string defaultValue)
         {
@@ -528,7 +541,7 @@ namespace Umbraco.Core
         public static string StripHtml(this string text)
         {
             const string pattern = @"<(.|\n)*?>";
-            return Regex.Replace(text, pattern, String.Empty);
+            return Regex.Replace(text, pattern, string.Empty);
         }
 
         /// <summary>
@@ -608,7 +621,7 @@ namespace Umbraco.Core
                 byte[] decodedBytes = UrlTokenDecode(input);
                 return decodedBytes != null ? Encoding.UTF8.GetString(decodedBytes) : null;
             }
-            catch (FormatException ex)
+            catch (FormatException)
             {
                 return null;
             }
@@ -702,65 +715,72 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Generates a hash of a string based on the FIPS compliance setting.
+        /// </summary>
+        /// <param name="str">Referrs to itself</param>
+        /// <returns>The hashed string</returns>
+        public static string GenerateHash(this string str)
+        {
+            return CryptoConfig.AllowOnlyFipsAlgorithms
+                ? str.ToSHA1()
+                : str.ToMd5();
+        }
+
+        /// <summary>
         /// Converts the string to MD5
         /// </summary>
-        /// <param name="stringToConvert">referrs to itself</param>
-        /// <returns>the md5 hashed string</returns>
+        /// <param name="stringToConvert">Referrs to itself</param>
+        /// <returns>The MD5 hashed string</returns>
+        [Obsolete("Please use the GenerateHash method instead. This may be removed in future versions")]
         public static string ToMd5(this string stringToConvert)
         {
-            //create an instance of the MD5CryptoServiceProvider
-            var md5Provider = new MD5CryptoServiceProvider();
-
-            //convert our string into byte array
-            var byteArray = Encoding.UTF8.GetBytes(stringToConvert);
-
-            //get the hashed values created by our MD5CryptoServiceProvider
-            var hashedByteArray = md5Provider.ComputeHash(byteArray);
-
-            //create a StringBuilder object
-            var stringBuilder = new StringBuilder();
-
-            //loop to each each byte
-            foreach (var b in hashedByteArray)
-            {
-                //append it to our StringBuilder
-                stringBuilder.Append(b.ToString("x2").ToLower());
-            }
-
-            //return the hashed value
-            return stringBuilder.ToString();
+            return stringToConvert.GenerateHash("MD5");
         }
 
         /// <summary>
         /// Converts the string to SHA1
         /// </summary>
         /// <param name="stringToConvert">referrs to itself</param>
-        /// <returns>the md5 hashed string</returns>
+        /// <returns>The SHA1 hashed string</returns>
+        [Obsolete("Please use the GenerateHash method instead. This may be removed in future versions")]
         public static string ToSHA1(this string stringToConvert)
         {
-            //create an instance of the SHA1CryptoServiceProvider
-            var md5Provider = new SHA1CryptoServiceProvider();
-
-            //convert our string into byte array
-            var byteArray = Encoding.UTF8.GetBytes(stringToConvert);
-
-            //get the hashed values created by our SHA1CryptoServiceProvider
-            var hashedByteArray = md5Provider.ComputeHash(byteArray);
-
-            //create a StringBuilder object
-            var stringBuilder = new StringBuilder();
-
-            //loop to each each byte
-            foreach (var b in hashedByteArray)
-            {
-                //append it to our StringBuilder
-                stringBuilder.Append(b.ToString("x2").ToLower());
-            }
-
-            //return the hashed value
-            return stringBuilder.ToString();
+            return stringToConvert.GenerateHash("SHA1");
         }
 
+
+        /// <summary>Generate a hash of a string based on the hashType passed in
+        /// </summary>
+        /// <param name="str">Referrs to itself</param>
+        /// <param name="hashType">String with the hash type.  See remarks section of the CryptoConfig Class in MSDN docs for a list of possible values.</param>
+        /// <returns>The hashed string</returns>
+        private static string GenerateHash(this string str, string hashType)
+        {
+            //create an instance of the correct hashing provider based on the type passed in
+            var hasher = HashAlgorithm.Create(hashType);
+            if (hasher == null) throw new InvalidOperationException("No hashing type found by name " + hashType);
+            using (hasher)
+            {
+                //convert our string into byte array
+                var byteArray = Encoding.UTF8.GetBytes(str);
+
+                //get the hashed values created by our selected provider
+                var hashedByteArray = hasher.ComputeHash(byteArray);
+
+                //create a StringBuilder object
+                var stringBuilder = new StringBuilder();
+
+                //loop to each each byte
+                foreach (var b in hashedByteArray)
+                {
+                    //append it to our StringBuilder
+                    stringBuilder.Append(b.ToString("x2"));
+                }
+
+                //return the hashed value
+                return stringBuilder.ToString();
+            }
+        }
 
         /// <summary>
         /// Decodes a string that was encoded with UrlTokenEncode
@@ -869,7 +889,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Ensures that the folder path endds with a DirectorySeperatorChar
+        /// Ensures that the folder path ends with a DirectorySeperatorChar
         /// </summary>
         /// <param name="currentFolder"></param>
         /// <returns></returns>
@@ -1415,14 +1435,25 @@ namespace Umbraco.Core
             return ReplaceMany(text, regexSpecialCharacters);
         }
 
+        /// <summary>
+        /// Checks whether a string "haystack" contains within it any of the strings in the "needles" collection and returns true if it does or false if it doesn't
+        /// </summary>
+        /// <param name="haystack">The string to check</param>
+        /// <param name="needles">The collection of strings to check are contained within the first string</param>
+        /// <param name="comparison">The type of comparision to perform - defaults to <see cref="StringComparison.CurrentCulture"/></param>
+        /// <returns>True if any of the needles are contained with haystack; otherwise returns false</returns>
+        /// Added fix to ensure the comparison is used - see http://issues.umbraco.org/issue/U4-11313
         public static bool ContainsAny(this string haystack, IEnumerable<string> needles, StringComparison comparison = StringComparison.CurrentCulture)
         {
-            if (haystack == null) throw new ArgumentNullException("haystack");
-            if (string.IsNullOrEmpty(haystack) == false || needles.Any())
+            if (haystack == null)
+                throw new ArgumentNullException("haystack");
+
+            if (string.IsNullOrEmpty(haystack) || needles == null || !needles.Any())
             {
-                return needles.Any(value => haystack.IndexOf(value) >= 0);
+                return false;
             }
-            return false;
+
+            return needles.Any(value => haystack.IndexOf(value, comparison) >= 0);
         }
 
         public static bool CsvContains(this string csv, string value)
@@ -1465,10 +1496,108 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static Guid ToGuid(this string text)
         {
-            var md5 = MD5.Create();
-            byte[] myStringBytes = Encoding.ASCII.GetBytes(text);
-            byte[] hash = md5.ComputeHash(myStringBytes);
-            return new Guid(hash);
+            return CreateGuidFromHash(UrlNamespace,
+                                        text,
+                                        CryptoConfig.AllowOnlyFipsAlgorithms
+                                            ? 5     // SHA1
+                                            : 3);   // MD5
+        }
+
+        /// <summary>
+        /// The namespace for URLs (from RFC 4122, Appendix C).
+        /// 
+        /// See <a href="http://www.ietf.org/rfc/rfc4122.txt">RFC 4122</a>
+        /// </summary>
+        internal static readonly Guid UrlNamespace = new Guid("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
+
+        /// <summary>
+        /// Creates a name-based UUID using the algorithm from RFC 4122 §4.3.
+        /// 
+        /// See <a href="https://github.com/LogosBible/Logos.Utility/blob/master/src/Logos.Utility/GuidUtility.cs#L34">GuidUtility.cs</a> for original implementation.
+        /// </summary>
+        /// <param name="namespaceId">The ID of the namespace.</param>
+        /// <param name="name">The name (within that namespace).</param>
+        /// <param name="version">The version number of the UUID to create; this value must be either
+        /// 3 (for MD5 hashing) or 5 (for SHA-1 hashing).</param>
+        /// <returns>A UUID derived from the namespace and name.</returns>
+        /// <remarks>See <a href="http://code.logos.com/blog/2011/04/generating_a_deterministic_guid.html">Generating a deterministic GUID</a>.</remarks>
+        internal static Guid CreateGuidFromHash(Guid namespaceId, string name, int version)
+        {
+            if (name == null)
+                throw new ArgumentNullException("name");
+            if (version != 3 && version != 5)
+                throw new ArgumentOutOfRangeException("version", "version must be either 3 or 5.");
+
+            // convert the name to a sequence of octets (as defined by the standard or conventions of its namespace) (step 3)
+            // ASSUME: UTF-8 encoding is always appropriate
+            byte[] nameBytes = Encoding.UTF8.GetBytes(name);
+
+            // convert the namespace UUID to network order (step 3)
+            byte[] namespaceBytes = namespaceId.ToByteArray();
+            SwapByteOrder(namespaceBytes);
+
+            // comput the hash of the name space ID concatenated with the name (step 4)
+            byte[] hash;
+            using (HashAlgorithm algorithm = version == 3 ? (HashAlgorithm)MD5.Create() : SHA1.Create())
+            {
+                algorithm.TransformBlock(namespaceBytes, 0, namespaceBytes.Length, null, 0);
+                algorithm.TransformFinalBlock(nameBytes, 0, nameBytes.Length);
+                hash = algorithm.Hash;
+            }
+
+            // most bytes from the hash are copied straight to the bytes of the new GUID (steps 5-7, 9, 11-12)
+            byte[] newGuid = new byte[16];
+            Array.Copy(hash, 0, newGuid, 0, 16);
+
+            // set the four most significant bits (bits 12 through 15) of the time_hi_and_version field to the appropriate 4-bit version number from Section 4.1.3 (step 8)
+            newGuid[6] = (byte)((newGuid[6] & 0x0F) | (version << 4));
+
+            // set the two most significant bits (bits 6 and 7) of the clock_seq_hi_and_reserved to zero and one, respectively (step 10)
+            newGuid[8] = (byte)((newGuid[8] & 0x3F) | 0x80);
+
+            // convert the resulting UUID to local byte order (step 13)
+            SwapByteOrder(newGuid);
+            return new Guid(newGuid);
+        }
+
+        // Converts a GUID (expressed as a byte array) to/from network order (MSB-first).
+        internal static void SwapByteOrder(byte[] guid)
+        {
+            SwapBytes(guid, 0, 3);
+            SwapBytes(guid, 1, 2);
+            SwapBytes(guid, 4, 5);
+            SwapBytes(guid, 6, 7);
+        }
+
+        private static void SwapBytes(byte[] guid, int left, int right)
+        {
+            byte temp = guid[left];
+            guid[left] = guid[right];
+            guid[right] = temp;
+        }
+        
+        /// <summary>
+        /// Converts a file name to a friendly name for a content item
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string ToFriendlyName(this string fileName)
+        {
+            // strip the file extension
+            fileName = fileName.StripFileExtension();
+
+            // underscores and dashes to spaces
+            fileName = fileName.ReplaceMany(new[] { '_', '-' }, ' ');
+
+            // any other conversions ?
+
+            // Pascalcase (to be done last)
+            fileName = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(fileName);
+
+            // Replace multiple consecutive spaces with a single space
+            fileName = string.Join(" ", fileName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+
+            return fileName;
         }
     }
 }

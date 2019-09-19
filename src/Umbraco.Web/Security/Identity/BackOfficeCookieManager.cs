@@ -6,7 +6,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -96,8 +96,8 @@ namespace Umbraco.Web.Security.Identity
             if (request.Uri.AbsolutePath.InvariantEquals(_getRemainingSecondsPath)) return false;
 
             if (//check the explicit flag
-                (checkForceAuthTokens && ctx.Get<bool?>("umbraco-force-auth") != null)
-                || (checkForceAuthTokens && httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null)                
+                (checkForceAuthTokens && ctx.Get<bool?>(Constants.Security.ForceReAuthFlag) != null)
+                || (checkForceAuthTokens && httpCtx.Success && httpCtx.Result.Items[Constants.Security.ForceReAuthFlag] != null)                
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer

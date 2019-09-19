@@ -14,14 +14,22 @@ function sectionResource($q, $http, umbRequestHelper) {
     return {
         /** Loads in the data to display the section list */
         getSections: function () {
-            
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "sectionApiBaseUrl",
                        "GetSections")),
                'Failed to retrieve data for sections');
-
+		},
+        
+        /** Loads in all available sections */
+        getAllSections: function () {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "sectionApiBaseUrl",
+                       "GetAllSections")),
+               'Failed to retrieve data for sections');
 		}
     };
 }

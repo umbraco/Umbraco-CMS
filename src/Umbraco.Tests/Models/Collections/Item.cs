@@ -12,7 +12,6 @@ namespace Umbraco.Tests.Models.Collections
     public abstract class Item : IEntity, ICanBeDirty
     {
         private bool _hasIdentity;
-        private int? _hash;
         private int _id;
         private Guid _key;
 
@@ -173,15 +172,7 @@ namespace Umbraco.Tests.Models.Collections
 
         public static bool operator ==(Item left, Item right)
         {
-            /*if (ReferenceEquals(null, left))
-                return false;
-
-            if(ReferenceEquals(null, right))
-                return false;*/
-
             return ReferenceEquals(left, right);
-
-            return left.Equals(right);
         }
 
         public static bool operator !=(Item left, Item right)

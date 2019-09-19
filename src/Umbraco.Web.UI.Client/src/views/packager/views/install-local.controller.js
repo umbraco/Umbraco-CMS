@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window, localizationService) {
+    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window, localizationService, $q) {
 
         var vm = this;
         vm.state = "upload";
@@ -68,6 +68,7 @@
                     // set done status on file
                     vm.zipFile.uploadStatus = "done";
                     loadPackage();
+                    vm.zipFile.uploadProgress = 100;
                     vm.localPackage = data;
                 }
 
@@ -96,7 +97,7 @@
                         }
 
                     } else if (evt.Message) {
-                        file.serverErrorMessage = evt.Message;
+                        vm.zipFile.serverErrorMessage = evt.Message;
                     }
                 }
             });
@@ -117,10 +118,37 @@
                 .then(function(pack) {
                         vm.installState.progress = "25";
                         vm.installState.status = localizationService.localize("packager_installStateInstalling");
-                        vm.installState.progress = "50";
                         return packageResource.installFiles(pack);
                     },
                     installError)
+                .then(function(pack) {
+                        vm.installState.status = localizationService.localize("packager_installStateRestarting");
+                        vm.installState.progress = "50";
+                        var deferred = $q.defer();
+
+                        //check if the app domain is restarted ever 2 seconds
+                        var count = 0;
+                        function checkRestart() {
+                          $timeout(function () {
+                            packageResource.checkRestart(pack).then(function (d) {
+                                count++;
+                                //if there is an id it means it's not restarted yet but we'll limit it to only check 10 times
+                                if (d.isRestarting && count < 10) {
+                                  checkRestart();
+                                }
+                                else {
+                                  //it's restarted!
+                                  deferred.resolve(d);
+                                }
+                              },
+                              installError);
+                          }, 2000);
+                        }
+
+                        checkRestart();
+                        
+                        return deferred.promise;
+                    }, installError)
                 .then(function(pack) {
                     vm.installState.status = localizationService.localize("packager_installStateRestarting");
                         vm.installState.progress = "75";

@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked when copying a document or media 
-	/// </summary>
-	public class ActionUpdate : IAction
+    /// <summary>
+    /// This action is invoked when copying a document or media 
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
+    public class ActionUpdate : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618

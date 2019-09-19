@@ -35,7 +35,7 @@ namespace Umbraco.Tests.CodeFirst
 		        }
             };
 
-          
+
         }
 
         [Test]
@@ -84,10 +84,7 @@ namespace Umbraco.Tests.CodeFirst
             var foundTypes = _pluginManager.ResolveContentTypeBaseTypes();
 
             Assert.That(foundTypes.Count(), Is.EqualTo(15));
-            Assert.AreEqual(1,
-                            _pluginManager.GetTypeLists()
-                                .Count(x => x.IsTypeList<ContentTypeBase>(PluginManager.TypeResolutionKind.FindAllTypes)));
+            Assert.AreEqual(1, _pluginManager.TypeLists.Count(x => x.BaseType == typeof (ContentTypeBase) && x.AttributeType == null));
         }
-
     }
 }

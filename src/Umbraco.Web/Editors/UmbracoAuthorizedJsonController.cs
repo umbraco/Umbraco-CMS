@@ -1,4 +1,6 @@
 ﻿using System.Web.Http.Controllers;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
@@ -23,5 +25,8 @@ namespace Umbraco.Web.Editors
         {
         }
 
+        protected UmbracoAuthorizedJsonController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager) : base(umbracoContext, umbracoHelper, backOfficeUserManager)
+        {
+        }
     }
 }

@@ -126,10 +126,12 @@ namespace Umbraco.Core.Sync
 
         public static string GetServerHash(string machineName, string appDomainAppId)
         {
-            var hasher = new HashCodeCombiner();
-            hasher.AddCaseInsensitiveString(appDomainAppId);
-            hasher.AddCaseInsensitiveString(machineName);
-            return hasher.GetCombinedHashCode();
+            using (var generator = new HashGenerator())
+            {
+                generator.AddString(machineName);
+                generator.AddString(appDomainAppId);
+                return generator.GenerateHash();
+            }
         }
 
         protected override bool RequiresDistributed(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType)

@@ -44,52 +44,69 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (!parentNode.section) {
                 parentNode.section = section;
             }
+
+            if (parentNode.metaData && parentNode.metaData.noAccess === true) {
+                if (!parentNode.cssClasses) {
+                    parentNode.cssClasses = [];
+                }
+                parentNode.cssClasses.push("no-access");
+            }
+
             //create a method outside of the loop to return the parent - otherwise jshint blows up
             var funcParent = function() {
                 return parentNode;
             };
             for (var i = 0; i < treeNodes.length; i++) {
 
-                treeNodes[i].level = childLevel;
+                var treeNode = treeNodes[i];
+
+                treeNode.level = childLevel;
 
                 //create a function to get the parent node, we could assign the parent node but 
                 // then we cannot serialize this entity because we have a cyclical reference.
                 // Instead we just make a function to return the parentNode.
-                treeNodes[i].parent = funcParent;
+                treeNode.parent = funcParent;
 
                 //set the section for each tree node - this allows us to reference this easily when accessing tree nodes
-                treeNodes[i].section = section;
+                treeNode.section = section;
 
                 //if there is not route path specified, then set it automatically,
                 //if this is a tree root node then we want to route to the section's dashboard
-                if (!treeNodes[i].routePath) {
+                if (!treeNode.routePath) {
                     
-                    if (treeNodes[i].metaData && treeNodes[i].metaData["treeAlias"]) {
+                    if (treeNode.metaData && treeNode.metaData["treeAlias"]) {
                         //this is a root node
-                        treeNodes[i].routePath = section;                        
+                        treeNode.routePath = section;                        
                     }
                     else {
-                        var treeAlias = this.getTreeAlias(treeNodes[i]);
-                        treeNodes[i].routePath = section + "/" + treeAlias + "/edit/" + treeNodes[i].id;
+                        var treeAlias = this.getTreeAlias(treeNode);
+                        treeNode.routePath = section + "/" + treeAlias + "/edit/" + treeNode.id;
                     }
                 }
-
+                
                 //now, format the icon data
-                if (treeNodes[i].iconIsClass === undefined || treeNodes[i].iconIsClass) {
-                    var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNodes[i]);
-                    treeNodes[i].cssClass = standardCssClass + " " + converted;
+                if (treeNode.iconIsClass === undefined || treeNode.iconIsClass) {
+                    var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNode);
+                    treeNode.cssClass = standardCssClass + " " + converted;
                     if (converted.startsWith('.')) {
                         //its legacy so add some width/height
-                        treeNodes[i].style = "height:16px;width:16px;";
+                        treeNode.style = "height:16px;width:16px;";
                     }
                     else {
-                        treeNodes[i].style = "";
+                        treeNode.style = "";
                     }
                 }
                 else {
-                    treeNodes[i].style = "background-image: url('" + treeNodes[i].iconFilePath + "');";
+                    treeNode.style = "background-image: url('" + treeNode.iconFilePath + "');";
                     //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
-                    treeNodes[i].cssClass = standardCssClass + " legacy-custom-file";
+                    treeNode.cssClass = standardCssClass + " legacy-custom-file";
+                }
+
+                if (treeNode.metaData && treeNode.metaData.noAccess === true) {
+                    if (!treeNode.cssClasses) {
+                        treeNode.cssClasses = [];
+                    }
+                    treeNode.cssClasses.push("no-access");
                 }
             }
         },
@@ -246,7 +263,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     if (args.node.children && args.node.children.length > 0) {
                         args.node.expanded = true;
                         args.node.hasChildren = true;
+
+                        if (angular.isFunction(args.node.updateNodeData)) {
+                            args.node.updateNodeData();
+                        }
                     }
+
                     return data;
 
                 }, function(reason) {
@@ -375,9 +397,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
 
             for (var i = 0; i < treeNode.children.length; i++) {
-                if (treeNode.children[i].children && angular.isArray(treeNode.children[i].children) && treeNode.children[i].children.length > 0) {
+                var child = treeNode.children[i];
+                if (child.children && angular.isArray(child.children) && child.children.length > 0) {
                     //recurse
-                    found = this.getDescendantNode(treeNode.children[i], id);
+                    found = this.getDescendantNode(child, id);
                     if (found) {
                         return found;
                     }
@@ -736,7 +759,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 }
                 else {
                     //couldn't find it in the 
-                    self.loadNodeChildren({ node: node, section: node.section }).then(function () {
+                    self.loadNodeChildren({ node: node, section: node.section }).then(function (children) {
+
+                        //we've reloaded a portion of the tree, call the callback if one is specified.
+                        //TODO: In v8, we can just use deferred.notify
+                        if (args.treeNodeExpanded && angular.isFunction(args.treeNodeExpanded)) {
+                            args.treeNodeExpanded({ node: node, children: children });
+                        }
+
                         //ok, got the children, let's find it
                         var found = self.getChildNode(node, args.path[currPathIndex]);
                         if (found) {

@@ -93,53 +93,59 @@ namespace Umbraco.Tests.Routing
 			var result = uri.IsClientSideRequest();
 			Assert.AreEqual(assert, result);
 		}
+        
+        [Test]
+	    public void Is_Client_Side_Request_InvalidPath_ReturnFalse()
+	    {
+            //This url is invalid. Default to false when the extension cannot be determined
+	        var uri = new Uri("http://test.com/installing-modules+foobar+\"yipee\"");
+	        var result = uri.IsClientSideRequest();
+	        Assert.AreEqual(false, result);
+	    }
 
+        //NOTE: This test shows how we can test most of the HttpModule, it however is testing a method that no longer exists and is testing too much, 
+        // we need to write unit tests for each of the components: NiceUrlProvider, all of the Lookup classes, etc...
+        // to ensure that each one is individually tested. 
 
+        //[TestCase("/", 1046)]
+        //[TestCase("/home.aspx", 1046)]
+        //[TestCase("/home/sub1.aspx", 1173)]
+        //[TestCase("/home.aspx?altTemplate=blah", 1046)]
+        //public void Process_Front_End_Document_Request_Match_Node(string url, int nodeId)
+        //{
+        //    var httpContextFactory = new FakeHttpContextFactory(url);
+        //    var httpContext = httpContextFactory.HttpContext;
+        //    var umbracoContext = new UmbracoContext(httpContext, ApplicationContext.Current, new NullRoutesCache());
+        //    var contentStore = new ContentStore(umbracoContext);
+        //    var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
+        //    umbracoContext.RoutingContext = new RoutingContext(
+        //        new IPublishedContentLookup[] {new LookupByNiceUrl()},
+        //        new DefaultLastChanceLookup(),
+        //        contentStore,
+        //        niceUrls); 
 
+        //    StateHelper.HttpContext = httpContext;
 
-		//NOTE: This test shows how we can test most of the HttpModule, it however is testing a method that no longer exists and is testing too much, 
-		// we need to write unit tests for each of the components: NiceUrlProvider, all of the Lookup classes, etc...
-		// to ensure that each one is individually tested. 
+        //    //because of so much dependency on the db, we need to create som stuff here, i originally abstracted out stuff but 
+        //    //was turning out to be quite a deep hole because ultimately we'd have to abstract the old 'Domain' and 'Language' classes
+        //    Domain.MakeNew("Test.com", 1000, Language.GetByCultureCode("en-US").id);
 
-		//[TestCase("/", 1046)]
-		//[TestCase("/home.aspx", 1046)]
-		//[TestCase("/home/sub1.aspx", 1173)]
-		//[TestCase("/home.aspx?altTemplate=blah", 1046)]
-		//public void Process_Front_End_Document_Request_Match_Node(string url, int nodeId)
-		//{
-		//    var httpContextFactory = new FakeHttpContextFactory(url);
-		//    var httpContext = httpContextFactory.HttpContext;
-		//    var umbracoContext = new UmbracoContext(httpContext, ApplicationContext.Current, new NullRoutesCache());
-		//    var contentStore = new ContentStore(umbracoContext);
-		//    var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
-		//    umbracoContext.RoutingContext = new RoutingContext(
-		//        new IPublishedContentLookup[] {new LookupByNiceUrl()},
-		//        new DefaultLastChanceLookup(),
-		//        contentStore,
-		//        niceUrls); 
+        //    //need to create a template with id 1045
+        //    var template = Template.MakeNew("test", new User(0));
 
-		//    StateHelper.HttpContext = httpContext;
+        //    SetupUmbracoContextForTest(umbracoContext, template);
 
-		//    //because of so much dependency on the db, we need to create som stuff here, i originally abstracted out stuff but 
-		//    //was turning out to be quite a deep hole because ultimately we'd have to abstract the old 'Domain' and 'Language' classes
-		//    Domain.MakeNew("Test.com", 1000, Language.GetByCultureCode("en-US").id);
+        //    _module.AssignDocumentRequest(httpContext, umbracoContext, httpContext.Request.Url);
 
-		//    //need to create a template with id 1045
-		//    var template = Template.MakeNew("test", new User(0));
+        //    Assert.IsNotNull(umbracoContext.PublishedContentRequest);
+        //    Assert.IsNotNull(umbracoContext.PublishedContentRequest.XmlNode);	
+        //    Assert.IsFalse(umbracoContext.PublishedContentRequest.IsRedirect);
+        //    Assert.IsFalse(umbracoContext.PublishedContentRequest.Is404);
+        //    Assert.AreEqual(umbracoContext.PublishedContentRequest.Culture, Thread.CurrentThread.CurrentCulture);
+        //    Assert.AreEqual(umbracoContext.PublishedContentRequest.Culture, Thread.CurrentThread.CurrentUICulture);
+        //    Assert.AreEqual(nodeId, umbracoContext.PublishedContentRequest.NodeId);
 
-		//    SetupUmbracoContextForTest(umbracoContext, template);
+        //}
 
-		//    _module.AssignDocumentRequest(httpContext, umbracoContext, httpContext.Request.Url);
-
-		//    Assert.IsNotNull(umbracoContext.PublishedContentRequest);
-		//    Assert.IsNotNull(umbracoContext.PublishedContentRequest.XmlNode);	
-		//    Assert.IsFalse(umbracoContext.PublishedContentRequest.IsRedirect);
-		//    Assert.IsFalse(umbracoContext.PublishedContentRequest.Is404);
-		//    Assert.AreEqual(umbracoContext.PublishedContentRequest.Culture, Thread.CurrentThread.CurrentCulture);
-		//    Assert.AreEqual(umbracoContext.PublishedContentRequest.Culture, Thread.CurrentThread.CurrentUICulture);
-		//    Assert.AreEqual(nodeId, umbracoContext.PublishedContentRequest.NodeId);
-			
-		//}
-
-	}
+    }
 }

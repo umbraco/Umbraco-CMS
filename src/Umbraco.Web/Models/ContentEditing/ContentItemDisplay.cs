@@ -1,19 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Formatting;
 using System.Runtime.Serialization;
-using System.Web.Http;
-using System.Web.Http.ModelBinding;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Validation;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-   
     /// <summary>
     /// A model representing a content item to be displayed in the back office
     /// </summary>    
@@ -37,6 +28,21 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "template")]
         public string TemplateAlias { get; set; }
 
+
+
+
+        [DataMember(Name = "templateId")]
+        public int TemplateId { get; set; }
+
+
+
+
+        [DataMember(Name = "allowedTemplates")]
+        public IDictionary<string, string> AllowedTemplates { get; set; }
+
+        [DataMember(Name = "documentType")]
+        public ContentTypeBasic DocumentType { get; set; }
+
         [DataMember(Name = "urls")]
         public string[] Urls { get; set; }
 
@@ -56,7 +62,9 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Each char represents a button which we can then map on the front-end to the correct actions
         /// </remarks>
         [DataMember(Name = "allowedActions")]
-        public IEnumerable<char> AllowedActions { get; set; }
+        public IEnumerable<string> AllowedActions { get; set; }
 
+        [DataMember(Name = "isBlueprint")]
+        public bool IsBlueprint { get; set; }
     }
 }

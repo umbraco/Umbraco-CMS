@@ -14,15 +14,15 @@
 
             <div ng-switch-default>
                 <p>
-                    <i class="icon-alert red"></i> <strong class="red">All property types & property data</strong>
-                    using this data type will be deleted permanently, please confirm you want to delete these as well.
+                    <i class="icon-alert red"></i> <strong class="red"><localize key="editdatatype_allPropTypes">All property types & property data</localize></strong>
+                    <localize key="editdatatype_willBeDeleted">using this data type will be deleted permanently, please confirm you want to delete these as well</localize>.
                 </p>
 
                 <hr />
 
                 <label class="checkbox">
                     <input type="checkbox" ng-model="confirmed" />
-                    Yes, delete {{currentNode.name}} and all property types & property data using this data type
+                    <localize key="editdatatype_yesDelete">Yes, delete</localize> <strong>{{currentNode.name}}</strong> <localize key="editdatatype_andAllRelated">and all property types & property data using this data type</localize>
                 </label>
 
                 <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel">

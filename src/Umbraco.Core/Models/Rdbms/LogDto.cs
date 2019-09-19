@@ -32,6 +32,6 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("logComment")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(4000)]
-        public string Comment { get; set; }
+        public string Comment { get; set; }        
     }
 }

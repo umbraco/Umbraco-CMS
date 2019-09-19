@@ -125,6 +125,39 @@ namespace Umbraco.Core.Persistence.Repositories
             return isValidPath && isValidExtension;
         }
 
+        public Stream GetFileContentStream(string filepath)
+        {
+            if (FileSystem.FileExists(filepath) == false) return null;
+
+            try
+            {
+                return FileSystem.OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
+        }
+
+        public void SetFileContent(string filepath, Stream content)
+        {
+            FileSystem.AddFile(filepath, content, true);
+        }
+
+        public long GetFileSize(string filepath)
+        {
+            if (FileSystem.FileExists(filepath) == false) return -1;
+
+            try
+            {
+                return FileSystem.GetSize(filepath);
+            }
+            catch
+            {
+                return -1; // deal with race conds
+            }
+        }
+
         #endregion
     }
 }

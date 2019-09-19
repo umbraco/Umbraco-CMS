@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.Initialize();
         }
 
-        private DataTypeDefinitionRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private DataTypeDefinitionRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             var dataTypeDefinitionRepository = new DataTypeDefinitionRepository(
                 unitOfWork, CacheHelper.CreateDisabledCacheHelper(),
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             return dataTypeDefinitionRepository;
         }
 
-        private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
+        private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork)
         {
             return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Constants.ObjectTypes.DataTypeContainerGuid);
         }
@@ -424,7 +424,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var exists = repository.Exists(1034); //Content picker
+                var exists = repository.Exists(1046); //Content picker
                 var doesntExist = repository.Exists(-80);
 
                 // Assert

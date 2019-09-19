@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
-    [Migration("7.3.0", 1, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 1, Constants.System.UmbracoMigrationName)]
     public class CreateCacheInstructionTable : MigrationBase
     {
         public CreateCacheInstructionTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)

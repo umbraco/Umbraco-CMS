@@ -9,7 +9,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Configuration.Grid
 {
-    class GridEditorsConfig : IGridEditorsConfig
+    internal class GridEditorsConfig : IGridEditorsConfig
     {
         private readonly ILogger _logger;
         private readonly IRuntimeCacheProvider _runtimeCache;

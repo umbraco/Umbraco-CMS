@@ -7,7 +7,7 @@ namespace Umbraco.Core.Packaging.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class InstallationSummary
+    public class InstallationSummary
     {
         public MetaData MetaData { get; set; }
         public IEnumerable<IDataTypeDefinition> DataTypesInstalled { get; set; }

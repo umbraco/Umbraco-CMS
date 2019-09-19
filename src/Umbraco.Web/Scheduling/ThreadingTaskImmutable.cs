@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 namespace Umbraco.Web.Scheduling
 {
     /// <summary>
-    /// Wraps a Task within an object that gives access to its GetAwaiter method and Status
+    /// Wraps a <see cref="Task"/> within an object that gives access to its GetAwaiter method and Status
     /// property while ensuring that it cannot be modified in any way.
     /// </summary>
-    internal class ThreadingTaskImmutable
+    public class ThreadingTaskImmutable
     {
         private readonly Task _task;
 

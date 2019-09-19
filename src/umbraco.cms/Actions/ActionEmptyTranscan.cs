@@ -1,6 +1,7 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
 
 namespace umbraco.BusinessLogic.Actions
 {
@@ -82,6 +83,7 @@ namespace umbraco.BusinessLogic.Actions
 			}
 		}
 
-		#endregion
-	}
+        #endregion
+        
+    }
 }

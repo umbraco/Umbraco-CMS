@@ -20,6 +20,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             //FROM IMacro TO EntityBasic
             config.CreateMap<IMacro, EntityBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Macro, content.Key)))
                   .ForMember(entityBasic => entityBasic.Icon, expression => expression.UseValue("icon-settings-alt"))
                   .ForMember(dto => dto.ParentId, expression => expression.UseValue(-1))
                   .ForMember(dto => dto.Path, expression => expression.ResolveUsing(macro => "-1," + macro.Id))
@@ -36,8 +37,8 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((property, parameter) =>
                 {
                     //map the view and the config
-
-                    var paramEditor = ParameterEditorResolver.Current.GetByAlias(property.EditorAlias);
+                    // we need to show the depracated ones for backwards compatibility
+                    var paramEditor = ParameterEditorResolver.Current.GetByAlias(property.EditorAlias, true);
                     if (paramEditor == null)
                     {
                         //we'll just map this to a text box

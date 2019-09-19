@@ -20,7 +20,7 @@ namespace Umbraco.Core.Security
         /// Use this constructor to create/assign new UserData to the ticket
         /// </summary>
         /// <param name="sessionId">
-        /// The security stamp for the user
+        /// The current sessionId for the user
         /// </param>
         public UserData(string sessionId)
         {
@@ -30,10 +30,16 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// This is the 'security stamp' for validation
+        /// This is the 'sessionId' for validation
         /// </summary>        
         [DataMember(Name = "sessionId")]
-        public string SessionId { get; set; } 
+        public string SessionId { get; set; }
+
+        /// <summary>
+        /// This is the 'security stamp' for validation
+        /// </summary>        
+        [DataMember(Name = "securityStamp")]
+        public string SecurityStamp { get; set; }
 
         [DataMember(Name = "id")]
         public object Id { get; set; }
@@ -47,11 +53,17 @@ namespace Umbraco.Core.Security
         [DataMember(Name = "name")]
         public string RealName { get; set; }
 
+        /// <summary>
+        /// The start nodes on the UserData object for the auth ticket contains all of the user's start nodes including ones assigned to their user groups
+        /// </summary>
         [DataMember(Name = "startContent")]
-        public int StartContentNode { get; set; }
+        public int[] StartContentNodes { get; set; }
 
+        /// <summary>
+        /// The start nodes on the UserData object for the auth ticket contains all of the user's start nodes including ones assigned to their user groups
+        /// </summary>
         [DataMember(Name = "startMedia")]
-        public int StartMediaNode { get; set; }
+        public int[] StartMediaNodes { get; set; }
 
         [DataMember(Name = "allowedApps")]
         public string[] AllowedApplications { get; set; }

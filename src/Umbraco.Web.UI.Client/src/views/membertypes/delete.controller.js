@@ -1,10 +1,10 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.DocumentType.DeleteController
+ * @name Umbraco.Editors.MemberTypes.DeleteController
  * @function
  *
  * @description
- * The controller for deleting content
+ * The controller for deleting member types
  */
 function MemberTypesDeleteController($scope, memberTypeResource, treeService, navigationService) {
 

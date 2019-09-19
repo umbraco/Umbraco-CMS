@@ -148,11 +148,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public override Task RunAsync(CancellationToken token)
-        {
-            throw new NotImplementedException();
-        }
-
         public override bool IsAsync
         {
             get { return false; }

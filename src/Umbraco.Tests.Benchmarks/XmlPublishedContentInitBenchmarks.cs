@@ -3,37 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnostics.Windows;
-using BenchmarkDotNet.Jobs;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Tests.Benchmarks.Config;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [Config(typeof(Config))]
+    [QuickRunWithMemoryDiagnoserConfig]
     public class XmlPublishedContentInitBenchmarks
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(new MemoryDiagnoser());
-
-                //The 'quick and dirty' settings, so it runs a little quicker
-                // see benchmarkdotnet FAQ
-                Add(Job.Default
-                    .WithLaunchCount(1) // benchmark process will be launched only once
-                    .WithIterationTime(100) // 100ms per iteration
-                    .WithWarmupCount(3) // 3 warmup iteration
-                    .WithTargetCount(3)); // 3 target iteration              
-            }
-        }
-
         public XmlPublishedContentInitBenchmarks()
         {
             _xml10 = Build(10);
@@ -281,7 +261,7 @@ namespace Umbraco.Tests.Benchmarks
             var nodes = xmlNode.SelectNodes(dataXPath);
 
             contentType = GetPublishedContentType(PublishedItemType.Content, docTypeAlias);
-            
+
             var propertyNodes = new Dictionary<string, XmlNode>();
             if (nodes != null)
                 foreach (XmlNode n in nodes)
@@ -307,8 +287,8 @@ namespace Umbraco.Tests.Benchmarks
 
         private static PublishedContentType GetPublishedContentType(PublishedItemType type, string alias)
         {
-            return new PublishedContentType(alias, new string[] {},
-                new List<PublishedPropertyType>(Enumerable.Range(0, 10).Select(x => new PublishedPropertyType("prop" + x, 0, "test", initConverters:false))));
+            return new PublishedContentType(alias, new string[] { },
+                new List<PublishedPropertyType>(Enumerable.Range(0, 10).Select(x => new PublishedPropertyType("prop" + x, 0, "test", initConverters: false))));
 
         }
     }

@@ -1,12 +1,12 @@
-<div class="umb-overlay umb-overlay-{{position}}" on-outside-click="closeOverLay()">
+<div data-element="overlay" class="umb-overlay umb-overlay-{{position}}" on-outside-click="closeOverLay()">
     <ng-form class="umb-overlay__form" name="overlayForm" novalidate val-form-manager>
 
-        <div class="umb-overlay-header">
+        <div data-element="overlay-header" class="umb-overlay-header">
             <h4 class="umb-overlay__title">{{model.title}}</h4>
             <p class="umb-overlay__subtitle">{{model.subtitle}}</p>
         </div>
 
-        <div class="umb-overlay-container form-horizontal" ng-transclude>
+        <div data-element="overlay-content" class="umb-overlay-container form-horizontal" ng-transclude>
             <div ng-if="view" ng-include="view"></div>
         </div>
 
@@ -21,7 +21,7 @@
 
         </div>
 
-        <div class="umb-overlay-drawer" ng-class="{'-auto-height': model.confirmSubmit.show}">
+        <div data-element="overlay-footer" class="umb-overlay-drawer" ng-class="{'-auto-height': model.confirmSubmit.show}">
 
             <div ng-if="model.confirmSubmit.show">
 
@@ -35,6 +35,7 @@
 
                 <div class="umb-overlay-drawer__align-right">
                     <umb-button
+                        alias="overlayCancelSubmit"
                         action="cancelConfirmSubmit()"
                         button-style="link"
                         label="Cancel"
@@ -42,6 +43,7 @@
                     </umb-button>
 
                     <umb-button
+                        data-element="overlay-confirm-submit"
                         button-style="success"
                         label="Confirm"
                         type="button"
@@ -53,6 +55,7 @@
 
             <div class="umb-overlay-drawer__align-right" ng-if="!model.confirmSubmit.show">
                 <umb-button
+                    alias="overlayClose"
                     action="closeOverLay()"
                     button-style="link"
                     label-key="{{model.closeButtonLabelKey}}"
@@ -61,6 +64,7 @@
                 </umb-button>
 
                 <umb-button
+                    alias="overlaySubmit"
                     button-style="success"
                     label-key="{{model.submitButtonLabelKey}}"
                     label="{{model.submitButtonLabel}}"

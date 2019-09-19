@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -9,20 +11,17 @@ namespace Umbraco.Core.Persistence.Factories
     {
         private readonly IMediaType _contentType;
         private readonly Guid _nodeObjectTypeId;
-        private readonly int _id;
         private int _primaryKey;
 
-        public MediaFactory(IMediaType contentType, Guid nodeObjectTypeId, int id)
+        public MediaFactory(IMediaType contentType, Guid nodeObjectTypeId)
         {
             _contentType = contentType;
             _nodeObjectTypeId = nodeObjectTypeId;
-            _id = id;
         }
 
-        public MediaFactory(Guid nodeObjectTypeId, int id)
+        public MediaFactory(Guid nodeObjectTypeId)
         {
             _nodeObjectTypeId = nodeObjectTypeId;
-            _id = id;
         }
 
         #region Implementation of IEntityFactory<IMedia,ContentVersionDto>
@@ -64,15 +63,27 @@ namespace Umbraco.Core.Persistence.Factories
             return BuildEntity(dto, _contentType);
         }
 
-        public ContentVersionDto BuildDto(IMedia entity)
+        public MediaDto BuildDto(IMedia entity)
         {
-            var dto = new ContentVersionDto
-                                        {
-                                            NodeId = entity.Id,
-                                            VersionDate = entity.UpdateDate,
-                                            VersionId = entity.Version,
-                                            ContentDto = BuildContentDto(entity)
-                                        };
+            var versionDto = new ContentVersionDto
+            {
+                NodeId = entity.Id,
+                VersionDate = entity.UpdateDate,
+                VersionId = entity.Version,
+                ContentDto = BuildContentDto(entity)
+            };
+
+            //Extract the media path for storage
+            string mediaPath;
+            TryMatch(entity.GetValue<string>("umbracoFile"), out mediaPath);
+
+            var dto = new MediaDto()
+            {
+                NodeId = entity.Id,
+                ContentVersionDto = versionDto,
+                MediaPath = mediaPath,
+                VersionId = entity.Version
+            };
             return dto;
         }
 
@@ -118,6 +129,34 @@ namespace Umbraco.Core.Persistence.Factories
                               };
 
             return nodeDto;
+        }
+
+        private static readonly Regex MediaPathPattern = new Regex($@"({SystemDirectories.Media.TrimStart("~")}/.+?)(?:['""]|$)", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Try getting a media path out of the string being stored for media
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="mediaPath"></param>
+        /// <returns></returns>
+        internal static bool TryMatch(string text, out string mediaPath)
+        {
+            //TODO: In v8 we should allow exposing this via the property editor in a much nicer way so that the property editor
+            // can tell us directly what any URL is for a given property if it contains an asset
+
+            mediaPath = null;
+
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            var match = MediaPathPattern.Match(text);
+            if (match.Success == false || match.Groups.Count != 2)
+                return false;
+
+            
+            var url = match.Groups[1].Value;
+            mediaPath = url;
+            return true;
         }
     }
 }

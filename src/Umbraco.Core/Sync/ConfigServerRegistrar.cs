@@ -4,6 +4,7 @@ using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Sync
 {
@@ -40,8 +41,9 @@ namespace Umbraco.Core.Sync
                 .ToList();
 
             if (serversA.Length == 0)
-            {
+            {               
                 _serverRole = ServerRole.Unknown; // config error, actually
+                LogHelper.Debug<ConfigServerRegistrar>(string.Format("Server Role Unknown: DistributedCalls are enabled but no servers are listed"));
             }
             else
             {
@@ -50,7 +52,10 @@ namespace Umbraco.Core.Sync
                 var serverName = master.ServerName;
 
                 if (appId.IsNullOrWhiteSpace() && serverName.IsNullOrWhiteSpace())
+                {
                     _serverRole = ServerRole.Unknown; // config error, actually
+                    LogHelper.Debug<ConfigServerRegistrar>(string.Format("Server Role Unknown: Server Name or AppId missing from Server configuration in DistributedCalls settings"));
+                }
                 else
                     _serverRole = IsCurrentServer(appId, serverName)
                         ? ServerRole.Master

@@ -29,7 +29,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [EnableOverrideAuthorization]
-    [MediaTypeControllerControllerConfigurationAttribute]
+    [MediaTypeControllerControllerConfiguration]
     public class MediaTypeController : ContentTypeControllerBase
     {
         /// <summary>
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAllowedChildren", "contentId", typeof(int), typeof(Guid), typeof(string))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAllowedChildren", "contentId", typeof(int), typeof(Guid), typeof(Udi), typeof(string))));
             }
         }
 
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a document type wth a given ID
+        /// Deletes a media type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -127,28 +127,51 @@ namespace Umbraco.Web.Editors
                 });
             return Request.CreateResponse(result);
         }
-
+        /// <summary>
+        /// Returns where a particular composition has been used
+        /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
+        {
+            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType)
+                .Select(x => new
+                {
+                    contentType = x
+                });
+            return Request.CreateResponse(result);
+        }
         public MediaTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new MediaType(parentId) {Icon = "icon-picture"};
+            IMediaType mt;
+            if (parentId != Constants.System.Root)
+            {
+                var parent = Services.ContentTypeService.GetMediaType(parentId);
+                mt = parent != null ? new MediaType(parent, string.Empty) : new MediaType(parentId);
+            }
+            else
+                mt = new MediaType(parentId);
 
-            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
+            mt.Icon = "icon-picture";
+
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mt);
             return dto;
         }
 
 
         /// <summary>
-        /// Returns all member types
+        /// Returns all media types
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAll()
         {
-
             return Services.ContentTypeService.GetAllMediaTypes()
                                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
         }
 
         /// <summary>
-        /// Deletes a document type container wth a given ID
+        /// Deletes a media type container wth a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -164,6 +187,16 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostCreateContainer(int parentId, string name)
         {
             var result = Services.ContentTypeService.CreateMediaTypeContainer(parentId, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+
+        public HttpResponseMessage PostRenameContainer(int id, string name)
+        {
+            
+            var result = Services.ContentTypeService.RenameMediaTypeContainer(id, name, Security.CurrentUser.Id);
 
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
@@ -187,6 +220,7 @@ namespace Umbraco.Web.Editors
         }
 
 
+        #region GetAllowedChildren
         /// <summary>
         /// Returns the allowed child content type objects for the content item id passed in - based on an INT id
         /// </summary>
@@ -229,7 +263,7 @@ namespace Umbraco.Web.Editors
                 basic.Description = TranslateItem(basic.Description);
             }
 
-            return basics;
+            return basics.OrderBy(x => x.Name);
         }
 
         /// <summary>
@@ -247,10 +281,30 @@ namespace Umbraco.Web.Editors
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
-        
-        [Obsolete("Do not use this method, use either the overload with INT or GUID instead, this will be removed in future versions")]
+
+        /// <summary>
+        /// Returns the allowed child content type objects for the content item id passed in - based on a UDI id
+        /// </summary>
+        /// <param name="contentId"></param>
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public IEnumerable<ContentTypeBasic> GetAllowedChildren(Udi contentId)
+        {
+            var guidUdi = contentId as GuidUdi;
+            if (guidUdi != null)
+            {
+                var entity = ApplicationContext.Services.EntityService.GetByKey(guidUdi.Guid);
+                if (entity != null)
+                {
+                    return GetAllowedChildren(entity.Id);
+                }
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+
+        [Obsolete("Do not use this method, use either the overload with INT, GUID or UDI instead, this will be removed in future versions")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]        
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(string contentId)
         {
             foreach (var type in new[] { typeof(int), typeof(Guid) })
@@ -260,11 +314,12 @@ namespace Umbraco.Web.Editors
                 {
                     //oooh magic! will auto select the right overload
                     return GetAllowedChildren((dynamic)parsed.Result);
-                }                    
+                }
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Move the media type

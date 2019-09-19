@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using System.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -24,6 +25,15 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
         Attempt<OperationStatus> MoveToRecycleBin(IMedia media, int userId = 0);
+
+        /// <summary>
+        /// Moves an <see cref="IMedia"/> object to a new location
+        /// </summary>
+        /// <param name="media">The <see cref="IMedia"/> to move</param>
+        /// <param name="parentId">Id of the Media's new Parent</param>
+        /// <param name="userId">Id of the User moving the Media</param>
+        /// <returns>True if moving succeeded, otherwise False</returns>
+        Attempt<OperationStatus> Move(IMedia media, int parentId, int userId = 0);
 
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
@@ -56,7 +66,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public interface IMediaService : IService
+    public interface IMediaService : IContentServiceBase
     {
         /// <summary>
         /// Gets all XML entries found in the cmsContentXml table based on the given path
@@ -86,6 +96,23 @@ namespace Umbraco.Core.Services
         int CountDescendants(int parentId, string contentTypeAlias = null);
 
         IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
+        IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids);
+
+        /// <summary>
+        /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
+        /// that this Media should based on.
+        /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IMedia without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new media objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Media object</param>
+        /// <param name="parentId">Id of Parent for the new Media item</param>
+        /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
+        /// <param name="userId">Optional id of the user creating the media item</param>
+        /// <returns><see cref="IMedia"/></returns>
+        IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = 0);
 
         /// <summary>
         /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
@@ -251,6 +278,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the User moving the Media</param>
         void Move(IMedia media, int parentId, int userId = 0);
 
+
         /// <summary>
         /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
         /// </summary>
@@ -261,7 +289,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
         void EmptyRecycleBin();
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
+        /// </summary>
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        void EmptyRecycleBin(int userId = 0);
 
         /// <summary>
         /// Deletes all media of specified type. All children of deleted media is moved to Recycle Bin.
@@ -270,6 +306,14 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional Id of the user deleting Media</param>
         void DeleteMediaOfType(int mediaTypeId, int userId = 0);
+
+        /// <summary>
+        /// Deletes all media of the specified types. All Descendants of deleted media that is not of these types is moved to Recycle Bin.
+        /// </summary>
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="mediaTypeIds">Ids of the <see cref="IMediaType"/>s</param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0);
 
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
@@ -431,5 +475,35 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user creating the media item</param>
         /// <returns><see cref="IMedia"/></returns>
         IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = 0);
+
+        /// <summary>
+        /// Gets the content of a media as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        /// <returns>The content of the media.</returns>
+        Stream GetMediaFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a media.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        /// <param name="content">The content of the media.</param>
+        void SetMediaFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a media.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        /// <returns>The size of the media.</returns>
+        long GetMediaFileSize(string filepath);
+
+        /// <summary>
+        /// Deletes a media file and all thumbnails.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        void DeleteMediaFile(string filepath);
+
+        [Obsolete("This should no longer be used, thumbnail generation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
+        void GenerateThumbnails(string filepath, PropertyType propertyType);
     }
 }

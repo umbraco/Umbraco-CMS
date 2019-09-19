@@ -491,7 +491,7 @@ namespace Umbraco.Web
 
             //disable asp.net headers (security)
             // This is the correct place to modify headers according to MS:
-            // https://our.umbraco.org/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
+            // https://our.umbraco.com/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
 		    app.PostReleaseRequestState += (sender, args) =>
 		    {
                 var httpContext = ((HttpApplication)sender).Context;
@@ -503,10 +503,17 @@ namespace Umbraco.Web
                     httpContext.Response.Headers.Remove("X-AspNet-Version");
                     httpContext.Response.Headers.Remove("X-AspNetMvc-Version");
                 }
-                catch (PlatformNotSupportedException ex)
+                catch (PlatformNotSupportedException)
                 {
                     // can't remove headers this way on IIS6 or cassini.
                 }
+		    };
+
+		    app.PostAuthenticateRequest += (sender, e) =>
+		    {
+		        var httpContext = ((HttpApplication)sender).Context;
+		        //ensure the thread culture is set
+		        httpContext.User?.Identity?.EnsureCulture();
 		    };
 
             app.PostResolveRequestCache += (sender, e) =>

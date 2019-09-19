@@ -358,9 +358,8 @@ namespace Umbraco.Core.Services
                 {
                     var applicationAlias = (string)addElement.Attribute("application");
                     var type = (string)addElement.Attribute("type");
-                    var assembly = (string)addElement.Attribute("assembly");
-
-                    var clrType = Type.GetType(type);
+                    
+                    var clrType = ApplicationTree.TryGetType(type);
                     if (clrType == null)
                     {
                         _logger.Warn<ApplicationTreeService>("The tree definition: " + addElement.ToString() + " could not be resolved to a .Net object type");

@@ -25,7 +25,7 @@ namespace Umbraco.Web.Trees
             nodes.AddRange(
                 Services.MemberTypeService.GetAll()
                     .OrderBy(x => x.Name)
-                    .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", false)));
+                    .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberTypeGuid, id, queryStrings, "icon-item-arrangement", false)));
             
             return nodes;
         }

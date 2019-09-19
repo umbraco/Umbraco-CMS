@@ -8,7 +8,7 @@ namespace Umbraco.Web.Scheduling
     /// </summary>
     /// <typeparam name="T">The type of the managed tasks.</typeparam>
     /// <remarks>The interface is not complete and exists only to have the contravariance on T.</remarks>
-    internal interface IBackgroundTaskRunner<in T> : IDisposable, IRegisteredObject
+    public interface IBackgroundTaskRunner<in T> : IDisposable, IRegisteredObject
         where T : class, IBackgroundTask
     {
         bool IsCompleted { get; }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Xml.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
@@ -176,6 +176,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
+            var jv = value as JValue;
+            if (jv != null)
+            {
+                value = value.ToString();
+            }
+
             //this is a custom check to avoid any errors, if it's a string and it's empty just make it null
             var s = value as string;
             if (s != null)
@@ -293,7 +299,7 @@ namespace Umbraco.Core.PropertyEditors
                             //swallow this exception, we thought it was json but it really isn't so continue returning a string
                         }
                     }
-                    return property.Value.ToString();
+                    return asString;
                 case DataTypeDatabaseType.Integer:
                 case DataTypeDatabaseType.Decimal:
                     //Decimals need to be formatted with invariant culture (dots, not commas)

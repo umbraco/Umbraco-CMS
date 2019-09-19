@@ -1,5 +1,10 @@
-﻿namespace Umbraco.Core.Configuration.UmbracoSettings
+﻿using System;
+using System.ComponentModel;
+
+namespace Umbraco.Core.Configuration.UmbracoSettings
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This is no longer used and will be removed in future versions")]
     public interface ILink
     {
         string Application { get; }

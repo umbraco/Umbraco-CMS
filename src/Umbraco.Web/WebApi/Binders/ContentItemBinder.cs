@@ -3,7 +3,6 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.WebApi.Binders
 {
@@ -33,7 +32,7 @@ namespace Umbraco.Web.WebApi.Binders
             var contentType = ApplicationContext.Services.ContentTypeService.GetContentType(model.ContentTypeAlias);
             if (contentType == null)
             {
-                throw new InvalidOperationException("No content type found wth alias " + model.ContentTypeAlias);
+                throw new InvalidOperationException("No content type found with alias " + model.ContentTypeAlias);
             }
             return new Content(model.Name, model.ParentId, contentType);     
         }

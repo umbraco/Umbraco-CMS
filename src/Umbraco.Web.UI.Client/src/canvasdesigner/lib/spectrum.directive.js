@@ -48,7 +48,7 @@ angular.module('spectrumcolorpicker', [])
                           scope.colorselected = initColor;
                           scope.$apply();
                       });
-                  },
+                  }
 
               });
 

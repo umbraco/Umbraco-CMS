@@ -20,8 +20,21 @@ namespace Umbraco.Web.Models
         public string OldPassword { get; set; }
 
         /// <summary>
-        /// Set to true if the password is to be reset - only valid when: EnablePasswordReset = true
+        /// Set to true if the password is to be reset
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This operator is different between using ASP.NET Identity APIs and Membership APIs.
+        /// </para>
+        /// <para>
+        /// When using Membership APIs, this is only valid when: EnablePasswordReset = true and it will reset the password to something auto generated.
+        /// </para>
+        /// <para>
+        /// When using ASP.NET Identity APIs this needs to be set if an administrator user that has access to the Users section is changing another users
+        /// password. This flag is required to indicate that the oldPassword value is not required and that we are in fact performing a password reset and
+        /// then a password change if the executing user has access to do so.
+        /// </para>
+        /// </remarks>
         [DataMember(Name = "reset")]
         public bool? Reset { get; set; }
 

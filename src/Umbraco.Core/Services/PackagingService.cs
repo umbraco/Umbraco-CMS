@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Newtonsoft.Json;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
@@ -44,11 +45,11 @@ namespace Umbraco.Core.Services
         private readonly ILocalizationService _localizationService;
         private readonly IEntityService _entityService;
         private readonly RepositoryFactory _repositoryFactory;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
         private readonly IUserService _userService;
-
+        private static HttpClient _httpClient;
 
         public PackagingService(
             ILogger logger,
@@ -62,7 +63,7 @@ namespace Umbraco.Core.Services
             IEntityService entityService,
             IUserService userService,
             RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider uowProvider) 
+            IScopeUnitOfWorkProvider uowProvider)
         {
             _logger = logger;
             _contentService = contentService;
@@ -88,17 +89,18 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId)
         {
-            var packageRepo = UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault();
-
-            using (var httpClient = new HttpClient())
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 //includeHidden = true because we don't care if it's hidden we want to get the file regardless
-                var url = string.Format("{0}/{1}?version={2}&includeHidden=true&asFile=true", packageRepo.RestApiUrl, packageId, umbracoVersion.ToString(3));
+                var url = string.Format("{0}/{1}?version={2}&includeHidden=true&asFile=true", Constants.PackageRepository.RestApiBaseUrl, packageId, umbracoVersion.ToString(3));
                 byte[] bytes;
                 try
                 {
-                    bytes = httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
+                    if (_httpClient == null)
+                    {
+                        _httpClient = new HttpClient();
+                    }
+                    bytes = _httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
                 }
                 catch (HttpRequestException ex)
                 {
@@ -123,12 +125,12 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                Audit(uow, AuditType.PackagerInstall, string.Format("Package {0} fetched from {1}", packageId, packageRepo.Id), userId, -1);
+                Audit(uow, AuditType.PackagerInstall, string.Format("Package {0} fetched from {1}", packageId, Constants.PackageRepository.DefaultRepositoryId), userId, -1);
                 return null;
             }
         }
 
-        private void Audit(IDatabaseUnitOfWork uow, AuditType type, string message, int userId, int objectId)
+        private void Audit(IScopeUnitOfWork uow, AuditType type, string message, int userId, int objectId)
         {
             var auditRepo = _repositoryFactory.CreateAuditRepository(uow);
             auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
@@ -284,6 +286,7 @@ namespace Umbraco.Core.Services
             var nodeName = element.Attribute("nodeName").Value;
             var path = element.Attribute("path").Value;
             var template = element.Attribute("template").Value;
+            var key = Guid.Empty;
 
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
@@ -300,6 +303,12 @@ namespace Umbraco.Core.Services
                                        Level = int.Parse(level),
                                        SortOrder = int.Parse(sortOrder)
                                    };
+
+            if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))
+            {
+                // update the Guid (for UDI support)
+                content.Key = key;
+            }
 
             foreach (var property in properties)
             {
@@ -519,7 +528,7 @@ namespace Umbraco.Core.Services
             {
                 var foldersAttribute = documentType.Attribute("Folders");
                 var infoElement = documentType.Element("Info");
-                if (foldersAttribute != null && infoElement != null 
+                if (foldersAttribute != null && infoElement != null
                     //don't import any folder if this is a child doc type - the parent doc type will need to
                     //exist which contains it's folders
                     && ((string)infoElement.Element("Master")).IsNullOrWhiteSpace())
@@ -824,21 +833,21 @@ namespace Umbraco.Core.Services
             foreach (var element in structureElement.Elements("DocumentType"))
             {
                 var alias = element.Value;
-                if (_importedContentTypes.ContainsKey(alias))
-                {
-                    var allowedChild = _importedContentTypes[alias];
-                    if (allowedChild == null || allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
 
-                    allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
-                    sortOrder++;
-                }
-                else
+                var allowedChild = _importedContentTypes.ContainsKey(alias) ? _importedContentTypes[alias] : _contentTypeService.GetContentType(alias);
+                if (allowedChild == null)
                 {
                     _logger.Warn<PackagingService>(
                     string.Format(
                         "Packager: Error handling DocumentType structure. DocumentType with alias '{0}' could not be found and was not added to the structure for '{1}'.",
                         alias, contentType.Alias));
+
+                    continue;
                 }
+                if (allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
+
+                allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
+                sortOrder++;
             }
 
             contentType.AllowedContentTypes = allowedChildren;
@@ -852,8 +861,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
-            using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
+            using (var uow = _uowProvider.GetUnitOfWork())
             {
+                var repository = _repositoryFactory.CreateContentTypeRepository(uow);
                 var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
                 var types = repository.GetByQuery(query).ToArray();
 
@@ -867,7 +877,7 @@ namespace Umbraco.Core.Services
                 if (contentType == null)
                     throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
                                                       contentTypeAlias));
-
+                uow.Commit();
                 return contentType;
             }
         }
@@ -1039,7 +1049,7 @@ namespace Umbraco.Core.Services
                         {
                             _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
-                        }                        
+                        }
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
                     }
 
@@ -1089,14 +1099,14 @@ namespace Umbraco.Core.Services
                 if (dataTypeDefinition != null)
                 {
                     var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
-                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace())
+                        .Where(x => ((string)x.Attribute("Alias")).IsNullOrWhiteSpace())
                         .Select(x => x.Attribute("Value").Value);
 
                     var valuesWithKeys = prevaluesElement.Elements("PreValue")
-                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
+                        .Where(x => ((string)x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
                         .ToDictionary(
-                            key => (string) key.Attribute("Alias"),
-                            val => new PreValue((string) val.Attribute("Value")));
+                            key => (string)key.Attribute("Alias"),
+                            val => new PreValue((string)val.Attribute("Value")));
 
                     //save the values with keys
                     _dataTypeService.SavePreValues(dataTypeDefinition, valuesWithKeys);
@@ -1739,9 +1749,10 @@ namespace Umbraco.Core.Services
 
         internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
         {
+            var metaData = GetPackageMetaData(packageFilePath);
+
             if (raiseEvents)
-            {
-                var metaData = GetPackageMetaData(packageFilePath);
+            {                
                 if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFilePath, metaData), this))
                 {
                     var initEmpty = new InstallationSummary().InitEmpty();
@@ -1753,7 +1764,7 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
             {
-                ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, false), this);
+                ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, metaData, false), this);
             }
 
             return installationSummary;
@@ -1773,6 +1784,24 @@ namespace Umbraco.Core.Services
 
         #region Package Building
         #endregion
+
+        /// <summary>
+        /// This method can be used to trigger the 'ImportedPackage' event when a package is installed by something else but this service.
+        /// </summary>
+        /// <param name="args"></param>
+        internal static void OnImportedPackage(ImportPackageEventArgs<InstallationSummary> args)
+        {
+            ImportedPackage.RaiseEvent(args, null);
+        }
+
+        /// <summary>
+        /// This method can be used to trigger the 'UninstalledPackage' event when a package is uninstalled by something else but this service.
+        /// </summary>
+        /// <param name="args"></param>
+        internal static void OnUninstalledPackage(UninstallPackageEventArgs<UninstallationSummary> args)
+        {
+            UninstalledPackage.RaiseEvent(args, null);
+        }
 
         #region Event Handlers
         /// <summary>
@@ -1934,9 +1963,14 @@ namespace Umbraco.Core.Services
         internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
 
         /// <summary>
-        /// Occurs after a apckage is imported
+        /// Occurs after a package is imported
         /// </summary>
-        internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
+        public static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
+
+        /// <summary>
+        /// Occurs after a package is uninstalled
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs<UninstallationSummary>> UninstalledPackage;
 
         #endregion
     }

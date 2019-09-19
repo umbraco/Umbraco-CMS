@@ -1,30 +1,40 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.LinkPickerController">
 	<div class="umb-panel-body no-header with-footer compact">
 		<umb-pane>
-			<umb-control-group label="@content_urls">
-				<input type="text"
-					localize="placeholder" 
-					placeholder="@general_url" 
-					class="umb-editor umb-textstring" 
-					ng-model="target.url"
-					ng-disabled="target.id"
-					 />
-			</umb-control-group>
+	<umb-control-group label="@defaultdialogs_urlLinkPicker" class="umb-property--pull">
+	    <input type="text"
+	           localize="placeholder"
+	           placeholder="@general_url"
+	           class="umb-editor umb-textstring"
+	           ng-model="target.url"
+	           ng-disabled="target.id || target.udi" />
+	</umb-control-group>
 
-			<umb-control-group label="@content_nodeName">
+	<umb-control-group label="@defaultdialogs_anchorLinkPicker" class="umb-property--push">
+	    <input type="text"
+	           list="anchors"
+	           localize="placeholder"
+	           placeholder="@placeholders_anchor"
+	           class="umb-editor umb-textstring"
+	           ng-model="target.anchor" />
+
+		<datalist id="anchors">
+					<option value="{{a}}" ng-repeat="a in anchorValues"></option>
+				</datalist>
+	</umb-control-group>
+
+			<umb-control-group label="@defaultdialogs_nodeNameLinkPicker">
 				<input type="text"
-					localize="placeholder" 
-					placeholder="@placeholders_entername" 
-					class="umb-editor umb-textstring" 
+					localize="placeholder"
+					placeholder="@placeholders_entername"
+					class="umb-editor umb-textstring"
 					ng-model="target.name" />
 			</umb-control-group>
 
 			<umb-control-group label="@content_target">
 				<select class="umb-editor umb-dropdown" ng-model="target.target">
 					<option value=""></option>
-					<option value="_blank">Opens the linked document in a new window or tab</option>
-					<option value="_top">Opens the linked document in the full body of the window</option>
-					<option value="_parent">Opens the linked document in the parent frame</option>
+					<option value="_blank"><localize key="defaultdialogs_openInNewWindow">Opens the linked document in a new window or tab</localize></option>
 				</select>
 			</umb-control-group>
 		</umb-pane>
@@ -33,17 +43,18 @@
                              search-callback="onSearchResults"
                              search-from-id="{{searchInfo.searchFromId}}"
                              search-from-name="{{searchInfo.searchFromName}}"
+                             datatype-id="{{searchInfo.dataTypeId}}"
                              show-search="{{searchInfo.showSearch}}"
                              section="{{section}}">
         </umb-tree-search-box>
-        
+
         <br/>
 
         <umb-tree-search-results ng-if="searchInfo.showSearch"
                                  results="searchInfo.results"
                                  select-result-callback="selectResult">
         </umb-tree-search-results>
-        
+
 	    <div ng-hide="searchInfo.showSearch">
             <umb-tree section="content"
                       hideheader="true"
@@ -51,9 +62,9 @@
                       eventhandler="dialogTreeEventHandler"
                       isdialog="true"
                       enablecheckboxes="true">
-            </umb-tree>    
+            </umb-tree>
 	    </div>
-        
+
 	</div>
 
 	<div class="umb-panel-footer">
@@ -62,9 +73,9 @@
 	        	<a href ng-click="close()" class="btn btn-link">
 	        		<localize key="general_cancel">Cancel</localize>
 				</a>
-
-				<a href ng-click="switchToMediaPicker()" class="btn">Link to file</a>
-
+	            <a href ng-click="switchToMediaPicker()" class="btn">
+                    <localize key="defaultdialogs_selectMedia">Select media</localize>
+	            </a>
 				<button
 					class="btn btn-primary"
 					ng-click="submit(target)">

@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    internal class RedirectUrlService : RepositoryService, IRedirectUrlService
+    internal class RedirectUrlService : ScopeRepositoryService, IRedirectUrlService
     {
         public RedirectUrlService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory) 
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
@@ -17,8 +17,9 @@ namespace Umbraco.Core.Services
         public void Register(string url, Guid contentKey)
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
+
                 var redir = repo.Get(url, contentKey);
                 if (redir != null)
                     redir.CreateDateUtc = DateTime.UtcNow;
@@ -32,8 +33,8 @@ namespace Umbraco.Core.Services
         public void Delete(IRedirectUrl redirectUrl)
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
                 repo.Delete(redirectUrl);
                 uow.Commit();
             }
@@ -42,8 +43,8 @@ namespace Umbraco.Core.Services
         public void Delete(Guid id)
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
                 repo.Delete(id);
                 uow.Commit();
             }
@@ -52,8 +53,8 @@ namespace Umbraco.Core.Services
         public void DeleteContentRedirectUrls(Guid contentKey)
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
                 repo.DeleteContentUrls(contentKey);
                 uow.Commit();
             }
@@ -62,8 +63,8 @@ namespace Umbraco.Core.Services
         public void DeleteAll()
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
                 repo.DeleteAll();
                 uow.Commit();
             }
@@ -72,9 +73,10 @@ namespace Umbraco.Core.Services
         public IRedirectUrl GetMostRecentRedirectUrl(string url)
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
                 var rule = repo.GetMostRecentUrl(url);
+                uow.Commit();
                 return rule;
             }
         }
@@ -82,9 +84,10 @@ namespace Umbraco.Core.Services
         public IEnumerable<IRedirectUrl> GetContentRedirectUrls(Guid contentKey)
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
                 var rules = repo.GetContentUrls(contentKey);
+                uow.Commit();
                 return rules;
             }
         }
@@ -92,9 +95,10 @@ namespace Umbraco.Core.Services
         public IEnumerable<IRedirectUrl> GetAllRedirectUrls(long pageIndex, int pageSize, out long total)
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
                 var rules = repo.GetAllUrls(pageIndex, pageSize, out total);
+                uow.Commit();
                 return rules;
             }
         }
@@ -102,18 +106,20 @@ namespace Umbraco.Core.Services
         public IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total)
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
                 var rules = repo.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
+                uow.Commit();
                 return rules;
             }
         }
         public IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total)
         {
             using (var uow = UowProvider.GetUnitOfWork())
-            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
+                var repo = RepositoryFactory.CreateRedirectUrlRepository(uow);
                 var rules = repo.SearchUrls(searchTerm, pageIndex, pageSize, out total);
+                uow.Commit();
                 return rules;
             }
         }

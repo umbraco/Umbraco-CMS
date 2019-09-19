@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
@@ -14,7 +15,7 @@ namespace Umbraco.Tests.PropertyEditors
     /// multiple values such as the drop down list, check box list, color picker, etc....
     /// </summary>
     [TestFixture]
-    public class MultiValuePropertyEditorTests
+    public class MultiValuePropertyEditorTests : BaseUmbracoApplicationTest
     {
         //TODO: Test the other formatting methods for the drop down classes
 

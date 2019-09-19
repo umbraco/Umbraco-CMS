@@ -109,6 +109,25 @@ namespace Umbraco.Web.Editors
 
             var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
 
+            Func<IContentTypeComposition, IEnumerable<EntityContainer>> getEntityContainers = contentType =>
+            {
+                if (contentType == null)
+                {
+                    return null;
+                }
+                switch (type)
+                {
+                    case UmbracoObjectTypes.DocumentType:
+                        return Services.ContentTypeService.GetContentTypeContainers(contentType as IContentType);
+                    case UmbracoObjectTypes.MediaType:
+                        return Services.ContentTypeService.GetMediaTypeContainers(contentType as IMediaType);
+                    case UmbracoObjectTypes.MemberType:
+                        return new EntityContainer[0];
+                    default:
+                        throw new ArgumentOutOfRangeException("The entity type was not a content type");
+                }
+            };
+
             var currCompositions = source == null ? new IContentTypeComposition[] { } : source.ContentTypeComposition.ToArray();
             var compAliases = currCompositions.Select(x => x.Alias).ToArray();
             var ancestors = availableCompositions.Ancestors.Select(x => x.Alias);
@@ -117,9 +136,6 @@ namespace Umbraco.Web.Editors
                 .Select(x => new Tuple<EntityBasic, bool>(Mapper.Map<IContentTypeComposition, EntityBasic>(x.Composition), x.Allowed))
                 .Select(x =>
                 {
-                    //translate the name
-                    x.Item1.Name = TranslateItem(x.Item1.Name);
-
                     //we need to ensure that the item is enabled if it is already selected
                     // but do not allow it if it is any of the ancestors
                     if (compAliases.Contains(x.Item1.Alias) && ancestors.Contains(x.Item1.Alias) == false)
@@ -128,12 +144,79 @@ namespace Umbraco.Web.Editors
                         x = new Tuple<EntityBasic, bool>(x.Item1, true);
                     }
 
+                    //translate the name
+                    x.Item1.Name = TranslateItem(x.Item1.Name);
+
+                    var contentType = allContentTypes.FirstOrDefault(c => c.Key == x.Item1.Key);
+                    var containers = getEntityContainers(contentType)?.ToArray();
+                    var containerPath = $"/{(containers != null && containers.Any() ? $"{string.Join("/", containers.Select(c => c.Name))}/" : null)}";
+                    x.Item1.AdditionalData["containerPath"] = containerPath;
+
                     return x;
                 })
                 .ToList();
         }
 
+        /// <summary>
+        /// Returns a list of content types where a particular composition content type is used
+        /// </summary>
+        /// <param name="type">Type of content Type, eg documentType or mediaType</param>
+        /// <param name="contentTypeId">Id of composition content type</param>
+        /// <returns></returns>
+        protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId,
+            UmbracoObjectTypes type)
+        {
+            IContentTypeComposition source = null;
 
+            //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
+
+            IContentTypeComposition[] allContentTypes;
+
+            switch (type)
+            {
+                case UmbracoObjectTypes.DocumentType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.ContentTypeService.GetContentType(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                case UmbracoObjectTypes.MediaType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.ContentTypeService.GetMediaType(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                case UmbracoObjectTypes.MemberType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.MemberTypeService.Get(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.MemberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException("The entity type was not a content type");
+            }
+
+            var contentTypesWhereCompositionIsUsed = Services.ContentTypeService.GetWhereCompositionIsUsedInContentTypes(source, allContentTypes);
+           return contentTypesWhereCompositionIsUsed
+                .Select(x => Mapper.Map<IContentTypeComposition, EntityBasic>(x))
+                .Select(x =>
+                {
+                    //translate the name
+                    x.Name = TranslateItem(x.Name);
+
+                    return x;
+                })
+                .ToList();
+        }
         protected string TranslateItem(string text)
         {
             if (text == null)
@@ -168,9 +251,9 @@ namespace Umbraco.Web.Editors
             // works since that is based on aliases.
             var allAliases = Services.ContentTypeService.GetAllContentTypeAliases();
             var exists = allAliases.InvariantContains(contentTypeSave.Alias);
-            if ((exists) && (ctId == 0 || ct.Alias != contentTypeSave.Alias))
+            if (exists && (ctId == 0 || ct.Alias.InvariantEquals(contentTypeSave.Alias) == false))
             {
-                ModelState.AddModelError("Alias", "A content type, media type or member type with this alias already exists");
+                ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype/aliasAlreadyExists"));
             }
 
             //now let the external validators execute
@@ -220,9 +303,12 @@ namespace Umbraco.Web.Editors
                 //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
                 //always filter these 0 types out
                 var allowItselfAsChild = false;
+                var allowIfselfAsChildSortOrder = -1;
                 if (contentTypeSave.AllowedContentTypes != null)
                 {
+                    allowIfselfAsChildSortOrder = contentTypeSave.AllowedContentTypes.IndexOf(0);
                     allowItselfAsChild = contentTypeSave.AllowedContentTypes.Any(x => x == 0);
+
                     contentTypeSave.AllowedContentTypes = contentTypeSave.AllowedContentTypes.Where(x => x > 0).ToList();
                 }
 
@@ -251,10 +337,12 @@ namespace Umbraco.Web.Editors
                 saveContentType(newCt);
 
                 //we need to save it twice to allow itself under itself.
-                if (allowItselfAsChild)
+                if (allowItselfAsChild && newCt != null)
                 {
-                    //NOTE: This will throw if the composition isn't right... but it shouldn't be at this stage
-                    newCt.AddContentType(newCt);
+                    newCt.AllowedContentTypes =
+                        newCt.AllowedContentTypes.Union(
+                            new []{ new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder) }
+                        );
                     saveContentType(newCt);
                 }
                 return newCt;

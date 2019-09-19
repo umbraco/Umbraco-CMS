@@ -129,11 +129,11 @@ namespace Umbraco.Web.PublishedCache
 
         public override IPublishedProperty GetProperty(string alias)
         {
-            switch (alias)
+            switch (alias.ToLowerInvariant())
             {
-                case "Email":
+                case "email":
                     return new PropertyResult("Email", Email, PropertyResultType.CustomProperty);
-                case "UserName":
+                case "username":
                     return new PropertyResult("UserName", UserName, PropertyResultType.CustomProperty);
             }
 

@@ -37,7 +37,7 @@
                 codeVal = UmbEditor.GetCode();
             }
             umbraco.presentation.webservices.codeEditorSave.SaveXslt(
-                fileName, self._opts.originalFileName, codeVal, self._opts.skipTestingCheckBox.is(':checked'),
+                fileName, self._opts.originalFileName, codeVal, true,
                 function (t) { self.submitSucces(t); },
                 function (t) { self.submitFailure(t); });
 

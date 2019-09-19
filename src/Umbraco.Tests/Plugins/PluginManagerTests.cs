@@ -18,6 +18,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using umbraco.editorControls;
+using umbraco.interfaces;
 using umbraco.MacroEngines;
 using umbraco.uicontrols;
 using Umbraco.Web;
@@ -34,14 +35,14 @@ namespace Umbraco.Tests.Plugins
         public void Initialize()
         {
             //this ensures its reset
-            _manager = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), 
+            _manager = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
             //TODO: Should probably update this so it only searches this assembly and add custom types to be found
             _manager.AssembliesToScan = new[]
 			    {
-			        this.GetType().Assembly, 
+			        this.GetType().Assembly,
 			        typeof(ApplicationStartupHandler).Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
@@ -160,7 +161,7 @@ namespace Umbraco.Tests.Plugins
         public void Detect_Legacy_Plugin_File_List()
         {
             var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
-            
+
             var filePath= Path.Combine(tempFolder, string.Format("umbraco-plugins.{0}.list", NetworkHelper.FileSafeMachineName));
 
             File.WriteAllText(filePath, @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -169,12 +170,11 @@ namespace Umbraco.Tests.Plugins
 <add type=""umbraco.macroCacheRefresh, umbraco, Version=6.0.0.0, Culture=neutral, PublicKeyToken=null"" />
 </baseType>
 </plugins>");
-            
-            Assert.IsTrue(_manager.DetectLegacyPluginListFile());
+
+            Assert.IsEmpty(_manager.ReadCache()); // uber-legacy cannot be read
 
             File.Delete(filePath);
 
-            //now create a valid one
             File.WriteAllText(filePath, @"<?xml version=""1.0"" encoding=""utf-8""?>
 <plugins>
 <baseType type=""umbraco.interfaces.ICacheRefresher"" resolutionType=""FindAllTypes"">
@@ -182,19 +182,32 @@ namespace Umbraco.Tests.Plugins
 </baseType>
 </plugins>");
 
-            Assert.IsFalse(_manager.DetectLegacyPluginListFile());
+            Assert.IsEmpty(_manager.ReadCache()); // legacy cannot be read
+
+            File.Delete(filePath);
+
+            File.WriteAllText(filePath, @"IContentFinder
+
+MyContentFinder
+AnotherContentFinder
+
+");
+
+            Assert.IsNotNull(_manager.ReadCache()); // works
         }
 
         [Test]
         public void Create_Cached_Plugin_File()
         {
-            var types = new[] { typeof(PluginManager), typeof(PluginManagerTests), typeof(UmbracoContext) };
+            var types = new[] { typeof (PluginManager), typeof (PluginManagerTests), typeof (UmbracoContext) };
 
-            //yes this is silly, none of these types inherit from string, but this is just to test the xml file format
-            _manager.UpdateCachedPluginsFile<string>(types, PluginManager.TypeResolutionKind.FindAllTypes);
+            var typeList1 = new PluginManager.TypeList(typeof (object), null);
+            foreach (var type in types) typeList1.Add(type);
+            _manager.AddTypeList(typeList1);
+            _manager.WriteCache();
 
-            var plugins = _manager.TryGetCachedPluginsFromFile<string>(PluginManager.TypeResolutionKind.FindAllTypes);
-            var diffType = _manager.TryGetCachedPluginsFromFile<string>(PluginManager.TypeResolutionKind.FindAttributedTypes);
+            var plugins = _manager.TryGetCached(typeof (object), null);
+            var diffType = _manager.TryGetCached(typeof (object), typeof (ObsoleteAttribute));
 
             Assert.IsTrue(plugins.Success);
             //this will be false since there is no cache of that type resolution kind
@@ -205,15 +218,7 @@ namespace Umbraco.Tests.Plugins
             //ensure they are all found
             Assert.IsTrue(plugins.Result.ContainsAll(shouldContain));
         }
-
-        [Test]
-        public void PluginHash_From_String()
-        {
-            var s = "hello my name is someone".GetHashCode().ToString("x", CultureInfo.InvariantCulture);
-            var output = PluginManager.ConvertPluginsHashFromHex(s);
-            Assert.AreNotEqual(0, output);
-        }
-
+        
         [Test]
         public void Get_Plugins_Hash()
         {
@@ -240,7 +245,7 @@ namespace Umbraco.Tests.Plugins
             var list1 = new[] { f1, f2, f3, f4, f5, f6 };
             var list2 = new[] { f1, f3, f5 };
             var list3 = new[] { f1, f3, f5, f7 };
-            
+
             //Act
             var hash1 = PluginManager.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var hash2 = PluginManager.GetFileHash(list2, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
@@ -259,16 +264,14 @@ namespace Umbraco.Tests.Plugins
         {
             var foundTypes1 = _manager.ResolveFindMeTypes();
             var foundTypes2 = _manager.ResolveFindMeTypes();
-            Assert.AreEqual(1,
-                            _manager.GetTypeLists()
-                                .Count(x => x.IsTypeList<IFindMe>(PluginManager.TypeResolutionKind.FindAllTypes)));
+            Assert.AreEqual(1, _manager.TypeLists.Count(x => x.BaseType == typeof(IFindMe) && x.AttributeType == null));
         }
 
         [Test]
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = _manager.ResolveAssignedMapperTypes();
-            Assert.AreEqual(28, foundTypes1.Count());
+            Assert.AreEqual(31, foundTypes1.Count());
         }
 
         [Test]
@@ -282,22 +285,21 @@ namespace Umbraco.Tests.Plugins
         public void Resolves_Attributed_Trees()
         {
             var trees = _manager.ResolveAttributedTrees();
-            // commit 6c5e35ec2cbfa31be6790d1228e0c2faf5f55bc8 brings the count down to 14
-            Assert.AreEqual(12, trees.Count());
+            Assert.AreEqual(5, trees.Count());
         }
 
         [Test]
         public void Resolves_Actions()
         {
             var actions = _manager.ResolveActions();
-            Assert.AreEqual(37, actions.Count());
+            Assert.AreEqual(38, actions.Count());
         }
 
         [Test]
         public void Resolves_Trees()
         {
             var trees = _manager.ResolveTrees();
-            Assert.AreEqual(39, trees.Count());
+            Assert.AreEqual(33, trees.Count());
         }
 
         [Test]
@@ -325,7 +327,7 @@ namespace Umbraco.Tests.Plugins
         public void Resolves_RestExtensions()
         {
             var types = _manager.ResolveRestExtensions();
-            Assert.AreEqual(3, types.Count());
+            Assert.AreEqual(2, types.Count());
         }
 
         [Test]
@@ -344,20 +346,20 @@ namespace Umbraco.Tests.Plugins
         {
             var types = new HashSet<PluginManager.TypeList>();
 
-            var propEditors = new PluginManager.TypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes);
-            propEditors.AddType(typeof(LabelPropertyEditor));
+            var propEditors = new PluginManager.TypeList(typeof (PropertyEditor), null);
+            propEditors.Add(typeof(LabelPropertyEditor));
             types.Add(propEditors);
 
-            var found = types.SingleOrDefault(x => x.IsTypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
+            var found = types.SingleOrDefault(x => x.BaseType == typeof (PropertyEditor) && x.AttributeType == null);
 
             Assert.IsNotNull(found);
 
             //This should not find a type list of this type
-            var shouldNotFind = types.SingleOrDefault(x => x.IsTypeList<IParameterEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
+            var shouldNotFind = types.SingleOrDefault(x => x.BaseType == typeof (IParameterEditor) && x.AttributeType == null);
 
             Assert.IsNull(shouldNotFind);
         }
-     
+
         [XsltExtension("Blah.Blah")]
         public class MyXsltExtension
         {
@@ -371,7 +373,7 @@ namespace Umbraco.Tests.Plugins
 
         }
 
-        public interface IFindMe
+        public interface IFindMe : IDiscoverable
         {
 
         }

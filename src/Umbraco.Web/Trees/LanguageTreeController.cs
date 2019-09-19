@@ -5,9 +5,12 @@ using System.Net.Http.Formatting;
 using System.Web.Services.Description;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
+using umbraco.cms.presentation;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using umbraco.presentation.actions;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -42,9 +45,18 @@ namespace Umbraco.Web.Trees
                 var languages = Services.LocalizationService.GetAllLanguages();
                 foreach (var language in languages)
                 {
-                    nodes.Add(
-                        CreateTreeNode(
-                            language.Id.ToString(CultureInfo.InvariantCulture), "-1", queryStrings, language.CultureInfo.DisplayName, "icon-flag-alt", false,
+                    string displayName;
+                    try
+                    {
+                        displayName = language.CultureInfo.DisplayName;
+                    }
+                    catch (CultureNotFoundException ex)
+                    {
+                        Logger.Error<LanguageTreeController>(string.Format("Could not find the specified culture: '{0}'. Please make sure this culture is installed on your machine.", language.IsoCode), ex);
+                        displayName = "Unknown Locale (" + language.IsoCode + ")";
+                    }
+                    nodes.Add(CreateTreeNode(
+                            language.Id.ToString(CultureInfo.InvariantCulture), "-1", queryStrings, displayName, "icon-flag-alt", false,
                             //TODO: Rebuild the language editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
                             "/" + queryStrings.GetValue<string>("application") + "/framed/" +
                             Uri.EscapeDataString("settings/editLanguage.aspx?id=" + language.Id)));

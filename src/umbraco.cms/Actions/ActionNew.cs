@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked upon creation of a document
-	/// </summary>
-	public class ActionNew : IAction
+    /// <summary>
+    /// This action is invoked upon creation of a document
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
+    public class ActionNew : IAction
 	{
 		//create singleton
 		private static readonly ActionNew InnerInstance = new ActionNew();
@@ -82,6 +85,7 @@ namespace umbraco.BusinessLogic.Actions
 			}
 		}
 
-		#endregion
-	}
+        #endregion
+        
+    }
 }

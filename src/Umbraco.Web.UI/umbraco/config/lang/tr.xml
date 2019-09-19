@@ -2,7 +2,7 @@
 <language alias="tr" intName="Turkish" localName="Türkçe" lcid="" culture="tr-TR">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Kültür ve Hostnames</key>
@@ -456,7 +456,7 @@
               <p>
               <strong>Tekrar dene</strong>. 
               <br />
-              <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              Burada düzenleme web.config Hakkında Daha Fazla Bilgi.</a></p>]]>
     </key>
     <key alias="databaseText">
@@ -482,17 +482,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
-    <key alias="defaultUserText">
-      <![CDATA[
-        <p>
-          Umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
-          changed to something unique.
-        </p>
-        <p>
-          This step will check the default user's password and suggest if it needs to be changed.
-        </p>
-      ]]>
-    </key>
     <key alias="greatStart">Get a great start, watch our introduction videos</key>
     <key alias="licenseText">By clicking the next button (or modifying the umbracoConfigurationStatus in web.config), you accept the license for this software as specified in the box below. Notice that this Umbraco distribution consists of two different licenses, the open source MIT license for the framework and the Umbraco freeware license that covers the UI.</key>
     <key alias="None">Not installed yet.</key>
@@ -734,7 +723,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="publicAccess">
     <key alias="paAdvanced">Role based protection</key>
     <key alias="paAdvancedHelp"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using Umbraco's member groups.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[You need to create a membergroup before you can use <br />role-based authentication.]]></key>
+    <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication.</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
     <key alias="paHowWould">Choose how to restrict access to this page</key>
@@ -855,7 +844,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>
     <key alias="sortHelp">Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items</key>
-    <key alias="sortPleaseWait"><![CDATA[ Please wait. Items are being sorted, this can take a while.<br/> <br/> Do not close this window during sorting]]></key>
+    <key alias="sortPleaseWait"><![CDATA[ Please wait. Items are being sorted, this can take a while.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="operationFailedHeader">Hata</key>
@@ -941,6 +930,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="template">Template</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Insert control</key>
     <key alias="addRows">Choose a layout for the page</key>
     <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>

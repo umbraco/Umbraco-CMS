@@ -212,6 +212,8 @@ Use this directive to construct a header inside the main editor window.
                 scope.dialogModel = {
                     view: "iconpicker",
                     show: true,
+                    icon: scope.icon.split(' ')[0],
+                    color: scope.icon.split(' ')[1],
                     submit: function (model) {
 
                         /* ensure an icon is selected, because on focus on close button
@@ -225,8 +227,8 @@ Use this directive to construct a header inside the main editor window.
                                 scope.icon = model.icon;
                             }
 
-                            // set form to dirty
-                            ctrl.$setDirty();
+                            // set the icon form to dirty
+                            scope.iconForm.$setDirty();
                         }
 
                         scope.dialogModel.show = false;
@@ -237,7 +239,6 @@ Use this directive to construct a header inside the main editor window.
         }
 
         var directive = {
-            require: '^form',
             transclude: true,
             restrict: 'E',
             replace: true,
@@ -251,10 +252,12 @@ Use this directive to construct a header inside the main editor window.
                 icon: "=",
                 hideIcon: "@",
                 alias: "=",
-                hideAlias: "@",
+                hideAlias: "=",
                 description: "=",
                 hideDescription: "@",
-                navigation: "="
+                descriptionLocked: "@",
+                navigation: "=",
+                key: "="
             },
             link: link
         };

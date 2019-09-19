@@ -197,7 +197,7 @@ namespace umbraco
 		/// <param name="url">The URL to get the XML node from.</param>
 		/// <returns>Returns the node Id.</returns>
 		/// <remarks>
-		/// <para>Thanks to Jonas Eriksson http://our.umbraco.org/member/4853 </para>
+		/// <para>Thanks to Jonas Eriksson https://our.umbraco.com/member/4853 </para>
 		/// <para>Just runs lookups to find the document, does not follow internal redirects, 404 handlers,
 		/// page access verification, wildcard domains -- nothing.</para>
 		/// </remarks>

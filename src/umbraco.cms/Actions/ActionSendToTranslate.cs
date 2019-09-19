@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked when a send to translate request occurs
-	/// </summary>
-	public class ActionSendToTranslate : IAction
+    /// <summary>
+    /// This action is invoked when a send to translate request occurs
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
+    public class ActionSendToTranslate : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618

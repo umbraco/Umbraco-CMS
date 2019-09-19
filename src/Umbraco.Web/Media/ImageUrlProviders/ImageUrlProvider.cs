@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.XPath;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Media;
@@ -7,6 +8,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Media.ImageUrlProviders
 {
+    [Obsolete("IImageUrlProvider is no longer used and will be removed in future versions")]
     public class ImageUrlProvider : IImageUrlProvider
     {
         public const string DefaultName = "umbracoUpload";

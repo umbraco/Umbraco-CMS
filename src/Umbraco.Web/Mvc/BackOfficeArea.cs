@@ -1,10 +1,6 @@
-﻿using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
+﻿using System.Web.Mvc;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Install;
-using Umbraco.Web.Install.Controllers;
 
 namespace Umbraco.Web.Mvc
 {
@@ -24,6 +20,12 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         public override void RegisterArea(AreaRegistrationContext context)
         {
+            context.MapRoute(
+                "Umbraco_preview",
+                GlobalSettings.UmbracoMvcArea + "/preview/{action}/{editor}",
+                new {controller = "Preview", action = "Index", editor = UrlParameter.Optional},
+                new[] { "Umbraco.Web.Editors" });
+
             context.MapRoute(
                 "Umbraco_back_office",
                 GlobalSettings.UmbracoMvcArea + "/{action}/{id}",

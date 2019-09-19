@@ -1,0 +1,46 @@
+<div ng-controller="Umbraco.Overlays.InsertOverlay as vm">
+    <div class="umb-insert-code-boxes">
+        <div ng-if="model.allowedTypes.umbracoField" class="umb-insert-code-box" ng-click="vm.openPageFieldOverlay()">
+            <div class="umb-insert-code-box__title"><localize key="template_insertPageField" /></div>
+            <div class="umb-insert-code-box__description"><localize key="template_insertPageFieldDesc" /></div>
+        </div>
+        <div ng-if="model.allowedTypes.partial" class="umb-insert-code-box" ng-click="vm.openPartialOverlay()">
+            <div class="umb-insert-code-box__title"><localize key="template_insertPartialView" /></div>
+            <div class="umb-insert-code-box__description">
+                <localize key="template_insertPartialViewDesc" />
+            </div>
+        </div>
+        <div ng-if="model.allowedTypes.macro" class="umb-insert-code-box" ng-click="vm.openMacroPicker()">
+            <div class="umb-insert-code-box__title"><localize key="template_insertMacro" /></div>
+            <div class="umb-insert-code-box__description">
+                <localize key="template_insertMacroDesc" />
+
+            </div>
+        </div>
+        <div ng-if="model.allowedTypes.dictionary" class="umb-insert-code-box" ng-click="vm.openDictionaryItemOverlay()">
+            <div class="umb-insert-code-box__title"><localize key="template_insertDictionaryItem" /></div>
+            <div class="umb-insert-code-box__description"><localize key="template_insertDictionaryItemDesc" /></div>
+        </div>
+    </div>
+
+    <umb-overlay ng-if="vm.macroPickerOverlay.show"
+                 model="vm.macroPickerOverlay"
+                 view="vm.macroPickerOverlay.view"
+                 position="right">
+    </umb-overlay>
+    <umb-overlay ng-if="vm.pageFieldOverlay.show"
+                 model="vm.pageFieldOverlay"
+                 position="right"
+                 view="vm.pageFieldOverlay.view">
+    </umb-overlay>
+    <umb-overlay ng-if="vm.dictionaryItemOverlay.show"
+                 model="vm.dictionaryItemOverlay"
+                 position="right"
+                 view="vm.dictionaryItemOverlay.view">
+    </umb-overlay>
+    <umb-overlay ng-if="vm.partialItemOverlay.show"
+                 model="vm.partialItemOverlay"
+                 view="vm.partialItemOverlay.view"
+                 position="right">
+    </umb-overlay>
+</div>

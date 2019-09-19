@@ -1,11 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Publishing
 {
-    /// <summary>
-    /// Abstract class for the implementation of an <see cref="IPublishingStrategy"/>, which provides the events used for publishing/unpublishing.
-    /// </summary>
+    [Obsolete("This class is not intended to be used and will be removed in future versions, see IPublishingStrategy instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class BasePublishingStrategy : IPublishingStrategy
     {
 

@@ -1,0 +1,194 @@
+<div data-element="editor-templates" ng-controller="Umbraco.Editors.Templates.EditController as vm">
+
+    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+
+   <form name="contentForm"
+      ng-submit="vm.save()"
+      novalidate
+      val-form-manager>
+
+
+        <umb-editor-view ng-if="!vm.page.loading">
+
+            <umb-editor-header
+                name="vm.template.name"
+                alias="vm.template.alias"
+                key="vm.template.key"
+                hideDescription="true"
+                description="vm.template.virtualPath"
+                description-locked="true"
+                menu="vm.page.menu"
+                hide-icon="false">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <div class="flex" style="margin-bottom: 30px;">
+
+                    <div class="flex">
+
+                        <div ng-class="{'btn-group umb-era-button-group': vm.template.masterTemplateAlias}" style="margin-right: 10px;">
+                            
+                            <button
+                                data-element="button-masterTemplate"
+                                type="button"
+                                class="umb-era-button umb-button--s"
+                                ng-click="vm.openMasterTemplateOverlay()">
+                                <i class="icon icon-layout"></i>
+                                <span class="bold"><localize key="template_mastertemplate">Master template</localize>:</span>
+                                <span style="margin-left: 5px;">
+                                    <span ng-if="vm.template.masterTemplateAlias">{{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}</span>
+                                    <span ng-if="!vm.template.masterTemplateAlias"><localize key="template_noMaster">No master</localize></span>
+                                </span>
+                            </button>
+
+                            <a ng-if="vm.template.masterTemplateAlias" ng-click="vm.removeMasterTemplate()" class="umb-era-button umb-button--s dropdown-toggle umb-button-group__toggle">
+                                <span class="icon icon-wrong"></span>
+                            </a>
+
+                        </div>
+                        
+                    </div>
+
+                    <div class="flex" style="margin-left: auto;">
+                        <div class="btn-group umb-era-button-group dropdown" style="margin-right: 10px;">
+                            
+                            <button
+                                data-element="button-insert"
+                                type="button"
+                                class="umb-era-button umb-button--s"
+                                ng-click="vm.openInsertOverlay()">
+                                <i class="icon icon-add"></i> <localize key="general_insert">Insert</localize>
+                            </button>
+
+                            <a class="umb-era-button umb-button--s dropdown-toggle umb-button-group__toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </a>
+
+                            <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up umb-button-group__sub-buttons" role="menu">
+                                <li><a href="" ng-click="vm.openPageFieldOverlay()"><localize key="template_insertPageField">Value</localize></a></li>
+                                <li><a href="" ng-click="vm.openPartialOverlay()"><localize key="template_insertPartialView">Partial view</localize></a></li>
+                                <li><a href="" ng-click="vm.openDictionaryItemOverlay()"><localize key="template_insertDictionaryItem">Dictionary</localize></a></li>
+                                <li><a href="" ng-click="vm.openMacroOverlay()"><localize key="template_insertMacro">Macro</localize></a></li>
+                            </ul>
+
+                        </div>
+
+                        <button
+                            data-element="button-queryBuilder"
+                            type="button"
+                            style="margin-right: 10px;"
+                            class="umb-era-button umb-button--s"
+                            ng-click="vm.openQueryBuilderOverlay()">
+                            <i class="icon icon-wand"></i> <localize key="template_queryBuilder">Query builder</localize>
+                        </button>
+
+                        <button
+                            data-element="button-sections"
+                            type="button"
+                            class="umb-era-button umb-button--s"
+                            ng-click="vm.openSectionsOverlay()">
+                            <i class="icon icon-indent"></i> <localize key="template_insertSections">Sections</localize>
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div
+                    data-element="code-editor"
+                    auto-scale="85"
+                    umb-ace-editor="vm.aceOption"
+                    model="vm.template.content">
+                </div>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                
+                <umb-editor-footer-content-left>
+
+                    <umb-keyboard-shortcuts-overview
+                        model="vm.page.keyboardShortcutsOverview"
+                        show-overlay="vm.showKeyboardShortcut">
+                    </umb-keyboard-shortcuts-overview>
+
+                </umb-editor-footer-content-left>
+
+            <umb-editor-footer-content-right>
+
+               <umb-button
+                  alias="save"
+                  type="submit"
+                  button-style="success"
+                  state="vm.page.saveButtonState"
+                  shortcut="ctrl+s"
+                  label="Save"
+                  label-key="buttons_save">
+               </umb-button>
+
+            </umb-editor-footer-content-right>
+
+         </umb-editor-footer>
+
+        </umb-editor-view>
+    </form>
+
+    <umb-overlay
+       ng-if="vm.insertOverlay.show"
+       model="vm.insertOverlay"
+       view="vm.insertOverlay.view"
+       position="right">
+   </umb-overlay>
+
+    <umb-overlay
+       ng-if="vm.macroPickerOverlay.show"
+       model="vm.macroPickerOverlay"
+       view="vm.macroPickerOverlay.view"
+       position="right">
+   </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.pageFieldOverlay.show"
+        model="vm.pageFieldOverlay"
+        position="right"
+        view="vm.pageFieldOverlay.view">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.dictionaryItemOverlay.show"
+        model="vm.dictionaryItemOverlay"
+        position="right"
+        view="vm.dictionaryItemOverlay.view">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.queryBuilderOverlay.show"
+        model="vm.queryBuilderOverlay"
+        position="right"
+        view="vm.queryBuilderOverlay.view">
+    </umb-overlay>
+
+    <umb-overlay
+       ng-if="vm.sectionsOverlay.show"
+       model="vm.sectionsOverlay"
+       view="vm.sectionsOverlay.view"
+       position="right">
+   </umb-overlay>
+
+   <umb-overlay
+       ng-if="vm.partialItemOverlay.show"
+       model="vm.partialItemOverlay"
+       view="vm.partialItemOverlay.view"
+       position="right">
+   </umb-overlay>
+   
+   <umb-overlay
+       ng-if="vm.masterTemplateOverlay.show"
+       model="vm.masterTemplateOverlay"
+       view="vm.masterTemplateOverlay.view"
+       position="right">
+   </umb-overlay>
+
+
+</div>

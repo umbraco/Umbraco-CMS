@@ -19,23 +19,15 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository)
+        public ContentTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository)
             : base(work, cache, logger, sqlSyntax)
         {
             _templateRepository = templateRepository;
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<IContentType, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IContentType, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IContentType, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), 
-                    //allow this cache to expire
-                    expires:true));
-            }
+            return new FullDataSetRepositoryCachePolicy<IContentType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
 
         protected override IContentType PerformGet(int id)
@@ -118,6 +110,19 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<string>(sql);
         }
 
+        public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
+        {
+            if (aliases.Length == 0) return Enumerable.Empty<int>();
+
+            var sql = new Sql().Select("cmsContentType.nodeId")
+                .From<ContentTypeDto>(SqlSyntax)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentTypeDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
+                .Where<ContentTypeDto>(dto => aliases.Contains(dto.Alias), SqlSyntax);            
+
+            return Database.Fetch<int>(sql);
+        }
+
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
@@ -143,7 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = new List<string>
                            {
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
                                "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id",
                                "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id",

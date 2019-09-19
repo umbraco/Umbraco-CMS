@@ -1,19 +1,28 @@
 <div ng-controller="Umbraco.PrevalueEditors.ImageFilePickerController" class="umb-editor umb-mediapicker">
-    <ul class="umb-sortable-thumbnails">
-        <li>
-            <img ng-src="{{model.value}}" alt="" ng-show="model.value">
-            <a href class="picked-image" ng-click="model.value = null" ng-show="model.value"><i class="icon icon-delete"></i></a>
+
+    <ul class="umb-sortable-thumbnails" ng-if="model.value">
+        <li class="umb-sortable-thumbnails__wrapper">
+            <img ng-src="{{model.value}}" alt="">
+
+            <div class="umb-sortable-thumbnails__actions">
+                <!--<a class="umb-sortable-thumbnails__action" href="" ng-click="goToItem(image)">
+                    <i class="icon icon-edit"></i>
+                </a>-->
+                <a class="umb-sortable-thumbnails__action -red" href="" ng-click="remove()">
+                    <i class="icon icon-delete"></i>
+                </a>
+            </div>
         </li>
     </ul>
 
-    <a href ng-click="pick()" class="umb-mediapicker add-link" ng-hide="model.value">
+    <a href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': !model.value }" ng-hide="model.value" prevent-default>
         <i class="icon icon-add large"></i>
     </a>
 
     <umb-overlay
-      ng-if="mediaPickerDialog.show"
-      model="mediaPickerDialog"
-      view="mediaPickerDialog.view"
+      ng-if="mediaPickerOverlay.show"
+      model="mediaPickerOverlay"
+      view="mediaPickerOverlay.view"
       position="right">
     </umb-overlay>
 

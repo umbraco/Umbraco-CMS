@@ -19,6 +19,8 @@ using Lucene.Net.Analysis;
 namespace UmbracoExamine
 {
 
+    
+
     /// <summary>
     /// Custom indexer for members
     /// </summary>
@@ -101,6 +103,11 @@ namespace UmbracoExamine
             _memberTypeService = memberTypeService;
         }
 
+        protected override IDataService CreateDefaultUmbracoDataService()
+        {
+            return new UmbracoMemberDataService();
+        }
+
         /// <summary>
         /// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
         /// </summary>
@@ -108,34 +115,26 @@ namespace UmbracoExamine
         /// <returns></returns>
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
-            var indexerData = base.GetIndexerData(indexSet);
-
             if (CanInitialize())
             {
-                //If the fields are missing a custom _searchEmail, then add it
-
-                if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
+                //Add a custom _searchEmail to the index criteria no matter what is in config
+                var field = new IndexField { Name = "_searchEmail" };
+                StaticField policy;
+                if (IndexFieldPolicies.TryGetValue("_searchEmail", out policy))
                 {
-                    var field = new IndexField { Name = "_searchEmail" };
-
-                    StaticField policy;
-                    if (IndexFieldPolicies.TryGetValue("_searchEmail", out policy))
-                    {
-                        field.Type = policy.Type;
-                        field.EnableSorting = policy.EnableSorting;
-                    }
-
-                    return new IndexCriteria(
-                        indexerData.StandardFields,
-                        indexerData.UserFields.Concat(new[] { field }),
-                        indexerData.IncludeNodeTypes,
-                        indexerData.ExcludeNodeTypes,
-                        indexerData.ParentNodeId
-                        );
+                    field.Type = policy.Type;
+                    field.EnableSorting = policy.EnableSorting;
                 }
-            }
 
-            return indexerData;
+                return indexSet.ToIndexCriteria(DataService, IndexFieldPolicies,
+                    //add additional explicit fields
+                    new []{field});
+            }
+            else
+            {
+                return base.GetIndexerData(indexSet);
+            }
+            
         }
 
         /// <summary>
@@ -198,7 +197,7 @@ namespace UmbracoExamine
                                 AddNodesToIndex(GetSerializedMembers(members), type);
 
                                 pageIndex++;
-                            } while (members.Length == pageSize);
+                            } while (members.Length == pageSize && IsCancellationRequested == false); //don't continue if the app is shutting down
                         }
                     }
                     else
@@ -212,7 +211,7 @@ namespace UmbracoExamine
                             AddNodesToIndex(GetSerializedMembers(members), type);
 
                             pageIndex++;
-                        } while (members.Length == pageSize);
+                        } while (members.Length == pageSize && IsCancellationRequested == false); //don't continue if the app is shutting down
                     }
                 }
             }
@@ -235,25 +234,6 @@ namespace UmbracoExamine
             throw new NotSupportedException();
         }
 
-        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
-        {
-            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
-
-            //adds the special key property to the index
-            string valuesForIndexing;
-            if (allValuesForIndexing.TryGetValue("__key", out valuesForIndexing))
-            {
-                if (fields.ContainsKey("__key") == false)
-                {
-                    fields.Add("__key", valuesForIndexing);
-                }
-            }
-
-
-            return fields;
-
-        }
-
         /// <summary>
         /// Add the special __key and _searchEmail fields
         /// </summary>
@@ -264,8 +244,8 @@ namespace UmbracoExamine
 
             if (e.Node.Attribute("key") != null)
             {
-                if (e.Fields.ContainsKey("__key") == false)
-                    e.Fields.Add("__key", e.Node.Attribute("key").Value);
+                if (e.Fields.ContainsKey(NodeKeyFieldName) == false)
+                    e.Fields.Add(NodeKeyFieldName, e.Node.Attribute("key").Value);
             }
 
             if (e.Node.Attribute("email") != null)

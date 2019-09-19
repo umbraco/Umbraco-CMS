@@ -9,7 +9,7 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="head" runat="server" ID="cp2">
-    
+
     <umb:JsInclude ID="JsInclude2" runat="server" FilePath="Editors/EditXslt.js" PathNameAlias="UmbracoClient" />
     <umb:CssInclude ID="CssInclude1" runat="server" FilePath="Editors/EditXslt.css" PathNameAlias="UmbracoClient" />
 
@@ -21,8 +21,7 @@
                     nameTxtBox: $('#<%= xsltFileName.ClientID %>'),
                     originalFileName: '<%= xsltFileName.Text %>',
                     saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
-                    editorSourceElement: $('#<%= editorSource.ClientID %>'),
-                    skipTestingCheckBox: $("#<%= SkipTesting.ClientID %>"),
+                    editorSourceElement: $('#<%= editorSource.ClientID %>')
                 });
                 editor.init();
 
@@ -32,7 +31,7 @@
         })(jQuery);
 
         //TODO: Move these to EditXslt.js one day
-        var xsltSnippet = "";        
+        var xsltSnippet = "";
         function xsltVisualize() {
 
             xsltSnippet = UmbEditor.IsSimpleEditor
@@ -46,7 +45,7 @@
             }
 
             UmbClientMgr.openModalWindow('<%= Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) %>/developer/xslt/xsltVisualize.aspx', 'Visualize XSLT', true, 550, 650);
-        } 
+        }
     </script>
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/jQuery/jquery-fieldselection.js"
         PathNameAlias="UmbracoClient" />
@@ -56,13 +55,10 @@
             <cc1:Pane runat="server" ID="pane1">
                 <cc1:CodeArea ID="editorSource" CodeBase="XML" runat="server" AutoResize="false"  />
             </cc1:Pane>
-            
+
             <cc1:Pane runat="server" ID="pane2">
                  <cc1:PropertyPanel ID="pp_filename" runat="server" Text="Filename">
                     <asp:TextBox ID="xsltFileName" runat="server" CssClass="guiInputText"></asp:TextBox>
-                </cc1:PropertyPanel>
-                <cc1:PropertyPanel ID="pp_testing" runat="server" Text="Skip testing (ignore errors)">
-                    <asp:CheckBox ID="SkipTesting" runat="server"></asp:CheckBox>
                 </cc1:PropertyPanel>
             </cc1:Pane>
     </cc1:TabView>

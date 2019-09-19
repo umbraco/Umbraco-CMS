@@ -73,7 +73,7 @@ namespace umbraco.cms.businesslogic.datatype
                         int subfolderId;
                         var numberedFolder = int.TryParse(subfolder, out subfolderId)
                             ? subfolderId.ToString(CultureInfo.InvariantCulture)
-                            : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
+                            : fs.GetNextFolder();
 
                         var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories 
                             ? Path.Combine(numberedFolder, name) 

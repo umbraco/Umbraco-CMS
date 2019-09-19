@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,12 +13,14 @@ using System.Security.Principal;
 using System.Threading;
 using System.Web;
 using System.Web.Security;
+using Microsoft.AspNet.Identity;
 using AutoMapper;
 using Microsoft.Owin;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Logging;
+using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Core.Security
 {
@@ -81,6 +85,40 @@ namespace Umbraco.Core.Security
             return false;
         }
 
+        /// <summary>
+        /// This will return the current back office identity if the IPrincipal is the correct type
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        internal static UmbracoBackOfficeIdentity GetUmbracoIdentity(this IPrincipal user)
+        {
+            //If it's already a UmbracoBackOfficeIdentity
+            var backOfficeIdentity = user.Identity as UmbracoBackOfficeIdentity;
+            if (backOfficeIdentity != null) return backOfficeIdentity;
+
+            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
+            var claimsPrincipal = user as ClaimsPrincipal;
+            if (claimsPrincipal != null)
+            {
+                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
+                if (backOfficeIdentity != null) return backOfficeIdentity;
+            }
+
+            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
+            var claimsIdentity = user.Identity as ClaimsIdentity;
+            if (claimsIdentity != null && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
+            {
+                try
+                {
+                    return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
+                }
+                catch (InvalidOperationException)
+                {                    
+                }
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// This will return the current back office identity. 
@@ -100,31 +138,8 @@ namespace Umbraco.Core.Security
             if (http.User == null) return null; //there's no user at all so no identity
 
             //If it's already a UmbracoBackOfficeIdentity
-            var backOfficeIdentity = http.User.Identity as UmbracoBackOfficeIdentity;
-            if (backOfficeIdentity != null) return backOfficeIdentity;
-
-            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
-            var claimsPrincipal = http.User as ClaimsPrincipal;
-            if (claimsPrincipal != null)
-            {
-                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
-                if (backOfficeIdentity != null) return backOfficeIdentity;
-            }
-
-            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
-            var claimsIdentity = http.User.Identity as ClaimsIdentity;
-            if (claimsIdentity != null && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
-            {                 
-                try
-                {
-                    return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    //This will occur if the required claim types are missing which would mean something strange is going on
-                    LogHelper.Error(typeof(AuthenticationExtensions), "The current identity cannot be converted to " + typeof(UmbracoBackOfficeIdentity), ex);
-                }
-            }
+            var backOfficeIdentity = GetUmbracoIdentity(http.User);
+            if (backOfficeIdentity != null) return backOfficeIdentity;            
 
             if (authenticateRequestIfNotFound == false) return null;
 
@@ -207,7 +222,7 @@ namespace Umbraco.Core.Security
         public static bool RenewUmbracoAuthTicket(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            http.Items["umbraco-force-auth"] = true;
+            http.Items[Constants.Security.ForceReAuthFlag] = true;
             return true;
         }
 
@@ -219,7 +234,7 @@ namespace Umbraco.Core.Security
         internal static bool RenewUmbracoAuthTicket(this HttpContext http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            http.Items["umbraco-force-auth"] = true;
+            http.Items[Constants.Security.ForceReAuthFlag] = true;
             return true;
         }
 
@@ -230,8 +245,11 @@ namespace Umbraco.Core.Security
         /// <param name="userdata"></param>
         public static FormsAuthenticationTicket CreateUmbracoAuthTicket(this HttpContextBase http, UserData userdata)
         {
+            //ONLY used by BasePage.doLogin!
+
             if (http == null) throw new ArgumentNullException("http");
             if (userdata == null) throw new ArgumentNullException("userdata");
+            
             var userDataString = JsonConvert.SerializeObject(userdata);
             return CreateAuthTicketAndCookie(
                 http, 
@@ -243,14 +261,7 @@ namespace Umbraco.Core.Security
                 1440, 
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
-        }
-
-        internal static FormsAuthenticationTicket CreateUmbracoAuthTicket(this HttpContext http, UserData userdata)
-        {
-            if (http == null) throw new ArgumentNullException("http");
-            if (userdata == null) throw new ArgumentNullException("userdata");
-            return new HttpContextWrapper(http).CreateUmbracoAuthTicket(userdata);
-        }
+        }        
 
         /// <summary>
         /// returns the number of seconds the user has until their auth session times out
@@ -321,6 +332,22 @@ namespace Umbraco.Core.Security
         /// <param name="cookieName"></param>
         private static void Logout(this HttpContextBase http, string cookieName)
         {
+            //We need to clear the sessionId from the database. This is legacy code to do any logging out and shouldn't really be used at all but in any case
+            //we need to make sure the session is cleared. Due to the legacy nature of this it means we need to use singletons
+            if (http.User != null)
+            {
+                var claimsIdentity = http.User.Identity as ClaimsIdentity;
+                if (claimsIdentity != null)
+                {
+                    var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
+                    Guid guidSession;
+                    if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out guidSession))
+                    {
+                        ApplicationContext.Current.Services.UserService.ClearLoginSession(guidSession);
+                    }
+                }
+            }
+
             if (http == null) throw new ArgumentNullException("http");
             //clear the preview cookie and external login
             var cookies = new[] { cookieName, Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalCookieName };
@@ -433,5 +460,23 @@ namespace Umbraco.Core.Security
 
             return ticket;
         }
+
+        /// <summary>
+        /// Ensures that the thread culture is set based on the back office user's culture
+        /// </summary>
+        /// <param name="identity"></param>
+        internal static void EnsureCulture(this IIdentity identity)
+        {
+            if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)
+            {
+                Thread.CurrentThread.CurrentUICulture =
+                    Thread.CurrentThread.CurrentCulture =
+                        UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
+            }
+        }
+        /// <summary>
+        /// Used so that we aren't creating a new CultureInfo object for every single request
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
     }
 }

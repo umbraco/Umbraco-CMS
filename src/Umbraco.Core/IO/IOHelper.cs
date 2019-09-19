@@ -4,20 +4,37 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 using System.Configuration;
+using System.Linq;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.Web.Hosting;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
 	public static class IOHelper
-    {
+	{
+        /// <summary>
+        /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
+        /// </summary>
+        /// <remarks>This should always be false, unless unit testing.</remarks>
+	    public static bool ForceNotHosted { get; set; }
+
         private static string _rootDir = "";
 
         // static compiled regex for faster performance
         private readonly static Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+        /// <summary>
+        /// Gets a value indicating whether Umbraco is hosted.
+        /// </summary>
+	    public static bool IsHosted
+	    {
+	        get
+	        {
+	            return ForceNotHosted == false && (HttpContext.Current != null || HostingEnvironment.IsHosted);
+            }
+	    }
 
         public static char DirSepChar
         {
@@ -72,14 +89,14 @@ namespace Umbraco.Core.IO
         internal static string ResolveUrlsFromTextString(string text)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.ResolveUrlsFromTextString)
-            {				
+            {
 				using (DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
 				{
 					// find all relative urls (ie. urls that contain ~)
 					var tags = ResolveUrlPattern.Matches(text);
-					
+
 					foreach (Match tag in tags)
-					{						
+					{
 						string url = "";
 						if (tag.Groups[1].Success)
 							url = tag.Groups[1].Value;
@@ -97,6 +114,9 @@ namespace Umbraco.Core.IO
 
         public static string MapPath(string path, bool useHttpContext)
         {
+            if (path == null) throw new ArgumentNullException("path");
+            useHttpContext = useHttpContext && IsHosted;
+
             // Check if the path is already mapped
             if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
                 || path.StartsWith(@"\\")) //UNC Paths start with "\\". If the site is running off a network drive mapped paths will look like "\\Whatever\Boo\Bar"
@@ -301,7 +321,7 @@ namespace Umbraco.Core.IO
             var debugFolder = Path.Combine(binFolder, "debug");
             if (Directory.Exists(debugFolder))
                 return debugFolder;
-#endif   
+#endif
             var releaseFolder = Path.Combine(binFolder, "release");
             if (Directory.Exists(releaseFolder))
                 return releaseFolder;
@@ -351,7 +371,54 @@ namespace Umbraco.Core.IO
                     writer.Write(contents);
                 }
 	        }
-	            
-	    }
+
+        }
+
+        /// <summary>
+        /// Checks if a given path is a full path including drive letter
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        // From: http://stackoverflow.com/a/35046453/5018
+        internal static bool IsFullPath(this string path)
+        {
+            return string.IsNullOrWhiteSpace(path) == false
+                && path.IndexOfAny(Path.GetInvalidPathChars().ToArray()) == -1
+                && Path.IsPathRooted(path)
+                && Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
+        }
+
+        /// <summary>
+        /// Get properly formatted relative path from an existing absolute or relative path
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        internal static string GetRelativePath(this string path)
+        {
+            if (path.IsFullPath())
+            {
+                var rootDirectory = GetRootDirectorySafe();
+                var relativePath = path.ToLowerInvariant().Replace(rootDirectory.ToLowerInvariant(), string.Empty);
+                path = relativePath;
+            }
+
+            return path.EnsurePathIsApplicationRootPrefixed();
+        }
+
+        /// <summary>
+        /// Ensures that a path has `~/` as prefix
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        internal static string EnsurePathIsApplicationRootPrefixed(this string path)
+        {
+            if (path.StartsWith("~/"))
+                return path;
+            if (path.StartsWith("/") == false && path.StartsWith("\\") == false)
+                path = string.Format("/{0}", path);
+            if (path.StartsWith("~") == false)
+                path = string.Format("~{0}", path);
+            return path;
+        }
     }
 }

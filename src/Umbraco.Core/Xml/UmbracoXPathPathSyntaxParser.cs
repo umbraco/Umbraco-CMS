@@ -60,7 +60,7 @@ namespace Umbraco.Core.Xml
                 return -1;
             });
 
-            const string rootXpath = "descendant::*[@id={0}]";
+            const string rootXpath = "id({0})";
 
             //parseable items:
             var vars = new Dictionary<string, Func<string, string>>();

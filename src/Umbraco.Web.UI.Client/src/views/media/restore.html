@@ -1,0 +1,97 @@
+<div ng-controller="Umbraco.Editors.Media.RestoreController">
+	<div class="umb-dialog-body" ng-cloak>
+		<umb-pane>
+		    <umb-load-indicator
+		        ng-if="loading">
+		    </umb-load-indicator>
+
+		    <div ng-show="error">
+		        <div class="alert alert-error">
+		            <div><strong>{{error.errorMsg}}</strong></div>
+		            <div>{{error.data.Message}}</div>
+		        </div>
+		    </div>
+
+		    <div ng-show="success">
+		        <div class="alert alert-success">
+		            <strong>{{source.name}}</strong>
+		            <span ng-hide="moving"><localize key="recycleBin_wasRestored">was restored under</localize></span>
+		            <span ng-show="moving"><localize key="editdatatype_wasMoved">was moved underneath</localize></span>
+		            <strong>{{target.name}}</strong>
+		        </div>
+		        <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
+		    </div>
+
+		    <div ng-hide="moving || loading || success">
+
+		        <p class="abstract" ng-hide="error || success">
+		            <localize key="actions_restore">Restore</localize> <strong>{{source.name}}</strong> <localize key="general_under">under</localize> <strong>{{target.name}}</strong>?
+		        </p>
+
+		    </div>
+
+		    <div ng-hide="!moving || loading || success">
+		        <div>
+		            <div class="alert alert-info">
+		                <div><strong><localize key="recycleBin_itemCannotBeRestored">Cannot automatically restore this item</localize></strong></div>
+		                <div><localize key="recycleBin_itemCannotBeRestoredHelpText">There is no location where this item can be automatically restored. You can move the item manually using the tree below.</localize></div>
+		            </div>
+		        </div>
+
+		        <div ng-hide="miniListView">
+		            <umb-tree-search-box 
+		                hide-search-callback="hideSearch"
+		                search-callback="onSearchResults"
+		                show-search="{{searchInfo.showSearch}}"
+		                section="media">
+		            </umb-tree-search-box>
+
+		            <br />
+
+		            <umb-tree-search-results
+		                ng-if="searchInfo.showSearch"
+		                results="searchInfo.results"
+		                select-result-callback="selectResult">
+		            </umb-tree-search-results>
+
+		            <div ng-hide="searchInfo.showSearch">
+		                <umb-tree
+		                    section="media"
+		                    hideheader="{{treeModel.hideHeader}}"
+		                    hideoptions="true"
+		                    isdialog="true"
+		                    eventhandler="dialogTreeEventHandler"
+		                    enablelistviewexpand="true"
+		                    enablecheckboxes="true">
+		                </umb-tree>
+		            </div>
+		        </div>
+
+		        <umb-mini-list-view
+		            ng-if="miniListView"
+		            node="miniListView"
+		            entity-type="Document"
+		            on-select="selectListViewNode(node)"
+		            on-close="closeMiniListView()">
+		        </umb-mini-list-view>
+
+		    </div>
+
+		</umb-pane>
+	</div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="loading || moving || success">
+        <a class="btn btn-link" ng-click="nav.hideDialog()"><localize key="general_cancel">Cancel</localize></a>
+        <button class="btn btn-primary" ng-click="restore()" ng-show="error == null"><localize key="actions_restore">Restore</localize></button>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="loading || !moving || success">
+        <a class="btn btn-link" ng-click="nav.hideDialog()"><localize key="general_cancel">Cancel</localize></a>
+        <button class="btn btn-primary" ng-click="restore()" ng-show="error == null" ng-disabled="!target"><localize key="actions_move">Move</localize></button>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success == true">
+		<a class="btn btn-link" ng-click="nav.hideDialog()"><localize key="general_cancel">Cancel</localize></a>
+		<button class="btn btn-primary" ng-click="restore()" ng-show="error == null"><localize key="actions_restore">Restore</localize></button>
+	</div>
+</div>

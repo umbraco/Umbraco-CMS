@@ -1,0 +1,19 @@
+<div class="umb-backdrop" ng-click="clickBackdrop($event)">
+
+    <!-- Backdrop with highlight -->
+    <div ng-if="highlightElement && !loading" class="umb-backdrop__backdrop">
+        <div class="umb-backdrop__rect umb-backdrop__rect--top" ng-style="rectTopCss"></div>
+        <div class="umb-backdrop__rect umb-backdrop__rect--right" ng-style="rectRightCss"></div>
+        <div class="umb-backdrop__rect umb-backdrop__rect--bottom" ng-style="rectBottomCss"></div>        
+        <div class="umb-backdrop__rect umb-backdrop__rect--left" ng-style="rectLeftCss"></div>
+    </div>
+
+    <!-- Full screen backdrop -->
+    <div ng-if="!highlightElement || loading" class="umb-backdrop__backdrop">
+        <div  class="umb-backdrop__rect" ng-style="{'opacity': backdropOpacity }"></div>
+    </div>
+
+    <!-- Prevent clicks in highlighted area -->
+    <div ng-if="highlightPreventClick" class="umb-backdrop__highlight-prevent-click"></div>
+
+</div>

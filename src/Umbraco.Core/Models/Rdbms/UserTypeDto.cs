@@ -1,8 +1,10 @@
-﻿using Umbraco.Core.Persistence;
+﻿using System;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
+    [Obsolete("Table no longer exists as of 7.7 - retained only to support migrations from previous versions")]
     [TableName("umbracoUserType")]
     [PrimaryKey("id")]
     [ExplicitColumns]

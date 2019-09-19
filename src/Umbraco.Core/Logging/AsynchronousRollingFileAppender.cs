@@ -16,7 +16,7 @@ namespace Umbraco.Core.Logging
     /// This is an old/deprecated logger and has been superceded by ParallelForwardingAppender which is included in Umbraco and 
     /// also by AsyncForwardingAppender in the Log4Net.Async library.
 	/// </summary>
-	[Obsolete("This is superceded by the ParallelForwardingAppender, this will be removed in v8")]
+	[Obsolete("This is superceded by the ParallelForwardingAppender, this will be removed in v8, do not use this")]
     [EditorBrowsable(EditorBrowsableState.Never)]
 	public class AsynchronousRollingFileAppender : RollingFileAppender
 	{

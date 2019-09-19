@@ -37,8 +37,13 @@ namespace Umbraco.Core.IO
             throw new ArgumentException("Retries must be greater than zero");
         }
 
+        // GetSize has been added to IFileSystem2 but not IFileSystem
         public static long GetSize(this IFileSystem fs, string path)
         {
+            var fs2 = fs as IFileSystem2;
+            if (fs2 != null) return fs2.GetSize(path);
+
+            // this is implementing GetSize for IFileSystem, the old way
             using (var file = fs.OpenFile(path))
             {
                 return file.Length;

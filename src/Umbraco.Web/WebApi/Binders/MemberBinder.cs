@@ -14,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
 using System.Linq;
+using System.Net.Http;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
 
@@ -99,15 +100,6 @@ namespace Umbraco.Web.WebApi.Binders
                 throw new InvalidOperationException("Could not find member with key " + key);
             }
 
-            var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
-
-            //remove all membership properties, these values are set with the membership provider.
-            var exclude = standardProps.Select(x => x.Value.Alias).ToArray();
-
-            foreach (var remove in exclude)
-            {
-                member.Properties.Remove(remove);
-            }
             return member;
         }
 
@@ -244,6 +236,14 @@ namespace Umbraco.Web.WebApi.Binders
                 return base.ValidatePropertyData(postedItem, actionContext);
             }
 
+            /// <summary>
+            /// This ensures that the internal membership property types are removed from validation before processing the validation
+            /// since those properties are actually mapped to real properties of the IMember.
+            /// This also validates any posted data for fields that are sensitive.
+            /// </summary>
+            /// <param name="postedItem"></param>
+            /// <param name="actionContext"></param>
+            /// <returns></returns>
             protected override bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
             {
                 var propertiesToValidate = postedItem.Properties.ToList();
@@ -254,9 +254,41 @@ namespace Umbraco.Web.WebApi.Binders
                     propertiesToValidate.RemoveAll(property => property.Alias == remove);
                 }
 
-                return ValidateProperties(propertiesToValidate.ToArray(), postedItem.PersistedContent.Properties.ToArray(), actionContext);
-            }
+                var httpCtx = actionContext.Request.TryGetHttpContext();
+                if (httpCtx.Success == false)
+                {
+                    actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, "No http context");
+                    return false;
+                }
+                var umbCtx = httpCtx.Result.GetUmbracoContext();
 
+                //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
+                //if a sensitive value is being submitted.
+                if (umbCtx.Security.CurrentUser.HasAccessToSensitiveData() == false)
+                {
+                    var sensitiveProperties = postedItem.PersistedContent.ContentType
+                        .PropertyTypes.Where(x => postedItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
+                        .ToList();
+
+                    foreach (var sensitiveProperty in sensitiveProperties)
+                    {
+                        var prop = propertiesToValidate.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
+
+                        if (prop != null)
+                        {
+                            //this should not happen, this means that there was data posted for a sensitive property that
+                            //the user doesn't have access to, which means that someone is trying to hack the values.
+
+                            var message = string.Format("property with alias: {0} cannot be posted", prop.Alias);
+                            actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new InvalidOperationException(message));
+                            return false;
+                        }
+                    }
+                }
+
+                return ValidateProperties(propertiesToValidate, postedItem.PersistedContent.Properties.ToList(), actionContext);
+            }
+            
             internal bool ValidateUniqueLogin(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
             {
                 if (contentItem == null) throw new ArgumentNullException("contentItem");

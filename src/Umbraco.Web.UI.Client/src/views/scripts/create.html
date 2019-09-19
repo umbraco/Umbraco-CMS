@@ -1,0 +1,49 @@
+<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Scripts.CreateController as vm" ng-cloak>
+
+    <div class="umb-pane" ng-if="!vm.creatingFolder">
+        <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+
+        <ul class="umb-actions umb-actions-child">
+            <li>
+                <a href="" umb-auto-focus ng-click="vm.createFile()">
+                    <i class="large icon-script"></i>
+                    <span class="menu-label"><localize key="create_newJavascriptFile">New javascript file</localize></span>
+                </a>
+            </li>
+            <li>
+                <a href="" ng-click="vm.showCreateFolder()">
+                    <i class="large icon-folder"></i>
+                    <span class="menu-label"><localize key="general_folder"></localize></span>
+                </a>
+            </li>
+        </ul>
+
+    </div>
+
+    <div class="umb-pane" ng-if="vm.creatingFolder">
+        <form novalidate name="createFolderForm"
+              ng-submit="vm.createFolder(createFolderForm)"
+              val-form-manager>
+            
+            <div ng-show="vm.createFolderError">
+                <div class="alert alert-error">
+                    <div><strong>{{vm.createFolderError.errorMsg}}</strong></div>
+                    <div>{{vm.createFolderError.data.message}}</div>
+                </div>
+            </div>
+
+            <umb-control-group label="Enter a folder name" hide-label="false">
+                <input type="text" name="folderName" ng-model="vm.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+            </umb-control-group>
+
+            <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+        </form>
+    </div>
+
+</div>
+
+<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-if="!vm.creatingFolder">
+    <button class="btn btn-info" ng-click="nav.hideDialog(true)">
+        <localize key="buttons_somethingElse">Do something else</localize>
+    </button>
+</div>

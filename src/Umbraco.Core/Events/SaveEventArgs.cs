@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Events
 {
-	public class SaveEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
+	public class SaveEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>
 	{
         /// <summary>
         /// Constructor accepting multiple entities that are used in the saving operation

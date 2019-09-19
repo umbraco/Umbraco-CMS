@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
@@ -142,10 +143,18 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static bool IsClientSideRequest(this Uri url)
         {
-            var ext = Path.GetExtension(url.LocalPath);
-            if (ext.IsNullOrWhiteSpace()) return false;
-            var toInclude = new[] { ".aspx", ".ashx", ".asmx", ".axd", ".svc" };
-            return toInclude.Any(ext.InvariantEquals) == false;
+            try
+            {
+                var ext = Path.GetExtension(url.LocalPath);
+                if (ext.IsNullOrWhiteSpace()) return false;
+                var toInclude = new[] {".aspx", ".ashx", ".asmx", ".axd", ".svc"};
+                return toInclude.Any(ext.InvariantEquals) == false;
+            }
+            catch (ArgumentException)
+            {
+                LogHelper.Debug(typeof(UriExtensions), "Failed to determine if request was client side. Due to invalid characters in path: {0}", () => url.LocalPath);
+                return false;
+            }
         }
 
         /// <summary>

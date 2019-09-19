@@ -96,7 +96,23 @@ namespace Umbraco.Core.IO
 			}
 		}
 
-       
+        public static string PartialViews
+        {
+            get
+            {
+                return MvcViews + "/Partials/";
+            }
+        }
+
+        public static string MacroPartials
+        {
+            get
+            {
+                return MvcViews + "/MacroPartials/"; 
+                
+            }
+        }
+
         public static string Media
         {
             get
@@ -187,7 +203,6 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                //by default the packages folder should exist in the data folder
                 return IOHelper.ReturnPath("umbracoPreviewPath", Data + IOHelper.DirSepChar + "preview");
             }
         }

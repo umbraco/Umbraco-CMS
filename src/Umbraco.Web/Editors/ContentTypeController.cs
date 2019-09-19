@@ -103,19 +103,24 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets all the standard fields.
+        /// </summary>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(
+            Constants.Trees.DocumentTypes, Constants.Trees.Content,
+            Constants.Trees.MediaTypes, Constants.Trees.Media,
+            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+        public IEnumerable<string> GetAllStandardFields()
+        {
+            string[] preValuesSource = { "createDate", "creatorName", "level", "nodeType", "nodeTypeAlias", "pageID", "pageName", "parentID", "path", "template", "updateDate", "writerID", "writerName" };
+            return preValuesSource;
+        }
+
+        /// <summary>
         /// Returns the avilable compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
-        /// <param name="contentTypeId"></param>
-        /// <param name="filterContentTypes">
-        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
-        /// along with any content types that have matching property types that are included in the filtered content types
-        /// </param>
-        /// <param name="filterPropertyTypes">
-        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
-        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
-        /// be looked up via the db, they need to be passed in.
-        /// </param>
+        /// <param name="filter"></param>
         /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
@@ -125,6 +130,22 @@ namespace Umbraco.Web.Editors
                 {
                     contentType = x.Item1,
                     allowed = x.Item2
+                });
+            return Request.CreateResponse(result);
+        }
+        /// <summary>
+        /// Returns where a particular composition has been used
+        /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
+        {
+            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType)
+                .Select(x => new
+                {
+                    contentType = x
                 });
             return Request.CreateResponse(result);
         }
@@ -177,6 +198,71 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
+        public HttpResponseMessage PostRenameContainer(int id, string name)
+        {
+            var result = Services.ContentTypeService.RenameContentTypeContainer(id, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+        
+        public DocumentTypeCollectionDisplay PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
+        {
+            // create item doctype
+            var itemDocType = new ContentType(parentId);
+            itemDocType.Name = collectionItemName;
+            itemDocType.Alias = collectionItemName.ToSafeAlias(true);
+            itemDocType.Icon = collectionItemIcon;
+            
+            // create item doctype template
+            if (collectionItemCreateTemplate)
+            {
+                var template = CreateTemplateForContentType(itemDocType.Alias, itemDocType.Name);
+                itemDocType.SetDefaultTemplate(template);
+            }
+
+            // save item doctype
+            Services.ContentTypeService.Save(itemDocType);
+
+            // create collection doctype
+            var collectionDocType = new ContentType(parentId);
+            collectionDocType.Name = collectionName;
+            collectionDocType.Alias = collectionName.ToSafeAlias(true);
+            collectionDocType.Icon = collectionIcon;
+            collectionDocType.IsContainer = true;
+            collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
+            {
+                new ContentTypeSort(itemDocType.Id, 0)
+            };
+            
+            // create collection doctype template
+            if (collectionCreateTemplate)
+            {
+                var template = CreateTemplateForContentType(collectionDocType.Alias, collectionDocType.Name);
+                collectionDocType.SetDefaultTemplate(template);
+            }
+
+            // save collection doctype
+            Services.ContentTypeService.Save(collectionDocType);
+
+            // test if the parent exist and then allow the collection underneath
+            var parentCt = Services.ContentTypeService.GetContentType(parentId);
+            if (parentCt != null)
+            {
+                var allowedCts = parentCt.AllowedContentTypes.ToList();
+                allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
+                parentCt.AllowedContentTypes = allowedCts;
+                Services.ContentTypeService.Save(parentCt);
+            }
+
+            return new DocumentTypeCollectionDisplay
+            {
+                CollectionId = collectionDocType.Id,
+                ItemId = itemDocType.Id
+            };
+        }
+
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IContentType, DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
@@ -188,18 +274,19 @@ namespace Umbraco.Web.Editors
                     //create a default template if it doesnt exist -but only if default template is == to the content type
                     if (ctSave.DefaultTemplate.IsNullOrWhiteSpace() == false && ctSave.DefaultTemplate == ctSave.Alias)
                     {
-                        var template = Services.FileService.GetTemplate(ctSave.Alias);
-                        if (template == null)
+                        var template = CreateTemplateForContentType(ctSave.Alias, ctSave.Name);
+
+                        // If the alias has been manually updated before the first save,
+                        // make sure to also update the first allowed template, as the
+                        // name will come back as a SafeAlias of the document type name,
+                        // not as the actual document type alias.
+                        // For more info: http://issues.umbraco.org/issue/U4-11059
+                        if (ctSave.DefaultTemplate != template.Alias)
                         {
-                            var tryCreateTemplate = Services.FileService.CreateTemplateForContentType(ctSave.Alias, ctSave.Name);
-                            if (tryCreateTemplate == false)
-                            {
-                                Logger.Warn<ContentTypeController>(
-                                    "Could not create a template for the Content Type: {0}, status: {1}",
-                                    () => ctSave.Alias,
-                                    () => tryCreateTemplate.Result.StatusType);
-                            }
-                            template = tryCreateTemplate.Result.Entity;
+                            var allowedTemplates = ctSave.AllowedTemplates.ToArray();
+                            if (allowedTemplates.Any())
+                                allowedTemplates[0] = template.Alias;
+                            ctSave.AllowedTemplates = allowedTemplates;
                         }
 
                         //make sure the template alias is set on the default and allowed template so we can map it back
@@ -215,6 +302,26 @@ namespace Umbraco.Web.Editors
                             string.Empty);
 
             return display;
+        }
+
+        private ITemplate CreateTemplateForContentType(string contentTypeAlias, string contentTypeName)
+        {
+            var template = Services.FileService.GetTemplate(contentTypeAlias);
+            if (template == null)
+            {
+                var tryCreateTemplate = Services.FileService.CreateTemplateForContentType(contentTypeAlias, contentTypeName);
+                if (tryCreateTemplate == false)
+                {
+                    Logger.Warn<ContentTypeController>(
+                        "Could not create a template for the Content Type: {0}, status: {1}",
+                        () => contentTypeAlias,
+                        () => tryCreateTemplate.Result.StatusType);
+                }
+
+                template = tryCreateTemplate.Result.Entity;
+            }
+
+            return template;
         }
 
         /// <summary>
@@ -297,6 +404,17 @@ namespace Umbraco.Web.Editors
             {
                 basic.Name = localizedTextService.UmbracoDictionaryTranslate(basic.Name);
                 basic.Description = localizedTextService.UmbracoDictionaryTranslate(basic.Description);
+            }
+
+            //map the blueprints
+            var blueprints = Services.ContentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray()).ToArray();
+            foreach (var basic in basics)
+            {
+                var docTypeBluePrints = blueprints.Where(x => x.ContentTypeId == (int) basic.Id).ToArray();
+                foreach (var blueprint in docTypeBluePrints)
+                {
+                    basic.Blueprints[blueprint.Id] = blueprint.Name;
+                }
             }
 
             return basics;

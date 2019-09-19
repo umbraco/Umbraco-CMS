@@ -15,14 +15,15 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
 
     /// <summary>
-	/// A value converter for TinyMCE that will ensure any macro content is rendered properly even when 
-	/// used dynamically.
-	/// </summary>
+    /// A value converter for TinyMCE that will ensure any macro content is rendered properly even when 
+    /// used dynamically.
+    /// </summary>
     // because that version of RTE converter parses {locallink} and executes macros, when going from
     // data to source, its source value has to be cached at the request level, because we have no idea
     // what the macros may depend on actually. An so, object and xpath need to follow... request, too.
     // note: the TinyMceValueConverter is NOT inherited, so the PropertyValueCache attribute here is not
     // actually required (since Request is default) but leave it here to be absolutely explicit.
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(IHtmlString))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
     public class RteMacroRenderingValueConverter : TinyMceValueConverter
@@ -70,9 +71,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var sourceString = source.ToString();
 
-            // ensures string is parsed for {localLink} and urls are resolved correctly
+            // ensures string is parsed for {localLink} and urls and media are resolved correctly
             sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
+            sourceString = TemplateUtilities.ResolveMediaFromTextString(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly
             sourceString = RenderRteMacros(sourceString, preview);

@@ -9,11 +9,41 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService) {
+    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService, angularHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
         var evts = [];
+
+        var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
+
+        var buttons = [
+            {
+                "name": localizationService.localize("general_design"),
+                "alias": "design",
+                "icon": "icon-document-dashed-line",
+                "view": "views/documenttypes/views/design/design.html",
+                "active": true
+            },
+            {
+                "name": localizationService.localize("general_listView"),
+                "alias": "listView",
+                "icon": "icon-list",
+                "view": "views/documenttypes/views/listview/listview.html"
+            },
+            {
+                "name": localizationService.localize("general_rights"),
+                "alias": "permissions",
+                "icon": "icon-keychain",
+                "view": "views/documenttypes/views/permissions/permissions.html"
+            },
+            {
+                "name": localizationService.localize("treeHeaders_templates"),
+                "alias": "templates",
+                "icon": "icon-layout",
+                "view": "views/documenttypes/views/templates/templates.html"
+            }
+        ];
 
         vm.save = save;
 
@@ -23,93 +53,73 @@
         vm.page = {};
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
-        vm.page.navigation = [
-			{
-			    "name": localizationService.localize("general_design"),
-			    "icon": "icon-document-dashed-line",
-			    "view": "views/documenttypes/views/design/design.html",
-			    "active": true
-			},
-			{
-			    "name": localizationService.localize("general_listView"),
-			    "icon": "icon-list",
-			    "view": "views/documenttypes/views/listview/listview.html"
-			},
-			{
-			    "name": localizationService.localize("general_rights"),
-			    "icon": "icon-keychain",
-			    "view": "views/documenttypes/views/permissions/permissions.html"
-			},
-			{
-			    "name": localizationService.localize("treeHeaders_templates"),
-			    "icon": "icon-layout",
-			    "view": "views/documenttypes/views/templates/templates.html"
-			}
-        ];
+        vm.page.navigation = [];
+
+        loadButtons();
 
         vm.page.keyboardShortcutsOverview = [
-			{
-			    "name": localizationService.localize("main_sections"),
-			    "shortcuts": [
-					{
-					    "description": localizationService.localize("shortcuts_navigateSections"),
-					    "keys": [{ "key": "1" }, { "key": "4" }],
-					    "keyRange": true
-					}
-			    ]
-			},
-			{
-			    "name": localizationService.localize("general_design"),
-			    "shortcuts": [
-				{
-				    "description": localizationService.localize("shortcuts_addTab"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-				},
-				{
-				    "description": localizationService.localize("shortcuts_addProperty"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
-				},
-				{
-				    "description": localizationService.localize("shortcuts_addEditor"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
-				},
-				{
-				    "description": localizationService.localize("shortcuts_editDataType"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
-				}
-			    ]
-			},
-		{
-		    "name": localizationService.localize("general_listView"),
-		    "shortcuts": [
-				{
-				    "description": localizationService.localize("shortcuts_toggleListView"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "l" }]
-				}
-		    ]
-		},
-		{
-		    "name": localizationService.localize("general_rights"),
-		    "shortcuts": [
-				{
-				    "description": localizationService.localize("shortcuts_toggleAllowAsRoot"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "r" }]
-				},
-				{
-				    "description": localizationService.localize("shortcuts_addChildNode"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
-				}
-		    ]
-		},
-		{
-		    "name": localizationService.localize("treeHeaders_templates"),
-		    "shortcuts": [
-				{
-				    "description": localizationService.localize("shortcuts_addTemplate"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-				}
-		    ]
-		}
+            {
+                "name": localizationService.localize("main_sections"),
+                "shortcuts": [
+                    {
+                        "description": localizationService.localize("shortcuts_navigateSections"),
+                        "keys": [{ "key": "1" }, { "key": "4" }],
+                        "keyRange": true
+                    }
+                ]
+            },
+            {
+                "name": localizationService.localize("general_design"),
+                "shortcuts": [
+                    {
+                        "description": localizationService.localize("shortcuts_addTab"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_addProperty"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_addEditor"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_editDataType"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
+                    }
+                ]
+            },
+            {
+                "name": localizationService.localize("general_listView"),
+                "shortcuts": [
+                    {
+                        "description": localizationService.localize("shortcuts_toggleListView"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "l" }]
+                    }
+                ]
+            },
+            {
+                "name": localizationService.localize("general_rights"),
+                "shortcuts": [
+                    {
+                        "description": localizationService.localize("shortcuts_toggleAllowAsRoot"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "r" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_addChildNode"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
+                    }
+                ]
+            },
+            {
+                "name": localizationService.localize("treeHeaders_templates"),
+                "shortcuts": [
+                    {
+                        "description": localizationService.localize("shortcuts_addTemplate"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                    }
+                ]
+            }
         ];
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
@@ -117,6 +127,7 @@
             if (result) {
                 //Models builder mode:
                 vm.page.defaultButton = {
+                    alias: "save",
                     hotKey: "ctrl+s",
                     hotKeyWhenHidden: true,
                     labelKey: "buttons_save",
@@ -125,6 +136,7 @@
                     handler: function () { vm.save(); }
                 };
                 vm.page.subButtons = [{
+                    alias: "saveAndGenerateModels",
                     hotKey: "ctrl+g",
                     hotKeyWhenHidden: true,
                     labelKey: "buttons_saveAndGenerateModels",
@@ -138,7 +150,7 @@
                             vm.page.saveButtonState = "busy";
 
                             localizationService.localize("modelsBuilder_buildingModels").then(function (headerValue) {
-                                localizationService.localize("modelsBuilder_waitingMessage").then(function(msgValue) {
+                                localizationService.localize("modelsBuilder_waitingMessage").then(function (msgValue) {
                                     notificationsService.info(headerValue, msgValue);
                                 });
                             });
@@ -149,32 +161,30 @@
                                 if (!result.lastError) {
 
                                     //re-check model status
-                                    contentTypeHelper.checkModelsBuilderStatus().then(function(statusResult) {
+                                    contentTypeHelper.checkModelsBuilderStatus().then(function (statusResult) {
                                         vm.page.modelsBuilder = statusResult;
                                     });
 
                                     //clear and add success
                                     vm.page.saveButtonState = "init";
-                                    localizationService.localize("modelsBuilder_modelsGenerated").then(function(value) {
+                                    localizationService.localize("modelsBuilder_modelsGenerated").then(function (value) {
                                         notificationsService.success(value);
                                     });
 
                                 } else {
                                     vm.page.saveButtonState = "error";
-                                    localizationService.localize("modelsBuilder_modelsExceptionInUlog").then(function(value) {
+                                    localizationService.localize("modelsBuilder_modelsExceptionInUlog").then(function (value) {
                                         notificationsService.error(value);
                                     });
                                 }
 
                             }, function () {
                                 vm.page.saveButtonState = "error";
-                                localizationService.localize("modelsBuilder_modelsGeneratedError").then(function(value) {
+                                localizationService.localize("modelsBuilder_modelsGeneratedError").then(function (value) {
                                     notificationsService.error(value);
                                 });
                             });
-
                         });
-
                     }
                 }];
             }
@@ -185,40 +195,44 @@
 
             //we are creating so get an empty data type item
             contentTypeResource.getScaffold($routeParams.id)
-				.then(function (dt) {
-
-				    init(dt);
-
-				    vm.page.loading = false;
-
-				});
+                .then(function (dt) {
+                    init(dt);
+                    vm.page.loading = false;
+                });
         }
         else {
             loadDocumentType();
         }
 
         function loadDocumentType() {
-
             vm.page.loading = true;
-
             contentTypeResource.getById($routeParams.id).then(function (dt) {
                 init(dt);
-
                 syncTreeNode(vm.contentType, dt.path, true);
-
                 vm.page.loading = false;
-
             });
-
         }
 
+        function loadButtons() {
+
+            angular.forEach(buttons,
+                function (val, index) {
+
+                    if (disableTemplates === true && val.alias === "templates") {
+                        buttons.splice(index, 1);
+                    }
+
+                });
+
+            vm.page.navigation = buttons;
+        }
 
         /* ---------- SAVE ---------- */
 
         function save() {
 
             // only save if there is no overlays open
-            if(overlayHelper.getNumberOfOverlays() === 0) {
+            if (overlayHelper.getNumberOfOverlays() === 0) {
 
                 var deferred = $q.defer();
 
@@ -239,9 +253,8 @@
                     // we need to rebind... the IDs that have been created!
                     rebindCallback: function (origContentType, savedContentType) {
                         vm.contentType.id = savedContentType.id;
-                        vm.contentType.groups.forEach(function(group) {
+                        vm.contentType.groups.forEach(function (group) {
                             if (!group.name) return;
-
                             var k = 0;
                             while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
                                 k++;
@@ -249,13 +262,11 @@
                                 group.id = 0;
                                 return;
                             }
-
                             var savedGroup = savedContentType.groups[k];
                             if (!group.id) group.id = savedGroup.id;
 
                             group.properties.forEach(function (property) {
                                 if (property.id || !property.alias) return;
-
                                 k = 0;
                                 while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
                                     k++;
@@ -263,7 +274,6 @@
                                     property.id = 0;
                                     return;
                                 }
-
                                 var savedProperty = savedGroup.properties[k];
                                 property.id = savedProperty.id;
                             });
@@ -283,19 +293,16 @@
                     }
                     else {
                         localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                            localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
+                            localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
                                 notificationsService.error(headerValue, msgValue);
                             });
                         });
                     }
                     vm.page.saveButtonState = "error";
-
                     deferred.reject(err);
                 });
                 return deferred.promise;
-
             }
-
         }
 
         function init(contentType) {
@@ -343,12 +350,11 @@
 
         function getDataTypeDetails(property) {
             if (property.propertyState !== "init") {
-
                 dataTypeResource.getById(property.dataTypeId)
-					.then(function (dataType) {
-					    property.dataTypeIcon = dataType.icon;
-					    property.dataTypeName = dataType.name;
-					});
+                    .then(function (dataType) {
+                        property.dataTypeIcon = dataType.icon;
+                        property.dataTypeName = dataType.name;
+                    });
             }
         }
 
@@ -359,7 +365,7 @@
             });
         }
 
-        evts.push(eventsService.on("app.refreshEditor", function(name, error) {
+        evts.push(eventsService.on("app.refreshEditor", function (name, error) {
             loadDocumentType();
         }));
 
@@ -370,6 +376,14 @@
             }
         });
 
+        // #3368 - changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty 
+        $scope.$watch("vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.allowedTemplates.length + vm.contentType.isContainer", function (newVal, oldVal) {
+            if (oldVal === undefined) {
+                // still initializing, ignore
+                return;
+            }
+            angularHelper.getCurrentForm($scope).$setDirty();
+        });
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.DocumentTypes.EditController", DocumentTypesEditController);

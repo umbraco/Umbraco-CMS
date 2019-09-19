@@ -1,7 +1,8 @@
 body.mce-content-body {
     background-color: #fff;
     font-family: Verdana,Arial,Helvetica,sans-serif;
-    font-size: 11px;
+    font-size: 14px;
+    line-height: 1.5em;
     scrollbar-3dlight-color: #f0f0ee;
     scrollbar-arrow-color: #676662;
     scrollbar-base-color: #f0f0ee;

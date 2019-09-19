@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi
 {
@@ -10,6 +11,8 @@ namespace Umbraco.Web.WebApi
     /// </summary>    
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
+        private readonly bool _requireApproval;
+
         /// <summary>
         /// Can be used by unit tests to enable/disable this filter
         /// </summary>
@@ -39,8 +42,14 @@ namespace Umbraco.Web.WebApi
             _applicationContext = _umbracoContext.Application;
         }
 
-        public UmbracoAuthorizeAttribute()
+        public UmbracoAuthorizeAttribute() : this(true)
         {
+            
+        }
+
+        public UmbracoAuthorizeAttribute(bool requireApproval)
+        {
+            _requireApproval = requireApproval;
         }
 
         protected override bool IsAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
@@ -59,7 +68,7 @@ namespace Umbraco.Web.WebApi
                 if (appContext.IsConfigured == false)
                     return false;
 
-                var isLoggedIn = umbContext.Security.ValidateCurrentUser();
+                var isLoggedIn = umbContext.Security.ValidateCurrentUser(false, _requireApproval) == ValidateRequestAttempt.Success;
 
                 return isLoggedIn;
             }

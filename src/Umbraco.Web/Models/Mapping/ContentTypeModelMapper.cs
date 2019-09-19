@@ -38,6 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             
             config.CreateMap<PropertyTypeBasic, PropertyType>()
                 .ConstructUsing(basic => new PropertyType(applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(basic.DataTypeId)))
+                .IgnoreEntityCommonProperties()
                 .ForMember(type => type.ValidationRegExp, expression => expression.ResolveUsing(basic => basic.Validation.Pattern))
                 .ForMember(type => type.Mandatory, expression => expression.ResolveUsing(basic => basic.Validation.Mandatory))
                 .ForMember(type => type.Name, expression => expression.ResolveUsing(basic => basic.Label))
@@ -45,9 +46,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
                 .ForMember(type => type.PropertyEditorAlias, expression => expression.Ignore())
                 .ForMember(type => type.HelpText, expression => expression.Ignore())
-                .ForMember(type => type.Key, expression => expression.Ignore())
-                .ForMember(type => type.CreateDate, expression => expression.Ignore())
-                .ForMember(type => type.UpdateDate, expression => expression.Ignore())
+                .ForMember(type => type.Key, expression => expression.Ignore())                                
+                .ForMember(type => type.DeletedDate, expression => expression.Ignore())                                
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore());
 
             config.CreateMap<DocumentTypeSave, IContentType>()
@@ -65,6 +65,8 @@ namespace Umbraco.Web.Models.Mapping
 
                     if (source.DefaultTemplate != null)
                         dest.SetDefaultTemplate(applicationContext.Services.FileService.GetTemplate(source.DefaultTemplate));
+                    else
+                        dest.SetDefaultTemplate(null);
 
                     ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
                 });
@@ -72,7 +74,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<MediaTypeSave, IMediaType>()
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity<MediaTypeSave, PropertyTypeBasic, IMediaType>(applicationContext)
-                .ConstructUsing((source) => new MediaType(source.ParentId))                
+                .ConstructUsing((source) => new MediaType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
                     ContentTypeModelMapperExtensions.AfterMapMediaTypeSaveToEntity(source, dest, applicationContext);
@@ -86,7 +88,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
 
-                    //map the MemberCanEditProperty,MemberCanViewProperty
+                    //map the MemberCanEditProperty,MemberCanViewProperty,IsSensitiveData
                     foreach (var propertyType in source.Groups.SelectMany(x => x.Properties))
                     {
                         var localCopy = propertyType;
@@ -95,6 +97,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             dest.SetMemberCanEditProperty(localCopy.Alias, localCopy.MemberCanEditProperty);
                             dest.SetMemberCanViewProperty(localCopy.Alias, localCopy.MemberCanViewProperty);
+                            dest.SetIsSensitiveProperty(localCopy.Alias, localCopy.IsSensitiveData);
                         }
                     }
                 });
@@ -106,7 +109,7 @@ namespace Umbraco.Web.Models.Mapping
                 .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
                 .AfterMap((memberType, display) =>
                 {
-                    //map the MemberCanEditProperty,MemberCanViewProperty
+                    //map the MemberCanEditProperty,MemberCanViewProperty,IsSensitiveData
                     foreach (var propertyType in memberType.PropertyTypes)
                     {
                         var localCopy = propertyType;
@@ -115,6 +118,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             displayProp.MemberCanEditProperty = memberType.MemberCanEditProperty(localCopy.Alias);
                             displayProp.MemberCanViewProperty = memberType.MemberCanViewProperty(localCopy.Alias);
+                            displayProp.IsSensitiveData = memberType.IsSensitiveProperty(localCopy.Alias);
                         }
                     }
                 });
@@ -161,9 +165,15 @@ namespace Umbraco.Web.Models.Mapping
 
                 });
 
-            config.CreateMap<IMemberType, ContentTypeBasic>();
-            config.CreateMap<IMediaType, ContentTypeBasic>();
-            config.CreateMap<IContentType, ContentTypeBasic>();
+            config.CreateMap<IMemberType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MemberType, content.Key)))
+                .ForMember(x => x.Blueprints, expression => expression.Ignore());
+            config.CreateMap<IMediaType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MediaType, content.Key)))
+                .ForMember(x => x.Blueprints, expression => expression.Ignore());
+            config.CreateMap<IContentType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DocumentType, content.Key)))
+                .ForMember(x => x.Blueprints, expression => expression.Ignore());
 
             config.CreateMap<PropertyTypeBasic, PropertyType>()
 

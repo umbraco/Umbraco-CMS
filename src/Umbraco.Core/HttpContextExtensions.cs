@@ -26,13 +26,13 @@ namespace Umbraco.Core
                 var ipAddress = httpContext.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
 
                 if (string.IsNullOrEmpty(ipAddress))
-                    return httpContext.Request.ServerVariables["REMOTE_ADDR"];
+                    return httpContext.Request.UserHostAddress;
 
                 var addresses = ipAddress.Split(',');
                 if (addresses.Length != 0)
                     return addresses[0];
 
-                return httpContext.Request.ServerVariables["REMOTE_ADDR"];
+                return httpContext.Request.UserHostAddress;
             }
             catch (System.Exception ex)
             {

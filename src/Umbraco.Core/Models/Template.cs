@@ -15,7 +15,7 @@ using Umbraco.Core.Strings;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents a Template file
+    /// Represents a Template file.
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]

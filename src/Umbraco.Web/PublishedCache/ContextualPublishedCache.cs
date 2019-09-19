@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
 
@@ -16,7 +15,7 @@ namespace Umbraco.Web.PublishedCache
         protected readonly UmbracoContext UmbracoContext;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContextualPublishedCache"/> with a context.
+        /// Initializes a new instance of the <see cref="ContextualPublishedCache" /> with a context.
         /// </summary>
         /// <param name="umbracoContext">The context.</param>
         protected ContextualPublishedCache(UmbracoContext umbracoContext)
@@ -28,9 +27,43 @@ namespace Umbraco.Web.PublishedCache
         /// Gets a content identified by its unique identifier.
         /// </summary>
         /// <param name="contentId">The content unique identifier.</param>
-        /// <returns>The content, or null.</returns>
-        /// <remarks>Considers published or unpublished content depending on context.</remarks>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
+        /// <remarks>
+        /// Considers published or unpublished content depending on context.
+        /// </remarks>
         public IPublishedContent GetById(int contentId)
+        {
+            return GetById(UmbracoContext.InPreviewMode, contentId);
+        }
+
+        /// <summary>
+        /// Gets a content identified by its unique identifier.
+        /// </summary>
+        /// <param name="contentId">The content unique identifier.</param>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
+        /// <remarks>
+        /// Considers published or unpublished content depending on context.
+        /// </remarks>
+        public IPublishedContent GetById(Guid contentId)
+        {
+            return GetById(UmbracoContext.InPreviewMode, contentId);
+        }
+
+        /// <summary>
+        /// Gets a content identified by its unique identifier.
+        /// </summary>
+        /// <param name="contentId">The content unique identifier.</param>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
+        /// <remarks>
+        /// Considers published or unpublished content depending on context.
+        /// </remarks>
+        public IPublishedContent GetById(Udi contentId)
         {
             return GetById(UmbracoContext.InPreviewMode, contentId);
         }
@@ -40,14 +73,61 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="contentId">The content unique identifier.</param>
-        /// <returns>The content, or null.</returns>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
         public abstract IPublishedContent GetById(bool preview, int contentId);
+
+        /// <summary>
+        /// Gets a content identified by its unique identifier.
+        /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="contentKey">The content key.</param>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
+        public virtual IPublishedContent GetById(bool preview, Guid contentKey)
+        {
+            var contentIdAttempt = UmbracoContext.Application.Services.EntityService.GetIdForKey(contentKey, UmbracoObjectTypes.Document);
+
+            return GetById(preview, contentIdAttempt.Success ? contentIdAttempt.Result : -1);
+        }
+
+        /// <summary>
+        /// Gets a content identified by its unique identifier.
+        /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="contentId">The content identifier.</param>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">UDIs for content items must be <see cref="GuidUdi" /></exception>
+        public virtual IPublishedContent GetById(bool preview, Udi contentId)
+        {
+            var guidUdi = contentId as GuidUdi;
+            if (guidUdi == null)
+                throw new ArgumentException($"Udi must be of type {typeof(GuidUdi).Name}.", nameof(contentId));
+
+            if (guidUdi.EntityType != UdiEntityType)
+                throw new ArgumentException($"Udi entity type must be \"{UdiEntityType}\".", nameof(contentId));
+
+            return GetById(preview, guidUdi.Guid);
+        }
+
+        /// <summary>
+        /// Gets the entity type.
+        /// </summary>
+        protected abstract string UdiEntityType { get; }
 
         /// <summary>
         /// Gets content at root.
         /// </summary>
-        /// <returns>The contents.</returns>
-        /// <remarks>Considers published or unpublished content depending on context.</remarks>
+        /// <returns>
+        /// The contents.
+        /// </returns>
+        /// <remarks>
+        /// Considers published or unpublished content depending on context.
+        /// </remarks>
         public IEnumerable<IPublishedContent> GetAtRoot()
         {
             return GetAtRoot(UmbracoContext.InPreviewMode);
@@ -57,7 +137,9 @@ namespace Umbraco.Web.PublishedCache
         /// Gets contents at root.
         /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-        /// <returns>The contents.</returns>
+        /// <returns>
+        /// The contents.
+        /// </returns>
         public abstract IEnumerable<IPublishedContent> GetAtRoot(bool preview);
 
         /// <summary>
@@ -65,10 +147,11 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The content, or null.</returns>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
         /// <remarks>
-        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
-        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// <para>Considers published or unpublished content depending on context.</para>
         /// </remarks>
@@ -82,10 +165,11 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The content, or null.</returns>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
         /// <remarks>
-        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
-        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// <para>Considers published or unpublished content depending on context.</para>
         /// </remarks>
@@ -100,10 +184,11 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The content, or null.</returns>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
         /// <remarks>
-        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
-        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
         public abstract IPublishedContent GetSingleByXPath(bool preview, string xpath, params XPathVariable[] vars);
@@ -114,10 +199,11 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The content, or null.</returns>
+        /// <returns>
+        /// The content, or null.
+        /// </returns>
         /// <remarks>
-        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
-        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
         public abstract IPublishedContent GetSingleByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
@@ -127,7 +213,9 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The contents.</returns>
+        /// <returns>
+        /// The contents.
+        /// </returns>
         /// <remarks>
         /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
         /// value which itself is <c>null</c>, then variables are ignored.</para>
@@ -162,10 +250,11 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The contents.</returns>
+        /// <returns>
+        /// The contents.
+        /// </returns>
         /// <remarks>
-        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
-        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
         public abstract IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, params XPathVariable[] vars);
@@ -176,10 +265,11 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The contents.</returns>
+        /// <returns>
+        /// The contents.
+        /// </returns>
         /// <remarks>
-        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
-        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
         public abstract IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
@@ -187,8 +277,12 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Gets an XPath navigator that can be used to navigate content.
         /// </summary>
-        /// <returns>The XPath navigator.</returns>
-        /// <remarks>Considers published or unpublished content depending on context.</remarks>
+        /// <returns>
+        /// The XPath navigator.
+        /// </returns>
+        /// <remarks>
+        /// Considers published or unpublished content depending on context.
+        /// </remarks>
         public XPathNavigator GetXPathNavigator()
         {
             return GetXPathNavigator(UmbracoContext.InPreviewMode);
@@ -198,20 +292,28 @@ namespace Umbraco.Web.PublishedCache
         /// Gets an XPath navigator that can be used to navigate content.
         /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-        /// <returns>The XPath navigator.</returns>
+        /// <returns>
+        /// The XPath navigator.
+        /// </returns>
         public abstract XPathNavigator GetXPathNavigator(bool preview);
 
         /// <summary>
-        /// Gets a value indicating whether <c>GetXPathNavigator</c> returns an <c>XPathNavigator</c>
-        /// and that navigator is a <c>NavigableNavigator</c>.
+        /// Gets a value indicating whether <c>GetXPathNavigator</c> returns an <c>XPathNavigator</c> and that navigator is a <c>NavigableNavigator</c>.
         /// </summary>
+        /// <value>
+        ///   <c>true</c> if the <c>XPathNavigator</c> is navigable; otherwise, <c>false</c>.
+        /// </value>
         public abstract bool XPathNavigatorIsNavigable { get; }
 
         /// <summary>
         /// Gets a value indicating whether the underlying non-contextual cache contains content.
         /// </summary>
-        /// <returns>A value indicating whether the underlying non-contextual cache contains content.</returns>
-        /// <remarks>Considers published or unpublished content depending on context.</remarks>
+        /// <returns>
+        /// A value indicating whether the underlying non-contextual cache contains content.
+        /// </returns>
+        /// <remarks>
+        /// Considers published or unpublished content depending on context.
+        /// </remarks>
         public bool HasContent()
         {
             return HasContent(UmbracoContext.InPreviewMode);
@@ -221,7 +323,9 @@ namespace Umbraco.Web.PublishedCache
         /// Gets a value indicating whether the underlying non-contextual cache contains content.
         /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
-        /// <returns>A value indicating whether the underlying non-contextual cache contains content.</returns>
+        /// <returns>
+        /// A value indicating whether the underlying non-contextual cache contains content.
+        /// </returns>
         public abstract bool HasContent(bool preview);
     }
 }

@@ -1,5 +1,4 @@
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -8,7 +7,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
     /// <summary>
     /// See: http://issues.umbraco.org/issue/U4-9188
     /// </summary>
-    [Migration("7.6.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class UpdateUniqueIndexOnCmsPropertyData : MigrationBase
     {
         public UpdateUniqueIndexOnCmsPropertyData(ISqlSyntaxProvider sqlSyntax, ILogger logger)

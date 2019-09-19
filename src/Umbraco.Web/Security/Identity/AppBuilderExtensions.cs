@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
@@ -53,7 +54,22 @@ namespace Umbraco.Web.Security.Identity
         {
             app.SetLoggerFactory(new OwinLoggerFactory());
         }
-        
+
+        /// <summary>
+        /// This maps a Signal path/hub
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseSignalR(this IAppBuilder app)
+        {
+
+            // TODO: Move this method in v8, it doesn't belong in this namespace/extension class
+            var umbracoPath = GlobalSettings.UmbracoMvcArea;
+            
+            return app.MapSignalR(HttpRuntime.AppDomainAppVirtualPath + 
+                umbracoPath + "/BackOffice/signalr", new HubConfiguration { EnableDetailedErrors = true });
+        }
+
         /// <summary>
         /// Configure Default Identity User Manager for Umbraco
         /// </summary>
@@ -72,8 +88,10 @@ namespace Umbraco.Web.Security.Identity
                 (options, owinContext) => BackOfficeUserManager.Create(
                     options,
                     appContext.Services.UserService,
+                    appContext.Services.EntityService,
                     appContext.Services.ExternalLoginService,
-                    userMembershipProvider));
+                    userMembershipProvider,
+                    UmbracoConfig.For.UmbracoSettings().Content));
             
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
@@ -102,7 +120,8 @@ namespace Umbraco.Web.Security.Identity
                 (options, owinContext) => BackOfficeUserManager.Create(
                     options,
                     customUserStore,
-                    userMembershipProvider));
+                    userMembershipProvider,
+                    UmbracoConfig.For.UmbracoSettings().Content));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 

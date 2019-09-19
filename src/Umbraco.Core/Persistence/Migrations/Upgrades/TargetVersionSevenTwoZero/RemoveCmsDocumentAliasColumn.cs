@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
 {
-    [Migration("7.2.0", 2, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.2.0", 2, Constants.System.UmbracoMigrationName)]
     public class RemoveCmsDocumentAliasColumn : MigrationBase
     {
         public RemoveCmsDocumentAliasColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
