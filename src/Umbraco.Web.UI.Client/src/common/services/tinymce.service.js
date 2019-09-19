@@ -349,8 +349,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 };
                 
                 // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later.
-                var validElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li"
-                
+                var validElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li,hr,pre,dl,dt,figure,figcaption,wbr"
+                  
                 // add valid elements from styleFormats.
                 var style, i = 0;
                 for(; i < styles.styleFormats.length; i++) {
