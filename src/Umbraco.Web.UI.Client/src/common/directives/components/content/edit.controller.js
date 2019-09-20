@@ -171,6 +171,14 @@
                 }
             }));
 
+            evts.push(eventsService.on("editors.content.reload", function (name, args) {                
+                if (args && args.node && $scope.content.id === args.node.id) {
+                    reload();
+                    loadBreadcrumb();
+                    syncTreeNode($scope.content, $scope.content.path);
+                }
+            }));
+            
             evts.push(eventsService.on("rte.file.uploading", function(){
                 $scope.page.saveButtonState = "busy";
                 $scope.page.buttonGroupState = "busy";
