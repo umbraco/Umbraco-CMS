@@ -365,7 +365,7 @@ namespace Umbraco.Tests.Testing
 
             // somehow property editor ends up wanting this
             Composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
-            Composition.RegisterUnique<ManifestParser>();
+            Composition.RegisterUnique<ManifestParser, ManifestParserImpl>();
 
             // note - don't register collections, use builders
             Composition.WithCollectionBuilder<DataEditorCollectionBuilder>();

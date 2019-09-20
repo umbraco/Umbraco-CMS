@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Manifest
                 new RequiredValidator(Mock.Of<ILocalizedTextService>()),
                 new RegexValidator(Mock.Of<ILocalizedTextService>(), null)
             };
-            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>());
+            _parser = new ManifestParserImpl(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>());
         }
 
         [Test]
