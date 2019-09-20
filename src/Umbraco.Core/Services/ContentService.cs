@@ -2665,6 +2665,8 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                var currVersion = content.Version;
+
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
                     var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
@@ -2706,7 +2708,9 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                return OperationStatus.Success(evtMsgs);
+                return currVersion == content.Version
+                    ? OperationStatus.NoOperation(evtMsgs)
+                    : OperationStatus.Success(evtMsgs);
             }
         }
 
