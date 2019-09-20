@@ -44,21 +44,21 @@
             </div>
             <ul class="sections" ng-class="{selected: showDevicesPreview && showDevices}">
                 <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }">
-                    <a href="" ng-click="updatePreviewDevice(device)"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
+                    <a ng-click="updatePreviewDevice(device)"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
                 </li>
 
                 @if (Model.Languages != null && Model.Languages.Count() > 1)
                 {
                     foreach (var previewLink in Model.Languages)
                      {
-                         <li>
-                             <a href="" ng-click="changeCulture('@previewLink.IsoCode')" title="Preview in @previewLink.CultureName"><i class="icon icon-globe-europe---africa"></i><span>@previewLink.CultureName</span></a>
+                         <li ng-class="{ current:isCurrentCulture('@previewLink.IsoCode') }">
+                             <a ng-click="changeCulture('@previewLink.IsoCode')" title="Preview in @previewLink.CultureName"><i class="icon icon-globe-europe---africa"></i><span>@previewLink.CultureName</span></a>
                          </li>
                      }
                 }
 
                 <li>
-                    <a href="" ng-click="exitPreview()" title="Exit Preview"><i class="icon icon-wrong"></i><span> </span></a>
+                    <a ng-click="exitPreview()" title="Exit Preview"><i class="icon icon-wrong"></i><span> </span></a>
                 </li>
             </ul>
         </div>
