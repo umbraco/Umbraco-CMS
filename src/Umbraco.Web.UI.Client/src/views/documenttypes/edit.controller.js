@@ -338,6 +338,7 @@
                     saveMethod: contentTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,
+                    infiniteMode: infiniteMode,
                     // we need to rebind... the IDs that have been created!
                     rebindCallback: function (origContentType, savedContentType) {
                         vm.contentType.id = savedContentType.id;
