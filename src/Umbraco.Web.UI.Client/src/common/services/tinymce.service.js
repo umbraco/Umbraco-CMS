@@ -7,7 +7,7 @@
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource) {
+    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -166,6 +166,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         xhr = new XMLHttpRequest();
         xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
+
+        xhr.onloadstart = function(e) {
+            angularHelper.safeApply($rootScope, function() {
+                eventsService.emit("rte.file.uploading");
+            });
+        };
+
+        xhr.onloadend = function(e) {
+            angularHelper.safeApply($rootScope, function() {
+                eventsService.emit("rte.file.uploaded");
+            });
+        };
 
         xhr.upload.onprogress = function (e) {
             progress(e.loaded / e.total * 100);
