@@ -474,6 +474,19 @@ angular.module("umbraco")
                 editorService.mediaEditor(mediaEditor);
             };
 
+            /**
+             * Called when the umgImageGravity component updates the focal point value
+             * @param {any} left
+             * @param {any} top
+             */
+            $scope.focalPointChanged = function (left, top) {
+                //update the model focalpoint value
+                $scope.target.focalPoint = {
+                    left: left,
+                    top: top
+                };
+            }
+
             function setUpdatedMediaNodes(item) {
                 // add udi to list of updated media items so we easily can update them in other editors
                 if ($scope.model.updatedMediaNodes.indexOf(item.udi) === -1) {
