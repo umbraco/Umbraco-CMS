@@ -1,10 +1,12 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, tinyMceAssets) {
+        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, tinyMceAssets, $element) {
 
             // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
             $scope.isLoading = true;
+            
+            var editorNode = $element[0].querySelector('.umb-rte-editor');
 
             //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
             // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
@@ -38,7 +40,7 @@ angular.module("umbraco")
             var tinyMceEditor = null;
 
             promises.push(tinyMceService.getTinyMceEditorConfig({
-                htmlId: $scope.textAreaHtmlId,
+                target: editorNode,
                 stylesheets: editorConfig.stylesheets,
                 toolbar: editorConfig.toolbar,
                 mode: editorConfig.mode
@@ -46,7 +48,7 @@ angular.module("umbraco")
 
             //wait for queue to end
             $q.all(promises).then(function (result) {
-
+                
                 var standardConfig = result[promises.length - 1];
                 
                 if (height !== null) {
@@ -57,10 +59,7 @@ angular.module("umbraco")
                 var baseLineConfigObj = {
                     maxImageSize: editorConfig.maxImageSize,
                     width: width,
-                    height: height,
-                    init_instance_callback: function(editor){
-                        $scope.isLoading = false;
-                    }
+                    height: height
                 };
 
                 angular.extend(baseLineConfigObj, standardConfig);
@@ -69,7 +68,18 @@ angular.module("umbraco")
 
                     //set the reference
                     tinyMceEditor = editor;
-
+                    
+                    //$scope.isLoading = false;
+                    
+                    tinyMceEditor.on('init', function (e) {
+                        $timeout(function () {
+                            console.log(editor);
+                            //editor.editorContainer.style.display = 'block'
+                            //editorNode.style.display = 'block'
+                            $scope.isLoading = false;
+                        }, 1000)
+                    });
+                    
                     //initialize the standard editor functionality for Umbraco
                     tinyMceService.initializeEditor({
                         editor: editor,
@@ -80,16 +90,7 @@ angular.module("umbraco")
                 };
 
                 /** Loads in the editor */
-                function loadTinyMce() {
-
-                    //we need to add a timeout here, to force a redraw so TinyMCE can find
-                    //the elements needed
-                    $timeout(function () {                        
-                        tinymce.init(baseLineConfigObj);
-                    }, 200);
-                }
-
-                loadTinyMce();
+                tinymce.init(baseLineConfigObj);
 
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 var unsubscribe = $scope.$on("formSubmitting", function () {

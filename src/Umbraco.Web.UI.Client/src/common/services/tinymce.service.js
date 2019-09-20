@@ -205,38 +205,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         xhr.send(formData);
     }
 
-    function initEvents(editor){
-
-        editor.on('SetContent', function (e) {
-            var content = e.content;
-
-            // Upload BLOB images (dragged/pasted ones)
-            if(content.indexOf('<img src="blob:') > -1){
-
-                editor.uploadImages(function(data) {
-                    // Once all images have been uploaded
-                    data.forEach(function(item) {
-                        // Select img element
-                        var img = item.element;
-
-                        // Get img src
-                        var imgSrc = img.getAttribute("src");
-                        var tmpLocation = localStorage.getItem(`tinymce__${imgSrc}`);
-
-                        // Select the img & add new attr which we can search for
-                        // When its being persisted in RTE property editor
-                        // To create a media item & delete this tmp one etc
-                        tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
-
-                        // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly 
-                        // same image twice
-                        tinymce.activeEditor.editorUpload.blobCache.removeByUri(imgSrc);
-                    });
-                });
-            }
-        });
-    }
-
     return {
 
         /**
@@ -259,7 +227,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 var tinyMceConfig = result[0];
                 var styles = result[1];
-
+                
                 var toolbars = getToolbars(args.toolbar, tinyMceConfig);
 
                 var plugins = _.map(tinyMceConfig.plugins, function (plugin) {
@@ -300,7 +268,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 //create a baseline Config to exten upon
                 var config = {
-                    selector: "#" + args.htmlId,
+                    //selector: "#" + args.htmlId,
                     theme: modeTheme,
                     //skin: "umbraco",
                     inline: modeInline,
@@ -333,10 +301,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     images_upload_handler: uploadImageHandler,
                     automatic_uploads: false,
-                    images_replace_blob_uris: false,
-                    init_instance_callback: initEvents
+                    images_replace_blob_uris: false
                 };
-
+                
+                if (args.htmlId) {
+                    config.selector = "#" + args.htmlId;
+                } else if (args.target) {
+                    config.target = args.target;
+                }
+                
+                
+                
                 if (tinyMceConfig.customConfig) {
 
                     //if there is some custom config, we need to see if the string value of each item might actually be json and if so, we need to
@@ -372,7 +347,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     angular.extend(config, tinyMceConfig.customConfig);
                 }
 
-                return $q.when(config);
+                return config;
 
             });
 
@@ -1209,13 +1184,46 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 startWatch();
             }
 
-            args.editor.on('init', function (e) {
+            args.editor.on('SetContent', function (e) {
+                var content = e.content;
 
+                // Upload BLOB images (dragged/pasted ones)
+                if(content.indexOf('<img src="blob:') > -1){
+
+                    editor.uploadImages(function(data) {
+                        // Once all images have been uploaded
+                        data.forEach(function(item) {
+                            // Select img element
+                            var img = item.element;
+
+                            // Get img src
+                            var imgSrc = img.getAttribute("src");
+                            var tmpLocation = localStorage.getItem(`tinymce__${imgSrc}`);
+
+                            // Select the img & add new attr which we can search for
+                            // When its being persisted in RTE property editor
+                            // To create a media item & delete this tmp one etc
+                            tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
+
+                            // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly 
+                            // same image twice
+                            tinymce.activeEditor.editorUpload.blobCache.removeByUri(imgSrc);
+                        });
+                    });
+                }
+            });
+
+            args.editor.on('init', function (e) {
+                
                 if (args.model.value) {
                     args.editor.setContent(args.model.value);
                 }
+                
                 //enable browser based spell checking
                 args.editor.getBody().setAttribute('spellcheck', true);
+                
+                //start watching the value
+                startWatch();
             });
 
             args.editor.on('Change', function (e) {
@@ -1360,8 +1368,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 editorService.open(aceEditor);
             });
 
-            //start watching the value
-            startWatch(args.editor);
         }
 
     };
