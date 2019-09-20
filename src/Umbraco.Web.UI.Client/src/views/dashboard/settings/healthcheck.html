@@ -1,19 +1,19 @@
 <div ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
 
     <div ng-if="vm.viewState === 'list'">
-        
+
         <umb-box>
             <umb-box-content>
                 <div class="flex justify-between items-center">
                     <h3 class="bold">Health Check</h3>
                     <umb-button
                         type="button"
-                        button-style="success" 
+                        button-style="success"
                         label="Check All Groups"
                         action="vm.checkAllGroups(vm.groups)">
                     </umb-button>
                 </div>
-        
+
                 <div class="umb-healthcheck-help-text">
                     <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
                     You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
@@ -23,40 +23,40 @@
 
         <div class="umb-healthcheck">
 
-            <div class="umb-air" ng-repeat="group in vm.groups" ng-click="vm.openGroup(group);">
-                <div class="umb-healthcheck-group">
+            <div class="umb-air" ng-repeat="group in vm.groups">
+                <button type="button" class="umb-healthcheck-group" ng-click="vm.openGroup(group);">
 
-                    <div class="umb-healthcheck-title">{{group.name}}</div>
+                        <div class="umb-healthcheck-title">{{group.name}}</div>
 
-                    <div class="umb-healthcheck-group__load-container" ng-if="group.loading">
-                        <umb-load-indicator></umb-load-indicator>
-                    </div>
-
-                    <div class="umb-healthcheck-messages" ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
-
-                        <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
-                            <i class="icon-check color-green"></i>
-                            {{ group.totalSuccess }}
+                        <div class="umb-healthcheck-group__load-container" ng-if="group.loading">
+                            <umb-load-indicator></umb-load-indicator>
                         </div>
 
-                        <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
-                            <i class="icon-alert color-orange"></i>
-                            {{ group.totalWarning }}
+                        <div class="umb-healthcheck-messages" ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
+
+                            <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
+                                <i class="icon-check color-green" aria-hidden="true"></i>
+                                {{ group.totalSuccess }}
+                            </div>
+
+                            <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
+                                <i class="icon-alert color-orange" aria-hidden="true"></i>
+                                {{ group.totalWarning }}
+                            </div>
+
+                            <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
+                                <i class="icon-delete color-red" aria-hidden="true"></i>
+                                {{ group.totalError }}
+                            </div>
+
+                            <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
+                                <i class="umb-healthcheck-status-icon icon-info" aria-hidden="true"></i>
+                                {{ group.totalInfo }}
+                            </div>
+
                         </div>
 
-                        <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
-                            <i class="icon-delete color-red"></i>
-                            {{ group.totalError }}
-                        </div>
-
-                        <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
-                            <i class="umb-healthcheck-status-icon icon-info"></i>
-                            {{ group.totalInfo }}
-                        </div>
-
-                    </div>
-
-                </div>
+                </button>
             </div>
 
         </div>
@@ -79,7 +79,7 @@
                 <div class="umb-panel-group__details-group-title">
                     <div class="umb-panel-group__details-group-name">{{ vm.selectedGroup.name }}</div>
                     <umb-button
-                        type="button" 
+                        type="button"
                         action="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks)"
                         label="Check group">
                     </umb-button>

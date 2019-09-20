@@ -98,7 +98,9 @@
                         item-max-height="150"
                         item-min-width="100"
                         item-min-height="100"
+                        disable-folder-select={{disableFolderSelect}}
                         only-images={{onlyImages}}
+                        only-folders={{onlyFolders}}
                         include-sub-folders={{showChilds}}
                         current-Folder-id="{{currentFolder.id}}">
                 </umb-media-grid>
@@ -125,7 +127,8 @@
                     <div ng-if="target.url">
                         <umb-image-gravity
                             src="target.url"
-                            center="target.focalPoint">
+                            center="target.focalPoint"
+							on-value-changed="focalPointChanged(left, top)">
                         </umb-image-gravity>
                     </div>
 

@@ -9,6 +9,8 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -38,7 +40,7 @@ namespace Umbraco.Tests.PublishedContent
             var converters = Factory.GetInstance<PropertyValueConverterCollection>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new RichTextPropertyEditor(Mock.Of<ILogger>())) { Id = 1 });
+                new DataType(new RichTextPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IUmbracoContextAccessor>())) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 

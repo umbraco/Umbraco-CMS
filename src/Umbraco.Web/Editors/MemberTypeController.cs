@@ -89,7 +89,7 @@ namespace Umbraco.Web.Editors
             [FromUri]string[] filterContentTypes,
             [FromUri]string[] filterPropertyTypes)
         {
-            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes)
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes, false)
                 .Select(x => new
                 {
                     contentType = x.Item1,

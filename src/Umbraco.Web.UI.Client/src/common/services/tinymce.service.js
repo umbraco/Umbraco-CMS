@@ -6,7 +6,8 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource) {
+function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
+    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -93,6 +94,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
 
         return $q.all(promises).then(function() {
+            // Always push our Umbraco RTE stylesheet
+            // So we can style macros, embed items etc...
+            stylesheets.push(`${Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath}/assets/css/rte-content.css`);
+
             return $q.when({ stylesheets: stylesheets, styleFormats: styleFormats});
         });
     }
@@ -156,6 +161,109 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
     }
 
+    function uploadImageHandler(blobInfo, success, failure, progress){
+        let xhr, formData;
+
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
+
+        xhr.onloadstart = function(e) {
+            angularHelper.safeApply($rootScope, function() {
+                eventsService.emit("rte.file.uploading");
+            });
+        };
+
+        xhr.onloadend = function(e) {
+            angularHelper.safeApply($rootScope, function() {
+                eventsService.emit("rte.file.uploaded");
+            });
+        };
+
+        xhr.upload.onprogress = function (e) {
+            progress(e.loaded / e.total * 100);
+        };
+
+        xhr.onerror = function () {
+            failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+        };
+
+        xhr.onload = function () {
+            let json;
+
+            if (xhr.status < 200 || xhr.status >= 300) {
+                failure('HTTP Error: ' + xhr.status);
+                return;
+            }
+
+            json = JSON.parse(xhr.responseText);
+
+            if (!json || typeof json.tmpLocation !== 'string') {
+                failure('Invalid JSON: ' + xhr.responseText);
+                return;
+            }
+
+            // Put temp location into localstorage (used to update the img with data-tmpimg later on)
+            localStorage.setItem(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
+
+            // We set the img src url to be the same as we started
+            // The Blob URI is stored in TinyMce's cache
+            // so the img still shows in the editor
+            success(blobInfo.blobUri());
+        };
+
+        formData = new FormData();
+        formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+
+        xhr.send(formData);
+    }
+
+    function initEvents(editor){
+
+        editor.on('SetContent', function (e) {
+            
+            var content = e.content;
+
+            // Upload BLOB images (dragged/pasted ones)
+            if(content.indexOf('<img src="blob:') > -1){
+
+                editor.uploadImages(function(data) {
+                    // Once all images have been uploaded
+                    data.forEach(function(item) {
+                        // Select img element
+                        var img = item.element;
+
+                        // Get img src
+                        var imgSrc = img.getAttribute("src");
+                        var tmpLocation = localStorage.getItem(`tinymce__${imgSrc}`);
+
+                        // Select the img & add new attr which we can search for
+                        // When its being persisted in RTE property editor
+                        // To create a media item & delete this tmp one etc
+                        tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
+
+                        // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly 
+                        // same image twice
+                        tinymce.activeEditor.editorUpload.blobCache.removeByUri(imgSrc);
+                    });
+                });
+            }
+        });
+    }
+    
+    function cleanupPasteData(plugin, args) {
+        
+        // Remove spans
+        args.content = args.content.replace(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g, "$1");
+        
+        // Convert b to strong.
+        args.content = args.content.replace(/<\s*b([^>]*)>(.*?)<\s*\/\s*b([^>]*)>/g, "<strong$1>$2</strong$3>");
+        
+        // convert i to em
+        args.content = args.content.replace(/<\s*i([^>]*)>(.*?)<\s*\/\s*i([^>]*)>/g, "<em$1>$2</em$3>");
+        
+        
+    }
+
     return {
 
         /**
@@ -164,6 +272,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
          * @returns {}
          */
         getTinyMceEditorConfig: function (args) {
+
+            //global defaults, called before/during init
+            tinymce.DOM.events.domLoaded = true;
+            tinymce.baseURL = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + "/lib/tinymce/"; // trailing slash important
 
             var promises = [
                 this.configuration(),
@@ -233,19 +345,53 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     //this would be for a theme other than inlite
                     toolbar: args.toolbar.join(" "),
+
                     //these are for the inlite theme to work
                     insert_toolbar: toolbars.insertToolbar,
                     selection_toolbar: toolbars.selectionToolbar,
 
-                    body_class: 'umb-rte',
+                    body_class: "umb-rte",
+
                     //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
                     cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster,
 
-                    //this is used to style the inline macro bits, sorry hard coding this form now since we don't have a standalone
-                    //stylesheet to load in for this with only these styles (the color is @pinkLight)
-                    content_style: ".mce-content-body .umb-macro-holder { border: 3px dotted #f5c1bc; padding: 7px; display: block; margin: 3px; } .umb-rte .mce-content-body .umb-macro-holder.loading {background: url(assets/img/loader.gif) right no-repeat; background-size: 18px; background-position-x: 99%;}"
-                };
+                    // This allows images to be pasted in & stored as Base64 until they get uploaded to server
+                    paste_data_images: true,
 
+                    images_upload_handler: uploadImageHandler,
+                    automatic_uploads: false,
+                    images_replace_blob_uris: false,
+                    init_instance_callback: initEvents
+                };
+                
+                // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later.
+                var validPasteElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li,hr,pre,dl,dt,figure,figcaption,wbr"
+                
+                // add elements from user configurated styleFormats to our list of validPasteElements.
+                // (This means that we only allow H3-element if its configured as a styleFormat on this specific propertyEditor.)
+                var style, i = 0;
+                for(; i < styles.styleFormats.length; i++) {
+                    style = styles.styleFormats[i];
+                    if(style.block) {
+                        validPasteElements += "," + style.block;
+                    }
+                }
+                
+                var pasteConfig = {
+                    
+                    paste_remove_styles: true,
+                    paste_text_linebreaktype: true, //Converts plaintext linebreaks to br or p elements.
+                    paste_strip_class_attributes: "all",
+                    
+                    paste_word_valid_elements: validPasteElements,
+                    
+                    paste_preprocess: cleanupPasteData
+                    
+                };
+                
+                angular.extend(config, pasteConfig);
+                
+                
                 if (tinyMceConfig.customConfig) {
 
                     //if there is some custom config, we need to see if the string value of each item might actually be json and if so, we need to
@@ -280,7 +426,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     angular.extend(config, tinyMceConfig.customConfig);
                 }
-
 
                 return $q.when(config);
 
@@ -339,18 +484,60 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             editor.addButton('umbembeddialog', {
                 icon: 'custom icon-tv',
                 tooltip: 'Embed',
+                stateSelector: 'div[data-embed-url]',
                 onclick: function () {
+
+                    // Get the selected element
+                    // Check nodename is a DIV and the claslist contains 'embeditem'
+                    var selectedElm = editor.selection.getNode();
+                    var nodeName = selectedElm.nodeName;
+                    var modify = null;
+
+                    if(nodeName.toUpperCase() === "DIV" && selectedElm.classList.contains("embeditem")){
+                        // See if we can go and get the attributes
+                        var embedUrl = editor.dom.getAttrib(selectedElm, "data-embed-url");
+                        var embedWidth = editor.dom.getAttrib(selectedElm, "data-embed-width");
+                        var embedHeight = editor.dom.getAttrib(selectedElm, "data-embed-height");
+                        var embedConstrain = editor.dom.getAttrib(selectedElm, "data-embed-constrain");
+
+                        modify = {
+                            url: embedUrl,
+                            width: parseInt(embedWidth) || 0,
+                            height: parseInt(embedHeight) || 0,
+                            constrain: embedConstrain
+                        };
+                    }
+
                     if (callback) {
                         angularHelper.safeApply($rootScope, function() {
-                            callback();
+                            // pass the active element along so we can retrieve it later
+                            callback(selectedElm, modify);
                         });
                     }
                 }
             });
         },
 
-        insertEmbeddedMediaInEditor: function (editor, preview) {
-            editor.insertContent(preview);
+        insertEmbeddedMediaInEditor: function (editor, embed, activeElement) {
+            // Wrap HTML preview content here in a DIV with non-editable class of .mceNonEditable
+            // This turns it into a selectable/cutable block to move about
+            var wrapper = tinymce.activeEditor.dom.create('div',
+            {
+                'class': 'mceNonEditable embeditem',
+                'data-embed-url': embed.url,
+                'data-embed-height': embed.height,
+                'data-embed-width': embed.width,
+                'data-embed-constrain': embed.constrain,
+                'contenteditable': false
+            },
+            embed.preview);
+
+            if (activeElement) {
+                activeElement.replaceWith(wrapper); // directly replaces the html node
+            }
+            else {
+                editor.selection.setNode(wrapper);
+            }
         },
 
 
@@ -384,7 +571,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
-                stateSelector: 'img',
+                stateSelector: 'img[data-udi]',
                 onclick: function () {
 
 
@@ -428,7 +615,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     id: '__mcenew',
                     'data-udi': img.udi
                 };
-                
+
                 editor.selection.setContent(editor.dom.createHTML('img', data));
 
                 $timeout(function () {
@@ -437,19 +624,19 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
                         var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
-
-                        var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
-                        editor.dom.setAttrib(imgElm, 'style', s);
-
+                        
+                        editor.dom.setAttrib(imgElm, 'width', newSize.width);
+                        editor.dom.setAttrib(imgElm, 'height', newSize.height);
+                        
                         if (img.url) {
                             var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
                             editor.dom.setAttrib(imgElm, 'data-mce-src', src);
                         }
                     }
 				    editor.dom.setAttrib(imgElm, 'id', null);
-                    
+
                     editor.fire('Change');
-                    
+
                 }, 500);
             }
         },
@@ -521,7 +708,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 onPostRender: function () {
 
                     let ctrl = this;
-                    
+
 					/**
 					 * Check if the macro is currently selected and toggle the menu button
 					 */
@@ -1134,7 +1321,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     };
                     editorService.linkPicker(linkPicker);
                 });
-             
+
             });
 
             //Create the insert media plugin
@@ -1172,10 +1359,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             //Create the embedded plugin
-            self.createInsertEmbeddedMedia(args.editor, function () {
+            self.createInsertEmbeddedMedia(args.editor, function (activeElement, modify) {
                 var embed = {
+                    modify: modify,
                     submit: function (model) {
-                        self.insertEmbeddedMediaInEditor(args.editor, model.embed.preview);
+                        self.insertEmbeddedMediaInEditor(args.editor, model.embed, activeElement);
                         editorService.close();
                     },
                     close: function () {
