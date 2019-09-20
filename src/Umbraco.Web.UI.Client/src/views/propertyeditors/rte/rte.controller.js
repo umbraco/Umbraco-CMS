@@ -45,7 +45,7 @@ angular.module("umbraco")
                 toolbar: editorConfig.toolbar,
                 mode: editorConfig.mode
             }));
-
+            
             //wait for queue to end
             $q.all(promises).then(function (result) {
                 
@@ -61,23 +61,16 @@ angular.module("umbraco")
                     width: width,
                     height: height
                 };
-
-                angular.extend(baseLineConfigObj, standardConfig);
-
+                
                 baseLineConfigObj.setup = function (editor) {
-
+                    
                     //set the reference
                     tinyMceEditor = editor;
                     
-                    //$scope.isLoading = false;
-                    
                     tinyMceEditor.on('init', function (e) {
                         $timeout(function () {
-                            console.log(editor);
-                            //editor.editorContainer.style.display = 'block'
-                            //editorNode.style.display = 'block'
                             $scope.isLoading = false;
-                        }, 1000)
+                        });
                     });
                     
                     //initialize the standard editor functionality for Umbraco
@@ -86,9 +79,10 @@ angular.module("umbraco")
                         model: $scope.model,
                         currentForm: angularHelper.getCurrentForm($scope)
                     });
-
+    
                 };
 
+                angular.extend(baseLineConfigObj, standardConfig);
                 /** Loads in the editor */
                 tinymce.init(baseLineConfigObj);
 
