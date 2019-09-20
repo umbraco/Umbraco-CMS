@@ -115,6 +115,12 @@ namespace Umbraco.Core.Security
                 AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String, Issuer, Issuer, this));
             }
 
+            // if upgrading from a pre-7.3.0 version, SecurityStamp will be null
+            if (userdata.SecurityStamp == null && ApplicationContext.Current.IsUpgrading)
+            {
+                userdata.SecurityStamp = Guid.NewGuid().ToString();
+            }
+
             _currentIssuer = claimsIdentity.AuthenticationType;
             UserData = userdata;
             AddExistingClaims(claimsIdentity);
@@ -227,7 +233,9 @@ namespace Umbraco.Core.Security
             //The security stamp claim is also required... this is because this claim type is hard coded
             // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
             if (HasClaim(x => x.Type == Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType) == false)
+            {
                 AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, SecurityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
+            }
 
             //Add each app as a separate claim
             if (HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false)
