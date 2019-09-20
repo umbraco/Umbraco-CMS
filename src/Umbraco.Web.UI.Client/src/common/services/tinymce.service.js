@@ -230,6 +230,26 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
                     });
                 });
+
+                // Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
+                // This is most likely seen as a duplicate image that has already been uploaded
+                // editor.uploadImages() does not give us any indiciation that the image been uploaded already
+                var blobImageWithNoTmpImgAttribute = editor.dom.select("img[src^='blob:']:not([data-tmpimg])");
+
+                //For each of these selected items
+                blobImageWithNoTmpImgAttribute.forEach(imageElement => {
+                    var blobSrcUri = editor.dom.getAttrib(imageElement, "src");
+
+                    // Select/find the same image uploaded with the matching SRC uri
+                    var uploadedImage = editor.dom.select(`img[src="${blobSrcUri}"][data-tmpimg]`);
+
+                    if(uploadedImage){
+                        // Get the value of the tmpimg - so we can apply it to the matched/duplicate image
+                        var dataTmpImg = editor.dom.getAttrib(uploadedImage, "data-tmpimg");
+                        editor.dom.setAttrib(imageElement, "data-tmpimg", dataTmpImg);
+                    }
+                });
+
             }
         });
     }
