@@ -38,7 +38,7 @@
 
             //watch for changes to isNew & the content.id, set the page.isNew accordingly and load the breadcrumb if we can
             $scope.$watchGroup(['isNew', 'content.id'], function (newVal, oldVal) {
-                
+
                 var contentId = newVal[1];
                 $scope.page.isNew = Object.toBoolean(newVal[0]);
 
@@ -65,7 +65,7 @@
             if (content.id && content.isChildOfListView && content.trashed === false) {
                 $scope.page.listViewPath = "/content/content/edit/" + content.parentId
                     + "?list=" + $routeParams.list
-                    + "&page=" + $routeParams.page 
+                    + "&page=" + $routeParams.page
                     + "&filter=" + $routeParams.filter
                     + "&orderBy=" + $routeParams.orderBy
                     + "&orderDirection=" + $routeParams.orderDirection;
@@ -171,6 +171,24 @@
                 }
             }));
 
+            evts.push(eventsService.on("editors.content.reload", function (name, args) {                
+                if (args && args.node && $scope.content.id === args.node.id) {
+                    reload();
+                    loadBreadcrumb();
+                    syncTreeNode($scope.content, $scope.content.path);
+                }
+            }));
+            
+            evts.push(eventsService.on("rte.file.uploading", function(){
+                $scope.page.saveButtonState = "busy";
+                $scope.page.buttonGroupState = "busy";
+
+            }));
+
+            evts.push(eventsService.on("rte.file.uploaded", function(){
+                $scope.page.saveButtonState = "success";
+                $scope.page.buttonGroupState = "success";
+            }));
         }
 
         /**
@@ -493,7 +511,7 @@
 
         $scope.unpublish = function () {
             clearNotifications($scope.content);
-            if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {                
+            if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/unpublish.html",
