@@ -29,8 +29,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     ).ToDictionary(n => n.NodeId)
                 );
 
-            var refreshCache = Migrate(GetDataTypes("Umbraco.ContentPickerAlias"));
+            var refreshCache = Migrate(GetDataTypes(Constants.PropertyEditors.Legacy.Aliases.ContentPicker));
             refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.MediaPicker));
+            refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.MultipleMediaPicker));
             refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.MemberPicker));
             refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.MultiNodeTreePicker));
             
