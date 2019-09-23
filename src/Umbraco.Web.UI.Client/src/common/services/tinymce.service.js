@@ -241,7 +241,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         // To create a media item & delete this tmp one etc
                         tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
 
-                        // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly 
+                        // Resize the image to the max size configured
+                        // NOTE: no imagesrc passed into func as the src is blob://...
+                        // We will append ImageResizing Querystrings on perist to DB with node save
+                        sizeImageInEditor(editor, img);
+
+                        // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly
                         // same image twice
                         tinymce.activeEditor.editorUpload.blobCache.removeByUri(imgSrc);
                     });
@@ -249,19 +254,42 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
         });
     }
-    
+
     function cleanupPasteData(plugin, args) {
-        
+
         // Remove spans
         args.content = args.content.replace(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g, "$1");
-        
+
         // Convert b to strong.
         args.content = args.content.replace(/<\s*b([^>]*)>(.*?)<\s*\/\s*b([^>]*)>/g, "<strong$1>$2</strong$3>");
-        
+
         // convert i to em
         args.content = args.content.replace(/<\s*i([^>]*)>(.*?)<\s*\/\s*i([^>]*)>/g, "<em$1>$2</em$3>");
-        
-        
+
+
+    }
+
+    function sizeImageInEditor(editor, imageDomElement, imgUrl) {
+
+        var size = editor.dom.getSize(imageDomElement);
+        console.log('size', size);
+
+        if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
+            var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
+
+            console.log('new size', newSize);
+
+            editor.dom.setAttrib(imageDomElement, 'width', newSize.width);
+            editor.dom.setAttrib(imageDomElement, 'height', newSize.height);
+
+            // Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
+            // Images pasted/dragged in are not persisted to media until saved & thus will need to be added
+            if(imgUrl){
+                console.log('got an img src use QS');
+                var src = imgUrl + "?width=" + newSize.width + "&height=" + newSize.height;
+                editor.dom.setAttrib(imageDomElement, 'data-mce-src', src);
+            }
+        }
     }
 
     return {
@@ -620,21 +648,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 $timeout(function () {
                     var imgElm = editor.dom.get('__mcenew');
-                    var size = editor.dom.getSize(imgElm);
-
-                    if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
-                        var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
-                        
-                        editor.dom.setAttrib(imgElm, 'width', newSize.width);
-                        editor.dom.setAttrib(imgElm, 'height', newSize.height);
-                        
-                        if (img.url) {
-                            var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
-                            editor.dom.setAttrib(imgElm, 'data-mce-src', src);
-                        }
-                    }
+                    sizeImageInEditor(editor, imgElm, img.url);
 				    editor.dom.setAttrib(imgElm, 'id', null);
-
                     editor.fire('Change');
 
                 }, 500);
