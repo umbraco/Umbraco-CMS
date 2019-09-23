@@ -26,9 +26,19 @@
                 // convert legacy icons
                 iconHelper.formatContentTypeIcons($scope.model.elemTypes);
 
+                 // Count doctype name occurrences
+                var docTypeNameOccurrences = _.countBy(docTypes, 'name');
+            
                 // Populate document type tab dictionary
+                // And append alias to name if multiple doctypes have the same name
                 elemTypes.forEach(function (value) {
                     $scope.elemTypeTabs[value.alias] = value.tabs;
+
+                    value.displayName = value.name;
+
+                    if (docTypeNameOccurrences[value.name] > 1) {
+                        value.displayName += " (" + value.alias + ")";
+                    }
                 });
             });
 
@@ -43,6 +53,10 @@
                 ncTabAlias: "",
                 nameTemplate: ""
             });
+        }
+
+        $scope.canAdd = function () {
+            return !$scope.model.docTypes || !$scope.model.value || $scope.model.value.length < $scope.model.docTypes.length;
         }
 
         $scope.remove = function (index) {
@@ -82,6 +96,7 @@
                 ui.placeholder.html('<td colspan="' + cellCount + '"></td>').height(cellHeight);
             }
         };
+
 
         $scope.placeholder = function (config) {
             return _.find($scope.model.elemTypes, function (elType) {

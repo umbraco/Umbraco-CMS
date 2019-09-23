@@ -29,7 +29,7 @@
                                     <i class="umb-nested-content__placeholder-icon {{ ph.icon }}"></i>
                                 </div>
                                 <span class="umb-nested-content__placeholder-name">
-                                    {{ ph.name }}
+                                    {{ ph.displayName }}
                                 </span>
                             </div>
 
@@ -48,17 +48,17 @@
                         <input type="text" ng-model="config.nameTemplate" />
                     </td>
                     <td>
-                        <a class="btn btn-danger" ng-click="remove($index)">
+                        <button type="button" class="btn btn-danger" ng-click="remove($index)">
                             <localize key="general_delete">Delete</localize>
-                        </a>
+                        </button>
                     </td>
                 </tr>
             </tbody>
         </table>
         <div>
-            <a class="btn" ng-click="add()" ng-show="thereIsAvailableElemTypes()">
+            <button type="button" class="btn" ng-click="add()" ng-disabled="!canAdd()">
                 <localize key="general_add">Add</localize>
-            </a>
+            </button>
             <i class="icon icon-help-alt medium umb-nested-content__help-icon" ng-click="showHelpText = !showHelpText"></i>
         </div>
     </div>
