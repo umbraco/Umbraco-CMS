@@ -123,7 +123,7 @@
 
         $scope.openElemTypeModal = function ($event, config) {
 
-            //we have to add the alias to the objects (they areStored as ncAlias)
+            //we have to add the alias to the objects (they are stored as ncAlias)
             var selectedItems = _.each($scope.model.value, function (obj) {
                 obj.alias = obj.ncAlias;
                 return obj;
