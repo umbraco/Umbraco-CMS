@@ -237,9 +237,19 @@ namespace Umbraco.Web.Templates
                 var udi = mediaFile.GetUdi();
                 img.SetAttributeValue("data-udi", udi.ToString());
 
-                //Get the new persisted image url
+                // Get the new persisted image url
                 var mediaTyped = Current.UmbracoHelper.Media(mediaFile.Id);
                 var location = mediaTyped.Url;
+
+                // Find the width & height attributes as we need to set the imageprocessor QueryString
+                var width = img.GetAttributeValue("width", int.MinValue);
+                var height = img.GetAttributeValue("height", int.MinValue);
+
+                if(width != int.MinValue && height != int.MinValue)
+                {
+                    location = $"{location}?width={width}&height={height}&mode=max";
+                }
+                
                 img.SetAttributeValue("src", location);
 
                 // Remove the data attribute (so we do not re-process this)
