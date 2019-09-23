@@ -29,11 +29,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     ).ToDictionary(n => n.NodeId)
                 );
 
-            var refreshCache = Migrate(GetDataTypes(Constants.PropertyEditors.Legacy.Aliases.ContentPicker));
-            refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.MediaPicker));
-            refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.MultipleMediaPicker));
-            refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.MemberPicker));
-            refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.MultiNodeTreePicker));
+            var refreshCache = Migrate(Constants.PropertyEditors.Legacy.Aliases.ContentPicker, ValueStorageType.Nvarchar);
+            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.MediaPicker, ValueStorageType.Ntext);
+            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.MultipleMediaPicker, ValueStorageType.Ntext);
+            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.MemberPicker, ValueStorageType.Nvarchar);
+            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.MultiNodeTreePicker, ValueStorageType.Ntext);
             
             // if some data types have been updated directly in the database (editing DataTypeDto and/or PropertyDataDto),
             // bypassing the services, then we need to rebuild the cache entirely, including the umbracoContentNu table
@@ -41,15 +41,15 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 Context.AddPostMigration<RebuildPublishedSnapshot>();
         }
 
-        private bool Migrate(IEnumerable<DataTypeDto> dataTypes)
+        private bool Migrate(string alias, ValueStorageType valueType)
         {
             var refreshCache = false;
 
+            var dataTypes = GetDataTypes(alias);
             foreach (var dataType in dataTypes)
             {
                 Context.Logger.Info<LegacyPickersPropertyEditorsMigration>("Migrating " + dataType.EditorAlias + ", " + dataType.NodeId);
-
-                dataType.DbType = ValueStorageType.Ntext.ToString();
+                dataType.DbType = valueType.ToString();
                 Database.Update(dataType);
 
                 // get property data dtos
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     .Where<PropertyTypeDto>(x => x.DataTypeId == dataType.NodeId));
 
                 // update dtos
-                var updatedDtos = propertyDataDtos.Where(x => UpdatePropertyDataDto(x, true));
+                var updatedDtos = propertyDataDtos.Where(x => UpdatePropertyDataDto(x, valueType));
 
                 // persist changes
                 foreach (var propertyDataDto in updatedDtos)
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             return refreshCache;
         }
 
-        private bool UpdatePropertyDataDto(PropertyDataDto propData, bool isMultiple)
+        private bool UpdatePropertyDataDto(PropertyDataDto propData, ValueStorageType valueType)
         {
             //Get the INT ids stored for this property/drop down
             int[] ids = null;
@@ -100,21 +100,24 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             {
                 if (_nodeIdToKey.Value.TryGetValue(id, out var node))
                 {
-                    values.Add(Udi.Create(ObjectTypes.GetUdiType(node.NodeObjectType.Value), node.UniqueId));
-                    continue;
+                    values.Add(Udi.Create(ObjectTypes.GetUdiType(node.NodeObjectType.Value), node.UniqueId));                    
                 }
-                canConvert = false;
             }
 
             if (!canConvert) return false;
 
-            propData.TextValue = String.Join(",", values);
-            propData.VarcharValue = null;
             propData.IntegerValue = null;
+            if (valueType == ValueStorageType.Ntext)
+            {
+                propData.TextValue = String.Join(",", values);
+                propData.VarcharValue = null;
+            }
+            else if (valueType == ValueStorageType.Nvarchar)
+            {
+                propData.TextValue = null;
+                propData.VarcharValue = String.Join(",", values);
+            }
             return true;
         }
-
-
-
     }
 }

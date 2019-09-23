@@ -28,7 +28,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Constants.PropertyEditors.Legacy.Aliases.MemberPicker2,
             Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2,
             Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple,
-            Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
+            Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2
         };
 
         public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators, PropertyEditorCollection propertyEditors, ILogger logger)

@@ -14,7 +14,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
             => _editors.Contains(editorAlias);
 
         public override string GetNewAlias(string editorAlias)
-            => null;
+            => Constants.PropertyEditors.Aliases.ContentPicker;
 
         protected override object GetPreValueValue(PreValueDto preValue)
         {

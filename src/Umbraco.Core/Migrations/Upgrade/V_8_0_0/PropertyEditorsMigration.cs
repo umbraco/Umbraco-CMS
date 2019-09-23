@@ -12,8 +12,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
+            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.ContentPicker, Constants.PropertyEditors.Aliases.ContentPicker);
             RenameDataType(Constants.PropertyEditors.Legacy.Aliases.ContentPicker2, Constants.PropertyEditors.Aliases.ContentPicker);
             RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MediaPicker2, Constants.PropertyEditors.Aliases.MediaPicker);
+            RenameDataType(Constants.PropertyEditors.Aliases.MultipleMediaPicker, Constants.PropertyEditors.Aliases.MediaPicker);
             RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MemberPicker2, Constants.PropertyEditors.Aliases.MemberPicker);
             RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2, Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
             RenameDataType(Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple, Constants.PropertyEditors.Aliases.TextArea);
