@@ -24,7 +24,8 @@ namespace Umbraco.Web.PropertyEditors
         "nestedcontent",
         ValueType = ValueTypes.Json,
         Group = Constants.PropertyEditors.Groups.Lists,
-        Icon = "icon-thumbnail-list")]
+        Icon = "icon-thumbnail-list",
+        CanCopy = true)]
     public class NestedContentPropertyEditor : DataEditor
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;

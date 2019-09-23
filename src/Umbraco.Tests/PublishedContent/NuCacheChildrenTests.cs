@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -25,6 +27,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -79,12 +82,16 @@ namespace Umbraco.Tests.PublishedContent
                 _contentTypeVariant
             };
 
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            Mock.Get(contentTypeService).Setup(x => x.GetAll()).Returns(contentTypes);
-            Mock.Get(contentTypeService).Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
+            var contentTypeService = new Mock<IContentTypeService>();
+            contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
+            contentTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
 
-            var contentTypeServiceBaseFactory = Mock.Of<IContentTypeBaseServiceProvider>();
-            Mock.Get(contentTypeServiceBaseFactory).Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService);
+            var mediaTypeService = new Mock<IMediaTypeService>();
+            mediaTypeService.Setup(x => x.GetAll()).Returns(Enumerable.Empty<IMediaType>());
+            mediaTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(Enumerable.Empty<IMediaType>());
+
+            var contentTypeServiceBaseFactory = new Mock<IContentTypeBaseServiceProvider>();
+            contentTypeServiceBaseFactory.Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService.Object);
 
             var dataTypeService = Mock.Of<IDataTypeService>();
             Mock.Get(dataTypeService).Setup(x => x.GetAll()).Returns(dataTypes);
@@ -94,8 +101,10 @@ namespace Umbraco.Tests.PublishedContent
                 dataTypeService: dataTypeService,
                 memberTypeService: Mock.Of<IMemberTypeService>(),
                 memberService: Mock.Of<IMemberService>(),
-                contentTypeService: contentTypeService,
-                localizationService: Mock.Of<ILocalizationService>()
+                contentTypeService: contentTypeService.Object,
+                mediaTypeService: mediaTypeService.Object,
+                localizationService: Mock.Of<ILocalizationService>(),
+                domainService: Mock.Of<IDomainService>()
             );
 
             // create a scope provider
@@ -133,7 +142,7 @@ namespace Umbraco.Tests.PublishedContent
                 null,
                 _snapshotAccessor,
                 _variationAccesor,
-                Mock.Of<ILogger>(),
+                Mock.Of<IProfilingLogger>(),
                 scopeProvider,
                 Mock.Of<IDocumentRepository>(),
                 Mock.Of<IMediaRepository>(),
@@ -157,7 +166,7 @@ namespace Umbraco.Tests.PublishedContent
 
             //1x variant (root)
             yield return CreateVariantKit(1, -1, 1, paths);
-            
+
             //1x invariant under root
             yield return CreateInvariantKit(4, 1, 1, paths);
 
@@ -944,6 +953,43 @@ namespace Umbraco.Tests.PublishedContent
 
             documents = snapshot.Content.GetAtRoot(true).ToArray();
             AssertDocuments(documents, "N1-en-US", "N2-en-US", "N3-en-US");
+        }
+
+        [Test]
+        public void Issue6353()
+        {
+            IEnumerable<ContentNodeKit> GetKits()
+            {
+                var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+                yield return CreateInvariantKit(1, -1, 1, paths);
+                yield return CreateInvariantKit(2, 1, 1, paths);
+            }
+
+            Init(GetKits());
+
+            var snapshotService = (PublishedSnapshotService) _snapshotService;
+            var contentStoreField = typeof(PublishedSnapshotService).GetField("_contentStore", BindingFlags.Instance | BindingFlags.NonPublic);
+            var contentStore = (ContentStore) contentStoreField.GetValue(snapshotService);
+            var contentNodesField = typeof(ContentStore).GetField("_contentNodes", BindingFlags.Instance | BindingFlags.NonPublic);
+            var contentNodes = (ConcurrentDictionary<int, LinkedNode<ContentNode>>) contentNodesField.GetValue(contentStore);
+
+            var parentNode = contentNodes[1].Value;
+            Assert.AreEqual(-1, parentNode.PreviousSiblingContentId);
+            Assert.AreEqual(-1, parentNode.NextSiblingContentId);
+            Assert.AreEqual(2, parentNode.FirstChildContentId);
+            Assert.AreEqual(2, parentNode.LastChildContentId);
+
+            _snapshotService.Notify(new[]
+            {
+                new ContentCacheRefresher.JsonPayload(2, TreeChangeTypes.Remove)
+            }, out _, out _);
+
+            parentNode = contentNodes[1].Value;
+            Assert.AreEqual(-1, parentNode.PreviousSiblingContentId);
+            Assert.AreEqual(-1, parentNode.NextSiblingContentId);
+            Assert.AreEqual(-1, parentNode.FirstChildContentId);
+            Assert.AreEqual(-1, parentNode.LastChildContentId);
         }
 
         private void AssertDocuments(IPublishedContent[] documents, params string[] names)

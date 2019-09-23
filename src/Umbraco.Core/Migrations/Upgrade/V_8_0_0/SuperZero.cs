@@ -30,6 +30,7 @@
             Database.Execute("set identity_insert umbracoUser off;");
 
             Database.Execute("update umbracoUser2UserGroup set userId=-1 where userId=0;");
+            Database.Execute("update umbracoUser2NodeNotify set userId=-1 where userId=0;");
             Database.Execute("update umbracoNode set nodeUser=-1 where nodeUser=0;");
             Database.Execute("update umbracoUserLogin set userId=-1 where userId=0;");
             Database.Execute($"update {Constants.DatabaseSchema.Tables.ContentVersion} set userId=-1 where userId=0;");

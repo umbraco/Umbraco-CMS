@@ -84,8 +84,7 @@ angular.module("umbraco")
 
                     //we need to add a timeout here, to force a redraw so TinyMCE can find
                     //the elements needed
-                    $timeout(function () {
-                        tinymce.DOM.events.domLoaded = true;
+                    $timeout(function () {                        
                         tinymce.init(baseLineConfigObj);
                     }, 200);
                 }

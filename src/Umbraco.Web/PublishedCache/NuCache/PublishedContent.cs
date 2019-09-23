@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
@@ -119,7 +120,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 case PublishedItemType.Media:
                     return GetMediaByIdFunc;
                 default:
-                    throw new Exception("panic: invalid item type");
+                    throw new PanicException("invalid item type");
             }
         }
 
@@ -194,7 +195,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     };
 
                 if (ContentData.CultureInfos == null)
-                    throw new Exception("panic: _contentDate.CultureInfos is null.");
+                    throw new PanicException("_contentDate.CultureInfos is null.");
 
                 return _cultures = ContentData.CultureInfos
                     .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date), StringComparer.OrdinalIgnoreCase);
@@ -232,8 +233,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // invariant content items)
 
             // if there is no 'published' published content, no culture can be published
-            var hasPublished = _contentNode.PublishedContent != null;
-            if (!hasPublished)
+            if (!_contentNode.HasPublished)
                 return false;
 
             // if there is a 'published' published content, and does not vary = published
@@ -246,7 +246,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // there is a 'published' published content, and varies
             // = depends on the culture
-            return _contentNode.PublishedContent.ContentData.CultureInfos.ContainsKey(culture);
+            return _contentNode.HasPublishedCulture(culture);
         }
 
         #endregion
@@ -286,13 +286,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     {
                         // but if IsPreviewing is true, we should have a child
                         if (IsPreviewing)
-                            throw new Exception($"panic: failed to get content with id={id}");
+                            throw new PanicException($"failed to get content with id={id}");
 
                         // if IsPreviewing is false, get the unpublished child nevertheless
                         // we need it to keep enumerating children! but we don't return it
                         content = getById(publishedSnapshot, true, id);
                         if (content == null)
-                            throw new Exception($"panic: failed to get content with id={id}");
+                            throw new PanicException($"failed to get content with id={id}");
                     }
 
                     id = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
