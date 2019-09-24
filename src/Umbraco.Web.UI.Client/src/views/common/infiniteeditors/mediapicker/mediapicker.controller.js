@@ -2,8 +2,20 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
         function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
+
+            var vm = this;
             
-            
+            vm.submit = submit;
+            vm.close = close;
+
+            vm.toggle = toggle;
+            vm.upload = upload;
+            vm.dragLeave = dragLeave;
+            vm.dragEnter = dragEnter;
+            vm.submitFolder = submitFolder;
+            vm.enterSubmitFolder = enterSubmitFolder;
+            vm.focalPointChanged = focalPointChanged;
+
             if (!$scope.model.title) {
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
                     .then(function (data) {
@@ -54,9 +66,10 @@ angular.module("umbraco")
                 });
 
             var dataTypeKey = null;
-            if($scope.model && $scope.model.dataTypeKey) {
+            if ($scope.model && $scope.model.dataTypeKey) {
                 dataTypeKey = $scope.model.dataTypeKey;
             }
+
             $scope.searchOptions = {
                 pageNumber: 1,
                 pageSize: 100,
@@ -111,24 +124,23 @@ angular.module("umbraco")
                                 $scope.target.altText = altText;
                                 $scope.openDetailsDialog();
                             }
-                        },
-                            gotoStartNode);
+                        }, gotoStartNode);
                 }
             }
 
-            $scope.upload = function (v) {
+            function upload(v) {
                 angular.element(".umb-file-dropzone .file-select").trigger("click");
-            };
+            }
 
-            $scope.dragLeave = function (el, event) {
+            function dragLeave(el, event) {
                 $scope.activeDrag = false;
-            };
+            }
 
-            $scope.dragEnter = function (el, event) {
+            function dragEnter(el, event) {
                 $scope.activeDrag = true;
-            };
+            }
 
-            $scope.submitFolder = function () {
+            function submitFolder() {
                 if ($scope.model.newFolderName) {
                     $scope.model.creatingFolder = true;
                     mediaResource
@@ -147,14 +159,14 @@ angular.module("umbraco")
                 } else {
                     $scope.model.showFolderInput = false;
                 }
-            };
+            }
 
-            $scope.enterSubmitFolder = function (event) {
+            function enterSubmitFolder(event) {
                 if (event.keyCode === 13) {
                     $scope.submitFolder();
                     event.stopPropagation();
                 }
-            };
+            }
 
             $scope.gotoFolder = function (folder) {
                 if (!$scope.multiPicker) {
@@ -340,7 +352,7 @@ angular.module("umbraco")
                 debounceSearchMedia();
             };
 
-            $scope.toggle = function () {
+            function toggle() {
                 // Make sure to activate the changeSearch function everytime the toggle is clicked
                 $scope.changeSearch();
             }
@@ -475,12 +487,12 @@ angular.module("umbraco")
             };
 
             /**
-             * Called when the umgImageGravity component updates the focal point value
+             * Called when the umbImageGravity component updates the focal point value
              * @param {any} left
              * @param {any} top
              */
-            $scope.focalPointChanged = function (left, top) {
-                //update the model focalpoint value
+            function focalPointChanged(left, top) {
+                // update the model focalpoint value
                 $scope.target.focalPoint = {
                     left: left,
                     top: top
@@ -494,17 +506,17 @@ angular.module("umbraco")
                 }
             }
 
-            $scope.submit = function () {
-                if ($scope.model.submit) {
+            function submit() {
+                if ($scope.model && $scope.model.submit) {
                     $scope.model.submit($scope.model);
                 }
-            };
+            }
 
-            $scope.close = function () {
-                if ($scope.model.close) {
+            function close() {
+                if ($scope.model && $scope.model.close) {
                     $scope.model.close($scope.model);
                 }
-            };
+            }
 
             onInit();
 

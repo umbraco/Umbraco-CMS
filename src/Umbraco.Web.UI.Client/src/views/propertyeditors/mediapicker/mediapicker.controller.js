@@ -133,15 +133,15 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     userService.getCurrentUser().then(function (userData) {
 
                         if (!$scope.model.config.startNodeId) {
-                    if ($scope.model.config.ignoreUserStartNodes === true) {
-                        $scope.model.config.startNodeId = -1;
-                        $scope.model.config.startNodeIsVirtual = true;
-                    }
-                    else {
-                        $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                        $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-                    }  
-                }
+                            if ($scope.model.config.ignoreUserStartNodes === true) {
+                                $scope.model.config.startNodeId = -1;
+                                $scope.model.config.startNodeIsVirtual = true;
+                            }
+                            else {
+                                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                            }  
+                        }
 
                         // only allow users to add and edit media if they have access to the media section
                         var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;

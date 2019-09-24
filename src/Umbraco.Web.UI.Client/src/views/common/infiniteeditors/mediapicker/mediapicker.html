@@ -13,7 +13,7 @@
 
         <form id="fileupload" method="POST" enctype="multipart/form-data" umb-image-upload="options">
 
-            <div on-drag-leave="dragLeave()" on-drag-end="dragLeave()" on-drag-enter="dragEnter()">
+            <div on-drag-leave="vm.dragLeave()" on-drag-end="vm.dragLeave()" on-drag-enter="vm.dragEnter()">
 
                 <div class="umb-control-group umb-mediapicker-upload">
 
@@ -33,7 +33,7 @@
 
                         <div class="form-search__toggle">
                             <label>
-                                <input type="checkbox" ng-model="showChilds" ng-change="toggle()" />
+                                <input type="checkbox" ng-model="showChilds" ng-change="vm.toggle()" />
                                 <localize key="general_includeFromsubFolders">Include subfolders in search</localize>
                             </label>
                         </div>
@@ -43,7 +43,7 @@
                         <umb-button
                             type="button"
                             label-key="general_upload"
-                            action="upload()"
+                            action="vm.upload()"
                             disabled="lockedFolder"
                             button-style="action">
                         </umb-button>
@@ -128,7 +128,7 @@
                         <umb-image-gravity
                             src="target.url"
                             center="target.focalPoint"
-							on-value-changed="focalPointChanged(left, top)">
+							on-value-changed="vm.focalPointChanged(left, top)">
                         </umb-image-gravity>
                     </div>
 
@@ -172,7 +172,7 @@
         <umb-editor-footer-content-right>
 
             <umb-button
-                action="close()"
+                action="vm.close()"
                 button-style="link"
                 shortcut="esc"
                 label-key="general_close"
@@ -184,7 +184,7 @@
                 label-key="buttons_select"
                 type="button"
                 disabled="model.selection.length === 0"
-                action="submit(model)">
+                action="vm.submit(model)">
             </umb-button>
 
         </umb-editor-footer-content-right>
