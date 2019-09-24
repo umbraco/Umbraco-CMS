@@ -16,6 +16,11 @@ angular.module("umbraco")
             vm.submitFolder = submitFolder;
             vm.enterSubmitFolder = enterSubmitFolder;
             vm.focalPointChanged = focalPointChanged;
+            vm.changePagination = changePagination;
+
+            vm.clickHandler = clickHandler;
+            vm.clickItemName = clickItemName;
+            vm.editMediaItem = editMediaItem;
 
             if (!$scope.model.title) {
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
@@ -203,7 +208,7 @@ angular.module("umbraco")
                 return getChildren(folder.id);
             };
 
-            $scope.clickHandler = function (image, event, index) {
+            function clickHandler(media, event, index) {
                 
                 if (image.isFolder) {
                     if ($scope.disableFolderSelect) {
@@ -228,13 +233,13 @@ angular.module("umbraco")
                         selectImage(image);
                     }
                 }
-            };
+            }
 
-            $scope.clickItemName = function (item) {
+            function clickItemName(item) {
                 if (item.isFolder) {
                     $scope.gotoFolder(item);
                 }
-            };
+            }
 
             function selectImage(image) {
                 if(!image.selectable) {
@@ -359,7 +364,7 @@ angular.module("umbraco")
                 changeSearch();
             }
 
-            $scope.changePagination = function (pageNumber) {
+            function changePagination(pageNumber) {
                 vm.loading = true;
                 $scope.searchOptions.pageNumber = pageNumber;
                 searchMedia();
@@ -463,7 +468,7 @@ angular.module("umbraco")
                 }
             }
 
-            $scope.editMediaItem = function (item) {
+            function editMediaItem(item) {
                 var mediaEditor = {
                     id: item.id,
                     submit: function (model) {

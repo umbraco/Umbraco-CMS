@@ -90,9 +90,9 @@
                 <umb-media-grid
                         ng-if="!vm.loading"
                         items="images"
-                        on-click="clickHandler"
-                        on-click-name="clickItemName"
-                        on-click-edit="editMediaItem(item)"
+                        on-click="vm.clickHandler"
+                        on-click-name="vm.clickItemName"
+                        on-click-edit="vm.editMediaItem(item)"
                         allow-on-click-edit="{{allowMediaEdit}}"
                         item-max-width="150"
                         item-max-height="150"
@@ -110,7 +110,7 @@
                         ng-if="searchOptions.totalPages > 0 && !vm.loading"
                         page-number="searchOptions.pageNumber"
                         total-pages="searchOptions.totalPages"
-                        on-change="changePagination(pageNumber)">
+                        on-change="vm.changePagination(pageNumber)">
                     </umb-pagination>
                 </div>
 
