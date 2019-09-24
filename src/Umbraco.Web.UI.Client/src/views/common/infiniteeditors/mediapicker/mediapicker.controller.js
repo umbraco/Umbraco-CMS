@@ -130,7 +130,7 @@ angular.module("umbraco")
                         .then(function (node) {
                             $scope.target = node;
                             if (ensureWithinStartNode(node)) {
-                                selectImage(node);
+                                selectMedia(node);
                                 $scope.target.url = mediaHelper.resolveFile(node);
                                 $scope.target.altText = altText;
                                 openDetailsDialog();
@@ -215,27 +215,27 @@ angular.module("umbraco")
 
             function clickHandler(media, event, index) {
                 
-                if (image.isFolder) {
+                if (media.isFolder) {
                     if ($scope.disableFolderSelect) {
                         gotoFolder(media);
                     } else {
-                        selectImage(image);
+                        selectMedia(media);
                     }
                 } else {
                     if ($scope.showDetails) {
                         
-                        $scope.target = image;
+                        $scope.target = media;
                         
                         // handle both entity and full media object
-                        if (image.image) {
-                            $scope.target.url = image.image;
+                        if (media.image) {
+                            $scope.target.url = media.image;
                         } else {
-                            $scope.target.url = mediaHelper.resolveFile(image);
+                            $scope.target.url = mediaHelper.resolveFile(media);
                         }
                         
                         openDetailsDialog();
                     } else {
-                        selectImage(image);
+                        selectMedia(media);
                     }
                 }
             }
@@ -246,15 +246,15 @@ angular.module("umbraco")
                 }
             }
 
-            function selectImage(image) {
-                if(!image.selectable) {
+            function selectMedia(media) {
+                if (!media.selectable) {
                     return;
                 }
-                if (image.selected) {
+                if (media.selected) {
                     for (var i = 0; $scope.model.selection.length > i; i++) {
                         var imageInSelection = $scope.model.selection[i];
-                        if (image.key === imageInSelection.key) {
-                            image.selected = false;
+                        if (media.key === imageInSelection.key) {
+                            media.selected = false;
                             $scope.model.selection.splice(i, 1);
                         }
                     }
@@ -262,9 +262,9 @@ angular.module("umbraco")
                     if (!$scope.multiPicker) {
                         deselectAllImages($scope.model.selection);
                     }
-                    eventsService.emit("dialogs.mediaPicker.select", image);
-                    image.selected = true;
-                    $scope.model.selection.push(image);
+                    eventsService.emit("dialogs.mediaPicker.select", media);
+                    media.selected = true;
+                    $scope.model.selection.push(media);
                 }
             }
 
@@ -282,7 +282,7 @@ angular.module("umbraco")
                         var image = $scope.images[$scope.images.length - 1];
                         $scope.target = image;
                         $scope.target.url = mediaHelper.resolveFile(image);
-                        selectImage(image);
+                        selectMedia(image);
                     }
                 })
             }
