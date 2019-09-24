@@ -1,13 +1,16 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, tinyMceAssets, $element) {
+        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, tinyMceAssets) {
 
             // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
             $scope.isLoading = true;
             
-            var editorNode = $element[0].querySelector('.umb-rte-editor');
-
+            //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
+            // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
+            // we have this mini content editor panel that can be launched with MNTP.
+            $scope.textAreaHtmlId = $scope.model.alias + "_" + String.CreateGuid();
+            
             var editorConfig = $scope.model.config ? $scope.model.config.editor : null;
             if (!editorConfig || angular.isString(editorConfig)) {
                 editorConfig = tinyMceService.defaultPrevalues();
@@ -35,7 +38,7 @@ angular.module("umbraco")
             var tinyMceEditor = null;
 
             promises.push(tinyMceService.getTinyMceEditorConfig({
-                target: editorNode,
+                htmlId: $scope.textAreaHtmlId,
                 stylesheets: editorConfig.stylesheets,
                 toolbar: editorConfig.toolbar,
                 mode: editorConfig.mode
