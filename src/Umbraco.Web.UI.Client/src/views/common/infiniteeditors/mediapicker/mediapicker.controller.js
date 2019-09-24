@@ -270,7 +270,7 @@ angular.module("umbraco")
 
             function deselectAllMedia(medias) {
                 for (var i = 0; i < medias.length; i++) {
-                    var media = images[i];
+                    var media = medias[i];
                     media.selected = false;
                 }
                 medias.length = 0;
