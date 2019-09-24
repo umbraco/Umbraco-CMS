@@ -204,7 +204,7 @@ namespace Umbraco.Web.Templates
                 return html;
 
             // An array to contain a list of URLs that
-            //  we have already processed to avoid dupes
+            // we have already processed to avoid dupes
             var uploadedImages = new Dictionary<string, GuidUdi>();
 
             foreach (var img in tmpImages)
@@ -252,9 +252,19 @@ namespace Umbraco.Web.Templates
                 // Add the UDI to the img element as new data attribute
                 img.SetAttributeValue("data-udi", udi.ToString());
 
-                //Get the new persisted image url
+                // Get the new persisted image url
                 var mediaTyped = Current.UmbracoHelper.Media(udi.Guid);
                 var location = mediaTyped.Url;
+
+                // Find the width & height attributes as we need to set the imageprocessor QueryString
+                var width = img.GetAttributeValue("width", int.MinValue);
+                var height = img.GetAttributeValue("height", int.MinValue);
+
+                if(width != int.MinValue && height != int.MinValue)
+                {
+                    location = $"{location}?width={width}&height={height}&mode=max";
+                }
+                
                 img.SetAttributeValue("src", location);
 
                 // Remove the data attribute (so we do not re-process this)
