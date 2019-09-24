@@ -8,6 +8,11 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         vm.labels = {};
         vm.labels.deletedItem = "";
 
+        vm.add = add;
+        vm.remove = remove;
+        vm.editItem = editItem;
+        vm.showAdd = showAdd;
+
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
@@ -153,14 +158,14 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 });
         }
 
-        $scope.remove = function (index) {
+        function remove(index) {
             $scope.mediaItems.splice(index, 1);
             $scope.ids.splice(index, 1);
             sync();
             setDirty();
-        };
+        }
 
-        $scope.editItem = function (item) {
+        function editItem(item) {
             var mediaEditor = {
                 id: item.id,
                 submit: function (model) {
@@ -187,9 +192,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 }
             };
             editorService.mediaEditor(mediaEditor);
-        };
+        }
 
-        $scope.add = function () {
+        function add() {
             var mediaPicker = {
                 startNodeId: $scope.model.config.startNodeId,
                 startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
@@ -230,8 +235,16 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             }
 
             editorService.mediaPicker(mediaPicker);
+        }
 
-        };
+        function showAdd() {
+            if (!multiPicker) {
+                if ($scope.model.value && $scope.model.value !== "") {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         $scope.sortableOptions = {
             containment: 'parent',
@@ -253,15 +266,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     sync();
                 });
             }
-        };
-
-        $scope.showAdd = function () {
-            if (!multiPicker) {
-                if ($scope.model.value && $scope.model.value !== "") {
-                    return false;
-                }
-            }
-            return true;
         };
 
         init();
