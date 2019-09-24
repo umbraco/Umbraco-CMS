@@ -301,7 +301,6 @@ function mediaHelper(umbRequestHelper, $log) {
 
             // Check if file is a svg
             if (this.getFileExtension(imagePath) === "svg") {
-                console.log("is svg", imagePath);
                 return imagePath;
             }
 
