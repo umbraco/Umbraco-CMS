@@ -18,7 +18,7 @@
                 <div class="umb-control-group umb-mediapicker-upload">
 
                     <umb-load-indicator
-                        ng-if="loading">
+                        ng-if="vm.loading">
                     </umb-load-indicator>
 
                     <div class="form-search">
@@ -76,7 +76,7 @@
                 </div>
 
                 <umb-file-dropzone
-                    ng-if="acceptedMediatypes.length > 0 && !loading && !lockedFolder"
+                    ng-if="acceptedMediatypes.length > 0 && !vm.loading && !lockedFolder"
                     accepted-mediatypes="acceptedMediatypes"
                     parent-id="{{currentFolder.id}}"
                     files-uploaded="onUploadComplete"
@@ -88,7 +88,7 @@
                 </umb-file-dropzone>
 
                 <umb-media-grid
-                        ng-if="!loading"
+                        ng-if="!vm.loading"
                         items="images"
                         on-click="clickHandler"
                         on-click-name="clickItemName"
@@ -107,14 +107,14 @@
 
                 <div class="flex justify-center">
                     <umb-pagination
-                        ng-if="searchOptions.totalPages > 0 && !loading"
+                        ng-if="searchOptions.totalPages > 0 && !vm.loading"
                         page-number="searchOptions.pageNumber"
                         total-pages="searchOptions.totalPages"
                         on-change="changePagination(pageNumber)">
                     </umb-pagination>
                 </div>
 
-                <umb-empty-state ng-if="searchOptions.filter && images.length === 0 && !loading" position="center">
+                <umb-empty-state ng-if="searchOptions.filter && images.length === 0 && !vm.loading" position="center">
                     <localize key="general_searchNoResult"></localize>
                 </umb-empty-state>
 

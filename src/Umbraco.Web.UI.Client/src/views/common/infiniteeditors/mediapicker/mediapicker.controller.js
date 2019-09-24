@@ -350,7 +350,7 @@ angular.module("umbraco")
             }, 500);
 
             function changeSearch() {
-                $scope.loading = true;
+                vm.loading = true;
                 debounceSearchMedia();
             }
 
@@ -360,13 +360,13 @@ angular.module("umbraco")
             }
 
             $scope.changePagination = function (pageNumber) {
-                $scope.loading = true;
+                vm.loading = true;
                 $scope.searchOptions.pageNumber = pageNumber;
                 searchMedia();
             };
 
             function searchMedia() {
-                $scope.loading = true;
+                vm.loading = true;
                 entityResource.getPagedDescendants($scope.currentFolder.id, "Media", $scope.searchOptions)
                     .then(function (data) {
                         // update image data to work with image grid
@@ -384,7 +384,7 @@ angular.module("umbraco")
                         $scope.searchOptions.totalPages = data.totalPages;
                         // set already selected images to selected
                         preSelectImages();
-                        $scope.loading = false;
+                        vm.loading = false;
                     });
             }
 
@@ -423,7 +423,7 @@ angular.module("umbraco")
             }
 
             function getChildren(id) {
-                $scope.loading = true;
+                vm.loading = true;
                 return entityResource.getChildren(id, "Media", $scope.searchOptions)
                     .then(function (data) {
                         for (var i = 0; i < data.length; i++) {
@@ -436,7 +436,7 @@ angular.module("umbraco")
                         $scope.images = data ? data : [];
                         // set already selected images to selected
                         preSelectImages();
-                        $scope.loading = false;
+                        vm.loading = false;
                     });
             }
 
