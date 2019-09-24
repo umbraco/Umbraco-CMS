@@ -1013,6 +1013,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="mediaPicker">
     <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
+    <key alias="trashed">Slettet</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
