@@ -272,7 +272,6 @@ a, a:hover{
 ul.sections {
     display: block;
     background: #1b264f;
-    height: 100%;
     position:absolute;
     top: 90px;
     width: 80px;
@@ -281,12 +280,21 @@ ul.sections {
     margin:0;
     padding:0;
     margin-left: -80px;
+    overflow: scroll;
+    overflow-x: hidden;
+    height: calc(100% - 91px);
+
+    &::-webkit-scrollbar {
+        width: 0px;
+        background: transparent; 
+    }
 }
 
 ul.sections li {
     display: block;
     border-left: 4px #1b264f solid;
     transition: all .3s linear;
+    cursor: pointer;
 }
 
 .fix-left-menu ul.sections li a span,
