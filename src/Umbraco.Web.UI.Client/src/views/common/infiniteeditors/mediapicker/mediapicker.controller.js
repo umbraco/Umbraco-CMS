@@ -51,26 +51,27 @@ angular.module("umbraco")
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
+
             if ($scope.onlyImages) {
-                $scope.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
+                vm.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
             } else {
                 // Use whitelist of allowed file types if provided
                 if (allowedUploadFiles !== '') {
-                    $scope.acceptedFileTypes = allowedUploadFiles;
+                    vm.acceptedFileTypes = allowedUploadFiles;
                 } else {
                     // If no whitelist, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
-                    $scope.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
+                    vm.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
                 }
             }
 
-            $scope.maxFileSize = umbracoSettings.maxFileSize + "KB";
+            vm.maxFileSize = umbracoSettings.maxFileSize + "KB";
 
             $scope.model.selection = [];
 
-            $scope.acceptedMediatypes = [];
+            vm.acceptedMediatypes = [];
             mediaTypeHelper.getAllowedImagetypes($scope.startNodeId)
                 .then(function (types) {
-                    $scope.acceptedMediatypes = types;
+                    vm.acceptedMediatypes = types;
                 });
 
             var dataTypeKey = null;
@@ -197,7 +198,7 @@ angular.module("umbraco")
 
                     mediaTypeHelper.getAllowedImagetypes(folder.id)
                         .then(function (types) {
-                            $scope.acceptedMediatypes = types;
+                            vm.acceptedMediatypes = types;
                         });
                 } else {
                     $scope.path = [];
