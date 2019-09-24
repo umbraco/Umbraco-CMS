@@ -3,11 +3,10 @@
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
     function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper) {
 
-        var vm = {
-            labels: {
-                 mediaPicker_deletedItem: ""
-            }
-        }
+        var vm = this;
+
+        vm.labels = {};
+        vm.labels.deletedItem = "";
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
@@ -57,7 +56,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                                 return found;
                             } else {
                                 return {
-                                    name: vm.labels.mediaPicker_deletedItem,
+                                    name: vm.labels.deletedItem,
                                     id: $scope.model.config.idType !== "udi" ? id : null,
                                     udi: $scope.model.config.idType === "udi" ? id : null,
                                     icon: "icon-picture",
@@ -122,9 +121,14 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         function init() {
 
-            localizationService.localizeMany(["mediaPicker_deletedItem"])
+            // localize labels
+            var labelKeys = [
+                "mediaPicker_deletedItem"
+            ];
+
+            localizationService.localizeMany(labelKeys)
                 .then(function(data) {
-                    vm.labels.mediaPicker_deletedItem = data[0];
+                    vm.labels.deletedItem = data[0];
 
                     userService.getCurrentUser().then(function (userData) {
 
