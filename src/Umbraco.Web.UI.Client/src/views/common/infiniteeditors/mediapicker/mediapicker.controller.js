@@ -23,6 +23,7 @@ angular.module("umbraco")
             vm.clickHandler = clickHandler;
             vm.clickItemName = clickItemName;
             vm.editMediaItem = editMediaItem;
+            vm.gotoFolder = gotoFolder;
 
             if (!$scope.model.title) {
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
@@ -162,7 +163,7 @@ angular.module("umbraco")
                                 childrenOf: data.parentId //clear the children of the parent
                             });
                             $scope.model.creatingFolder = false;
-                            $scope.gotoFolder(data);
+                            gotoFolder(data);
                             $scope.model.showFolderInput = false;
                             $scope.model.newFolderName = "";
                         });
@@ -178,7 +179,7 @@ angular.module("umbraco")
                 }
             }
 
-            $scope.gotoFolder = function (folder) {
+            function gotoFolder(folder) {
                 if (!$scope.multiPicker) {
                     deselectAllImages($scope.model.selection);
                 }
@@ -205,17 +206,18 @@ angular.module("umbraco")
                 }
 
                 $scope.lockedFolder = (folder.id === -1 && $scope.model.startNodeIsVirtual) || hasFolderAccess(folder) === false;
-
                 $scope.currentFolder = folder;
+
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
+
                 return getChildren(folder.id);
-            };
+            }
 
             function clickHandler(media, event, index) {
                 
                 if (image.isFolder) {
                     if ($scope.disableFolderSelect) {
-                        $scope.gotoFolder(image);
+                        gotoFolder(media);
                     } else {
                         selectImage(image);
                     }
@@ -240,7 +242,7 @@ angular.module("umbraco")
 
             function clickItemName(item) {
                 if (item.isFolder) {
-                    $scope.gotoFolder(item);
+                    gotoFolder(item);
                 }
             }
 
@@ -275,14 +277,14 @@ angular.module("umbraco")
             }
 
             function onUploadComplete(files) {
-                $scope.gotoFolder($scope.currentFolder).then(function () {
+                gotoFolder($scope.currentFolder).then(function () {
                     if (files.length === 1 && $scope.model.selection.length === 0) {
                         var image = $scope.images[$scope.images.length - 1];
                         $scope.target = image;
                         $scope.target.url = mediaHelper.resolveFile(image);
                         selectImage(image);
                     }
-                });
+                })
             }
 
             function onFilesQueue() {
@@ -295,10 +297,10 @@ angular.module("umbraco")
 
                 // also make sure the node is not trashed
                 if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
-                    $scope.gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder", path: node.path });
+                    gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder", path: node.path });
                     return true;
                 } else {
-                    $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+                    gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
                     return false;
                 }
             }
@@ -315,7 +317,7 @@ angular.module("umbraco")
             }
 
             function gotoStartNode(err) {
-                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+                gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
             }
 
             function openDetailsDialog() {
