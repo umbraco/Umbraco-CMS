@@ -13,6 +13,8 @@ describe('RTE controller tests', function () {
         }
     }
 
+    beforeEach(module('LocalStorageModule'));
+
     beforeEach(module('umbraco', function ($provide) {
         $provide.value('tinyMceAssets', []);
     }));
