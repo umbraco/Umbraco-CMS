@@ -19,16 +19,20 @@
                 <!-- IMAGE -->
                 <img ng-if="media.thumbnail && media.extension !== 'svg'"
                      ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
-                     alt="{{media.name}}" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
+                     ng-attr-title="{{media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + media.name : media.name}}"
+                     alt="{{media.name}}" />
 
                 <!-- SVG -->
                 <img ng-if="media.thumbnail && media.extension === 'svg'"
                      ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
-                     alt="{{media.name}}"
-                     title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
+                     ng-attr-title="{{media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + media.name : media.name}}"
+                     alt="{{media.name}}" />
 
                 <!-- FILE -->
-                <div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail">
+                <div ng-class="{'trashed': media.trashed}"
+                     ng-attr-title="{{media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + media.name : media.name}}"
+                     ng-hide="media.thumbnail"
+                     class="umb-icon-holder">
                     <span class="file-icon">
                         <i class="icon {{media.icon}}"></i>
                         <span ng-if="media.extension">.{{media.extension}}</span>

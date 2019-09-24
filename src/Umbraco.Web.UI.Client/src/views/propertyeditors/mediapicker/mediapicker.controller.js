@@ -128,12 +128,14 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
             // localize labels
             var labelKeys = [
-                "mediaPicker_deletedItem"
+                "mediaPicker_deletedItem",
+                "mediaPicker_trashed"
             ];
 
             localizationService.localizeMany(labelKeys)
                 .then(function(data) {
                     vm.labels.deletedItem = data[0];
+                    vm.labels.trashed = data[1];
 
                     userService.getCurrentUser().then(function (userData) {
 
