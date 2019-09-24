@@ -2,7 +2,8 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
         function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
-
+            
+            
             if (!$scope.model.title) {
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
                     .then(function (data) {
@@ -14,10 +15,11 @@ angular.module("umbraco")
             }
 
             var dialogOptions = $scope.model;
-
-            $scope.disableFolderSelect = dialogOptions.disableFolderSelect;
-            $scope.onlyImages = dialogOptions.onlyImages;
-            $scope.showDetails = dialogOptions.showDetails;
+            
+            $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
+            $scope.onlyImages = (dialogOptions.onlyImages && dialogOptions.onlyImages !== "0") ? true : false;
+            $scope.onlyFolders = (dialogOptions.onlyFolders && dialogOptions.onlyFolders !== "0") ? true : false;
+            $scope.showDetails = (dialogOptions.showDetails && dialogOptions.showDetails !== "0") ? true : false;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
@@ -188,26 +190,25 @@ angular.module("umbraco")
             };
 
             $scope.clickHandler = function (image, event, index) {
+                
                 if (image.isFolder) {
                     if ($scope.disableFolderSelect) {
                         $scope.gotoFolder(image);
                     } else {
-                        eventsService.emit("dialogs.mediaPicker.select", image);
                         selectImage(image);
                     }
                 } else {
-                    eventsService.emit("dialogs.mediaPicker.select", image);
                     if ($scope.showDetails) {
-
+                        
                         $scope.target = image;
-
+                        
                         // handle both entity and full media object
                         if (image.image) {
                             $scope.target.url = image.image;
                         } else {
                             $scope.target.url = mediaHelper.resolveFile(image);
                         }
-
+                        
                         $scope.openDetailsDialog();
                     } else {
                         selectImage(image);
@@ -222,6 +223,9 @@ angular.module("umbraco")
             };
 
             function selectImage(image) {
+                if(!image.selectable) {
+                    return;
+                }
                 if (image.selected) {
                     for (var i = 0; $scope.model.selection.length > i; i++) {
                         var imageInSelection = $scope.model.selection[i];
@@ -234,6 +238,7 @@ angular.module("umbraco")
                     if (!$scope.multiPicker) {
                         deselectAllImages($scope.model.selection);
                     }
+                    eventsService.emit("dialogs.mediaPicker.select", image);
                     image.selected = true;
                     $scope.model.selection.push(image);
                 }
@@ -468,6 +473,19 @@ angular.module("umbraco")
                 };
                 editorService.mediaEditor(mediaEditor);
             };
+
+            /**
+             * Called when the umgImageGravity component updates the focal point value
+             * @param {any} left
+             * @param {any} top
+             */
+            $scope.focalPointChanged = function (left, top) {
+                //update the model focalpoint value
+                $scope.target.focalPoint = {
+                    left: left,
+                    top: top
+                };
+            }
 
             function setUpdatedMediaNodes(item) {
                 // add udi to list of updated media items so we easily can update them in other editors

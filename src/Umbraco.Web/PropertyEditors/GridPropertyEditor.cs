@@ -1,13 +1,13 @@
-﻿using System.Linq;
-using Umbraco.Core.Logging;
+﻿using Newtonsoft.Json;
+using System;
+using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
-using Newtonsoft.Json;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
-using Umbraco.Web.Templates;
-using Umbraco.Web.Composing;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -26,12 +26,16 @@ namespace Umbraco.Web.PropertyEditors
     {
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private IUmbracoContextAccessor _umbracoContextAccessor;
+        private ILogger _logger;
 
-        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
             : base(logger)
         {
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _logger = logger;
         }
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
@@ -40,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
@@ -48,12 +52,16 @@ namespace Umbraco.Web.PropertyEditors
         {
             private IMediaService _mediaService;
             private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+            private IUmbracoContextAccessor _umbracoContextAccessor;
+            private ILogger _logger;
 
-            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
                 : base(attribute)
             {
                 _mediaService = mediaService;
                 _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+                _umbracoContextAccessor = umbracoContextAccessor;
+                _logger = logger;
             }
 
             /// <summary>
@@ -69,6 +77,10 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
+                var config = editorValue.DataTypeConfiguration as GridConfiguration;
+                var mediaParent = config?.MediaParentId;
+                var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+
                 // editorValue.Value is a JSON string of the grid
                 var rawJson = editorValue.Value.ToString();
                 var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
@@ -81,11 +93,10 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     // Parse the HTML
                     var html = rte.Value?.ToString();
-                    
-                    var userId = Current.UmbracoContext.Security.CurrentUser.Id;
 
-                    // TODO: In future task(get the parent folder from this config) to save the media into
-                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider);
+                    var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
+
+                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                     rte.Value = parsedHtml;
                 }
 

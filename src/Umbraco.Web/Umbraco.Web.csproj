@@ -230,11 +230,13 @@
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
+    <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
     <Compile Include="Routing\IMediaUrlProvider.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
+    <Compile Include="Scheduling\TempFileCleanup.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />

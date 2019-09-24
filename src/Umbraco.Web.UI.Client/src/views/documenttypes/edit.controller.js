@@ -497,6 +497,12 @@
             loadDocumentType();
         }));
 
+        evts.push(eventsService.on("editors.documentType.reload", function (name, args) {
+            if (args && args.node && vm.contentType.id === args.node.id) {
+                loadDocumentType();
+            }
+        }));
+
         evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
             if(args.documentType.allowedTemplates.length > 0){
                 navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
