@@ -284,7 +284,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             // Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
             // Images pasted/dragged in are not persisted to media until saved & thus will need to be added
             if(imgUrl){
-                console.log('got an img src use QS');
                 var src = imgUrl + "?width=" + newSize.width + "&height=" + newSize.height;
                 editor.dom.setAttrib(imageDomElement, 'data-mce-src', src);
             }
