@@ -322,20 +322,20 @@ angular.module("umbraco")
 
             function openDetailsDialog() {
 
-                $scope.mediaPickerDetailsOverlay = {};
-                $scope.mediaPickerDetailsOverlay.show = true;
+                vm.mediaPickerDetailsOverlay = {
+                    show: true,
+                    submit: function (model) {
 
-                $scope.mediaPickerDetailsOverlay.submit = function (model) {
-                    $scope.model.selection.push($scope.target);
-                    $scope.model.submit($scope.model);
+                        $scope.model.selection.push($scope.target);
+                        $scope.model.submit($scope.model);
 
-                    $scope.mediaPickerDetailsOverlay.show = false;
-                    $scope.mediaPickerDetailsOverlay = null;
-                };
-
-                $scope.mediaPickerDetailsOverlay.close = function (oldModel) {
-                    $scope.mediaPickerDetailsOverlay.show = false;
-                    $scope.mediaPickerDetailsOverlay = null;
+                        vm.mediaPickerDetailsOverlay.show = false;
+                        vm.mediaPickerDetailsOverlay = null;
+                    },
+                    close: function (oldModel) {
+                        vm.mediaPickerDetailsOverlay.show = false;
+                        vm.mediaPickerDetailsOverlay = null;
+                    }
                 };
             };
 
