@@ -406,6 +406,7 @@ angular.module("umbraco")
                 // set thumbnail and src
                 mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
                 mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
+
                 // set properties to match a media object
                 if (mediaItem.metaData) {
                     mediaItem.properties = [];
