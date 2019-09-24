@@ -80,8 +80,9 @@ angular.module("umbraco")
                 dataTypeKey: dataTypeKey
             };
 
-            //preload selected item
-            $scope.target = undefined;
+            // preload selected item
+            $scope.target = null;
+
             if (dialogOptions.currentTarget) {
                 $scope.target = dialogOptions.currentTarget;
             }
