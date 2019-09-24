@@ -277,7 +277,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
             var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
 
-            console.log('new size', newSize);
 
             editor.dom.setAttrib(imageDomElement, 'width', newSize.width);
             editor.dom.setAttrib(imageDomElement, 'height', newSize.height);
