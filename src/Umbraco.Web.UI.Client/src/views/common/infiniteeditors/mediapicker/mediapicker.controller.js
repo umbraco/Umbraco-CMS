@@ -80,7 +80,7 @@ angular.module("umbraco")
                 dataTypeKey = $scope.model.dataTypeKey;
             }
 
-            $scope.searchOptions = {
+            vm.searchOptions = {
                 pageNumber: 1,
                 pageSize: 100,
                 totalItems: 0,
@@ -341,12 +341,12 @@ angular.module("umbraco")
 
             var debounceSearchMedia = _.debounce(function () {
                 $scope.$apply(function () {
-                    if ($scope.searchOptions.filter) {
+                    if (vm.searchOptions.filter) {
                         searchMedia();
                     } else {
                         
                         // reset pagination
-                        $scope.searchOptions = {
+                        vm.searchOptions = {
                             pageNumber: 1,
                             pageSize: 100,
                             totalItems: 0,
@@ -354,6 +354,7 @@ angular.module("umbraco")
                             filter: '',
                             dataTypeKey: dataTypeKey
                         };
+                        
                         getChildren($scope.currentFolder.id);
                     }
                 });
@@ -371,27 +372,30 @@ angular.module("umbraco")
 
             function changePagination(pageNumber) {
                 vm.loading = true;
-                $scope.searchOptions.pageNumber = pageNumber;
+                vm.searchOptions.pageNumber = pageNumber;
                 searchMedia();
             };
 
             function searchMedia() {
                 vm.loading = true;
-                entityResource.getPagedDescendants($scope.currentFolder.id, "Media", $scope.searchOptions)
+                entityResource.getPagedDescendants($scope.currentFolder.id, "Media", vm.searchOptions)
                     .then(function (data) {
                         // update image data to work with image grid
                         angular.forEach(data.items, function (mediaItem) {
                             setMediaMetaData(mediaItem);
                         });
+
                         // update images
                         $scope.images = data.items ? data.items : [];
+
                         // update pagination
                         if (data.pageNumber > 0)
-                            $scope.searchOptions.pageNumber = data.pageNumber;
+                            vm.searchOptions.pageNumber = data.pageNumber;
                         if (data.pageSize > 0)
-                            $scope.searchOptions.pageSize = data.pageSize;
-                        $scope.searchOptions.totalItems = data.totalItems;
-                        $scope.searchOptions.totalPages = data.totalPages;
+                            vm.searchOptions.pageSize = data.pageSize;
+
+                        vm.searchOptions.totalItems = data.totalItems;
+                        vm.searchOptions.totalPages = data.totalPages;
                         // set already selected images to selected
                         preSelectImages();
                         vm.loading = false;
@@ -434,7 +438,7 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 vm.loading = true;
-                return entityResource.getChildren(id, "Media", $scope.searchOptions)
+                return entityResource.getChildren(id, "Media", vm.searchOptions)
                     .then(function (data) {
                         for (var i = 0; i < data.length; i++) {
                             if (data[i].metaData.MediaPath !== null) {
@@ -442,8 +446,10 @@ angular.module("umbraco")
                                 data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
                             }
                         }
-                        $scope.searchOptions.filter = "";
+
+                        vm.searchOptions.filter = "";
                         $scope.images = data ? data : [];
+
                         // set already selected images to selected
                         preSelectImages();
                         vm.loading = false;
