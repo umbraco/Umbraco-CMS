@@ -268,9 +268,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 //create a baseline Config to exten upon
                 var config = {
-                    //selector: "#" + args.htmlId,
                     theme: modeTheme,
-                    //skin: "umbraco",
                     inline: modeInline,
                     plugins: plugins,
                     valid_elements: tinyMceConfig.validElements,
