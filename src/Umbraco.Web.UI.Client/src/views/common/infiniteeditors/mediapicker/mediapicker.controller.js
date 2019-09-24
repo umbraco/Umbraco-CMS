@@ -181,7 +181,7 @@ angular.module("umbraco")
 
             function gotoFolder(folder) {
                 if (!$scope.multiPicker) {
-                    deselectAllImages($scope.model.selection);
+                    deselectAllMedia($scope.model.selection);
                 }
 
                 if (!folder) {
@@ -260,7 +260,7 @@ angular.module("umbraco")
                     }
                 } else {
                     if (!$scope.multiPicker) {
-                        deselectAllImages($scope.model.selection);
+                        deselectAllMedia($scope.model.selection);
                     }
                     eventsService.emit("dialogs.mediaPicker.select", media);
                     media.selected = true;
@@ -268,12 +268,12 @@ angular.module("umbraco")
                 }
             }
 
-            function deselectAllImages(images) {
-                for (var i = 0; i < images.length; i++) {
-                    var image = images[i];
-                    image.selected = false;
+            function deselectAllMedia(medias) {
+                for (var i = 0; i < medias.length; i++) {
+                    var media = images[i];
+                    media.selected = false;
                 }
-                images.length = 0;
+                medias.length = 0;
             }
 
             function onUploadComplete(files) {
@@ -396,8 +396,9 @@ angular.module("umbraco")
 
                         vm.searchOptions.totalItems = data.totalItems;
                         vm.searchOptions.totalPages = data.totalPages;
-                        // set already selected images to selected
-                        preSelectImages();
+
+                        // set already selected medias to selected
+                        preSelectMedia();
                         vm.loading = false;
                     });
             }
@@ -439,8 +440,8 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 vm.loading = true;
-                return entityResource.getChildren(id, "Media", vm.searchOptions)
-                    .then(function (data) {
+                return entityResource.getChildren(id, "Media", vm.searchOptions).then(function (data) {
+                        
                         for (var i = 0; i < data.length; i++) {
                             if (data[i].metaData.MediaPath !== null) {
                                 data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
@@ -451,22 +452,22 @@ angular.module("umbraco")
                         vm.searchOptions.filter = "";
                         $scope.images = data ? data : [];
 
-                        // set already selected images to selected
-                        preSelectImages();
+                        // set already selected medias to selected
+                        preSelectMedia();
                         vm.loading = false;
                     });
             }
 
-            function preSelectImages() {
-                for (var folderImageIndex = 0; folderImageIndex < $scope.images.length; folderImageIndex++) {
-                    var folderImage = $scope.images[folderImageIndex];
+            function preSelectMedia() {
+                for (var folderIndex = 0; folderIndex < $scope.images.length; folderIndex++) {
+                    var folderImage = $scope.images[folderIndex];
                     var imageIsSelected = false;
 
                     if ($scope.model && angular.isArray($scope.model.selection)) {
-                        for (var selectedImageIndex = 0;
-                            selectedImageIndex < $scope.model.selection.length;
-                            selectedImageIndex++) {
-                            var selectedImage = $scope.model.selection[selectedImageIndex];
+                        for (var selectedIndex = 0;
+                            selectedIndex < $scope.model.selection.length;
+                            selectedIndex++) {
+                            var selectedImage = $scope.model.selection[selectedIndex];
 
                             if (folderImage.key === selectedImage.key) {
                                 imageIsSelected = true;
