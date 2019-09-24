@@ -364,7 +364,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     init_instance_callback: initEvents
                 };
                 
-                // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later.
+                /*
+                // We are not ready to limit the pasted elements further than default, we will return to this feature. ( TODO: Make this feature an option. )
+                // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later. (TODO: move this definition to the config file... )
                 var validPasteElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li,hr,pre,dl,dt,figure,figcaption,wbr"
                 
                 // add elements from user configurated styleFormats to our list of validPasteElements.
@@ -376,14 +378,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         validPasteElements += "," + style.block;
                     }
                 }
+                */
                 
+                /**
+                The default paste config can be overwritten by defining these properties in the customConfig.
+                */
                 var pasteConfig = {
                     
                     paste_remove_styles: true,
                     paste_text_linebreaktype: true, //Converts plaintext linebreaks to br or p elements.
-                    paste_strip_class_attributes: "all",
+                    paste_strip_class_attributes: "none",
                     
-                    paste_word_valid_elements: validPasteElements,
+                    //paste_word_valid_elements: validPasteElements,
                     
                     paste_preprocess: cleanupPasteData
                     
