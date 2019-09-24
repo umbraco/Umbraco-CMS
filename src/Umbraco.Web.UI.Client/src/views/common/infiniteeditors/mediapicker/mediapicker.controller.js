@@ -12,6 +12,8 @@ angular.module("umbraco")
             vm.upload = upload;
             vm.dragLeave = dragLeave;
             vm.dragEnter = dragEnter;
+            vm.onUploadComplete = onUploadComplete;
+            vm.onFilesQueue = onFilesQueue;
             vm.changeSearch = changeSearch;
             vm.submitFolder = submitFolder;
             vm.enterSubmitFolder = enterSubmitFolder;
@@ -271,7 +273,7 @@ angular.module("umbraco")
                 images.length = 0;
             }
 
-            $scope.onUploadComplete = function (files) {
+            function onUploadComplete(files) {
                 $scope.gotoFolder($scope.currentFolder).then(function () {
                     if (files.length === 1 && $scope.model.selection.length === 0) {
                         var image = $scope.images[$scope.images.length - 1];
@@ -280,11 +282,11 @@ angular.module("umbraco")
                         selectImage(image);
                     }
                 });
-            };
+            }
 
-            $scope.onFilesQueue = function () {
+            function onFilesQueue() {
                 $scope.activeDrag = false;
-            };
+            }
 
             function ensureWithinStartNode(node) {
                 // make sure that last opened node is on the same path as start node
