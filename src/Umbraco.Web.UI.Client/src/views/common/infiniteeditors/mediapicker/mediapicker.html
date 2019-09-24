@@ -27,7 +27,7 @@
                                ng-model="searchOptions.filter"
                                localize="placeholder"
                                placeholder="@placeholders_search"
-                               ng-change="changeSearch()"
+                               ng-change="vm.changeSearch()"
                                type="text"
                                no-dirty-check />
 
@@ -69,7 +69,7 @@
                             </a>
 
                             <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="model.showFolderInput" ng-model="model.newFolderName" ng-keydown="enterSubmitFolder($event)"
-                                ng-blur="submitFolder()" focus-when="{{model.showFolderInput}}" />
+                                ng-blur="vm.submitFolder()" focus-when="{{model.showFolderInput}}" />
                         </li>
                     </ul>
                     <div class="umb-loader" ng-if="model.creatingFolder"></div>

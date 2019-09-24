@@ -7,11 +7,12 @@ angular.module("umbraco")
             
             vm.submit = submit;
             vm.close = close;
-
+            
             vm.toggle = toggle;
             vm.upload = upload;
             vm.dragLeave = dragLeave;
             vm.dragEnter = dragEnter;
+            vm.changeSearch = changeSearch;
             vm.submitFolder = submitFolder;
             vm.enterSubmitFolder = enterSubmitFolder;
             vm.focalPointChanged = focalPointChanged;
@@ -163,7 +164,7 @@ angular.module("umbraco")
 
             function enterSubmitFolder(event) {
                 if (event.keyCode === 13) {
-                    $scope.submitFolder();
+                    submitFolder();
                     event.stopPropagation();
                 }
             }
@@ -347,14 +348,14 @@ angular.module("umbraco")
                 });
             }, 500);
 
-            $scope.changeSearch = function () {
+            function changeSearch() {
                 $scope.loading = true;
                 debounceSearchMedia();
-            };
+            }
 
             function toggle() {
                 // Make sure to activate the changeSearch function everytime the toggle is clicked
-                $scope.changeSearch();
+                changeSearch();
             }
 
             $scope.changePagination = function (pageNumber) {
