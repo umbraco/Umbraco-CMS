@@ -129,7 +129,7 @@ angular.module("umbraco")
                                 selectImage(node);
                                 $scope.target.url = mediaHelper.resolveFile(node);
                                 $scope.target.altText = altText;
-                                $scope.openDetailsDialog();
+                                openDetailsDialog();
                             }
                         }, gotoStartNode);
                 }
@@ -228,7 +228,7 @@ angular.module("umbraco")
                             $scope.target.url = mediaHelper.resolveFile(image);
                         }
                         
-                        $scope.openDetailsDialog();
+                        openDetailsDialog();
                     } else {
                         selectImage(image);
                     }
@@ -315,7 +315,7 @@ angular.module("umbraco")
                 $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
             }
 
-            $scope.openDetailsDialog = function () {
+            function openDetailsDialog() {
 
                 $scope.mediaPickerDetailsOverlay = {};
                 $scope.mediaPickerDetailsOverlay.show = true;
