@@ -266,6 +266,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     var tmpLocation = localStorageService.get(`tinymce__${blobSrcUri}`)
 
                     if(tmpLocation){
+                        sizeImageInEditor(editor, imageElement);
                         editor.dom.setAttrib(imageElement, "data-tmpimg", tmpLocation);
                     }
                 });
