@@ -61,8 +61,7 @@ namespace Umbraco.Core.Serialization
         /// <returns></returns>
         public IStreamedResult ToStream(object input)
         {
-            var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
-            string s = JsonConvert.SerializeObject(input, formatting, _settings);
+            string s = JsonConvert.SerializeObject(input, Formatting.None, _settings);
             byte[] bytes = Encoding.UTF8.GetBytes(s);
             MemoryStream ms = new MemoryStream(bytes);
 
