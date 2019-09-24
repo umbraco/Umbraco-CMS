@@ -7,7 +7,7 @@
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService) {
+    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -203,7 +203,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
 
             // Put temp location into localstorage (used to update the img with data-tmpimg later on)
-            localStorage.setItem(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
+            localStorageService.set(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
 
             // We set the img src url to be the same as we started
             // The Blob URI is stored in TinyMce's cache
@@ -234,7 +234,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                         // Get img src
                         var imgSrc = img.getAttribute("src");
-                        var tmpLocation = localStorage.getItem(`tinymce__${imgSrc}`);
+                        var tmpLocation = localStorageService.get(`tinymce__${imgSrc}`)
 
                         // Select the img & add new attr which we can search for
                         // When its being persisted in RTE property editor
@@ -252,13 +252,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 blobImageWithNoTmpImgAttribute.forEach(imageElement => {
                     var blobSrcUri = editor.dom.getAttrib(imageElement, "src");
 
-                    // Select/find the same image uploaded with the matching SRC uri
-                    var uploadedImage = editor.dom.select(`img[src="${blobSrcUri}"][data-tmpimg]`);
+                    // Find the same image uploaded (Should be in LocalStorage)
+                    // May already exist in the editor as duplicate image
+                    // OR added to the RTE, deleted & re-added again
+                    // So lets fetch the tempurl out of localstorage for that blob URI item
+                    var tmpLocation = localStorageService.get(`tinymce__${blobSrcUri}`)
 
-                    if(uploadedImage){
-                        // Get the value of the tmpimg - so we can apply it to the matched/duplicate image
-                        var dataTmpImg = editor.dom.getAttrib(uploadedImage, "data-tmpimg");
-                        editor.dom.setAttrib(imageElement, "data-tmpimg", dataTmpImg);
+                    if(tmpLocation){
+                        editor.dom.setAttrib(imageElement, "data-tmpimg", tmpLocation);
                     }
                 });
 
