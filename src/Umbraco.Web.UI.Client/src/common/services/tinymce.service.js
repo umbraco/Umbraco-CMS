@@ -7,7 +7,7 @@
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource) {
+    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -167,6 +167,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         xhr = new XMLHttpRequest();
         xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
+        xhr.onloadstart = function(e) {
+            angularHelper.safeApply($rootScope, function() {
+                eventsService.emit("rte.file.uploading");
+            });
+        };
+
+        xhr.onloadend = function(e) {
+            angularHelper.safeApply($rootScope, function() {
+                eventsService.emit("rte.file.uploaded");
+            });
+        };
+
         xhr.upload.onprogress = function (e) {
             progress(e.loaded / e.total * 100);
         };
@@ -203,6 +215,53 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         formData.append('file', blobInfo.blob(), blobInfo.blob().name);
 
         xhr.send(formData);
+    }
+
+    function initEvents(editor){
+
+        editor.on('SetContent', function (e) {
+            
+            var content = e.content;
+
+            // Upload BLOB images (dragged/pasted ones)
+            if(content.indexOf('<img src="blob:') > -1){
+
+                editor.uploadImages(function(data) {
+                    // Once all images have been uploaded
+                    data.forEach(function(item) {
+                        // Select img element
+                        var img = item.element;
+
+                        // Get img src
+                        var imgSrc = img.getAttribute("src");
+                        var tmpLocation = localStorage.getItem(`tinymce__${imgSrc}`);
+
+                        // Select the img & add new attr which we can search for
+                        // When its being persisted in RTE property editor
+                        // To create a media item & delete this tmp one etc
+                        tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
+
+                        // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly 
+                        // same image twice
+                        tinymce.activeEditor.editorUpload.blobCache.removeByUri(imgSrc);
+                    });
+                });
+            }
+        });
+    }
+    
+    function cleanupPasteData(plugin, args) {
+        
+        // Remove spans
+        args.content = args.content.replace(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g, "$1");
+        
+        // Convert b to strong.
+        args.content = args.content.replace(/<\s*b([^>]*)>(.*?)<\s*\/\s*b([^>]*)>/g, "<strong$1>$2</strong$3>");
+        
+        // convert i to em
+        args.content = args.content.replace(/<\s*i([^>]*)>(.*?)<\s*\/\s*i([^>]*)>/g, "<em$1>$2</em$3>");
+        
+        
     }
 
     return {
@@ -308,6 +367,32 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     config.target = args.target;
                 }
                 
+                // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later.
+                var validPasteElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li,hr,pre,dl,dt,figure,figcaption,wbr"
+                
+                // add elements from user configurated styleFormats to our list of validPasteElements.
+                // (This means that we only allow H3-element if its configured as a styleFormat on this specific propertyEditor.)
+                var style, i = 0;
+                for(; i < styles.styleFormats.length; i++) {
+                    style = styles.styleFormats[i];
+                    if(style.block) {
+                        validPasteElements += "," + style.block;
+                    }
+                }
+                
+                var pasteConfig = {
+                    
+                    paste_remove_styles: true,
+                    paste_text_linebreaktype: true, //Converts plaintext linebreaks to br or p elements.
+                    paste_strip_class_attributes: "all",
+                    
+                    paste_word_valid_elements: validPasteElements,
+                    
+                    paste_preprocess: cleanupPasteData
+                    
+                };
+                
+                angular.extend(config, pasteConfig);
                 
                 
                 if (tinyMceConfig.customConfig) {
