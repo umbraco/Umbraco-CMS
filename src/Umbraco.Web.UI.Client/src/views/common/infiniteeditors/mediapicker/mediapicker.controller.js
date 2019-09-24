@@ -25,16 +25,6 @@ angular.module("umbraco")
             vm.editMediaItem = editMediaItem;
             vm.gotoFolder = gotoFolder;
 
-            if (!$scope.model.title) {
-                localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
-                    .then(function (data) {
-                        $scope.labels = {
-                            title: data[0],
-                            includeSubFolders: data[1]
-                        }
-                    });
-            }
-
             var dialogOptions = $scope.model;
             
             $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
@@ -96,7 +86,19 @@ angular.module("umbraco")
                 $scope.target = dialogOptions.currentTarget;
             }
 
+            function setTitle() {
+                if (!$scope.model.title) {
+                    localizationService.localize("defaultdialogs_selectMedia")
+                        .then(function (data) {
+                            $scope.model.title = data;
+                        });
+                }
+            }
+
             function onInit() {
+
+                setTitle();
+
                 userService.getCurrentUser().then(function (userData) {
                     userStartNodes = userData.startMediaIds;
 
