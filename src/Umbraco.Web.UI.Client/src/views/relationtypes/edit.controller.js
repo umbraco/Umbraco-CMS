@@ -22,7 +22,12 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     function init() {
         vm.page.loading = true;
 
-        localizationService.localizeMany(["relationType_tabRelationType", "relationType_tabRelations"]).then(function (data) {
+        var labelKeys = [
+            "relationType_tabRelationType",
+            "relationType_tabRelations"
+        ];
+
+        localizationService.localizeMany(labelKeys).then(function (data) {
             vm.page.navigation = [
                 {
                     "name": data[0],
