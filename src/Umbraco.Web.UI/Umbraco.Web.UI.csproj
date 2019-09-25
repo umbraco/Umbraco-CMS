@@ -348,10 +348,6 @@
           <DevelopmentServerPort>8200</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:8200/</IISUrl>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <DevelopmentServerPort>8150</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8150</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
