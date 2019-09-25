@@ -7,7 +7,7 @@
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService) {
+    $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -203,7 +203,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
 
             // Put temp location into localstorage (used to update the img with data-tmpimg later on)
-            localStorage.setItem(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
+            localStorageService.set(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
 
             // We set the img src url to be the same as we started
             // The Blob URI is stored in TinyMce's cache
@@ -234,23 +234,43 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                         // Get img src
                         var imgSrc = img.getAttribute("src");
-                        var tmpLocation = localStorage.getItem(`tinymce__${imgSrc}`);
+                        var tmpLocation = localStorageService.get(`tinymce__${imgSrc}`)
 
                         // Select the img & add new attr which we can search for
                         // When its being persisted in RTE property editor
                         // To create a media item & delete this tmp one etc
                         tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
-
+                        
                         // Resize the image to the max size configured
                         // NOTE: no imagesrc passed into func as the src is blob://...
                         // We will append ImageResizing Querystrings on perist to DB with node save
                         sizeImageInEditor(editor, img);
-
-                        // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly
-                        // same image twice
-                        tinymce.activeEditor.editorUpload.blobCache.removeByUri(imgSrc);
                     });
+                        
+
                 });
+
+                // Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
+                // This is most likely seen as a duplicate image that has already been uploaded
+                // editor.uploadImages() does not give us any indiciation that the image been uploaded already
+                var blobImageWithNoTmpImgAttribute = editor.dom.select("img[src^='blob:']:not([data-tmpimg])");
+
+                //For each of these selected items
+                blobImageWithNoTmpImgAttribute.forEach(imageElement => {
+                    var blobSrcUri = editor.dom.getAttrib(imageElement, "src");
+
+                    // Find the same image uploaded (Should be in LocalStorage)
+                    // May already exist in the editor as duplicate image
+                    // OR added to the RTE, deleted & re-added again
+                    // So lets fetch the tempurl out of localstorage for that blob URI item
+                    var tmpLocation = localStorageService.get(`tinymce__${blobSrcUri}`)
+
+                    if(tmpLocation){
+                        sizeImageInEditor(editor, imageElement);
+                        editor.dom.setAttrib(imageElement, "data-tmpimg", tmpLocation);
+                    }
+                });
+
             }
         });
     }
