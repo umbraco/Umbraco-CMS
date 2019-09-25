@@ -41,7 +41,7 @@ module.exports = {
                     "./src/views/**/*.{directive,component}.js"
                 ],
                 out: "umbraco.directives.js"
-            },
+            }
         },
 
         //selectors for copying all views into the build
