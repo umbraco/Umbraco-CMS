@@ -15,7 +15,6 @@ global.isProd = true;
 const { src, dest, series, parallel, lastRun } = require('gulp');
 
 const { dependencies } = require('./gulp/tasks/dependencies');
-const { docs, connectDocs, openDocs } = require('./gulp/tasks/docs');
 const { js } = require('./gulp/tasks/js');
 const { less } = require('./gulp/tasks/less');
 const { testE2e, testUnit } = require('./gulp/tasks/test');
@@ -31,11 +30,6 @@ const { watch } = require('./gulp/tasks/watch');
 var { readdirSync } = require('fs');
 
 var onlyScripts = require('./gulp/util/scriptFilter');
-var tasks = readdirSync('./gulp/extra/').filter(onlyScripts);
-tasks.forEach(function(task) {
-	require('./gulp/extra/' + task);
-});
-
 
 // ***********************************************************
 // These Exports are the new way of defining Tasks in Gulp 4.x
@@ -43,11 +37,6 @@ tasks.forEach(function(task) {
 exports.build = series(dependencies, js, less, views, testUnit);
 exports.dev = series(dependencies, js, less, views, watch);
 exports.fastdev = series(dependencies, js, less, views, watch);
-
-exports.docs = series(docs);
-exports.connectDocs = series(connectDocs);
-exports.openDocs = series(openDocs);
-exports.docserve = series(docs, connectDocs, openDocs);
 
 exports.js = series(js);
 exports.views = series(views);

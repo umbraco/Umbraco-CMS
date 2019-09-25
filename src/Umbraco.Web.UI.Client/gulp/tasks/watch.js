@@ -44,6 +44,7 @@ function watching() {
     jsAppWatcher.on('change', function (path) {
         console.log(`File ${path} was changed`);
         src(path).pipe(dest(config.root + config.targets.js))
+
     });
 
 };

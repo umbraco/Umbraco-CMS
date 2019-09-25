@@ -1,0 +1,37 @@
+<div ng-controller="Umbraco.PrevalueEditors.MediaFolderPickerController" class="umb-property-editor umb-mediapicker umb-mediapicker-single">
+
+    <div class="flex flex-wrap error">
+        <ul class="umb-sortable-thumbnails">
+            <li ng-if="model.value" class="umb-sortable-thumbnails__wrapper">
+
+                <p class="label label__trashed" ng-if="media.trashed">
+                    <localize key="mediaPicker_trashed"></localize>
+                    <i class="icon-trash" aria-hidden="true"></i>
+                </p>
+
+                <!-- FILE -->
+                <div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail">
+                    <span class="file-icon">
+                        <i class="icon {{media.icon}}"></i>
+                        <span ng-if="media.extension">.{{media.extension}}</span>
+                    </span>
+                    <small>{{media.name}}</small>
+                </div>
+
+                <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
+
+                    <a class="umb-sortable-thumbnails__action -red" data-element="action-remove" href="" ng-click="remove()">
+                        <i class="icon icon-delete"></i>
+                    </a>
+                </div>
+            </li>
+
+            <li style="border: none;" class="add-wrapper unsortable" ng-hide="model.value">
+                <a data-element="sortable-thumbnails-add" href="#" class="add-link add-link-square" ng-click="add()" prevent-default>
+                    <i class="icon icon-add large"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</div>

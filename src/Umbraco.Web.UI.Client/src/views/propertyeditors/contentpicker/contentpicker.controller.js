@@ -16,7 +16,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     var vm = {
         labels: {
-            general_recycleBin: ""
+            general_recycleBin: "",
+            general_add: ""
         }
     };
 
@@ -77,6 +78,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     $scope.renderModel = [];
     $scope.sortableModel = [];
+
+    $scope.labels = vm.labels;
 
     $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
 
@@ -479,9 +482,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     function init() {
-        localizationService.localizeMany(["general_recycleBin"])
+        localizationService.localizeMany(["general_recycleBin", "general_add"])
             .then(function(data) {
                 vm.labels.general_recycleBin = data[0];
+                vm.labels.general_add = data[1];
 
                 syncRenderModel(false).then(function () {
                     //everything is loaded, start the watch on the model

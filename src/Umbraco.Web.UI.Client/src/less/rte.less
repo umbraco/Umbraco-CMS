@@ -9,11 +9,19 @@
 
 .umb-rte .mce-tinymce {
     box-shadow: none;
-    
 }
 
-.umb-rte .umb-rte-editor{
+.umb-rte .umb-rte-editor-con {
+    height: 24px;
+    visibility: hidden;
+}
+.umb-rte .umb-rte-editor {
     min-height: 100px;
+}
+.umb-rte.--initialized .umb-rte-editor-con {
+    height:auto;
+    min-height: 100px;
+    visibility: visible;
 }
 
 .umb-rte .mce-content-body {

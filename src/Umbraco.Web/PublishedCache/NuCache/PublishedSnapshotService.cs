@@ -160,7 +160,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _domainStore = new SnapDictionary<int, Domain>();
 
-            publishedModelFactory.WithSafeLiveFactory(LoadCachesOnStartup);
+            LoadCachesOnStartup();
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
