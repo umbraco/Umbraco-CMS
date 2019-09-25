@@ -70,8 +70,8 @@
     "karma-junit-reporter": "^1.2.0",
     "karma-phantomjs-launcher": "1.0.4",
     "less": "3.9.0",
-    "lodash": "4.17.11",
-    "marked": "^0.5.2",
+    "lodash": "4.17.13",
+    "marked": "^0.6.1",
     "merge-stream": "1.0.1",
     "run-sequence": "2.2.1",
     "caniuse-lite": "^1.0.30000966"
