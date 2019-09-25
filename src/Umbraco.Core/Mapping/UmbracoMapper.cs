@@ -345,7 +345,8 @@ namespace Umbraco.Core.Mapping
 
             if (_ctors.ContainsKey(sourceType))
                 foreach (var c in sourceCtor)
-                    _ctors[sourceType].Add(c.Key, c.Value);
+                    if (!_ctors[sourceType].TryGetValue(c.Key, out _))
+                        _ctors[sourceType].Add(c.Key, c.Value);
             else
                 _ctors[sourceType] = sourceCtor;
             
@@ -375,7 +376,8 @@ namespace Umbraco.Core.Mapping
 
             if (_maps.ContainsKey(sourceType))
                 foreach(var m in sourceMap)
-                    _maps[sourceType].Add(m.Key, m.Value);
+                    if (!_maps[sourceType].TryGetValue(m.Key, out _))
+                        _maps[sourceType].Add(m.Key, m.Value);
             else
                 _maps[sourceType] = sourceMap;
             
