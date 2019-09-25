@@ -77,13 +77,17 @@ angular.module("umbraco")
                         model: $scope.model,
                         currentForm: angularHelper.getCurrentForm($scope)
                     });
-    
+                    
                 };
-
+                
                 angular.extend(baseLineConfigObj, standardConfig);
-                /** Loads in the editor */
-                tinymce.init(baseLineConfigObj);
-
+                
+                //we need to add a timeout here, to wait for a redraw so TinyMCE can find its placeholder element.
+                $timeout(function () {                        
+                    tinymce.init(baseLineConfigObj);
+                }, 150, false);
+                
+                
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 var unsubscribe = $scope.$on("formSubmitting", function () {
                     if (tinyMceEditor !== undefined && tinyMceEditor != null && !$scope.isLoading) {
