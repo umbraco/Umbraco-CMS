@@ -10,14 +10,10 @@
         <umb-control-group label="@relationType_direction">
             <ul class="unstyled">
                 <li>
-                    <label class="radio">
-                        <input type="radio" name="relationType-direction" ng-model="model.relationType.isBidirectional" ng-value="false"> <localize key="relationType_parentToChild">Parent to child</localize>
-                    </label>
+                    <umb-radiobutton name="relationTypeDirection" value="false" model="model.relationType.isBidirectional"></umb-radiobutton> <localize key="relationType_parentToChild">Parent to child</localize>
                 </li>
                 <li>
-                    <label class="radio">
-                        <input type="radio" name="relationType-direction" ng-model="model.relationType.isBidirectional" ng-value="true"> <localize key="relationType_bidirectional">Bidirectional</localize>
-                    </label>
+                    <umb-radiobutton name="relationTypeDirection" value="true" model="model.relationType.isBidirectional"></umb-radiobutton> <localize key="relationType_bidirectional">Bidirectional</localize>
                 </li>
             </ul>
         </umb-control-group>
