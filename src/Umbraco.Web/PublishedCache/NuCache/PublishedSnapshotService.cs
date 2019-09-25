@@ -1688,5 +1688,12 @@ AND cmsContentNu.nodeId IS NULL
         }
 
         #endregion
+
+        #region Internals/Testing
+
+        internal ContentStore GetContentStore() => _contentStore;
+        internal ContentStore GetMediaStore() => _mediaStore;
+
+        #endregion
     }
 }
