@@ -1626,5 +1626,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="warning">advarsel</key>
     <key alias="failed">fejlet</key>
     <key alias="suggestion">forslag</key>
+    <key alias="openBackofficeSearch">Åben backoffice søgning</key>
+    <key alias="openBackofficeHelp">Åben backoffice hjælp</key>
+    <key alias="closeBackofficeHelp">Luk backoffice hjælp</key>
+    <key alias="openBackofficeProfileOptions">Åben dine profil indstillinger</key>
+    <key alias="closeBackofficeProfileOptions">Luk dine profil indstillinger</key>
   </area>
 </language>
