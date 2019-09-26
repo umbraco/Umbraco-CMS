@@ -217,64 +217,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         xhr.send(formData);
     }
 
-    function initEvents(editor){
-
-        editor.on('SetContent', function (e) {
-
-            var content = e.content;
-
-            // Upload BLOB images (dragged/pasted ones)
-            if(content.indexOf('<img src="blob:') > -1){
-
-                editor.uploadImages(function(data) {
-                    // Once all images have been uploaded
-                    data.forEach(function(item) {
-                        // Select img element
-                        var img = item.element;
-
-                        // Get img src
-                        var imgSrc = img.getAttribute("src");
-                        var tmpLocation = localStorageService.get(`tinymce__${imgSrc}`)
-
-                        // Select the img & add new attr which we can search for
-                        // When its being persisted in RTE property editor
-                        // To create a media item & delete this tmp one etc
-                        tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
-
-                        // Resize the image to the max size configured
-                        // NOTE: no imagesrc passed into func as the src is blob://...
-                        // We will append ImageResizing Querystrings on perist to DB with node save
-                        sizeImageInEditor(editor, img);
-                    });
-
-
-                });
-
-                // Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
-                // This is most likely seen as a duplicate image that has already been uploaded
-                // editor.uploadImages() does not give us any indiciation that the image been uploaded already
-                var blobImageWithNoTmpImgAttribute = editor.dom.select("img[src^='blob:']:not([data-tmpimg])");
-
-                //For each of these selected items
-                blobImageWithNoTmpImgAttribute.forEach(imageElement => {
-                    var blobSrcUri = editor.dom.getAttrib(imageElement, "src");
-
-                    // Find the same image uploaded (Should be in LocalStorage)
-                    // May already exist in the editor as duplicate image
-                    // OR added to the RTE, deleted & re-added again
-                    // So lets fetch the tempurl out of localstorage for that blob URI item
-                    var tmpLocation = localStorageService.get(`tinymce__${blobSrcUri}`)
-
-                    if(tmpLocation){
-                        sizeImageInEditor(editor, imageElement);
-                        editor.dom.setAttrib(imageElement, "data-tmpimg", tmpLocation);
-                    }
-                });
-
-            }
-        });
-    }
-
     function cleanupPasteData(plugin, args) {
 
         // Remove spans
@@ -1311,7 +1253,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 // Upload BLOB images (dragged/pasted ones)
                 if(content.indexOf('<img src="blob:') > -1){
 
-                    editor.uploadImages(function(data) {
+                    args.editor.uploadImages(function(data) {
                         // Once all images have been uploaded
                         data.forEach(function(item) {
                             // Select img element
@@ -1319,18 +1261,43 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                             // Get img src
                             var imgSrc = img.getAttribute("src");
-                            var tmpLocation = localStorage.getItem(`tinymce__${imgSrc}`);
+                            var tmpLocation = localStorageService.get(`tinymce__${imgSrc}`)
 
                             // Select the img & add new attr which we can search for
                             // When its being persisted in RTE property editor
                             // To create a media item & delete this tmp one etc
                             tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
 
-                            // We need to remove the image from the cache, otherwise we can't handle if we upload the exactly 
-                            // same image twice
-                            tinymce.activeEditor.editorUpload.blobCache.removeByUri(imgSrc);
+                            // Resize the image to the max size configured
+                            // NOTE: no imagesrc passed into func as the src is blob://...
+                            // We will append ImageResizing Querystrings on perist to DB with node save
+                            sizeImageInEditor(args.editor, img);
                         });
+
+
                     });
+
+                    // Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
+                    // This is most likely seen as a duplicate image that has already been uploaded
+                    // editor.uploadImages() does not give us any indiciation that the image been uploaded already
+                    var blobImageWithNoTmpImgAttribute = args.editor.dom.select("img[src^='blob:']:not([data-tmpimg])");
+
+                    //For each of these selected items
+                    blobImageWithNoTmpImgAttribute.forEach(imageElement => {
+                        var blobSrcUri = args.editor.dom.getAttrib(imageElement, "src");
+
+                        // Find the same image uploaded (Should be in LocalStorage)
+                        // May already exist in the editor as duplicate image
+                        // OR added to the RTE, deleted & re-added again
+                        // So lets fetch the tempurl out of localstorage for that blob URI item
+                        var tmpLocation = localStorageService.get(`tinymce__${blobSrcUri}`)
+
+                        if(tmpLocation){
+                            sizeImageInEditor(args.editor, imageElement);
+                            args.editor.dom.setAttrib(imageElement, "data-tmpimg", tmpLocation);
+                        }
+                    });
+
                 }
             });
 
