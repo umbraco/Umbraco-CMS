@@ -12,12 +12,6 @@ function RelationTypeSettingsController($scope, localizationService) {
 
     vm.labels = {};
 
-    vm.changeDirection = changeDirection;
-
-    function changeDirection(model, value) {
-        console.log("model", model, value);
-    }
-
     function init() {
 
         var labelKeys = [
@@ -26,7 +20,6 @@ function RelationTypeSettingsController($scope, localizationService) {
         ];
 
         localizationService.localizeMany(labelKeys).then(function (data) {
-            console.log("data", data);
             vm.labels.parentToChild = data[0];
             vm.labels.bidirectional = data[1];
         });
