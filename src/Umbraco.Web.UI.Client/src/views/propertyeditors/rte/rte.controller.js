@@ -28,6 +28,13 @@ angular.module("umbraco")
             $scope.containerOverflow = editorConfig.mode === "distraction-free" ? (height ? "auto" : "inherit") : "inherit";
 
             var promises = [];
+            
+            // we need to make sure that the element is initialized before we can init TinyMCE, because we find the placeholder by ID, so it needs to be appended to document before.
+            var initPromise = new Promise((resolve, reject) => {
+                this.$onInit = resolve;
+            });
+            
+            promises.push(initPromise);
 
             //queue file loading
             tinyMceAssets.forEach(function (tinyJsAsset) {
@@ -82,11 +89,7 @@ angular.module("umbraco")
                 
                 angular.extend(baseLineConfigObj, standardConfig);
                 
-                //we need to add a timeout here, to wait for a redraw so TinyMCE can find its placeholder element.
-                $timeout(function () {                        
-                    tinymce.init(baseLineConfigObj);
-                }, 150, false);
-                
+                tinymce.init(baseLineConfigObj);
                 
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 var unsubscribe = $scope.$on("formSubmitting", function () {
