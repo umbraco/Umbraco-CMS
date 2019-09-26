@@ -338,15 +338,28 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     body_class: "umb-rte",
 
                     //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
-                    cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster,
+                    cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
+                };
+
+                // Need to check if we are allowed to UPLOAD images
+                // This is done by checking if the insert image toolbar button is available
+                var insertMediaButtonFound = false;
+                args.toolbar.forEach(toolbarItem => {
+                    if(toolbarItem.indexOf("umbmediapicker") > -1){
+                        insertMediaButtonFound = true;
+                    }
+                });
+
+                if(insertMediaButtonFound){
+                    // Update the TinyMCE Config object to allow pasting
+                    config.images_upload_handler = uploadImageHandler;
+                    config.automatic_uploads = false;
+                    config.images_replace_blob_uris = false;
 
                     // This allows images to be pasted in & stored as Base64 until they get uploaded to server
-                    paste_data_images: true,
+                    config.paste_data_images = true;
+                }
 
-                    images_upload_handler: uploadImageHandler,
-                    automatic_uploads: false,
-                    images_replace_blob_uris: false
-                };
 
                 if (args.htmlId) {
                     config.selector = "#" + args.htmlId;
@@ -1245,6 +1258,29 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 });
                 //re-watch the value
                 startWatch();
+            }
+
+            // If we can not find the insert image/media toolbar button
+            // Then we need to add an event listener to the editor
+            // That will update native browser drag & drop events
+            // To update the icon to show you can NOT drop something into the editor
+            var insertMediaButtonFound = false;
+            var toolbarItems = args.editor.settings.toolbar;
+            toolbarItems = toolbarItems.split(" ");
+            toolbarItems.forEach(toolbarItem => {
+                if(toolbarItem.indexOf("umbmediapicker") > -1){
+                    insertMediaButtonFound = true;
+                }
+            });
+
+            if(insertMediaButtonFound === false){
+                // Wire up the event listener
+                args.editor.on('dragend dragover draggesture dragdrop drop drag', function (e) {
+                    e.preventDefault();
+                    e.dataTransfer.effectAllowed = "none";
+                    e.dataTransfer.dropEffect = "none";
+                    e.stopPropagation();
+                });
             }
 
             args.editor.on('SetContent', function (e) {
