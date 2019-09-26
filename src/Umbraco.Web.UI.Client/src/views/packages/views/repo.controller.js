@@ -104,10 +104,8 @@
 
             vm.loading = true;
             vm.searchQuery = "";
-            var searchCategory = selectedCategory.name;
-            if (reset === true) {
-                searchCategory = "";
-            }
+
+            var searchCategory = reset === true ? "" : selectedCategory.name;
 
             currSort = "Latest";
 
@@ -122,7 +120,7 @@
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
                         vm.pagination.pageNumber = 1;
                     })
-            ])
+                ])
                 .then(function () {
                     vm.loading = false;
                     selectedCategory.active = reset === false;
