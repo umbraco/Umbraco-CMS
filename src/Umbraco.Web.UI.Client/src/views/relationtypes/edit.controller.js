@@ -56,6 +56,10 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
         formatDates(relationType.relations);
         getRelationNames(relationType);
 
+        // Convert property value to string, so umb-radiobutton component can handle the value as a string
+        // Sometime later the umb-radiobutton might be able to handle value as boolean.
+        relationType.isBidirectional = (relationType.isBidirectional || false).toString();
+
         vm.relationType = relationType;
 
         editorState.set(vm.relationType);
