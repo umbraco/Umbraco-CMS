@@ -803,6 +803,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //show the throbber
             $macroDiv.addClass("loading");
 
+            // Add the contenteditable="false" attribute
+            // As just the CSS class of .mceNonEditable is not working by itself?!
+            // TODO: At later date - use TinyMCE editor DOM manipulation as opposed to jQuery
+            $macroDiv.attr("contenteditable", "false");
+
             var contentId = $routeParams.id;
 
             //need to wrap in safe apply since this might be occuring outside of angular
