@@ -30,12 +30,12 @@ angular.module("umbraco")
             var promises = [];
             
             // we need to make sure that the element is initialized before we can init TinyMCE, because we find the placeholder by ID, so it needs to be appended to document before.
-            var initPromise = new Promise((resolve, reject) => {
+            var initPromise = $q((resolve, reject) => {
                 this.$onInit = resolve;
             });
             
             promises.push(initPromise);
-
+            
             //queue file loading
             tinyMceAssets.forEach(function (tinyJsAsset) {
                 promises.push(assetsService.loadJs(tinyJsAsset, $scope));
