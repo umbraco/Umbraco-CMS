@@ -46,7 +46,7 @@ namespace Umbraco.Core.Serialization
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            JsonSerializer.CreateDefault(new JsonSerializerSettings { ContractResolver = resolver }).Serialize(writer, value);
+            JsonSerializer.CreateDefault(new JsonSerializerSettings { ContractResolver = resolver, Formatting = Formatting.None }).Serialize(writer, value);
         }
     }
 }

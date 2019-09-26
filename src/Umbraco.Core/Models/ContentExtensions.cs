@@ -683,7 +683,7 @@ namespace Umbraco.Core.Models
                         break;
                     case TagCacheStorageType.Json:
                         //json array
-                        property.Value = JsonConvert.SerializeObject(trimmedTags);
+                        property.Value = JsonConvert.SerializeObject(trimmedTags, Formatting.None);
                         break;
                 }
 
@@ -705,7 +705,7 @@ namespace Umbraco.Core.Models
                             currJson.Add(tag);
                         }
                         //json array
-                        property.Value = JsonConvert.SerializeObject(currJson);
+                        property.Value = JsonConvert.SerializeObject(currJson, Formatting.None);
                         break;
                 }
             }

@@ -13,6 +13,7 @@ namespace Umbraco.Core.Serialization
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
+            writer.Formatting = serializer.Formatting;
             writer.WriteValue(value.ToString());
         }
 
