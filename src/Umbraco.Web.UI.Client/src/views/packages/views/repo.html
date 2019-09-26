@@ -11,19 +11,19 @@
             </div>
         </div>
 
-        <div ng-show="vm.loading === false">
-
-            <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
-                <div class="umb-packages-categories">
-                    <a href=""
-                       class="umb-packages-category"
-                       ng-click="vm.selectCategory(category, vm.categories)"
-                       ng-repeat="category in vm.categories"
-                       ng-class="{'-active': category.active, '-first': $first, '-last': $last}">
-                        <div>{{ category.name }}</div>
-                    </a>
-                </div>
+        <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
+            <div class="umb-packages-categories">
+                <a href=""
+                   class="umb-packages-category"
+                   ng-click="vm.selectCategory(category, vm.categories)"
+                   ng-repeat="category in vm.categories"
+                   ng-class="{'-active': category.active, '-first': $first, '-last': $last}">
+                    <div>{{category.name}}</div>
+                </a>
             </div>
+        </div>
+
+        <div ng-show="vm.loading === false">
 
             <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
                 <h4><strong><localize key="packager_packagesPopular">Popular</localize></strong></h4>
@@ -102,9 +102,8 @@
             </div>
 
             <!-- Empty state -->
-            <umb-empty-state
-                ng-if="vm.packages.length === 0 && vm.loading === false && vm.searchQuery !== ''"
-                position="center">
+            <umb-empty-state ng-if="vm.packages.length === 0 && vm.loading === false && vm.searchQuery !== ''"
+                             position="center">
                 <h4><strong><localize key="packager_packageNoResults">We couldn't find anything for</localize> '{{ vm.searchQuery }}'</strong></h4>
                 <p class="faded"><localize key="packager_packageNoResultsDescription">Please try searching for another package or browse through the categories</localize>.</p>
             </umb-empty-state>
