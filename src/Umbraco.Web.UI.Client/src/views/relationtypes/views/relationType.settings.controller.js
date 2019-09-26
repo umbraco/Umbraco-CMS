@@ -1,10 +1,10 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.RelationTypes.EditController
+ * @name Umbraco.Editors.RelationTypes.SettingsController
  * @function
  *
  * @description
- * The controller for editing relation types.
+ * The controller for editing relation type settings.
  */
 function RelationTypeSettingsController($scope, localizationService) {
 
