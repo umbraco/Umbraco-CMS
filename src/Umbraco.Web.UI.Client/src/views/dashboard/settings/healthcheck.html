@@ -32,26 +32,41 @@
                             <umb-load-indicator></umb-load-indicator>
                         </div>
 
-                        <div class="umb-healthcheck-messages" ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
+                        <div
+                            class="umb-healthcheck-messages"
+                            ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo"
+                        >
 
                             <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
                                 <i class="icon-check color-green" aria-hidden="true"></i>
                                 {{ group.totalSuccess }}
+                                <span class="sr-only">
+                                    <localize key="visuallyHiddenTexts_passed">passed</localize>
+                                </span>
                             </div>
 
                             <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
                                 <i class="icon-alert color-orange" aria-hidden="true"></i>
                                 {{ group.totalWarning }}
+                                <span class="sr-only">
+                                    <localize key="visuallyHiddenTexts_warning">warning</localize>
+                                </span>
                             </div>
 
                             <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
                                 <i class="icon-delete color-red" aria-hidden="true"></i>
                                 {{ group.totalError }}
+                                <span class="sr-only">
+                                    <localize key="visuallyHiddenTexts_failed">failed</localize>
+                                </span>
                             </div>
 
                             <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
                                 <i class="umb-healthcheck-status-icon icon-info" aria-hidden="true"></i>
                                 {{ group.totalInfo }}
+                                <span class="sr-only">
+                                    <localize key="visuallyHiddenTexts_suggestion">suggestion</localize>
+                                </span>
                             </div>
 
                         </div>
