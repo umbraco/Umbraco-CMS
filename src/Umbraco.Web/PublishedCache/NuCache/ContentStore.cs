@@ -953,8 +953,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var parent = parentLink.Value;
 
-            var currentGen = parentLink.Gen;
-
             // if parent has no children, clone parent + add as first child
             if (parent.FirstChildContentId < 0)
             {
@@ -965,7 +963,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             // get parent's first child
-            var childLink = GetRequiredLinkedNode(parent.FirstChildContentId, "first child", currentGen);
+            var childLink = GetRequiredLinkedNode(parent.FirstChildContentId, "first child", null);
             var child = childLink.Value;
 
             // if first, clone parent + insert as first child
@@ -985,7 +983,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             // get parent's last child
-            var lastChildLink = GetRequiredLinkedNode(parent.LastChildContentId, "last child", currentGen);
+            var lastChildLink = GetRequiredLinkedNode(parent.LastChildContentId, "last child", null);
             var lastChild = lastChildLink.Value;
 
             // if last, clone parent + append as last child
@@ -1010,7 +1008,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (child.NextSiblingContentId > 0)
             {
                 // get next child
-                var nextChildLink = GetRequiredLinkedNode(child.NextSiblingContentId, "next child", currentGen);
+                var nextChildLink = GetRequiredLinkedNode(child.NextSiblingContentId, "next child", null);
                 var nextChild = nextChildLink.Value;
 
                 // if here, clone previous + append/insert
@@ -1034,7 +1032,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             // should never get here
-            throw new Exception("panic: no more children.");
+            throw new PanicException("No more children.");
         }
 
         // replaces the root node
@@ -1370,7 +1368,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #endregion
 
-        #region Unit testing
+        #region Internals/Unit testing
 
         private TestHelper _unitTesting;
 
@@ -1393,17 +1391,22 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 set => _store._collectAuto = value;
             }
 
-            public Tuple<long, ContentNode>[] GetValues(int id)
+            /// <summary>
+            /// Return a list of Gen/ContentNode values
+            /// </summary>
+            /// <param name="id"></param>
+            /// <returns></returns>
+            public (long gen, ContentNode contentNode)[] GetValues(int id)
             {
                 _store._contentNodes.TryGetValue(id, out LinkedNode<ContentNode> link); // else null
 
                 if (link == null)
-                    return new Tuple<long, ContentNode>[0];
+                    return Array.Empty<(long, ContentNode)>();
 
-                var tuples = new List<Tuple<long, ContentNode>>();
+                var tuples = new List<(long, ContentNode)>();
                 do
                 {
-                    tuples.Add(Tuple.Create(link.Gen, link.Value));
+                    tuples.Add((link.Gen, link.Value));
                     link = link.Next;
                 } while (link != null);
                 return tuples.ToArray();
