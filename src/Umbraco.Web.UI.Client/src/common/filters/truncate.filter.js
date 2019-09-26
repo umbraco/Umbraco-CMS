@@ -20,7 +20,13 @@ angular.module("umbraco.filters").filter('truncate',
             
             if (!value) return '';
             
-            // Overload-fix to support Forms Legacy Version:
+            /* 
+            Overload-fix to support Forms Legacy Version:
+
+            We are making this hack to support the old Forms version of the truncate filter.
+            The old version took different attributes, this code block checks if the first argument isnt a boolean, meaning its not the new version, meaning that the filter is begin used in the old way.
+            Therefor we use the second argument(max) to indicate wether we want a tail (…) and using the first argument(wordwise) as the second argument(max amount of characters)
+            */
             if (typeof(wordwise) !== 'boolean') {
                 // switch arguments around to fit Forms version.
                 if (max !== true) {
