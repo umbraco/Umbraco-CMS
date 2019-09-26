@@ -251,6 +251,16 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
     }
 
+    function isMediaPickerEnabled(toolbarItemArray){
+        var insertMediaButtonFound = false;
+        toolbarItemArray.forEach(toolbarItem => {
+            if(toolbarItem.indexOf("umbmediapicker") > -1){
+                insertMediaButtonFound = true;
+            }
+        });
+        return insertMediaButtonFound;
+    }
+
     return {
 
         /**
@@ -343,14 +353,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 // Need to check if we are allowed to UPLOAD images
                 // This is done by checking if the insert image toolbar button is available
-                var insertMediaButtonFound = false;
-                args.toolbar.forEach(toolbarItem => {
-                    if(toolbarItem.indexOf("umbmediapicker") > -1){
-                        insertMediaButtonFound = true;
-                    }
-                });
-
-                if(insertMediaButtonFound){
+                if(isMediaPickerEnabled(args.toolbar)){
                     // Update the TinyMCE Config object to allow pasting
                     config.images_upload_handler = uploadImageHandler;
                     config.automatic_uploads = false;
@@ -1264,16 +1267,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             // Then we need to add an event listener to the editor
             // That will update native browser drag & drop events
             // To update the icon to show you can NOT drop something into the editor
-            var insertMediaButtonFound = false;
-            var toolbarItems = args.editor.settings.toolbar;
-            toolbarItems = toolbarItems.split(" ");
-            toolbarItems.forEach(toolbarItem => {
-                if(toolbarItem.indexOf("umbmediapicker") > -1){
-                    insertMediaButtonFound = true;
-                }
-            });
-
-            if(insertMediaButtonFound === false){
+            var toolbarItems = args.editor.settings.toolbar.split(" ");
+            if(isMediaPickerEnabled(toolbarItems) === false){
                 // Wire up the event listener
                 args.editor.on('dragend dragover draggesture dragdrop drop drag', function (e) {
                     e.preventDefault();
