@@ -1,7 +1,7 @@
 <form ng-controller="Umbraco.Overlays.EmbedOverlay as vm">
 
    <umb-control-group label="@general_url">
-       <input id="url" class="umb-editor input-block-level" type="text" style="margin-bottom: 10px;" ng-model="model.embed.url" ng-keyup="$event.keyCode == 13 ? vm.showPreview() : null" required />
+       <input id="url" class="umb-editor input-block-level" type="text" style="margin-bottom: 10px;" ng-model="model.embed.url" ng-keyup="$event.keyCode == 13 ? vm.showPreview() : null" focus-when="{{true}}" required />
        <input type="button" ng-click="vm.showPreview()" class="btn" value="@general_retrieve" localize="value" />
    </umb-control-group>
 
