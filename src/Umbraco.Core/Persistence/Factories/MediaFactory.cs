@@ -145,7 +145,9 @@ namespace Umbraco.Core.Persistence.Factories
                         var match = SrcPathPattern.Match(value);
                         if (match.Success)
                             return match.Groups[1].Value;
-                    }                    
+                    }
+
+                    return String.Empty;
                 }
             }
 

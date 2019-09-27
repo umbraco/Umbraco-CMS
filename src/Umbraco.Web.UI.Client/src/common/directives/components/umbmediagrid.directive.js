@@ -150,7 +150,7 @@ Use this directive to generate a thumbnail grid of media items.
             function setItemData(item) {
 
                 // check if item is a folder
-                if(item.image) {
+                if(typeof item.image !== "undefined") {
                     // if is has an image path, it is not a folder
                     item.isFolder = false;
                 } else {

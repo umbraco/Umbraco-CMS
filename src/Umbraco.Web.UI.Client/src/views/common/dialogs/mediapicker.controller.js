@@ -83,7 +83,7 @@ angular.module("umbraco")
                 entityResource.getChildren(folder.id, "Media")
                     .then(function(data) {
                         for (i=0;i<data.length;i++){
-                            if(data[i].metaData.MediaPath){
+                            if(data[i].metaData.MediaPath !== null){
                                 data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
                                 data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
                             }

@@ -143,7 +143,7 @@ function mediaHelper(umbRequestHelper, $log) {
          */
         resolveFileFromEntity: function (mediaEntity, thumbnail) {
 
-            if (!angular.isObject(mediaEntity.metaData) || !mediaEntity.metaData.MediaPath) {
+            if (!angular.isObject(mediaEntity.metaData) || typeof mediaEntity.metaData.MediaPath === 'undefined' || mediaEntity.metaData.MediaPath === null) {
                 //don't throw since this image legitimately might not contain a media path, but output a warning
                 $log.warn("Cannot resolve the file url from the mediaEntity, it does not contain the required metaData");
                 return null;
