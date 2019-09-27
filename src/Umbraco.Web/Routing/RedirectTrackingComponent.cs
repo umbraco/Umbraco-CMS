@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Sync;
-using Umbraco.Web.Cache;
-using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
 {
@@ -24,35 +20,17 @@ namespace Umbraco.Web.Routing
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
     public sealed class RedirectTrackingComponent : IComponent
     {
-        private const string ContextKey1 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.1";
+        private const string _eventStateKey = "Umbraco.Web.Redirects.RedirectTrackingEventHandler";
 
         private readonly IUmbracoSettingsSection _umbracoSettings;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly IRedirectUrlService _redirectUrlService;
 
-        public RedirectTrackingComponent(IUmbracoSettingsSection umbracoSettings)
+        public RedirectTrackingComponent(IUmbracoSettingsSection umbracoSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService)
         {
             _umbracoSettings = umbracoSettings;
-        }
-
-        private static Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute> OldRoutes
-        {
-            get
-            {
-                var oldRoutes = (Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>) Current.UmbracoContext.HttpContext.Items[ContextKey1];
-                if (oldRoutes == null)
-                    Current.UmbracoContext.HttpContext.Items[ContextKey1] = oldRoutes = new Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>();
-                return oldRoutes;
-            }
-        }
-
-        private static bool HasOldRoutes
-        {
-            get
-            {
-                if (Current.UmbracoContext == null) return false;
-                if (Current.UmbracoContext.HttpContext == null) return false;
-                if (Current.UmbracoContext.HttpContext.Items[ContextKey1] == null) return false;
-                return true;
-            }
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _redirectUrlService = redirectUrlService;
         }
 
         public void Initialize()
@@ -76,37 +54,51 @@ namespace Umbraco.Web.Routing
         public void Terminate()
         { }
 
-        private static void ContentService_Publishing(IContentService sender, PublishEventArgs<IContent> args)
+        private void ContentService_Publishing(IContentService sender, PublishEventArgs<IContent> args)
         {
+            var oldRoutes = GetOldRoutes(args.EventState);
             foreach (var entity in args.PublishedEntities)
             {
-                StoreOldRoute(entity);
+                StoreOldRoute(entity, oldRoutes);
             }
         }
 
         private void ContentService_Published(IContentService sender, ContentPublishedEventArgs args)
         {
-            CreateRedirects(args.PublishedEntities.Select(c => c.Id).ToArray());            
+            var oldRoutes = GetOldRoutes(args.EventState);
+            CreateRedirects(oldRoutes);
         }
 
-        private static void ContentService_Moving(IContentService sender, MoveEventArgs<IContent> args)
+        private void ContentService_Moving(IContentService sender, MoveEventArgs<IContent> args)
         {
+            var oldRoutes = GetOldRoutes(args.EventState);
             foreach (var info in args.MoveInfoCollection)
             {
-                StoreOldRoute(info.Entity);
+                StoreOldRoute(info.Entity, oldRoutes);
             }
         }
 
-        private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> args)
+        private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> args)
         {
-            CreateRedirects(args.MoveInfoCollection.Select(i => i.Entity.Id).ToArray());
+            var oldRoutes = GetOldRoutes(args.EventState);
+            CreateRedirects(oldRoutes);
         }
 
-        private static void StoreOldRoute(IContent entity)
+        private OldRoutesDictionary GetOldRoutes(IDictionary<string, object> eventState)
         {
-            var contentCache = Current.UmbracoContext.Content;
+            if (! eventState.ContainsKey(_eventStateKey))
+            {
+                eventState[_eventStateKey] = new OldRoutesDictionary();
+            }
+
+            return eventState[_eventStateKey] as OldRoutesDictionary;
+        }
+
+        private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)
+        {
+            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
             var entityContent = contentCache.GetById(entity.Id);
-            if (entityContent == null) return;
+            if (entityContent == null) return;            
 
             // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures) 
             var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray()
@@ -119,42 +111,22 @@ namespace Umbraco.Web.Routing
                 foreach (var culture in cultures)
                 {
                     var route = contentCache.GetRouteById(x.Id, culture);
-                    if (IsNotRoute(route)) return;
-                    OldRoutes[new ContentIdAndCulture(x.Id, culture)] = new ContentKeyAndOldRoute(x.Key, route);
+                    if (IsNotRoute(route)) continue;
+                    oldRoutes[new ContentIdAndCulture(x.Id, culture)] = new ContentKeyAndOldRoute(x.Key, route);
                 }
             }
         }
 
-        private static void CreateRedirects(IEnumerable<int> contentIds)
+        private void CreateRedirects(OldRoutesDictionary oldRoutes)
         {
-            if (!HasOldRoutes)
-                return;
+            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
 
-            // manage routes
-            var removeKeys = new List<ContentIdAndCulture>();
-
-            foreach (var oldRoute in OldRoutes)
+            foreach (var oldRoute in oldRoutes)
             {
-                if (contentIds.Contains(oldRoute.Key.ContentId))
-                {
-                    CreateRedirect(oldRoute.Key.ContentId, oldRoute.Key.Culture, oldRoute.Value.ContentKey, oldRoute.Value.OldRoute);
-                    removeKeys.Add(oldRoute.Key);
-                }
+                var newRoute = contentCache.GetRouteById(oldRoute.Key.ContentId, oldRoute.Key.Culture);
+                if (IsNotRoute(newRoute) || oldRoute.Value.OldRoute == newRoute) continue;
+                _redirectUrlService.Register(oldRoute.Value.OldRoute, oldRoute.Value.ContentKey, oldRoute.Key.Culture);
             }
-
-            foreach (var k in removeKeys)
-            {
-                OldRoutes.Remove(k);
-            }
-        }
-
-        private static void CreateRedirect(int contentId, string culture, Guid contentKey, string oldRoute)
-        {
-            var contentCache = Current.UmbracoContext.Content;
-            var newRoute = contentCache.GetRouteById(contentId, culture);
-            if (IsNotRoute(newRoute) || oldRoute == newRoute) return;
-            var redirectUrlService = Current.Services.RedirectUrlService;
-            redirectUrlService.Register(oldRoute, contentKey, culture);
         }
 
         private static bool IsNotRoute(string route)
@@ -183,5 +155,8 @@ namespace Umbraco.Web.Routing
             public Guid ContentKey => Item1;
             public string OldRoute => Item2;
         }
+
+        private class OldRoutesDictionary : Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>
+        { }
     }
 }
