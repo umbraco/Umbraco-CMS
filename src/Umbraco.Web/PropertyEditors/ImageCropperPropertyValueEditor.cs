@@ -195,10 +195,10 @@ namespace Umbraco.Web.PropertyEditors
                 }
                 catch
                 {
-                }                
+                }
             }
 
-            return null;
+            return String.Empty;
         }
     }
 }

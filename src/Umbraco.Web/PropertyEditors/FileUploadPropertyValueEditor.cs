@@ -91,13 +91,11 @@ namespace Umbraco.Web.PropertyEditors
             // update json and return
             if (editorFile == null) return null;
             return filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
-
-            
         }
 
         public string ToMediaPath(Core.Models.Property property)
         {
-            return property?.GetValue()?.ToString();
+            return property?.GetValue()?.ToString() ?? String.Empty;
         }
 
         private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)
