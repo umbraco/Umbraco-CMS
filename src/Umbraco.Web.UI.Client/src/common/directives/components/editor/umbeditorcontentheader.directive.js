@@ -35,7 +35,7 @@
                     title += name;
                 }
                 
-                $rootScope.$emit("$changeTitle", title);
+                scope.$emit("$changeTitle", title);
             });
             scope.vm = {};
             scope.vm.dropdownOpen = false;
