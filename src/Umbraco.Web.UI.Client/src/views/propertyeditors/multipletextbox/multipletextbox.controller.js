@@ -80,6 +80,7 @@
                 break;
             default:
         }
+        validate();
     }
 
     $scope.add = function () {
@@ -89,6 +90,7 @@
             var newItemIndex = $scope.model.value.length - 1;
             $scope.model.value[newItemIndex].hasFocus = true;
         }
+        validate();
     };
 
     $scope.remove = function (index) {
@@ -118,6 +120,16 @@
         $scope.promptIsVisible = "-1";
     }
 
+    function validate() {
+        if ($scope.multipleTextboxForm) {
+            var invalid = $scope.model.validation.mandatory && !$scope.model.value.length
+            $scope.multipleTextboxForm.mandatory.$setValidity("minCount", !invalid);
+        }
+    }
+    $timeout(function () {
+        validate();
+    });
+    
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.MultipleTextBoxController", MultipleTextBoxController);
