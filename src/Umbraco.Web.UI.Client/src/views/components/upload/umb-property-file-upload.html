@@ -28,22 +28,18 @@
 
                     <div ng-if="!file.isImage && file.extension !== 'svg'">
                         <a class="span6 thumbnail tc" ng-show="!file.isClientSide" ng-href="{{file.fileName}}" target="_blank">
-                            <span class="umb-icon-holder">
-                                <span class="file-icon">
-                                    <i class="icon icon-document"></i>
-                                    <span ng-if="file.extension">.{{file.extension}}</span>
-                                </span>
-                            </span>
-                            <div>{{file.fileName}}</div>
+                            <umb-file-icon
+                                extension="{{file.extension}}"
+                                size="m">
+                            </umb-file-icon>
+                            <div class="mt2">{{file.fileName}}</div>
                         </a>
                         <div class="span6 thumbnail tc" ng-show="file.isClientSide">
-                            <span class="umb-icon-holder">
-                                <span class="file-icon">
-                                    <i class="icon icon-document"></i>
-                                    <span ng-if="file.extension">.{{file.extension}}</span>
-                                </span>
-                            </span>
-                            <div>{{file.fileName}}</div>
+                            <umb-file-icon
+                                extension="{{file.extension}}"
+                                size="m">
+                            </umb-file-icon>
+                            <div class="mt2">{{file.fileName}}</div>
                         </div>
                     </div>
                 </div>

@@ -153,9 +153,16 @@
 
         function reload() {
             $scope.page.loading = true;
-            loadContent().then(function () {
-                $scope.page.loading = false;
-            });
+
+            if ($scope.page.isNew) {
+                loadScaffold().then(function () {
+                    $scope.page.loading = false;
+                });
+            } else {
+                loadContent().then(function () {
+                    $scope.page.loading = false;
+                });
+            }
         }
 
         function bindEvents() {
@@ -222,6 +229,28 @@
 
                 });
 
+        }
+
+        /**
+        *  This loads the content scaffold for when creating new content
+        */
+        function loadScaffold() {
+            //we are creating so get an empty content item
+            return $scope.getScaffoldMethod()()
+                .then(function (data) {
+
+                    $scope.content = data;
+
+                    init();
+                    startWatches($scope.content);
+
+                    resetLastListPageNumber($scope.content);
+
+                    eventsService.emit("content.newReady", { content: $scope.content });
+
+                    return $q.resolve($scope.content);
+
+                });
         }
 
         /**
@@ -489,22 +518,9 @@
 
             $scope.page.loading = true;
 
-            //we are creating so get an empty content item
-            $scope.getScaffoldMethod()()
-                .then(function (data) {
-
-                    $scope.content = data;
-
-                    init();
-                    startWatches($scope.content);
-
-                    resetLastListPageNumber($scope.content);
-
-                    eventsService.emit("content.newReady", { content: $scope.content });
-
-                    $scope.page.loading = false;
-
-                });
+            loadScaffold().then(function () {
+                $scope.page.loading = false;
+            });
         }
         else {
 

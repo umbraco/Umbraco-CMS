@@ -138,7 +138,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -ContentStartNode -UserCount -MediaStartNode -Key -Sections
-        // Umbraco.Code.MapAll -Notifications -Udi -Trashed -AdditionalData
+        // Umbraco.Code.MapAll -Notifications -Udi -Trashed -AdditionalData -IsSystemUserGroup
         private void Map(IReadOnlyUserGroup source, UserGroupBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
@@ -147,11 +147,11 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
+            MapUserGroupBasic(target, source.Alias, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
 
         // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications
-        // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData
+        // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -IsSystemUserGroup
         private void Map(IUserGroup source, UserGroupBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
@@ -162,7 +162,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
             target.UserCount = source.UserCount;
-            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
+            MapUserGroupBasic(target, source.Alias, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
 
         // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -AssignedPermissions
@@ -198,7 +198,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications -Udi
-        // Umbraco.Code.MapAll -Trashed -AdditionalData -Users -AssignedPermissions
+        // Umbraco.Code.MapAll -Trashed -AdditionalData -Users -AssignedPermissions -IsSystemUserGroup
         private void Map(IUserGroup source, UserGroupDisplay target, MapperContext context)
         {
             target.Alias = source.Alias;
@@ -211,7 +211,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Path = "-1," + source.Id;
             target.UserCount = source.UserCount;
 
-            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
+            MapUserGroupBasic(target, source.Alias, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
 
             //Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
@@ -334,8 +334,12 @@ namespace Umbraco.Web.Models.Mapping
 
         // helpers
 
-        private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
+        private void MapUserGroupBasic(UserGroupBasic target, string alias, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
         {
+            target.IsSystemUserGroup = alias == Constants.Security.AdminGroupAlias
+                               || alias == Constants.Security.TranslatorGroupAlias
+                               || alias == Constants.Security.SensitiveDataGroupAlias;
+
             var allSections = _sectionService.GetSections();
             target.Sections = context.MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias)));
 
