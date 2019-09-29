@@ -143,22 +143,27 @@ function mediaHelper(umbRequestHelper, $log) {
          */
         resolveFileFromEntity: function (mediaEntity, thumbnail) {
 
-            if (!angular.isObject(mediaEntity.metaData) || !mediaEntity.metaData.MediaPath) {
+            var mediaPath = angular.isObject(mediaEntity.metaData) ? mediaEntity.metaData.MediaPath : null;
+
+            if (!mediaPath) {
                 //don't throw since this image legitimately might not contain a media path, but output a warning
                 $log.warn("Cannot resolve the file url from the mediaEntity, it does not contain the required metaData");
                 return null;
             }
 
             if (thumbnail) {
-                if (this.detectIfImageByExtension(mediaEntity.metaData.MediaPath)) {
-                    return this.getThumbnailFromPath(mediaEntity.metaData.MediaPath);
+                if (this.detectIfImageByExtension(mediaPath)) {
+                    return this.getThumbnailFromPath(mediaPath);
+                }
+                else if (this.getFileExtension(mediaPath) === "svg") {
+                    return this.getThumbnailFromPath(mediaPath);
                 }
                 else {
                     return null;
                 }
             }
             else {
-                return mediaEntity.metaData.MediaPath;
+                return mediaPath;
             }            
         },
 
@@ -294,7 +299,12 @@ function mediaHelper(umbRequestHelper, $log) {
          */
         getThumbnailFromPath: function (imagePath) {
 
-            //If the path is not an image we cannot get a thumb
+            // Check if file is a svg
+            if (this.getFileExtension(imagePath) === "svg") {
+                return imagePath;
+            }
+
+            // If the path is not an image we cannot get a thumb
             if (!this.detectIfImageByExtension(imagePath)) {
                 return null;
             }

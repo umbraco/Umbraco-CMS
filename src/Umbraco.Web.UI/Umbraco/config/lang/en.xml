@@ -1269,6 +1269,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
   </area>
   <area alias="mediaPicker">
+    <key alias="deletedItem">Deleted item</key>
     <key alias="pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</key>
     <key alias="trashed">Trashed</key>

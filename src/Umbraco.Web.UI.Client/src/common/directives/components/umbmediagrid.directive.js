@@ -122,17 +122,16 @@ Use this directive to generate a thumbnail grid of media items.
                     item.selectable = getSelectableState(item);
                     
                     // remove non images when onlyImages is set to true
-                    if( scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
+                    if (scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
                         scope.items.splice(i, 1);
                         i--;
                     }
-
 
                     // If subfolder search is not enabled remove the media items that's not needed
                     // Make sure that includeSubFolder is not undefined since the directive is used
                     // in contexts where it should not be used. Currently only used when we trigger
                     // a media picker
-                    if(scope.includeSubFolders !== undefined){
+                    if (scope.includeSubFolders !== undefined) {
                         if (scope.includeSubFolders !== 'true') {
                             if (item.parentId !== parseInt(scope.currentFolderId)) {
                                 scope.items.splice(i, 1);
@@ -146,13 +145,12 @@ Use this directive to generate a thumbnail grid of media items.
                 if (scope.items.length > 0) {
                     setFlexValues(scope.items);
                 }
-                
             }
 
             function setItemData(item) {
 
                 // check if item is a folder
-                if(item.image) {
+                if (item.image) {
                     // if is has an image path, it is not a folder
                     item.isFolder = false;
                 } else {
@@ -163,7 +161,7 @@ Use this directive to generate a thumbnail grid of media items.
                 if (!item.isFolder && !item.thumbnail) {
 
                     // handle entity
-                    if(item.image) {
+                    if (item.image) {
                         item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
                         item.extension = mediaHelper.getFileExtension(item.image);
                     // handle full media object
@@ -288,10 +286,8 @@ Use this directive to generate a thumbnail grid of media items.
                         "min-height": itemMinHeight + "px"
                     };
 
-                        mediaItem.flexStyle = flexStyle;
-
+                    mediaItem.flexStyle = flexStyle;
                 }
-
             }
             
             scope.clickItem = function(item, $event, $index) {
