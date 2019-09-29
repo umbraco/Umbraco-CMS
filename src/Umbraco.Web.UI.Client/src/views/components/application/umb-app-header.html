@@ -2,7 +2,7 @@
 <div>
 
     <div class="umb-app-header">
-
+            {{appState}}
         <umb-sections
             ng-if="authenticated"
             sections="sections">
@@ -21,7 +21,7 @@
                 <li data-element="global-help" class="umb-app-header__action">
                     <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+shift+h" ng-click="helpClick()">
                         <span class="sr-only">
-                            <localize key="visuallyHiddenTexts_openBackofficeHelp">Open backoffice help</localize>...
+                            <localize key="visuallyHiddenTexts_openCloseBackofficeHelp">Open/Close backoffice help</localize>...
                         </span>
                         <i class="umb-app-header__action-icon icon-help-alt" aria-hidden="true"></i>
                     </button>
@@ -29,7 +29,7 @@
                 <li data-element="global-user" class="umb-app-header__action">
                    <button type="button" class="umb-app-header__button btn-reset" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}">
                         <span class="sr-only">
-                            <localize key="visuallyHiddenTexts_openBackofficeProfileOptions">Open your profile options</localize>...
+                            <localize key="visuallyHiddenTexts_openCloseBackofficeProfileOptions">Open/Close your profile options</localize>...
                         </span>
                         <umb-avatar
                             class="umb-app-header__action-icon"
