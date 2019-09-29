@@ -8,6 +8,21 @@ namespace Umbraco.Core.Services
     public static class ContentTypeServiceExtensions
     {
         /// <summary>
+        /// Gets all of the element types (e.g. content types that have been marked as an element type).
+        /// </summary>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <returns>Returns all the element types.</returns>
+        public static IEnumerable<IContentType> GetAllElementTypes(this IContentTypeService contentTypeService)
+        {
+            if (contentTypeService == null)
+            {
+                return Enumerable.Empty<IContentType>();
+            }
+
+            return contentTypeService.GetAll().Where(x => x.IsElement);
+        }
+
+        /// <summary>
         /// Returns the available composite content types for a given content type
         /// </summary>
         /// <param name="allContentTypes"></param>
@@ -22,12 +37,14 @@ namespace Umbraco.Core.Services
         /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
         /// be looked up via the db, they need to be passed in.
         /// </param>
+        /// <param name="isElement">Wether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
         internal static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
             IContentTypeComposition source,
             IContentTypeComposition[] allContentTypes,
             string[] filterContentTypes = null,
-            string[] filterPropertyTypes = null)
+            string[] filterPropertyTypes = null,
+            bool isElement = false)
         {
             filterContentTypes = filterContentTypes == null
                 ? Array.Empty<string>()
@@ -46,7 +63,7 @@ namespace Umbraco.Core.Services
                     .Select(c => c.Alias)
                     .Union(filterPropertyTypes)
                     .ToArray();
-
+            
             var sourceId = source?.Id ?? 0;
 
             // find out if any content type uses this content type
@@ -64,8 +81,9 @@ namespace Umbraco.Core.Services
                 x => x.Id));
 
             // usable types are those that are top-level
+            // do not allow element types to be composed by non-element types as this will break the model generation in ModelsBuilder
             var usableContentTypes = allContentTypes
-                .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
+                .Where(x => x.ContentTypeComposition.Any() == false && (isElement == false || x.IsElement)).ToArray();
             foreach (var x in usableContentTypes)
                 list.Add(x);
 

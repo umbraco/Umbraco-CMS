@@ -191,17 +191,17 @@ namespace Umbraco.Tests.Runtimes
             var umbracoContext = umbracoContextReference.UmbracoContext;
 
             // assert that there is no published document
-            var pcontent = umbracoContext.ContentCache.GetById(content.Id);
+            var pcontent = umbracoContext.Content.GetById(content.Id);
             Assert.IsNull(pcontent);
 
             // but a draft document
-            pcontent = umbracoContext.ContentCache.GetById(true, content.Id);
+            pcontent = umbracoContext.Content.GetById(true, content.Id);
             Assert.IsNotNull(pcontent);
-            Assert.AreEqual("test", pcontent.Name);
+            Assert.AreEqual("test", pcontent.Name());
             Assert.IsTrue(pcontent.IsDraft());
 
             // no published url
-            Assert.AreEqual("#", pcontent.GetUrl());
+            Assert.AreEqual("#", pcontent.Url());
 
             // now publish the document + make some unpublished changes
             contentService.SaveAndPublish(content);
@@ -209,22 +209,22 @@ namespace Umbraco.Tests.Runtimes
             contentService.Save(content);
 
             // assert that snapshot has been updated and there is now a published document
-            pcontent = umbracoContext.ContentCache.GetById(content.Id);
+            pcontent = umbracoContext.Content.GetById(content.Id);
             Assert.IsNotNull(pcontent);
-            Assert.AreEqual("test", pcontent.Name);
+            Assert.AreEqual("test", pcontent.Name());
             Assert.IsFalse(pcontent.IsDraft());
 
             // but the url is the published one - no draft url
-            Assert.AreEqual("/test/", pcontent.GetUrl());
+            Assert.AreEqual("/test/", pcontent.Url());
 
             // and also an updated draft document
-            pcontent = umbracoContext.ContentCache.GetById(true, content.Id);
+            pcontent = umbracoContext.Content.GetById(true, content.Id);
             Assert.IsNotNull(pcontent);
-            Assert.AreEqual("testx", pcontent.Name);
+            Assert.AreEqual("testx", pcontent.Name());
             Assert.IsTrue(pcontent.IsDraft());
 
             // and the published document has a url
-            Assert.AreEqual("/test/", pcontent.GetUrl());
+            Assert.AreEqual("/test/", pcontent.Url());
 
             umbracoContextReference.Dispose();
             mainDom.Stop();

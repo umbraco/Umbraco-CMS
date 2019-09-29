@@ -139,6 +139,10 @@ namespace Umbraco.Core.Services.Implement
             var parent = parentId > 0 ? GetById(parentId) : null;
             if (parentId > 0 && parent == null)
                 throw new ArgumentException("No media with that id.", nameof(parentId));
+            if (name != null && name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
 
             var media = new Models.Media(name, parentId, mediaType);
             using (var scope = ScopeProvider.CreateScope())
@@ -168,6 +172,10 @@ namespace Umbraco.Core.Services.Implement
             var mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
+            if (name != null && name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
 
             var media = new Models.Media(name, -1, mediaType);
             using (var scope = ScopeProvider.CreateScope())
@@ -201,7 +209,11 @@ namespace Umbraco.Core.Services.Implement
 
                 var mediaType = GetMediaType(mediaTypeAlias);
                 if (mediaType == null)
-                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback // causes rollback
+                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
+                if (name != null && name.Length > 255)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
 
                 var media = new Models.Media(name, parent, mediaType);
                 CreateMedia(scope, media, parent, userId, false);
@@ -227,13 +239,13 @@ namespace Umbraco.Core.Services.Implement
                 // locking the media tree secures media types too
                 scope.WriteLock(Constants.Locks.MediaTree);
 
-                var mediaType = GetMediaType(mediaTypeAlias); // + locks // + locks
+                var mediaType = GetMediaType(mediaTypeAlias); // + locks
                 if (mediaType == null)
-                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback // causes rollback
+                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
 
-                var parent = parentId > 0 ? GetById(parentId) : null; // + locks // + locks
+                var parent = parentId > 0 ? GetById(parentId) : null; // + locks
                 if (parentId > 0 && parent == null)
-                    throw new ArgumentException("No media with that id.", nameof(parentId)); // causes rollback // causes rollback
+                    throw new ArgumentException("No media with that id.", nameof(parentId)); // causes rollback
 
                 var media = parentId > 0 ? new Models.Media(name, parent, mediaType) : new Models.Media(name, parentId, mediaType);
                 CreateMedia(scope, media, parent, userId, true);
@@ -261,9 +273,9 @@ namespace Umbraco.Core.Services.Implement
                 // locking the media tree secures media types too
                 scope.WriteLock(Constants.Locks.MediaTree);
 
-                var mediaType = GetMediaType(mediaTypeAlias); // + locks // + locks
+                var mediaType = GetMediaType(mediaTypeAlias); // + locks
                 if (mediaType == null)
-                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback // causes rollback
+                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
 
                 var media = new Models.Media(name, parent, mediaType);
                 CreateMedia(scope, media, parent, userId, true);
@@ -645,10 +657,13 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 // poor man's validation?
-                // poor man's validation?
-
                 if (string.IsNullOrWhiteSpace(media.Name))
                     throw new ArgumentException("Media has no name.", nameof(media));
+
+                if (media.Name != null && media.Name.Length > 255)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
 
                 scope.WriteLock(Constants.Locks.MediaTree);
                 if (media.HasIdentity == false)
@@ -762,7 +777,7 @@ namespace Umbraco.Core.Services.Implement
             const int pageSize = 500;
             var page = 0;
             var total = long.MaxValue;
-            while(page * pageSize < total)
+            while (page * pageSize < total)
             {
                 //get descendants - ordered from deepest to shallowest
                 var descendants = GetPagedDescendants(media.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
@@ -934,7 +949,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var parent = parentId == Constants.System.Root ? null : GetById(parentId);
                 if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
-                    throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback // causes rollback
+                    throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
 
                 var moveEventInfo = new MoveEventInfo<IMedia>(media, media.Path, parentId);
                 var moveEventArgs = new MoveEventArgs<IMedia>(true, evtMsgs, moveEventInfo);
@@ -947,13 +962,7 @@ namespace Umbraco.Core.Services.Implement
                 // if media was trashed, and since we're not moving to the recycle bin,
                 // indicate that the trashed status should be changed to false, else just
                 // leave it unchanged
-                // if media was trashed, and since we're not moving to the recycle bin,
-
-                // indicate that the trashed status should be changed to false, else just
-
-                // leave it unchanged
-
-                var trashed = media.Trashed ? false : (bool?) null;
+                var trashed = media.Trashed ? false : (bool?)null;
 
                 PerformMoveLocked(media, parentId, parent, userId, moves, trashed);
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch).ToEventArgs());
@@ -1017,7 +1026,7 @@ namespace Umbraco.Core.Services.Implement
 
         private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
         {
-            if (trash.HasValue) ((ContentBase) media).Trashed = trash.Value;
+            if (trash.HasValue) ((ContentBase)media).Trashed = trash.Value;
             _mediaRepository.Save(media);
         }
 
@@ -1042,17 +1051,11 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
+                // no idea what those events are for, keep a simplified version
+
                 // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
                 // each deleted items will have its own deleting/deleted events. so, files and such
                 // are managed by Delete, and not here.
-
-                // no idea what those events are for, keep a simplified version
-                // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
-                // each deleted items will have its own deleting/deleted events. so, files and such
-
-                // emptying the recycle bin means deleting whatever is in there - do it properly!
-                // are managed by Delete, and not here.
-                // no idea what those events are for, keep a simplified version
                 var args = new RecycleBinEventArgs(nodeObjectType, evtMsgs);
 
                 if (scope.Events.DispatchCancelable(EmptyingRecycleBin, this, args))
@@ -1113,11 +1116,6 @@ namespace Umbraco.Core.Services.Implement
                 {
                     // if the current sort order equals that of the media we don't
                     // need to update it, so just increment the sort order and continue.
-                    // if the current sort order equals that of the media we don't
-
-                    // else update
-                    // need to update it, so just increment the sort order and continue.
-                    // save
                     if (media.SortOrder == sortOrder)
                     {
                         sortOrder++;

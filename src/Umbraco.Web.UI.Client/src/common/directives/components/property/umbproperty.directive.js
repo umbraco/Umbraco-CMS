@@ -32,6 +32,10 @@ angular.module("umbraco.directives")
                 self.setPropertyError = function (errorMsg) {
                     $scope.property.propertyErrorMessage = errorMsg;
                 };
+
+                $scope.onCopy = function () {
+                    $scope.$broadcast("propertyCopy");
+                }
             }
         };
     });

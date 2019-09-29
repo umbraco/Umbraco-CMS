@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -12,7 +11,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Packaging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
@@ -26,13 +27,14 @@ namespace Umbraco.Core.Packaging
         private readonly ILocalizationService _localizationService;
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IScopeProvider _scopeProvider;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
 
         public PackageDataInstallation(ILogger logger, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
-            IContentService contentService, PropertyEditorCollection propertyEditors)
+            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider)
         {
             _logger = logger;
             _fileService = fileService;
@@ -40,12 +42,13 @@ namespace Umbraco.Core.Packaging
             _localizationService = localizationService;
             _dataTypeService = dataTypeService;
             _propertyEditors = propertyEditors;
+            _scopeProvider = scopeProvider;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
         }
 
-        #region Uninstall
+        #region Install/Uninstall
 
         public UninstallationSummary UninstallPackageData(PackageDefinition package, int userId)
         {
@@ -58,93 +61,97 @@ namespace Umbraco.Core.Packaging
             var removedDataTypes = new List<IDataType>();
             var removedLanguages = new List<ILanguage>();
 
-
-            //Uninstall templates
-            foreach (var item in package.Templates.ToArray())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var found = _fileService.GetTemplate(nId);
-                if (found != null)
+                //Uninstall templates
+                foreach (var item in package.Templates.ToArray())
                 {
-                    removedTemplates.Add(found);
-                    _fileService.DeleteTemplate(found.Alias, userId);
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var found = _fileService.GetTemplate(nId);
+                    if (found != null)
+                    {
+                        removedTemplates.Add(found);
+                        _fileService.DeleteTemplate(found.Alias, userId);
+                    }
+                    package.Templates.Remove(nId.ToString());
                 }
-                package.Templates.Remove(nId.ToString());
-            }
 
-            //Uninstall macros
-            foreach (var item in package.Macros.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var macro = _macroService.GetById(nId);
-                if (macro != null)
+                //Uninstall macros
+                foreach (var item in package.Macros.ToArray())
                 {
-                    removedMacros.Add(macro);
-                    _macroService.Delete(macro, userId);
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var macro = _macroService.GetById(nId);
+                    if (macro != null)
+                    {
+                        removedMacros.Add(macro);
+                        _macroService.Delete(macro, userId);
+                    }
+                    package.Macros.Remove(nId.ToString());
                 }
-                package.Macros.Remove(nId.ToString());
-            }
 
-            //Remove Document Types
-            var contentTypes = new List<IContentType>();
-            var contentTypeService = _contentTypeService;
-            foreach (var item in package.DocumentTypes.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var contentType = contentTypeService.Get(nId);
-                if (contentType == null) continue;
-                contentTypes.Add(contentType);
-                package.DocumentTypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
-            }
-
-            //Order the DocumentTypes before removing them
-            if (contentTypes.Any())
-            {
-                // TODO: I don't think this ordering is necessary
-                var orderedTypes = (from contentType in contentTypes
-                                    orderby contentType.ParentId descending, contentType.Id descending
-                                    select contentType).ToList();
-                removedContentTypes.AddRange(orderedTypes);
-                contentTypeService.Delete(orderedTypes, userId);
-            }
-
-            //Remove Dictionary items
-            foreach (var item in package.DictionaryItems.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var di = _localizationService.GetDictionaryItemById(nId);
-                if (di != null)
+                //Remove Document Types
+                var contentTypes = new List<IContentType>();
+                var contentTypeService = _contentTypeService;
+                foreach (var item in package.DocumentTypes.ToArray())
                 {
-                    removedDictionaryItems.Add(di);
-                    _localizationService.Delete(di, userId);
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var contentType = contentTypeService.Get(nId);
+                    if (contentType == null) continue;
+                    contentTypes.Add(contentType);
+                    package.DocumentTypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
                 }
-                package.DictionaryItems.Remove(nId.ToString());
-            }
 
-            //Remove Data types
-            foreach (var item in package.DataTypes.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var dtd = _dataTypeService.GetDataType(nId);
-                if (dtd != null)
+                //Order the DocumentTypes before removing them
+                if (contentTypes.Any())
                 {
-                    removedDataTypes.Add(dtd);
-                    _dataTypeService.Delete(dtd, userId);
+                    // TODO: I don't think this ordering is necessary
+                    var orderedTypes = (from contentType in contentTypes
+                                        orderby contentType.ParentId descending, contentType.Id descending
+                                        select contentType).ToList();
+                    removedContentTypes.AddRange(orderedTypes);
+                    contentTypeService.Delete(orderedTypes, userId);
                 }
-                package.DataTypes.Remove(nId.ToString());
-            }
 
-            //Remove Langs
-            foreach (var item in package.Languages.ToArray())
-            {
-                if (int.TryParse(item, out var nId) == false) continue;
-                var lang = _localizationService.GetLanguageById(nId);
-                if (lang != null)
+                //Remove Dictionary items
+                foreach (var item in package.DictionaryItems.ToArray())
                 {
-                    removedLanguages.Add(lang);
-                    _localizationService.Delete(lang, userId);
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var di = _localizationService.GetDictionaryItemById(nId);
+                    if (di != null)
+                    {
+                        removedDictionaryItems.Add(di);
+                        _localizationService.Delete(di, userId);
+                    }
+                    package.DictionaryItems.Remove(nId.ToString());
                 }
-                package.Languages.Remove(nId.ToString());
+
+                //Remove Data types
+                foreach (var item in package.DataTypes.ToArray())
+                {
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var dtd = _dataTypeService.GetDataType(nId);
+                    if (dtd != null)
+                    {
+                        removedDataTypes.Add(dtd);
+                        _dataTypeService.Delete(dtd, userId);
+                    }
+                    package.DataTypes.Remove(nId.ToString());
+                }
+
+                //Remove Langs
+                foreach (var item in package.Languages.ToArray())
+                {
+                    if (int.TryParse(item, out var nId) == false) continue;
+                    var lang = _localizationService.GetLanguageById(nId);
+                    if (lang != null)
+                    {
+                        removedLanguages.Add(lang);
+                        _localizationService.Delete(lang, userId);
+                    }
+                    package.Languages.Remove(nId.ToString());
+                }
+
+                scope.Complete();
             }
 
             // create a summary of what was actually removed, for PackagingService.UninstalledPackage
@@ -165,14 +172,40 @@ namespace Umbraco.Core.Packaging
 
         }
 
+        public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
+        {
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                var installationSummary = new InstallationSummary
+                {
+                    DataTypesInstalled = ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
+                    LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
+                    DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
+                    MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
+                    TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
+                    DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId)
+                };
+
+                //we need a reference to the imported doc types to continue
+                var importedDocTypes = installationSummary.DocumentTypesInstalled.ToDictionary(x => x.Alias, x => x);
+
+                installationSummary.StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId);
+                installationSummary.ContentInstalled = ImportContent(compiledPackage.Documents, importedDocTypes, userId);
+
+                scope.Complete();
+
+                return installationSummary;
+            }
+        }
+
         #endregion
 
         #region Content
 
 
-        public IEnumerable<IContent> ImportContent(IEnumerable<CompiledPackageDocument> docs, IDictionary<string, IContentType> importedDocumentTypes, int userId)
+        public IReadOnlyList<IContent> ImportContent(IEnumerable<CompiledPackageDocument> docs, IDictionary<string, IContentType> importedDocumentTypes, int userId)
         {
-            return docs.SelectMany(x => ImportContent(x, -1, importedDocumentTypes, userId));
+            return docs.SelectMany(x => ImportContent(x, -1, importedDocumentTypes, userId)).ToList();
         }
 
         /// <summary>
@@ -353,7 +386,7 @@ namespace Umbraco.Core.Packaging
 
         #region DocumentTypes
 
-        public IEnumerable<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
+        public IReadOnlyList<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
         {
             return ImportDocumentTypes(new[] { docTypeElement }, userId);
         }
@@ -364,7 +397,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="docTypeElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
+        public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
         {
             return ImportDocumentTypes(docTypeElements.ToList(), true, userId);
         }
@@ -376,7 +409,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="importStructure">Boolean indicating whether or not to import the </param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportDocumentTypes(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId)
+        public IReadOnlyList<IContentType> ImportDocumentTypes(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId)
         {
             var importedContentTypes = new Dictionary<string, IContentType>();
 
@@ -575,12 +608,11 @@ namespace Umbraco.Core.Packaging
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
 
-            //NOTE AllowAtRoot is a new property in the package xml so we need to verify it exists before using it.
+            //NOTE AllowAtRoot, IsListView, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
             var allowAtRoot = infoElement.Element("AllowAtRoot");
             if (allowAtRoot != null)
                 contentType.AllowedAsRoot = allowAtRoot.Value.InvariantEquals("true");
 
-            //NOTE IsListView is a new property in the package xml so we need to verify it exists before using it.
             var isListView = infoElement.Element("IsListView");
             if (isListView != null)
                 contentType.IsContainer = isListView.Value.InvariantEquals("true");
@@ -588,6 +620,10 @@ namespace Umbraco.Core.Packaging
             var isElement = infoElement.Element("IsElement");
             if (isElement != null)
                 contentType.IsElement = isElement.Value.InvariantEquals("true");
+
+            var variationsElement = infoElement.Element("Variations");
+            if (variationsElement != null)
+                contentType.Variations = (ContentVariation)Enum.Parse(typeof(ContentVariation), variationsElement.Value);
 
             //Name of the master corresponds to the parent and we need to ensure that the Parent Id is set
             var masterElement = infoElement.Element("Master");
@@ -614,7 +650,7 @@ namespace Umbraco.Core.Packaging
                         var compositionContentType = importedContentTypes.ContainsKey(compositionAlias)
                             ? importedContentTypes[compositionAlias]
                             : _contentTypeService.Get(compositionAlias);
-                        var added = contentType.AddContentType(compositionContentType);
+                        contentType.AddContentType(compositionContentType);
                     }
                 }
             }
@@ -748,9 +784,14 @@ namespace Umbraco.Core.Packaging
                 {
                     Name = property.Element("Name").Value,
                     Description = (string)property.Element("Description"),
-                    Mandatory = property.Element("Mandatory") != null ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true") : false,
+                    Mandatory = property.Element("Mandatory") != null
+                        ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true")
+                        : false,
                     ValidationRegExp = (string)property.Element("Validation"),
-                    SortOrder = sortOrder
+                    SortOrder = sortOrder,
+                    Variations = property.Element("Variations") != null
+                        ? (ContentVariation)Enum.Parse(typeof(ContentVariation), property.Element("Variations").Value)
+                        : ContentVariation.Nothing
                 };
 
                 var tab = (string)property.Element("Tab");
@@ -817,7 +858,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="dataTypeElements">Xml to import</param>
         /// <param name="userId">Optional id of the user</param>
         /// <returns>An enumerable list of generated DataTypeDefinitions</returns>
-        public IEnumerable<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId)
+        public IReadOnlyList<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId)
         {
             var dataTypes = new List<IDataType>();
 
@@ -946,13 +987,13 @@ namespace Umbraco.Core.Packaging
         /// <param name="dictionaryItemElementList">Xml to import</param>
         /// <param name="userId"></param>
         /// <returns>An enumerable list of dictionary items</returns>
-        public IEnumerable<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, int userId)
+        public IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, int userId)
         {
             var languages = _localizationService.GetAllLanguages().ToList();
             return ImportDictionaryItems(dictionaryItemElementList, languages, null, userId);
         }
 
-        private IEnumerable<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, List<ILanguage> languages, Guid? parentId, int userId)
+        private IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, List<ILanguage> languages, Guid? parentId, int userId)
         {
             var items = new List<IDictionaryItem>();
             foreach (var dictionaryItemElement in dictionaryItemElementList)
@@ -1029,7 +1070,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="languageElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <returns>An enumerable list of generated languages</returns>
-        public IEnumerable<ILanguage> ImportLanguages(IEnumerable<XElement> languageElements, int userId)
+        public IReadOnlyList<ILanguage> ImportLanguages(IEnumerable<XElement> languageElements, int userId)
         {
             var list = new List<ILanguage>();
             foreach (var languageElement in languageElements)
@@ -1058,7 +1099,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="macroElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <returns></returns>
-        public IEnumerable<IMacro> ImportMacros(IEnumerable<XElement> macroElements, int userId)
+        public IReadOnlyList<IMacro> ImportMacros(IEnumerable<XElement> macroElements, int userId)
         {
             var macros = macroElements.Select(ParseMacroElement).ToList();
 
@@ -1148,7 +1189,7 @@ namespace Umbraco.Core.Packaging
 
         #region Stylesheets
 
-        public IEnumerable<IFile> ImportStylesheets(IEnumerable<XElement> stylesheetElements, int userId)
+        public IReadOnlyList<IFile> ImportStylesheets(IEnumerable<XElement> stylesheetElements, int userId)
         {
             var result = new List<IFile>();
 
@@ -1216,7 +1257,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="templateElements">Xml to import</param>
         /// <param name="userId">Optional user id</param>
         /// <returns>An enumerable list of generated Templates</returns>
-        public IEnumerable<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
+        public IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
         {
             var templates = new List<ITemplate>();
 

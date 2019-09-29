@@ -145,7 +145,7 @@ namespace Umbraco.Web
         }
 
         #endregion
-            
+
         #region ToIndexedArray
 
         public static IndexedArrayItem<TContent>[] ToIndexedArray<TContent>(this IEnumerable<TContent> source)
@@ -185,6 +185,35 @@ namespace Umbraco.Web
             // rely on the property converter - will return default bool value, ie false, if property
             // is not defined, or has no value, else will return its value.
             return content.Value<bool>(Constants.Conventions.Content.NaviHide) == false;
+        }
+
+        #endregion
+
+        #region MediaUrl
+
+        /// <summary>
+        /// Gets the url for a media.
+        /// </summary>
+        /// <param name="content">The content item.</param>
+        /// <param name="culture">The culture (use current culture by default).</param>
+        /// <param name="mode">The url mode (use site configuration by default).</param>
+        /// <param name="propertyAlias">The alias of the property (use 'umbracoFile' by default).</param>
+        /// <returns>The url for the media.</returns>
+        /// <remarks>
+        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
+        /// if any. In addition, when the content type is multi-lingual, this is the url for the
+        /// specified culture. Otherwise, it is the invariant url.</para>
+        /// </remarks>
+        public static string MediaUrl(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default, string propertyAlias = Constants.Conventions.Media.File)
+        {
+            var umbracoContext = Composing.Current.UmbracoContext;
+
+            if (umbracoContext == null)
+                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
+            if (umbracoContext.UrlProvider == null)
+                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
+
+            return umbracoContext.UrlProvider.GetMediaUrl(content, mode, culture, propertyAlias);
         }
 
         #endregion

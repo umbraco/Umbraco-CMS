@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
@@ -23,7 +24,7 @@ namespace Umbraco.Web.ContentApps
                     {
                         Alias = "umbContent",
                         Name = "Content",
-                        Icon = "icon-document",
+                        Icon = Constants.Icons.Content,
                         View = "views/content/apps/content/content.html",
                         Weight = Weight
                     });
@@ -36,7 +37,7 @@ namespace Umbraco.Web.ContentApps
                     {
                         Alias = "umbContent",
                         Name = "Content",
-                        Icon = "icon-document",
+                        Icon = Constants.Icons.Content,
                         View = "views/media/apps/content/content.html",
                         Weight = Weight
                     });

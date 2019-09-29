@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -9,11 +8,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
     // internal, never exposed, to be accessed from ContentStore (only!)
     internal class ContentNode
     {
+        // special ctor for root pseudo node
+        public ContentNode()
+        {
+            FirstChildContentId = -1;
+            LastChildContentId = -1;
+            NextSiblingContentId = -1;
+            PreviousSiblingContentId = -1;
+        }
+
         // special ctor with no content data - for members
-        public ContentNode(int id, Guid uid, PublishedContentType contentType,
+        public ContentNode(int id, Guid uid, IPublishedContentType contentType,
             int level, string path, int sortOrder,
             int parentContentId,
             DateTime createDate, int creatorId)
+            : this()
         {
             Id = id;
             Uid = uid;
@@ -24,21 +33,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ParentContentId = parentContentId;
             CreateDate = createDate;
             CreatorId = creatorId;
-
-            ChildContentIds = new List<int>();
         }
 
-        public ContentNode(int id, Guid uid, PublishedContentType contentType,
+        public ContentNode(int id, Guid uid, IPublishedContentType contentType,
             int level, string path, int sortOrder,
             int parentContentId,
             DateTime createDate, int creatorId,
             ContentData draftData, ContentData publishedData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IVariationContextAccessor variationContextAccessor)
             : this(id, uid, level, path, sortOrder, parentContentId, createDate, creatorId)
         {
-            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor);
         }
 
         // 2-phases ctor, phase 1
@@ -53,125 +59,112 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Path = path;
             SortOrder = sortOrder;
             ParentContentId = parentContentId;
+            FirstChildContentId = -1;
+            LastChildContentId = -1;
+            NextSiblingContentId = -1;
+            PreviousSiblingContentId = -1;
             CreateDate = createDate;
             CreatorId = creatorId;
-
-            ChildContentIds = new List<int>();
         }
 
         // two-phase ctor, phase 2
-        public void SetContentTypeAndData(PublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor)
+        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
         {
             ContentType = contentType;
 
             if (draftData == null && publishedData == null)
                 throw new ArgumentException("Both draftData and publishedData cannot be null at the same time.");
 
-            if (draftData != null)
-            {
-                DraftContent = new PublishedContent(this, draftData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
-                DraftModel = DraftContent.CreateModel();
-            }
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _variationContextAccessor = variationContextAccessor;
 
-            if (publishedData != null)
-            {
-                PublishedContent = new PublishedContent(this, publishedData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
-                PublishedModel = PublishedContent.CreateModel();
-            }
+            _draftData = draftData;
+            _publishedData = publishedData;
         }
 
-        // clone parent
-        private ContentNode(ContentNode origin, IUmbracoContextAccessor umbracoContextAccessor)
+        // clone
+        public ContentNode(ContentNode origin, IPublishedContentType contentType = null)
         {
-            // everything is the same, except for the child items
-            // list which is a clone of the original list
-
             Id = origin.Id;
             Uid = origin.Uid;
-            ContentType = origin.ContentType;
+            ContentType = contentType ?? origin.ContentType;
             Level = origin.Level;
             Path = origin.Path;
             SortOrder = origin.SortOrder;
             ParentContentId = origin.ParentContentId;
+            FirstChildContentId = origin.FirstChildContentId;
+            LastChildContentId = origin.LastChildContentId;
+            NextSiblingContentId = origin.NextSiblingContentId;
+            PreviousSiblingContentId = origin.PreviousSiblingContentId;
             CreateDate = origin.CreateDate;
             CreatorId = origin.CreatorId;
 
-            var originDraft = origin.DraftContent;
-            var originPublished = origin.PublishedContent;
-
-
-            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft, umbracoContextAccessor);
-            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished, umbracoContextAccessor);
-            DraftModel = DraftContent?.CreateModel();
-            PublishedModel = PublishedContent?.CreateModel();
-
-            ChildContentIds = new List<int>(origin.ChildContentIds); // needs to be *another* list
-        }
-
-        // clone with new content type
-        public ContentNode(ContentNode origin, PublishedContentType contentType, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor)
-        {
-            Id = origin.Id;
-            Uid = origin.Uid;
-            ContentType = contentType; // change!
-            Level = origin.Level;
-            Path = origin.Path;
-            SortOrder = origin.SortOrder;
-            ParentContentId = origin.ParentContentId;
-            CreateDate = origin.CreateDate;
-            CreatorId = origin.CreatorId;
-
-            var originDraft = origin.DraftContent;
-            var originPublished = origin.PublishedContent;
-
-            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft.ContentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
-            DraftModel = DraftContent?.CreateModel();
-            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished.ContentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
-            PublishedModel = PublishedContent?.CreateModel();
-
-            ChildContentIds = origin.ChildContentIds; // can be the *same* list
+            _draftData = origin._draftData;
+            _publishedData = origin._publishedData;
+            _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
+            _variationContextAccessor = origin._variationContextAccessor;
         }
 
         // everything that is common to both draft and published versions
         // keep this as small as possible
         public readonly int Id;
         public readonly Guid Uid;
-        public PublishedContentType ContentType;
+        public IPublishedContentType ContentType;
         public readonly int Level;
         public readonly string Path;
         public readonly int SortOrder;
         public readonly int ParentContentId;
-        public List<int> ChildContentIds;
+        public int FirstChildContentId;
+        public int LastChildContentId;
+        public int NextSiblingContentId;
+        public int PreviousSiblingContentId;
         public readonly DateTime CreateDate;
         public readonly int CreatorId;
 
-        // draft and published version (either can be null, but not both)
-        // are the direct PublishedContent instances
-        public PublishedContent DraftContent;
-        public PublishedContent PublishedContent;
+        private ContentData _draftData;
+        private ContentData _publishedData;
+        private IVariationContextAccessor _variationContextAccessor;
+        private IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+
+        public bool HasPublished => _publishedData != null;
+        public bool HasPublishedCulture(string culture) => _publishedData != null && _publishedData.CultureInfos.ContainsKey(culture);
 
         // draft and published version (either can be null, but not both)
         // are models not direct PublishedContent instances
-        public IPublishedContent DraftModel;
-        public IPublishedContent PublishedModel;
+        private IPublishedContent _draftModel;
+        private IPublishedContent _publishedModel;
 
-        public ContentNode CloneParent(
-            IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor)
+        private IPublishedContent GetModel(ref IPublishedContent model, ContentData contentData)
         {
-            return new ContentNode(this, umbracoContextAccessor);
+            if (model != null) return model;
+            if (contentData == null) return null;
+
+            // create the model - we want to be fast, so no lock here: we may create
+            // more than 1 instance, but the lock below ensures we only ever return
+            // 1 unique instance - and locking is a nice explicit way to ensure this
+
+            var m = new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor).CreateModel();
+
+            // locking 'this' is not a best-practice but ContentNode is internal and
+            // we know what we do, so it is fine here and avoids allocating an object
+            lock (this)
+            {
+                return model = model ?? m;
+            }
         }
+
+        public IPublishedContent DraftModel => GetModel(ref _draftModel, _draftData);
+
+        public IPublishedContent PublishedModel => GetModel(ref _publishedModel, _publishedData);
 
         public ContentNodeKit ToKit()
-        {
-            return new ContentNodeKit
-            {
-                Node = this,
-                ContentTypeId = ContentType.Id,
+            => new ContentNodeKit
+                {
+                    Node = this,
+                    ContentTypeId = ContentType.Id,
 
-                DraftData = DraftContent?.ContentData,
-                PublishedData = PublishedContent?.ContentData
-            };
-        }
+                    DraftData = _draftData,
+                    PublishedData = _publishedData
+                };
     }
 }

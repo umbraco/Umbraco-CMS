@@ -41,6 +41,7 @@ namespace Umbraco.Core.Migrations
         public void AddPostMigration<TMigration>()
             where TMigration : IMigration
         {
+            // just adding - will be de-duplicated when executing
             PostMigrations.Add(typeof(TMigration));
         }
     }

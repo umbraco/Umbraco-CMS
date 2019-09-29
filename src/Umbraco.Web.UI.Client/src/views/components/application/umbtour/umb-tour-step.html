@@ -2,7 +2,11 @@
 
 
     <div ng-if="hideClose !== true">
-        <button class="icon-wrong umb-tour-step__close" ng-click="close()"></button>
+        <button class="icon-wrong umb-tour-step__close" ng-click="close()">
+            <span class="sr-only">
+                <localize key="general_close">Close</localize>
+            </span>
+        </button>
     </div>
 
     <div ng-transclude></div>

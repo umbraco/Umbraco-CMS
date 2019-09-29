@@ -1,0 +1,42 @@
+// Loading Animation
+// ------------------------
+
+.umb-loader {
+    background-color: @blue;
+    margin-top: 0;
+    margin-left: -100%;
+    animation-name: bounce_loadingProgressG;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    width: 100%;
+    height: 2px;
+}
+
+@keyframes bounce_loadingProgressG {
+    0% {
+        margin-left: -100%;
+    }
+
+    100% {
+        margin-left: 100%;
+    }
+}
+
+.umb-loader-wrapper {
+    position: absolute;
+    right: 0;
+    left: 0;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.umb-loader-wrapper.-top {
+    top: 0;
+    bottom: auto;
+}
+
+.umb-loader-wrapper.-bottom {
+    top: auto;
+    bottom: 0;
+}

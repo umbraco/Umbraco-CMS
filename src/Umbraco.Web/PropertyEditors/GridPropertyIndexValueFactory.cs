@@ -41,9 +41,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             var controlVal = control.Value;
 
-                            // TODO: If it's not a string, then it's a json formatted value -
-                            // we cannot really index this in a smart way since it could be 'anything'
-                            if (controlVal.Type == JTokenType.String)
+                            if (controlVal?.Type == JTokenType.String)
                             {
                                 var str = controlVal.Value<string>();
                                 str = XmlHelper.CouldItBeXml(str) ? str.StripHtml() : str;
@@ -53,14 +51,22 @@ namespace Umbraco.Web.PropertyEditors
                                 //add the row name as an individual field
                                 result.Add(new KeyValuePair<string, IEnumerable<object>>($"{property.Alias}.{rowName}", new[] { str }));
                             }
+                            else if (controlVal is JContainer jc)
+                            {
+                                foreach (var s in jc.Descendants().Where(t => t.Type == JTokenType.String))
+                                {
+                                    sb.Append(s.Value<string>());
+                                    sb.Append(" ");
+                                }
+                            }
                         }
                     }
 
+                    //First save the raw value to a raw field
+                    result.Add(new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineIndex.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
+
                     if (sb.Length > 0)
                     {
-                        //First save the raw value to a raw field
-                        result.Add(new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineIndex.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
-
                         //index the property with the combined/cleaned value
                         result.Add(new KeyValuePair<string, IEnumerable<object>>(property.Alias, new[] { sb.ToString() }));
                     }

@@ -6,12 +6,17 @@
     animation: fadeIn 0.2s;
     box-shadow: 0 10px 50px rgba(0,0,0,0.1), 0 6px 20px rgba(0,0,0,0.16);
     text-align: left;
+
+    .scoped-view{
+        display: none;
+    }
 }
 
 .umb-overlay__form {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: column;
+    height: 100%;
 }
 
 .umb-overlay .umb-overlay-header {
@@ -19,21 +24,18 @@
     margin-top: 0;
     flex-grow: 0;
     flex-shrink: 0;
-    
     padding: 20px 30px 0;
 }
-
-
 
 .umb-overlay__section-header {
     width: 100%;
     margin-top:30px;
     margin-bottom: 10px;
-    
+
     h5 {
         display: inline;
     }
-    
+
     button {
         display: inline;
         float: right;
@@ -48,6 +50,7 @@
 .umb-overlay__title {
     font-size: @fontSizeLarge;
     color: @black;
+    line-height: 20px;
     font-weight: bold;
     margin: 7px 0;
 }
@@ -63,8 +66,7 @@
     flex-shrink: 1;
     flex-basis: auto;
     position: relative;
-    
-    padding: 0px 30px;
+    padding: 0 30px;
     margin-bottom: 10px;
     max-height: calc(100vh - 170px);
     overflow-y: auto;
@@ -76,7 +78,6 @@
     flex-basis: 31px;
     padding: 10px 20px;
     margin: 0;
-
     background: @gray-10;
     border-top: 1px solid @purple-l3;
 }
@@ -113,10 +114,6 @@
     padding: 30px 30px 0;
 }
 
-.umb-overlay.umb-overlay-center .umb-overlay__form {
-    
-}
-
 .umb-overlay.umb-overlay-center .umb-overlay-drawer {
     border: none;
     background: transparent;
@@ -129,11 +126,7 @@
     max-height: 100vh;
     box-sizing: border-box;
     border-radius: @baseBorderRadius;
-    /* default:
-    &.umb-overlay--small {
-        width: 400px;
-    }
-    */
+
     &.umb-overlay--medium {
         width: 480px;
     }
@@ -233,12 +226,12 @@
 }
 
 .umb-overlay__item-details-title {
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0;
+    font-size: 15px;
 }
 
 .umb-overlay__item-details-description {
-    margin-top: 10px;
+    margin: 10px 0 0;
     font-size: 12px;
 }
 
