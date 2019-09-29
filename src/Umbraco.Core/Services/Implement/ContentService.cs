@@ -2996,6 +2996,8 @@ namespace Umbraco.Core.Services.Implement
                     {
                         defaultCulture.Name = name;
                     }
+
+                    scope.Complete();
                 }
             }
 
