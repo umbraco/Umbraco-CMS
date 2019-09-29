@@ -46,7 +46,7 @@
                     vm.onChange({ model: vm.model, value: vm.value });
                 }, 0);
             }
-        }     
+        }    
     }
 
     var component = {
@@ -58,8 +58,8 @@
             value: "@",
             name: "@",
             text: "@",
-            disabled: "=",
-            required: "=",
+            disabled: "<",
+            required: "<",
             onChange: "&?"
         }
     };

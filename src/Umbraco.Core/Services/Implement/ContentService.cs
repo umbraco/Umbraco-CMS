@@ -1284,6 +1284,9 @@ namespace Umbraco.Core.Services.Implement
                 {
                     if (isNew == false && previouslyPublished == false)
                         changeType = TreeChangeTypes.RefreshBranch; // whole branch
+                    else if (isNew == false && previouslyPublished)
+                        changeType = TreeChangeTypes.RefreshNode; // single node
+                    
 
                     // invalidate the node/branch
                     if (!branchOne) // for branches, handled by SaveAndPublishBranch
@@ -2591,7 +2594,7 @@ namespace Umbraco.Core.Services.Implement
             var variesByCulture = content.ContentType.VariesByCulture();
 
             var impactsToPublish = culturesPublishing == null
-                ? new[] {CultureImpact.Invariant} //if it's null it's invariant
+                ? new[] { CultureImpact.Invariant } //if it's null it's invariant
                 : culturesPublishing.Select(x => CultureImpact.Explicit(x, allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory))).ToArray();
 
             // publish the culture(s)
@@ -3001,7 +3004,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 foreach (var property in blueprint.Properties)
                 {
-					var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
+                    var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
                     content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
                 }
 

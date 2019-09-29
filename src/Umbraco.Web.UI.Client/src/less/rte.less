@@ -9,11 +9,19 @@
 
 .umb-rte .mce-tinymce {
     box-shadow: none;
-    
 }
 
-.umb-rte .umb-rte-editor{
+.umb-rte .umb-rte-editor-con {
+    height: 24px;
+    visibility: hidden;
+}
+.umb-rte .umb-rte-editor {
     min-height: 100px;
+}
+.umb-rte.--initialized .umb-rte-editor-con {
+    height:auto;
+    min-height: 100px;
+    visibility: visible;
 }
 
 .umb-rte .mce-content-body {
@@ -48,14 +56,15 @@
 }
 */
 
-.mce-ico {
+.umb-rte .mce-ico {
+    text-align: center;
     font-size: 12px !important;
     /*color: @gray-1 !important;*/
 }
 
 /* Special case to support helviticons for the tiny mce button controls */
-.mce-ico.mce-i-custom[class^="icon-"],
-.mce-ico.mce-i-custom[class*=" icon-"] {
+.umb-rte .mce-ico.mce-i-custom[class^="icon-"],
+.umb-rte .mce-ico.mce-i-custom[class*=" icon-"] {
     font-family: icomoon;
     font-size: 16px !important;
 }
@@ -73,6 +82,84 @@
     }
 }
 
-.mce-fullscreen {
+.umb-rte .mce-fullscreen {
     position:absolute;
+}
+
+.umb-rte .mce-toolbar .mce-btn-group {
+    padding: 0;
+}
+
+.umb-rte .mce-btn {
+    color: @ui-action-type;
+    border-radius: 3px;
+}
+
+.umb-rte .mce-btn-group .mce-btn {
+    margin-top:2px;
+    margin-bottom:2px;
+}
+
+.umb-rte .mce-btn {
+    button:hover {
+        .mce-caret {
+            border-top-color: @ui-action-type-hover;
+        }
+    }
+}
+
+.umb-rte .mce-btn:hover, .umb-rte .mce-btn:active {
+    background: @ui-action-hover;
+    border-color: transparent;
+    button {
+        color: @ui-action-type-hover;
+        .mce-ico {
+            color: @ui-action-type-hover;
+        }
+    }
+}
+
+.umb-rte .mce-btn.mce-active, .umb-rte .mce-btn.mce-active:active, 
+.umb-rte .mce-btn.mce-active:hover, .umb-rte .mce-btn.mce-active:focus {
+    background: @gray-9;
+    border-color: transparent;
+    button {
+        color: @ui-action-type-hover;
+        .mce-ico {
+            color: @ui-action-type-hover;
+        }
+        .mce-caret {
+            border-top-color: @ui-action-type-hover;
+        }
+    }
+}
+
+
+.mce-menu {
+    border-radius: 3px;
+}
+
+.mce-menu-item.mce-menu-item-normal.mce-stack-layout-item {
+    .mce-text, .mce-ico {
+        color: @ui-action-type;
+    }
+    &:hover {
+        background: @ui-action-hover;
+        .mce-text, .mce-ico {
+            color: @ui-action-type-hover;
+        }
+    }
+}
+
+.mce-menu-item.mce-menu-item-normal.mce-stack-layout-item.mce-active {
+    &, &:hover {
+        background: @gray-9;
+    }
+    .mce-text, .mce-ico {
+        color: @ui-action-type-hover;
+    }
+}
+
+.umb-grid .umb-rte {
+    border: 1px solid #d8d7d9;
 }
