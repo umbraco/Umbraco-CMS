@@ -1623,6 +1623,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="goBack">Gå tilbage</key>
     <key alias="activeListLayout">Aktivt layout:</key>
     <key alias="jumpTo">Gå til</key>
-    <key alias="group">gruppe</key>    
+    <key alias="group">gruppe</key>
+    <key alias="passed">bestået</key>
+    <key alias="warning">advarsel</key>
+    <key alias="failed">fejlet</key>
+    <key alias="suggestion">forslag</key>
+    <key alias="checkPassed">Test bestået</key>
+    <key alias="checkFailed">Test fejlet</key>
   </area>
 </language>

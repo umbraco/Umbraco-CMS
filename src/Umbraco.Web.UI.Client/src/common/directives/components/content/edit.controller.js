@@ -4,7 +4,7 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, overlayService, $location) {
+        editorState, $http, eventsService, overlayService, $location, localStorageService) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -188,6 +188,13 @@
             evts.push(eventsService.on("rte.file.uploaded", function(){
                 $scope.page.saveButtonState = "success";
                 $scope.page.buttonGroupState = "success";
+            }));
+
+            evts.push(eventsService.on("content.saved", function(){
+                // Clear out localstorage keys that start with tinymce__
+                // When we save/perist a content node
+                // NOTE: clearAll supports a RegEx pattern of items to remove
+                localStorageService.clearAll(/^tinymce__/);
             }));
         }
 
