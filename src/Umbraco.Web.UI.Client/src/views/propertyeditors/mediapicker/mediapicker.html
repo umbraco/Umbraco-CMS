@@ -29,16 +29,11 @@
                      alt="{{media.name}}" />
 
                 <!-- FILE -->
-                <div ng-class="{'trashed': media.trashed}"
-                     ng-attr-title="{{media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + media.name : media.name}}"
-                     ng-hide="media.thumbnail"
-                     class="umb-icon-holder">
-                    <span class="file-icon">
-                        <i class="icon {{media.icon}}"></i>
-                        <span ng-if="media.extension">.{{media.extension}}</span>
-                    </span>
-                    <small>{{media.name}}</small>
-                </div>
+                <umb-file-icon ng-hide="media.thumbnail" ng-class="{'trashed': media.trashed}"
+                               extension="{{media.extension}}"
+                               size="s"
+                               text="{{media.name}}">
+                </umb-file-icon>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
                     <a ng-if="allowEditMedia" class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="vm.editItem(media)">
