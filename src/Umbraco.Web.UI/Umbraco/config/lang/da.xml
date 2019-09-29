@@ -37,6 +37,7 @@
     <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
     <key alias="wasMovedTo">blev flyttet til</key>
     <key alias="wasCopiedTo">blev kopieret til</key>
+    <key alias="wasDeleted">blev slettet</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -145,6 +146,7 @@
     <key alias="deleteTag">Slet tag</key>
     <key alias="confirmActionCancel">Fortryd</key>
     <key alias="confirmActionConfirm">Bekræft</key>
+	<key alias="morePublishingOptions">Flere publiseringsmuligheder</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
@@ -308,6 +310,7 @@
     <key alias="copyFailed">Kopiering af mediet fejlede</key>
     <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
     <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Træk og slip dine filer ind i dropzonen</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -429,14 +432,17 @@
     <key alias="linkToMedia">Link til medie</key>
     <key alias="selectContentStartNode">Vælg indhold startnode</key>
     <key alias="selectMedia">Vælg medie</key>
+    <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
     <key alias="selectItem">Vælg item</key>
     <key alias="selectLink">Vælg link</key>
     <key alias="selectMacro">Vælg makro</key>
     <key alias="selectContent">Vælg indhold</key>
+    <key alias="selectContentType">Vælg indholdstype</key>
     <key alias="selectMediaStartNode">Vælg medie startnode</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
+    <key alias="selectMemberType">Vælg medlemstype</key>
     <key alias="selectNode">Vælg node</key>
     <key alias="selectSections">Vælg sektioner</key>
     <key alias="selectUsers">Vælg brugere</key>
@@ -561,6 +567,7 @@
     <key alias="stylesNoStylesOnPage">Der er ingen aktive styles eller formatteringer på denne side</key>
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
+    <key alias="propertyHasErrors">Denne egenskab er ugyldig</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -580,6 +587,7 @@
     <key alias="closewindow">Luk vindue</key>
     <key alias="comment">Kommentar</key>
     <key alias="confirm">Bekræft</key>
+    <key alias="constrain">Proportioner</key>
     <key alias="constrainProportions">Behold proportioner</key>
     <key alias="content">Indhold</key>
     <key alias="continue">Fortsæt</key>
@@ -1003,8 +1011,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
   </area>
   <area alias="mediaPicker">
+    <key alias="deletedItem">Slettet medie</key>
     <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
+    <key alias="trashed">Slettet</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
@@ -1278,17 +1288,17 @@ Mange hilsner fra Umbraco robotten
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompositioner</key>
     <key alias="group">Gruppe</key>
-    <key alias="noGroups">Du har ikke tilføjet nogle grupper</key>
+    <key alias="noGroups">Du har ikke tilføjet nogen grupper</key>
     <key alias="addGroup">Tilføj gruppe</key>
     <key alias="inheritedFrom">Nedarvet fra</key>
     <key alias="addProperty">Tilføj egenskab</key>
     <key alias="requiredLabel">Påkrævet label</key>
-    <key alias="enableListViewHeading">Aktiver listevisning</key>
-    <key alias="enableListViewDescription">Konfigurer indholdet til at blive vist i en sorterbar og søgbar liste, dens børn vil ikke blive vist i træet</key>
+    <key alias="enableListViewHeading">Aktivér listevisning</key>
+    <key alias="enableListViewDescription">Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste; undersider vil ikke blive vist i træet</key>
     <key alias="allowedTemplatesHeading">Tilladte skabeloner</key>
     <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner der er tilladt at bruge på dette indhold</key>
     <key alias="allowAsRootHeading">Tillad på rodniveau</key>
-    <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret oprettes i rodniveau under inhold og mediearkiv</key>
+    <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under indhold og mediearkiv</key>
     <key alias="childNodesHeading">Tilladte typer</key>
     <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne</key>
     <key alias="chooseChildNode">Vælg child node</key>
@@ -1325,20 +1335,20 @@ Mange hilsner fra Umbraco robotten
     <key alias="addLanguage">Tilføj sprog</key>
     <key alias="mandatoryLanguage">Påkrævet sprog</key>
     <key alias="mandatoryLanguageHelp">Egenskaber på dette sprog skal være udfyldt før noden kan blive udgivet.</key>
-    <key alias="defaultLanguage">Standard sprog</key>
-    <key alias="defaultLanguageHelp">Et Umbraco site kan kun have et standard sprog.</key>
-    <key alias="changingDefaultLanguageWarning">Ved at skifte standardsprog kan resultere i standard indhold mangler.</key>
-    <key alias="fallsbackToLabel">Fallsback til</key>
-    <key alias="noFallbackLanguageOption">Ingen fallback sprog</key>
-    <key alias="fallbackLanguageDescription">For at tillade flersproget indhold til at falde tilbage på et andet sprog, hvis det ikke er tilgængelig i det anmodet sprog, vælg det her.</key>
-    <key alias="fallbackLanguage">Fallback sprog</key>
+    <key alias="defaultLanguage">Standardsprog</key>
+    <key alias="defaultLanguageHelp">Et Umbraco-site kan kun have ét standardsprog.</key>
+    <key alias="changingDefaultLanguageWarning">At skifte standardsprog kan resultere i at standardindhold mangler.</key>
+    <key alias="fallsbackToLabel">Fallback til</key>
+    <key alias="noFallbackLanguageOption">Intet fallback-sprog</key>
+    <key alias="fallbackLanguageDescription">For at tillade flersproget indhold, som ikke er tilgængeligt i det anmodede sprog, skal du her vælge et sprog at falde tilbage på.</key>
+    <key alias="fallbackLanguage">Fallback-sprog</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Tilføj parameter</key>
-    <key alias="editParameter">Rediger parameter</key>
+    <key alias="editParameter">Redigér parameter</key>
     <key alias="enterMacroName">Indtast makronavn</key>
     <key alias="parameters">Parametre</key>
-    <key alias="parametersDescription">Definer de parametre, der skal være tilgængelige, når du bruger denne makro.</key>
+    <key alias="parametersDescription">Definér de parametre der skal være tilgængelige, når du bruger denne makro.</key>
     <key alias="selectViewFile">Vælg partial view makrofil</key>
   </area>
   <area alias="templateEditor">
@@ -1605,7 +1615,20 @@ Mange hilsner fra Umbraco robotten
     <key alias="settingsPublishedStatus">Published Cache</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Kom godt i gang</key>
     <key alias="formsInstall">Installer Umbraco Forms</key>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Gå tilbage</key>
+    <key alias="activeListLayout">Aktivt layout:</key>
+    <key alias="jumpTo">Gå til</key>
+    <key alias="group">gruppe</key>
+    <key alias="passed">bestået</key>
+    <key alias="warning">advarsel</key>
+    <key alias="failed">fejlet</key>
+    <key alias="suggestion">forslag</key>
+    <key alias="checkPassed">Test bestået</key>
+    <key alias="checkFailed">Test fejlet</key>
   </area>
 </language>

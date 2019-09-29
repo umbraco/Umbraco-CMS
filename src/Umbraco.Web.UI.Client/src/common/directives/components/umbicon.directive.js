@@ -30,29 +30,29 @@ This format is only used in the iconpicker.html
  **/
 
 (function () {
-    'use strict';
+    "use strict";
 
     function UmbIconDirective($http, $sce, iconHelper) {
 
         var directive = {
             replace: true,
             transclude: true,
-            templateUrl: 'views/components/umb-icon.html',
+            templateUrl: "views/components/umb-icon.html",
             scope: {
-                iconName: '@',
-                svgString: '=?',
+                iconName: "@",
+                svgString: "=?"
             },
 
             link: function (scope) {
                 if (scope.svgString === undefined) {
-                    var iconName = scope.iconName.split(' ')[0]; // Ensure that only the first part of the iconName is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
+                    var iconName = scope.iconName.split(" ")[0]; // Ensure that only the first part of the iconName is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
 
                     _requestIcon(iconName);
                 }
-                scope.$watch('iconName', function (newValue, oldValue) {
+                scope.$watch("iconName", function (newValue, oldValue) {
                     if (newValue && oldValue) {
-                        var newIconName = newValue.split(' ')[0];
-                        var oldIconName = oldValue.split(' ')[0];
+                        var newIconName = newValue.split(" ")[0];
+                        var oldIconName = oldValue.split(" ")[0];
 
                         if (newIconName !== oldIconName) {
                             _requestIcon(newIconName);
@@ -75,6 +75,6 @@ This format is only used in the iconpicker.html
         return directive;
     }
 
-    angular.module('umbraco.directives').directive('umbIcon', UmbIconDirective);
+    angular.module("umbraco.directives").directive("umbIcon", UmbIconDirective);
 
 })();

@@ -18,7 +18,8 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<AuditItem, LogDto>(nameof(AuditItem.Id), nameof(LogDto.NodeId));
             DefineMap<AuditItem, LogDto>(nameof(AuditItem.CreateDate), nameof(LogDto.Datestamp));
             DefineMap<AuditItem, LogDto>(nameof(AuditItem.UserId), nameof(LogDto.UserId));
-            DefineMap<AuditItem, LogDto>(nameof(AuditItem.AuditType), nameof(LogDto.Header));
+            // we cannot map that one - because AuditType is an enum but Header is a string
+            //DefineMap<AuditItem, LogDto>(nameof(AuditItem.AuditType), nameof(LogDto.Header));
             DefineMap<AuditItem, LogDto>(nameof(AuditItem.Comment), nameof(LogDto.Comment));
         }
     }

@@ -1,9 +1,11 @@
-<div ng-controller="Umbraco.PropertyEditors.Grid.RichTextEditorController as vm">
+<div ng-controller="Umbraco.PropertyEditors.Grid.RichTextEditorController as vm" class="umb-rte">
 
 	<grid-rte
 		configuration="model.config.rte"
 		value="control.value"
-		unique-id="control.$uniqueId">
+		unique-id="control.$uniqueId"
+        datatype-key="{{model.dataTypeKey}}"
+        ignore-user-start-nodes="{{model.config.ignoreUserStartNodes}}">
 	</grid-rte>
 
 </div>

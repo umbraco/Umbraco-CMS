@@ -5,6 +5,9 @@ var gulp = require('gulp');
 var runSequence = require('run-sequence');
 
 // Dev - build the files ready for development and start watchers
-gulp.task('dev', function(cb) {
+gulp.task('dev', function (cb) {
+
+    global.isProd = false;
+
     runSequence(["dependencies", "js", "less", "views"], "watch", cb);
 });

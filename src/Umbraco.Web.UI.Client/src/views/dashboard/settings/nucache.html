@@ -4,13 +4,13 @@
         <umb-load-indicator></umb-load-indicator>
     </div>
 
-    <p style="min-height: 120px; background: #f8f8f8; padding: 10px; margin-bottom: 4px;">
+    <p>
         <span ng-show="vm.working">(wait)</span>
         <span ng-show="!vm.working">{{vm.status}}</span>
     </p>
 
     <div>
-        <button type="button" ng-click="vm.verify($event)" class="btn btn-warning">Refresh status</button>
+        <button type="button" ng-click="vm.verify($event)" class="btn btn-danger">Refresh status</button>
     </div>
 
     <h4 class="mt4">Memory Cache</h4>
@@ -24,7 +24,7 @@
     </p>
 
     <div>
-        <button type="button" ng-click="vm.reload($event)" class="btn btn-warning">Reload</button>
+        <button type="button" ng-click="vm.reload($event)" class="btn btn-danger">Reload</button>
     </div>
 
     <h4 class="mt4">Database Cache</h4>
@@ -37,7 +37,7 @@
     </p>
 
     <div>
-        <button type="button" ng-click="vm.rebuild($event)" class="btn btn-warning">Rebuild</button>
+        <button type="button" ng-click="vm.rebuild($event)" class="btn btn-danger">Rebuild</button>
     </div>
 
     <h4 class="mt4">Internals</h4>
@@ -48,7 +48,7 @@
     </p>
 
     <div>
-        <button type="button" ng-click="vm.collect($event)" class="btn btn-warning">Collect</button>
+        <button type="button" ng-click="vm.collect($event)" class="btn btn-danger">Collect</button>
     </div>
 
 </div>
