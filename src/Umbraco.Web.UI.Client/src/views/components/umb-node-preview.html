@@ -31,10 +31,9 @@
             title="Edit {{name}}"
             ng-if="allowEdit && !editUrl"
             ng-click="onEdit()"
-            aria-haspopup="dialog"
         >
             <localize key="general_edit">Edit</localize>
-            <span class="sr-only">{{name}}</span>
+            <span class="sr-only">{{name}}...</span>
         </button>
 
         <!-- If openUrl has a value we render a link otherwise a button-->
@@ -55,10 +54,9 @@
             title="Open {{name}}"
             ng-if="allowOpen && !openUrl"
             ng-click="onOpen()"
-            aria-haspopup="dialog"
         >
             <localize key="general_open">Open</localize>
-            <span class="sr-only">{{name}}</span>
+            <span class="sr-only">{{name}}...</span>
         </button>
 
         <!-- If removeUrl has a value we render a link otherwise a button-->

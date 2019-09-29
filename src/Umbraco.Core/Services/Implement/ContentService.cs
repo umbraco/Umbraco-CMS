@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -12,7 +11,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
 
@@ -1286,6 +1284,9 @@ namespace Umbraco.Core.Services.Implement
                 {
                     if (isNew == false && previouslyPublished == false)
                         changeType = TreeChangeTypes.RefreshBranch; // whole branch
+                    else if (isNew == false && previouslyPublished)
+                        changeType = TreeChangeTypes.RefreshNode; // single node
+                    
 
                     // invalidate the node/branch
                     if (!branchOne) // for branches, handled by SaveAndPublishBranch
@@ -2593,7 +2594,7 @@ namespace Umbraco.Core.Services.Implement
             var variesByCulture = content.ContentType.VariesByCulture();
 
             var impactsToPublish = culturesPublishing == null
-                ? new[] {CultureImpact.Invariant} //if it's null it's invariant
+                ? new[] { CultureImpact.Invariant } //if it's null it's invariant
                 : culturesPublishing.Select(x => CultureImpact.Explicit(x, allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory))).ToArray();
 
             // publish the culture(s)
@@ -2985,13 +2986,27 @@ namespace Umbraco.Core.Services.Implement
             content.CreatorId = userId;
             content.WriterId = userId;
 
+            IEnumerable<string> cultures = ArrayOfOneNullString;
+            if (blueprint.CultureInfos.Count > 0)
+            {
+                cultures = blueprint.CultureInfos.Values.Select(x => x.Culture);
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    if (blueprint.CultureInfos.TryGetValue(_languageRepository.GetDefaultIsoCode(), out var defaultCulture))
+                    {
+                        defaultCulture.Name = name;
+                    }
+
+                    scope.Complete();
+                }
+            }
+
             var now = DateTime.Now;
-            var cultures = blueprint.CultureInfos.Count > 0 ? blueprint.CultureInfos.Values.Select(x => x.Culture) : ArrayOfOneNullString;
             foreach (var culture in cultures)
             {
                 foreach (var property in blueprint.Properties)
                 {
-					var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
+                    var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
                     content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
                 }
 

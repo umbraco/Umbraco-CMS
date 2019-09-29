@@ -70,6 +70,7 @@
                 view: "views/languages/overlays/delete.html",
                 language: language,
                 submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                submitButtonStyle: "danger",
                 submit: function (model) {
                     performDelete(model.language);
                     overlayService.close();

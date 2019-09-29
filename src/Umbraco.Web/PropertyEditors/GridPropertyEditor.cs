@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -76,6 +77,10 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
+                var config = editorValue.DataTypeConfiguration as GridConfiguration;
+                var mediaParent = config?.MediaParentId;
+                var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+
                 // editorValue.Value is a JSON string of the grid
                 var rawJson = editorValue.Value.ToString();
                 var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
@@ -89,10 +94,9 @@ namespace Umbraco.Web.PropertyEditors
                     // Parse the HTML
                     var html = rte.Value?.ToString();
 
-                    var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? -1;
+                    var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
 
-                    // TODO: In future task(get the parent folder from this config) to save the media into
-                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                     rte.Value = parsedHtml;
                 }
 

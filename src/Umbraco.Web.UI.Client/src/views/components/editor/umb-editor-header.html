@@ -46,7 +46,7 @@
                                         ng-if="!hideAlias"
                                         alias="$parent.alias"
                                         alias-from="$parent.name"
-                                        enable-lock="true"
+                                        enable-lock="aliasLocked !== true"
                                         validation-position="'right'"
                                         server-validation-field="Alias">
                     </umb-generate-alias>
