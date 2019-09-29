@@ -12,6 +12,7 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
     var id = infiniteMode ? $scope.model.id : $routeParams.id;
     var create = infiniteMode ? $scope.model.create : $routeParams.create;
     var listName = infiniteMode ? $scope.model.listname : $routeParams.listName;
+    var docType = infiniteMode ? $scope.model.doctype : $routeParams.doctype;
 
     //setup scope vars
     $scope.page = {};
@@ -32,10 +33,10 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
         //if there is no doc type specified then we are going to assume that
         // we are not using the umbraco membership provider
-        if (doctype) {
+        if (docType) {
 
             //we are creating so get an empty member item
-            memberResource.getScaffold(doctype)
+            memberResource.getScaffold(docType)
                 .then(function(data) {
 
                     $scope.content = data;
