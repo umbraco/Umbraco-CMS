@@ -70,18 +70,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ValidateVariationTests()
         {
-            void Assert4A(ContentVariation v, string c, string s, bool xx)
-            {
-                Assert4B(v, c, s, xx, xx, xx, xx);
-            }
-
-            void Assert4B(ContentVariation v, string c, string s, bool ew, bool nn, bool en, bool nw)
-            {
-                Assert.AreEqual(ew, v.ValidateVariation(c, s, true, true, false));
-                Assert.AreEqual(nn, v.ValidateVariation(c, s, false, false, false));
-                Assert.AreEqual(en, v.ValidateVariation(c, s, true, false, false));
-                Assert.AreEqual(nw, v.ValidateVariation(c, s, false, true, false));
-            }
 
             // All tests:
             // 1. if exact is set to true: culture cannot be null when the ContentVariation.Culture flag is set
@@ -172,6 +160,19 @@ namespace Umbraco.Tests.Models
             Assert4B(ContentVariation.CultureAndSegment, "culture", "segment", true, true, true, true);
 
             #endregion
+        }
+
+        private static void Assert4B(ContentVariation v, string culture, string segment, bool ew, bool nn, bool en, bool nw)
+        {
+            Assert.AreEqual(ew, v.ValidateVariation(culture, segment, true, true, false));
+            Assert.AreEqual(nn, v.ValidateVariation(culture, segment, false, false, false));
+            Assert.AreEqual(en, v.ValidateVariation(culture, segment, true, false, false));
+            Assert.AreEqual(nw, v.ValidateVariation(culture, segment, false, true, false));
+        }
+
+        private static void Assert4A(ContentVariation v, string culture, string segment, bool xx)
+        {
+            Assert4B(v, culture, segment, xx, xx, xx, xx);
         }
 
         [Test]
