@@ -164,14 +164,14 @@
         }
 
         function openUserPicker() {
-            var oldSelection = angular.copy(vm.userGroup.users);
+            var currentSelection = [];
+            angular.copy(vm.userGroup.users, currentSelection);
             var userPicker = {
-                selection: vm.userGroup.users,
+                selection: currentSelection,
                 submit: function () {
                     editorService.close();
                 },
                 close: function () {
-                    vm.userGroup.users = oldSelection;
                     editorService.close();
                 }
             };
