@@ -1299,9 +1299,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowedTemplatesHeading">Tilladte skabeloner</key>
     <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner, der er tilladt at bruge på dette indhold.</key>
     <key alias="allowAsRootHeading">Tillad på rodniveau</key>
-    <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under indhold og mediearkiv</key>
+    <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under indhold og mediearkiv.</key>
     <key alias="childNodesHeading">Tilladte typer</key>
-    <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne</key>
+    <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne.</key>
     <key alias="chooseChildNode">Vælg child node</key>
     <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.</key>
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
@@ -1328,7 +1328,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
-    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet</key>
+    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.</key>
     <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>
     <key alias="propertyHasChanges">Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?</key>
   </area>
