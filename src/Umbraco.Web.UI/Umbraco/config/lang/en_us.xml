@@ -1339,6 +1339,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
     </area>
     <area alias="mediaPicker">
+    <key alias="deletedItem">Deleted item</key>
         <key alias="pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</key>
         <key alias="pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</key>
         <key alias="trashed">Trashed</key>
@@ -1651,9 +1652,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="allowedTemplatesHeading">Allowed Templates</key>
         <key alias="allowedTemplatesDescription">Choose which templates editors are allowed to use on content of this type</key>
         <key alias="allowAsRootHeading">Allow as root</key>
-        <key alias="allowAsRootDescription">Allow editors to create content of this type in the root of the content tree</key>
+    <key alias="allowAsRootDescription">Allow editors to create content of this type in the root of the content tree.</key>
         <key alias="childNodesHeading">Allowed child node types</key>
-        <key alias="childNodesDescription">Allow content of the specified types to be created underneath content of this type</key>
+    <key alias="childNodesDescription">Allow content of the specified types to be created underneath content of this type.</key>
         <key alias="chooseChildNode">Choose child node</key>
         <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
         <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
@@ -1687,11 +1688,11 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="compositionUsageHeading">Where is this composition used?</key>
         <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
         <key alias="variantsHeading">Allow varying by culture</key>
-        <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
+    <key alias="variantsDescription">Allow editors to create content of this type in different languages.</key>
         <key alias="allowVaryByCulture">Allow varying by culture</key>
         <key alias="elementType">Element type</key>
         <key alias="elementHeading">Is an Element type</key>
-        <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
+    <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree.</key>
         <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
     </area>
@@ -2228,6 +2229,15 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="goBack">Go back</key>
     <key alias="activeListLayout">Active layout:</key>
     <key alias="jumpTo">Jump to</key>
-    <key alias="group">group</key>    
+    <key alias="group">group</key>
+    <key alias="passed">passed</key>
+    <key alias="warning">warning</key>
+    <key alias="failed">failed</key>
+    <key alias="suggestion">suggestion</key>
+    <key alias="checkPassed">Check passed</key>
+    <key alias="checkFailed">Check failed</key>
+    <key alias="openBackofficeSearch">Open backoffice search</key>
+    <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
+    <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
   </area>
 </language>

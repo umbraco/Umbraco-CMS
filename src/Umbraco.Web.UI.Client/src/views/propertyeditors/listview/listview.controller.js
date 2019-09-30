@@ -383,6 +383,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
+            submitButtonStyle: "danger",
             submit: function (model) {
                 performDelete();
                 overlayService.close();

@@ -801,8 +801,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 using (_contentStore.GetScopedWriteLock(_scopeProvider))
                 using (_mediaStore.GetScopedWriteLock(_scopeProvider))
                 {
-                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
-                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
                 }
             }
 
@@ -1686,6 +1686,13 @@ AND cmsContentNu.nodeId IS NULL
             var mediaCollect = _mediaStore.CollectAsync();
             System.Threading.Tasks.Task.WaitAll(contentCollect, mediaCollect);
         }
+
+        #endregion
+
+        #region Internals/Testing
+
+        internal ContentStore GetContentStore() => _contentStore;
+        internal ContentStore GetMediaStore() => _mediaStore;
 
         #endregion
     }

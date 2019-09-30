@@ -29,14 +29,9 @@
                             <umb-dropdown class="pull-right" ng-if="vm.page.showLevelFilter" on-close="vm.page.showLevelFilter = false;">
                                 <umb-dropdown-item ng-repeat="level in vm.logLevels" style="padding: 8px 20px 8px 16px;">
                                     <div class="flex items-center">
-                                        <input
-                                            id="loglevel-{{$index}}"
-                                            type="checkbox"
-                                            ng-model="level.selected"
-                                            ng-change="vm.setLogLevelFilter(level)"
-                                            style="margin-right: 10px; margin-top: -3px;" />
+                                        <umb-checkbox input-id="loglevel-{{$index}}" name="loglevel" model="level.selected" on-change="vm.setLogLevelFilter(level)" />
                                         <label for="loglevel-{{$index}}">
-                                            <umb-badge size="s" color="{{ level.logTypeColor }}">{{ level.name }}</umb-badge>
+                                            <umb-badge size="s" color="{{level.logTypeColor}}">{{level.name}}</umb-badge>
                                         </label>
                                     </div>
                                 </umb-dropdown-item>
@@ -87,9 +82,9 @@
                 </umb-editor-sub-header>
             </form>
 
-            <div class=" ng-if="!vm.loading">
+            <div ng-if="!vm.loading">
 
-                <div class="">
+                <div>
 
                     <!-- Loader for the main logs content when paging -->
                     <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>

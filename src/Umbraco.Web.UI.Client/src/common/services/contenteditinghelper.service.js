@@ -80,17 +80,19 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
                         formHelper.resetForm({ scope: args.scope });
 
-                        self.handleSuccessfulSave({
-                            scope: args.scope,
-                            savedContent: data,
-                            softRedirect: args.softRedirect,
-                            rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, data]);
-                            }
-                        });
+                        if (!args.infiniteMode) {
+                            self.handleSuccessfulSave({
+                                scope: args.scope,
+                                savedContent: data,
+                                softRedirect: args.softRedirect,
+                                rebindCallback: function () {
+                                    rebindCallback.apply(self, [args.content, data]);
+                                }
+                            });
 
-                        //update editor state to what is current
-                        editorState.set(args.content);
+                            //update editor state to what is current
+                            editorState.set(args.content);
+                        }
 
                         return $q.resolve(data);
 

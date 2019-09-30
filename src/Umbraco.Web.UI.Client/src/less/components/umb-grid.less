@@ -637,8 +637,7 @@
 }
 
 .umb-grid .mce-toolbar {
-    border-bottom: 1px solid @gray-8;
-    background-color: rgba(250, 250, 250, 1);
+    border-bottom: 1px solid @gray-7;
     display: none;
 }
 
@@ -652,6 +651,13 @@
 
 .umb-grid .mceContentBody {
     overflow-y: hidden!important;
+}
+
+// had to overwrite defaults from TinyMCE, needed for buttons panel to float to new line in narrow space.
+.umb-grid .mce-container > div {
+    white-space: normal;
+    left:0;
+    right:0;
 }
 
 
