@@ -63,6 +63,19 @@
   <PropertyGroup Condition="Exists('$(VSWherePath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
     <WebPublishingTasks>$(VSWherePath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
+  
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="Exists('$(VSWherePath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(VSWherePath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  
+  <!-- Temporary addition for the VS2019 preview - can be removed when VS2019 final is released, then v16 above will be used -->
+  <PropertyGroup Condition="Exists('$(ProgramFiles32)\Microsoft Visual Studio\2019\Preview\MSBuild\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(ProgramFiles32)\Microsoft Visual Studio\2019\Preview\MSBuild\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
 
   <!-- 
   ****************************************************

@@ -53,6 +53,12 @@ namespace Umbraco.Core.PropertyEditors
                 nestedContentEditorFromPackage.Name = "(Obsolete) " + nestedContentEditorFromPackage.Name;
                 nestedContentEditorFromPackage.IsDeprecated = true;
             }
+            var multiUrlPickerEditorFromPackage = editors.FirstOrDefault(x => x.Alias == "RJP.MultiUrlPicker");
+            if (multiUrlPickerEditorFromPackage != null)
+            {
+                multiUrlPickerEditorFromPackage.Name = "(Obsolete) " + multiUrlPickerEditorFromPackage.Name;
+                multiUrlPickerEditorFromPackage.IsDeprecated = true;
+            }
             return editors;
 
         }

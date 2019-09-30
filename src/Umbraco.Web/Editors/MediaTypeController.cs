@@ -145,9 +145,18 @@ namespace Umbraco.Web.Editors
         }
         public MediaTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new MediaType(parentId) {Icon = "icon-picture"};
+            IMediaType mt;
+            if (parentId != Constants.System.Root)
+            {
+                var parent = Services.ContentTypeService.GetMediaType(parentId);
+                mt = parent != null ? new MediaType(parent, string.Empty) : new MediaType(parentId);
+            }
+            else
+                mt = new MediaType(parentId);
 
-            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
+            mt.Icon = "icon-picture";
+
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mt);
             return dto;
         }
 

@@ -116,6 +116,11 @@ namespace umbraco.presentation.dialogs
             currentVersionTitle.Text = currentDoc.Text;
             currentVersionMeta.Text = ui.Text("content", "createDate") + ": " + currentDoc.VersionDate.ToShortDateString() + " " + currentDoc.VersionDate.ToShortTimeString();
 
+		    pp_selectVersion.Text = ui.Text("rollback", "headline");
+		    pp_currentVersion.Text = ui.Text("rollback", "currentVersion");
+		    pp_view.Text = ui.Text("rollback", "view");
+		    pp_rollBackTo.Text = ui.Text("rollback", "rollbackTo");
+
             if (!IsPostBack) {
                 allVersions.Items.Add(new ListItem(ui.Text("rollback", "selectVersion")+ "...", ""));
                 

@@ -266,7 +266,11 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     treeService.syncTree({
                         node: treeNode,
                         path: path,
-                        forceReload: forceReload
+                        forceReload: forceReload,
+                        //when the tree node is expanding during sync tree, handle it and raise appropriate events
+                        treeNodeExpanded: function (args) {
+                            emitEvent("treeNodeExpanded", { tree: scope.tree, node: args.node, children: args.children });
+                        }
                     }).then(function (data) {
 
                         if (activate === undefined || activate === true) {

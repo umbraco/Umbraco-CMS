@@ -6,7 +6,7 @@
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
-                    <li ng-repeat="url in node.urls">
+                    <li ng-repeat="url in node.urls track by $index">
                         <a ng-if="node.hasPublishedVersion" href="{{url}}" target="_blank">
                             <i class="icon icon-window-popin"></i>
                             <span>{{url}}</span>
@@ -107,7 +107,7 @@
     </div>
 
     <div class="umb-package-details__sidebar">
-        <umb-box data-element="node-info-scheduled-publishing">
+        <umb-box data-element="node-info-scheduled-publishing" ng-if="allowScheduledPublishing">
             <umb-box-header title-key="general_scheduledPublishing"></umb-box-header>
             <umb-box-content class="block-form">
 
@@ -198,9 +198,10 @@
                         style="max-width: 100%; margin-bottom: 0;"
                         icon="node.icon"
                         name="node.contentTypeName"
+                        alias="documentType.alias"
                         allow-open="allowOpen"
                         on-open="openDocumentType(documentType)"
-						open-url="previewOpenUrl">
+                        open-url="previewOpenUrl">
                     </umb-node-preview>
                 </umb-control-group>
 

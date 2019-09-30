@@ -145,9 +145,9 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
 			    var element = $element.find("div:first");
 
-				// Open the datepicker and add a changeDate eventlistener
+                // Open the datepicker and add a changeDate eventlistener
 			    element
-			        .datetimepicker(angular.extend({ useCurrent: true }, $scope.model.config))
+			        .datetimepicker(angular.extend({ useCurrent: $scope.model.config.defaultEmpty !== "1" }, $scope.model.config))
 			        .on("dp.change", applyDate)
 			        .on("dp.error", function(a, b, c) {
 			            $scope.hasDatetimePickerValue = false;

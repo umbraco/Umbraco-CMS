@@ -55,7 +55,7 @@
     </div>
 
     <div runat="server" id="pl_buttons" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel")%></a>
+        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "close")%></a>
         <asp:Button ID="Button1" runat="server" visible="false" CssClass="btn btn-primary" OnClick="doRollback_Click"></asp:Button>
     </div>  
 </asp:Content>

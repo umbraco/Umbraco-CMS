@@ -11,6 +11,8 @@ namespace Umbraco.Web.Controllers
     public class UmbLoginController : SurfaceController
     {
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ValidateUmbracoFormRouteString]
         public ActionResult HandleLogin([Bind(Prefix = "loginModel")]LoginModel model)
         {
             if (ModelState.IsValid == false)

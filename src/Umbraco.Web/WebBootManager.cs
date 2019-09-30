@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
@@ -46,10 +47,12 @@ using Umbraco.Web.Profiling;
 using Umbraco.Web.Search;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
-
+using System.Web.Helpers;
+using Umbraco.Web.Controllers;
 
 namespace Umbraco.Web
 {
+
     /// <summary>
     /// A bootstrapper for the Umbraco application which initializes all objects including the Web portion of the application
     /// </summary>
@@ -129,6 +132,10 @@ namespace Umbraco.Web
 
             InstallHelper insHelper = new InstallHelper(UmbracoContext.Current);
             insHelper.DeleteLegacyInstaller();
+
+            // Tell .NET 4.5 that we also want to try connecting over TLS 1.2, not just TLS 1.1 (but only if specific protocols are defined)
+            if (ServicePointManager.SecurityProtocol != 0)
+                ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 
             return this;
         }
@@ -276,7 +283,7 @@ namespace Umbraco.Web
                     // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
                     // utilizing an old path
                     appDomainHash);
-                
+
                 //set the file map and composite file default location to the %temp% location
                 BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder
                     = XmlFileMapper.FileMapDefaultFolder
@@ -539,6 +546,19 @@ namespace Umbraco.Web
                 () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
             HealthCheckNotificationMethodResolver.Current = new HealthCheckNotificationMethodResolver(LoggerResolver.Current.Logger,
                 () => PluginManager.ResolveTypes<HealthCheck.NotificationMethods.IHealthCheckNotificatationMethod>());
+
+            // Disable duplicate community health checks which appear in Our.Umbraco.HealtchChecks and Umbraco Core.
+            // See this issue to understand why https://github.com/umbraco/Umbraco-CMS/issues/4174
+            var disabledHealthCheckTypes = new[]
+            {
+                "Our.Umbraco.HealthChecks.Checks.Security.HstsCheck",
+                "Our.Umbraco.HealthChecks.Checks.Security.TlsCheck"
+            }.Select(TypeFinder.GetTypeByName).WhereNotNull();
+
+            foreach (var type in disabledHealthCheckTypes)
+            {
+                HealthCheckResolver.Current.RemoveType(type);
+            }
         }
 
         /// <summary>

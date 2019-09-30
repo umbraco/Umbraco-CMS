@@ -3,7 +3,7 @@
     * @name umbraco.resources.codefileResource
     * @description Loads in data for files that contain code such as js scripts, partial views and partial view macros
     **/
-function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
+function codefileResource($q, $http, umbDataFormatter, umbRequestHelper, localizationService) {
 
     return {
 
@@ -106,13 +106,16 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          */
         deleteByPath: function (type, virtualpath) {
+
+            var promise = localizationService.localize("codefile_deleteItemFailed", [virtualpath]);
+
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "codeFileApiBaseUrl",
                         "Delete",
                         [{ type: type }, { virtualPath: virtualpath}])),
-                "Failed to delete item: " + virtualpath);
+                promise);
         },
 
         /**
@@ -236,13 +239,19 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          */
 
-        createContainer: function(type, parentId, name) {
+        createContainer: function (type, parentId, name) {
+
+            // Is the parent ID numeric?
+            var key = "codefile_createFolderFailedBy" + (isNaN(parseInt(parentId)) ? "Name" : "Id");
+
+            var promise = localizationService.localize(key, [parentId]);
+
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl(
                     "codeFileApiBaseUrl", 
                     "PostCreateContainer", 
                     { type: type, parentId: parentId, name: encodeURIComponent(name) })),
-                'Failed to create a folder under parent id ' + parentId);
+                promise);
         }
 
     };

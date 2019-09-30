@@ -28,14 +28,13 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.$watch(function () {
             //return the joined Ids as a string to watch
             return _.map($scope.renderModel, function (i) {
-                return $scope.model.config.idType === "udi" ? i.udi : i.id;                 
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;
             }).join();
         }, function (newVal) {
             var currIds = _.map($scope.renderModel, function (i) {
-                return $scope.model.config.idType === "udi" ? i.udi : i.id;                
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;
             });
             $scope.model.value = trim(currIds.join(), ",");
-            angularHelper.getCurrentForm($scope).$setDirty();
 
             //Validate!
             if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
@@ -58,8 +57,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     $scope.renderModel = [];
-	    
-    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;    
+
+    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
 
     //the default pre-values
     var defaultConfig = {
@@ -67,12 +66,13 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
+        dataTypeId: null,
         maxNumber: 1,
-        minNumber : 0,
+        minNumber: 0,
         startNode: {
             query: "",
             type: "content",
-	        id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
+            id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
         }
     };
 
@@ -84,7 +84,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
-        zIndex: 6000
+        zIndex: 6000,
+        update: function (e, ui) {
+            angularHelper.getCurrentForm($scope).$setDirty();
+        }
     };
 
     if ($scope.model.config) {
@@ -97,12 +100,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = ($scope.model.config.showOpenButton === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
     $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
-    
+
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
-        ? "Media"
-        : "Document";
+            ? "Media"
+            : "Document";
     $scope.allowOpenButton = entityType === "Document";
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
@@ -130,7 +133,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         idType: "int"
     };
 
-    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
+    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
 
@@ -141,7 +144,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         dialogOptions.filterCssClass = "not-allowed";
         var currFilter = dialogOptions.filter;
         //now change the filter to be a method
-        dialogOptions.filter = function(i) {
+        dialogOptions.filter = function (i) {
             //filter out the list view nodes
             if (i.metaData.isContainer) {
                 return true;
@@ -149,7 +152,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             if (!currFilter) {
                 return false;
             }
-            //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller, 
+            //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller,
             // but not much we can do about that since members require special filtering.
             var filterItem = currFilter.toLowerCase().split(',');
             var found = filterItem.indexOf(i.metaData.contentType.toLowerCase()) >= 0;
@@ -176,28 +179,30 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     //dialog
-    $scope.openContentPicker = function() {
-      $scope.contentPickerOverlay = dialogOptions;
-      $scope.contentPickerOverlay.view = "treepicker";
-      $scope.contentPickerOverlay.show = true;
+    $scope.openContentPicker = function () {
+        
+        $scope.contentPickerOverlay = dialogOptions;
+        $scope.contentPickerOverlay.view = "treepicker";
+        $scope.contentPickerOverlay.show = true;
+        $scope.contentPickerOverlay.dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
 
-      $scope.contentPickerOverlay.submit = function(model) {
+        $scope.contentPickerOverlay.submit = function (model) {
 
-          if (angular.isArray(model.selection)) {
-             _.each(model.selection, function (item, i) {
-                  $scope.add(item);
-              });
-              angularHelper.getCurrentForm($scope).$setDirty();
-          }
+            if (angular.isArray(model.selection)) {
+                _.each(model.selection, function (item, i) {
+                    $scope.add(item);
+                });
+                angularHelper.getCurrentForm($scope).$setDirty();
+            }
 
-          $scope.contentPickerOverlay.show = false;
-          $scope.contentPickerOverlay = null;
-      }
+            $scope.contentPickerOverlay.show = false;
+            $scope.contentPickerOverlay = null;
+        }
 
-      $scope.contentPickerOverlay.close = function(oldModel) {
-          $scope.contentPickerOverlay.show = false;
-          $scope.contentPickerOverlay = null;
-      }
+        $scope.contentPickerOverlay.close = function (oldModel) {
+            $scope.contentPickerOverlay.show = false;
+            $scope.contentPickerOverlay = null;
+        }
 
     };
 
@@ -237,13 +242,13 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.renderModel = [];
     };
 
-    $scope.openMiniEditor = function(node) {
-        miniEditorHelper.launchMiniEditor(node).then(function(updatedNode){
+    $scope.openMiniEditor = function (node) {
+        miniEditorHelper.launchMiniEditor(node).then(function (updatedNode) {
             // update the node
             node.name = updatedNode.name;
             node.published = updatedNode.hasPublishedVersion;
-            if(entityType !== "Member") {
-                entityResource.getUrl(updatedNode.id, entityType).then(function(data){
+            if (entityType !== "Member") {
+                entityResource.getUrl(updatedNode.id, entityType).then(function (data) {
                     node.url = data;
                 });
             }
@@ -252,21 +257,21 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     //when the scope is destroyed we need to unsubscribe
     $scope.$on('$destroy', function () {
-        if(unsubscribe) {
+        if (unsubscribe) {
             unsubscribe();
         }
     });
-    
+
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
     //load current data if anything selected
     if (modelIds.length > 0) {
-        entityResource.getByIds(modelIds, entityType).then(function(data) {
+        entityResource.getByIds(modelIds, entityType).then(function (data) {
 
             _.each(modelIds,
-                function(id, i) {
+                function (id, i) {
                     var entity = _.find(data,
-                        function(d) {
+                        function (d) {
                             return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
                         });
 
@@ -290,10 +295,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     function setEntityUrl(entity) {
 
         // get url for content and media items
-        if(entityType !== "Member") {
-            entityResource.getUrl(entity.id, entityType).then(function(data){
-                // update url                
-                angular.forEach($scope.renderModel, function(item){
+        if (entityType !== "Member") {
+            entityResource.getUrl(entity.id, entityType).then(function (data) {
+                // update url
+                angular.forEach($scope.renderModel, function (item) {
                     if (item.id === entity.id) {
                         if (entity.trashed) {
                             item.url = localizationService.dictionary.general_recycleBin;
@@ -306,7 +311,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
 
         // add the selected item to the renderModel
-        // if it needs to show a url the item will get 
+        // if it needs to show a url the item will get
         // updated when the url comes back from server
         addSelectedItem(entity);
 
@@ -315,7 +320,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     function addSelectedItem(item) {
 
         // set icon
-        if(item.icon) {
+        if (item.icon) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
         }
 
@@ -334,7 +339,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             }
         }
 
-        $scope.renderModel.push({ 
+        $scope.renderModel.push({
             "name": item.name,
             "id": item.id,
             "udi": item.udi,
@@ -343,14 +348,14 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             "url": item.url,
             "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
-            // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
+            // only content supports published/unpublished content so we set everything else to published so the UI looks correct
         });
 
     }
 
     function setSortingState(items) {
         // disable sorting if the list only consist of one item
-        if(items.length > 1) {
+        if (items.length > 1) {
             $scope.sortableOptions.disabled = false;
         } else {
             $scope.sortableOptions.disabled = true;

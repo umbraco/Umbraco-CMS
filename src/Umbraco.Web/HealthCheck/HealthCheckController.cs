@@ -82,7 +82,7 @@ namespace Umbraco.Web.HealthCheck
         public object GetStatus(Guid id)
         {
             var check = GetCheckById(id);
-            
+
             try
             {
                 //Core.Logging.LogHelper.Debug<HealthCheckController>("Running health check: " + check.Name);

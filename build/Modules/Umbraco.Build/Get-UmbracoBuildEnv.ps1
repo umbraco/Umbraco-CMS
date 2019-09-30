@@ -135,7 +135,9 @@ function Get-UmbracoBuildEnv
   $vsPath = ""
   $vsVer = ""
   $msBuild = $null
-  &$vswhere | foreach {
+  $params = @()
+  $params += "-prerelease"
+  &$vswhere @params | foreach {
     if ($_.StartsWith("installationPath:")) { $vsPath = $_.SubString("installationPath:".Length).Trim() }
     if ($_.StartsWith("installationVersion:")) { $vsVer = $_.SubString("installationVersion:".Length).Trim() }
   }
@@ -144,7 +146,10 @@ function Get-UmbracoBuildEnv
     $vsVerParts = $vsVer.Split('.')
     $vsMajor = [int]::Parse($vsVerParts[0])
     $vsMinor = [int]::Parse($vsVerParts[1])
-    if ($vsMajor -eq 15) {
+    if ($vsMajor -eq 16) {
+      $msBuild = "$vsPath\MSBuild\Current\Bin"
+    }	
+    elseif ($vsMajor -eq 15) {
       $msBuild = "$vsPath\MSBuild\$vsMajor.0\Bin"
     }
     elseif ($vsMajor -eq 14) {

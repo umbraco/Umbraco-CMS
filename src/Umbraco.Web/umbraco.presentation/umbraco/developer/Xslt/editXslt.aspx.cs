@@ -97,7 +97,7 @@ namespace umbraco.cms.presentation.developer
 
 
 			// Add source and filename
-			var file = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Request.QueryString["file"]);
+			var file = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Request.QueryString["file"].CleanForXss().Replace(" ", ""));
 
 			// validate file
 			IOHelper.ValidateEditPath(file, SystemDirectories.Xslt);

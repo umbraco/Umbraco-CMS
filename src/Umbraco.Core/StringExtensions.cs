@@ -189,7 +189,6 @@ namespace Umbraco.Core
                 outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
             return new string(outputArray);
         }
-
         private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
 
         /// <summary>
@@ -542,7 +541,7 @@ namespace Umbraco.Core
         public static string StripHtml(this string text)
         {
             const string pattern = @"<(.|\n)*?>";
-            return Regex.Replace(text, pattern, String.Empty);
+            return Regex.Replace(text, pattern, string.Empty);
         }
 
         /// <summary>
@@ -732,6 +731,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="stringToConvert">Referrs to itself</param>
         /// <returns>The MD5 hashed string</returns>
+        [Obsolete("Please use the GenerateHash method instead. This may be removed in future versions")]
         public static string ToMd5(this string stringToConvert)
         {
             return stringToConvert.GenerateHash("MD5");
@@ -742,6 +742,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="stringToConvert">referrs to itself</param>
         /// <returns>The SHA1 hashed string</returns>
+        [Obsolete("Please use the GenerateHash method instead. This may be removed in future versions")]
         public static string ToSHA1(this string stringToConvert)
         {
             return stringToConvert.GenerateHash("SHA1");

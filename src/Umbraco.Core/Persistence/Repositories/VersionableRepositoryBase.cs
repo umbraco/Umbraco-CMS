@@ -703,6 +703,8 @@ ORDER BY contentNodeId, versionId, propertytypeid
                 // Members only
                 case "USERNAME":
                     return "cmsMember.LoginName";
+                case "CONTENTTYPEALIAS":
+                    return "cmsContentType.alias";
                 default:
                     //ensure invalid SQL cannot be submitted
                     return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Web;
 using System.Xml;
 using umbraco.BusinessLogic;
@@ -13,6 +14,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.presentation.nodeFactory;
+using umbraco.presentation.preview;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -275,6 +277,8 @@ namespace umbraco
 
                 safeXml.AcceptChanges();
             }
+
+            ClearPreviewXmlContent();
         }
 
         /// <summary>
@@ -474,6 +478,8 @@ namespace umbraco
                     safeXml.AcceptChanges();
                 }
             }
+
+            ClearPreviewXmlContent(id);
         }
 
         /// <summary>
@@ -666,6 +672,21 @@ namespace umbraco
 
             //_lastXmlChange = DateTime.UtcNow;
             _persisterTask = _persisterTask.Touch(); // _persisterTask != null because SyncToXmlFile == true
+        }
+
+        private static bool HasSchema(string contentTypeAlias, XmlDocument xml)
+        {
+            string subset = null;
+
+            // get current doctype
+            var n = xml.FirstChild;
+            while (n.NodeType != XmlNodeType.DocumentType && n.NextSibling != null)
+                n = n.NextSibling;
+            if (n.NodeType == XmlNodeType.DocumentType)
+                subset = ((XmlDocumentType)n).InternalSubset;
+
+            // ensure it contains the content type
+            return subset != null && subset.Contains(string.Format("<!ATTLIST {0} id ID #REQUIRED>", contentTypeAlias));
         }
 
         private static XmlDocument EnsureSchema(string contentTypeAlias, XmlDocument xml)
@@ -1256,6 +1277,208 @@ namespace umbraco
             if (BeforePublishNodeToContentCache != null)
             {
                 BeforePublishNodeToContentCache(node, e);
+            }
+        }
+
+        #endregion
+
+        #region Preview
+
+        private const string PreviewCacheKey = "umbraco.content.preview";
+        private readonly object _previewLock = new object();
+
+        internal void ClearPreviewXmlContent()
+        {
+            if (PreviewContent.IsSinglePreview == false) return;
+
+            var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+            lock (_previewLock)
+            {
+                runtimeCache.ClearCacheItem(PreviewCacheKey);
+            }
+        }
+
+        internal void ClearPreviewXmlContent(int id)
+        {
+            if (PreviewContent.IsSinglePreview == false) return;
+
+            var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+
+            lock (_previewLock)
+            {
+                var xml = runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey);
+                if (xml == null) return;
+
+                // Check if node present, before cloning
+                var x = xml.GetElementById(id.ToString());
+                if (x == null)
+                    return;
+
+                // Find the document in the xml cache
+                // The document already exists in cache, so repopulate it
+                x.ParentNode.RemoveChild(x);
+            }
+        }
+
+        internal void UpdatePreviewXmlContent(Document d)
+        {
+            if (PreviewContent.IsSinglePreview == false) return;
+
+            var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+
+            lock (_previewLock)
+            {
+                var xml = runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey);
+                if (xml == null) return;
+
+                var pnode = GetPreviewOrPublishedNode(d, xml, true);
+                var pattr = ((XmlElement)pnode).GetAttributeNode("sortOrder");
+                pattr.Value = d.sortOrder.ToString();
+                AddOrUpdatePreviewXmlNode(d.Id, d.Level, d.Level == 1 ? -1 : d.ParentId, pnode);
+            }
+        }
+
+        private void AddOrUpdatePreviewXmlNode(int id, int level, int parentId, XmlNode docNode)
+        {
+            var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+            var xml = runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey);
+            if (xml == null) return;
+
+            // sanity checks
+            if (id != docNode.AttributeValue<int>("id"))
+                throw new ArgumentException("Values of id and docNode/@id are different.");
+            if (parentId != docNode.AttributeValue<int>("parentID"))
+                throw new ArgumentException("Values of parentId and docNode/@parentID are different.");
+
+            // find the document in the cache
+            XmlNode currentNode = xml.GetElementById(id.ToInvariantString());
+
+            // if the document is not there already then it's a new document
+            // we must make sure that its document type exists in the schema
+            if (currentNode == null && UseLegacySchema == false)
+            {
+                if (HasSchema(docNode.Name, xml) == false)
+                {
+                    runtimeCache.ClearCacheItem(PreviewCacheKey);
+                    return;
+                }
+            }
+
+            // find the parent
+            XmlNode parentNode = level == 1
+                ? xml.DocumentElement
+                : xml.GetElementById(parentId.ToInvariantString());
+
+            // no parent = cannot do anything
+            if (parentNode == null)
+                return;
+
+            // insert/move the node under the parent
+            if (currentNode == null)
+            {
+                // document not there, new node, append
+                currentNode = docNode;
+                parentNode.AppendChild(currentNode);
+            }
+            else
+            {
+                // document found... we could just copy the currentNode children nodes over under
+                // docNode, then remove currentNode and insert docNode... the code below tries to
+                // be clever and faster, though only benchmarking could tell whether it's worth the
+                // pain...
+
+                // first copy current parent ID - so we can compare with target parent
+                var moving = currentNode.AttributeValue<int>("parentID") != parentId;
+
+                if (docNode.Name == currentNode.Name)
+                {
+                    // name has not changed, safe to just update the current node
+                    // by transfering values eg copying the attributes, and importing the data elements
+                    TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode);
+
+                    // if moving, move the node to the new parent
+                    // else it's already under the right parent
+                    // (but maybe the sort order has been updated)
+                    if (moving)
+                        parentNode.AppendChild(currentNode); // remove then append to parentNode
+                }
+                else
+                {
+                    // name has changed, must use docNode (with new name)
+                    // move children nodes from currentNode to docNode (already has properties)
+                    var children = currentNode.SelectNodes(ChildNodesXPath);
+                    if (children == null) throw new Exception("oops");
+                    foreach (XmlNode child in children)
+                        docNode.AppendChild(child); // remove then append to docNode
+
+                    // and put docNode in the right place - if parent has not changed, then
+                    // just replace, else remove currentNode and insert docNode under the right parent
+                    // (but maybe not at the right position due to sort order)
+                    if (moving)
+                    {
+                        if (currentNode.ParentNode == null) throw new Exception("oops");
+                        currentNode.ParentNode.RemoveChild(currentNode);
+                        parentNode.AppendChild(docNode);
+                    }
+                    else
+                    {
+                        // replacing might screw the sort order
+                        parentNode.ReplaceChild(docNode, currentNode);
+                    }
+
+                    currentNode = docNode;
+                }
+            }
+
+            // if the nodes are not ordered, must sort
+            // (see U4-509 + has to work with ReplaceChild too)
+            //XmlHelper.SortNodesIfNeeded(parentNode, childNodesXPath, x => x.AttributeValue<int>("sortOrder"));
+
+            // but...
+            // if we assume that nodes are always correctly sorted
+            // then we just need to ensure that currentNode is at the right position.
+            // should be faster that moving all the nodes around.
+            XmlHelper.SortNode(parentNode, ChildNodesXPath, currentNode, x => x.AttributeValue<int>("sortOrder"));
+        }
+
+        // UpdateSortOrder is meant to update the Xml cache sort order on Save, 'cos that change
+        // should be applied immediately, even though the Xml cache is not updated on Saves - we
+        // don't have to do it for preview Xml since it is always fully updated - OTOH we have
+        // to ensure it *is* updated, in UnpublishedPageCacheRefresher
+
+        private XmlDocument LoadPreviewXmlContent()
+        {
+            try
+            {
+                LogHelper.Info<content>("Loading preview content from database...");
+                var xml = ApplicationContext.Current.Services.ContentService.BuildPreviewXmlCache();
+                LogHelper.Debug<content>("Done loading preview content");
+                return xml;
+            }
+            catch (Exception ee)
+            {
+                LogHelper.Error<content>("Error loading preview content", ee);
+            }
+
+            // An error of some sort must have stopped us from successfully generating
+            // the content tree, so lets return null signifying there is no content available
+            return null;
+        }
+
+        public XmlDocument PreviewXmlContent
+        {
+            get
+            {
+                if (PreviewContent.IsSinglePreview == false)
+                    throw new InvalidOperationException();
+
+                var runtimeCache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+
+                lock (_previewLock)
+                {
+                    return runtimeCache.GetCacheItem<XmlDocument>(PreviewCacheKey, LoadPreviewXmlContent, TimeSpan.FromSeconds(PreviewContent.SinglePreviewCacheDurationSeconds), true,
+                        removedCallback: (key, removed, reason) => LogHelper.Debug<content>($"Removed preview xml from cache ({reason})"));
+                }
             }
         }
 

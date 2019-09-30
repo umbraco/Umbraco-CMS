@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -293,6 +295,12 @@ namespace Umbraco.Core.IO
         {
             var property = GetProperty(content, propertyTypeAlias);
             var svalue = property.Value as string;
+            if (svalue != null && svalue.DetectIsJson())
+            {
+                // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
+                var jObject = JsonConvert.DeserializeObject<JObject>(svalue);
+                svalue = jObject != null ? jObject.GetValueAsString("src") : svalue;
+            }
             var oldpath = svalue == null ? null : GetRelativePath(svalue);
             var filepath = StoreFile(content, property.PropertyType, filename, filestream, oldpath);
             property.Value = GetUrl(filepath);
@@ -357,7 +365,8 @@ namespace Umbraco.Core.IO
             {
                 var jpgInfo = ImageFile.FromStream(stream);
 
-                if (jpgInfo.Format != ImageFileFormat.Unknown
+                if (jpgInfo != null
+                    && jpgInfo.Format != ImageFileFormat.Unknown
                     && jpgInfo.Properties.ContainsKey(ExifTag.PixelYDimension)
                     && jpgInfo.Properties.ContainsKey(ExifTag.PixelXDimension))
                 {
@@ -368,21 +377,28 @@ namespace Umbraco.Core.IO
                         return new Size(width, height);
                     }
                 }
+            }
+            catch
+            {
+                //We will just swallow, just means we can't read exif data, we don't want to log an error either
+            }
 
-                //we have no choice but to try to read in via GDI
+            //we have no choice but to try to read in via GDI
+            try
+            {
                 using (var image = Image.FromStream(stream))
                 {
-
                     var fileWidth = image.Width;
                     var fileHeight = image.Height;
                     return new Size(fileWidth, fileHeight);
                 }
             }
-            catch (Exception)
+            catch
             {
-                //We will just swallow, just means we can't read exif data, we don't want to log an error either
-                return new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);
+                //We will just swallow, just means we can't read via GDI, we don't want to log an error either
             }
+
+            return new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);
         }
 
         #endregion

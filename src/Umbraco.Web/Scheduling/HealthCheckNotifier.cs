@@ -16,7 +16,7 @@ namespace Umbraco.Web.Scheduling
         private readonly ApplicationContext _appContext;
         private readonly IHealthCheckResolver _healthCheckResolver;
 
-        public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
+        public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             ApplicationContext appContext)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {

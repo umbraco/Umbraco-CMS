@@ -30,6 +30,7 @@ namespace Umbraco.Web.Editors
             //authorize that the user has access to save this user group
             var authHelper = new UserGroupEditorAuthorizationHelper(
                 Services.UserService, Services.ContentService, Services.MediaService, Services.EntityService);
+
             var isAuthorized = authHelper.AuthorizeGroupAccess(Security.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
@@ -49,6 +50,9 @@ namespace Umbraco.Web.Editors
                 userGroupSave.StartMediaId);
             if (isAuthorized == false)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
+
+            //need to ensure current user is in a group if not an admin to avoid a 401
+            EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
 
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
@@ -77,6 +81,23 @@ namespace Umbraco.Web.Editors
 
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserGroupSaved"));
             return display;
+        }
+
+        private void EnsureNonAdminUserIsInSavedUserGroup(UserGroupSave userGroupSave)
+        {
+            if (Security.CurrentUser.IsAdmin())
+            {
+                return;
+            }
+
+            var userIds = userGroupSave.Users.ToList();
+            if (userIds.Contains(Security.CurrentUser.Id))
+            {
+                return;
+            }
+
+            userIds.Add(Security.CurrentUser.Id);
+            userGroupSave.Users = userIds;
         }
 
         /// <summary>

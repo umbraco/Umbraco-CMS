@@ -17,7 +17,7 @@ namespace Umbraco.Web.Mvc
     public class RenderRouteHandler : IRouteHandler
     {
         // Define reserved dictionary keys for controller, action and area specified in route additional values data
-        private static class ReservedAdditionalKeys
+        internal static class ReservedAdditionalKeys
         {
             internal const string Controller = "c";
             internal const string Action = "a";
@@ -142,36 +142,7 @@ namespace Umbraco.Web.Mvc
                     return null;
             }
 
-
-            string decryptedString;
-            try
-            {
-                decryptedString = encodedVal.DecryptWithMachineKey();
-            }
-            catch (FormatException)
-            {
-                LogHelper.Warn<RenderRouteHandler>("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
-                return null;
-            }
-
-            var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
-            var decodedParts = new Dictionary<string, string>();
-
-            foreach (var key in parsedQueryString.AllKeys)
-            {
-                decodedParts[key] = parsedQueryString[key];
-            }
-
-            //validate all required keys exist
-
-            //the controller
-            if (decodedParts.All(x => x.Key != ReservedAdditionalKeys.Controller))
-                return null;
-            //the action
-            if (decodedParts.All(x => x.Key != ReservedAdditionalKeys.Action))
-                return null;
-            //the area
-            if (decodedParts.All(x => x.Key != ReservedAdditionalKeys.Area))
+            if (!UmbracoHelper.DecryptAndValidateEncryptedRouteString(encodedVal, out var decodedParts))
                 return null;
 
             foreach (var item in decodedParts.Where(x => new[] {
@@ -191,6 +162,8 @@ namespace Umbraco.Web.Mvc
                 Area = HttpUtility.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Area).Value),
             };
         }
+
+       
 
         /// <summary>
         /// Handles a posted form to an Umbraco Url and ensures the correct controller is routed to and that

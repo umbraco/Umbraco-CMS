@@ -25,7 +25,7 @@
         </ul>
         <ul class="umb-actions umb-actions-child" ng-show="selectBlueprint">
 
-            <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
+            <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false track by $index">
                 <a ng-click="createFromBlueprint(key)">
                     <i class="large {{docType.icon}}"></i>
                     <span class="menu-label">

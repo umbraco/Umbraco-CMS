@@ -27,7 +27,7 @@ namespace Umbraco.Web.Editors
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? Query<IAuditItem>.Builder.Where(x => x.CreateDate >= sinceDate) : null;
             var result = Services.AuditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter: dateQuery);
-            var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
+            var mapped = result.Select(item => Mapper.Map<AuditLog>(item));        
             
             var page = new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
@@ -85,16 +85,17 @@ namespace Umbraco.Web.Editors
 
         private IEnumerable<AuditLog> MapAvatarsAndNames(IEnumerable<AuditLog> items)
         {
-            var userIds = items.Select(x => x.UserId).ToArray();
+            var mappedItems = items.ToList();
+            var userIds = mappedItems.Select(x => x.UserId).ToArray();
             var users = Services.UserService.GetUsersById(userIds)
                 .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(ApplicationContext.ApplicationCache.RuntimeCache));
             var userNames = Services.UserService.GetUsersById(userIds).ToDictionary(x => x.Id, x => x.Name);
-            foreach (var item in items)
+            foreach (var item in mappedItems)
             {
                 item.UserAvatars = users[item.UserId];
                 item.UserName = userNames[item.UserId];
             }
-            return items;
+            return mappedItems;
         }
     }
 }

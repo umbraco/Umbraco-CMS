@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState) {
+    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState, entityResource) {
 
         $scope.isLoading = true;
 
@@ -11,20 +11,15 @@ angular.module("umbraco")
         var n = d.getTime();
         $scope.textAreaHtmlId = $scope.model.alias + "_" + n + "_rte";
 
-        var alreadyDirty = false;
         function syncContent(editor){
             editor.save();
             angularHelper.safeApply($scope, function () {
                 $scope.model.value = editor.getContent();
             });
 
-            if (!alreadyDirty) {
-                //make the form dirty manually so that the track changes works, setting our model doesn't trigger
-                // the angular bits because tinymce replaces the textarea.
-                var currForm = angularHelper.getCurrentForm($scope);
-                currForm.$setDirty();
-                alreadyDirty = true;
-            }
+            //make the form dirty manually so that the track changes works, setting our model doesn't trigger
+            // the angular bits because tinymce replaces the textarea.
+            angularHelper.getCurrentForm($scope).$setDirty();
         }
 
         tinyMceService.configuration().then(function (tinyMceConfig) {
@@ -56,6 +51,8 @@ angular.module("umbraco")
             if (!editorConfig.maxImageSize && editorConfig.maxImageSize != 0) {
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
+
+            var dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
 
             //queue file loading
             if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
@@ -139,7 +136,7 @@ angular.module("umbraco")
 
             //wait for queue to end
             $q.all(await).then(function () {
-                
+
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
                     mode: "exact",
@@ -264,7 +261,10 @@ angular.module("umbraco")
                     // Update model on change, i.e. copy/pasted text, plugins altering content
                     editor.on('SetContent', function (e) {
                         if (!e.initial) {
-                            syncContent(editor);
+                              // sync content if editor is dirty
+                              if (!editor.isNotDirty) {
+                                syncContent(editor);
+                            }
                         }
                     });
 
@@ -277,31 +277,48 @@ angular.module("umbraco")
 
                         syncContent(editor);
                     });
-					
+
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
-                        $scope.linkPickerOverlay = {
-                            view: "linkpicker",
-                            currentTarget: currentTarget,
-							anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
-                            show: true,
-                            submit: function(model) {
-                                tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
-                                $scope.linkPickerOverlay.show = false;
-                                $scope.linkPickerOverlay = null;
-                            }
-                        };
+
+                        entityResource.getAnchors($scope.model.value).then(function(anchorValues){
+                            
+                            $scope.linkPickerOverlay = {
+                                view: "linkpicker",
+                                currentTarget: currentTarget,
+                                anchors: anchorValues,
+                                dataTypeId: dataTypeId,
+                                ignoreUserStartNodes: $scope.model.config.ignoreUserStartNodes,
+                                show: true,
+                                submit: function(model) {
+                                    tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
+                                    $scope.linkPickerOverlay.show = false;
+                                    $scope.linkPickerOverlay = null;
+                                }
+                            };
+                        });
+
+
+
                     });
 
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
+                        var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                        var startNodeIsVirtual = userData.startMediaIds.length !== 1;
 
+                        if ($scope.model.config.ignoreUserStartNodes === "1") {
+                            startNodeId = -1;
+                            startNodeIsVirtual = true;
+                        }
+                        
                         $scope.mediaPickerOverlay = {
                             currentTarget: currentTarget,
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
-                            startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-                            startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                            startNodeId: startNodeId,
+                            startNodeIsVirtual: startNodeIsVirtual,
+                            dataTypeId: dataTypeId,
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {
@@ -312,7 +329,7 @@ angular.module("umbraco")
                         };
 
                     });
-                    
+
                     //Create the embedded plugin
                     tinyMceService.createInsertEmbeddedMedia(editor, $scope, function() {
 
@@ -346,7 +363,7 @@ angular.module("umbraco")
 
                     });
                 };
-                
+
                 /** Loads in the editor */
                 function loadTinyMce() {
 
@@ -392,8 +409,8 @@ angular.module("umbraco")
                 $scope.$on('$destroy', function () {
                     unsubscribe();
 					if (tinyMceEditor !== undefined && tinyMceEditor != null) {
-						tinyMceEditor.destroy()
-					}
+                        tinyMceEditor.destroy();
+                    }
                 });
             });
         });

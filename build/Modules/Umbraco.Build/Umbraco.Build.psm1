@@ -195,6 +195,10 @@ function Compile-Umbraco
   {
     $toolsVersion = "15.0"
   }
+  if ($uenv.VisualStudio.Major -eq 16)
+  {
+    $toolsVersion = "Current"
+  }
     
   Write-Host ">> Compile Umbraco"
   Write-Host "Logging to $tmp\msbuild.umbraco.log"

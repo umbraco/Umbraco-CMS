@@ -100,7 +100,7 @@ namespace Umbraco.Web.Editors
                 {
                     var errors = string.Join(". ", resetResult.Errors);
                     _logger.Warn<PasswordChanger>(string.Format("Could not reset user password {0}", errors));
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, errors: " + errors, new[] { "resetPassword" }) });
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "resetPassword" }) });
                 }
 
                 return Attempt.Succeed(new PasswordChangedModel());
@@ -120,21 +120,30 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "oldPassword" }) });
             }
 
-            if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
+            //get the user
+            var backOfficeIdentityUser = await userMgr.FindByIdAsync(savingUser.Id);
+            if (backOfficeIdentityUser == null)
             {
-                //if an old password is suplied try to change it
-                var changeResult = await userMgr.ChangePasswordAsync(savingUser.Id, passwordModel.OldPassword, passwordModel.NewPassword);
-                if (changeResult.Succeeded == false)
-                {
-                    var errors = string.Join(". ", changeResult.Errors);
-                    _logger.Warn<PasswordChanger>(string.Format("Could not change user password {0}", errors));
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, errors: " + errors, new[] { "oldPassword" }) });
-                }
-                return Attempt.Succeed(new PasswordChangedModel());
+                //this really shouldn't ever happen... but just in case
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password could not be verified", new[] { "oldPassword" }) });
             }
-
-            //We shouldn't really get here
-            return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid information supplied", new[] { "value" }) });
+            //is the old password correct?
+            var validateResult = await userMgr.CheckPasswordAsync(backOfficeIdentityUser, passwordModel.OldPassword);
+            if(validateResult == false)
+            {
+                //no, fail with an error message for "oldPassword"
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Incorrect password", new[] { "oldPassword" }) });
+            }
+            //can we change to the new password?
+            var changeResult = await userMgr.ChangePasswordAsync(savingUser.Id, passwordModel.OldPassword, passwordModel.NewPassword);
+            if (changeResult.Succeeded == false)
+            {
+                //no, fail with error messages for "password"
+                var errors = string.Join(". ", changeResult.Errors);
+                _logger.Warn<PasswordChanger>(string.Format("Could not change user password {0}", errors));
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "password" }) });
+            }
+            return Attempt.Succeed(new PasswordChangedModel());
         }
 
         /// <summary>
@@ -146,6 +155,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
+            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
+
             // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
 
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
@@ -174,7 +185,7 @@ namespace Umbraco.Web.Editors
                 //this is only possible when using a membership provider if the membership provider supports AllowManuallyChangingPassword
                 if (passwordModel.NewPassword.IsNullOrWhiteSpace() == false)
                 {
-                    if (membershipProvider is MembershipProviderBase umbracoBaseProvider && umbracoBaseProvider.AllowManuallyChangingPassword)
+                    if (umbracoBaseProvider !=null && umbracoBaseProvider.AllowManuallyChangingPassword)
                     {
                         //this provider allows manually changing the password without the old password, so we can just do it
                         try

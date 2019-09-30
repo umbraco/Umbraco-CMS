@@ -523,6 +523,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 {
                     if (preview)
                     {
+                        if (PreviewContent.IsSinglePreview)
+                            return content.Instance.PreviewXmlContent;
                         var previewContent = PreviewContentCache.GetOrCreateValue(context); // will use the ctor with no parameters
                         previewContent.EnsureInitialized(context.UmbracoUser, StateHelper.Cookies.Preview.GetValue(), true, () =>
                         {

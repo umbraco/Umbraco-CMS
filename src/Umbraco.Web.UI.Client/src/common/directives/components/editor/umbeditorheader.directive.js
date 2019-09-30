@@ -252,7 +252,7 @@ Use this directive to construct a header inside the main editor window.
                 icon: "=",
                 hideIcon: "@",
                 alias: "=",
-                hideAlias: "@",
+                hideAlias: "=",
                 description: "=",
                 hideDescription: "@",
                 descriptionLocked: "@",

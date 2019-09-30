@@ -4,12 +4,13 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
+using Language = umbraco.cms.businesslogic.language.Language;
+using Property = umbraco.cms.businesslogic.property.Property;
+using Task = umbraco.cms.businesslogic.task.Task;
 
 namespace umbraco.cms.businesslogic.translation
 {
@@ -32,8 +33,10 @@ namespace umbraco.cms.businesslogic.translation
             task.Save();
 
             // Add log entry
-            // Note: not updated to LogHelper as LogTypes.SendToTranslate might be something special, not sure
-            Log.Add(LogTypes.SendToTranslate, user, node.Id, "Translator: " + translator.Name + ", Language: " + language.FriendlyName);
+            ApplicationContext.Current.Services.AuditService.Add(AuditType.SendToTranslate,
+                "Translator: " + translator.Name + ", Language: " + language.FriendlyName,
+                user.Id,
+                node.Id);
 
             // send it
             if (sendEmail)

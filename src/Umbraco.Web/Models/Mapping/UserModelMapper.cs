@@ -323,7 +323,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(
                     detail => detail.EmailHash,
-                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
+                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().GenerateHash()))
                 .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
                 .ForMember(detail => detail.Path, opt => opt.MapFrom(user => "-1," + user.Id))
                 .ForMember(detail => detail.Notifications, opt => opt.Ignore())

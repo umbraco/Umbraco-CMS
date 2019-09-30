@@ -189,35 +189,8 @@ function openMedia(id) {
             return "";
         }
 
-        /// <summary>
-        /// NOTE: New implementation of the legacy GetLinkValue. This is however a bit quirky as a media item can have multiple "Linkable DataTypes".
-        /// Returns the value for a link in WYSIWYG mode, by default only media items that have a 
-        /// DataTypeUploadField are linkable, however, a custom tree can be created which overrides
-        /// this method, or another GUID for a custom data type can be added to the LinkableMediaDataTypes
-        /// list on application startup.
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        internal virtual string GetLinkValue(UmbracoEntity entity)
-        {
-            foreach (var property in entity.AdditionalData
-                .Select(x => x.Value as UmbracoEntity.EntityProperty)
-                .Where(x => x != null))
-            {
-
-
-                //required for backwards compatibility with v7 with changing the GUID -> alias
-                var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(property.PropertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.ReturnNull);
-                if (controlId != null)
-                {
-                    if (LinkableMediaDataTypes.Contains(controlId.Value) 
-                        && string.IsNullOrEmpty((string)property.Value) == false)
-                        
-                        return property.Value.ToString();
-                }
-            }
-            return "";
-        }
+        [Obsolete("Just like this class is and is not used whatsoever for a very long time, this method will return an empty string")]
+        internal virtual string GetLinkValue(UmbracoEntity entity) => string.Empty;
 
         /// <summary>
         /// By default, any media type that is to be "linkable" in the WYSIWYG editor must contain

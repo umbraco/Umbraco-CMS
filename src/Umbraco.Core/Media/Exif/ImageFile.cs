@@ -118,9 +118,9 @@ namespace Umbraco.Core.Media.Exif
         /// <param name="encoding">The encoding to be used for text metadata when the source encoding is unknown.</param>
 		/// <returns>The <see cref="ImageFile"/> created from the file.</returns>
         public static ImageFile FromStream(Stream stream, Encoding encoding)
-		{
+        {
             // JPEG
-            if(JPEGDetector.IsOfType(stream))
+            if (JPEGDetector.IsOfType(stream))
             {
                 return new JPEGFile(stream, encoding);
             }
@@ -137,8 +137,9 @@ namespace Umbraco.Core.Media.Exif
                 return new SVGFile(stream);
             }
 
-            throw new NotValidImageFileException ();
-		}
+            // We don't know
+            return null;
+        }
 		#endregion
 	}
 }
