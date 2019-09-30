@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -83,12 +84,17 @@ namespace Umbraco.Web.Routing
                     yield break;
 
                 var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
-                if (string.IsNullOrWhiteSpace(umbracoUrlName))
+                var aliases = umbracoUrlName?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (aliases == null || aliases.Any() == false)
                     yield break;
 
-                var path = "/" + umbracoUrlName;
-                var uri = new Uri(path, UriKind.Relative);
-                yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                foreach (var alias in aliases.Distinct())
+                {
+                    var path = "/" + alias;
+                    var uri = new Uri(path, UriKind.Relative);
+                    yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                }
             }
             else
             {
@@ -105,12 +111,17 @@ namespace Umbraco.Web.Routing
                         ? node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
                         : node.Value<string>(Constants.Conventions.Content.UrlAlias);
 
-                    if (string.IsNullOrWhiteSpace(umbracoUrlName))
+                    var aliases = umbracoUrlName?.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (aliases == null || aliases.Any() == false)
                         continue;
 
-                    var path = "/" + umbracoUrlName;
-                    var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
-                    yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
+                    foreach(var alias in aliases.Distinct())
+                    {
+                        var path = "/" + alias;
+                        var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                        yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
+                    }
                 }
             }
         }
