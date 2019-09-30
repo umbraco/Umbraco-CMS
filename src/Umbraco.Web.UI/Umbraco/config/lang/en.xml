@@ -2147,5 +2147,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="suggestion">suggestion</key>
     <key alias="checkPassed">Check passed</key>
     <key alias="checkFailed">Check failed</key>
+    <key alias="openBackofficeSearch">Open backoffice search</key>
+    <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
+    <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
   </area>
 </language>

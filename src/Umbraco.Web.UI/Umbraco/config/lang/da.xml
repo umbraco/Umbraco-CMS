@@ -1630,5 +1630,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="suggestion">forslag</key>
     <key alias="checkPassed">Test bestået</key>
     <key alias="checkFailed">Test fejlet</key>
+    <key alias="openBackofficeSearch">Åben backoffice søgning</key>
+    <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
+    <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
   </area>
 </language>
