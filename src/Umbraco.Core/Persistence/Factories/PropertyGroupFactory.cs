@@ -54,6 +54,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                             propertyType.Alias = typeDto.Alias;
                             propertyType.DataTypeId = typeDto.DataTypeId;
+                            propertyType.DataTypeKey = typeDto.DataTypeDto.NodeDto.UniqueId;
                             propertyType.Description = typeDto.Description;
                             propertyType.Id = typeDto.Id;
                             propertyType.Key = typeDto.UniqueId;

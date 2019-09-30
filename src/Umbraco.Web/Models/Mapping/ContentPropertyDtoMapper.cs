@@ -12,8 +12,8 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDtoMapper : ContentPropertyBasicMapper<ContentPropertyDto>
     {
-        public ContentPropertyDtoMapper(IDataTypeService dataTypeService, ILogger logger, PropertyEditorCollection propertyEditors)
-            : base(dataTypeService, logger, propertyEditors)
+        public ContentPropertyDtoMapper(IDataTypeService dataTypeService, IEntityService entityService, ILogger logger, PropertyEditorCollection propertyEditors)
+            : base(dataTypeService, entityService, logger, propertyEditors)
         { }
 
         public override void Map(Property property, ContentPropertyDto dest, MapperContext context)

@@ -237,6 +237,7 @@ namespace Umbraco.Web.Models.Mapping
                     GroupId = groupId,
                     Inherited = inherited,
                     DataTypeId = p.DataTypeId,
+                    DataTypeKey = p.DataTypeKey,
                     SortOrder = p.SortOrder,
                     ContentTypeId = contentType.Id,
                     ContentTypeName = contentType.Name,

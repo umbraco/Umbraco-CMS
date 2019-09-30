@@ -35,7 +35,13 @@ namespace Umbraco.Core.PropertyEditors
         bool HideLabel { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the value can be copied.
+        /// </summary>
+        bool CanCopy { get; }
+
+        /// <summary>
         /// Validates a property value using custom messages.
+
         /// </summary>
         /// <param name="value">The property value.</param>
         /// <param name="required">A value indicating whether the property value is required.</param>

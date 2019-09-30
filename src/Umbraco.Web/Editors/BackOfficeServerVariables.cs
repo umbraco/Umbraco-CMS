@@ -239,10 +239,6 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetCheck())
                         },
                         {
-                            "tagApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsController>(
-                                controller => controller.GetAllTags(null))
-                        },
-                        {
                             "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
                                 controller => controller.GetById(0))
                         },
@@ -313,7 +309,11 @@ namespace Umbraco.Web.Editors
                         {
                             "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
                                 controller => controller.GetStatus())
-                        }
+                        },
+                        {
+                            "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
+                                controller => controller.UploadImage())
+                        },
                     }
                 },
                 {

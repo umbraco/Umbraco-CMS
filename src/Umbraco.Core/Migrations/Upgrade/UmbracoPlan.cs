@@ -74,6 +74,11 @@ namespace Umbraco.Core.Migrations.Upgrade
                     throw new InvalidOperationException($"Version {currentVersion} cannot be migrated to {UmbracoVersion.SemanticVersion}."
                                                         + $" Please upgrade first to at least {minVersion}.");
 
+                // Force versions between 7.14.*-7.15.* into into 7.14 initial state. Because there is no db-changes,
+                // and we don't want users to workaround my putting in version 7.14.0 them self.
+                if (minVersion <= currentVersion && currentVersion < new SemVersion(7, 16))
+                    return GetInitState(minVersion);
+
                 // initial state is eg "{init-7.14.0}"
                 return GetInitState(currentVersion);
             }

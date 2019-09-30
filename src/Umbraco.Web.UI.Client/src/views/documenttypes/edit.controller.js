@@ -338,6 +338,7 @@
                     saveMethod: contentTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,
+                    infiniteMode: infiniteMode,
                     // we need to rebind... the IDs that have been created!
                     rebindCallback: function (origContentType, savedContentType) {
                         vm.contentType.id = savedContentType.id;
@@ -497,6 +498,12 @@
             loadDocumentType();
         }));
 
+        evts.push(eventsService.on("editors.documentType.reload", function (name, args) {
+            if (args && args.node && vm.contentType.id === args.node.id) {
+                loadDocumentType();
+            }
+        }));
+
         evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
             if(args.documentType.allowedTemplates.length > 0){
                 navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
@@ -504,6 +511,10 @@
                         navigationService.reloadNode(syncArgs.node)
                     });
             }
+        }));
+
+        evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
+            angularHelper.getCurrentForm($scope).$setDirty();
         }));
 
         //ensure to unregister from all events!

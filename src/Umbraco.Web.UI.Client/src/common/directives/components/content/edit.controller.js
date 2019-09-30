@@ -4,7 +4,7 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, overlayService, $location) {
+        editorState, $http, eventsService, overlayService, $location, localStorageService) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -21,6 +21,12 @@
         $scope.page.menu.currentSection = appState.getSectionState("currentSection");
         $scope.page.listViewPath = null;
         $scope.page.isNew = $scope.isNew ? true : false;
+
+        if (infiniteMode) {
+            $scope.page.allowInfinitePublishAndClose = $scope.infiniteModel.allowPublishAndClose;
+            $scope.page.allowInfiniteSaveAndClose = $scope.infiniteModel.allowSaveAndClose;
+        }
+
         $scope.page.buttonGroupState = "init";
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
         $scope.page.hideChangeVariant = false;
@@ -32,7 +38,7 @@
 
             //watch for changes to isNew & the content.id, set the page.isNew accordingly and load the breadcrumb if we can
             $scope.$watchGroup(['isNew', 'content.id'], function (newVal, oldVal) {
-                
+
                 var contentId = newVal[1];
                 $scope.page.isNew = Object.toBoolean(newVal[0]);
 
@@ -56,11 +62,13 @@
         function init() {
 
             var content = $scope.content;
-
             if (content.id && content.isChildOfListView && content.trashed === false) {
-                $scope.page.listViewPath = ($routeParams.page) ?
-                    "/content/content/edit/" + content.parentId + "?page=" + $routeParams.page :
-                    "/content/content/edit/" + content.parentId;
+                $scope.page.listViewPath = "/content/content/edit/" + content.parentId
+                    + "?list=" + $routeParams.list
+                    + "&page=" + $routeParams.page
+                    + "&filter=" + $routeParams.filter
+                    + "&orderBy=" + $routeParams.orderBy
+                    + "&orderDirection=" + $routeParams.orderDirection;
             }
 
             // we need to check wether an app is present in the current data, if not we will present the default app.
@@ -93,6 +101,10 @@
             if (isAppPresent === false && content.apps.length) {
                 content.apps[0].active = true;
                 $scope.appChanged(content.apps[0]);
+            }
+            // otherwise make sure the save options are up to date with the current content state
+            else {
+                createButtons($scope.content);
             }
 
             editorState.set(content);
@@ -141,9 +153,16 @@
 
         function reload() {
             $scope.page.loading = true;
-            loadContent().then(function () {
-                $scope.page.loading = false;
-            });
+
+            if ($scope.page.isNew) {
+                loadScaffold().then(function () {
+                    $scope.page.loading = false;
+                });
+            } else {
+                loadContent().then(function () {
+                    $scope.page.loading = false;
+                });
+            }
         }
 
         function bindEvents() {
@@ -159,6 +178,31 @@
                 }
             }));
 
+            evts.push(eventsService.on("editors.content.reload", function (name, args) {                
+                if (args && args.node && $scope.content.id === args.node.id) {
+                    reload();
+                    loadBreadcrumb();
+                    syncTreeNode($scope.content, $scope.content.path);
+                }
+            }));
+            
+            evts.push(eventsService.on("rte.file.uploading", function(){
+                $scope.page.saveButtonState = "busy";
+                $scope.page.buttonGroupState = "busy";
+
+            }));
+
+            evts.push(eventsService.on("rte.file.uploaded", function(){
+                $scope.page.saveButtonState = "success";
+                $scope.page.buttonGroupState = "success";
+            }));
+
+            evts.push(eventsService.on("content.saved", function(){
+                // Clear out localstorage keys that start with tinymce__
+                // When we save/perist a content node
+                // NOTE: clearAll supports a RegEx pattern of items to remove
+                localStorageService.clearAll(/^tinymce__/);
+            }));
         }
 
         /**
@@ -185,6 +229,28 @@
 
                 });
 
+        }
+
+        /**
+        *  This loads the content scaffold for when creating new content
+        */
+        function loadScaffold() {
+            //we are creating so get an empty content item
+            return $scope.getScaffoldMethod()()
+                .then(function (data) {
+
+                    $scope.content = data;
+
+                    init();
+                    startWatches($scope.content);
+
+                    resetLastListPageNumber($scope.content);
+
+                    eventsService.emit("content.newReady", { content: $scope.content });
+
+                    return $q.resolve($scope.content);
+
+                });
         }
 
         /**
@@ -365,12 +431,17 @@
                 saveMethod: args.saveMethod,
                 scope: $scope,
                 content: $scope.content,
+                create: $scope.page.isNew,
                 action: args.action,
                 showNotifications: args.showNotifications,
                 softRedirect: true
             }).then(function (data) {
                 //success
                 init();
+
+                //needs to be manually set for infinite editing mode
+                $scope.page.isNew = false;
+
                 syncTreeNode($scope.content, data.path);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
@@ -447,22 +518,9 @@
 
             $scope.page.loading = true;
 
-            //we are creating so get an empty content item
-            $scope.getScaffoldMethod()()
-                .then(function (data) {
-
-                    $scope.content = data;
-
-                    init();
-                    startWatches($scope.content);
-
-                    resetLastListPageNumber($scope.content);
-
-                    eventsService.emit("content.newReady", { content: $scope.content });
-
-                    $scope.page.loading = false;
-
-                });
+            loadScaffold().then(function () {
+                $scope.page.loading = false;
+            });
         }
         else {
 
@@ -476,7 +534,7 @@
 
         $scope.unpublish = function () {
             clearNotifications($scope.content);
-            if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {                
+            if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/unpublish.html",

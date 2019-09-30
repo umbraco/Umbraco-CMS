@@ -172,7 +172,7 @@ namespace Umbraco.Core.Services.Implement
             xml.Add(new XAttribute("Id", dataType.EditorAlias));
             xml.Add(new XAttribute("Definition", dataType.Key));
             xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
-            xml.Add(new XAttribute("Configuration", JsonConvert.SerializeObject(dataType.Configuration)));
+            xml.Add(new XAttribute("Configuration", JsonConvert.SerializeObject(dataType.Configuration, PropertyEditors.ConfigurationEditor.ConfigurationJsonSettings)));
 
             var folderNames = string.Empty;
             if (dataType.Level != 1)
@@ -439,7 +439,8 @@ namespace Umbraco.Core.Services.Implement
                                     new XElement("Description", contentType.Description),
                                     new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
                                     new XElement("IsListView", contentType.IsContainer.ToString()),
-                                    new XElement("IsElement", contentType.IsElement.ToString()));
+                                    new XElement("IsElement", contentType.IsElement.ToString()),
+                                    new XElement("Variations", contentType.Variations.ToString()));
 
             var masterContentType = contentType.ContentTypeComposition.FirstOrDefault(x => x.Id == contentType.ParentId);
             if(masterContentType != null)
@@ -491,7 +492,8 @@ namespace Umbraco.Core.Services.Implement
                                                    propertyType.MandatoryMessage != null ? new XElement("MandatoryMessage", propertyType.MandatoryMessage) : null,
                                                    propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
                                                    propertyType.ValidationRegExpMessage != null ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage) : null,
-                                                   propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
+                                                   propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null,
+                                                   new XElement("Variations", propertyType.Variations.ToString()));
 
                 genericProperties.Add(genericProperty);
             }
