@@ -213,9 +213,10 @@
         }
 
         function openUserGroupPicker() {
-            var oldSelection = angular.copy(vm.user.userGroups);
+            var currentSelection = [];
+            angular.copy(vm.user.userGroups, currentSelection);
             var userGroupPicker = {
-                selection: vm.user.userGroups,
+                selection: currentSelection,
                 submit: function (model) {
                     // apply changes
                     if (model.selection) {
@@ -223,9 +224,7 @@
                     }
                     editorService.close();
                 },
-                close: function () {
-                    // roll back the selection
-                    vm.user.userGroups = oldSelection;
+                close: function () {        
                     editorService.close();
                 }
             };
