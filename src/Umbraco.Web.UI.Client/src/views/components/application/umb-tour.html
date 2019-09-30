@@ -1,6 +1,7 @@
 <div class="umb-tour">
 
-    <div class="umb-loader umb-tour__loader" ng-if="loadingStep"></div>
+    <umb-loader class="umb-tour__loader" ng-if="loadingStep"></umb-loader>
+
     <div class="umb-tour__pulse"></div>
 
     <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length}">

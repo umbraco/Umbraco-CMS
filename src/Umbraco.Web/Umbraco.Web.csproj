@@ -148,6 +148,7 @@
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
+    <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
@@ -224,15 +225,18 @@
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
+    <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
     <Compile Include="Routing\IMediaUrlProvider.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
+    <Compile Include="Scheduling\TempFileCleanup.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />
@@ -1205,6 +1209,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
+    <None Include="JavaScript\TinyMceInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
   </ItemGroup>

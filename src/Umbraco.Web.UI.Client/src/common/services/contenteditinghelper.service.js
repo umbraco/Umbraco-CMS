@@ -80,17 +80,19 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
                         formHelper.resetForm({ scope: args.scope });
 
-                        self.handleSuccessfulSave({
-                            scope: args.scope,
-                            savedContent: data,
-                            softRedirect: args.softRedirect,
-                            rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, data]);
-                            }
-                        });
+                        if (!args.infiniteMode) {
+                            self.handleSuccessfulSave({
+                                scope: args.scope,
+                                savedContent: data,
+                                softRedirect: args.softRedirect,
+                                rebindCallback: function () {
+                                    rebindCallback.apply(self, [args.content, data]);
+                                }
+                            });
 
-                        //update editor state to what is current
-                        editorState.set(args.content);
+                            //update editor state to what is current
+                            editorState.set(args.content);
+                        }
 
                         return $q.resolve(data);
 
@@ -491,7 +493,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             var savedVariants = [];
             if (origContent.variants) {
                 isContent = true;
-                //it's contnet so assign the variants as they exist
+                //it's content so assign the variants as they exist
                 origVariants = origContent.variants;
                 savedVariants = savedContent.variants;
             }
@@ -517,7 +519,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
                 //special case for content, don't sync this variant if it wasn't tagged
                 //for saving in the first place
-                if (!origVariant.save) {
+                if (isContent && !origVariant.save) {
                     continue;
                 }
 

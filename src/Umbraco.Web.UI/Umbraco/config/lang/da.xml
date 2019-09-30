@@ -37,6 +37,7 @@
     <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
     <key alias="wasMovedTo">blev flyttet til</key>
     <key alias="wasCopiedTo">blev kopieret til</key>
+    <key alias="wasDeleted">blev slettet</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -145,6 +146,7 @@
     <key alias="deleteTag">Slet tag</key>
     <key alias="confirmActionCancel">Fortryd</key>
     <key alias="confirmActionConfirm">Bekræft</key>
+	<key alias="morePublishingOptions">Flere publiseringsmuligheder</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
@@ -153,6 +155,7 @@
     <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
     <key alias="publishvariant">Brugeren har gemt og udgivet indholdet for sprogene: %0% </key>
     <key alias="save">Brugeren har gemt indholdet</key>
+    <key alias="savevariant">Brugeren har gemt indholdet for sprogene: %0%</key>
     <key alias="move">Brugeren har flyttet indholdet</key>
     <key alias="copy">Brugeren har kopieret indholdet</key>
     <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
@@ -430,6 +433,7 @@
     <key alias="linkToMedia">Link til medie</key>
     <key alias="selectContentStartNode">Vælg indhold startnode</key>
     <key alias="selectMedia">Vælg medie</key>
+    <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
     <key alias="selectItem">Vælg item</key>
     <key alias="selectLink">Vælg link</key>
@@ -439,6 +443,7 @@
     <key alias="selectMediaStartNode">Vælg medie startnode</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
+    <key alias="selectMemberType">Vælg medlemstype</key>
     <key alias="selectNode">Vælg node</key>
     <key alias="selectSections">Vælg sektioner</key>
     <key alias="selectUsers">Vælg brugere</key>
@@ -563,6 +568,7 @@
     <key alias="stylesNoStylesOnPage">Der er ingen aktive styles eller formatteringer på denne side</key>
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
+    <key alias="propertyHasErrors">Denne egenskab er ugyldig</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -582,6 +588,7 @@
     <key alias="closewindow">Luk vindue</key>
     <key alias="comment">Kommentar</key>
     <key alias="confirm">Bekræft</key>
+    <key alias="constrain">Proportioner</key>
     <key alias="constrainProportions">Behold proportioner</key>
     <key alias="content">Indhold</key>
     <key alias="continue">Fortsæt</key>
@@ -1005,8 +1012,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
   </area>
   <area alias="mediaPicker">
+    <key alias="deletedItem">Slettet medie</key>
     <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
+    <key alias="trashed">Slettet</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
@@ -1613,5 +1622,17 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="visuallyHiddenTexts">
     <key alias="goBack">Gå tilbage</key>
+    <key alias="activeListLayout">Aktivt layout:</key>
+    <key alias="jumpTo">Gå til</key>
+    <key alias="group">gruppe</key>
+    <key alias="passed">bestået</key>
+    <key alias="warning">advarsel</key>
+    <key alias="failed">fejlet</key>
+    <key alias="suggestion">forslag</key>
+    <key alias="checkPassed">Test bestået</key>
+    <key alias="checkFailed">Test fejlet</key>
+    <key alias="openBackofficeSearch">Åben backoffice søgning</key>
+    <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
+    <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
   </area>
 </language>

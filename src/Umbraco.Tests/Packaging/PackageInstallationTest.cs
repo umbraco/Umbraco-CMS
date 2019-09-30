@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using File = System.IO.File;
@@ -45,7 +46,8 @@ namespace Umbraco.Tests.Packaging
             Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             ServiceContext.DataTypeService, ServiceContext.EntityService,
             ServiceContext.ContentTypeService, ServiceContext.ContentService,
-            Factory.GetInstance<PropertyEditorCollection>());
+            Factory.GetInstance<PropertyEditorCollection>(),
+            Factory.GetInstance<IScopeProvider>());
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

@@ -211,17 +211,20 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id">Int id of the entity to fetch URL for</param>
         /// <param name="type">The type of entity such as Document, Media, Member</param>
+        /// <param name="culture">The culture to fetch the URL for</param>
         /// <returns>The URL or path to the item</returns>
         /// <remarks>
         /// We are not restricting this with security because there is no sensitive data
         /// </remarks>
-        public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type)
+        public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type, string culture = null)
         {
+            culture = culture ?? ClientCulture();
+
             var returnUrl = string.Empty;
 
             if (type == UmbracoEntityTypes.Document)
             {
-                var foundUrl = UmbracoContext.Url(id);
+                var foundUrl = UmbracoContext.Url(id, culture);
                 if (string.IsNullOrEmpty(foundUrl) == false && foundUrl != "#")
                 {
                     returnUrl = foundUrl;

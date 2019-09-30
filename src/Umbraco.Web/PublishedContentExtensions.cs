@@ -1067,7 +1067,7 @@ namespace Umbraco.Web
         /// <remarks>
         ///   <para>Note that in V7 this method also return the content node self.</para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent> Siblings<T>(this IPublishedContent content, string culture = null)
+        public static IEnumerable<T> Siblings<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
             return SiblingsAndSelf<T>(content, culture).Where(x => x.Id != content.Id);
