@@ -94,14 +94,14 @@
                                         focus-when="{{vm.focusOnMandatoryField}}"
                             </umb-toggle>
 
-                            <textarea class="editor-validation-message"
-                                      localize="placeholder"
-                                      placeholder="@validation_mandatoryMessage"
-                                      ng-model="model.property.validation.mandatoryMessage"
-                                      ng-if="model.property.validation.mandatory"
-                                      umb-auto-resize
-                                      ng-keypress="vm.submitOnEnter($event)">
-                            </textarea>
+                            <input type="text"
+                                   class="editor-validation-message"
+                                   localize="placeholder"
+                                   placeholder="@validation_mandatoryMessage"
+                                   ng-model="model.property.validation.mandatoryMessage"
+                                   ng-if="model.property.validation.mandatory"
+                                   ng-keypress="vm.submitOnEnter($event)">
+                            </input>
 
                             <label class="mt3">
                                 <localize key="validation_customValidation"></localize>
@@ -122,14 +122,13 @@
                                       ng-keypress="vm.submitOnEnter($event)">
                             </textarea>
 
-                            <textarea class="editor-validation-message"
-                                      localize="placeholder"
-                                      placeholder="@validation_validationRegExpMessage"
-                                      ng-model="model.property.validation.patternMessage"
-                                      ng-if="vm.showValidationPattern"
-                                      umb-auto-resize
-                                      ng-keypress="vm.submitOnEnter($event)">
-                            </textarea>
+                            <input type="text"
+                                   class="editor-validation-message"
+                                   localize="placeholder"
+                                   placeholder="@validation_validationRegExpMessage"
+                                   ng-model="model.property.validation.patternMessage"
+                                   ng-if="vm.showValidationPattern"
+                                   ng-keypress="vm.submitOnEnter($event)" />
 
                         </div>
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
