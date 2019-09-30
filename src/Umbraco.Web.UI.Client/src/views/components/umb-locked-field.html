@@ -3,11 +3,11 @@
     <div class="umb-locked-field__wrapper">
 
         <button ng-if="locked" ng-click="unlock()" class="umb-locked-field__toggle">
-            <i class="umb-locked-field__lock-icon icon-lock"></i>
+            <i class="umb-locked-field__lock-icon icon-lock" aria-hidden="true"></i>
         </button>
 
         <button ng-if="!locked" ng-click="lock()" class="umb-locked-field__toggle">
-            <i class="umb-locked-field__lock-icon icon-unlocked -unlocked"></i>
+            <i class="umb-locked-field__lock-icon icon-unlocked -unlocked" aria-hidden="true"></i>
         </button>
 
         <input type="text"
