@@ -364,6 +364,22 @@
       };
 
 
+      scope.openDocumentType = function (documentTypeId) {
+          const editor = {
+              id: documentTypeId,
+              submit: function (model) {
+                  const args = { node: scope.model };
+                  eventsService.emit("editors.documentType.reload", args);
+                  editorService.close();
+              },
+              close: function () {
+                  editorService.close();
+              }
+          };
+          editorService.documentTypeEditor(editor);
+
+      };
+
       /* ---------- GROUPS ---------- */
 
       scope.addGroup = function(group) {

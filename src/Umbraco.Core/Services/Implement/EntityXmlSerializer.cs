@@ -172,7 +172,7 @@ namespace Umbraco.Core.Services.Implement
             xml.Add(new XAttribute("Id", dataType.EditorAlias));
             xml.Add(new XAttribute("Definition", dataType.Key));
             xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
-            xml.Add(new XAttribute("Configuration", JsonConvert.SerializeObject(dataType.Configuration)));
+            xml.Add(new XAttribute("Configuration", JsonConvert.SerializeObject(dataType.Configuration, PropertyEditors.ConfigurationEditor.ConfigurationJsonSettings)));
 
             var folderNames = string.Empty;
             if (dataType.Level != 1)

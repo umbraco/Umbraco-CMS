@@ -1,6 +1,20 @@
 describe('RTE controller tests', function () {
     var scope, controllerFactory;
-    
+
+    //mock tinymce globals
+    if ((typeof tinymce) === "undefined") {
+        tinymce = {
+            DOM: {
+                events: {
+                    domLoaded: false
+                }
+            },
+            baseUrl: ""
+        }
+    }
+
+    beforeEach(module('LocalStorageModule'));
+
     beforeEach(module('umbraco', function ($provide) {
         $provide.value('tinyMceAssets', []);
     }));

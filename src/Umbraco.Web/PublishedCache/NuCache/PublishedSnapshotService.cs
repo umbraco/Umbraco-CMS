@@ -160,7 +160,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _domainStore = new SnapDictionary<int, Domain>();
 
-            publishedModelFactory.WithSafeLiveFactory(LoadCachesOnStartup);
+            LoadCachesOnStartup();
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
@@ -1686,6 +1686,13 @@ AND cmsContentNu.nodeId IS NULL
             var mediaCollect = _mediaStore.CollectAsync();
             System.Threading.Tasks.Task.WaitAll(contentCollect, mediaCollect);
         }
+
+        #endregion
+
+        #region Internals/Testing
+
+        internal ContentStore GetContentStore() => _contentStore;
+        internal ContentStore GetMediaStore() => _mediaStore;
 
         #endregion
     }

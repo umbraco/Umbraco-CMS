@@ -1011,8 +1011,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
   </area>
   <area alias="mediaPicker">
+    <key alias="deletedItem">Slettet medie</key>
     <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
+    <key alias="trashed">Slettet</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
@@ -1621,6 +1623,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="goBack">Gå tilbage</key>
     <key alias="activeListLayout">Aktivt layout:</key>
     <key alias="jumpTo">Gå til</key>
-    <key alias="group">gruppe</key>    
+    <key alias="group">gruppe</key>
+    <key alias="passed">bestået</key>
+    <key alias="warning">advarsel</key>
+    <key alias="failed">fejlet</key>
+    <key alias="suggestion">forslag</key>
+    <key alias="checkPassed">Test bestået</key>
+    <key alias="checkFailed">Test fejlet</key>
+    <key alias="openBackofficeSearch">Åben backoffice søgning</key>
+    <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
+    <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
   </area>
 </language>
