@@ -100,14 +100,14 @@
         }
 
         function openSectionPicker() {
-            var oldSelection = angular.copy(vm.userGroup.sections);
+            var currentSelection = [];
+            angular.copy(vm.userGroup.sections, currentSelection);
             var sectionPicker = {
-                selection: vm.userGroup.sections,
+                selection: currentSelection,
                 submit: function (model) {
                     editorService.close();
                 },
                 close: function () {
-                    vm.userGroup.sections = oldSelection;
                     editorService.close();
                 }
             };
