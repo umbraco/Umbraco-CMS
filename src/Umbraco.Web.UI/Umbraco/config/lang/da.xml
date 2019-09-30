@@ -155,6 +155,7 @@
     <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
     <key alias="publishvariant">Brugeren har gemt og udgivet indholdet for sprogene: %0% </key>
     <key alias="save">Brugeren har gemt indholdet</key>
+    <key alias="savevariant">Brugeren har gemt indholdet for sprogene: %0%</key>
     <key alias="move">Brugeren har flyttet indholdet</key>
     <key alias="copy">Brugeren har kopieret indholdet</key>
     <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
