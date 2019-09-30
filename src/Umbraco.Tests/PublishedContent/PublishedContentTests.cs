@@ -42,10 +42,14 @@ namespace Umbraco.Tests.PublishedContent
             Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
 
             var logger = Mock.Of<ILogger>();
+            var mediaService = Mock.Of<IMediaService>();
+            var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
+            var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
+
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(logger)) { Id = 1 },
                 new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger)) { Id = 1002 },
+                new DataType(new RichTextPropertyEditor(logger, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor)) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(logger)) { Id = 1005 });

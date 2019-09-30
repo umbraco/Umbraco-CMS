@@ -13,6 +13,7 @@ using Umbraco.Web.Models;
 namespace Umbraco.Web
 {
     using Core.Configuration;
+    using Umbraco.Web.JavaScript;
 
     /// <summary>
     /// HtmlHelper extensions for the back office
@@ -117,6 +118,21 @@ namespace Umbraco.Web
             sb.Append(@"resetCodeModel: ");
             sb.AppendLine(JsonConvert.SerializeObject(resetCodeModel));
             sb.AppendLine(@"});");
+
+            return html.Raw(sb.ToString());
+        }
+
+        public static IHtmlString AngularValueTinyMceAssets(this HtmlHelper html)
+        {
+            var ctx = new HttpContextWrapper(HttpContext.Current);
+            var files = JsInitialization.OptimizeTinyMceScriptFiles(ctx);
+
+            var sb = new StringBuilder();
+
+            sb.AppendLine(@"app.value(""tinyMceAssets"",");
+            sb.AppendLine(JsonConvert.SerializeObject(files));
+            sb.AppendLine(@");");
+
 
             return html.Raw(sb.ToString());
         }

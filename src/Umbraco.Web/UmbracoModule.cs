@@ -103,10 +103,5 @@ namespace Umbraco.Web
             return end;
         }
 
-        /// <summary>
-        /// This is used internally to track any registered callback paths for Identity providers. If the request path matches
-        /// any of the registered paths, then the module will let the request keep executing
-        /// </summary>
-        internal static readonly ConcurrentHashSet<string> ReservedPaths = new ConcurrentHashSet<string>();
     }
 }

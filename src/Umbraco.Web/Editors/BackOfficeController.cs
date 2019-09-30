@@ -189,7 +189,7 @@ namespace Umbraco.Web.Editors
                 .ToDictionary(pv => pv.Key, pv =>
                     pv.ToDictionary(pve => pve.valueAlias, pve => pve.value));
 
-            return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.Indented };
+            return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.None };
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace Umbraco.Web.Editors
                     GetAssetList,
                     new TimeSpan(0, 2, 0));
 
-            return new JsonNetResult { Data = result, Formatting = Formatting.Indented };
+            return new JsonNetResult { Data = result, Formatting = Formatting.None };
         }
 
         [UmbracoAuthorize(Order = 0)]
@@ -244,7 +244,7 @@ namespace Umbraco.Web.Editors
         public JsonNetResult GetGridConfig()
         {
             var gridConfig = Current.Configs.Grids();
-            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
+            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
         }
 
 

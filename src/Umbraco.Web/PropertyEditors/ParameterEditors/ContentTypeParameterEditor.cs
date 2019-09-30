@@ -6,7 +6,11 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
     /// <summary>
     /// Represents a content type parameter editor.
     /// </summary>
-    [DataEditor("contentType", EditorType.MacroParameter, "Content Type Picker", "entitypicker")]
+    [DataEditor(
+        "contentType",
+        EditorType.MacroParameter,
+        "Content Type Picker",
+        "entitypicker")]
     public class ContentTypeParameterEditor : DataEditor
     {
         /// <summary>

@@ -2297,7 +2297,7 @@ namespace Umbraco.Web.Editors
             }
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
-            if (entry == null)
+            if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -2379,7 +2379,7 @@ namespace Umbraco.Web.Editors
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
 
-            if (entry == null)
+            if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 entry = new PublicAccessEntry(content, loginPage, errorPage, new List<PublicAccessRule>());
 

@@ -74,6 +74,7 @@ namespace Umbraco.Web.Editors
                     //id is passed in eventually we'll probably want to support GUID + Udi too
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPagedChildren", "id", typeof(int), typeof(string)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPath", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetUrlAndAnchors", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
@@ -210,17 +211,20 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id">Int id of the entity to fetch URL for</param>
         /// <param name="type">The type of entity such as Document, Media, Member</param>
+        /// <param name="culture">The culture to fetch the URL for</param>
         /// <returns>The URL or path to the item</returns>
         /// <remarks>
         /// We are not restricting this with security because there is no sensitive data
         /// </remarks>
-        public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type)
+        public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type, string culture = null)
         {
+            culture = culture ?? ClientCulture();
+
             var returnUrl = string.Empty;
 
             if (type == UmbracoEntityTypes.Document)
             {
-                var foundUrl = UmbracoContext.Url(id);
+                var foundUrl = UmbracoContext.Url(id, culture);
                 if (string.IsNullOrEmpty(foundUrl) == false && foundUrl != "#")
                 {
                     returnUrl = foundUrl;
@@ -288,7 +292,16 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public UrlAndAnchors GetUrlAndAnchors([FromUri]int id, [FromUri]string culture = "*")
+        public UrlAndAnchors GetUrlAndAnchors(Udi id, string culture = "*")
+        {
+            var intId = Services.EntityService.GetId(id);
+            if (!intId.Success)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return GetUrlAndAnchors(intId.Result, culture);
+        }
+        [HttpGet]
+        public UrlAndAnchors GetUrlAndAnchors(int id, string culture = "*")
         {
             var url = UmbracoContext.UrlProvider.GetUrl(id);
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id, culture);
