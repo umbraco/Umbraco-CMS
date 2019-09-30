@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.Mapping
                 var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
                 if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariantDisplay>(); //this should never happen
 
-                var langs = context.Map<IEnumerable<Language>>(allLanguages).ToList();
+                var langs = context.MapEnumerable<ILanguage, Language>(allLanguages).ToList();
 
                 //create a variant for each language, then we'll populate the values
                 var variants = langs.Select(x =>
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Models.Mapping
                 variants.Remove(defaultLang);
 
                 //Sort the remaining languages a-z
-                variants = variants.OrderBy(x => x.Name).ToList();
+                variants = variants.OrderBy(x => x.Language.Name).ToList();
 
                 //Insert the default language as the first item
                 variants.Insert(0, defaultLang);

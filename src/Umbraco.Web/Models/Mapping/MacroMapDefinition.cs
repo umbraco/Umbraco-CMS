@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.Mapping
         public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<IMacro, EntityBasic>((source, context) => new EntityBasic(), Map);
-            mapper.Define<IMacro, IEnumerable<MacroParameter>>((source, context) => source.Properties.Values.Select(context.Map<MacroParameter>).ToList());
+            mapper.Define<IMacro, IEnumerable<MacroParameter>>((source, context) => context.MapEnumerable<IMacroProperty, MacroParameter>(source.Properties.Values));
             mapper.Define<IMacroProperty, MacroParameter>((source, context) => new MacroParameter(), Map);
         }
 
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Models.Mapping
         private static void Map(IMacro source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
-            target.Icon = "icon-settings-alt";
+            target.Icon = Constants.Icons.Macro;
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;

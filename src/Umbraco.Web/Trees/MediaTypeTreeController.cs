@@ -50,7 +50,7 @@ namespace Umbraco.Web.Trees
                         // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
                         // need this check to keep supporting sites where children have already been created.
                         var hasChildren = dt.HasChildren;
-                        var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings, "icon-thumbnails", hasChildren);
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings, Constants.Icons.MediaType, hasChildren);
 
                         node.Path = dt.Path;
                         return node;
@@ -120,7 +120,7 @@ namespace Umbraco.Web.Trees
         {
             var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.MediaType, pageIndex, pageSize, out totalFound,
                 filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
-            return Mapper.Map<IEnumerable<SearchResultEntity>>(results);
+            return Mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
     }
 }

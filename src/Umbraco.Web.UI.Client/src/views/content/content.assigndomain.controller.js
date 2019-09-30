@@ -88,6 +88,7 @@
 
         function save() {
 
+            vm.error = null;
             vm.submitButtonState = "busy";
 
             if (vm.domainForm.$valid) {
@@ -131,6 +132,7 @@
                     }
 
                 }, function (e) {
+                    vm.error = e;
                     vm.submitButtonState = "error";
                 });
             }

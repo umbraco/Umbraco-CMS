@@ -16,7 +16,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                 'Failed to retrieve count');
         },
 
-        getAvailableCompositeContentTypes: function (contentTypeId, filterContentTypes, filterPropertyTypes) {
+        getAvailableCompositeContentTypes: function (contentTypeId, filterContentTypes, filterPropertyTypes, isElement) {
             if (!filterContentTypes) {
                 filterContentTypes = [];
             }
@@ -27,7 +27,8 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
             var query = {
                 contentTypeId: contentTypeId,
                 filterContentTypes: filterContentTypes,
-                filterPropertyTypes: filterPropertyTypes
+                filterPropertyTypes: filterPropertyTypes,
+                isElement: isElement
             };
 
             return umbRequestHelper.resourcePromise(
@@ -344,6 +345,12 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "Import", { file: file })),
                 "Failed to import document type " + file
             );
+        },
+
+        createDefaultTemplate: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateDefaultTemplate", { id: id })),
+                'Failed to create default template for content type with id ' + id);
         }
     };
 }

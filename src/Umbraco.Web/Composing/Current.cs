@@ -101,6 +101,9 @@ namespace Umbraco.Web.Composing
         public static UrlProviderCollection UrlProviders
             => Factory.GetInstance<UrlProviderCollection>();
 
+        public static MediaUrlProviderCollection MediaUrlProviders
+            => Factory.GetInstance<MediaUrlProviderCollection>();
+
         public static HealthCheckCollectionBuilder HealthCheckCollectionBuilder
             => Factory.GetInstance<HealthCheckCollectionBuilder>();
 

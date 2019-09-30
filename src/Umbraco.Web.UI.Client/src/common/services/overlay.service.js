@@ -27,6 +27,11 @@
                 overlay.position = "center";
             }
 
+            // set the default overlay size to small
+            if(!overlay.size) {
+                overlay.size = "small";
+            }
+
             // use a default empty view if nothing is set
             if(!overlay.view) {
                 overlay.view = "views/common/overlays/default/default.html";
@@ -72,5 +77,6 @@
     }
 
     angular.module("umbraco.services").factory("overlayService", overlayService);
+
 
 })();

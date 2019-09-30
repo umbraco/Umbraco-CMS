@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
-
     /// <inheritdoc />
     /// <summary>
     /// Represents a published content item.
@@ -27,21 +26,13 @@ namespace Umbraco.Core.Models.PublishedContent
         int Id { get; }
 
         /// <summary>
-        /// Gets the name of the content item.
+        /// Gets the name of the content item for the current culture.
         /// </summary>
-        /// <remarks>
-        /// <para>The value of this property is contextual. When the content type is multi-lingual,
-        /// this is the name for the 'current' culture. Otherwise, it is the invariant name.</para>
-        /// </remarks>
         string Name { get; }
 
         /// <summary>
-        /// Gets the url segment of the content item.
+        /// Gets the url segment of the content item for the current culture.
         /// </summary>
-        /// <remarks>
-        /// <para>The value of this property is contextual. When the content type is multi-lingual,
-        /// this is the name for the 'current' culture. Otherwise, it is the invariant url segment.</para>
-        /// </remarks>
         string UrlSegment { get; }
 
         /// <summary>
@@ -94,43 +85,28 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         /// <remarks>
         /// <para>For published content items, this is also the date the item was published.</para>
-        /// <para>This date is always global to the content item, see GetCulture().Date for the
+        /// <para>This date is always global to the content item, see CultureDate() for the
         /// date each culture was published.</para>
         /// </remarks>
         DateTime UpdateDate { get; }
 
         /// <summary>
-        /// Gets the url of the content item.
+        /// Gets the url of the content item for the current culture.
         /// </summary>
         /// <remarks>
         /// <para>The value of this property is contextual. It depends on the 'current' request uri,
-        /// if any. In addition, when the content type is multi-lingual, this is the url for the
-        /// 'current' culture. Otherwise, it is the invariant url.</para>
+        /// if any.</para>
         /// </remarks>
         string Url { get; }
 
         /// <summary>
-        /// Gets the url of the content item.
-        /// </summary>
-        /// <remarks>
-        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
-        /// if any. In addition, when the content type is multi-lingual, this is the url for the
-        /// specified culture. Otherwise, it is the invariant url.</para>
-        /// </remarks>
-        string GetUrl(string culture = null);
-
-        /// <summary>
-        /// Gets culture infos for a culture.
-        /// </summary>
-        PublishedCultureInfo GetCulture(string culture = null);
-
-        /// <summary>
-        /// Gets culture infos.
+        /// Gets available culture infos.
         /// </summary>
         /// <remarks>
         /// <para>Contains only those culture that are available. For a published content, these are
         /// the cultures that are published. For a draft content, those that are 'available' ie
         /// have a non-empty content name.</para>
+        /// <para>Does not contain the invariant culture.</para> // fixme?
         /// </remarks>
         IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
 
@@ -178,10 +154,14 @@ namespace Umbraco.Core.Models.PublishedContent
         IPublishedContent Parent { get; }
 
         /// <summary>
-        /// Gets the children of the content item.
+        /// Gets the children of the content item that are available for the current culture.
         /// </summary>
-        /// <remarks>Children are sorted by their sortOrder.</remarks>
         IEnumerable<IPublishedContent> Children { get; }
+
+        /// <summary>
+        /// Gets all the children of the content item, regardless of whether they are available for the current culture.
+        /// </summary>
+        IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 
         #endregion
     }

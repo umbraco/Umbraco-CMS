@@ -14,6 +14,13 @@
  */
 function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, localizationService, editorService, $q) {
 
+    var vm = {
+        labels: {
+            general_recycleBin: "",
+            general_add: ""
+        }
+    };
+
     var unsubscribe;
 
     function subscribe() {
@@ -33,7 +40,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     /** Performs validation based on the renderModel data */
     function validate() {
         if ($scope.contentPickerForm) {
-            angularHelper.getCurrentForm($scope).$setDirty();
             //Validate!
             if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", false);
@@ -65,13 +71,15 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         //model if it changes (i.e. based on server updates, or if used in split view, etc...)
         $scope.$watch("model.value", function (newVal, oldVal) {
             if (newVal !== oldVal) {
-                syncRenderModel();
+                syncRenderModel(true);
             }
         });
     }
 
     $scope.renderModel = [];
     $scope.sortableModel = [];
+
+    $scope.labels = vm.labels;
 
     $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
 
@@ -81,6 +89,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
+        dataTypeKey: null,
         maxNumber: 1,
         minNumber: 0,
         startNode: {
@@ -111,6 +120,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
         //merge the server config on top of the default config, then set the server config to use the result
         $scope.model.config = angular.extend(defaultConfig, $scope.model.config);
+
+        // if the property is mandatory, set the minCount config to 1 (unless of course it is set to something already),
+        // that way the minCount/maxCount validation handles the mandatory as well
+        if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
+            $scope.model.config.minNumber = 1;
+        }
     }
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
@@ -134,6 +149,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
         startNodeId: null,
+        dataTypeKey: $scope.model.dataTypeKey,
         currentNode: editorState ? editorState.current : null,
         callback: function (data) {
             if (angular.isArray(data)) {
@@ -151,9 +167,23 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         idType: "udi"
     };
 
-    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
+    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
+
+    dialogOptions.dataTypeKey = $scope.model.dataTypeKey;
+
+    // if we can't pick more than one item, explicitly disable multiPicker in the dialog options
+    if ($scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) === 1) {
+        dialogOptions.multiPicker = false;
+    }
+
+    // add the current filter (if any) as title for the filtered out nodes
+    if ($scope.model.config.filter) {
+        localizationService.localize("contentPicker_allowedItemTypes", [$scope.model.config.filter]).then(function (data) {
+            dialogOptions.filterTitle = data;
+        });
+    }
 
     //We need to manually handle the filter for members here since the tree displayed is different and only contains
     // searchable list views
@@ -170,7 +200,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             if (!currFilter) {
                 return false;
             }
-            //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller, 
+            //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller,
             // but not much we can do about that since members require special filtering.
             var filterItem = currFilter.toLowerCase().split(',');
             var found = filterItem.indexOf(i.metaData.contentType.toLowerCase()) >= 0;
@@ -376,7 +406,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
         else {
             $scope.renderModel = [];
-            if (validate) {
+            if (doValidation) {
                 validate();
             }
             setSortingState($scope.renderModel);
@@ -390,11 +420,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         // get url for content and media items
         if (entityType !== "Member") {
             entityResource.getUrl(entity.id, entityType).then(function (data) {
-                // update url                
+                // update url
                 angular.forEach($scope.renderModel, function (item) {
                     if (item.id === entity.id) {
                         if (entity.trashed) {
-                            item.url = localizationService.dictionary.general_recycleBin;
+                            item.url = vm.labels.general_recycleBin;
                         } else {
                             item.url = data;
                         }
@@ -436,7 +466,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             "url": item.url,
             "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
-            // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
+            // only content supports published/unpublished content so we set everything else to published so the UI looks correct
         });
 
         setEntityUrl(item);
@@ -452,11 +482,18 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     function init() {
-        syncRenderModel(false).then(function () {
-            //everything is loaded, start the watch on the model
-            startWatch();
-            subscribe();
-        });
+        localizationService.localizeMany(["general_recycleBin", "general_add"])
+            .then(function(data) {
+                vm.labels.general_recycleBin = data[0];
+                vm.labels.general_add = data[1];
+
+                syncRenderModel(false).then(function () {
+                    //everything is loaded, start the watch on the model
+                    startWatch();
+                    subscribe();
+                    validate();
+                });
+            });
     }
 
     init();

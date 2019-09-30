@@ -127,10 +127,10 @@ namespace Umbraco.Web.Models.Mapping
         private IEnumerable<PropertyEditorBasic> MapAvailableEditors(IDataType source, MapperContext context)
         {
             var contentSection = Current.Configs.Settings().Content;
-            return _propertyEditors
+            var properties = _propertyEditors
                 .Where(x => !x.IsDeprecated || contentSection.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
-                .OrderBy(x => x.Name)
-                .Select(context.Map<PropertyEditorBasic>);
+                .OrderBy(x => x.Name);
+            return context.MapEnumerable<IDataEditor, PropertyEditorBasic>(properties);
         }
 
         private IEnumerable<DataTypeConfigurationFieldDisplay> MapPreValues(IDataType dataType, MapperContext context)
@@ -143,22 +143,29 @@ namespace Umbraco.Web.Models.Mapping
                 throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
 
             var configurationEditor = editor.GetConfigurationEditor();
-            var fields = configurationEditor.Fields.Select(context.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+            var fields = context.MapEnumerable<ConfigurationField,DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
             var configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.Configuration);
 
-            MapConfigurationFields(fields, configurationDictionary);
+            MapConfigurationFields(dataType, fields, configurationDictionary);
 
             return fields;
         }
-
-        private void MapConfigurationFields(DataTypeConfigurationFieldDisplay[] fields, IDictionary<string, object> configuration)
+        
+        private void MapConfigurationFields(IDataType dataType, List<DataTypeConfigurationFieldDisplay> fields, IDictionary<string, object> configuration)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             // now we need to wire up the pre-values values with the actual fields defined
-            foreach (var field in fields)
+            foreach (var field in fields.ToList())
             {
+                //filter out the not-supported pre-values for built-in data types
+                if (dataType != null && dataType.IsBuildInDataType() && field.Key.InvariantEquals(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes))
+                {
+                    fields.Remove(field);
+                    continue;
+                }
+
                 if (configuration.TryGetValue(field.Key, out var value))
                 {
                     field.Value = value;
@@ -190,11 +197,11 @@ namespace Umbraco.Web.Models.Mapping
 
             var configurationEditor = source.GetConfigurationEditor();
 
-            var fields = configurationEditor.Fields.Select(context.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+            var fields = context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
 
             var defaultConfiguration = configurationEditor.DefaultConfiguration;
             if (defaultConfiguration != null)
-                MapConfigurationFields(fields, defaultConfiguration);
+                MapConfigurationFields(null, fields, defaultConfiguration);
 
             return fields;
         }

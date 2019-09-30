@@ -202,13 +202,6 @@
     <key alias="displayName">שם התצוגה לשפה</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">תת פריטי תוכן מאושרים:</key>
-    <key alias="create">צור</key>
-    <key alias="deletetab">מחק לשונית</key>
-    <key alias="description">תיאור</key>
-    <key alias="newtab">לשונית חדשה</key>
-    <key alias="tab">לשונית</key>
-    <key alias="thumbnail">תמונה ממוזערת</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">הוסף ערך מקדים</key>

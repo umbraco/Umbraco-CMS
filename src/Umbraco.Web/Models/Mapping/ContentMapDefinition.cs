@@ -64,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
+            target.Properties = context.MapEnumerable<Property, ContentPropertyDto>(source.Properties);
         }
 
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
@@ -73,6 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             target.AllowedActions = GetActions(source);
             target.AllowedTemplates = GetAllowedTemplates(source);
             target.ContentApps = _commonMapper.GetContentApps(source);
+            target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(source.ContentType.Name);
             target.DocumentType = _commonMapper.GetContentType(source, context);
@@ -98,7 +99,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Variants = _contentVariantMapper.Map(source, context);
 
             target.ContentDto = new ContentPropertyCollectionDto();
-            target.ContentDto.Properties = source.Properties.Select(context.Map<ContentPropertyDto>);
+            target.ContentDto.Properties = context.MapEnumerable<Property, ContentPropertyDto>(source.Properties);
         }
 
         // Umbraco.Code.MapAll -Segment -Language
@@ -117,6 +118,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Alias
         private void Map(IContent source, ContentItemBasic<ContentPropertyBasic> target, MapperContext context)
         {
+            target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.CreateDate = source.CreateDate;
             target.Edited = source.Edited;
@@ -127,7 +129,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = source.Properties.Select(context.Map<ContentPropertyBasic>);
+            target.Properties = context.MapEnumerable<Property, ContentPropertyBasic>(source.Properties);
             target.SortOrder = source.SortOrder;
             target.State = _basicStateMapper.Map(source, context);
             target.Trashed = source.Trashed;

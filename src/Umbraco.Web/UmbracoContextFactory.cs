@@ -29,12 +29,13 @@ namespace Umbraco.Web
         private readonly IUmbracoSettingsSection _umbracoSettings;
         private readonly IGlobalSettings _globalSettings;
         private readonly UrlProviderCollection _urlProviders;
+        private readonly MediaUrlProviderCollection _mediaUrlProviders;
         private readonly IUserService _userService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextFactory"/> class.
         /// </summary>
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, UrlProviderCollection urlProviders, IUserService userService)
+        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IUserService userService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -44,6 +45,7 @@ namespace Umbraco.Web
             _umbracoSettings = umbracoSettings ?? throw new ArgumentNullException(nameof(umbracoSettings));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _urlProviders = urlProviders ?? throw new ArgumentNullException(nameof(urlProviders));
+            _mediaUrlProviders = mediaUrlProviders ?? throw new ArgumentNullException(nameof(mediaUrlProviders));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
@@ -51,11 +53,19 @@ namespace Umbraco.Web
         {
             // make sure we have a variation context
             if (_variationContextAccessor.VariationContext == null)
+            {
+                // TODO: By using _defaultCultureAccessor.DefaultCulture this means that the VariationContext will always return a variant culture, it will never
+                // return an empty string signifying that the culture is invariant. But does this matter? Are we actually expecting this to return an empty string
+                // for invariant routes? From what i can tell throughout the codebase is that whenever we are checking against the VariationContext.Culture we are
+                // also checking if the content type varies by culture or not. This is fine, however the code in the ctor of VariationContext is then misleading
+                // since it's assuming that the Culture can be empty (invariant) when in reality of a website this will never be empty since a real culture is always set here.
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
+            }
+                
 
             var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings);
 
-            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _globalSettings, _variationContextAccessor);
+            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor);
         }
 
         /// <inheritdoc />

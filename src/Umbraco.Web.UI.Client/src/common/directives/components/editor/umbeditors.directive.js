@@ -15,9 +15,7 @@
                 editor.moveRight = true;
                 editor.level = 0;
                 editor.styleIndex = 0;
-                
-                editor.infinityMode = true;
-                
+                                
                 // push the new editor to the dom
                 scope.editors.push(editor);
                 

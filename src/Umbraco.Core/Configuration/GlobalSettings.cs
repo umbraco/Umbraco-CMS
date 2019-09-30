@@ -33,7 +33,6 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         private static void ResetInternal()
         {
-            GlobalSettingsExtensions.Reset();
             _reservedPaths = null;
             _reservedUrls = null;
             HasSmtpServer = null;
@@ -315,7 +314,7 @@ namespace Umbraco.Core.Configuration
                         var hash = hashString.GenerateHash();
                         var siteTemp = System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", hash);
 
-                        return _localTempPath = System.IO.Path.Combine(siteTemp, "umbraco.config");
+                        return _localTempPath = siteTemp;
 
                     //case LocalTempStorage.Default:
                     //case LocalTempStorage.Unknown:

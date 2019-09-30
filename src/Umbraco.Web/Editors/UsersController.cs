@@ -238,7 +238,7 @@ namespace Umbraco.Web.Editors
 
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
-                Items = Mapper.Map<IEnumerable<UserBasic>>(result),
+                Items = Mapper.MapEnumerable<IUser, UserBasic>(result),
                 UserStates = Services.UserService.GetUserStates()
             };
 

@@ -44,7 +44,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             return selected.id;
         };
         createEditUrlCallback = function (item) {
-            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id + "?page=" + $scope.options.pageNumber;
+            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id 
+                + "?list=" + $routeParams.id + "&page=" + $scope.options.pageNumber + "&filter=" + $scope.options.filter 
+                + "&orderBy=" + $scope.options.orderBy + "&orderDirection=" + $scope.options.orderDirection;
         };
     }
 
@@ -53,7 +55,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     $scope.actionInProgress = false;
     $scope.selection = [];
     $scope.folders = [];
-    $scope.page = {};
+    $scope.page = {
+        createDropdownOpen: false
+    };
     $scope.listViewResultSet = {
         totalPages: 0,
         items: []
@@ -141,12 +145,13 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     }
 
+    var listParamsForCurrent = $routeParams.id == $routeParams.list;
     $scope.options = {
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
-        pageNumber: ($routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
-        filter: '',
-        orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
-        orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection.trim() : "desc",
+        pageNumber: (listParamsForCurrent && $routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
+        filter: (listParamsForCurrent && $routeParams.filter ? $routeParams.filter : '').trim(),
+        orderBy: (listParamsForCurrent && $routeParams.orderBy ? $routeParams.orderBy : $scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
+        orderDirection: (listParamsForCurrent && $routeParams.orderDirection ? $routeParams.orderDirection : $scope.model.config.orderDirection ? $scope.model.config.orderDirection : "desc").trim(),
         orderBySystemField: true,
         includeProperties: $scope.model.config.includeProperties ? $scope.model.config.includeProperties : [
             { alias: 'updateDate', header: 'Last edited', isSystem: 1 },
@@ -186,15 +191,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     //update all of the system includeProperties to enable sorting
     _.each($scope.options.includeProperties, function (e, i) {
+        e.allowSorting = true;
 
-        //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
-        // to do that, we'd need to update the base query for content to include the content type alias column
-        // which requires another join and would be slower. BUT We are doing this for members so not sure it makes a diff?
-        if (e.alias != "contentTypeAlias") {
-            e.allowSorting = true;
-        }
-
-        // Another special case for members, only fields on the base table (cmsMember) can be used for sorting
+        // Special case for members, only fields on the base table (cmsMember) can be used for sorting
         if (e.isSystem && $scope.entityType == "member") {
             e.allowSorting = e.alias == 'username' || e.alias == 'email';
         }
@@ -384,6 +383,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
+            submitButtonStyle: "danger",
             submit: function (model) {
                 performDelete();
                 overlayService.close();
@@ -801,8 +801,18 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             .search("blueprintId", blueprintId);
     }
 
+    function toggleDropdown () {
+        $scope.page.createDropdownOpen = !$scope.page.createDropdownOpen;
+    }
+
+    function leaveDropdown () {
+        $scope.page.createDropdownOpen = false;
+    }
+
     $scope.createBlank = createBlank;
     $scope.createFromBlueprint = createFromBlueprint;
+    $scope.toggleDropdown = toggleDropdown;
+    $scope.leaveDropdown = leaveDropdown;
 
     //GO!
     initView();

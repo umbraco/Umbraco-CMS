@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Mapping
 {
@@ -29,11 +31,16 @@ namespace Umbraco.Core.Mapping
     /// </remarks>
     public class UmbracoMapper
     {
-        private readonly Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors
-            = new Dictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>>();
+        // note
+        //
+        // the outer dictionary *can* be modified, see GetCtor and GetMap, hence have to be ConcurrentDictionary
+        // the inner dictionaries are never modified and therefore can be simple Dictionary
 
-        private readonly Dictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
-            = new Dictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
+        private readonly ConcurrentDictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors
+            = new ConcurrentDictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>>();
+
+        private readonly ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
+            = new ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoMapper"/> class.
@@ -101,16 +108,12 @@ namespace Umbraco.Core.Mapping
 
         private Dictionary<Type, Func<object, MapperContext, object>> DefineCtors(Type sourceType)
         {
-            if (!_ctors.TryGetValue(sourceType, out var sourceCtor))
-                sourceCtor = _ctors[sourceType] = new Dictionary<Type, Func<object, MapperContext, object>>();
-            return sourceCtor;
+            return _ctors.GetOrAdd(sourceType, _ => new Dictionary<Type, Func<object, MapperContext, object>>());
         }
 
         private Dictionary<Type, Action<object, object, MapperContext>> DefineMaps(Type sourceType)
         {
-            if (!_maps.TryGetValue(sourceType, out var sourceMap))
-                sourceMap = _maps[sourceType] = new Dictionary<Type, Action<object, object, MapperContext>>();
-            return sourceMap;
+            return _maps.GetOrAdd(sourceType, _ => new Dictionary<Type, Action<object, object, MapperContext>>());
         }
 
         #endregion
@@ -189,7 +192,7 @@ namespace Umbraco.Core.Mapping
         private TTarget Map<TTarget>(object source, Type sourceType, MapperContext context)
         {
             if (source == null)
-                throw new ArgumentNullException(nameof(source));
+                return default;
 
             var targetType = typeof(TTarget);
 
@@ -229,10 +232,10 @@ namespace Umbraco.Core.Mapping
                 if (ctor != null && map != null)
                 {
                     // register (for next time) and do it now (for this time)
-                    object NCtor(object s, MapperContext c) => MapEnumerable<TTarget>((IEnumerable) s, targetGenericArg, ctor, map, c);
+                    object NCtor(object s, MapperContext c) => MapEnumerableInternal<TTarget>((IEnumerable)s, targetGenericArg, ctor, map, c);
                     DefineCtors(sourceType)[targetType] = NCtor;
                     DefineMaps(sourceType)[targetType] = Identity;
-                    return (TTarget) NCtor(source, context);
+                    return (TTarget)NCtor(source, context);
                 }
 
                 throw new InvalidOperationException($"Don't know how to map {sourceGenericArg.FullName} to {targetGenericArg.FullName}, so don't know how to map {sourceType.FullName} to {targetType.FullName}.");
@@ -241,7 +244,7 @@ namespace Umbraco.Core.Mapping
             throw new InvalidOperationException($"Don't know how to map {sourceType.FullName} to {targetType.FullName}.");
         }
 
-        private TTarget MapEnumerable<TTarget>(IEnumerable source, Type targetGenericArg, Func<object, MapperContext, object> ctor, Action<object, object, MapperContext> map, MapperContext context)
+        private TTarget MapEnumerableInternal<TTarget>(IEnumerable source, Type targetGenericArg, Func<object, MapperContext, object> ctor, Action<object, object, MapperContext> map, MapperContext context)
         {
             var targetList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
 
@@ -257,13 +260,13 @@ namespace Umbraco.Core.Mapping
             if (typeof(TTarget).IsArray)
             {
                 var elementType = typeof(TTarget).GetElementType();
-                if (elementType == null) throw new Exception("panic");
+                if (elementType == null) throw new PanicException("elementType == null which should never occur");
                 var targetArray = Array.CreateInstance(elementType, targetList.Count);
                 targetList.CopyTo(targetArray, 0);
                 target = targetArray;
             }
 
-            return (TTarget) target;
+            return (TTarget)target;
         }
 
         /// <summary>
@@ -326,6 +329,8 @@ namespace Umbraco.Core.Mapping
             if (_ctors.TryGetValue(sourceType, out var sourceCtor) && sourceCtor.TryGetValue(targetType, out var ctor))
                 return ctor;
 
+            // we *may* run this more than once but it does not matter
+
             ctor = null;
             foreach (var (stype, sctors) in _ctors)
             {
@@ -338,7 +343,17 @@ namespace Umbraco.Core.Mapping
 
             if (ctor == null) return null;
 
-            _ctors[sourceType] = sourceCtor;
+            if (_ctors.ContainsKey(sourceType))
+            {
+                foreach (var c in sourceCtor)
+                {
+                    if (!_ctors[sourceType].TryGetValue(c.Key, out _))
+                        _ctors[sourceType].Add(c.Key, c.Value);
+                }   
+            }
+            else
+                _ctors[sourceType] = sourceCtor;
+
             return ctor;
         }
 
@@ -346,6 +361,8 @@ namespace Umbraco.Core.Mapping
         {
             if (_maps.TryGetValue(sourceType, out var sourceMap) && sourceMap.TryGetValue(targetType, out var map))
                 return map;
+
+            // we *may* run this more than once but it does not matter
 
             map = null;
             foreach (var (stype, smap) in _maps)
@@ -361,7 +378,17 @@ namespace Umbraco.Core.Mapping
 
             if (map == null) return null;
 
-            _maps[sourceType] = sourceMap;
+            if (_maps.ContainsKey(sourceType))
+            {
+                foreach (var m in sourceMap)
+                {
+                    if (!_maps[sourceType].TryGetValue(m.Key, out _))
+                        _maps[sourceType].Add(m.Key, m.Value);
+                }
+            }
+            else
+                _maps[sourceType] = sourceMap;
+
             return map;
         }
 
@@ -376,7 +403,47 @@ namespace Umbraco.Core.Mapping
         {
             if (type.IsArray) return type.GetElementType();
             if (type.IsGenericType) return type.GenericTypeArguments[0];
-            throw new Exception("panic");
+            throw new PanicException($"Could not get enumerable or array type from {type}");
+        }
+
+        /// <summary>
+        /// Maps an enumerable of source objects to a new list of target objects.
+        /// </summary>
+        /// <typeparam name="TSourceElement">The type of the source objects.</typeparam>
+        /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
+        /// <param name="source">The source objects.</param>
+        /// <returns>A list containing the target objects.</returns>
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source)
+        {
+            return source.Select(Map<TSourceElement, TTargetElement>).ToList();
+        }
+
+        /// <summary>
+        /// Maps an enumerable of source objects to a new list of target objects.
+        /// </summary>
+        /// <typeparam name="TSourceElement">The type of the source objects.</typeparam>
+        /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
+        /// <param name="source">The source objects.</param>
+        /// <param name="f">A mapper context preparation method.</param>
+        /// <returns>A list containing the target objects.</returns>
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, Action<MapperContext> f)
+        {
+            var context = new MapperContext(this);
+            f(context);
+            return source.Select(x => Map<TSourceElement, TTargetElement>(x, context)).ToList();
+        }
+
+        /// <summary>
+        /// Maps an enumerable of source objects to a new list of target objects.
+        /// </summary>
+        /// <typeparam name="TSourceElement">The type of the source objects.</typeparam>
+        /// <typeparam name="TTargetElement">The type of the target objects.</typeparam>
+        /// <param name="source">The source objects.</param>
+        /// <param name="context">A mapper context.</param>
+        /// <returns>A list containing the target objects.</returns>
+        public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, MapperContext context)
+        {
+            return source.Select(x => Map<TSourceElement, TTargetElement>(x, context)).ToList();
         }
 
         #endregion

@@ -14,7 +14,7 @@ namespace Umbraco.Web.Models.Mapping
             mapper.Define<RelationTypeSave, IRelationType>(Map);
         }
 
-        // Umbraco.Code.MapAll -Icon -Trashed -Alias -AdditionalData
+        // Umbraco.Code.MapAll -Icon -Trashed -AdditionalData
         // Umbraco.Code.MapAll -Relations -ParentId -Notifications
         private static void Map(IRelationType source, RelationTypeDisplay target, MapperContext context)
         {
@@ -23,6 +23,7 @@ namespace Umbraco.Web.Models.Mapping
             target.IsBidirectional = source.IsBidirectional;
             target.Key = source.Key;
             target.Name = source.Name;
+            target.Alias = source.Alias;
             target.ParentObjectType = source.ParentObjectType;
             target.Udi = Udi.Create(Constants.UdiEntityType.RelationType, source.Key);
             target.Path = "-1," + source.Id;

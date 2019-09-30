@@ -73,7 +73,7 @@ namespace Umbraco.Web.Runtime
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
             composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
-
+            
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
@@ -92,9 +92,9 @@ namespace Umbraco.Web.Runtime
 
             // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
             // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register
-            // a way to inject the UmbracoContext - and register it per-request to be more efficient
-            // TODO: stop doing this
-            composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
+            // a way to inject the UmbracoContext - DO NOT register this as Lifetime.Request since LI will dispose the context
+            // in it's own way but we don't want that to happen, we manage its lifetime ourselves.
+            composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext);
 
             composition.Register<IPublishedContentQuery>(factory =>
             {
@@ -124,6 +124,8 @@ namespace Umbraco.Web.Runtime
 
             // register distributed cache
             composition.RegisterUnique(f => new DistributedCache());
+
+            composition.RegisterUnique<RoutableDocumentFilter>();
 
             // replace some services
             composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
@@ -182,6 +184,9 @@ namespace Umbraco.Web.Runtime
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>()
                 .Append<AliasUrlProvider>()
                 .Append<DefaultUrlProvider>();
+
+            composition.WithCollectionBuilder<MediaUrlProviderCollectionBuilder>()
+                .Append<DefaultMediaUrlProvider>();
 
             composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
@@ -261,7 +266,9 @@ namespace Umbraco.Web.Runtime
                 .Append<Ted>()
                 .Append<Soundcloud>()
                 .Append<Issuu>()
-                .Append<Hulu>();
+                .Append<Hulu>()
+                .Append<Giphy>();
+            
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();

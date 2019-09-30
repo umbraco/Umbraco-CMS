@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Scoping;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -89,7 +91,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     contentType = ContentTypeFactory.BuildContentTypeEntity(contentTypeDto);
                 else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
                     contentType = ContentTypeFactory.BuildMemberTypeEntity(contentTypeDto);
-                else throw new Exception("panic");
+                else throw new PanicException($"The node object type {contentTypeDto.NodeDto.NodeObjectType} is not supported");
                 contentTypes.Add(contentType.Id, contentType);
 
                 // map allowed content types
@@ -140,10 +142,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 while (templateDtoIx < templateDtos.Count && templateDtos[templateDtoIx].ContentTypeNodeId == contentType.Id)
                 {
                     var allowedDto = templateDtos[templateDtoIx];
+                    templateDtoIx++;
                     if (!templates.TryGetValue(allowedDto.TemplateNodeId, out var template)) continue;
                     allowedTemplates.Add(template);
-                    templateDtoIx++;
-
+                    
                     if (allowedDto.IsDefault)
                         defaultTemplateId = template.Id;
                 }
@@ -188,10 +190,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var groupDtos = Database.Fetch<PropertyTypeGroupDto>(sql1);
 
             var sql2 = Sql()
-                .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto))
+                .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto, r1 => r1.Select(x => x.NodeDto)))
                 .AndSelect<MemberPropertyTypeDto>()
                 .From<PropertyTypeDto>()
                 .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((pt, dt) => pt.DataTypeId == dt.NodeId)
+                .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((dt, n) => dt.NodeId == n.NodeId)
                 .InnerJoin<ContentTypeDto>().On<PropertyTypeDto, ContentTypeDto>((pt, ct) => pt.ContentTypeId == ct.NodeId)
                 .LeftJoin<PropertyTypeGroupDto>().On<PropertyTypeDto, PropertyTypeGroupDto>((pt, ptg) => pt.PropertyTypeGroupId == ptg.Id)
                 .LeftJoin<MemberPropertyTypeDto>().On<PropertyTypeDto, MemberPropertyTypeDto>((pt, mpt) => pt.Id == mpt.PropertyTypeId)
@@ -240,6 +243,25 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     propertyIx++;
                 }
                 contentType.NoGroupPropertyTypes = noGroupPropertyTypes;
+
+                // ensure builtin properties
+                if (contentType is MemberType memberType)
+                {
+                    // ensure that the group exists (ok if it already exists)
+                    memberType.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
+
+                    // ensure that property types exist (ok if they already exist)
+                    foreach (var (alias, propertyType) in builtinProperties)
+                    {
+                        var added = memberType.AddPropertyType(propertyType, Constants.Conventions.Member.StandardPropertiesGroupName);
+
+                        if (added)
+                        {
+                            var access = new MemberTypePropertyProfileAccess(false, false, false);
+                            memberType.MemberTypePropertyTypes[alias] = access;
+                        }
+                    }
+                }
             }
         }
 
@@ -264,13 +286,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (contentType is MemberType memberType)
             {
                 var access = new MemberTypePropertyProfileAccess(dto.ViewOnProfile, dto.CanEdit, dto.IsSensitive);
-                memberType.MemberTypePropertyTypes.Add(dto.Alias, access);
+                memberType.MemberTypePropertyTypes[dto.Alias] = access;
             }
 
             return new PropertyType(dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType, dto.Alias)
             {
                 Description = dto.Description,
                 DataTypeId = dto.DataTypeId,
+                DataTypeKey = dto.DataTypeDto.NodeDto.UniqueId,
                 Id = dto.Id,
                 Key = dto.UniqueId,
                 Mandatory = dto.Mandatory,

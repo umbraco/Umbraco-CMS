@@ -50,13 +50,8 @@ namespace Umbraco.Web.Editors
             if (isAuthorized == false)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
 
-            //current user needs to be added to a new group if not an admin (possibly only if no other users are added?) to avoid a 401
-            if(!Security.CurrentUser.IsAdmin() && (userGroupSave.Id == null || Convert.ToInt32(userGroupSave.Id) >= 0)/* && !userGroupSave.Users.Any() */)
-            {
-                var userIds = userGroupSave.Users.ToList();
-                userIds.Add(Security.CurrentUser.Id);
-                userGroupSave.Users = userIds;
-            }
+            //need to ensure current user is in a group if not an admin to avoid a 401
+            EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
 
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
@@ -87,6 +82,23 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        private void EnsureNonAdminUserIsInSavedUserGroup(UserGroupSave userGroupSave)
+        {
+            if (Security.CurrentUser.IsAdmin())
+            {
+                return;
+            }
+
+            var userIds = userGroupSave.Users.ToList();
+            if (userIds.Contains(Security.CurrentUser.Id))
+            {
+                return;
+            }
+
+            userIds.Add(Security.CurrentUser.Id);
+            userGroupSave.Users = userIds;
+        }
+
         /// <summary>
         /// Returns the scaffold for creating a new user group
         /// </summary>
@@ -102,7 +114,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<UserGroupBasic> GetUserGroups(bool onlyCurrentUserGroups = true)
         {
-            var allGroups = Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups())
+            var allGroups = Mapper.MapEnumerable<IUserGroup, UserGroupBasic>(Services.UserService.GetAllUserGroups())
                 .ToList();
 
             var isAdmin = Security.CurrentUser.IsAdmin();

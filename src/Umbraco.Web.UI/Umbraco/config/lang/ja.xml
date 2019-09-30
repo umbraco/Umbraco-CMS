@@ -300,13 +300,6 @@
     <key alias="enterTags">入力してタグを追加 (各タグの後に Enter を押してください)...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">子ノードとして許可するタイプ</key>
-    <key alias="create">新規作成</key>
-    <key alias="deletetab">タブの削除</key>
-    <key alias="description">説明</key>
-    <key alias="newtab">新しいタブ</key>
-    <key alias="tab">タブ</key>
-    <key alias="thumbnail">サムネイル</key>
     <key alias="createListView" version="7.2">カスタムリストビューを作成する</key>
     <key alias="removeListView" version="7.2">カスタムリストビューを削除する</key>
   </area>

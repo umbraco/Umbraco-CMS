@@ -21,6 +21,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Search;
@@ -36,7 +37,12 @@ namespace Umbraco.Web.Editors
     /// The API controller used for getting entity objects, basic name, icon, id representation of umbraco objects that are based on CMSNode
     /// </summary>
     /// <remarks>
-    /// Some objects such as macros are not based on CMSNode
+    /// <para>
+    /// This controller allows resolving basic entity data for various entities without placing the hard restrictions on users that may not have access
+    /// to the sections these entities entities exist in. This is to allow pickers, etc... of data to work for all users. In some cases such as accessing
+    /// Members, more explicit security checks are done.
+    /// </para>
+    /// <para>Some objects such as macros are not based on CMSNode</para>
     /// </remarks>
     [EntityControllerConfiguration]
     [PluginController("UmbracoApi")]
@@ -68,6 +74,7 @@ namespace Umbraco.Web.Editors
                     //id is passed in eventually we'll probably want to support GUID + Udi too
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPagedChildren", "id", typeof(int), typeof(string)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPath", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetUrlAndAnchors", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
@@ -98,19 +105,20 @@ namespace Umbraco.Web.Editors
         /// <param name="searchFrom">
         /// A starting point for the search, generally a node id, but for members this is a member type alias
         /// </param>
+        /// <param name="dataTypeKey">If set used to look up whether user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, Guid? dataTypeKey = null)
         {
-            // TODO: Should we restrict search results based on what app the user has access to?
-            // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
+            // NOTE: Theoretically you shouldn't be able to see member data if you don't have access to members right? ... but there is a member picker, so can't really do that
 
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
             //TODO: This uses the internal UmbracoTreeSearcher, this instead should delgate to the ISearchableTree implementation for the type
 
-            return ExamineSearch(query, type, searchFrom);
+            var ignoreUserStartNodes = dataTypeKey.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
+            return ExamineSearch(query, type, searchFrom, ignoreUserStartNodes);
         }
 
         /// <summary>
@@ -136,22 +144,20 @@ namespace Umbraco.Web.Editors
 
             var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
 
-            foreach (var searchableTree in _searchableTreeCollection.SearchableApplicationTrees)
+            foreach (var searchableTree in _searchableTreeCollection.SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
             {
                 if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {
                     var tree = _treeService.GetByAlias(searchableTree.Key);
                     if (tree == null) continue; //shouldn't occur
 
-                    var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
-
                     result[Tree.GetRootNodeDisplayName(tree, Services.TextService)] = new TreeSearchResult
                     {
                         Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out var total),
                         TreeAlias = searchableTree.Key,
                         AppAlias = searchableTree.Value.AppAlias,
-                        JsFormatterService = searchableTreeAttribute == null ? "" : searchableTreeAttribute.ServiceName,
-                        JsFormatterMethod = searchableTreeAttribute == null ? "" : searchableTreeAttribute.MethodName
+                        JsFormatterService = searchableTree.Value.FormatterService,
+                        JsFormatterMethod = searchableTree.Value.FormatterMethod
                     };
                 }
             }
@@ -205,14 +211,20 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id">Int id of the entity to fetch URL for</param>
         /// <param name="type">The type of entity such as Document, Media, Member</param>
+        /// <param name="culture">The culture to fetch the URL for</param>
         /// <returns>The URL or path to the item</returns>
-        public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type)
+        /// <remarks>
+        /// We are not restricting this with security because there is no sensitive data
+        /// </remarks>
+        public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type, string culture = null)
         {
+            culture = culture ?? ClientCulture();
+
             var returnUrl = string.Empty;
 
             if (type == UmbracoEntityTypes.Document)
             {
-                var foundUrl = UmbracoContext.Url(id);
+                var foundUrl = UmbracoContext.Url(id, culture);
                 if (string.IsNullOrEmpty(foundUrl) == false && foundUrl != "#")
                 {
                     returnUrl = foundUrl;
@@ -278,6 +290,32 @@ namespace Umbraco.Web.Editors
                 },
                 publishedContentExists: i => Umbraco.Content(i) != null);
         }
+
+        [HttpGet]
+        public UrlAndAnchors GetUrlAndAnchors(Udi id, string culture = "*")
+        {
+            var intId = Services.EntityService.GetId(id);
+            if (!intId.Success)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return GetUrlAndAnchors(intId.Result, culture);
+        }
+        [HttpGet]
+        public UrlAndAnchors GetUrlAndAnchors(int id, string culture = "*")
+        {
+            var url = UmbracoContext.UrlProvider.GetUrl(id);
+            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id, culture);
+            return new UrlAndAnchors(url, anchorValues);
+        }
+
+        [HttpGet]
+        [HttpPost]
+        public IEnumerable<string> GetAnchors(AnchorsModel model)
+        {
+            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEContent(model.RteContent);
+            return anchorValues;
+        }
+
 
         #region GetById
 
@@ -399,9 +437,43 @@ namespace Umbraco.Web.Editors
         }
         #endregion
 
-        public IEnumerable<EntityBasic> GetChildren(int id, UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> GetChildren(int id, UmbracoEntityTypes type, Guid? dataTypeKey = null)
         {
-            return GetResultForChildren(id, type);
+            var objectType = ConvertToObjectType(type);
+            if (objectType.HasValue)
+            {
+                //TODO: Need to check for Object types that support hierarchy here, some might not.
+
+                var startNodes = GetStartNodes(type);
+
+                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
+
+                // root is special: we reduce it to start nodes if the user's start node is not the default, then we need to return their start nodes
+                if (id == Constants.System.Root && startNodes.Length > 0 && startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
+                {
+                    var nodes = Services.EntityService.GetAll(objectType.Value, startNodes).ToArray();
+                    if (nodes.Length == 0)
+                        return Enumerable.Empty<EntityBasic>();
+                    var pr = new List<EntityBasic>(nodes.Select(Mapper.Map<EntityBasic>));
+                    return pr;
+                }
+
+                // else proceed as usual
+
+                return Services.EntityService.GetChildren(id, objectType.Value)
+                    .WhereNotNull()
+                    .Select(Mapper.Map<EntityBasic>);
+            }
+            //now we need to convert the unknown ones
+            switch (type)
+            {
+                case UmbracoEntityTypes.Domain:
+                case UmbracoEntityTypes.Language:
+                case UmbracoEntityTypes.User:
+                case UmbracoEntityTypes.Macro:
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + type);
+            }
         }
 
         /// <summary>
@@ -422,7 +494,8 @@ namespace Umbraco.Web.Editors
             int pageSize,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
-            string filter = "")
+            string filter = "",
+            Guid? dataTypeKey = null)
         {
             if (int.TryParse(id, out var intId))
             {
@@ -447,7 +520,7 @@ namespace Umbraco.Web.Editors
                 //the EntityService can search paged members from the root
 
                 intId = -1;
-                return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
+                return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter, dataTypeKey);
             }
 
             //the EntityService cannot search members of a certain type, this is currently not supported and would require
@@ -482,7 +555,8 @@ namespace Umbraco.Web.Editors
             int pageSize,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
-            string filter = "")
+            string filter = "",
+            Guid? dataTypeKey = null)
         {
             if (pageNumber <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -492,11 +566,36 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
             {
-                var entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out var totalRecords,
+                IEnumerable<IEntitySlim> entities;
+                long totalRecords;
+
+                var startNodes = GetStartNodes(type);
+
+                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
+
+                // root is special: we reduce it to start nodes if the user's start node is not the default, then we need to return their start nodes
+                if (id == Constants.System.Root && startNodes.Length > 0 && startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
+                {
+                    if (pageNumber > 0)
+                        return new PagedResult<EntityBasic>(0, 0, 0);
+                    var nodes = Services.EntityService.GetAll(objectType.Value, startNodes).ToArray();
+                    if (nodes.Length == 0)
+                        return new PagedResult<EntityBasic>(0, 0, 0);
+                    if (pageSize < nodes.Length) pageSize = nodes.Length; // bah
+                    var pr = new PagedResult<EntityBasic>(nodes.Length, pageNumber, pageSize)
+                    {
+                        Items = nodes.Select(Mapper.Map<EntityBasic>)
+                    };
+                    return pr;
+                }
+
+                // else proceed as usual
+                entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords,
                     filter.IsNullOrWhiteSpace()
                         ? null
                         : SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
                     Ordering.By(orderBy, orderDirection));
+
 
                 if (totalRecords == 0)
                 {
@@ -512,6 +611,7 @@ namespace Umbraco.Web.Editors
                         {
                             context.SetCulture(culture);
                         });
+                        //TODO: Why is this here and not in the mapping?
                         target.AdditionalData["hasChildren"] = source.HasChildren;
                         return target;
                     })
@@ -534,6 +634,19 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        private int[] GetStartNodes(UmbracoEntityTypes type)
+        {
+            switch (type)
+            {
+                case UmbracoEntityTypes.Document:
+                    return Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                case UmbracoEntityTypes.Media:
+                    return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                default:
+                    return  Array.Empty<int>();
+            }
+        }
+
         public PagedResult<EntityBasic> GetPagedDescendants(
             int id,
             UmbracoEntityTypes type,
@@ -541,7 +654,8 @@ namespace Umbraco.Web.Editors
             int pageSize,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
-            string filter = "")
+            string filter = "",
+            Guid? dataTypeKey = null)
         {
             if (pageNumber <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -558,18 +672,10 @@ namespace Umbraco.Web.Editors
                 {
                     // root is special: we reduce it to start nodes
 
-                    int[] aids = null;
-                    switch (type)
-                    {
-                        case UmbracoEntityTypes.Document:
-                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                            break;
-                        case UmbracoEntityTypes.Media:
-                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                            break;
-                    }
+                    int[] aids = GetStartNodes(type);
 
-                    entities = aids == null || aids.Contains(Constants.System.Root)
+                    var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
+                    entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
                         ? Services.EntityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize, out totalRecords,
                             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
                             Ordering.By(orderBy, orderDirection), includeTrashed: false)
@@ -611,6 +717,8 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        private bool IsDataTypeIgnoringUserStartNodes(Guid? dataTypeKey) => dataTypeKey.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
+
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             return GetResultForAncestors(id, type, queryStrings);
@@ -622,10 +730,11 @@ namespace Umbraco.Web.Editors
         /// <param name="query"></param>
         /// <param name="entityType"></param>
         /// <param name="searchFrom"></param>
+        /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
-        private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
+        private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
-            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, searchFrom);
+            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, searchFrom, ignoreUserStartNodes);
         }
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
@@ -660,35 +769,39 @@ namespace Umbraco.Web.Editors
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
 
-                int[] aids = null;
-                switch (entityType)
+                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
+                if (ignoreUserStartNodes == false)
                 {
-                    case UmbracoEntityTypes.Document:
-                        aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                        break;
-                    case UmbracoEntityTypes.Media:
-                        aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                        break;
-                }
-
-                if (aids != null)
-                {
-                    var lids = new List<int>();
-                    var ok = false;
-                    foreach (var i in ids)
+                    int[] aids = null;
+                    switch (entityType)
                     {
-                        if (ok)
-                        {
-                            lids.Add(i);
-                            continue;
-                        }
-                        if (aids.Contains(i))
-                        {
-                            lids.Add(i);
-                            ok = true;
-                        }
+                        case UmbracoEntityTypes.Document:
+                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                            break;
+                        case UmbracoEntityTypes.Media:
+                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                            break;
                     }
-                    ids = lids.ToArray();
+
+                    if (aids != null)
+                    {
+                        var lids = new List<int>();
+                        var ok = false;
+                        foreach (var i in ids)
+                        {
+                            if (ok)
+                            {
+                                lids.Add(i);
+                                continue;
+                            }
+                            if (aids.Contains(i))
+                            {
+                                lids.Add(i);
+                                ok = true;
+                            }
+                        }
+                        ids = lids.ToArray();
+                    }
                 }
 
                 var culture = queryStrings?.GetValue<string>("culture");
@@ -851,7 +964,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     return UmbracoObjectTypes.Media;
                 case UmbracoEntityTypes.MemberType:
-                    return UmbracoObjectTypes.MediaType;
+                    return UmbracoObjectTypes.MemberType;
                 case UmbracoEntityTypes.MemberGroup:
                     return UmbracoObjectTypes.MemberGroup;
                 case UmbracoEntityTypes.MediaType:
@@ -917,7 +1030,7 @@ namespace Umbraco.Web.Editors
                                                 .SelectMany(x => x.PropertyTypes)
                                                 .DistinctBy(composition => composition.Alias);
                     var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter);
-                    return Mapper.Map<IEnumerable<PropertyType>, IEnumerable<EntityBasic>>(filteredPropertyTypes);
+                    return Mapper.MapEnumerable<PropertyType, EntityBasic>(filteredPropertyTypes);
 
                 case UmbracoEntityTypes.PropertyGroup:
 
@@ -928,13 +1041,13 @@ namespace Umbraco.Web.Editors
                                                 .SelectMany(x => x.PropertyGroups)
                                                 .DistinctBy(composition => composition.Name);
                     var filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter);
-                    return Mapper.Map<IEnumerable<PropertyGroup>, IEnumerable<EntityBasic>>(filteredpropertyGroups);
+                    return Mapper.MapEnumerable<PropertyGroup, EntityBasic>(filteredpropertyGroups);
 
                 case UmbracoEntityTypes.User:
 
                     var users = Services.UserService.GetAll(0, int.MaxValue, out _);
                     var filteredUsers = ExecutePostFilter(users, postFilter);
-                    return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
+                    return Mapper.MapEnumerable<IUser, EntityBasic>(filteredUsers);
 
                 case UmbracoEntityTypes.Stylesheet:
 

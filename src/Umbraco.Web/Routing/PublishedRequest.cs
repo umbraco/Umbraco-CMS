@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Routing
         private void EnsureWriteable()
         {
             if (_readonly)
-                throw new InvalidOperationException("Cannot modify a PublishedContentRequest once it is read-only.");
+                throw new InvalidOperationException("Cannot modify a PublishedRequest once it is read-only.");
         }
 
         /// <summary>

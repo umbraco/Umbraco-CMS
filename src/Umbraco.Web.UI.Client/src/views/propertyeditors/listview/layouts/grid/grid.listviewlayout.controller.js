@@ -117,7 +117,7 @@
         }
         
         function goToItem(item, $event, $index) {
-            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
+            listViewHelper.editItem(item);
         }
 
         activate();

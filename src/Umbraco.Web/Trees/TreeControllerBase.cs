@@ -15,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -366,7 +367,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected bool IsDialog(FormDataCollection queryStrings)
         {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IsDialog);
+            return queryStrings.GetValue<string>(TreeQueryStringParameters.Use) == "dialog";
         }
 
         /// <summary>

@@ -1,10 +1,8 @@
-<div class="usky-grid usky-grid-configuration" ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.EditConfigController">
+<div class="usky-grid usky-grid-configuration" ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.EditConfigController as vm">
 
+    <umb-editor-view>
 
-
-        <umb-editor-view>
-
-            <form novalidate name="EditConfigForm" val-form-manager>
+        <form novalidate name="EditConfigForm" val-form-manager>
 
             <umb-editor-header
                 name="model.title"
@@ -18,44 +16,39 @@
                 <umb-box>
                     <umb-box-content>
 
+                        <ng-form name="gridConfigEditor">
 
+                            <h4>{{model.name}}</h4>
+                            <p>Settings will only save if the entered json configuration is valid</p>
+                            <textarea name="configSource"
+                                validate-on="'blur'"
+                                rows="20" class="umb-property-editor umb-textarea"
+                                umb-raw-model="model.config"></textarea>
 
-<form name="gridConfigEditor">
+                            <div class="alert alert-error" ng-show="gridConfigEditor.$invalid === true">
+                                This configuration is not valid json, and will not be saved.
+                            </div>
 
-   <h4>{{model.name}}</h4>
-   <p>Settings will only save if the entered json configuration is valid</p>
-   <textarea name="configSource"
-      validate-on="'blur'"
-      rows="20" class="umb-property-editor umb-textarea"
-      umb-raw-model="model.config"></textarea>
+                        </ng-form>
 
-   <div class="alert alert-error" ng-show="gridConfigEditor.$invalid === true">
-      This configuration is not valid json, and will not be saved.
-   </div>
+                    </umb-box-content>
+                </umb-box>
+            </umb-editor-container>
 
-</form>
-
-
-
-
-                            </umb-box-content>
-                        </umb-box>
-                    </umb-editor-container>
-
-                    <umb-editor-footer>
-                    <umb-editor-footer-content-right>
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
                     <umb-button
                         type="button"
                         button-style="link"
                         label-key="general_close"
                         shortcut="esc"
-                        action="close()">
+                        action="vm.close()">
                     </umb-button>
                     <umb-button
                         type="button"
                         button-style="success"
                         label-key="general_submit"
-                        action="submit()">
+                        action="vm.submit()">
                     </umb-button>
                 </umb-editor-footer-content-right>
             </umb-editor-footer>

@@ -2,6 +2,8 @@
 
 namespace Umbraco.Web.WebApi
 {
-    public class UmbracoApiControllerTypeCollectionBuilder : TypeCollectionBuilderBase<UmbracoApiControllerTypeCollection, UmbracoApiController>
-    { }
+    public class UmbracoApiControllerTypeCollectionBuilder : TypeCollectionBuilderBase<UmbracoApiControllerTypeCollectionBuilder, UmbracoApiControllerTypeCollection, UmbracoApiController>
+    {
+        protected override UmbracoApiControllerTypeCollectionBuilder This => this;
+    }
 }

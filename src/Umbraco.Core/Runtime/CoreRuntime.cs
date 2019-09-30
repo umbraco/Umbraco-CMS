@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Web;
+using System.Web.Hosting;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -65,10 +66,15 @@ namespace Umbraco.Core.Runtime
             // objects.
 
             using (var timer = profilingLogger.TraceDuration<CoreRuntime>(
-                $"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()} on {NetworkHelper.MachineName}.",
+                $"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()}.",
                 "Booted.",
                 "Boot failed."))
             {
+                logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationID}', path '{HostingPhysicalPath}', server '{MachineName}'.",
+                    HostingEnvironment.SiteName,
+                    HostingEnvironment.ApplicationID,
+                    HostingEnvironment.ApplicationPhysicalPath,
+                    NetworkHelper.MachineName);
                 logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
@@ -133,7 +139,7 @@ namespace Umbraco.Core.Runtime
                 // there should be none, really - this is here "just in case"
                 Compose(composition);
 
-                // acquire the main domain
+                // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
                 AcquireMainDom(mainDom);
 
                 // determine our runtime level
@@ -212,13 +218,13 @@ namespace Umbraco.Core.Runtime
                 IOHelper.SetRootDirectory(path);
         }
 
-        private void AcquireMainDom(MainDom mainDom)
+        private bool AcquireMainDom(MainDom mainDom)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    mainDom.Acquire();
+                    return mainDom.Acquire();
                 }
                 catch
                 {

@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Logging;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -27,9 +27,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>If successful, also assigns the template.</remarks>
         public override bool TryFindContent(PublishedRequest frequest)
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
             var path = frequest.Uri.GetAbsolutePathDecoded();
 
             if (frequest.HasDomain)
-                path = DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, path);
+                path = DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, path);
 
             // no template if "/"
             if (path == "/")

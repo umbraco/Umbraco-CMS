@@ -24,10 +24,10 @@ namespace Umbraco.Web.Models.Mapping
             mapper.Define<ITemplate, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<EntityBasic, ContentTypeSort>((source, context) => new ContentTypeSort(), Map);
             mapper.Define<IContentTypeComposition, EntityBasic>((source, context) => new EntityBasic(), Map);
-            mapper.Define<EntitySlim, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
+            mapper.Define<IEntitySlim, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
             mapper.Define<ISearchResult, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
-            mapper.Define<ISearchResults, IEnumerable<SearchResultEntity>>((source, context) => source.Select(context.Map<SearchResultEntity>).ToList());
-            mapper.Define<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>((source, context) => source.Select(context.Map<SearchResultEntity>).ToList());
+            mapper.Define<ISearchResults, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source));
+            mapper.Define<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source));
         }
 
         // Umbraco.Code.MapAll -Alias
@@ -43,7 +43,29 @@ namespace Umbraco.Web.Models.Mapping
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
 
             if (source.NodeObjectType == Constants.ObjectTypes.Member && target.Icon.IsNullOrWhiteSpace())
-                target.Icon = "icon-user";
+                target.Icon = Constants.Icons.Member;
+
+            if (source is IContentEntitySlim contentSlim)
+            {
+                source.AdditionalData["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
+            }
+
+            if (source is IDocumentEntitySlim documentSlim)
+            {
+                source.AdditionalData["IsPublished"] = documentSlim.Published;
+            }
+
+            if (source is IMediaEntitySlim mediaSlim)
+            {
+                source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
+            }
+
+            // NOTE: we're mapping the objects in AdditionalData by object reference here.
+            // it works fine for now, but it's something to keep in mind in the future
+            foreach(var kvp in source.AdditionalData)
+            {
+                target.AdditionalData[kvp.Key] = kvp.Value;
+            }
 
             target.AdditionalData.Add("IsContainer", source.IsContainer);
         }
@@ -76,7 +98,7 @@ namespace Umbraco.Web.Models.Mapping
         private static void Map(IUser source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.Username;
-            target.Icon = "icon-user";
+            target.Icon = Constants.Icons.User;
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
@@ -88,7 +110,7 @@ namespace Umbraco.Web.Models.Mapping
         private static void Map(ITemplate source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
-            target.Icon = "icon-layout";
+            target.Icon = Constants.Icons.Template;
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
@@ -131,15 +153,15 @@ namespace Umbraco.Web.Models.Mapping
             if (target.Icon.IsNullOrWhiteSpace())
             {
                 if (source.NodeObjectType == Constants.ObjectTypes.Member)
-                    target.Icon = "icon-user";
+                    target.Icon = Constants.Icons.Member;
                 else if (source.NodeObjectType == Constants.ObjectTypes.DataType)
-                    target.Icon = "icon-autofill";
+                    target.Icon = Constants.Icons.DataType;
                 else if (source.NodeObjectType == Constants.ObjectTypes.DocumentType)
-                    target.Icon = "icon-item-arrangement";
+                    target.Icon = Constants.Icons.ContentType;
                 else if (source.NodeObjectType == Constants.ObjectTypes.MediaType)
-                    target.Icon = "icon-thumbnails";
+                    target.Icon = Constants.Icons.MediaType;
                 else if (source.NodeObjectType == Constants.ObjectTypes.TemplateType)
-                    target.Icon = "icon-newspaper-alt";
+                    target.Icon = Constants.Icons.Template;
             }
         }
 
@@ -154,7 +176,7 @@ namespace Umbraco.Web.Models.Mapping
             //get the icon if there is one
             target.Icon = source.Values.ContainsKey(UmbracoExamineIndex.IconFieldName)
                 ? source.Values[UmbracoExamineIndex.IconFieldName]
-                : "icon-document";
+                : Constants.Icons.DefaultIcon;
 
             target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
 

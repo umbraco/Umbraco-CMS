@@ -67,6 +67,9 @@ Use this directive to render an umbraco button. The directive can be used to gen
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
 @param {string=} addEllipsis Adds an ellipsis character (…) to the button label which means the button will open a dialog or prompt the user for more information.
 @param {string=} showCaret Shows a caret on the right side of the button label
+@param {string=} autoFocus add autoFocus to the button
+@param {string=} hasPopup Used to expose to the accessibility API whether the button will trigger a popup or not
+@param {string=]} isExpanded Used to add an aria-expanded attribute and expose whether the button has expanded a popup or not
 
 **/
 
@@ -95,7 +98,10 @@ Use this directive to render an umbraco button. The directive can be used to gen
                 size: "@?",
                 alias: "@?",
                 addEllipsis: "@?",
-                showCaret: "@?"
+                showCaret: "@?",
+                autoFocus: "@?",
+                hasPopup: "@?",
+                isExpanded: "<?"
             }
         });
 
@@ -115,20 +121,23 @@ Use this directive to render an umbraco button. The directive can be used to gen
             vm.blockElement = false;
             vm.style = null;
             vm.innerState = "init";
+            vm.generalActions = vm.labelKey === "general_actions";
 
             vm.buttonLabel = vm.label;
+            // is this a primary button style (i.e. anything but an 'info' button)?
+            vm.isPrimaryButtonStyle = vm.buttonStyle && vm.buttonStyle !== 'info';
 
             if (vm.buttonStyle) {
 
                 // make it possible to pass in multiple styles
                 if(vm.buttonStyle.startsWith("[") && vm.buttonStyle.endsWith("]")) {
-                    
+
                     // when using an attr it will always be a string so we need to remove square brackets
                     // and turn it into and array
                     var withoutBrackets = vm.buttonStyle.replace(/[\[\]']+/g,'');
                     // split array by , + make sure to catch whitespaces
                     var array = withoutBrackets.split(/\s?,\s?/g);
-                    
+
                     angular.forEach(array, function(item){
                         vm.style = vm.style + " " + "btn-" + item;
                         if(item === "block") {
