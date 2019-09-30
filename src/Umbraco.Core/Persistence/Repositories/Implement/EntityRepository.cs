@@ -393,12 +393,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     sql
                         .AndSelect<MediaVersionDto>(x => Alias(x.Path, "MediaPath"));
                 }
-
-                //if (isMember)
-                //{
-                //    sql
-                //        .AndSelect<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.IsContainer);
-                //}
             }
 
             sql
@@ -423,13 +417,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 sql
                     .LeftJoin<MediaVersionDto>().On<ContentVersionDto, MediaVersionDto>((left, right) => left.Id == right.Id);
             }
-
-             //if (isMember)
-             //{
-             //    sql
-             //        .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-             //        .InnerJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId);
-             //}
 
             //Any LeftJoin statements need to come last
             if (isCount == false)
