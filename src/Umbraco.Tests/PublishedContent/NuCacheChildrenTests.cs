@@ -458,7 +458,7 @@ namespace Umbraco.Tests.PublishedContent
             };
 
             // notify
-            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(10, TreeChangeTypes.RefreshBranch) }, out _, out _);
+            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(10, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
             var documents = snapshot.Content.GetAtRoot().ToArray();
@@ -500,7 +500,7 @@ namespace Umbraco.Tests.PublishedContent
             };
 
             // notify
-            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.RefreshBranch) }, out _, out _);
+            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
             var documents = snapshot.Content.GetAtRoot().ToArray();
@@ -580,7 +580,7 @@ namespace Umbraco.Tests.PublishedContent
             };
 
             // notify
-            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(kit.Node.ParentContentId, TreeChangeTypes.RefreshBranch) }, out _, out _);
+            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(kit.Node.ParentContentId, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
             var documents = snapshot.Content.GetById(kit.Node.ParentContentId).Children().ToArray();
@@ -677,8 +677,8 @@ namespace Umbraco.Tests.PublishedContent
             _snapshotService.Notify(new[]
             {
                 // removal must come first
-                new ContentCacheRefresher.JsonPayload(2, TreeChangeTypes.RefreshBranch),
-                new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.RefreshBranch)
+                new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshBranch),
+                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch)
             }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
@@ -873,9 +873,9 @@ namespace Umbraco.Tests.PublishedContent
             // notify
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(3, TreeChangeTypes.Remove), // remove last
-                new ContentCacheRefresher.JsonPayload(5, TreeChangeTypes.Remove), // remove middle
-                new ContentCacheRefresher.JsonPayload(9, TreeChangeTypes.Remove), // remove first
+                new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.Remove), // remove last
+                new ContentCacheRefresher.JsonPayload(5, Guid.Empty, TreeChangeTypes.Remove), // remove middle
+                new ContentCacheRefresher.JsonPayload(9, Guid.Empty, TreeChangeTypes.Remove), // remove first
             }, out _, out _);
 
             documents = snapshot.Content.GetAtRoot().ToArray();
@@ -890,9 +890,9 @@ namespace Umbraco.Tests.PublishedContent
             // notify
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.Remove), // remove first
-                new ContentCacheRefresher.JsonPayload(8, TreeChangeTypes.Remove), // remove
-                new ContentCacheRefresher.JsonPayload(7, TreeChangeTypes.Remove), // remove
+                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.Remove), // remove first
+                new ContentCacheRefresher.JsonPayload(8, Guid.Empty, TreeChangeTypes.Remove), // remove
+                new ContentCacheRefresher.JsonPayload(7, Guid.Empty, TreeChangeTypes.Remove), // remove
             }, out _, out _);
 
             documents = snapshot.Content.GetAtRoot().ToArray();
@@ -922,8 +922,8 @@ namespace Umbraco.Tests.PublishedContent
             // notify
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.RefreshBranch),
-                new ContentCacheRefresher.JsonPayload(2, TreeChangeTypes.RefreshNode),
+                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch),
+                new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshNode),
             }, out _, out _);
 
             documents = snapshot.Content.GetAtRoot().ToArray();
@@ -979,7 +979,7 @@ namespace Umbraco.Tests.PublishedContent
 
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(2, TreeChangeTypes.Remove)
+                new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.Remove)
             }, out _, out _);
 
             parentNodes = contentStore.Test.GetValues(1);
@@ -1038,7 +1038,7 @@ namespace Umbraco.Tests.PublishedContent
 
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(3, TreeChangeTypes.Remove) //remove middle child
+                new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.Remove) //remove middle child
             }, out _, out _);
 
             Assert.AreEqual(2, contentStore.Test.LiveGen);
@@ -1113,7 +1113,7 @@ namespace Umbraco.Tests.PublishedContent
 
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(3, TreeChangeTypes.RefreshBranch) //remove middle child
+                new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.RefreshBranch) //remove middle child
             }, out _, out _);
 
             Assert.AreEqual(2, contentStore.Test.LiveGen);
