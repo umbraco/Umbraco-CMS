@@ -1,12 +1,14 @@
 <li class="umb-tree-item" data-element="tree-item-{{::node.dataElement}}" ng-class="getNodeCssClass(node)" on-right-click="altSelect(node, $event)">
-    <div class="umb-tree-item__inner" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >
-        <umb-icon data-element="tree-item-expand"
-            class="umb-tree-item__arrow umb-outline"
-            icon-name="{{(node.expanded && !node.metaData.isContainer) ? 'icon-navigation-down' : 'icon-navigation-right'}}"
-            ng-class="{'icon-navigation-right': !node.expanded || node.metaData.isContainer, 'icon-navigation-down': node.expanded && !node.metaData.isContainer}"
-            ng-style="{'visibility': (scope.enablelistviewexpand === 'true' || node.hasChildren && (!node.metaData.isContainer || isDialog)) ? 'visible' : 'hidden'}"
-            ng-click="load(node)"/>&nbsp;
-        <span class="sr-only">Expand child items for {{node.name}}</span>
+    <div class="umb-tree-item__inner" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)">
+        <button data-element="tree-item-expand"
+                class="umb-tree-item__arrow umb-outline btn-reset"
+                ng-class="{'icon-navigation-right': !node.expanded || node.metaData.isContainer, 'icon-navigation-down': node.expanded && !node.metaData.isContainer}"
+                ng-style="{'visibility': (scope.enablelistviewexpand === 'true' || node.hasChildren && (!node.metaData.isContainer || isDialog)) ? 'visible' : 'hidden'}"
+                ng-click="load(node)">&nbsp;
+                <umb-icon icon-name="{{(node.expanded && !node.metaData.isContainer) ? 'icon-navigation-down' : 'icon-navigation-right'}}"></umb-icon>
+            <!-- TODO: Use localization for this text -->
+            <span class="sr-only">Expand child items for {{node.name}}</span>
+        </button>
 
         <i class="icon umb-tree-icon sprTree" ng-class="::node.cssClass" title="{{::node.title}}" ng-click="select(node, $event)" ng-style="::node.style"></i>
         <span class="umb-tree-item__annotation"></span>
