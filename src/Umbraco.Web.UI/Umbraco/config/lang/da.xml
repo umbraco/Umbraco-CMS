@@ -1297,7 +1297,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="enableListViewHeading">Aktivér listevisning</key>
     <key alias="enableListViewDescription">Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste; undersider vil ikke blive vist i træet</key>
     <key alias="allowedTemplatesHeading">Tilladte skabeloner</key>
-    <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner der er tilladt at bruge på dette indhold</key>
+    <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner, der er tilladt at bruge på dette indhold.</key>
     <key alias="allowAsRootHeading">Tillad på rodniveau</key>
     <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under indhold og mediearkiv</key>
     <key alias="childNodesHeading">Tilladte typer</key>
