@@ -5,8 +5,8 @@
 
         var vm = this;
 
-        vm.field;
-        vm.defaultValue;
+        vm.field = null;
+        vm.defaultValue = null;
         vm.recursive = false;
         vm.showDefaultValue = false;
 
@@ -16,10 +16,14 @@
 
         function onInit() {
 
+            var labelKeys = [
+                "template_insertPageField"
+            ];
+
             // set default title
             if(!$scope.model.title) {
-                localizationService.localize("template_insertPageField").then(function(value){
-                    $scope.model.title = value;
+                localizationService.localizeMany(labelKeys).then(function (data) {
+                    $scope.model.title = data[0];
                 });
             }
 
@@ -37,19 +41,19 @@
 
         function generateOutputSample() {
 
-            var fallback;
+            var fallback = null;
 
-            if(vm.recursive !== false && vm.defaultValue !== undefined){
+            if (vm.recursive !== false && vm.defaultValue !== null) {
                 fallback = "Fallback.To(Fallback.Ancestors, Fallback.DefaultValue)";
-            }else if(vm.recursive !== false){
+            } else if (vm.recursive !== false) {
                 fallback = "Fallback.ToAncestors";
-            }else if(vm.defaultValue !== undefined){
+            } else if (vm.defaultValue !== null) {
                 fallback = "Fallback.ToDefaultValue";
             }
 
-            var pageField = (vm.field !== undefined ? '@Model.Value("' + vm.field + '"' : "")
-                + (fallback  !== undefined? ', fallback: ' + fallback : "")
-                + (vm.defaultValue !== undefined ? ', defaultValue: new HtmlString("' + vm.defaultValue + '")' : "")
+            var pageField = (vm.field !== null ? '@Model.Value("' + vm.field + '"' : "")
+                + (fallback  !== null? ', fallback: ' + fallback : "")
+                + (vm.defaultValue !== null ? ', defaultValue: new HtmlString("' + vm.defaultValue + '")' : "")
 
                 + (vm.field ? ')' : "");
 

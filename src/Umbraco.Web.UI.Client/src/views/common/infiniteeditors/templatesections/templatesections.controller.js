@@ -13,12 +13,12 @@
 
         $scope.model.mandatoryRenderSection = false;
 
-        if(!$scope.model.title) {
+        if (!$scope.model.title) {
             $scope.model.title = "Sections";
         }
 
         function onInit() {
-            if($scope.model.hasMaster) {
+            if ($scope.model.hasMaster) {
                 $scope.model.insertType = 'addSection';
             } else {
                 $scope.model.insertType = 'renderBody';
@@ -44,13 +44,12 @@
         }
 
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }
 
         onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.TemplateSectionsController", TemplateSectionsController);
