@@ -54,8 +54,8 @@ namespace Umbraco.Web.Compose
                         // note: refresh all content & media caches does refresh content types too
                         var svc = Current.PublishedSnapshotService;
                         svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
-                        svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _, out _);
-                        svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _);
+                        svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                        svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
                     },
 
                     //rebuild indexes if the server is not synced

@@ -50,6 +50,19 @@ namespace Umbraco.Web.Editors.Filters
                         actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                         return;
                     }
+
+                    if (persisted.Alias != userGroupSave.Alias)
+                    {
+                        if (persisted.Alias == Constants.Security.AdminGroupAlias
+                            || persisted.Alias == Constants.Security.SensitiveDataGroupAlias
+                            || persisted.Alias == Constants.Security.TranslatorGroupAlias)
+                        {
+                            var message = $"User group with alias: {persisted.Alias} cannot be changed";
+                            actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
+                            return;
+                        }
+                    }
+
                     //map the model to the persisted instance
                     Mapper.Map(userGroupSave, persisted);
                     break;

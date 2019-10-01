@@ -14,7 +14,7 @@
                 <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
             </p>
 
-            <div class="umb-alert umb-alert--warning">
+            <div class="umb-alert umb-alert--warning" ng-show="hasMoreThanOneLanguage">
                 <localize key="defaultdialogs_variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</localize>
             </div>
 

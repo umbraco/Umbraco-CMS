@@ -222,6 +222,7 @@
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
+    <Compile Include="Mvc\StatusCodeFilterAttribute.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />

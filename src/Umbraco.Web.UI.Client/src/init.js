@@ -43,7 +43,13 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
         }
 
         var currentRouteParams = null;
-        
+
+        var originalTitle = "";
+
+        $rootScope.$on('$changeTitle', function (event, titlePrefix) {
+            $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+        });
+
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 
@@ -90,7 +96,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
 
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
             }
-
+            originalTitle = $rootScope.locationTitle;
         });
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including

@@ -36,14 +36,13 @@
         //initializes any watches
         function startWatches(content) {
 
-            //watch for changes to isNew & the content.id, set the page.isNew accordingly and load the breadcrumb if we can
-            $scope.$watchGroup(['isNew', 'content.id'], function (newVal, oldVal) {
-
-                var contentId = newVal[1];
-                $scope.page.isNew = Object.toBoolean(newVal[0]);
+            //watch for changes to isNew, set the page.isNew accordingly and load the breadcrumb if we can
+            $scope.$watch('isNew', function (newVal, oldVal) {
+                
+                $scope.page.isNew = Object.toBoolean(newVal);
 
                 //We fetch all ancestors of the node to generate the footer breadcrumb navigation
-                if (!$scope.page.isNew && contentId && content.parentId && content.parentId !== -1) {
+                if (content.parentId && content.parentId !== -1) {
                     loadBreadcrumb();
                     if (!watchingCulture) {
                         $scope.$watch('culture',
@@ -115,7 +114,12 @@
         }
 
         function loadBreadcrumb() {
-            entityResource.getAncestors($scope.content.id, "document", $scope.culture)
+            // load the parent breadcrumb when creating new content
+            var id = $scope.page.isNew ? $scope.content.parentId : $scope.content.id;
+            if (!id) {
+                return;
+            }
+            entityResource.getAncestors(id, "document", $scope.culture)
                 .then(function (anc) {
                     $scope.ancestors = anc;
                 });
@@ -153,9 +157,16 @@
 
         function reload() {
             $scope.page.loading = true;
-            loadContent().then(function () {
-                $scope.page.loading = false;
-            });
+
+            if ($scope.page.isNew) {
+                loadScaffold().then(function () {
+                    $scope.page.loading = false;
+                });
+            } else {
+                loadContent().then(function () {
+                    $scope.page.loading = false;
+                });
+            }
         }
 
         function bindEvents() {
@@ -225,6 +236,28 @@
         }
 
         /**
+        *  This loads the content scaffold for when creating new content
+        */
+        function loadScaffold() {
+            //we are creating so get an empty content item
+            return $scope.getScaffoldMethod()()
+                .then(function (data) {
+
+                    $scope.content = data;
+
+                    init();
+                    startWatches($scope.content);
+
+                    resetLastListPageNumber($scope.content);
+
+                    eventsService.emit("content.newReady", { content: $scope.content });
+
+                    return $q.resolve($scope.content);
+
+                });
+        }
+
+        /**
          * Create the save/publish/preview buttons for the view
          * @param {any} content the content node
          * @param {any} app the active content app
@@ -236,7 +269,7 @@
 
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo") {
+            if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo" && $scope.app.alias !== "umbListView") {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
@@ -489,22 +522,9 @@
 
             $scope.page.loading = true;
 
-            //we are creating so get an empty content item
-            $scope.getScaffoldMethod()()
-                .then(function (data) {
-
-                    $scope.content = data;
-
-                    init();
-                    startWatches($scope.content);
-
-                    resetLastListPageNumber($scope.content);
-
-                    eventsService.emit("content.newReady", { content: $scope.content });
-
-                    $scope.page.loading = false;
-
-                });
+            loadScaffold().then(function () {
+                $scope.page.loading = false;
+            });
         }
         else {
 

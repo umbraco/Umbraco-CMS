@@ -11,7 +11,7 @@
             ng-change="vm.search(vm.searchQuery)" 
             placeholder="Search..." 
             focus-when="{{vm.searchHasFocus}}" />
-        <button ng-if="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">Clear</button>
+        <button ng-show="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">Clear</button>
     </div>
 
     <div class="umb-search-results">
