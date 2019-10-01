@@ -13,7 +13,7 @@
             <div class="umb-media-grid__image-background" ng-if="item.thumbnail || item.extension === 'svg'"></div>
 
             <!-- Image thumbnail -->
-            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" draggable="false" />
+            <img umb-image-lazy-load="{{item.thumbnail}}" class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" alt="{{item.name}}" draggable="false" />
 
             <!-- SVG -->
             <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="!item.thumbnail && item.extension === 'svg'" ng-src="{{item.image}}" alt="{{item.name}}" draggable="false" />
