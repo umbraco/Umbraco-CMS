@@ -162,17 +162,36 @@ namespace Umbraco.Tests.Models
             #endregion
         }
 
-        private static void Assert4B(ContentVariation v, string culture, string segment, bool ew, bool nn, bool en, bool nw)
+        /// <summary>
+        /// Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation(ContentVariation, string, string, bool, bool, bool)"/> 
+        /// </summary>
+        /// <param name="variation"></param>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <param name="exactAndWildcards">Validate using Exact + Wildcards flags</param>
+        /// <param name="nonExactAndNoWildcards">Validate using non Exact + no Wildcard flags</param>
+        /// <param name="exactAndNoWildcards">Validate using Exact + no Wildcard flags</param>
+        /// <param name="nonExactAndWildcards">Validate using non Exact + Wildcard flags</param>
+        private static void Assert4B(ContentVariation variation, string culture, string segment,
+            bool exactAndWildcards, bool nonExactAndNoWildcards, bool exactAndNoWildcards, bool nonExactAndWildcards)
         {
-            Assert.AreEqual(ew, v.ValidateVariation(culture, segment, true, true, false));
-            Assert.AreEqual(nn, v.ValidateVariation(culture, segment, false, false, false));
-            Assert.AreEqual(en, v.ValidateVariation(culture, segment, true, false, false));
-            Assert.AreEqual(nw, v.ValidateVariation(culture, segment, false, true, false));
+            Assert.AreEqual(exactAndWildcards, variation.ValidateVariation(culture, segment, true, true, false));
+            Assert.AreEqual(nonExactAndNoWildcards, variation.ValidateVariation(culture, segment, false, false, false));
+            Assert.AreEqual(exactAndNoWildcards, variation.ValidateVariation(culture, segment, true, false, false));
+            Assert.AreEqual(nonExactAndWildcards, variation.ValidateVariation(culture, segment, false, true, false));
         }
 
-        private static void Assert4A(ContentVariation v, string culture, string segment, bool xx)
+        /// <summary>
+        /// Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation(ContentVariation, string, string, bool, bool, bool)"/>
+        /// where expectedResult matches all combinations of Exact + Wildcard
+        /// </summary>
+        /// <param name="variation"></param>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <param name="expectedResult"></param>
+        private static void Assert4A(ContentVariation variation, string culture, string segment, bool expectedResult)
         {
-            Assert4B(v, culture, segment, xx, xx, xx, xx);
+            Assert4B(variation, culture, segment, expectedResult, expectedResult, expectedResult, expectedResult);
         }
 
         [Test]
