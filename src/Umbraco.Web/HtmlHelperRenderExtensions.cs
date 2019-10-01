@@ -869,14 +869,30 @@ namespace Umbraco.Web
         private static readonly HtmlStringUtilities StringUtilities = new HtmlStringUtilities();
 
         /// <summary>
-        /// Replaces text line breaks with HTML line breaks
+        /// Replaces text line breaks with HTML line breaks.
         /// </summary>
-        /// <param name="helper"></param>
+        /// <param name="helper">The HTML helper.</param>
         /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with HTML line breaks (<br/>)</returns>
+        /// <returns>
+        /// The text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
+        /// </returns>
+        [Obsolete("This method doesn't HTML encode the text. Use ReplaceLineBreaks instead.")]
         public static IHtmlString ReplaceLineBreaksForHtml(this HtmlHelper helper, string text)
         {
             return StringUtilities.ReplaceLineBreaksForHtml(text);
+        }
+
+        /// <summary>
+        /// HTML encodes the text and replaces text line breaks with HTML line breaks.
+        /// </summary>
+        /// <param name="helper">The HTML helper.</param>
+        /// <param name="text">The text.</param>
+        /// <returns>
+        /// The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
+        /// </returns>
+        public static IHtmlString ReplaceLineBreaks(this HtmlHelper helper, string text)
+        {
+            return StringUtilities.ReplaceLineBreaks(text);
         }
 
         /// <summary>
