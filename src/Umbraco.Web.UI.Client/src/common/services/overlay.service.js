@@ -65,10 +65,26 @@
             open(overlay);
         }
 
+        function confirm(overlay) {
+            if (!overlay.closeButtonLabelKey) overlay.closeButtonLabelKey = "general_cancel";
+            if (!overlay.submitButtonLabelKey) overlay.submitButtonLabelKey = "general_confirm";
+            if (!overlay.view) overlay.view = "views/common/overlays/confirm/confirm.html";
+            if (!overlay.close) overlay.close = function () { close(); };
+            open(overlay);
+        }
+
+        function confirmDelete(overlay) {
+            if (!overlay.submitButtonStyle) overlay.submitButtonStyle = "danger";
+            if (!overlay.submitButtonLabelKey) overlay.submitButtonLabelKey = "contentTypeEditor_yesDelete";
+            confirm(overlay);
+        }
+
         var service = {
             open: open,
             close: close,
-            ysod: ysod
+            ysod: ysod,
+            confirm: confirm,
+            confirmDelete: confirmDelete
         };
 
         return service;
