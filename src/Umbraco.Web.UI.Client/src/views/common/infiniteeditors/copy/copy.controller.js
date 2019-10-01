@@ -13,7 +13,6 @@
       vm.close = close;
 
       var dialogOptions = $scope.model;
-      var searchText = "Search...";
       var node = dialogOptions.currentNode;
 
       $scope.model.relateToOriginal = true;
@@ -34,17 +33,13 @@
 
         var labelKeys = [
             "general_copy",
-            "general_search",
             "defaultdialogs_relateToOriginalLabel"
         ];
 
         localizationService.localizeMany(labelKeys).then(function (data) {
 
             vm.labels.title = data[0];
-
-            searchText = data[1] + "...";
-
-            vm.labels.relateToOriginal = data[2]; 
+            vm.labels.relateToOriginal = data[1]; 
 
             setTitle(vm.labels.title);
         });
