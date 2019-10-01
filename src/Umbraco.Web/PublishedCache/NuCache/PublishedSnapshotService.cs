@@ -801,8 +801,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 using (_contentStore.GetScopedWriteLock(_scopeProvider))
                 using (_mediaStore.GetScopedWriteLock(_scopeProvider))
                 {
-                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
-                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
                 }
             }
 
