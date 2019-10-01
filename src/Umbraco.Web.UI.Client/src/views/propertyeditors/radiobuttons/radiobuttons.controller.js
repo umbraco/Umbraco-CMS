@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.RadioButtonsController",
-    function ($scope, validationHelper) {
+    function ($scope, validationMessageService) {
 
         var vm = this;
 
@@ -26,7 +26,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.RadioButtonsContro
 
             // Set the message to use for when a mandatory field isn't completed.
             // Will either use the one provided on the property type or a localised default.
-            validationHelper.getMandatoryMessage($scope.model.validation).then(function (value) {
+            validationMessageService.getMandatoryMessage($scope.model.validation).then(function (value) {
                 $scope.mandatoryMessage = value;
             });    
             

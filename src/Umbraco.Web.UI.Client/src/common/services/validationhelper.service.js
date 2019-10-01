@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function validationHelperService($q, localizationService) {
+    function validationMessageService($q, localizationService) {
 
         // Gets the message to use for when a mandatory field isn't completed.
         // Will either use the one provided on the property type's validation object
@@ -28,7 +28,7 @@
 
     }
 
-    angular.module('umbraco.services').factory('validationHelper', validationHelperService);
+    angular.module('umbraco.services').factory('validationMessageService', validationMessageService);
 
 
 })();
