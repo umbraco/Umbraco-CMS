@@ -56,7 +56,6 @@
             $scope.model.umbracoField = pageField;
 
             return pageField;
-
         }
 
         function submit(model) {

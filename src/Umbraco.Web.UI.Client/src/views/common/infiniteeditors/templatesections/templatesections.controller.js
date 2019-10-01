@@ -1,9 +1,11 @@
 (function () {
     "use strict";
 
-    function TemplateSectionsController($scope, formHelper) {
+    function TemplateSectionsController($scope, formHelper, localizationService) {
 
         var vm = this;
+
+        vm.labels = {};
 
         vm.select = select;
         vm.submit = submit;
@@ -21,6 +23,14 @@
             } else {
                 $scope.model.insertType = 'renderBody';
             }
+
+            var labelKeys = [
+                "template_sectionMandatory"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (data) {
+                vm.labels.sectionMandotory = data[0];
+            });
         }
 
         function select(type) {
