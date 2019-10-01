@@ -420,7 +420,6 @@
     <key alias="linkinternal">Internal link:</key>
     <key alias="linklocaltip">When using local links, insert "#" in front of link</key>
     <key alias="linknewwindow">Open in new window?</key>
-    <key alias="macroContainerSettings">Macro Settings</key>
     <key alias="macroDoesNotHaveProperties">This macro does not contain any properties you can edit</key>
     <key alias="paste">Paste</key>
     <key alias="permissionsEdit">Edit permissions for</key>

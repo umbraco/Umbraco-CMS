@@ -238,7 +238,6 @@
     <key alias="linkinternal">Anker:</key>
     <key alias="linklocaltip">Wenn lokale Links verwendet werden, füge ein "#" vor den Link ein</key>
     <key alias="linknewwindow">In einem neuen Fenster öffnen?</key>
-    <key alias="macroContainerSettings">Macro Einstellungen</key>
     <key alias="macroDoesNotHaveProperties">Dieses Makro enthält keine einstellbaren Eigenschaften.</key>
     <key alias="paste">Einfügen</key>
     <key alias="permissionsEdit">Berechtigungen bearbeiten für</key>
