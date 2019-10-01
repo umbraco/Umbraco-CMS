@@ -29,7 +29,7 @@
             ];
 
             localizationService.localizeMany(labelKeys).then(function (data) {
-                vm.labels.sectionMandotory = data[0];
+                vm.labels.sectionMandatory = data[0];
             });
         }
 
