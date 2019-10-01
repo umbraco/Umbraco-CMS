@@ -273,14 +273,33 @@ namespace Umbraco.Web
             return content.Id == other.Id;
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is equal to <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsEqual(other, valueIfTrue, string.Empty);
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is equal to <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <param name="valueIfFalse">The value if <c>false</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(content.IsEqual(other) ? valueIfTrue : valueIfFalse);
+            return new HtmlString(HttpUtility.HtmlEncode(content.IsEqual(other) ? valueIfTrue : valueIfFalse));
         }
 
         public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other)
@@ -288,14 +307,33 @@ namespace Umbraco.Web
             return content.IsEqual(other) == false;
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is not equal to <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsNotEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsNotEqual(other, valueIfTrue, string.Empty);
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is not equal to <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <param name="valueIfFalse">The value if <c>false</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsNotEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(content.IsNotEqual(other) ? valueIfTrue : valueIfFalse);
+            return new HtmlString(HttpUtility.HtmlEncode(content.IsNotEqual(other) ? valueIfTrue : valueIfFalse));
         }
 
         #endregion
@@ -307,14 +345,33 @@ namespace Umbraco.Web
             return other.Level < content.Level && content.Path.InvariantStartsWith(other.Path.EnsureEndsWith(','));
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is a decendant of <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsDescendant(other, valueIfTrue, string.Empty);
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is a decendant of <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <param name="valueIfFalse">The value if <c>false</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(content.IsDescendant(other) ? valueIfTrue : valueIfFalse);
+            return new HtmlString(HttpUtility.HtmlEncode(content.IsDescendant(other) ? valueIfTrue : valueIfFalse));
         }
 
         public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other)
@@ -322,14 +379,33 @@ namespace Umbraco.Web
             return content.Path.InvariantEquals(other.Path) || content.IsDescendant(other);
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is a decendant of <paramref name="other" /> or are the same, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsDescendantOrSelf(other, valueIfTrue, string.Empty);
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is a decendant of <paramref name="other" /> or are the same, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <param name="valueIfFalse">The value if <c>false</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(content.IsDescendantOrSelf(other) ? valueIfTrue : valueIfFalse);
+            return new HtmlString(HttpUtility.HtmlEncode(content.IsDescendantOrSelf(other) ? valueIfTrue : valueIfFalse));
         }
 
         public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
@@ -337,14 +413,33 @@ namespace Umbraco.Web
             return content.Level < other.Level && other.Path.InvariantStartsWith(content.Path.EnsureEndsWith(','));
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is an ancestor of <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsAncestor(other, valueIfTrue, string.Empty);
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is an ancestor of <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <param name="valueIfFalse">The value if <c>false</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(content.IsAncestor(other) ? valueIfTrue : valueIfFalse);
+            return new HtmlString(HttpUtility.HtmlEncode(content.IsAncestor(other) ? valueIfTrue : valueIfFalse));
         }
 
         public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
@@ -352,14 +447,33 @@ namespace Umbraco.Web
             return other.Path.InvariantEquals(content.Path) || content.IsAncestor(other);
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is an ancestor of <paramref name="other" /> or are the same, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsAncestorOrSelf(other, valueIfTrue, string.Empty);
         }
 
+        /// <summary>
+        /// If the specified <paramref name="content" /> is an ancestor of <paramref name="other" /> or are the same, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <param name="valueIfFalse">The value if <c>false</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(content.IsAncestorOrSelf(other) ? valueIfTrue : valueIfFalse);
+            return new HtmlString(HttpUtility.HtmlEncode(content.IsAncestorOrSelf(other) ? valueIfTrue : valueIfFalse));
         }
 
         #endregion

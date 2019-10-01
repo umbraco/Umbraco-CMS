@@ -221,7 +221,7 @@ namespace Umbraco.Web
             {
                 _viewContext = viewContext;
                 _method = method;
-			    _controllerName = controllerName;
+                _controllerName = controllerName;
                 _encryptedString = UrlHelperRenderExtensions.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
             }
 
@@ -230,7 +230,7 @@ namespace Umbraco.Web
             private readonly FormMethod _method;
             private bool _disposed;
             private readonly string _encryptedString;
-		    private readonly string _controllerName;
+            private readonly string _controllerName;
 
             protected override void Dispose(bool disposing)
             {
@@ -243,9 +243,9 @@ namespace Umbraco.Web
                     || _controllerName == "UmbProfile"
                     || _controllerName == "UmbLoginStatus"
                     || _controllerName == "UmbLogin")
-			    {
+                {
                     _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
-			    }
+                }
 
                 //write out the hidden surface form routes
                 _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
@@ -834,19 +834,32 @@ namespace Umbraco.Web
         #region If
 
         /// <summary>
-        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+        /// If <paramref name="test" /> is <c>true</c>, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
         /// </summary>
-        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue, string valueIfFalse)
+        /// <param name="html">The HTML helper.</param>
+        /// <param name="test">If set to <c>true</c> returns <paramref name="valueIfTrue" />; otherwise, <see cref="string.Empty" />.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
+        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue)
         {
-            return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
+            return If(html, test, valueIfTrue, string.Empty);
         }
 
         /// <summary>
-        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+        /// If <paramref name="test" /> is <c>true</c>, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
         /// </summary>
-        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue)
+        /// <param name="html">The HTML helper.</param>
+        /// <param name="test">If set to <c>true</c> returns <paramref name="valueIfTrue" />; otherwise, <paramref name="valueIfFalse" />.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <param name="valueIfFalse">The value if <c>false</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
+        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue, string valueIfFalse)
         {
-            return test ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
+            return new HtmlString(HttpUtility.HtmlEncode(test ? valueIfTrue : valueIfFalse));
         }
 
         #endregion
