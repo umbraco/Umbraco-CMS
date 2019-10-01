@@ -1848,7 +1848,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.WriteLock(Constants.Locks.ContentTree);
                 var c = _documentRepository.Get(id);
-                if (c.VersionId != versionId) // don't delete the current version
+                if (c.VersionId != versionId && c.PublishedVersionId != versionId) // don't delete the current or published version
                     _documentRepository.DeleteVersion(versionId);
 
                 scope.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false,/* specificVersion:*/ versionId));
