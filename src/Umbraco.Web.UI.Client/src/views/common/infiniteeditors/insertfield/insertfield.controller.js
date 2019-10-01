@@ -59,19 +59,18 @@
         }
 
         function submit(model) {
-            if($scope.model.submit) {
+            if ($scope.model.submit) {
                 $scope.model.submit(model);
             }
         }
 
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }
 
         onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.InsertFieldController", InsertFieldController);
