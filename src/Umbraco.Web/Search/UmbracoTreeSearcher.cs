@@ -7,6 +7,7 @@ using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Models.ContentEditing;
@@ -14,6 +15,7 @@ using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
 {
+
     /// <summary>
     /// Used for internal Umbraco implementations of <see cref="ISearchableTree"/>
     /// </summary>
@@ -61,7 +63,7 @@ namespace Umbraco.Web.Search
 
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
-            var fields = new[] { "id", "__NodeId" };
+            var fields = new[] { "id", "__NodeId", "__Key" };
 
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc...
@@ -70,12 +72,18 @@ namespace Umbraco.Web.Search
 
             //}
 
+            //special GUID check since if a user searches on one specifically we need to escape it
+            if (Guid.TryParse(query, out var g))
+            {
+                query = "\"" + g.ToString() + "\"";
+            }
+
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
                     indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
-                    fields = new[] { "id", "__NodeId", "email", "loginName" };
+                    fields = new[] { "id", "__NodeId", "__Key", "email", "loginName" };
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");

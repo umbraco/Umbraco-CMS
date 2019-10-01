@@ -148,6 +148,7 @@ namespace Umbraco.Web.Runtime
                 .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>());
 
             composition.Register<UmbracoTreeSearcher>(Lifetime.Request);
+            composition.RegisterUnique<UmbracoEntitySearcher>();
 
             composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<IEditorValidator>());
