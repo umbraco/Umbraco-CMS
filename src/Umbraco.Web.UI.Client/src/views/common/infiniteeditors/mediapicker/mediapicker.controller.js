@@ -37,7 +37,7 @@ angular.module("umbraco")
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
             $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
-
+            
             var userStartNodes = [];
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -216,7 +216,7 @@ angular.module("umbraco")
             }
 
             function clickHandler(media, event, index) {
-                
+
                 if (media.isFolder) {
                     if ($scope.disableFolderSelect) {
                         gotoFolder(media);
@@ -443,21 +443,25 @@ angular.module("umbraco")
             function getChildren(id) {
                 vm.loading = true;
                 return entityResource.getChildren(id, "Media", vm.searchOptions).then(function (data) {
-                        
-                        for (var i = 0; i < data.length; i++) {
-                            if (data[i].metaData.MediaPath !== null) {
-                                data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
-                                data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
-                            }
+
+                    var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
+
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].metaData.MediaPath !== null) {
+                            data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
+                            data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
                         }
 
-                        vm.searchOptions.filter = "";
-                        $scope.images = data ? data : [];
+                        data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
+                    }
 
-                        // set already selected medias to selected
-                        preSelectMedia();
-                        vm.loading = false;
-                    });
+                    vm.searchOptions.filter = "";
+                    $scope.images = data ? data : [];
+
+                    // set already selected medias to selected
+                    preSelectMedia();
+                    vm.loading = false;
+                });
             }
 
             function preSelectMedia() {
