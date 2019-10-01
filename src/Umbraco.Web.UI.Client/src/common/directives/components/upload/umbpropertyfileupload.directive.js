@@ -298,7 +298,8 @@
              * Called when the file collection changes (i.e. a new file has been selected but maybe it wasn't this instance that caused the change)
              */
             onFilesChanged: "&",
-            onInit: "&"
+            onInit: "&",
+            required: "@"
         },
         transclude: true,
         controllerAs: 'vm',
