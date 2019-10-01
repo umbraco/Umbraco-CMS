@@ -1,3 +1,8 @@
+// TODO:
+// 1: Get rid of JQUERY
+// 2: Get rid of the timeouts if possible... see if it's possible to hook into some existing events or if it's possible to create specific ones
+// 3: Maybe ditch the polyfill and roll your own in order to ditch the tabbing into the browser address bar
+
 (function () {
     'use strict';
 
@@ -29,7 +34,7 @@
                             }
                         }
                     });
-    
+
                     eventsService.on('appState.editors.close', function (name, args) {
                         if (element.hasClass(infiniteEditorClassName)) {
 
@@ -41,7 +46,7 @@
                                 // Remove the inert atribute for the last child
                                 if (lastChild) {
                                     lastChild.removeAttribute('inert');
-                                    
+
                                     // Find the first focusable element and put focus on it
                                     setFocus(lastChild);
                                 }
@@ -76,7 +81,7 @@
             var $element = $(element);
             var focusableElementsString = 'a[href], area[href], input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), iframe, object, embed, [tabindex="0"], [contenteditable]';
             var focusableElements = $element.find(focusableElementsString);
-        
+
             if(focusableElements.length){
                 var $firstFocusableElement = $(focusableElements[0]);
 
