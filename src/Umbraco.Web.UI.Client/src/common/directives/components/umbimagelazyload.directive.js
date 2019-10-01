@@ -53,6 +53,10 @@ Use this directive to lazy-load an image only when it is scrolled into view.
                 });
             }
 
+            // make sure to disconnect the observer when the scope is destroyed
+            scope.$on('$destroy', function () {
+                observer.disconnect();
+            });
         }
 
         var directive = {
