@@ -235,14 +235,23 @@
 }
 
 .umb-nested-content__placeholder {
-    padding: 5px 15px;
+    padding: 4px 6px;    
     border: 1px dashed #d8d7d9;
     background: 0 0;
     cursor: pointer;
-    color: #1b264f;
-    display: flex;
+    color: #1b264f;    
     -webkit-animation: fadeIn .5s;
     animation: fadeIn .5s;
+    text-align: center;
+
+    &--selected {
+        border: 1px solid #d8d7d9;
+        text-align: left;
+    }
+}
+
+.umb-nested-content__placeholder-name{
+    font-size: 15px;
 }
 
 .umb-nested-content__placeholder:hover {
@@ -251,8 +260,7 @@
     text-decoration: none;
 }
 
-.umb-nested-content__placeholder-icon-holder {
-    margin-right: 10px;
+.umb-nested-content__placeholder-icon-holder {    
     width: 20px;
     text-align: center;
     display: inline-block;
