@@ -6,13 +6,26 @@
 }
 
 .umb-locked-field__wrapper {
-   display: flex;
-   align-items: center;
-   margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 .umb-locked-field__toggle {
   margin-right: 3px;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-size: inherit;
+  line-height: inherit;
+
+  &:focus {
+    outline: none;
+
+    .tabbing-active & {
+      outline: 2px solid @inputBorderTabFocus;
+    }
+  }
 }
 
 .umb-locked-field__toggle:hover,
