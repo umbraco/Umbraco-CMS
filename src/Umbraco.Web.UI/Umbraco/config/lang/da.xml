@@ -155,6 +155,7 @@
     <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
     <key alias="publishvariant">Brugeren har gemt og udgivet indholdet for sprogene: %0% </key>
     <key alias="save">Brugeren har gemt indholdet</key>
+    <key alias="savevariant">Brugeren har gemt indholdet for sprogene: %0%</key>
     <key alias="move">Brugeren har flyttet indholdet</key>
     <key alias="copy">Brugeren har kopieret indholdet</key>
     <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
@@ -310,7 +311,7 @@
     <key alias="copyFailed">Kopiering af mediet fejlede</key>
     <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
     <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
-    <key alias="dragAndDropYourFilesIntoTheArea">Træk og slip dine filer ind i dropzonen</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Træk dine filer ind i dropzonen for, at uploade dem til mediebiblioteketet.</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -693,7 +694,7 @@
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
     <key alias="searchResults">Søgeresultater</key>
-    <key alias="reorder">Sorter</key>
+    <key alias="reorder">Sortér</key>
     <key alias="reorderDone">Afslut sortering</key>
     <key alias="preview">Eksempel</key>
     <key alias="changePassword">Skift kodeord</key>
@@ -1010,8 +1011,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
   </area>
   <area alias="mediaPicker">
+    <key alias="deletedItem">Slettet medie</key>
     <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
+    <key alias="trashed">Slettet</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
@@ -1293,11 +1296,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="enableListViewHeading">Aktivér listevisning</key>
     <key alias="enableListViewDescription">Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste; undersider vil ikke blive vist i træet</key>
     <key alias="allowedTemplatesHeading">Tilladte skabeloner</key>
-    <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner der er tilladt at bruge på dette indhold</key>
+    <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner, der er tilladt at bruge på dette indhold.</key>
     <key alias="allowAsRootHeading">Tillad på rodniveau</key>
-    <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under indhold og mediearkiv</key>
+    <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under indhold og mediearkiv.</key>
     <key alias="childNodesHeading">Tilladte typer</key>
-    <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne</key>
+    <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne.</key>
     <key alias="chooseChildNode">Vælg child node</key>
     <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.</key>
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
@@ -1322,9 +1325,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberCanEdit">Medlem kan redigere</key>
     <key alias="showOnMemberProfile">Vis på medlemsprofil</key>
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
+    <key alias="variantsDescription">Tillad at redaktører kan oprette indhold af denne type på flere sprog.</key>
+    <key alias="allowVaryByCulture">Tillad sprogvariation</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
-    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet</key>
+    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.</key>
     <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>
     <key alias="propertyHasChanges">Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?</key>
   </area>
@@ -1620,6 +1625,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="goBack">Gå tilbage</key>
     <key alias="activeListLayout">Aktivt layout:</key>
     <key alias="jumpTo">Gå til</key>
-    <key alias="group">gruppe</key>    
+    <key alias="group">gruppe</key>
+    <key alias="passed">bestået</key>
+    <key alias="warning">advarsel</key>
+    <key alias="failed">fejlet</key>
+    <key alias="suggestion">forslag</key>
+    <key alias="checkPassed">Test bestået</key>
+    <key alias="checkFailed">Test fejlet</key>
+    <key alias="openBackofficeSearch">Åben backoffice søgning</key>
+    <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
+    <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
   </area>
 </language>
