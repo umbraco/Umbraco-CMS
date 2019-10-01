@@ -543,7 +543,7 @@ namespace Umbraco.Web.Editors
                 hasErrors = true;
             }
 
-            // if the found user has his email for username, we want to keep this synced when changing the email.
+            // if the found user has their email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
             if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
