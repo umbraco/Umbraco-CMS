@@ -1,5 +1,10 @@
-<div ng-controller="Umbraco.Dashboard.ProfilerController as vm" ng-hide="vm.loading">
-    <umb-box>
+<div ng-controller="Umbraco.Dashboard.ProfilerController as vm">
+
+    <div ng-show="vm.loading">
+        <umb-load-indicator></umb-load-indicator>
+    </div>
+
+    <umb-box ng-hide="vm.loading">
         <umb-box-content>
             <h3 class="bold">Performance profiling</h3>
             <div ng-show="vm.profilerEnabled">
