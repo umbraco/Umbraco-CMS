@@ -61,12 +61,23 @@
     font-size: 16px;
     padding: 4px;
     line-height: 10px;
-
+    opacity: 0;
+    transition: opacity .12s ease-in-out;
+    
+    &:focus {
+        opacity: 1;
+    }
     &:hover {
         color: @ui-option-type-hover;
         text-decoration: none;
     }
 }
+.umb-property:hover .umb-property__copy,
+.umb-property:focus .umb-property__copy,
+.umb-property:focus-within .umb-property__copy {
+    opacity: 1;
+}
+
 
 //
 // Content picker
