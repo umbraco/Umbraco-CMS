@@ -83,6 +83,9 @@ namespace Umbraco.Web.PropertyEditors
 
                 // editorValue.Value is a JSON string of the grid
                 var rawJson = editorValue.Value.ToString();
+                if (rawJson.IsNullOrWhiteSpace())
+                    return null;
+
                 var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
 
                 // Find all controls that use the RTE editor
