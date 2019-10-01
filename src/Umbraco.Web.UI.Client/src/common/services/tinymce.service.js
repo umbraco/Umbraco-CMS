@@ -1188,6 +1188,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             var tinyMceRect = editor.editorContainer.getBoundingClientRect();
             var tinyMceTop = tinyMceRect.top;
             var tinyMceBottom = tinyMceRect.bottom;
+            var tinyMceWidth = tinyMceRect.width;
 
             var tinyMceEditArea = tinyMce.find(".mce-edit-area");
 
@@ -1196,16 +1197,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             if (tinyMceTop < 177 && ((177 + toolbarHeight) < tinyMceBottom)) {
                 toolbar
-                    .css("visibility", "visible")
                     .css("position", "fixed")
                     .css("top", "177px")
-                    .css("margin-top", "0");
+                    .css("left", "auto")
+                    .css("right", "auto")
+                    .css("width", tinyMceWidth);
             } else {
                 toolbar
-                    .css("visibility", "visible")
                     .css("position", "absolute")
-                    .css("top", "auto")
-                    .css("margin-top", "0");
+                    .css("left", "")
+                    .css("right", "")
+                    .css("top", "")
+                    .css("width", "");
             }
 
         },
