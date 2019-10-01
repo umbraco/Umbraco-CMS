@@ -472,7 +472,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        // a specific value from one of the methods, so we'll have to try this way. Even though the first method
        // will fire once per every node moved, the destination path will be the same and we need to use that to sync.
        var newPath = null;
-       applySelected(
+       var attempt = applySelected(
                function(selected, index) {
                    return contentResource.move({ parentId: target.id, id: getIdCallback(selected[index]) })
                        .then(function(path) {
@@ -509,6 +509,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                        });
                }
            });
+       if (attempt) {
+           attempt.then(function () {
+               $scope.getContent();
+           });
+       }  
    }
 
    $scope.copy = function () {
@@ -536,7 +541,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    };
 
    function performCopy(target, relateToOriginal) {
-      applySelected(
+      var attempt = applySelected(
              function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal }); },
              function (count, total) {
                  var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
@@ -546,6 +551,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                  var key = (total === 1 ? "bulk_copiedItem" : "bulk_copiedItems");
                  return localizationService.localize(key, [total]);
              });
+       if (attempt) {
+           attempt.then(function () {
+               $scope.getContent();
+           });
+       }
    }
 
    function getCustomPropertyValue(alias, properties) {
