@@ -13,10 +13,6 @@
 
         $scope.model.mandatoryRenderSection = false;
 
-        if (!$scope.model.title) {
-            $scope.model.title = "Sections";
-        }
-
         function onInit() {
             if ($scope.model.hasMaster) {
                 $scope.model.insertType = 'addSection';
@@ -25,12 +21,22 @@
             }
 
             var labelKeys = [
+                "template_insertSections",
                 "template_sectionMandatory"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (data) {
-                vm.labels.sectionMandatory = data[0];
+                vm.labels.title = data[0];
+                vm.labels.sectionMandatory = data[1];
+
+                setTitle(vm.labels.title);
             });
+        }
+
+        function setTitle(value) {
+            if (!$scope.model.title) {
+                $scope.model.title = value;
+            }
         }
 
         function select(type) {
