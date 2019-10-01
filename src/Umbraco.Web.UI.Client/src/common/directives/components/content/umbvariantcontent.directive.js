@@ -45,7 +45,7 @@
             // disable the name field if the active content app is not "Content"
             vm.nameDisabled = false;
             angular.forEach(vm.editor.content.apps, function(app){
-                if(app.active && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+                if(app.active && app.alias !== "umbContent" && app.alias !== "umbInfo" && $scope.app.alias !== "umbListView") {
                     vm.nameDisabled = true;
                 }
             });
@@ -97,7 +97,7 @@
             var app = $args.app;
             // disable the name field if the active content app is not "Content" or "Info"
             vm.nameDisabled = false;
-            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo" && $scope.app.alias !== "umbListView") {
                 vm.nameDisabled = true;
             }
         });
