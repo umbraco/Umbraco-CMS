@@ -32,7 +32,6 @@
                     <ng-form name="headerNameForm">
                         <input data-element="editor-name-field"
                                no-password-manager
-                               title="{{key}}"
                                type="text"
                                id="headerName"
                                class="umb-editor-header__name-input"
@@ -56,7 +55,7 @@
                                         ng-if="!hideAlias"
                                         alias="$parent.alias"
                                         alias-from="$parent.name"
-                                        enable-lock="true"
+                                        enable-lock="aliasLocked !== true"
                                         validation-position="'right'"
                                         server-validation-field="Alias">
                     </umb-generate-alias>

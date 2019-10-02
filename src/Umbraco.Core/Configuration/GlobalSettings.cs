@@ -33,7 +33,6 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         private static void ResetInternal()
         {
-            GlobalSettingsExtensions.Reset();
             _reservedPaths = null;
             _reservedUrls = null;
             HasSmtpServer = null;

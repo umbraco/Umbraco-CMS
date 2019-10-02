@@ -4,7 +4,7 @@
                class="umb-property-editor umb-textstring textstring"
                val-server="value"
                ng-required="model.validation.mandatory"
-               aria-required="model.validation.mandatory"
+               aria-required="{{model.validation.mandatory}}"
                aria-invalid="False"
                ng-trim="false"
                ng-keyup="model.change()" />
