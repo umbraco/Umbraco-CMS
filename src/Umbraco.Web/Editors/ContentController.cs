@@ -1061,7 +1061,7 @@ namespace Umbraco.Web.Editors
                     display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
                             expireDate.HasValue
-                                ? Services.TextService.Localize("speechBubbles/editContentPublishedWithExpireDateText", new [] { expireDate.Value.ToLongDateString(), expireDate.Value.ToShortTimeString() })
+                                ? Services.TextService.Localize("speechBubbles/editContentPublishedWithExpireDateText", new [] { expireDate.Value.ToLocalTime().ToLongDateString(), expireDate.Value.ToLocalTime().ToShortTimeString() })
                                 : Services.TextService.Localize("speechBubbles/editContentPublishedText")
                     );
                     break;
