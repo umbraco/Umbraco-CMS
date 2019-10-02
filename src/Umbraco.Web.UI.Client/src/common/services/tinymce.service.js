@@ -617,7 +617,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     userService.getCurrentUser().then(function (userData) {
                         if (callback) {
                             angularHelper.safeApply($rootScope, function() {
-                                console.log('current data in create media picker', currentTarget);
                                 callback(currentTarget, userData, imgDomElement);
                             });
                         }
@@ -631,14 +630,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 // imgElement is only definied if updating an image
                 // if null/undefinied then its a BRAND new image
                 if(imgDomElement){
-                    console.log('UPDATING IMG', img);
-
                     // Check if the img src has changed
                     // If it has we will need to do some resizing/recalc again
                     var hasImageSrcChanged = false;
 
                     if(img.url !==  editor.dom.getAttrib(imgDomElement, "src")){
-                        console.log("IMG SRC CHANGED !!!!");
                         hasImageSrcChanged = true;
                     }
 
@@ -667,7 +663,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     }
 
                 } else{
-                    console.log('CREATE NEW IMAGE', img);
                     // We need to create a NEW DOM <img> element to insert
                     var data = {
                         alt: img.altText || "",
