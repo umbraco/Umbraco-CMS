@@ -25,7 +25,7 @@
 
         vm.currentNode = null;
         vm.contentType = {};
-        vm.editorfor = "documentType";
+        vm.editorfor = "content_documentType";
         vm.labels = {};
         vm.submitButtonKey = "buttons_save";
         vm.generateModelsKey = "buttons_saveAndGenerateModels";
