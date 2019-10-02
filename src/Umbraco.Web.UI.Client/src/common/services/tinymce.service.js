@@ -664,23 +664,37 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 } else{
                     // We need to create a NEW DOM <img> element to insert
+                    // setting an attribute of ID to __mcenew, so we can gather a reference to the node, to be able to update its size accordingly to the size of the image.
                     var data = {
                         alt: img.altText || "",
                         src: (img.url) ? img.url : "nothing.jpg",
                         id: "__mcenew",
                         "data-udi": img.udi
                     };
+                    
                     editor.selection.setContent(editor.dom.createHTML('img', data));
-
-                    // Insert a DOM element with an ID of __mcenew
-                    // So we can select it after 500ms by that ID
-                    // In order to call the sizeImageEditor function to size img correctly
+                    
+                    // Using settimeout to wait for a DoM-render, so we can find the new element by ID.
                     $timeout(function () {
+
                         var imgElm = editor.dom.get("__mcenew");
-                        sizeImageInEditor(editor, imgElm, img.url);
                         editor.dom.setAttrib(imgElm, "id", null);
-                        editor.fire("Change");
-                    }, 500);
+
+                        // When image is loaded we are ready to call sizeImageInEditor.
+                        var onImageLoaded = function() {
+                            sizeImageInEditor(editor, imgElm, img.url);
+                            editor.fire("Change");
+                        }
+
+                        // Check if image already is loaded.
+                        if(imgElm.complete === true) {
+                            onImageLoaded();
+                        } else {
+                            imgElm.onload = onImageLoaded;
+                        }
+
+                    });
+                    
                 }
             }
         },
