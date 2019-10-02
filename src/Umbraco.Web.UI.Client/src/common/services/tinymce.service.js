@@ -588,12 +588,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
 
                     var selectedElm = editor.selection.getNode(),
-                        currentTarget;
+                        currentTarget,
+                        imgDomElement;
 
                     if (selectedElm.nodeName === 'IMG') {
                         var img = $(selectedElm);
+                        imgDomElement = selectedElm;
 
                         var hasUdi = img.attr("data-udi") ? true : false;
+                        var hasDataTmpImg = img.attr("data-tmpimg") ? true : false;
 
                         currentTarget = {
                             altText: img.attr("alt"),
@@ -605,12 +608,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         } else {
                             currentTarget["id"] = img.attr("rel");
                         }
+
+                        if(hasDataTmpImg){
+                            currentTarget["tmpimg"] = img.attr("data-tmpimg");
+                        }
                     }
 
                     userService.getCurrentUser().then(function (userData) {
                         if (callback) {
                             angularHelper.safeApply($rootScope, function() {
-                                callback(currentTarget, userData);
+                                console.log('current data in create media picker', currentTarget);
+                                callback(currentTarget, userData, imgDomElement);
                             });
                         }
                     });
@@ -618,25 +626,67 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
         },
 
-        insertMediaInEditor: function (editor, img) {
+        insertMediaInEditor: function (editor, img, imgDomElement) {
             if (img) {
+                // imgElement is only definied if updating an image
+                // if null/undefinied then its a BRAND new image
+                if(imgDomElement){
+                    console.log('UPDATING IMG', img);
 
-                var data = {
-                    alt: img.altText || "",
-                    src: (img.url) ? img.url : "nothing.jpg",
-                    id: '__mcenew',
-                    'data-udi': img.udi
-                };
+                    // Check if the img src has changed
+                    // If it has we will need to do some resizing/recalc again
+                    var hasImageSrcChanged = false;
 
-                editor.selection.setContent(editor.dom.createHTML('img', data));
+                    if(img.url !==  editor.dom.getAttrib(imgDomElement, "src")){
+                        console.log("IMG SRC CHANGED !!!!");
+                        hasImageSrcChanged = true;
+                    }
 
-                $timeout(function () {
-                    var imgElm = editor.dom.get('__mcenew');
-                    sizeImageInEditor(editor, imgElm, img.url);
-                    editor.dom.setAttrib(imgElm, 'id', null);
-                    editor.fire('Change');
+                    // If null/undefinied it will remove the attribute
+                    editor.dom.setAttrib(imgDomElement, "alt", img.altText);
 
-                }, 500);
+                    // It's possible to pick a NEW image - so need to ensure this gets updated
+                    if(img.udi){
+                        editor.dom.setAttrib(imgDomElement, "data-udi", img.udi);
+                    }
+
+                    // It's possible to pick a NEW image - so need to ensure this gets updated
+                    if(img.url){
+                        editor.dom.setAttrib(imgDomElement, "src", img.url);
+                    }
+
+                    // Remove width & height attributes (ONLY if imgSrc changed)
+                    // So native image size is used as this needed to re-calc width & height
+                    // For the function sizeImageInEditor() & apply the image resizing querystrings etc..
+                    if(hasImageSrcChanged){
+                        editor.dom.setAttrib(imgDomElement, "width", null);
+                        editor.dom.setAttrib(imgDomElement, "height", null);
+
+                        //Re-calc the image dimensions
+                        sizeImageInEditor(editor, imgDomElement, img.url);
+                    }
+
+                } else{
+                    console.log('CREATE NEW IMAGE', img);
+                    // We need to create a NEW DOM <img> element to insert
+                    var data = {
+                        alt: img.altText || "",
+                        src: (img.url) ? img.url : "nothing.jpg",
+                        id: "__mcenew",
+                        "data-udi": img.udi
+                    };
+                    editor.selection.setContent(editor.dom.createHTML('img', data));
+
+                    // Insert a DOM element with an ID of __mcenew
+                    // So we can select it after 500ms by that ID
+                    // In order to call the sizeImageEditor function to size img correctly
+                    $timeout(function () {
+                        var imgElm = editor.dom.get("__mcenew");
+                        sizeImageInEditor(editor, imgElm, img.url);
+                        editor.dom.setAttrib(imgElm, "id", null);
+                        editor.fire("Change");
+                    }, 500);
+                }
             }
         },
 
@@ -1399,7 +1449,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             //Create the insert media plugin
-            self.createMediaPicker(args.editor, function (currentTarget, userData) {
+            self.createMediaPicker(args.editor, function (currentTarget, userData, imgDomElement) {
 
                 var startNodeId, startNodeIsVirtual;
                 if (!args.model.config.startNodeId) {
@@ -1422,7 +1472,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     startNodeIsVirtual: startNodeIsVirtual,
                     dataTypeKey: args.model.dataTypeKey,
                     submit: function (model) {
-                        self.insertMediaInEditor(args.editor, model.selection[0]);
+                        self.insertMediaInEditor(args.editor, model.selection[0], imgDomElement);
                         editorService.close();
                     },
                     close: function () {
