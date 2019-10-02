@@ -670,7 +670,6 @@
     <Compile Include="Exceptions\DataOperationException.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
-    <Compile Include="Exceptions\WontImplementException.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
