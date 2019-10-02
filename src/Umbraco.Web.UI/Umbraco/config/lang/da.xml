@@ -1636,7 +1636,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="openBackofficeSearch">Åben backoffice søgning</key>
     <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
     <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
-    <key alias="currentLanguage">Aktivt sprog:</key>
-    <key alias="switchLanguage">Skift sprog til:</key>
+    <key alias="currentLanguage">Aktivt sprog</key>
+    <key alias="switchLanguage">Skift sprog til</key>
   </area>
 </language>
