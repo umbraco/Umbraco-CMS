@@ -211,44 +211,47 @@ Use this directive to construct a header inside the main editor window.
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
+            scope.a11yMessage = "";
+            scope.a11yName = "";
+            if (editorState.current) {
+                //to do make work for user create/edit
+                scope.isNew = editorState.current.id === 0;
 
-            scope.isNew = editorState.current.id=== 0;
+                var localizeVars = [
+                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
+                    "placeholders_a11yName",
+                    scope.isNew ? "general_new" : "general_edit"
+                ];
 
-            var localizeVars = [
-                scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
-                "placeholders_a11yName",
-                scope.isNew ? "general_new" : "general_edit"
-            ];
+                if (scope.editorfor) {
+                    localizeVars.push("content_" + scope.editorfor);
+                }
+                localizationService.localizeMany(localizeVars).then(function(data) {
+                    scope.a11yMessage = data[0];
+                    scope.a11yName = data[1];
+                    var title = data[2] + ":";
+                    if (!scope.isNew) {
+                        scope.a11yMessage += " " + scope.name;
+                        title += " " + scope.name;
+                    } else {
+                        var name = "";
+                        if (editorState.current.contentTypeName) {
+                            name = editorState.current.contentTypeName;
+                        } else if (scope.editorfor) {
+                            name = data[3];
+                        }
+                        if (name !== "") {
+                            scope.a11yMessage += " " + name;
+                            scope.a11yName = name + " " + scope.a11yName;
+                            title += " " + name;
+                        }
+                    }
+                    if (title !== data[2] + ":") {
+                        scope.$emit("$changeTitle", title);
+                    }
+                });
 
-            if (scope.editorfor) {
-                localizeVars.push("content_" + scope.editorfor);
             }
-            localizationService.localizeMany(localizeVars).then(function (data) {
-                scope.a11yMessage = data[0];
-                scope.a11yName = data[1];
-                var title = data[2] + ":";
-                if (!scope.isNew) {
-                    scope.a11yMessage += " " + scope.name;
-                    title += " " + scope.name;
-                } else {
-                    var name = "";
-                    if (editorState.current.contentTypeName) {
-                        name = editorState.current.contentTypeName;
-                    }
-                    else if (scope.editorfor) {
-                        name = data[3];
-                    }
-                    if (name!=="") {
-                        scope.a11yMessage += " " + name;
-                        scope.a11yName = name + " " + scope.a11yName;
-                        title += " " + name;
-                    }
-                }
-                if (title !== data[2] + ":") {
-                    scope.$root.locationTitle = title + " - " + scope.$root.locationTitle;
-                }
-            });
-
             scope.goBack = function () {
                 if (scope.onBack) {
                     scope.onBack();
