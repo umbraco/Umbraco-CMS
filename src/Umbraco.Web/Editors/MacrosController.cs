@@ -230,6 +230,23 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets the available parameter editors grouped by their group.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="HttpResponseMessage"/>.
+        /// </returns>
+        public HttpResponseMessage GetGroupedParameterEditors()
+        {
+            var parameterEditors = Current.ParameterEditors.ToArray();
+
+            var grouped = parameterEditors
+                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
+                .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, grouped);
+        }
+
+        /// <summary>
         /// Returns a error response and optionally logs it
         /// </summary>
         /// <param name="message">
