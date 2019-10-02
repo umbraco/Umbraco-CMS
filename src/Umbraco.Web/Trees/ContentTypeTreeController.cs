@@ -24,11 +24,11 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
-        private readonly UmbracoEntitySearcher _entitySearcher;
+        private readonly UmbracoTreeSearcher _treeSearcher;
 
-        public ContentTypeTreeController(UmbracoEntitySearcher entitySearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public ContentTypeTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
-            _entitySearcher = entitySearcher;
+            _treeSearcher = treeSearcher;
         }
 
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Trees
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-            => _entitySearcher.Search(UmbracoObjectTypes.DocumentType, query, pageSize, pageIndex, out totalFound, searchFrom);
+            => _treeSearcher.EntitySearch(UmbracoObjectTypes.DocumentType, query, pageSize, pageIndex, out totalFound, searchFrom);
 
     }
 }

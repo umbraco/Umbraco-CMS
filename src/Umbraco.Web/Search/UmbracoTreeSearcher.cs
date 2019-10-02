@@ -7,6 +7,7 @@ using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
@@ -26,22 +27,25 @@ namespace Umbraco.Web.Search
         private readonly ILocalizationService _languageService;
         private readonly IEntityService _entityService;
         private readonly UmbracoMapper _mapper;
+        private readonly ISqlContext _sqlContext;
 
         public UmbracoTreeSearcher(IExamineManager examineManager,
             UmbracoContext umbracoContext,
             ILocalizationService languageService,
             IEntityService entityService,
-            UmbracoMapper mapper)
+            UmbracoMapper mapper,
+            ISqlContext sqlContext)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
             _umbracoContext = umbracoContext;
             _languageService = languageService;
             _entityService = entityService;
             _mapper = mapper;
+            _sqlContext = sqlContext;
         }
 
         /// <summary>
-        /// Searches for results based on the entity type
+        /// Searches Examine for results based on the entity type
         /// </summary>
         /// <param name="query"></param>
         /// <param name="entityType"></param>
@@ -135,6 +139,26 @@ namespace Umbraco.Web.Search
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
+        }
+
+        /// <summary>
+        /// Searches with the <see cref="IEntityService"/> for results based on the entity type
+        /// </summary>
+        /// <param name="objectType"></param>
+        /// <param name="query"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="totalFound"></param>
+        /// <param name="searchFrom"></param>
+        /// <returns></returns>
+        public IEnumerable<SearchResultEntity> EntitySearch(UmbracoObjectTypes objectType, string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        {
+            //if it's a GUID, match it
+            Guid.TryParse(query, out var g);
+
+            var results = _entityService.GetPagedDescendants(objectType, pageIndex, pageSize, out totalFound,
+                filter: _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query) || x.Key == g));
+            return _mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
 
         private bool BuildQuery(StringBuilder sb, string query, string searchFrom, string[] fields, string type)
