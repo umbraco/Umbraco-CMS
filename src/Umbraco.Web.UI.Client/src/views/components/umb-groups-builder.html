@@ -243,7 +243,7 @@
                                     </umb-property-editor>
                                 </ng-form>
 
-                                <button class="umb-group-builder__open-settings" ng-if="!property.inherited && !property.locked" ng-click="editPropertyTypeSettings(property, tab)"></button>
+                                <button aria-label="Open settings" class="umb-group-builder__open-settings" ng-if="!property.inherited && !property.locked" ng-click="editPropertyTypeSettings(property, tab)"></button>
 
                             </div>
 
@@ -254,12 +254,12 @@
 
                                     <!-- settings for property -->
                                     <div class="umb-group-builder__property-action">
-                                        <button class="icon icon-settings" ng-click="editPropertyTypeSettings(property, tab)"></button>
+                                        <button aria-label="Open settings"  class="icon icon-settings" ng-click="editPropertyTypeSettings(property, tab)"></button>
                                     </div>
 
                                     <!-- delete property -->
                                     <div ng-if="!property.locked" class="umb-group-builder__property-action">
-                                        <button class="icon-trash" ng-click="togglePrompt(property)"></button>
+                                        <button aria-label="Delete property" class="icon-trash" ng-click="togglePrompt(property)"></button>
                                         <umb-confirm-action
                                             ng-if="property.deletePrompt"
                                             direction="left"
