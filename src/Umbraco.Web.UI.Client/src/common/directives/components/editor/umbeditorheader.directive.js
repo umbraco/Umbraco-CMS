@@ -215,7 +215,8 @@ Use this directive to construct a header inside the main editor window.
             scope.a11yName = "";
             if (editorState.current) {
                 //to do make work for user create/edit
-                scope.isNew = editorState.current.id === 0;
+                // to do make it work for user group create/ edit
+                scope.isNew = editorState.current.id === 0 || editorState.current.id === "0";
 
                 var localizeVars = [
                     scope.isNew ? "placeholders_a11yCreate" : "placeholders_a11yEdit",
