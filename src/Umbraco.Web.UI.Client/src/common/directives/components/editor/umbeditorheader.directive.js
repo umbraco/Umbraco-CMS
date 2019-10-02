@@ -218,13 +218,13 @@ Use this directive to construct a header inside the main editor window.
                 scope.isNew = editorState.current.id === 0;
 
                 var localizeVars = [
-                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
+                    scope.isNew ? "placeholders_a11yCreate" : "placeholders_a11yEdit",
                     "placeholders_a11yName",
                     scope.isNew ? "general_new" : "general_edit"
                 ];
 
                 if (scope.editorfor) {
-                    localizeVars.push("content_" + scope.editorfor);
+                    localizeVars.push(scope.editorfor);
                 }
                 localizationService.localizeMany(localizeVars).then(function(data) {
                     scope.a11yMessage = data[0];
