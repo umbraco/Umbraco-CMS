@@ -98,7 +98,7 @@
                         </div>
                     </ng-form>
 
-                    <div class="umb-group-builder__group-remove" ng-if="!sortingMode">
+                    <div class="umb-group-builder__group-remove" ng-if="!sortingMode && canRemoveGroup(tab)">
                         <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
                         <umb-confirm-action
                             ng-if="tab.deletePrompt"
