@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         /// Initializes a new instance of the <see cref="RetryLimitExceededException" /> class with a default error message.
         /// </summary>
         public RetryLimitExceededException()
-            : this("RetryLimitExceeded")
+            : base()
         { }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         /// </summary>
         /// <param name="innerException">The exception that is the cause of the current exception.</param>
         public RetryLimitExceededException(Exception innerException)
-            : base(innerException != null ? innerException.Message : "RetryLimitExceeded", innerException)
+            : base(null, innerException)
         { }
 
         /// <summary>
