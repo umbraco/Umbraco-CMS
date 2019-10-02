@@ -1,0 +1,34 @@
+<umb-box>
+
+    <umb-box-content>
+
+        <umb-control-group label="Id" ng-if="vm.showIdentifier">
+            <div>{{vm.content.id}}</div>
+            <small>{{vm.content.key}}</small>
+        </umb-control-group>
+
+        <umb-property property="vm.properties.selectedEditor">
+            <div>
+                <select name="vm.selectedEditor"
+                        ng-model="vm.content.selectedEditor"
+                        required
+                        ng-options="e.alias as e.name for e in vm.content.availableEditors"></select>
+                <span ng-messages="contentForm.selectedEditor.$error" show-validation-on-submit>
+                    <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                </span>
+            </div>
+
+        </umb-property>
+
+        <umb-property property="vm.properties.selectedEditorId">
+            <div>{{vm.content.selectedEditor}}</div>
+        </umb-property>
+
+        <umb-property property="preValue"
+                      ng-repeat="preValue in vm.preValues">
+            <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+        </umb-property>
+
+    </umb-box-content>
+
+</umb-box>
