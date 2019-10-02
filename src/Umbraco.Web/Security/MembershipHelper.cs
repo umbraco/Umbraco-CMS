@@ -15,6 +15,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Security
 {
@@ -31,6 +32,7 @@ namespace Umbraco.Web.Security
         private readonly IPublicAccessService _publicAccessService;
         private readonly AppCaches _appCaches;
         private readonly ILogger _logger;
+        private readonly IGlobalSettings _globalSettings;
 
         #region Constructors
 
@@ -45,7 +47,8 @@ namespace Umbraco.Web.Security
             IUserService userService,
             IPublicAccessService publicAccessService,
             AppCaches appCaches,
-            ILogger logger
+            ILogger logger,
+            IGlobalSettings globalSettings
         )
         {
             HttpContext = httpContext;
@@ -56,6 +59,7 @@ namespace Umbraco.Web.Security
             _publicAccessService = publicAccessService;
             _appCaches = appCaches;
             _logger = logger;
+            _globalSettings = globalSettings;
 
             _membershipProvider = membershipProvider ?? throw new ArgumentNullException(nameof(membershipProvider));
             _roleProvider = roleProvider ?? throw new ArgumentNullException(nameof(roleProvider));
@@ -179,7 +183,7 @@ namespace Umbraco.Web.Security
             _memberService.Save(member);
 
             //reset the FormsAuth cookie since the username might have changed
-            FormsAuthentication.SetAuthCookie(member.Username, true);
+            SetAuthCookie(member.Username, true);
 
             return Attempt<MembershipUser>.Succeed(membershipUser);
         }
@@ -241,9 +245,9 @@ namespace Umbraco.Web.Security
                 provider.GetUser(model.Username, true);
 
                 //Log them in
-                FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
+                SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
             }
-
+            
             return membershipUser;
         }
 
@@ -270,7 +274,7 @@ namespace Umbraco.Web.Security
                 return false;
             }
             //Log them in
-            FormsAuthentication.SetAuthCookie(member.UserName, true);
+            SetAuthCookie(member.UserName, true);
             return true;
         }
 
@@ -805,6 +809,13 @@ namespace Umbraco.Web.Security
                 sb.Append(s);
             }
             return sb.ToString();
+        }
+
+        private void SetAuthCookie(string userName, bool createPersistentCookie)
+        {
+            var c = FormsAuthentication.GetAuthCookie(userName, createPersistentCookie);
+            c.Secure = _globalSettings.UseHttps || HttpContext.Request.IsSecureConnection;
+            HttpContext.Response.AppendCookie(c);
         }
 
     }
