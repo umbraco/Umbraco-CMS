@@ -982,7 +982,6 @@
     <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
     <Compile Include="Persistence\DbCommandExtensions.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
-    <Compile Include="Persistence\EntityNotFoundException.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
     <Compile Include="Persistence\Factories\DataTypeFactory.cs" />
     <Compile Include="Persistence\Factories\DictionaryItemFactory.cs" />
