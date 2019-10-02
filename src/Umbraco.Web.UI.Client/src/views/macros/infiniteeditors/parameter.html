@@ -15,7 +15,47 @@
 
                 <umb-box>
 
-                    <umb-box-content class="block-form">
+                    <umb-box-content class="block-form content-type-editor-dialog edit-property-settings">
+
+                        <div class="umb-control-group" ng-if="!model.parameter.locked">
+                            <div class="control-group">
+                                <textarea class="editor-label"
+                                          data-element="property-name"
+                                          name="propertyLabel"
+                                          ng-model="model.parameter.label"
+                                          localize="placeholder"
+                                          placeholder="@placeholders_entername"
+                                          umb-auto-focus
+                                          focus-on-filled="true"
+                                          umb-auto-resize
+                                          required
+                                          ng-keypress="vm.submitOnEnter($event)">
+                                </textarea>
+                                <!--<div ng-messages="propertySettingsForm.propertyLabel.$error" show-validation-on-submit>
+                                    <span class="umb-validation-label" ng-message="required">Required label</span>
+                                </div>-->
+                            </div>
+                            <div class="control-group -no-margin">
+                                <umb-generate-alias enable-lock="true" alias-from="model.parameter.label" alias="model.parameter.key"></umb-generate-alias>
+                            </div>
+                        </div>
+
+                        <a data-element="editor-add" href="" ng-if="!model.parameter.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openMacroParameterPicker(model.parameter)">
+                            <localize key="shortcuts_addEditor"></localize>
+                        </a>
+
+                        <div class="editor clearfix" ng-if="model.parameter.editor">
+
+                            <a href="" class="editor-icon-wrapper" ng-click="vm.openMacroParameterPicker(model.parameter)">
+                                <i class="icon {{model.parameter.dataTypeIcon}}" ng-class="{'icon-autofill': model.parameter.dataTypeIcon == null}"></i>
+                            </a>
+
+                            <div class="editor-details">
+                                <a href="" class="editor-name" ng-click="vm.openMacroParameterPicker(model.parameter)">{{ model.parameter.dataTypeName }}</a>
+                                <a href="" class="editor-editor" ng-click="vm.openMacroParameterPicker(model.parameter)">{{ model.parameter.editor }}</a>
+                            </div>
+
+                        </div>
 
                         <umb-control-group label="@general_name" description="">
                             <input type="text" ng-model="model.parameter.label" umb-auto-focus required />
@@ -26,9 +66,8 @@
                         </umb-control-group>
 
                         <umb-control-group label="Editor" description="">
-                            <select  required class="input-block-level" ng-model="model.parameter.editor" ng-options="i.alias as (i.name) for i in model.editors"></select>
+                            <select required class="input-block-level" ng-model="model.parameter.editor" ng-options="i.alias as (i.name) for i in model.editors"></select>
                         </umb-control-group>
-
 
                     </umb-box-content>
                 </umb-box>
