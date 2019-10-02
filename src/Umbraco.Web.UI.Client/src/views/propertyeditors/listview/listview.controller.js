@@ -262,10 +262,10 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     $scope.getContent = function (contentId) {
 
-        $scope.reloadView($scope.contentId);
+        $scope.reloadView($scope.contentId, true);
     }
 
-    $scope.reloadView = function (id) {
+    $scope.reloadView = function (id, reloadActiveNode) {
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -297,9 +297,20 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
 
                 //reload!
-                $scope.reloadView(id);
+                $scope.reloadView(id, reloadActiveNode);
             }
-
+            // in the media section, the list view items are by default also shown in the tree, so we need 
+            // to refresh the current tree node when changing the folder contents (adding and removing)
+            else if (reloadActiveNode && section === "media") {
+                var activeNode = appState.getTreeState("selectedNode");
+                if (activeNode) {
+                    if (activeNode.expanded) {
+                        navigationService.reloadNode(activeNode);
+                    }
+                } else {
+                    navigationService.reloadSection(section);
+                }
+            }
         });
     };
 
@@ -411,7 +422,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
                 return localizationService.localize(key, [total]);
             }).then(function () {
-                $scope.reloadView($scope.contentId);
+                $scope.reloadView($scope.contentId, true);
             });
     }
 
@@ -537,7 +548,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
                 return localizationService.localize(key, [total]);
             }).then(function () {
-                $scope.reloadView($scope.contentId);
+                $scope.reloadView($scope.contentId, true);
             });
     }
 
