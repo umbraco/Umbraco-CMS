@@ -8,7 +8,7 @@
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var id = infiniteMode ? $scope.model.id : $routeParams.id;
         var create = infiniteMode ? $scope.model.create : $routeParams.create;
-
+        vm.editorfor = "template_template";
         vm.page = {};
         vm.page.loading = true;
         vm.templates = [];
