@@ -98,9 +98,9 @@ namespace Umbraco.Core.Exceptions
         protected InvalidCompositionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            this.ContentTypeAlias = info.GetString(nameof(this.ContentTypeAlias));
-            this.AddedCompositionAlias = info.GetString(nameof(this.AddedCompositionAlias));
-            this.PropertyTypeAliases = (string[])info.GetValue(nameof(this.PropertyTypeAliases), typeof(string[]));
+            ContentTypeAlias = info.GetString(nameof(ContentTypeAlias));
+            AddedCompositionAlias = info.GetString(nameof(AddedCompositionAlias));
+            PropertyTypeAliases = (string[])info.GetValue(nameof(PropertyTypeAliases), typeof(string[]));
         }
 
         /// <summary>
@@ -116,9 +116,9 @@ namespace Umbraco.Core.Exceptions
                 throw new ArgumentNullException(nameof(info));
             }
 
-            info.AddValue(nameof(this.ContentTypeAlias), this.ContentTypeAlias);
-            info.AddValue(nameof(this.AddedCompositionAlias), this.AddedCompositionAlias);
-            info.AddValue(nameof(this.PropertyTypeAliases), this.PropertyTypeAliases);
+            info.AddValue(nameof(ContentTypeAlias), ContentTypeAlias);
+            info.AddValue(nameof(AddedCompositionAlias), AddedCompositionAlias);
+            info.AddValue(nameof(PropertyTypeAliases), PropertyTypeAliases);
 
             base.GetObjectData(info, context);
         }

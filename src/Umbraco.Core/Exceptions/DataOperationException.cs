@@ -17,6 +17,9 @@ namespace Umbraco.Core.Exceptions
         /// <value>
         /// The operation.
         /// </value>
+        /// <remarks>
+        /// This object should be serializable to prevent a <see cref="SerializationException" /> to be thrown.
+        /// </remarks>
         public T Operation { get; private set; }
 
         /// <summary>
