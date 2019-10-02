@@ -11,6 +11,7 @@
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
         vm.page.saveButtonState = "init";
+        vm.editorfor = "settings_stylesheet";
 
          //Used to toggle the keyboard shortcut modal
         //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
