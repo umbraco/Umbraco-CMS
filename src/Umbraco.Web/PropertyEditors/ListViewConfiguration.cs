@@ -74,6 +74,9 @@ namespace Umbraco.Web.PropertyEditors
             [JsonProperty("header")]
             public string Header { get; set; }
 
+            [JsonProperty("nameTemplate")]
+            public string Template { get; set; }
+
             [JsonProperty("isSystem")]
             public int IsSystem { get; set; } // TODO: bool
         }
