@@ -533,6 +533,7 @@
         <key alias="enterAlias">Enter alias...</key>
         <key alias="generatingAlias">Generating alias...</key>
         <key alias="a11yCreateItem">Create item</key>
+        <key alias="a11yCreate">Create</key>
         <key alias="a11yEdit">Edit</key>
         <key alias="a11yName">Name</key>
   </area>
