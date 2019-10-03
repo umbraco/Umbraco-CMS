@@ -179,7 +179,7 @@ namespace Umbraco.Web.Security
             _memberService.Save(member);
 
             //reset the FormsAuth cookie since the username might have changed
-            FormsAuthentication.SetAuthCookie(member.Username, true);
+            SetAuthCookie(member.Username, true);
 
             return Attempt<MembershipUser>.Succeed(membershipUser);
         }
@@ -241,7 +241,7 @@ namespace Umbraco.Web.Security
                 provider.GetUser(model.Username, true);
 
                 //Log them in
-                FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
+                SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
             }
 
             return membershipUser;
@@ -270,7 +270,7 @@ namespace Umbraco.Web.Security
                 return false;
             }
             //Log them in
-            FormsAuthentication.SetAuthCookie(member.UserName, true);
+            SetAuthCookie(member.UserName, true);
             return true;
         }
 
