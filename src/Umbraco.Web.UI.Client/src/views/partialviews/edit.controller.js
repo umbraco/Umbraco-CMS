@@ -16,7 +16,7 @@
         }
 
         vm.close = close;
-
+        vm.editorfor = "visuallyHiddenTexts_partialView";
         vm.page = {};
         vm.page.loading = true;
         vm.partialView = {};
