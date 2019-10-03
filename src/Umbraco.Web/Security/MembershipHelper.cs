@@ -814,7 +814,7 @@ namespace Umbraco.Web.Security
         private void SetAuthCookie(string userName, bool createPersistentCookie)
         {
             var c = FormsAuthentication.GetAuthCookie(userName, createPersistentCookie);
-            c.Secure = _globalSettings.UseHttps || HttpContext.Request.IsSecureConnection;
+            c.Secure = HttpContext.Request.IsSecureConnection;
             HttpContext.Response.AppendCookie(c);
         }
 
