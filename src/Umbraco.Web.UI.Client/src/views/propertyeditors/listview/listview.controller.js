@@ -197,8 +197,10 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         // (see MemberRepository.ApplySystemOrdering)
         if (e.isSystem && $scope.entityType === "member") {
             e.allowSorting = e.alias === "username" ||
-                             e.alias === "email" ||
-                             e.alias === "updateDate";
+                e.alias === "email" ||
+                e.alias === "updateDate" ||
+                e.alias === "createDate" ||
+                e.alias === "contentTypeAlias";
         }
 
         if (e.isSystem) {
@@ -774,7 +776,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                     ? "content_documentType"
                     : $scope.entityType === "media"
                         ? "content_mediatype"
-                        : "content_memberType";
+                        : "content_membertype";
             case "email":
                 return "general_email";
             case "username":
