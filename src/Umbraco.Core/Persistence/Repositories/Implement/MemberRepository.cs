@@ -546,6 +546,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (ordering.OrderBy.InvariantEquals("userName"))
                 return SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName);
 
+            if (ordering.OrderBy.InvariantEquals("updateDate"))
+                return SqlSyntax.GetFieldName<ContentVersionDto>(x => x.VersionDate);
+
             return base.ApplySystemOrdering(ref sql, ordering);
         }
 

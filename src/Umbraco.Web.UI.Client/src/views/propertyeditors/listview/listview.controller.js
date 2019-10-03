@@ -193,9 +193,12 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     _.each($scope.options.includeProperties, function (e, i) {
         e.allowSorting = true;
 
-        // Special case for members, only fields on the base table (cmsMember) can be used for sorting
-        if (e.isSystem && $scope.entityType == "member") {
-            e.allowSorting = e.alias == 'username' || e.alias == 'email';
+        // Special case for members, only the configured system fields should be enabled sorting
+        // (see MemberRepository.ApplySystemOrdering)
+        if (e.isSystem && $scope.entityType === "member") {
+            e.allowSorting = e.alias === "username" ||
+                             e.alias === "email" ||
+                             e.alias === "updateDate";
         }
 
         if (e.isSystem) {
@@ -767,8 +770,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             case "published":
                 return "content_isPublished";
             case "contentTypeAlias":
-                // TODO: Check for members
-                return $scope.entityType === "content" ? "content_documentType" : "content_mediatype";
+                return $scope.entityType === "content"
+                    ? "content_documentType"
+                    : $scope.entityType === "media"
+                        ? "content_mediatype"
+                        : "content_memberType";
             case "email":
                 return "general_email";
             case "username":
