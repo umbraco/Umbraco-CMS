@@ -249,6 +249,8 @@
     <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
     <Compile Include="Models\CultureImpact.cs" />
+    <Compile Include="Models\MailAddress.cs" />
+    <Compile Include="Models\MailMessage.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
@@ -258,6 +260,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedModelFactoryExtensions.cs" />
     <Compile Include="Services\Implement\MailKitSmtpService.cs" />
+    <Compile Include="Services\Implement\NetMailSmtpService.cs" />
     <Compile Include="Services\ISmtpService.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="Composing\TypeCollectionBuilderBase.cs" />

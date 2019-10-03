@@ -310,8 +310,6 @@ namespace Umbraco.Web.Editors
                         UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
-                    await _smtpService.SendAsync("*** mail content will go here ***");
-
                     await UserManager.SendEmailAsync(identityUser.Id,
                         Services.TextService.Localize("login/resetPasswordEmailCopySubject",
                             // Ensure the culture of the found user is used for the email!

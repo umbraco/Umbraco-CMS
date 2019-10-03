@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -14,7 +12,7 @@ namespace Umbraco.Core.Services.Implement
         {
             _logger = logger;
         }
-        public async Task SendAsync(string mailMessage)
+        public async Task SendAsync(MailMessage mailMessage)
         {
             throw new NotImplementedException();
             await Task.FromResult(0);

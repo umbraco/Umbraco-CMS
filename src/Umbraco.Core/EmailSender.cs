@@ -15,6 +15,7 @@ namespace Umbraco.Core
     /// <summary>
     /// A utility class for sending emails
     /// </summary>
+    [Obsolete]
     public class EmailSender : IEmailSender
     {
         // TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!

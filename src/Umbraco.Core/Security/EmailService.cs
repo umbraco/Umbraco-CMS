@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
@@ -14,11 +15,13 @@ namespace Umbraco.Core.Security
     {
         private readonly string _notificationEmailAddress;
         private readonly IEmailSender _defaultEmailSender;
+        private readonly ISmtpService _smtpService;
 
-        public EmailService(string notificationEmailAddress, IEmailSender defaultEmailSender)
+        public EmailService(string notificationEmailAddress, IEmailSender defaultEmailSender, ISmtpService smtpService)
         {
             _notificationEmailAddress = notificationEmailAddress;
             _defaultEmailSender = defaultEmailSender;
+            _smtpService = smtpService;
         }
 
 

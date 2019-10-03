@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
     public interface ISmtpService
     {
-        Task SendAsync(string mailMessage);
+        Task SendAsync(MailMessage message);
     }
 }

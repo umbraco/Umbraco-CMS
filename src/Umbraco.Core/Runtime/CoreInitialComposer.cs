@@ -124,7 +124,8 @@ namespace Umbraco.Core.Runtime
             // by default, register a noop rebuilder
             composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
-            composition.RegisterUnique<ISmtpService, MailKitSmtpService>();
+            //composition.RegisterUnique<ISmtpService, MailKitSmtpService>();
+            composition.RegisterUnique<ISmtpService, NetMailSmtpService>();
         }
     }
 }
