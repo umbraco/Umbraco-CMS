@@ -9,6 +9,7 @@ namespace Umbraco.Core.Persistence
     /// An exception used to indicate that an Umbraco entity could not be found.
     /// </summary>
     /// <seealso cref="System.Exception" />
+    [Obsolete("Instead of throwing an exception, return null or an HTTP 404 status code instead.")]
     [Serializable]
     public class EntityNotFoundException : Exception
     {

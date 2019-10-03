@@ -242,6 +242,7 @@ namespace Umbraco.Core.Collections
         /// <seealso cref="System.Collections.ObjectModel.ObservableCollection{TValue}" />
         /// <seealso cref="System.Collections.Generic.IReadOnlyDictionary{TKey, TValue}" />
         /// <seealso cref="System.Collections.Generic.IDictionary{TKey, TValue}" />
+        [Obsolete("Throw an ArgumentException when trying to add a duplicate key instead.")]
         [Serializable]
         internal class DuplicateKeyException : Exception
         {

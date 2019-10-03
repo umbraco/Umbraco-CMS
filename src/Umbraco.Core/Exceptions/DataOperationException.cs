@@ -8,6 +8,7 @@ namespace Umbraco.Core.Exceptions
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="System.Exception" />
+    [Obsolete("Refactor the generic type to a concrete serializable type.")]
     [Serializable]
     internal class DataOperationException<T> : Exception
     {

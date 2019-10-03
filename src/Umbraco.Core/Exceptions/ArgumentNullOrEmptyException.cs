@@ -7,6 +7,7 @@ namespace Umbraco.Core.Exceptions
     /// The exception that is thrown when a null reference, or an empty argument, is passed to a method that does not accept it as a valid argument.
     /// </summary>
     /// <seealso cref="System.ArgumentNullException" />
+    [Obsolete("Throw an ArgumentNullException when the parameter is null or an ArgumentException when its empty instead.")]
     [Serializable]
     public class ArgumentNullOrEmptyException : ArgumentNullException
     {

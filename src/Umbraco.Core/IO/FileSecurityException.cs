@@ -7,6 +7,7 @@ namespace Umbraco.Core.IO
     /// The exception that is thrown when the caller does not have the required permission to access a file.
     /// </summary>
     /// <seealso cref="System.Exception" />
+    [Obsolete("Throw an UnauthorizedAccessException instead.")]
     [Serializable]
     public class FileSecurityException : Exception
     {

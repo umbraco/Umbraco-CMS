@@ -7,6 +7,7 @@ namespace Umbraco.Web.Install
     /// Used for steps to be able to return a JSON structure back to the UI.
     /// </summary>
     /// <seealso cref="System.Exception" />
+    [Obsolete("Refactor the view model into a concrete serializable type.")]
     [Serializable]
     internal class InstallException : Exception
     {
