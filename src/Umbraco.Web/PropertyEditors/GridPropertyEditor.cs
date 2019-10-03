@@ -86,18 +86,18 @@ namespace Umbraco.Web.PropertyEditors
                 var rawJson = editorValue.Value.ToString();
                 var grid = DeserializeGridValue(rawJson, out var rtes);
 
+                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
+
                 //process the rte values
-                foreach(var rte in rtes)
+                foreach (var rte in rtes)
                 {
                     // Parse the HTML
                     var html = rte.Value?.ToString();
 
-                    var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
+                    var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                    var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(parseAndSavedTempImages);
 
-                    var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(html);
-
-                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(editorValueWithMediaUrlsRemoved, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
-                    rte.Value = parsedHtml;
+                    rte.Value = editorValueWithMediaUrlsRemoved;
                 }
 
                 // Convert back to raw JSON for persisting
