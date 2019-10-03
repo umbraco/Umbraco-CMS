@@ -2151,5 +2151,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
       <key alias="partialView">Partial View</key>
+      <key alias="partialViewMacro">Partial View Macro</key>
   </area>
 </language>
