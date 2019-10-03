@@ -1,4 +1,4 @@
-function ExamineManagementController($scope, $http, $q, $timeout, $location, umbRequestHelper, localizationService, overlayService) {
+function ExamineManagementController($scope, $http, $q, $timeout, $location, umbRequestHelper, localizationService, overlayService, editorService) {
 
     var vm = this;
 
@@ -56,17 +56,38 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
             return;
         }
         // targeting a new tab/window?
-        if (event.ctrlKey || 
-            event.shiftKey ||
-            event.metaKey || // apple
-            (event.button && event.button === 1) // middle click, >IE9 + everyone else
+        if (event.ctrlKey ||
+                event.shiftKey ||
+                event.metaKey || // apple
+                (event.button && event.button === 1) // middle click, >IE9 + everyone else
         ) {
             // yes, let the link open itself
             return;
         }
+
+        const editor = {
+            id: result.editId,
+            submit: function (model) {
+                editorService.close();
+            },
+            close: function () {
+                editorService.close();
+            }
+        };
+        switch (result.editSection) {
+            case "content":
+                editorService.contentEditor(editor);
+                break;
+            case "media":
+                editorService.mediaEditor(editor);
+                break;
+            case "member":
+                editorService.memberEditor(editor);
+                break;
+        }
+
         event.stopPropagation();
         event.preventDefault();
-        $location.path(result.editUrl);
     } 
 
     function setViewState(state) {
@@ -151,9 +172,13 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
                         case "content":
                         case "media":
                             result.editUrl = "/" + section + "/" + section + "/edit/" + result.values["__NodeId"];
+                            result.editId = result.values["__NodeId"];
+                            result.editSection = section;
                             break;
                         case "member":
                             result.editUrl = "/member/member/edit/" + result.values["__Key"];
+                            result.editId = result.values["__Key"];
+                            result.editSection = section;
                             break;
                     }
                 });
