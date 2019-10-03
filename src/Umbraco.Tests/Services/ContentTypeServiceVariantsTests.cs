@@ -107,12 +107,27 @@ namespace Umbraco.Tests.Services
             }
         }
 
-        [Test]
-        public void Change_Content_Type_Variation_Clears_Redirects()
+        [TestCase(ContentVariation.Nothing, ContentVariation.Nothing, false)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.Culture, true)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment, true)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.Segment, true)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Nothing, true)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Culture, false)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Segment, true)]
+        [TestCase(ContentVariation.Culture, ContentVariation.CultureAndSegment, true)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Nothing, true)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Culture, true)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Segment, false)]
+        [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment, true)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing, true)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Culture, true)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment, true)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment, false)]
+        public void Change_Content_Type_Variation_Clears_Redirects(ContentVariation startingContentTypeVariation, ContentVariation changedContentTypeVariation, bool shouldUrlRedirectsBeCleared)
         {
-            var contentType = MockedContentTypes.CreateBasicContentType();
-            contentType.Variations = ContentVariation.Nothing;
-            var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+            var contentType = MockedContentTypes.CreateBasicContentType();            
+            contentType.Variations = startingContentTypeVariation;
+            var properties = CreatePropertyCollection(("title", startingContentTypeVariation));
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
             var contentType2 = MockedContentTypes.CreateBasicContentType("test");
@@ -121,6 +136,11 @@ namespace Umbraco.Tests.Services
             //create some content of this content type
             IContent doc = MockedContent.CreateBasicContent(contentType);
             doc.Name = "Hello1";
+            if(startingContentTypeVariation.HasFlag(ContentVariation.Culture))
+            {
+                doc.SetCultureName(doc.Name, "en-US");
+            }
+
             ServiceContext.ContentService.Save(doc);
 
             IContent doc2 = MockedContent.CreateBasicContent(contentType2);
@@ -129,24 +149,27 @@ namespace Umbraco.Tests.Services
             ServiceContext.RedirectUrlService.Register("hello/world", doc.Key);
             ServiceContext.RedirectUrlService.Register("hello2/world2", doc2.Key);
 
+            // These 2 assertions should probably be moved to a test for the Register() method?
             Assert.AreEqual(1, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
             Assert.AreEqual(1, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
 
             //change variation
-            contentType.Variations = ContentVariation.Culture;
+            contentType.Variations = changedContentTypeVariation;
             ServiceContext.ContentTypeService.Save(contentType);
-
-            Assert.AreEqual(0, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
+            var expectedRedirectUrlCount = shouldUrlRedirectsBeCleared ? 0 : 1;
+            Assert.AreEqual(expectedRedirectUrlCount, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
             Assert.AreEqual(1, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
-
         }
 
-        [Test]
-        public void Change_Content_Type_From_Invariant_Variant()
-        {            
+        [TestCase(ContentVariation.Nothing, ContentVariation.Culture)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Culture)]
+        [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment)]
+        public void Change_Content_Type_From_No_Culture_To_Culture(ContentVariation from, ContentVariation to)
+        {
             var contentType = MockedContentTypes.CreateBasicContentType();
-            contentType.Variations = ContentVariation.Nothing;
-            var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+            contentType.Variations = from;
+            var properties = CreatePropertyCollection(("title", from));
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
@@ -161,12 +184,12 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("Hello1", doc.Name);
             Assert.AreEqual("hello world", doc.GetValue("title"));
             Assert.IsTrue(doc.Edited);
-            Assert.IsFalse (doc.IsCultureEdited("en-US"));
+            Assert.IsFalse(doc.IsCultureEdited("en-US"));
 
             //change the content type to be variant, we will also update the name here to detect the copy changes
             doc.Name = "Hello2";
             ServiceContext.ContentService.Save(doc);
-            contentType.Variations = ContentVariation.Culture;
+            contentType.Variations = to;
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
@@ -178,7 +201,7 @@ namespace Umbraco.Tests.Services
             //change back property type to be invariant, we will also update the name here to detect the copy changes
             doc.SetCultureName("Hello3", "en-US");
             ServiceContext.ContentService.Save(doc);
-            contentType.Variations = ContentVariation.Nothing;
+            contentType.Variations = from;
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
@@ -188,12 +211,15 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(doc.IsCultureEdited("en-US"));
         }
 
-        [Test]
-        public void Change_Content_Type_From_Variant_Invariant()
+        [TestCase(ContentVariation.Culture, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
+        public void Change_Content_Type_From_Culture_To_No_Culture(ContentVariation startingContentTypeVariation, ContentVariation changeContentTypeVariationTo)
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
-            contentType.Variations = ContentVariation.Culture;
-            var properties = CreatePropertyCollection(("title", ContentVariation.Culture));
+            contentType.Variations = startingContentTypeVariation;
+            var properties = CreatePropertyCollection(("title", startingContentTypeVariation));
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
@@ -212,7 +238,7 @@ namespace Umbraco.Tests.Services
             //change the content type to be invariant, we will also update the name here to detect the copy changes
             doc.SetCultureName("Hello2", "en-US");
             ServiceContext.ContentService.Save(doc);
-            contentType.Variations = ContentVariation.Nothing;
+            contentType.Variations = changeContentTypeVariationTo;
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
@@ -224,19 +250,20 @@ namespace Umbraco.Tests.Services
             //change back property type to be variant, we will also update the name here to detect the copy changes
             doc.Name = "Hello3";
             ServiceContext.ContentService.Save(doc);
-            contentType.Variations = ContentVariation.Culture;
+            contentType.Variations = startingContentTypeVariation;
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
             //at this stage all property types were switched to invariant so even though the variant value
             //exists it will not be returned because the property type is invariant,
             //so this check proves that null will be returned
+            Assert.AreEqual("Hello3", doc.Name);
             Assert.IsNull(doc.GetValue("title", "en-US"));
             Assert.IsTrue(doc.Edited);
             Assert.IsTrue(doc.IsCultureEdited("en-US")); // this is true because the name change is copied to the default language
 
             //we can now switch the property type to be variant and the value can be returned again
-            contentType.PropertyTypes.First().Variations = ContentVariation.Culture;
+            contentType.PropertyTypes.First().Variations = startingContentTypeVariation;
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
@@ -244,24 +271,42 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
             Assert.IsTrue(doc.Edited);
             Assert.IsTrue(doc.IsCultureEdited("en-US"));
-
         }
 
-
-        [Test]
-        public void Change_Property_Type_From_To_Variant_On_Invariant_Content_Type()
+        [TestCase(ContentVariation.Nothing, ContentVariation.Nothing, true)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.Culture, false)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.Segment, false)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment, false)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Nothing, true)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Culture, true)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Segment, false)]
+        [TestCase(ContentVariation.Culture, ContentVariation.CultureAndSegment, false)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Nothing, true)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Culture, false)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Segment, true)]
+        [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment, false)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing, true)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Culture, true)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment, true)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment, true)]
+        public void Verify_If_Property_Type_Variation_Is_Allowed(ContentVariation contentTypeVariation, ContentVariation propertyTypeVariation, bool isAllowed)
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
-            contentType.Variations = ContentVariation.Nothing;
-            var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+            contentType.Variations = contentTypeVariation;
+            var properties = CreatePropertyCollection(("title", contentTypeVariation));
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
-            //change the property type to be variant
-            contentType.PropertyTypes.First().Variations = ContentVariation.Culture;
+            contentType.PropertyTypes.First().Variations = propertyTypeVariation;
 
-            //Cannot change a property type to be variant if the content type itself is not variant
-            Assert.Throws<InvalidOperationException>(() => ServiceContext.ContentTypeService.Save(contentType));
+            // property may only vary by segment if the content type itself is also varied by segment
+            // property may only vary by culture if the content type itself is also varied by culture
+            // properties without variance should always be allowed
+
+            if (isAllowed)
+                Assert.DoesNotThrow(() => ServiceContext.ContentTypeService.Save(contentType));
+            else
+                Assert.Throws<InvalidOperationException>(() => ServiceContext.ContentTypeService.Save(contentType));
         }
 
         [Test]
