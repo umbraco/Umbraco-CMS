@@ -324,7 +324,11 @@
     <key alias="createContentBlueprint">Vælg den dokumenttype, du vil oprette en indholdsskabelon til</key>
     <key alias="enterFolderName">Angiv et navn for mappen</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokumenttyper. Du skal tillade disse i indstillingerne under <strong>"Rettigheder"</strong> for denne dokumenttype.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[Der kunne ikke findes nogen dokumenttyper. Du skal oprette disse i indstillingerne under <strong>"Dokumenttyper"</strong>.]]></key>
+    <key alias="noDocumentTypesWithNoSettingsAccess">Den valgte side i indholdstræet tillader ikke at der oprettes sider under den.</key>
+    <key alias="noDocumentTypesEditPermissions">Rediger denne dokumenttype</key>
+    <key alias="noDocumentTypesCreateNew">Opret en ny dokumenttype</key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
     <key alias="documentTypeWithoutTemplate">Dokumenttype uden skabelon</key>
     <key alias="newFolder">Ny mappe</key>
