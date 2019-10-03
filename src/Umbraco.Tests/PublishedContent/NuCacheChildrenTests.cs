@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -25,6 +27,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -79,12 +82,16 @@ namespace Umbraco.Tests.PublishedContent
                 _contentTypeVariant
             };
 
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            Mock.Get(contentTypeService).Setup(x => x.GetAll()).Returns(contentTypes);
-            Mock.Get(contentTypeService).Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
+            var contentTypeService = new Mock<IContentTypeService>();
+            contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
+            contentTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
 
-            var contentTypeServiceBaseFactory = Mock.Of<IContentTypeBaseServiceProvider>();
-            Mock.Get(contentTypeServiceBaseFactory).Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService);
+            var mediaTypeService = new Mock<IMediaTypeService>();
+            mediaTypeService.Setup(x => x.GetAll()).Returns(Enumerable.Empty<IMediaType>());
+            mediaTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(Enumerable.Empty<IMediaType>());
+
+            var contentTypeServiceBaseFactory = new Mock<IContentTypeBaseServiceProvider>();
+            contentTypeServiceBaseFactory.Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService.Object);
 
             var dataTypeService = Mock.Of<IDataTypeService>();
             Mock.Get(dataTypeService).Setup(x => x.GetAll()).Returns(dataTypes);
@@ -94,13 +101,15 @@ namespace Umbraco.Tests.PublishedContent
                 dataTypeService: dataTypeService,
                 memberTypeService: Mock.Of<IMemberTypeService>(),
                 memberService: Mock.Of<IMemberService>(),
-                contentTypeService: contentTypeService,
-                localizationService: Mock.Of<ILocalizationService>()
+                contentTypeService: contentTypeService.Object,
+                mediaTypeService: mediaTypeService.Object,
+                localizationService: Mock.Of<ILocalizationService>(),
+                domainService: Mock.Of<IDomainService>()
             );
 
             // create a scope provider
-            var scopeProvider = Mock.Of<IScopeProvider>();
-            Mock.Get(scopeProvider)
+            var scopeProvider = new Mock<IScopeProvider>();
+            scopeProvider
                 .Setup(x => x.CreateScope(
                     It.IsAny<IsolationLevel>(),
                     It.IsAny<RepositoryCacheMode>(),
@@ -133,8 +142,8 @@ namespace Umbraco.Tests.PublishedContent
                 null,
                 _snapshotAccessor,
                 _variationAccesor,
-                Mock.Of<ILogger>(),
-                scopeProvider,
+                Mock.Of<IProfilingLogger>(),
+                scopeProvider.Object,
                 Mock.Of<IDocumentRepository>(),
                 Mock.Of<IMediaRepository>(),
                 Mock.Of<IMemberRepository>(),
@@ -157,7 +166,7 @@ namespace Umbraco.Tests.PublishedContent
 
             //1x variant (root)
             yield return CreateVariantKit(1, -1, 1, paths);
-            
+
             //1x invariant under root
             yield return CreateInvariantKit(4, 1, 1, paths);
 
@@ -449,7 +458,7 @@ namespace Umbraco.Tests.PublishedContent
             };
 
             // notify
-            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(10, TreeChangeTypes.RefreshBranch) }, out _, out _);
+            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(10, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
             var documents = snapshot.Content.GetAtRoot().ToArray();
@@ -491,7 +500,7 @@ namespace Umbraco.Tests.PublishedContent
             };
 
             // notify
-            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.RefreshBranch) }, out _, out _);
+            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
             var documents = snapshot.Content.GetAtRoot().ToArray();
@@ -571,7 +580,7 @@ namespace Umbraco.Tests.PublishedContent
             };
 
             // notify
-            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(kit.Node.ParentContentId, TreeChangeTypes.RefreshBranch) }, out _, out _);
+            _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(kit.Node.ParentContentId, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
             var documents = snapshot.Content.GetById(kit.Node.ParentContentId).Children().ToArray();
@@ -668,8 +677,8 @@ namespace Umbraco.Tests.PublishedContent
             _snapshotService.Notify(new[]
             {
                 // removal must come first
-                new ContentCacheRefresher.JsonPayload(2, TreeChangeTypes.RefreshBranch),
-                new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.RefreshBranch)
+                new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshBranch),
+                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch)
             }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
@@ -864,9 +873,9 @@ namespace Umbraco.Tests.PublishedContent
             // notify
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(3, TreeChangeTypes.Remove), // remove last
-                new ContentCacheRefresher.JsonPayload(5, TreeChangeTypes.Remove), // remove middle
-                new ContentCacheRefresher.JsonPayload(9, TreeChangeTypes.Remove), // remove first
+                new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.Remove), // remove last
+                new ContentCacheRefresher.JsonPayload(5, Guid.Empty, TreeChangeTypes.Remove), // remove middle
+                new ContentCacheRefresher.JsonPayload(9, Guid.Empty, TreeChangeTypes.Remove), // remove first
             }, out _, out _);
 
             documents = snapshot.Content.GetAtRoot().ToArray();
@@ -881,9 +890,9 @@ namespace Umbraco.Tests.PublishedContent
             // notify
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.Remove), // remove first
-                new ContentCacheRefresher.JsonPayload(8, TreeChangeTypes.Remove), // remove
-                new ContentCacheRefresher.JsonPayload(7, TreeChangeTypes.Remove), // remove
+                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.Remove), // remove first
+                new ContentCacheRefresher.JsonPayload(8, Guid.Empty, TreeChangeTypes.Remove), // remove
+                new ContentCacheRefresher.JsonPayload(7, Guid.Empty, TreeChangeTypes.Remove), // remove
             }, out _, out _);
 
             documents = snapshot.Content.GetAtRoot().ToArray();
@@ -913,8 +922,8 @@ namespace Umbraco.Tests.PublishedContent
             // notify
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(1, TreeChangeTypes.RefreshBranch),
-                new ContentCacheRefresher.JsonPayload(2, TreeChangeTypes.RefreshNode),
+                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch),
+                new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshNode),
             }, out _, out _);
 
             documents = snapshot.Content.GetAtRoot().ToArray();
@@ -944,6 +953,198 @@ namespace Umbraco.Tests.PublishedContent
 
             documents = snapshot.Content.GetAtRoot(true).ToArray();
             AssertDocuments(documents, "N1-en-US", "N2-en-US", "N3-en-US");
+        }
+
+        [Test]
+        public void Set_All_Fast_Sorted_Ensure_LastChildContentId()
+        {
+            //see https://github.com/umbraco/Umbraco-CMS/issues/6353
+
+            IEnumerable<ContentNodeKit> GetKits()
+            {
+                var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+                yield return CreateInvariantKit(1, -1, 1, paths);
+                yield return CreateInvariantKit(2, 1, 1, paths);
+            }
+
+            Init(GetKits());
+
+            var snapshotService = (PublishedSnapshotService)_snapshotService;
+            var contentStore = snapshotService.GetContentStore();
+
+            var parentNodes = contentStore.Test.GetValues(1);
+            var parentNode = parentNodes[0];
+            AssertLinkedNode(parentNode.contentNode, -1, -1, -1, 2, 2);
+
+            _snapshotService.Notify(new[]
+            {
+                new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.Remove)
+            }, out _, out _);
+
+            parentNodes = contentStore.Test.GetValues(1);
+            parentNode = parentNodes[0];
+
+            AssertLinkedNode(parentNode.contentNode, -1, -1, -1, -1, -1);
+        }
+
+        [Test]
+        public void Remove_Node_Ensures_Linked_List()
+        {
+            // NOTE: these tests are not using real scopes, in which case a Scope does not control
+            // how the snapshots generations work. We are forcing new snapshot generations manually.
+
+            IEnumerable<ContentNodeKit> GetKits()
+            {
+                var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+                //root
+                yield return CreateInvariantKit(1, -1, 1, paths);
+
+                //children
+                yield return CreateInvariantKit(2, 1, 1, paths);
+                yield return CreateInvariantKit(3, 1, 2, paths); //middle child
+                yield return CreateInvariantKit(4, 1, 3, paths);
+            }
+
+            Init(GetKits());
+
+            var snapshotService = (PublishedSnapshotService)_snapshotService;
+            var contentStore = snapshotService.GetContentStore();
+
+            Assert.AreEqual(1, contentStore.Test.LiveGen);
+            Assert.IsTrue(contentStore.Test.NextGen);
+
+            var parentNode = contentStore.Test.GetValues(1)[0];
+            Assert.AreEqual(1, parentNode.gen);
+            AssertLinkedNode(parentNode.contentNode, -1, -1, -1, 2, 4);
+
+            var child1 = contentStore.Test.GetValues(2)[0];
+            Assert.AreEqual(1, child1.gen);
+            AssertLinkedNode(child1.contentNode, 1, -1, 3, -1, -1);
+
+            var child2 = contentStore.Test.GetValues(3)[0];
+            Assert.AreEqual(1, child2.gen);
+            AssertLinkedNode(child2.contentNode, 1, 2, 4, -1, -1);
+
+            var child3 = contentStore.Test.GetValues(4)[0];
+            Assert.AreEqual(1, child3.gen);
+            AssertLinkedNode(child3.contentNode, 1, 3, -1, -1, -1);
+
+            //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
+            contentStore.CreateSnapshot();
+
+            Assert.IsFalse(contentStore.Test.NextGen);
+
+            _snapshotService.Notify(new[]
+            {
+                new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.Remove) //remove middle child
+            }, out _, out _);
+
+            Assert.AreEqual(2, contentStore.Test.LiveGen);
+            Assert.IsTrue(contentStore.Test.NextGen);
+
+            var parentNodes = contentStore.Test.GetValues(1);
+            Assert.AreEqual(1, parentNodes.Length); // the parent doesn't get changed, not new gen's are added
+            parentNode = parentNodes[0];
+            Assert.AreEqual(1, parentNode.gen); // the parent node's gen has not changed
+            AssertLinkedNode(parentNode.contentNode, -1, -1, -1, 2, 4);
+
+            child1 = contentStore.Test.GetValues(2)[0];
+            Assert.AreEqual(2, child1.gen); // there is now 2x gen's of this item
+            AssertLinkedNode(child1.contentNode, 1, -1, 4, -1, -1);
+
+            child2 = contentStore.Test.GetValues(3)[0];
+            Assert.AreEqual(2, child2.gen); // there is now 2x gen's of this item
+            Assert.IsNull(child2.contentNode);  // because it doesn't exist anymore
+
+            child3 = contentStore.Test.GetValues(4)[0];
+            Assert.AreEqual(2, child3.gen); // there is now 2x gen's of this item
+            AssertLinkedNode(child3.contentNode, 1, 2, -1, -1, -1);
+        }
+
+        [Test]
+        public void Refresh_Branch_Ensures_Linked_List()
+        {
+            // NOTE: these tests are not using real scopes, in which case a Scope does not control
+            // how the snapshots generations work. We are forcing new snapshot generations manually.
+
+            IEnumerable<ContentNodeKit> GetKits()
+            {
+                var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+                //root
+                yield return CreateInvariantKit(1, -1, 1, paths);
+
+                //children
+                yield return CreateInvariantKit(2, 1, 1, paths);
+                yield return CreateInvariantKit(3, 1, 2, paths); //middle child
+                yield return CreateInvariantKit(4, 1, 3, paths);
+            }
+
+            Init(GetKits());
+
+            var snapshotService = (PublishedSnapshotService)_snapshotService;
+            var contentStore = snapshotService.GetContentStore();
+
+            Assert.AreEqual(1, contentStore.Test.LiveGen);
+            Assert.IsTrue(contentStore.Test.NextGen);
+
+            var parentNode = contentStore.Test.GetValues(1)[0];
+            Assert.AreEqual(1, parentNode.gen);
+            AssertLinkedNode(parentNode.contentNode, -1, -1, -1, 2, 4);
+
+            var child1 = contentStore.Test.GetValues(2)[0];
+            Assert.AreEqual(1, child1.gen);
+            AssertLinkedNode(child1.contentNode, 1, -1, 3, -1, -1);
+
+            var child2 = contentStore.Test.GetValues(3)[0];
+            Assert.AreEqual(1, child2.gen);
+            AssertLinkedNode(child2.contentNode, 1, 2, 4, -1, -1);
+
+            var child3 = contentStore.Test.GetValues(4)[0];
+            Assert.AreEqual(1, child3.gen);
+            AssertLinkedNode(child3.contentNode, 1, 3, -1, -1, -1);
+
+            //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
+            contentStore.CreateSnapshot();
+
+            Assert.IsFalse(contentStore.Test.NextGen);
+
+            _snapshotService.Notify(new[]
+            {
+                new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.RefreshBranch) //remove middle child
+            }, out _, out _);
+
+            Assert.AreEqual(2, contentStore.Test.LiveGen);
+            Assert.IsTrue(contentStore.Test.NextGen);
+
+            var parentNodes = contentStore.Test.GetValues(1);
+            Assert.AreEqual(1, parentNodes.Length); // the parent doesn't get changed, not new gen's are added
+            parentNode = parentNodes[0];
+            Assert.AreEqual(1, parentNode.gen); // the parent node's gen has not changed
+            AssertLinkedNode(parentNode.contentNode, -1, -1, -1, 2, 4);
+
+            child1 = contentStore.Test.GetValues(2)[0];
+            Assert.AreEqual(2, child1.gen); // there is now 2x gen's of this item
+            AssertLinkedNode(child1.contentNode, 1, -1, 3, -1, -1);
+
+            child2 = contentStore.Test.GetValues(3)[0];
+            Assert.AreEqual(2, child2.gen); // there is now 2x gen's of this item
+            AssertLinkedNode(child2.contentNode, 1, 2, 4, -1, -1);
+
+            child3 = contentStore.Test.GetValues(4)[0];
+            Assert.AreEqual(2, child3.gen); // there is now 2x gen's of this item
+            AssertLinkedNode(child3.contentNode, 1, 3, -1, -1, -1);
+        }
+
+        private void AssertLinkedNode(ContentNode node, int parent, int prevSibling, int nextSibling, int firstChild, int lastChild)
+        {
+            Assert.AreEqual(parent, node.ParentContentId);
+            Assert.AreEqual(prevSibling, node.PreviousSiblingContentId);
+            Assert.AreEqual(nextSibling, node.NextSiblingContentId);
+            Assert.AreEqual(firstChild, node.FirstChildContentId);
+            Assert.AreEqual(lastChild, node.LastChildContentId);
         }
 
         private void AssertDocuments(IPublishedContent[] documents, params string[] names)

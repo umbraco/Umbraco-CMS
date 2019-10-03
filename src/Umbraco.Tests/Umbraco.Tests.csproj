@@ -120,6 +120,7 @@
     <Compile Include="Composing\CompositionTests.cs" />
     <Compile Include="Composing\LightInjectValidation.cs" />
     <Compile Include="Composing\ContainerConformingTests.cs" />
+    <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreThings\EnumExtensionsTests.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
+    <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="Services\AmbiguousEventTests.cs" />
@@ -455,7 +457,6 @@
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
     <Compile Include="TestHelpers\SettingsForTests.cs" />
-    <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
     <Compile Include="Routing\ContentFinderByIdTests.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />

@@ -26,8 +26,7 @@
             action="togglePasswordFields()"
             button-style="action"
             label="Change password"
-            label-key="general_changePassword"
-            button-style="success">
+            label-key="general_changePassword">
        </umb-button>
 
         <umb-button
@@ -50,8 +49,7 @@
 
         <div ng-repeat="login in externalLoginProviders">
 
-			<form ng-if="login.linkedProviderKey == undefined" method="POST" name="externalLoginForm"
-				  action="{{externalLinkLoginFormAction}}" id="oauthloginform" name="oauthloginform">
+			<form ng-if="login.linkedProviderKey == undefined" method="POST" action="{{externalLinkLoginFormAction}}" id="oauthloginform" name="oauthloginform">
 				<input type="hidden" name="provider" value="{{login.authType}}" />
                 <button class="btn btn-block btn-social"
                         ng-class="login.properties.SocialStyle"

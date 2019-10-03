@@ -53,17 +53,22 @@
                                 <em>Total Unique Message types</em>: {{ vm.commonLogMessages.length }}
                                 <table class="table table-hover">
                                     <tbody>
-                                    <tr ng-repeat="template in vm.commonLogMessages | limitTo:vm.commonLogMessagesCount" ng-click="vm.findMessageTemplate(template)" style="cursor: pointer;">
-                                        <td>
-                                            {{ template.MessageTemplate }}
-                                        </td>
-                                        <td>
-                                            {{ template.Count }}
-                                        </td>
-                                    </tr>
+                                        <tr ng-repeat="template in vm.commonLogMessages | limitTo:vm.commonLogMessagesCount" ng-click="vm.findMessageTemplate(template)" style="cursor: pointer;">
+                                            <td>
+                                                {{ template.MessageTemplate }}
+                                            </td>
+                                            <td>
+                                                {{ template.Count }}
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
-                                <a class="btn btn-primary" ng-if="vm.commonLogMessagesCount < vm.commonLogMessages.length" ng-click="vm.commonLogMessagesCount = vm.commonLogMessagesCount +10">Show More</a>
+                                <umb-button ng-if="vm.commonLogMessagesCount < vm.commonLogMessages.length"
+                                            button-style="action"
+                                            type="button"
+                                            action="vm.showMore()"
+                                            label="Show More">
+                                </umb-button>
                             </umb-box-content>
                         </umb-box>
                     </div>

@@ -9,9 +9,10 @@
         colors="model.config.items"
         selected-color="model.value"
         size="m"
-        use-label="model.useLabel">
+        use-label="model.useLabel"
+        on-select="selectColor(color)">
     </umb-color-swatches>
 
-    <input type="hidden" name="modelValue" ng-model="model.value" val-property-validator="validateMandatory" />
+    <input type="hidden" name="selectedColor" ng-model="model.selectedColor" val-property-validator="validateMandatory" />
 
 </div>
