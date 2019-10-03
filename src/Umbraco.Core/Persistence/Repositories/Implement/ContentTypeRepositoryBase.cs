@@ -412,6 +412,11 @@ AND umbracoNode.id <> @id",
             foreach (var propertyType in entity.PropertyTypes)
             {
                 // Update property variations
+
+                // Determine target variation of the property type.
+                // The property is only considered culture variant when the base content type is also culture variant.
+                // The property is only considered segment variant when the base content type is also segment variant.
+                // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
                 propertyType.Variations = newContentTypeVariation & propertyType.Variations;
 
                 // then, track each property individually
@@ -442,15 +447,17 @@ AND umbracoNode.id <> @id",
 
                 propertyTypeVariationChanges = propertyTypeVariationChanges ?? new Dictionary<int, (ContentVariation, ContentVariation)>();
 
-                foreach (var propertyType in ((ContentTypeCompositionBase)entity).RawComposedPropertyTypes)
+                foreach (var composedPropertyType in ((ContentTypeCompositionBase)entity).RawComposedPropertyTypes)
                 {
-                    if (propertyType.Variations == ContentVariation.Nothing) continue;
+                    if (composedPropertyType.Variations == ContentVariation.Nothing) continue;
 
-                    var target = newContentTypeVariation & propertyType.Variations;
+                    // Determine target variation of the composed property type.
+                    // The composed property is only considered culture variant when the base content type is also culture variant.
+                    // The composed property is only considered segment variant when the base content type is also segment variant.
+                    // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
+                    var target = newContentTypeVariation & composedPropertyType.Variations;
 
-                    // if content type moves to a different variant, property type becomes Culture here again
-                    // if content type moves to Nothing, property type becomes Nothing here                    
-                    propertyTypeVariationChanges[propertyType.Id] = (propertyType.Variations, target);
+                    propertyTypeVariationChanges[composedPropertyType.Id] = (composedPropertyType.Variations, target);
                 }
             }
 
@@ -645,16 +652,19 @@ AND umbracoNode.id <> @id",
                 var propertyTypeIds = grouping.Select(x => x.Key).ToList();
                 var (FromVariation, ToVariation) = grouping.Key;
 
-                if(!FromVariation.HasFlag(ContentVariation.Culture) &&
-                    ToVariation.HasFlag(ContentVariation.Culture))
+                var fromCultureEnabled = FromVariation.HasFlag(ContentVariation.Culture);
+                var toCultureEnabled = ToVariation.HasFlag(ContentVariation.Culture);
+
+                if (!fromCultureEnabled && toCultureEnabled)
                 {
+                    // Culture has been enabled
                     CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
                     CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedL);
                     RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
                 }
-                else if (FromVariation.HasFlag(ContentVariation.Culture) &&
-                         !ToVariation.HasFlag(ContentVariation.Culture))
+                else if (fromCultureEnabled && !toCultureEnabled)
                 {
+                    // Culture has been disabled
                     CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
                     CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedL);
                     RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
@@ -672,7 +682,7 @@ AND umbracoNode.id <> @id",
             var cultureIsNotEnabled = !fromVariation.HasFlag(ContentVariation.Culture);
             var cultureWillBeEnabled = toVariation.HasFlag(ContentVariation.Culture);
 
-            if(cultureIsNotEnabled && cultureWillBeEnabled)
+            if (cultureIsNotEnabled && cultureWillBeEnabled)
             {
                 //move the names
                 //first clear out any existing names that might already exists under the default lang
@@ -728,6 +738,13 @@ AND umbracoNode.id <> @id",
                 sqlInsert = Sql($"INSERT INTO {DocumentCultureVariationDto.TableName} ({cols})").Append(sqlSelect);
 
                 Database.Execute(sqlInsert);
+            }
+            else
+            {
+                //we don't need to move the names! this is because we always keep the invariant names with the name of the default language.
+
+                //however, if we were to move names, we could do this: BUT this doesn't work with SQLCE, for that we'd have to update row by row :(
+                // if we want these SQL statements back, look into GIT history    
             }
         }
 
