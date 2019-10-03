@@ -18,6 +18,9 @@ namespace Umbraco.Core.Persistence
         /// <value>
         /// The identifier.
         /// </value>
+        /// <remarks>
+        /// This object should be serializable to prevent a <see cref="SerializationException" /> to be thrown.
+        /// </remarks>
         public object Id { get; private set; }
 
         /// <summary>
