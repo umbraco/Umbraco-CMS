@@ -7,6 +7,7 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
 using Moq;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -44,10 +45,18 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static MediaIndexPopulator GetMediaIndexRebuilder(PropertyEditorCollection propertyEditors, IMediaService mediaService)
         {
-            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService());
+            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService(), MockRuntimeState(RuntimeLevel.Run));
             var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
             return mediaIndexDataSource;
         }
+
+        public static IRuntimeState MockRuntimeState(RuntimeLevel level)
+        {
+            var runtimeState = Mock.Of<IRuntimeState>();
+            Mock.Get(runtimeState).Setup(x => x.Level).Returns(level);
+            return runtimeState;
+        }
+
 
         public static IContentService GetMockContentService()
         {

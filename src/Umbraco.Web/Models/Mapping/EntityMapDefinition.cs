@@ -180,6 +180,15 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
 
+            if (source.Values.ContainsKey("__umbracoFile"))
+            {
+                var umbracoFile = source.Values["__umbracoFile"];
+                if (umbracoFile != null)
+                {
+                    target.Name = $"{target.Name} ({umbracoFile})";
+                }
+            }
+
             if (source.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName))
             {
                 if (Guid.TryParse(source.Values[UmbracoExamineIndex.NodeKeyFieldName], out var key))
