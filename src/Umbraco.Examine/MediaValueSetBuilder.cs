@@ -53,8 +53,11 @@ namespace Umbraco.Examine
                     umbracoFilePath = umbracoFileSource;
                 }
 
+                if (!string.IsNullOrEmpty(umbracoFilePath))
+                {
                 var uri = new Uri(_runtimeState.ApplicationUrl.GetLeftPart(UriPartial.Authority) + umbracoFilePath);
                 umbracoFile = uri.Segments.Last();
+                }
 
                 var values = new Dictionary<string, IEnumerable<object>>
                 {
@@ -72,7 +75,7 @@ namespace Umbraco.Examine
                     {"path", m.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", m.ContentType.Id.ToString().Yield() },
                     {"creatorName", (m.GetCreatorProfile(_userService)?.Name ?? "??").Yield()},
-                    {UmbracoExamineIndex.UmbracoFileFieldName, new object[] {umbracoFile}}
+                    {UmbracoExamineIndex.UmbracoFileFieldName, umbracoFile.Yield()}
                 };
 
                 foreach (var property in m.Properties)
