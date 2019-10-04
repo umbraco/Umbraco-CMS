@@ -32,6 +32,7 @@ namespace Umbraco.Examine
         /// </summary>
         public const string IndexPathFieldName = SpecialFieldPrefix + "Path";
         public const string NodeKeyFieldName = SpecialFieldPrefix + "Key";
+        public const string UmbracoFileFieldName = SpecialFieldPrefix + "umbracoFile";
         public const string IconFieldName = SpecialFieldPrefix + "Icon";
         public const string PublishedFieldName = SpecialFieldPrefix + "Published";
 

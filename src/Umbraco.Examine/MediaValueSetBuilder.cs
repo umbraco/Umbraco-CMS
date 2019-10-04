@@ -72,7 +72,7 @@ namespace Umbraco.Examine
                     {"path", m.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", m.ContentType.Id.ToString().Yield() },
                     {"creatorName", (m.GetCreatorProfile(_userService)?.Name ?? "??").Yield()},
-                    {"__umbracoFile", new object[] {umbracoFile}}
+                    {UmbracoExamineIndex.UmbracoFileFieldName, new object[] {umbracoFile}}
                 };
 
                 foreach (var property in m.Properties)
