@@ -347,40 +347,37 @@ namespace Umbraco.Tests.Services
             }
         }
 
-        [TestCase(ContentVariation.Nothing, ContentVariation.Nothing, true)]
-        [TestCase(ContentVariation.Nothing, ContentVariation.Culture, false)]
-        [TestCase(ContentVariation.Nothing, ContentVariation.Segment, false)]
-        [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment, false)]
-        [TestCase(ContentVariation.Culture, ContentVariation.Nothing, true)]
-        [TestCase(ContentVariation.Culture, ContentVariation.Culture, true)]
-        [TestCase(ContentVariation.Culture, ContentVariation.Segment, false)]
-        [TestCase(ContentVariation.Culture, ContentVariation.CultureAndSegment, false)]
-        [TestCase(ContentVariation.Segment, ContentVariation.Nothing, true)]
-        [TestCase(ContentVariation.Segment, ContentVariation.Culture, false)]
-        [TestCase(ContentVariation.Segment, ContentVariation.Segment, true)]
-        [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment, false)]
-        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing, true)]
-        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Culture, true)]
-        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment, true)]
-        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment, true)]
-        public void Verify_If_Property_Type_Variation_Is_Allowed(ContentVariation contentTypeVariation, ContentVariation propertyTypeVariation, bool isAllowed)
+        [TestCase(ContentVariation.Nothing, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.Culture)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.Segment)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Culture)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
+        [TestCase(ContentVariation.Culture, ContentVariation.CultureAndSegment)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Culture)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Segment)]
+        [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Culture)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment)]
+        public void Verify_If_Property_Type_Variation_Is_Correctly_Corrected_When_Content_Type_Is_Updated(ContentVariation contentTypeVariation, ContentVariation propertyTypeVariation)
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
+
+            // We test an updated content type so it has to be saved first.
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            // Update it
             contentType.Variations = contentTypeVariation;
-            var properties = CreatePropertyCollection(("title", contentTypeVariation));
+            var properties = CreatePropertyCollection(("title", propertyTypeVariation));
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
             ServiceContext.ContentTypeService.Save(contentType);
 
-            contentType.PropertyTypes.First().Variations = propertyTypeVariation;
-
-            // property may only vary by segment if the content type itself is also varied by segment
-            // property may only vary by culture if the content type itself is also varied by culture
-            // properties without variance should always be allowed
-
-            if (isAllowed)
-                Assert.DoesNotThrow(() => ServiceContext.ContentTypeService.Save(contentType));
-            else
-                Assert.Throws<InvalidOperationException>(() => ServiceContext.ContentTypeService.Save(contentType));
+            // Check if property type variations have been updated correctly
+            Assert.AreEqual(properties.First().Variations, contentTypeVariation & propertyTypeVariation);
         }
 
         [Test]
