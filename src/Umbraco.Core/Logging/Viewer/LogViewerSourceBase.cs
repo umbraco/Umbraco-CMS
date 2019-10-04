@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 using Newtonsoft.Json;
+using Serilog;
 using Serilog.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace Umbraco.Core.Logging.Viewer
 {
@@ -87,6 +90,16 @@ namespace Umbraco.Core.Logging.Viewer
             var errorCounter = new ErrorCounterFilter();
             GetLogs(logTimePeriod, errorCounter, 0, int.MaxValue);
             return errorCounter.Count;
+        }
+
+        /// <summary>
+        /// Get the Serilog minimum-level value from the config file. 
+        /// </summary>
+        /// <returns></returns>
+        public string GetLogLevel()
+        {
+            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(Log.Logger.IsEnabled)?.Min() ?? null;
+            return logLevel?.ToString() ?? "";
         }
 
         public LogLevelCounts GetLogLevelCounts(LogTimePeriod logTimePeriod)

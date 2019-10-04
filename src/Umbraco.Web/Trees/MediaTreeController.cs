@@ -166,6 +166,6 @@ namespace Umbraco.Web.Trees
         {
             return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
         }
-
+    
     }
 }

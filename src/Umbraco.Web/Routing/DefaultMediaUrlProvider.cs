@@ -45,6 +45,10 @@ namespace Umbraco.Web.Routing
             if (string.IsNullOrEmpty(path))
                 return null;
 
+            // the stored path is absolute so we just return it as is
+            if(Uri.IsWellFormedUriString(path, UriKind.Absolute))
+                return new Uri(path);
+
             Uri uri;
 
             if (current == null)

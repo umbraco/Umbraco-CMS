@@ -53,7 +53,7 @@ function watch() {
         watch(config.sources.globs.js, { interval: watchInterval })
         .pipe(gulp.dest(config.root + config.targets.js))
     );
-
+    
     return stream;
 };
 

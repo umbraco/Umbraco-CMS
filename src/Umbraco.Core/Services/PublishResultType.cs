@@ -49,6 +49,11 @@
         /// </summary>
         SuccessUnpublishMandatoryCulture = 6,
 
+        /// <summary>
+        /// The specified document culture was unpublished, and was the last published culture in the document, therefore the document itself was unpublished.
+        /// </summary>
+        SuccessUnpublishLastCulture = 8,
+
         #endregion
 
         #region Success - Mixed
@@ -113,9 +118,9 @@
         FailedPublishContentInvalid = FailedPublish | 8,
 
         /// <summary>
-        /// The document could not be published because it has no publishing flags or values.
+        /// The document could not be published because it has no publishing flags or values or if its a variant document, no cultures were specified to be published.
         /// </summary>
-        FailedPublishNothingToPublish = FailedPublish | 9, // TODO: in ContentService.StrategyCanPublish - weird
+        FailedPublishNothingToPublish = FailedPublish | 9, 
 
         /// <summary>
         /// The document could not be published because some mandatory cultures are missing.

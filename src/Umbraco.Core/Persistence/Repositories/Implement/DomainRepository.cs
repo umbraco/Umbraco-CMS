@@ -6,6 +6,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
@@ -101,7 +102,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (languageExists == 0) throw new NullReferenceException("No language exists with id " + entity.LanguageId.Value);
             }
 
-            ((UmbracoDomain)entity).AddingEntity();
+            entity.AddingEntity();
 
             var factory = new DomainModelFactory();
             var dto = factory.BuildDto(entity);
@@ -120,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IDomain entity)
         {
-            ((UmbracoDomain)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomain WHERE domainName = @domainName AND umbracoDomain.id <> @id",
                 new { domainName = entity.DomainName, id = entity.Id });

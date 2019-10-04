@@ -1,6 +1,7 @@
 /**
 @ngdoc directive
-@name umbraco.directives.directive:umbOverlay
+@name umbraco.directives.directive:umbOverlay*
+@deprecated
 @restrict E
 @scope
 
@@ -208,8 +209,9 @@ Opens an overlay to show a custom YSOD. </br>
          var numberOfOverlays = 0;
          var isRegistered = false;
 
-          var modelCopy = {};
-          var unsubscribe = [];
+
+         var modelCopy = {};
+         var unsubscribe = [];
 
          function activate() {
 
@@ -221,8 +223,23 @@ Opens an overlay to show a custom YSOD. </br>
 
             $timeout(function() {
 
-               if (scope.position === "target") {
+               if (scope.position === "target" && scope.model.event) {
                   setTargetPosition();
+
+                  // update the position of the overlay on content changes
+                  // as these affect the layout/size of the overlay
+                  if ('ResizeObserver' in window)
+                  {
+                     var resizeObserver = new ResizeObserver(setTargetPosition);
+                     var contentArea = document.getElementById("contentwrapper");
+                     resizeObserver.observe(el[0]);
+                     if (contentArea) {
+                        resizeObserver.observe(contentArea);
+                     }
+                     unsubscribe.push(function () {
+                        resizeObserver.disconnect();
+                     });
+                  }
                }
 
                // this has to be done inside a timeout to ensure the destroy
@@ -397,50 +414,44 @@ Opens an overlay to show a custom YSOD. </br>
                bottom: "inherit"
             };
 
-            // if mouse click position is know place element with mouse in center
-            if (scope.model.event && scope.model.event) {
+            // click position
+            mousePositionClickX = scope.model.event.pageX;
+            mousePositionClickY = scope.model.event.pageY;
 
-               // click position
-               mousePositionClickX = scope.model.event.pageX;
-               mousePositionClickY = scope.model.event.pageY;
+            // element size
+            elementHeight = el[0].clientHeight;
+            elementWidth = el[0].clientWidth;
 
-               // element size
-               elementHeight = el[0].clientHeight;
-               elementWidth = el[0].clientWidth;
+            // move element to this position
+            position.left = mousePositionClickX - (elementWidth / 2);
+            position.top = mousePositionClickY - (elementHeight / 2);
 
-               // move element to this position
-               position.left = mousePositionClickX - (elementWidth / 2);
-               position.top = mousePositionClickY - (elementHeight / 2);
-
-               // check to see if element is outside screen
-               // outside right
-               if (position.left + elementWidth > containerRight) {
-                  position.right = 10;
-                  position.left = "inherit";
-               }
-
-               // outside bottom
-               if (position.top + elementHeight > containerBottom) {
-                  position.bottom = 10;
-                  position.top = "inherit";
-               }
-
-               // outside left
-               if (position.left < containerLeft) {
-                  position.left = containerLeft + 10;
-                  position.right = "inherit";
-               }
-
-               // outside top
-               if (position.top < containerTop) {
-                  position.top = 10;
-                  position.bottom = "inherit";
-               }
-
-               el.css(position);
-
+            // check to see if element is outside screen
+            // outside right
+            if (position.left + elementWidth > containerRight) {
+                position.right = 10;
+                position.left = "inherit";
             }
 
+            // outside bottom
+            if (position.top + elementHeight > containerBottom) {
+                position.bottom = 10;
+                position.top = "inherit";
+            }
+
+            // outside left
+            if (position.left < containerLeft) {
+                position.left = containerLeft + 10;
+                position.right = "inherit";
+            }
+
+            // outside top
+            if (position.top < containerTop) {
+                position.top = 10;
+                position.bottom = "inherit";
+            }
+
+            el.css(position);
          }
 
          scope.submitForm = function(model) {

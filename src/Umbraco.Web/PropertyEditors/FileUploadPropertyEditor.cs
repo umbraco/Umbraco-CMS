@@ -12,7 +12,12 @@ using Umbraco.Web.Media;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [DataEditor(Constants.PropertyEditors.Aliases.UploadField, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.UploadField,
+        "File upload",
+        "fileupload",
+        Group = Constants.PropertyEditors.Groups.Media,
+        Icon = "icon-download-alt")]
     public class FileUploadPropertyEditor : DataEditor
     {
         private readonly IMediaFileSystem _mediaFileSystem;
