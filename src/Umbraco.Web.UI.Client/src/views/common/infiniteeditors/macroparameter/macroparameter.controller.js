@@ -102,6 +102,7 @@
             $scope.model.itemDetails = null;
 
             if (vm.searchTerm) {
+                vm.showTabs = false;
 
                 var regex = new RegExp(vm.searchTerm, "i");
                 vm.filterResult = {
@@ -109,6 +110,7 @@
                 };
             } else {
                 vm.filterResult = null;
+                vm.showTabs = true;
             }
         }
 
@@ -116,7 +118,7 @@
             return _.map(_.keys(collection), function (key) {
                 return {
                     group: key,
-                    dataTypes: $filter('filter')(collection[key], function (editor) {
+                    parameterEditors: $filter('filter')(collection[key], function (editor) {
                         return regex.test(editor.name) || regex.test(editor.alias);
                     })
                 }

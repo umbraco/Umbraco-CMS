@@ -30,7 +30,9 @@
                                     no-dirty-check />
                         </div>
                     </div>
+
                     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
                     <!-- TABS -->
                     <div ng-if="vm.showTabs">
                         <umb-tabs-nav
@@ -80,6 +82,7 @@
                             </div>
                         </umb-tab-content>
                     </div>
+
                     <!-- FILTER RESULTS -->
                     <div ng-if="vm.filterResult">
                         <h5 class="-border-bottom -black"><localize key="contentTypeEditor_reuse"></localize></h5>
