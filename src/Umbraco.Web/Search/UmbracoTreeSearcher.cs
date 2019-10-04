@@ -85,7 +85,7 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    fields = new[] { UmbracoExamineIndex.UmbracoFileFieldName };
+                    fields = new[] { "id", "__NodeId", UmbracoExamineIndex.UmbracoFileFieldName};
                     var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
