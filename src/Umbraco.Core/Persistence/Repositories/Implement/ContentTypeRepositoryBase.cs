@@ -513,20 +513,18 @@ AND umbracoNode.id <> @id",
         /// <summary>
         /// Ensures that no property types are flagged for a variance that is not supported by the content type itself
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entity">The entity for which the property types will be validated</param>
         private void ValidateVariations(IContentTypeComposition entity)
         {
-            //if the entity does not vary at all, then the property cannot have a variance value greater than it
-            if (entity.Variations == ContentVariation.Nothing)
+            foreach (var prop in entity.PropertyTypes)
             {
-                foreach (var prop in entity.PropertyTypes)
-                {
-                    if (prop.IsPropertyDirty(nameof(prop.Variations)) && prop.Variations > entity.Variations)
-                        throw new InvalidOperationException($"The property {prop.Alias} cannot have variations of {prop.Variations} with the content type variations of {entity.Variations}");
-                }
-                    
+                // The variation of a property is only allowed if all its variation flags
+                // are also set on the entity itself. It cannot set anything that is not also set by the content type.
+                // For example, when entity.Variations is set to Culture a property cannot be set to Segment.
+                var isValid = entity.Variations.HasFlag(prop.Variations);
+                if (!isValid)
+                    throw new InvalidOperationException($"The property {prop.Alias} cannot have variations of {prop.Variations} with the content type variations of {entity.Variations}");
             }
-                
         }
 
         private IEnumerable<IContentTypeComposition> GetImpactedContentTypes(IContentTypeComposition contentType, IEnumerable<IContentTypeComposition> all)
