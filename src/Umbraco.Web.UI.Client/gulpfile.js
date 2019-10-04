@@ -23,6 +23,15 @@ const { views } = require('./gulp/tasks/views');
 const { watch } = require('./gulp/tasks/watch');
 
 
+// Load local overwrites, can be used to overwrite paths in your local setup.
+var fs = require('fs');
+var onlyScripts = require('./gulp/util/scriptFilter');
+var overwrites = fs.readdirSync('./gulp/overwrites/').filter(onlyScripts);
+overwrites.forEach(function(overwrite) {
+	require('./gulp/overwrites/' + overwrite);
+});
+
+
 // ***********************************************************
 // These Exports are the new way of defining Tasks in Gulp 4.x
 // ***********************************************************
