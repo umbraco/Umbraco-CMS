@@ -1500,6 +1500,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         </key>
     <key alias="queryBuilder">Query builder</key>
     <key alias="itemsReturned">items returned, in</key>
+    <key alias="copyToClipboard">copy to clipboard</key>
     <key alias="iWant">I want</key>
     <key alias="allContent">all content</key>
     <key alias="contentOfType">content of type "%0%"</key>
