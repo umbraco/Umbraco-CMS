@@ -124,9 +124,7 @@ namespace Umbraco.Tests.Services
         public void Change_Content_Type_Variation_Clears_Redirects(ContentVariation startingContentTypeVariation, ContentVariation changedContentTypeVariation, bool shouldUrlRedirectsBeCleared)
         {
             var contentType = MockedContentTypes.CreateBasicContentType();            
-            contentType.Variations = startingContentTypeVariation;
-            var properties = CreatePropertyCollection(("title", startingContentTypeVariation));
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.Variations = startingContentTypeVariation;            
             ServiceContext.ContentTypeService.Save(contentType);
             var contentType2 = MockedContentTypes.CreateBasicContentType("test");
             ServiceContext.ContentTypeService.Save(contentType2);
@@ -269,6 +267,84 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
             Assert.IsTrue(doc.Edited);
             Assert.IsTrue(doc.IsCultureEdited("en-US"));
+        }
+
+        [TestCase(ContentVariation.Nothing, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.Culture)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.Segment)]
+        [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Culture)]
+        [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
+        [TestCase(ContentVariation.Culture, ContentVariation.CultureAndSegment)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Culture)]
+        [TestCase(ContentVariation.Segment, ContentVariation.Segment)]
+        [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Culture)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
+        [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment)]
+        public void Preserve_Content_Name_After_Content_Type_Variation_Change(ContentVariation contentTypeVariationFrom, ContentVariation contentTypeVariationTo)
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = contentTypeVariationFrom;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var invariantContentName = "Content Invariant";
+
+            var defaultCultureContentName = "Content en-US";
+            var defaultCulture = "en-US";
+
+            var nlContentName = "Content nl-NL";
+            var nlCulture = "nl-NL";
+
+            ServiceContext.LocalizationService.Save(new Language(nlCulture));
+
+            var includeCultureNames = contentType.Variations.HasFlag(ContentVariation.Culture);
+
+            // Create some content of this content type
+            IContent doc = MockedContent.CreateBasicContent(contentType);
+
+            doc.Name = invariantContentName;
+            if (includeCultureNames)
+            {
+                Assert.DoesNotThrow(() => doc.SetCultureName(defaultCultureContentName, defaultCulture));
+                Assert.DoesNotThrow(() => doc.SetCultureName(nlContentName, nlCulture));
+            } else
+            {
+                Assert.Throws<NotSupportedException>(() => doc.SetCultureName(defaultCultureContentName, defaultCulture));
+                Assert.Throws<NotSupportedException>(() => doc.SetCultureName(nlContentName, nlCulture));
+            }
+
+            ServiceContext.ContentService.Save(doc);
+            doc = ServiceContext.ContentService.GetById(doc.Id);
+
+            AssertAll();
+
+            // Change variation
+            contentType.Variations = contentTypeVariationTo;
+            ServiceContext.ContentService.Save(doc);
+            doc = ServiceContext.ContentService.GetById(doc.Id);
+
+            AssertAll();
+
+            void AssertAll()
+            {
+                if (includeCultureNames)
+                {
+                    // Invariant content name is not preserved when content type is set to culture
+                    Assert.AreEqual(defaultCultureContentName, doc.Name);
+                    Assert.AreEqual(doc.Name, doc.GetCultureName(defaultCulture));
+                    Assert.AreEqual(nlContentName, doc.GetCultureName(nlCulture));
+                }
+                else
+                {
+                    Assert.AreEqual(invariantContentName, doc.Name);
+                    Assert.AreEqual(null, doc.GetCultureName(defaultCulture));
+                    Assert.AreEqual(null, doc.GetCultureName(nlCulture));
+                }
+            }
         }
 
         [TestCase(ContentVariation.Nothing, ContentVariation.Nothing, true)]
