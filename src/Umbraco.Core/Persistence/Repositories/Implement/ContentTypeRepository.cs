@@ -287,6 +287,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.SortOrder = maxSortOrder + 1;
             }
 
+            // Update property variations based on the content type variation
+            foreach (var propertyType in entity.PropertyTypes)
+            {
+                // Determine variation for the property type.
+                // The property is only considered culture variant when the base content type is also culture variant.
+                // The property is only considered segment variant when the base content type is also segment variant.
+                // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
+                propertyType.Variations = entity.Variations & propertyType.Variations;
+            }
+
             PersistUpdatedBaseContentType(entity);
             PersistTemplates(entity, true);
 

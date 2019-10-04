@@ -411,15 +411,7 @@ AND umbracoNode.id <> @id",
             // note: this only deals with *local* property types, we're dealing w/compositions later below
             foreach (var propertyType in entity.PropertyTypes)
             {
-                // Update property variations
-
-                // Determine target variation of the property type.
-                // The property is only considered culture variant when the base content type is also culture variant.
-                // The property is only considered segment variant when the base content type is also segment variant.
-                // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
-                propertyType.Variations = newContentTypeVariation & propertyType.Variations;
-
-                // then, track each property individually
+                // track each property individually
                 if (propertyType.IsPropertyDirty("Variations"))
                 {
                     // allocate the list only when needed
