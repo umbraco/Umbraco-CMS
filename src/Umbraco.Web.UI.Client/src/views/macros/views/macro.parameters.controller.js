@@ -8,6 +8,12 @@
  */
 function MacrosParametersController($scope, editorService, localizationService) {
 
+    const vm = this;
+
+    vm.add = add;
+    vm.edit = edit;
+    vm.remove = remove;
+
     $scope.sortableOptions = {
         axis: 'y',
         containment: 'parent',
@@ -21,14 +27,14 @@ function MacrosParametersController($scope, editorService, localizationService) 
     };
 
 
-    $scope.remove = function (parameter, evt) {
+    function remove(parameter, evt) {
         evt.preventDefault();
 
         $scope.model.macro.parameters = _.without($scope.model.macro.parameters, parameter);
         setDirty();
     }
 
-    $scope.add = function (evt) {
+    function add(evt) {
         evt.preventDefault();
 
         openOverlay({}, $scope.labels.addParameter, (newParameter) => {
@@ -40,11 +46,16 @@ function MacrosParametersController($scope, editorService, localizationService) 
         });
     }
 
-    $scope.edit = function (parameter, evt) {
+    function edit(parameter, evt) {
         evt.preventDefault();
 
+        console.log("parameter", parameter);
+
         openOverlay(parameter, $scope.labels.editParameter, (newParameter) => {
-            parameter.key = newParameter.key;
+
+            console.log("newParameter", newParameter);
+
+            parameter.alias = newParameter.alias;
             parameter.label = newParameter.label;
             parameter.editor = newParameter.editor;
             setDirty();
