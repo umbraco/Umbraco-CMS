@@ -57,7 +57,7 @@ function MacrosParametersController($scope, editorService, localizationService) 
 
             console.log("newParameter", newParameter);
 
-            parameter.alias = newParameter.alias;
+            parameter.key = newParameter.key;
             parameter.label = newParameter.label;
             parameter.editor = newParameter.editor;
             setDirty();
