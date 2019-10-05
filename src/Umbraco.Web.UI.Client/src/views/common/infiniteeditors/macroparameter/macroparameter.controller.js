@@ -67,7 +67,7 @@
                 var parameterEditors = filterCollection(vm.parameterEditors, regex);
 
                 vm.filterResult = {
-                    parameterEditors: filterCollection(vm.parameterEditors, regex),
+                    parameterEditors: parameterEditors,
                     totalResults: _.flatten(_.pluck(parameterEditors, 'parameterEditors')).length
                 };
             } else {
