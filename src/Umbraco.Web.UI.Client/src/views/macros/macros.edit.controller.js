@@ -110,7 +110,7 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
         vm.page.loading = true;
 
         vm.promises['partialViews'] = getPartialViews();
-        vm.promises['parameterEditors'] = getParameterEditors();
+        //vm.promises['parameterEditors'] = getParameterEditors();
         vm.promises['macro'] = getMacro();
 
         vm.views = [];
@@ -126,9 +126,9 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
                     vm.views = values[key];
                 }
 
-                if (key === 'parameterEditors') {
-                    vm.parameterEditors = values[key];                    
-                }
+                //if (key === 'parameterEditors') {
+                //    vm.parameterEditors = values[key];                    
+                //}
 
                 if (key === 'macro') {
                     bindMacro(values[key]);

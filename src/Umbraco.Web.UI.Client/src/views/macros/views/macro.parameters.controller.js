@@ -56,7 +56,7 @@ function MacrosParametersController($scope, editorService, localizationService) 
         const ruleDialog = {
             title: title,
             parameter: _.clone(parameter),
-            editors : $scope.model.parameterEditors,
+            //editors : $scope.model.parameterEditors,
             view: "views/macros/infiniteeditors/parameter.html",
             size: "small",
             submit: function (model) {
