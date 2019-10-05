@@ -51,8 +51,6 @@ function MacrosParametersController($scope, $q, editorService, localizationServi
     function edit(parameter, evt) {
         evt.preventDefault();
 
-        console.log("parameter", parameter);
-
         var promises = [
             getParameterEditorByAlias(parameter.editor)
         ];
@@ -87,7 +85,6 @@ function MacrosParametersController($scope, $q, editorService, localizationServi
         const ruleDialog = {
             title: title,
             parameter: _.clone(parameter),
-            //editors : $scope.model.parameterEditors,
             view: "views/macros/infiniteeditors/parameter.html",
             size: "small",
             submit: function (model) {
