@@ -16,7 +16,6 @@
 
             var overlay = {
                 parameter: $scope.model.parameter,
-                //contentTypeName: $scope.model.contentTypeName,
                 view: "views/common/infiniteeditors/macroparameter/macroparameter.html",
                 size: "small",
                 submit: function (model) {
@@ -36,7 +35,6 @@
             };
 
             editorService.open(overlay);
-
         }
 
         function submit() {
@@ -52,7 +50,6 @@
                 $scope.model.close();
             }
         }
-
 	}
 
     angular.module("umbraco").controller("Umbraco.Editors.ParameterEditorController", ParameterEditorController);

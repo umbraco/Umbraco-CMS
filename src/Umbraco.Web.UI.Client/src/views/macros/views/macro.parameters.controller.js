@@ -6,7 +6,7 @@
  * @description
  * The controller for editing macros parameters
  */
-function MacrosParametersController($scope, editorService, localizationService) {
+function MacrosParametersController($scope, $q, editorService, localizationService, macroResource) {
 
     const vm = this;
 
@@ -53,15 +53,33 @@ function MacrosParametersController($scope, editorService, localizationService) 
 
         console.log("parameter", parameter);
 
-        openOverlay(parameter, vm.labels.editParameter, (newParameter) => {
+        var promises = [
+            getParameterEditorByAlias(parameter.editor)
+        ];
 
-            console.log("newParameter", newParameter);
+        $q.all(promises).then(function (values) {
+            parameter.dataTypeName = values[0].name;
 
-            parameter.key = newParameter.key;
-            parameter.label = newParameter.label;
-            parameter.editor = newParameter.editor;
-            setDirty();
+            openOverlay(parameter, vm.labels.editParameter, (newParameter) => {
+
+                parameter.key = newParameter.key;
+                parameter.label = newParameter.label;
+                parameter.editor = newParameter.editor;
+                setDirty();
+            });
         });
+    }
+
+    function getParameterEditorByAlias(alias) {
+        var deferred = $q.defer();
+
+        macroResource.getParameterEditorByAlias(alias).then(function (data) {
+            deferred.resolve(data);
+        }, function () {
+            deferred.reject();
+        });
+
+        return deferred.promise;
     }
 
     function openOverlay(parameter, title, onSubmit) {

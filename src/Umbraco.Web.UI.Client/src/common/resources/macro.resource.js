@@ -112,6 +112,13 @@ function macroResource($q, $http, umbRequestHelper) {
             );
         },
 
+        getParameterEditorByAlias: function(alias) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetParameterEditorByAlias", { "alias": alias }),
+                    "Failed to get parameter editor")
+            );
+        },
+
         getById: function(id) {
             return umbRequestHelper.resourcePromise(
                 $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetById", { "id": id }), "Failed to get macro")

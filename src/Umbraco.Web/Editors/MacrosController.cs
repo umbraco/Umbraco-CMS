@@ -247,6 +247,21 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Get parameter editor by alias.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="HttpResponseMessage"/>.
+        /// </returns>
+        public HttpResponseMessage GetParameterEditorByAlias(string alias)
+        {
+            var parameterEditors = Current.ParameterEditors.ToArray();
+
+            var parameterEditor = parameterEditors.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, parameterEditor);
+        }
+
+        /// <summary>
         /// Returns a error response and optionally logs it
         /// </summary>
         /// <param name="message">
