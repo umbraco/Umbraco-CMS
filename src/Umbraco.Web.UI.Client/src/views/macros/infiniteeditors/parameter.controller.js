@@ -16,11 +16,9 @@
 
             var overlay = {
                 parameter: $scope.model.parameter,
-                view: "views/common/infiniteeditors/macroparameter/macroparameter.html",
+                view: "views/common/infiniteeditors/macroparameterpicker/macroparameterpicker.html",
                 size: "small",
                 submit: function (model) {
-
-                    console.log("macroparameter", model);
 
                     vm.focusOnMandatoryField = true;
 

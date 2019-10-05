@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.MacroParameterController 
+ * @name Umbraco.Editors.MacroParameterPickerController 
  * @function
  *
  * @description
@@ -122,6 +122,6 @@
         init();
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.MacroParameterController", MacroParameterController);
+    angular.module("umbraco").controller("Umbraco.Editors.MacroParameterPickerController", MacroParameterController);
 
 })();
