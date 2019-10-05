@@ -34,8 +34,7 @@
 
                     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-                    <!-- TABS -->
-                    <div ng-if="vm.showTabs">
+                    <div ng-if="!vm.filterResult">
                         <div ng-repeat="(key,value) in vm.parameterEditors">
                             <h5>{{key}}</h5>
                             <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">

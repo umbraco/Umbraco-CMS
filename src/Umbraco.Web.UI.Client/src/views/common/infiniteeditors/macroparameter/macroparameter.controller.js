@@ -15,7 +15,6 @@
         var vm = this;
 
         vm.searchTerm = "";
-        vm.showTabs = false;
         vm.parameterEditors = [];
         vm.loading = false;
         vm.labels = {};
@@ -47,10 +46,8 @@
             macroResource.getGroupedParameterEditors().then(function (data) {
                 vm.parameterEditors = data;
                 vm.loading = false;
-                vm.showTabs = true;
             }, function () {
                 vm.loading = false;
-                vm.showTabs = true;
             });
 
         }
@@ -60,7 +57,6 @@
             $scope.model.itemDetails = null;
 
             if (vm.searchTerm) {
-                vm.showTabs = false;
 
                 var regex = new RegExp(vm.searchTerm, "i");
 
@@ -74,7 +70,6 @@
                 };
             } else {
                 vm.filterResult = null;
-                vm.showTabs = true;
             }
         }
 
