@@ -241,6 +241,7 @@ namespace Umbraco.Web.Editors
 
             var grouped = parameterEditors
                 .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
+                .OrderBy(x => x.Key)
                 .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
             return this.Request.CreateResponse(HttpStatusCode.OK, grouped);
