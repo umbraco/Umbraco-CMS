@@ -45,11 +45,12 @@
             vm.loading = true;
             
             macroResource.getGroupedParameterEditors().then(function (data) {
-                console.log("data", data);
                 vm.parameterEditors = data;
                 vm.loading = false;
+                vm.showTabs = true;
             }, function () {
                 vm.loading = false;
+                vm.showTabs = true;
             });
 
         }
