@@ -10,7 +10,7 @@
 (function() {
     "use strict";
 
-    function DataTypePicker($scope, $filter, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService, editorService) {
+    function DataTypePicker($scope, $filter, dataTypeResource, contentTypeResource, localizationService, editorService) {
 
         var vm = this;
 
