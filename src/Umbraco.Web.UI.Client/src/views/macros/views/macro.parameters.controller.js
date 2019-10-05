@@ -69,7 +69,6 @@ function MacrosParametersController($scope, editorService, localizationService) 
         };
 
         editorService.open(ruleDialog);
-
     }
 
     function setDirty() {

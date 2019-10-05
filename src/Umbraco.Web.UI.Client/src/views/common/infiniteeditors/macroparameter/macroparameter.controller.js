@@ -10,18 +10,14 @@
 (function() {
     "use strict";
 
-    function MacroParameterController($scope, $filter, macroResource, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService, editorService) {
+    function MacroParameterController($scope, $filter, macroResource, localizationService, editorService) {
 
         var vm = this;
 
         vm.searchTerm = "";
         vm.showTabs = false;
-        vm.tabsLoaded = 0;
         vm.parameterEditors = [];
-        vm.typesAndEditors = [];
-        vm.userConfigured = [];
         vm.loading = false;
-        vm.tabs = [];
         vm.labels = {};
 
         vm.filterItems = filterItems;
@@ -33,7 +29,6 @@
 
         function activate() {
             setTitle();
-            //loadTabs();
             getGroupedParameterEditors();
         }
 
@@ -46,53 +41,17 @@
             }
         }
 
-        function loadTabs() {
-
-            var labels = ["contentTypeEditor_availableEditors", "contentTypeEditor_reuse"];
-
-            localizationService.localizeMany(labels)
-                .then(function(data){
-                    vm.labels.availableDataTypes = data[0];
-                    vm.labels.reuse = data[1];
-
-                    vm.tabs = [{
-                        active: true,
-                        id: 1,
-                        label: vm.labels.availableDataTypes,
-                        alias: "Default",
-                        typesAndEditors: []
-                    }, {
-                        active: false,
-                        id: 2,
-                        label: vm.labels.reuse,
-                        alias: "Reuse",
-                        userConfigured: []
-                    }];
-
-                });
-        }
-
         function getGroupedParameterEditors() {
 
+            console.log("getGroupedParameterEditors");
             vm.loading = true;
             
-            macroResource.getGroupedParameterEditors().then(function(data) {
+            macroResource.getGroupedParameterEditors().then(function (data) {
+                console.log("data", data);
                 vm.parameterEditors = data;
+                vm.loading = false;
             }, function () {
                 vm.loading = false;
-            });
-
-        }
-
-        function getGroupedPropertyEditors() {
-
-            vm.loading = true;
-
-            dataTypeResource.getGroupedPropertyEditors().then(function(data) {
-                vm.tabs[0].typesAndEditors = data;
-                vm.typesAndEditors = data;
-                vm.tabsLoaded = vm.tabsLoaded + 1;
-                checkIfTabContentIsLoaded();
             });
 
         }
@@ -105,8 +64,12 @@
                 vm.showTabs = false;
 
                 var regex = new RegExp(vm.searchTerm, "i");
+
+                var parameterEditors = filterCollection(vm.parameterEditors, regex);
+
                 vm.filterResult = {
-                    parameterEditors: filterCollection(vm.parameterEditors, regex)
+                    parameterEditors: filterCollection(vm.parameterEditors, regex),
+                    totalResults: _.flatten(_.pluck(parameterEditors, 'parameterEditors')).length
                 };
             } else {
                 vm.filterResult = null;

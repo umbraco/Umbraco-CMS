@@ -122,10 +122,16 @@
                 vm.showTabs = false;
 
                 var regex = new RegExp(vm.searchTerm, "i");
+
+                var userConfigured = filterCollection(vm.userConfigured, regex),
+                    typesAndEditors = filterCollection(vm.typesAndEditors, regex);
+
                 vm.filterResult = {
-                    userConfigured: filterCollection(vm.userConfigured, regex),
-                    typesAndEditors: filterCollection(vm.typesAndEditors, regex)
+                    userConfigured: userConfigured,
+                    typesAndEditors: typesAndEditors,
+                    totalResults: _.flatten(_.pluck(_.union(userConfigured, typesAndEditors), 'dataTypes')).length
                 };
+
             } else {
                 vm.filterResult = null;
                 vm.showTabs = true;
@@ -150,7 +156,6 @@
             propertyDetails.title = property.name;
 
             $scope.model.itemDetails = propertyDetails;
-
         }
 
         function hideDetailsOverlay() {
@@ -177,7 +182,6 @@
             };
 
             editorService.open(dataTypeSettings);
-
         }
 
         function pickDataType(selectedDataType) {
@@ -205,7 +209,7 @@
         }
 
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }
