@@ -66,9 +66,11 @@
 
                 var parameterEditors = filterCollection(vm.parameterEditors, regex);
 
+                var totalResults = _.reduce(_.pluck(parameterEditors, 'count'), (m, n) => m + n, 0);
+
                 vm.filterResult = {
                     parameterEditors: parameterEditors,
-                    totalResults: _.flatten(_.pluck(parameterEditors, 'parameterEditors')).length
+                    totalResults: totalResults
                 };
             } else {
                 vm.filterResult = null;
@@ -78,11 +80,15 @@
 
         function filterCollection(collection, regex) {
             return _.map(_.keys(collection), function (key) {
+
+                var filteredEditors = $filter('filter')(collection[key], function (editor) {
+                    return regex.test(editor.name) || regex.test(editor.alias);
+                });
+
                 return {
                     group: key,
-                    parameterEditors: $filter('filter')(collection[key], function (editor) {
-                        return regex.test(editor.name) || regex.test(editor.alias);
-                    })
+                    count: filteredEditors.length,
+                    parameterEditors: filteredEditors
                 }
             });
         }

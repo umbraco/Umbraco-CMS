@@ -126,10 +126,12 @@
                 var userConfigured = filterCollection(vm.userConfigured, regex),
                     typesAndEditors = filterCollection(vm.typesAndEditors, regex);
 
+                var totalResults = _.reduce(_.pluck(_.union(userConfigured, typesAndEditors), 'count'), (m, n) => m + n, 0);
+
                 vm.filterResult = {
                     userConfigured: userConfigured,
                     typesAndEditors: typesAndEditors,
-                    totalResults: _.flatten(_.pluck(_.union(userConfigured, typesAndEditors), 'dataTypes')).length
+                    totalResults: totalResults
                 };
 
             } else {
@@ -140,11 +142,15 @@
 
         function filterCollection(collection, regex) {
             return _.map(_.keys(collection), function (key) {
+
+                var filteredDataTypes = $filter('filter')(collection[key], function (dataType) {
+                    return regex.test(dataType.name) || regex.test(dataType.alias);
+                });
+
                 return {
                     group: key,
-                    dataTypes: $filter('filter')(collection[key], function (dataType) {
-                        return regex.test(dataType.name) || regex.test(dataType.alias);
-                    })
+                    count: filteredDataTypes.length,
+                    dataTypes: filteredDataTypes
                 }
             });
         }
