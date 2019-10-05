@@ -23,11 +23,10 @@
         vm.filterItems = filterItems;
         vm.showDetailsOverlay = showDetailsOverlay;
         vm.hideDetailsOverlay = hideDetailsOverlay;
-        vm.pickEditor = pickEditor;
         vm.pickParameterEditor = pickParameterEditor;
         vm.close = close;
 
-        function activate() {
+        function init() {
             setTitle();
             getGroupedParameterEditors();
         }
@@ -43,7 +42,6 @@
 
         function getGroupedParameterEditors() {
 
-            console.log("getGroupedParameterEditors");
             vm.loading = true;
             
             macroResource.getGroupedParameterEditors().then(function (data) {
@@ -101,29 +99,6 @@
             $scope.model.itemDetails = null;
         }
 
-        function pickEditor(propertyEditor) {           
-
-            //var dataTypeSettings = {
-            //    propertyEditor: propertyEditor,
-            //    property: $scope.model.property,
-            //    contentTypeName: $scope.model.contentTypeName,
-            //    create: true,
-            //    view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
-            //    submit: function(model) {
-            //        contentTypeResource.getPropertyTypeScaffold(model.dataType.id).then(function(propertyType) {
-            //            submit(model.dataType, propertyType, true);
-            //            editorService.close();
-            //        });
-            //    },
-            //    close: function() {
-            //        editorService.close();
-            //    }
-            //};
-
-            //editorService.open(dataTypeSettings);
-
-        }
-
         function pickParameterEditor(selectedParameterEditor) {
 
             console.log("pickParameterEditor", selectedParameterEditor);
@@ -134,19 +109,6 @@
             $scope.model.parameter.dataTypeIcon = selectedParameterEditor.icon;
 
             $scope.model.submit($scope.model);
-             //$scope.model.parameter = {
-            //    editor: "Umbraco.EmailAddress",
-            //    key: "test",
-            //    label: "Test"
-            //};
-
-            //selectedDataType.loading = true;
-            //dataTypeResource.getById(selectedDataType.id).then(function(dataType) {
-            //    contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
-            //        selectedDataType.loading = false;
-            //        submit(dataType, propertyType, false);
-            //    });
-            //});
         }
 
         function close() {
@@ -155,8 +117,7 @@
             }
         }
 
-        activate();
-
+        init();
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.MacroParameterController", MacroParameterController);
