@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
@@ -57,7 +58,8 @@ namespace Umbraco.Web.Search
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
                 LanguageService,
-                UmbracoIndexConfig.GetContentValueSetValidator());
+                GetContentValueSetValidator()
+                );
             return index;
         }
 
@@ -70,7 +72,7 @@ namespace Umbraco.Web.Search
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
                 LanguageService,
-                UmbracoIndexConfig.GetPublishedContentValueSetValidator());
+                GetPublishedContentValueSetValidator());
             return index;
         }
 
@@ -82,10 +84,30 @@ namespace Umbraco.Web.Search
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
-                UmbracoIndexConfig.GetMemberValueSetValidator());
+                GetMemberValueSetValidator()
+                );
             return index;
         }
+        [Obsolete]
+        public virtual IContentValueSetValidator GetContentValueSetValidator()
+        {
+            return UmbracoIndexConfig.GetContentValueSetValidator();
+        }
+        [Obsolete]
+        public virtual IContentValueSetValidator GetPublishedContentValueSetValidator()
+        {
+            return UmbracoIndexConfig.GetPublishedContentValueSetValidator();
+        }
 
+        /// <summary>
+        /// Returns the <see cref="IValueSetValidator"/> for the member indexer
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete]
+        public virtual IValueSetValidator GetMemberValueSetValidator()
+        {
+            return UmbracoIndexConfig.GetMemberValueSetValidator();
+        }
 
 
     }
