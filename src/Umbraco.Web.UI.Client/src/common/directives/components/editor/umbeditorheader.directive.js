@@ -284,9 +284,9 @@ Use this directive to construct a header inside the main editor window.
                                 title += " " + name;
                             }
                         }
-                        var setTitle = true;
-                        if (scope.settitle !== undefined) {
-                            setTitle = scope.settitle;
+                        var setTitle = false;
+                        if (scope.setpagetitle !== undefined) {
+                            setTitle = scope.setpagetitle;
                         }
                         if (setTitle && title !== data[2] + ":") {
                             scope.$emit("$changeTitle", title);
@@ -320,7 +320,7 @@ Use this directive to construct a header inside the main editor window.
                 onBack: "&?",
                 showBackButton: "<?",
                 editorfor: "=",
-                settitle:"="
+                setpagetitle:"="
             },
             link: link
         };
