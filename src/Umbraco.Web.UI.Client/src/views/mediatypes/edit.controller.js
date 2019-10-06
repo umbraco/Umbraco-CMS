@@ -24,6 +24,7 @@
         vm.close = close;
 
         vm.currentNode = null;
+        vm.editorfor = "content_mediatype";
         vm.contentType = {};
         vm.page = {};
         vm.page.loading = false;
