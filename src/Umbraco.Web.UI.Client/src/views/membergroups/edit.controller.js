@@ -11,7 +11,9 @@ function MemberGroupsEditController($scope, $routeParams, appState, navigationSe
     //setup scope vars
     $scope.page = {};
     $scope.page.loading = false;
-    $scope.page.editorfor = "content_membergroup";
+    $scope.header = {};
+    $scope.header.editorfor = "content_membergroup";
+    $scope.header.setPageTitle = true;
     $scope.page.menu = {};
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null;

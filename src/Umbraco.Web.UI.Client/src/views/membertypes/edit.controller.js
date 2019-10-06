@@ -16,6 +16,9 @@
 
         vm.save = save;
         vm.editorfor = "visuallyHiddenTexts_newMember";
+        vm.header = {};
+        vm.header.editorfor = "content_membergroup";
+        vm.header.setPageTitle = true;
         vm.currentNode = null;
         vm.contentType = {};
         vm.page = {};
