@@ -5,7 +5,7 @@
 
         var vm = this;
 
-        vm.editorfor = "visuallyHiddenTexts_partialViewMacro";
+        vm.editorfor = "visuallyHiddenTexts_newPartialViewMacro";
         vm.page = {};
         vm.page.loading = true;
         vm.partialViewMacroFile = {};

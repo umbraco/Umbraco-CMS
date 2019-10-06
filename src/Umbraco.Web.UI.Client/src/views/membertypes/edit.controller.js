@@ -15,7 +15,7 @@
         var vm = this;
 
         vm.save = save;
-
+        vm.editorfor = "visuallyHiddenTexts_newMember";
         vm.currentNode = null;
         vm.contentType = {};
         vm.page = {};
