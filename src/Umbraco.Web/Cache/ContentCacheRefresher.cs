@@ -51,7 +51,10 @@ namespace Umbraco.Web.Cache
 
             foreach (var payload in payloads.Where(x => x.Id != default))
             {
+                //By INT Id
                 isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
+                //By GUID Key
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Key));
 
                 _idkMap.ClearCache(payload.Id);
 
@@ -137,14 +140,15 @@ namespace Umbraco.Web.Cache
 
         public class JsonPayload
         {
-            public JsonPayload(int id, TreeChangeTypes changeTypes)
+            public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
             {
                 Id = id;
+                Key = key;
                 ChangeTypes = changeTypes;
             }
 
             public int Id { get; }
-
+            public Guid? Key { get; }
             public TreeChangeTypes ChangeTypes { get; }
         }
 

@@ -145,6 +145,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
         public async Task<ActionResult> AuthorizeUpgrade()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
