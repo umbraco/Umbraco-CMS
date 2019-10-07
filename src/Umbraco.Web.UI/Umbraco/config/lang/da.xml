@@ -298,6 +298,7 @@
     <key alias="schedulePublishHelp">Vælg dato og klokkeslæt for at udgive og/eller afpublicere indholdet.</key>
     <key alias="createEmpty">Opret ny</key>
     <key alias="createFromClipboard">Indsæt fra udklipsmappen</key>
+    <key alias="copyPropertyToClipboard">Kopiér alt indhold fra %0%</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Opret en ny indholdsskabelon fra '%0%'</key>
