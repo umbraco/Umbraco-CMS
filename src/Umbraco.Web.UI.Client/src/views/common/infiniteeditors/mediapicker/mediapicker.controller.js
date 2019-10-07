@@ -101,17 +101,18 @@ angular.module("umbraco")
                     // if a target is specified, go look it up - generally this target will just contain ids not the actual full
                     // media object so we need to look it up
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
-
+                    var altText = $scope.target.altText;
+                    
                     // ID of a UDI or legacy int ID still could be null/undefinied here
                     // As user may dragged in an image that has not been saved to media section yet
                     if(id){
                         entityResource.getById(id, "Media")
                         .then(function (node) {
-                            //$scope.target = node; //Not 100% sure why we override it here?!
+                            $scope.target = node;
                             if (ensureWithinStartNode(node)) {
                                 selectImage(node);
-                                //$scope.target.url = mediaHelper.resolveFile(node);
-                                //$scope.target.altText = altText;
+                                $scope.target.url = mediaHelper.resolveFile(node);
+                                $scope.target.altText = altText;
                                 $scope.openDetailsDialog();
                             }
                         },
