@@ -892,7 +892,7 @@ namespace Umbraco.Web
         /// <returns>The children of the content, of any of the specified types.</returns>
         public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.Children(x => contentTypeAlias.InvariantEquals(x.ContentType.Alias), culture);
+            return content.Children(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
 
         /// <summary>
