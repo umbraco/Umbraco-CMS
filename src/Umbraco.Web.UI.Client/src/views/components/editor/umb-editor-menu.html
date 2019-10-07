@@ -15,9 +15,12 @@
         <umb-dropdown-item class="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
             <button type="button" ng-click="executeMenuItem(action)">
                 <i class="icon icon-{{action.cssclass}}" aria-hidden="true"></i>
-                <span class="sr-only">{{action.textBefore}}</span>
-                <span class="menu-label">{{action.name}}</span>
-                <span class="sr-only">{{action.textAfter}}</span>
+                <!-- Render the text that will be visually displayed -->
+                <span class="menu-label" aria-hidden="true">{{action.name}}</span>
+                <!-- Render the textDescription from the language files if it's attached to the action object-->
+                <span class="sr-only" ng-if="action.textDescription">{{action.textDescription}} {{currentNode.name}}</span>
+                <!-- Otherwise render a combination of the nodename and the currentNode name-->
+                <span class="sr-only" ng-if="!action.textDescription">{{action.name}} {{currentNode.name}}</span>
             </button>
         </umb-dropdown-item>
     </umb-dropdown>

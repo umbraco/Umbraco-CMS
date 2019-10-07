@@ -5,21 +5,16 @@
         <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
     </creator>
     <area alias="actions">
-        <key alias="assignDomain_before">Setup</key>
         <key alias="assignDomain">Culture and Hostnames</key>
-        <key alias="assignDomain_after">for this node</key>
         <key alias="auditTrail">Audit Trail</key>
         <key alias="browse">Browse Node</key>
         <key alias="changeDocType">Change Document Type</key>
         <key alias="copy">Copy</key>
-        <key alias="copy_after">this node to another location in the content tree</key>
         <key alias="create">Create</key>
-        <key alias="create_after">a new node</key>
         <key alias="export">Export</key>
         <key alias="createPackage">Create Package</key>
         <key alias="createGroup">Create group</key>
         <key alias="delete">Delete</key>
-        <key alias="delete_after">this node</key>
         <key alias="disable">Disable</key>
         <key alias="emptyRecycleBin">Empty recycle bin</key>
         <key alias="enable">Enable</key>
@@ -29,15 +24,11 @@
         <key alias="liveEdit">Edit in Canvas</key>
         <key alias="logout">Exit</key>
         <key alias="move">Move</key>
-        <key alias="move_after">this node to another location in the content tree</key>
         <key alias="notify">Notifications</key>
-        <key alias="protect_before">Setup</key>
         <key alias="protect">Public access</key>
-        <key alias="protect_after">for this node</key>
         <key alias="publish">Publish</key>
         <key alias="unpublish">Unpublish</key>
         <key alias="refreshNode">Reload</key>
-        <key alias="refreshNode_after">the content tree</key>
         <key alias="republish">Republish entire site</key>
         <key alias="rename" version="7.3.0">Rename</key>
         <key alias="restore" version="7.3.0">Restore</key>
@@ -48,21 +39,17 @@
         <key alias="wasMovedTo">was moved to</key>
         <key alias="wasCopiedTo">was copied to</key>
         <key alias="wasDeleted">was deleted</key>
-        <key alias="rights_before">Setup</key>
         <key alias="rights">Permissions</key>
-        <key alias="rights_after">for this node</key>
         <key alias="rollback">Rollback</key>
         <key alias="sendtopublish">Send To Publish</key>
         <key alias="sendToTranslate">Send To Translation</key>
         <key alias="setGroup">Set group</key>
         <key alias="sort">Sort</key>
-        <key alias="sort_after">: Change the sort order of this node</key>
         <key alias="translate">Translate</key>
         <key alias="update">Update</key>
         <key alias="setPermissions">Set permissions</key>
         <key alias="unlock">Unlock</key>
         <key alias="createblueprint">Create Content Template</key>
-        <key alias="createblueprint_after">from this node</key>
         <key alias="resendInvite">Resend Invitation</key>
     </area>
     <area alias="actionCategories">
@@ -2258,8 +2245,14 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="suggestion">suggestion</key>
         <key alias="checkPassed">Check passed</key>
         <key alias="checkFailed">Check failed</key>
-    <key alias="openBackofficeSearch">Open backoffice search</key>
-    <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
-    <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
+        <key alias="openBackofficeSearch">Open backoffice search</key>
+        <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
+        <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
+        <key alias="assignDomain_description">Setup Culture and Hostnames for</key>
+        <key alias="create_description">Create new node under</key>
+        <key alias="protect_description">Setup Public access on</key>
+        <key alias="rights_description">Setup Permissions on</key>
+        <key alias="sort_description">Change sort order for</key>
+        <key alias="createblueprint_description">Create Content Template based on</key>
     </area>
 </language>

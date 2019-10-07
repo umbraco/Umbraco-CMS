@@ -33,13 +33,11 @@ namespace Umbraco.Web.Models.Trees
             : this()
         {
             var values = textService.GetAllStoredValues(Thread.CurrentThread.CurrentUICulture);
-            values.TryGetValue($"actions/{alias}_after", out var textAfter);
-            values.TryGetValue($"actions/{alias}_before", out var textBefore);
+            values.TryGetValue($"visuallyHiddenTexts/{alias}_description", out var textDescription);
 
             Alias = alias;
             Name = textService.Localize($"actions/{Alias}");
-            TextBefore = textBefore;
-            TextAfter = textAfter;
+            TextDescription = textDescription;
         }
 
         /// <summary>
@@ -80,11 +78,8 @@ namespace Umbraco.Web.Models.Trees
         [Required]
         public string Alias { get; set; }
 
-        [DataMember(Name = "textBefore")]
-        public string TextBefore { get; set; }
-
-        [DataMember(Name = "textAfter")]
-        public string TextAfter { get; set; }
+        [DataMember(Name = "textDescription")]
+        public string TextDescription { get; set; }
 
         /// <summary>
         /// Ensures a menu separator will exist before this menu item

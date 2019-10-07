@@ -98,15 +98,13 @@ namespace Umbraco.Web.Models.Trees
             if (item == null) return null;
 
             var values = textService.GetAllStoredValues(Thread.CurrentThread.CurrentUICulture);
-            values.TryGetValue($"actions/{item.Alias}_after", out var textAfter);
-            values.TryGetValue($"actions/{item.Alias}_before", out var textBefore);
+            values.TryGetValue($"visuallyHiddenTexts/{item.Alias}_description", out var textDescription);
 
             var menuItem = new MenuItem(item, textService.Localize($"actions/{item.Alias}"))
             {
                 SeparatorBefore = hasSeparator,
                 OpensDialog = opensDialog,
-                TextAfter = textAfter,
-                TextBefore = textBefore
+                TextDescription = textDescription,
             };
 
             return menuItem;
