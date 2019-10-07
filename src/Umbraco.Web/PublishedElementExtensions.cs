@@ -165,6 +165,8 @@ namespace Umbraco.Web
         public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params string[] types)
             where T : IPublishedElement
         {
+            if (types == null || types.Length == 0) return Enumerable.Empty<T>();
+            
             return contents.Where(x => types.InvariantContains(x.ContentType.Alias));
         }
 
