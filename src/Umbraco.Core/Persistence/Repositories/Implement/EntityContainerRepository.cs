@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
@@ -129,6 +128,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistDeletedItem(EntityContainer entity)
         {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
             EnsureContainerType(entity);
 
             var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
@@ -162,9 +162,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(EntityContainer entity)
         {
+            // TODO Ensure correct exceptions are thrown (entity.Name is not an argument and NullReferenceException shouldn't be thrown by user code)
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
             EnsureContainerType(entity);
 
-            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentNullOrEmptyException("entity.Name");
+            if (entity.Name == null) throw new ArgumentNullException(nameof(entity.Name));
+            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(entity.Name));
             entity.Name = entity.Name.Trim();
 
             // guard against duplicates
@@ -223,10 +226,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         //
         protected override void PersistUpdatedItem(EntityContainer entity)
         {
+            // TODO Ensure correct exceptions are thrown (entity.Name is not an argument and NullReferenceException shouldn't be thrown by user code)
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
             EnsureContainerType(entity);
 
+            if (entity.Name == null) throw new ArgumentNullException(nameof(entity.Name));
+            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(entity.Name));
             entity.Name = entity.Name.Trim();
-            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentNullOrEmptyException("entity.Name");
 
             // find container to update
             var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()

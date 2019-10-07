@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -2793,7 +2791,8 @@ namespace Umbraco.Core.Services.Implement
 
         private IContentType GetContentType(IScope scope, string contentTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
+            if (contentTypeAlias == null) throw new ArgumentNullException(nameof(contentTypeAlias));
+            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
 
             scope.ReadLock(Constants.Locks.ContentTypes);
 
@@ -2808,7 +2807,8 @@ namespace Umbraco.Core.Services.Implement
 
         private IContentType GetContentType(string contentTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
+            if (contentTypeAlias == null) throw new ArgumentNullException(nameof(contentTypeAlias));
+            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -2900,7 +2900,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 foreach (var property in blueprint.Properties)
                 {
-					var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
+                    var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
                     content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
                 }
 
