@@ -198,7 +198,8 @@ Use this directive to construct a header inside the main editor window.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
-
+@param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with 
+@param {string=} editorfor The localization to use to aid accessibility on the edit and create screen
 **/
 
 (function () {
@@ -211,8 +212,12 @@ Use this directive to construct a header inside the main editor window.
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
-            scope.a11yMessage = "";
-            scope.a11yName = "";
+
+            scope.accessibility = {};
+            scope.accessibility.a11yMessage = "";
+            scope.accessibility.a11yName = "";
+            scope.accessibility.a11yMessageVisible = false;
+            scope.accessibility.a11yNameVisible = false;
             setAccessibilityForEdtor();
             scope.goBack = function () {
                 if (scope.onBack) {
@@ -250,50 +255,72 @@ Use this directive to construct a header inside the main editor window.
             };
 
            function setAccessibilityForEdtor () {
-                if (editorState.current) {
-                    //to do make work for user create/edit
-                    // to do make it work for user group create/ edit
-                    // to make it work for language edit/create
-                    scope.isNew = editorState.current.id === 0 || editorState.current.id === "0" || editorState.current.id === -1 || editorState.current.id === 0 || editorState.current.id === "-1";
+               if (editorState.current) {
+                   if (scope.nameLocked) {
+                       scope.accessibility.a11yName = scope.name;
+                       SetPageTitle(scope.name);
+                   } else {
+                       //to do make work for user create/edit
+                       // to do make it work for user group create/ edit
+                       // to make it work for language edit/create
+                       scope.isNew = editorState.current.id === 0 ||
+                           editorState.current.id === "0" ||
+                           editorState.current.id === -1 ||
+                           editorState.current.id === 0 ||
+                           editorState.current.id === "-1";
 
-                    var localizeVars = [
-                        scope.isNew ? "placeholders_a11yCreate" : "placeholders_a11yEdit",
-                        "placeholders_a11yName",
-                        scope.isNew ? "general_new" : "general_edit"
-                    ];
+                       var localizeVars = [
+                           scope.isNew ? "placeholders_a11yCreate" : "placeholders_a11yEdit",
+                           "placeholders_a11yName",
+                           scope.isNew ? "general_new" : "general_edit"
+                       ];
 
-                    if (scope.editorfor) {
-                        localizeVars.push(scope.editorfor);
-                    }
-                    localizationService.localizeMany(localizeVars).then(function (data) {
-                        scope.a11yMessage = data[0];
-                        scope.a11yName = data[1];
-                        var title = data[2] + ":";
-                        if (!scope.isNew) {
-                            scope.a11yMessage += " " + scope.name;
-                            title += " " + scope.name;
-                        } else {
-                            var name = "";
-                            if (editorState.current.contentTypeName) {
-                                name = editorState.current.contentTypeName;
-                            } else if (scope.editorfor) {
-                                name = data[3];
-                            }
-                            if (name !== "") {
-                                scope.a11yMessage += " " + name;
-                                scope.a11yName = name + " " + scope.a11yName;
-                                title += " " + name;
-                            }
-                        }
-                        var setTitle = false;
-                        if (scope.setpagetitle !== undefined) {
-                            setTitle = scope.setpagetitle;
-                        }
-                        if (setTitle && title !== data[2] + ":") {
-                            scope.$emit("$changeTitle", title);
-                        }
-                    });
+                       if (scope.editorfor) {
+                           localizeVars.push(scope.editorfor);
+                       }
+                       localizationService.localizeMany(localizeVars).then(function(data) {
+                           scope.accessibility.a11yMessage = data[0];
+                           scope.accessibility.a11yName = data[1];
+                           var title = data[2] + ":";
+                           if (!scope.isNew) {
+                               scope.a11yMessage += " " + scope.name;
+                               title += " " + scope.name;
+                           } else {
+                               var name = "";
+                               if (editorState.current.contentTypeName) {
+                                   name = editorState.current.contentTypeName;
+                               } else if (scope.editorfor) {
+                                   name = data[3];
+                               }
+                               if (name !== "") {
+                                   scope.accessibility.a11yMessage += " " + name;
+                                   scope.accessibility.a11yName = name + " " + scope.a11yName;
+                                   title += " " + name;
+                               }
+                           }
+                           if (title !== data[2] + ":") {
+                               SetPageTitle(title);
+                           }
+                          
+                       });
+                   }
+                   scope.accessibility.a11yMessageVisible = !isEmptyOrSpaces(scope.accessibility.a11yMessage);
+                   scope.accessibility.a11yNameVisible = !isEmptyOrSpaces(scope.accessibility.a11yName);
+                   
+               }
+            }
 
+           function isEmptyOrSpaces(str) {
+               return str === null || str===undefined || str.trim ==='';
+            }
+
+            function SetPageTitle(title) {
+                var setTitle = false;
+                if (scope.setpagetitle !== undefined) {
+                    setTitle = scope.setpagetitle;
+                }
+                if (setTitle) {
+                    scope.$emit("$changeTitle", title);
                 }
             }
         }
