@@ -141,6 +141,58 @@
             }
         }
 
+        // Return a helper with preserved width of cells
+        var fixHelper = function (e, ui) {
+            ui.children().each(function () {
+                $(this).width($(this).width());
+            });
+
+            var row = ui.clone();
+            row.css("background-color", "lightgray");
+
+            return row;
+        };
+
+
+        $scope.sortableOptions = {
+            helper: fixHelper,
+            handle: ".handle",
+            opacity: 0.5,
+            axis: 'y',
+            containment: 'parent',
+            cursor: 'move',
+            items: '> tr',
+            tolerance: 'pointer',
+            forcePlaceholderSize: true,
+            start: function (e, ui) {
+                ui.placeholder.height(ui.item.height());
+            },
+            update: function (e, ui) {
+
+                // Get the new and old index for the moved element (using the text as the identifier)
+                var newIndex = ui.item.index();
+                var movedName = $('.domain_name', ui.item).val().trim();
+                var originalIndex = getDomainIndexByName(movedName);
+
+                // Move the element in the model
+                if (originalIndex > -1) {
+                    var movedElement = vm.domains[originalIndex];
+                    vm.domains.splice(originalIndex, 1);
+                    vm.domains.splice(newIndex, 0, movedElement);
+                }
+            }
+        };
+
+        function getDomainIndexByName(value) {
+            for (var i = 0; i < vm.domains.length; i++) {
+                if (vm.domains[i].name === value) {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
         activate();
     }
     angular.module("umbraco").controller("Umbraco.Editors.Content.AssignDomainController", AssignDomainController);

@@ -28,9 +28,10 @@
                     <localize key="assignDomain_domainHelpWithVariants"></localize>
                 </small>
                 <div class="umb-el-wrap  hidelabel">
-                    <table class="table table-condensed table-bordered domains" style="margin-bottom: 10px;" ng-if="vm.domains.length > 0">
+                    <table class="table table-condensed domains" style="margin-bottom: 10px;" ng-if="vm.domains.length > 0">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>
                                     <localize key="assignDomain_domain"></localize>
                                     <span class="umb-control-required">*</span>
@@ -42,10 +43,11 @@
                                 <th />
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody ui-sortable="sortableOptions" ng-model="vm.domains">
                             <tr ng-repeat="domain in vm.domains">
+                                <td><i class="icon icon-navigation handle ui-sortable-handle"></i></td>
                                 <td>
-                                    <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.name" name="domain_name_{{$index}}" required />
+                                    <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.name" class="domain_name" name="domain_name_{{$index}}" required />
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
                                         <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty"></localize></span>
                                     </span>
