@@ -2167,11 +2167,11 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="relations">
     <key alias="tabName">Relations</key>
     <key alias="DataTypenoRelations">This Data Type has no relations.</key>
-    <key alias="labelToDocumentTypes">Relations to Document Types</key>
-    <key alias="noDocumentType">No relations to Document Types.</key>
-    <key alias="labelToMediaTypes">Relations to Media Types</key>
-    <key alias="noMediaType">No relations to Media Types.</key>
-    <key alias="labelToMemberTypes">Relations to Member Types</key>
-    <key alias="noMemberType">No relations to Member Types.</key>
+    <key alias="labelUsedByDocumentTypes">Use by following Document Types</key>
+    <key alias="noDocumentTypes">No relations to Document Types.</key>
+    <key alias="labelUsedByMediaTypes">Use by following Media Types</key>
+    <key alias="noMediaTypes">No relations to Media Types.</key>
+    <key alias="labelUsedByMemberTypes">Use by following  Member Types</key>
+    <key alias="noMemberTypes">No relations to Member Types.</key>
   </area>
 </language>
