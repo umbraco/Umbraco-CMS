@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -86,25 +87,62 @@ namespace Umbraco.Web.PropertyEditors
                 if (rawJson.IsNullOrWhiteSpace())
                     return null;
 
-                var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
+                var grid = DeserializeGridValue(rawJson, out var rtes);
 
-                // Find all controls that use the RTE editor
-                var controls = grid.Sections.SelectMany(x => x.Rows.SelectMany(r => r.Areas).SelectMany(a => a.Controls));
-                var rtes = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "rte");
+                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
 
-                foreach(var rte in rtes)
+                //process the rte values
+                foreach (var rte in rtes)
                 {
                     // Parse the HTML
                     var html = rte.Value?.ToString();
 
-                    var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
+                    var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                    var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(parseAndSavedTempImages);
 
-                    var parsedHtml = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
-                    rte.Value = parsedHtml;
+                    rte.Value = editorValueWithMediaUrlsRemoved;
                 }
 
                 // Convert back to raw JSON for persisting
                 return JsonConvert.SerializeObject(grid);
+            }
+
+            /// <summary>
+            /// Ensures that the rich text editor values are processed within the grid
+            /// </summary>
+            /// <param name="property"></param>
+            /// <param name="dataTypeService"></param>
+            /// <param name="culture"></param>
+            /// <param name="segment"></param>
+            /// <returns></returns>
+            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            {
+                var val = property.GetValue(culture, segment);
+                if (val == null) return string.Empty;
+
+                var grid = DeserializeGridValue(val.ToString(), out var rtes);
+
+                //process the rte values
+                foreach (var rte in rtes.ToList())
+                {
+                    var html = rte.Value?.ToString();
+
+                    var propertyValueWithMediaResolved = TemplateUtilities.ResolveMediaFromTextString(html);
+                    rte.Value = propertyValueWithMediaResolved;
+                }
+
+                return grid;
+            }
+
+            private GridValue DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl> richTextValues)
+            {
+                var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
+
+                // Find all controls that use the RTE editor
+                var controls = grid.Sections.SelectMany(x => x.Rows.SelectMany(r => r.Areas).SelectMany(a => a.Controls));
+                richTextValues = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "rte");
+
+                return grid;
             }
         }
     }
