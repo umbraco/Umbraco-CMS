@@ -18,6 +18,7 @@
                 config: "<",
                 validation: "<",
                 culture: "<?",
+                htmlId: "<?",
                 onValueChanged: "&"
             }
         });
@@ -43,13 +44,13 @@
         vm.hidePrompt = hidePrompt;
         vm.onKeyUpOnTag = onKeyUpOnTag;
 
-        vm.htmlId = "t" + String.CreateGuid();
         vm.isLoading = true;
         vm.tagToAdd = "";
         vm.promptIsVisible = "-1";
         vm.viewModel = [];
 
         function onInit() {
+            vm.htmlId = vm.htmlId || "t" + String.CreateGuid();
 
             assetsService.loadJs("lib/typeahead.js/typeahead.bundle.min.js").then(function () {
 
