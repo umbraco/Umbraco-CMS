@@ -38,7 +38,7 @@
                     <div class="umb-table-row" ng-repeat="relation in vm.relations.documentTypes">
                         <div class="umb-table-cell umb-table__name not-fixed"><i class="icon {{relation.icon}}"></i><span class="ml2">{{relation.name}}</span></div>
                         <div class="umb-table-cell">{{relation.alias}}</div>
-                        <div class="umb-table-cell" style="width:32px"><a href="{{relation.udi}}"><localize key="general_open">Open</localize></a></div>
+                        <div class="umb-table-cell" style="width:32px"><a href="#/settings/documentTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
             </div>
@@ -69,7 +69,7 @@
                     <div class="umb-table-row" ng-repeat="relation in vm.relations.mediaTypes">
                         <div class="umb-table-cell umb-table__name not-fixed"><i class="icon {{relation.icon}}"></i><span class="ml2">{{relation.name}}</span></div>
                         <div class="umb-table-cell">{{relation.alias}}</div>
-                        <div class="umb-table-cell" style="width:32px"><a href="{{relation.udi}}"><localize key="general_open">Open</localize></a></div>
+                        <div class="umb-table-cell" style="width:32px"><a href="#/settings/mediaTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
 
@@ -101,7 +101,7 @@
                     <div class="umb-table-row" ng-repeat="relation in vm.relations.memberTypes">
                         <div class="umb-table-cell umb-table__name not-fixed"><i class="icon {{relation.icon}}"></i><span class="ml2">{{relation.name}}</span></div>
                         <div class="umb-table-cell">{{relation.alias}}</div>
-                        <div class="umb-table-cell" style="width:32px"><a href="{{relation.udi}}"><localize key="general_open">Open</localize></a></div>
+                        <div class="umb-table-cell" style="width:32px"><a href="#/settings/memberTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
 
