@@ -27,29 +27,23 @@ namespace Umbraco.Core.PropertyEditors.Validators
         /// <inheritdoc cref="IValueValidator.Validate"/>
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
-            return ValidateRequired(value, valueType, string.Empty);
+            return ValidateRequired(value, valueType);
         }
 
         /// <inheritdoc cref="IValueRequiredValidator.ValidateRequired"/>
-        public IEnumerable<ValidationResult> ValidateRequired(object value, string valueType, string requiredMessage)
+        public IEnumerable<ValidationResult> ValidateRequired(object value, string valueType)
         {
             if (value == null)
             {
-                var message = string.IsNullOrWhiteSpace(requiredMessage)
-                                  ? _textService.Localize("validation", "invalidNull")
-                                  : requiredMessage;
-                yield return new ValidationResult(message, new[] {"value"});
+                yield return new ValidationResult(_textService.Localize("validation", "invalidNull"), new[] { "value" });
                 yield break;
             }
 
             if (valueType.InvariantEquals(ValueTypes.Json))
             {
-                var message = string.IsNullOrWhiteSpace(requiredMessage)
-                                  ? _textService.Localize("validation", "invalidEmpty")
-                                  : requiredMessage;
                 if (value.ToString().DetectIsEmptyJson())
                 {
-                    yield return new ValidationResult(message, new[] { "value" });
+                    yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), new[] { "value" });
                 }
 
                 yield break;
@@ -57,10 +51,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
 
             if (value.ToString().IsNullOrWhiteSpace())
             {
-                var message = string.IsNullOrWhiteSpace(requiredMessage)
-                                  ? _textService.Localize("validation", "invalidEmpty")
-                                  : requiredMessage;
-                yield return new ValidationResult(message, new[] { "value" });
+                yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), new[] { "value" });
             }
         }
     }

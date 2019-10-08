@@ -62,11 +62,11 @@ namespace Umbraco.Core.PropertyEditors.Validators
                 throw new InvalidOperationException("The validator has not been configured.");
             }
 
-            return ValidateFormat(value, valueType, _regex, string.Empty);
+            return ValidateFormat(value, valueType, _regex);
         }
 
         /// <inheritdoc cref="IValueFormatValidator.ValidateFormat"/>
-        public IEnumerable<ValidationResult> ValidateFormat(object value, string valueType, string format, string formatMessage)
+        public IEnumerable<ValidationResult> ValidateFormat(object value, string valueType, string format)
         {
             if (string.IsNullOrWhiteSpace(format))
             {
@@ -75,10 +75,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
 
             if (value == null || !new Regex(format).IsMatch(value.ToString()))
             {
-                var message = string.IsNullOrWhiteSpace(formatMessage)
-                                  ? _textService.Localize("validation", "invalidPattern")
-                                  : formatMessage;
-                yield return new ValidationResult(message, new[] { "value" });
+                yield return new ValidationResult(_textService.Localize("validation", "invalidPattern"), new[] { "value" });
             }
         }
     }
