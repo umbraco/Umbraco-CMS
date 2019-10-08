@@ -39,8 +39,6 @@ namespace Umbraco.Core.Composing
         {
             using (_logger.DebugDuration<ComponentCollection>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
             {
-                var exceptions = new List<Exception>();
-
                 foreach (var component in this.Reverse()) // terminate components in reverse order
                 {
                     var componentType = component.GetType();
@@ -53,14 +51,9 @@ namespace Umbraco.Core.Composing
                         }
                         catch (Exception ex)
                         {
-                            exceptions.Add(ex);
+                            _logger.Error(componentType, ex, "Error while terminating component.");
                         }
                     }
-                }
-
-                if (exceptions.Count > 0)
-                {
-                    throw new AggregateException("One or more errors occurred while terminating components.", exceptions);
                 }
             }
         }
