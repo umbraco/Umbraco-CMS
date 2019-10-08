@@ -78,20 +78,20 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
-                var config = editorValue.DataTypeConfiguration as GridConfiguration;
-                var mediaParent = config?.MediaParentId;
-                var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
-
                 // editorValue.Value is a JSON string of the grid
                 var rawJson = editorValue.Value.ToString();
                 if (rawJson.IsNullOrWhiteSpace())
                     return null;
 
+                var config = editorValue.DataTypeConfiguration as GridConfiguration;
+                var mediaParent = config?.MediaParentId;
+                var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+
                 var grid = DeserializeGridValue(rawJson, out var rtes);
 
                 var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
 
-                //process the rte values
+                // Process the rte values
                 foreach (var rte in rtes)
                 {
                     // Parse the HTML
