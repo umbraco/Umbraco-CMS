@@ -18,7 +18,7 @@
                 config: "<",
                 validation: "<",
                 culture: "<?",
-                htmlId: "<?",
+                inputId: "@?",
                 onValueChanged: "&"
             }
         });
@@ -50,7 +50,7 @@
         vm.viewModel = [];
 
         function onInit() {
-            vm.htmlId = vm.htmlId || "t" + String.CreateGuid();
+            vm.inputId = vm.inputId || "t" + String.CreateGuid();
 
             assetsService.loadJs("lib/typeahead.js/typeahead.bundle.min.js").then(function () {
 
@@ -107,7 +107,7 @@
                         minLength: 1
                     };
 
-                    typeahead = $element.find('.tags-' + vm.htmlId).typeahead(opts, sources)
+                    typeahead = $element.find('.tags-' + vm.inputId).typeahead(opts, sources)
                         .bind("typeahead:selected", function (obj, datum, name) {
                             angularHelper.safeApply($rootScope, function () {
                                 addTagInternal(datum["text"]);
@@ -154,7 +154,7 @@
                 tagsHound.clearRemoteCache();
                 tagsHound = null;
             }
-            $element.find('.tags-' + vm.htmlId).typeahead('destroy');
+            $element.find('.tags-' + vm.inputId).typeahead('destroy');
         }
 
         function configureViewModel(isInitLoad) {
@@ -229,7 +229,7 @@
         function addTagOnEnter(e) {
             var code = e.keyCode || e.which;
             if (code == 13) { //Enter keycode
-                if ($element.find('.tags-' + vm.htmlId).parent().find(".tt-menu .tt-cursor").length === 0) {
+                if ($element.find('.tags-' + vm.inputId).parent().find(".tt-menu .tt-cursor").length === 0) {
                     //this is required, otherwise the html form will attempt to submit.
                     e.preventDefault();
                     addTag();
