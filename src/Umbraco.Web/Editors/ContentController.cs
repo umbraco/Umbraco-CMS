@@ -1731,6 +1731,32 @@ namespace Umbraco.Web.Editors
             }
 
             // process domains
+
+            // compare the model with the domains in db
+            // take each domain in the model one by one, and compare to the domains in db
+            // when the first mismatch occurs, the domain and proceeding domains should be deleted
+            // to get the right sort order
+            var nonWildcardDomains = domains.Where(x => !x.IsWildcard).ToArray();
+            var domainsToDelete = new List<int>();
+            for (var i=0; i < Math.Max(nonWildcardDomains.Length, model.Domains.Length); i++)
+            {
+                if (nonWildcardDomains.Length > i && model.Domains.Length > i && nonWildcardDomains[i].DomainName != model.Domains[i].Name)
+                {
+                    domainsToDelete = nonWildcardDomains.Skip(i).Select(x => x.Id).ToList();
+                    break;
+                }
+            }
+            if (domainsToDelete.Any())
+            {
+                foreach (var domain in nonWildcardDomains.Where(x => domainsToDelete.Contains(x.Id)))
+                {
+                    Services.DomainService.Delete(domain);
+                }
+            }
+            // update domains list
+            domains = Services.DomainService.GetAssignedDomains(model.NodeId, true).ToArray();
+
+
             // delete every (non-wildcard) domain, that exists in the DB yet is not in the model
             foreach (var domain in domains.Where(d => d.IsWildcard == false && model.Domains.All(m => m.Name.InvariantEquals(d.DomainName) == false)))
             {
