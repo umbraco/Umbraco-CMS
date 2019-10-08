@@ -1716,11 +1716,11 @@ Mange hilsner fra Umbraco robotten
   <area alias="relations">
     <key alias="tabName">Relationer</key>
     <key alias="DataTypenoRelations">Denne Data Type har ingen relationer.</key>
-    <key alias="labelsedByDocumentTypes">Brugt af følgende Dokument Typer</key>
+    <key alias="labelsedByDocumentTypes">Brugt af Dokument Typer</key>
     <key alias="noDocumentTypes">Ingen relationer til Dokument Typer.</key>
-    <key alias="labelUsedByMediaTypes">Brugt af følgende Medie Typer</key>
+    <key alias="labelUsedByMediaTypes">Brugt af Medie Typer</key>
     <key alias="noMediaTypes">Ingen relationer til Medie Typer.</key>
-    <key alias="labelUsedByMemberTypes">Brugt af følgende Medlems Typer</key>
+    <key alias="labelUsedByMemberTypes">Brugt af Medlems Typer</key>
     <key alias="noMemberTypes">Ingen relationer til Medlems Typer.</key>
   </area>
 
