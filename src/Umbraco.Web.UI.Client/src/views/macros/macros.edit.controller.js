@@ -108,10 +108,36 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
 
     function init() {
         vm.page.loading = true;
-        
+
+        vm.promises['partialViews'] = getPartialViews();
+        vm.promises['parameterEditors'] = getParameterEditors();
+        vm.promises['macro'] = getMacro();
+
         vm.views = [];
         vm.node = null;
-        
+
+        $q.all(vm.promises).then(function (values) {
+            var keys = Object.keys(values);
+
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+
+                if (key === 'partialViews') {
+                    vm.views = values[key];
+                }
+
+                if (key === 'parameterEditors') {
+                    vm.parameterEditors = values[key];                    
+                }
+
+                if (key === 'macro') {
+                    bindMacro(values[key]);
+                }
+            }
+
+            vm.page.loading = false;
+        });
+
         var labelKeys = [
             "general_settings",
             "macro_parameters"
