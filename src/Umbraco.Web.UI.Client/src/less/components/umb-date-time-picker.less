@@ -7,6 +7,9 @@ span.flatpickr-day {
     border-radius: @baseBorderRadius;
     border: none;
 
+    &.today:not(.active) {
+        border: 1px solid;
+    }
 }
 
 span.flatpickr-day:hover {
