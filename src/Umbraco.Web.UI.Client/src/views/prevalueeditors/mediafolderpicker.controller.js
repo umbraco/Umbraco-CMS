@@ -27,7 +27,7 @@ function mediaFolderPickerController($scope, editorService, entityResource) {
     $scope.add = function() {
         var mediaPickerOptions = {
             view: "mediapicker",
-            multiPicker: true,
+            multiPicker: false, // We only want to allow you to pick one folder at a given time
             disableFolderSelect: false,
             onlyImages: false,
             onlyFolders: true,
