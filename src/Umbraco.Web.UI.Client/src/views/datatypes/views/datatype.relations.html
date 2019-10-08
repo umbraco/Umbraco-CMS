@@ -1,34 +1,87 @@
-<umb-box>
+<div ng-controller="Umbraco.Editors.DataType.RelationsController as vm">
+    <umb-box>
 
-    <umb-box-content>
+        <umb-box-content>
 
-        <umb-control-group label="Id" ng-if="vm.showIdentifier">
-            <div>{{vm.content.id}}</div>
-            <small>{{vm.content.key}}</small>
-        </umb-control-group>
+            <umb-load-indicator ng-if="vm.view.loading === true"></umb-load-indicator>
 
-        <umb-property property="vm.properties.selectedEditor">
-            <div>
-                <select name="vm.selectedEditor"
-                        ng-model="vm.content.selectedEditor"
-                        required
-                        ng-options="e.alias as e.name for e in vm.content.availableEditors"></select>
-                <span ng-messages="contentForm.selectedEditor.$error" show-validation-on-submit>
-                    <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
-                </span>
-            </div>
+            <umb-empty-state size="small" ng-if="vm.view.loading === false && vm.hasRelations === false">
+                <localize key="relation_DataTypenoRelations">This Data Type has no relations.</localize>
+            </umb-empty-state>
 
-        </umb-property>
+            <!-- Document Types -->
+            <umb-control-group label="@relation_labelToDocumentTypes" ng-if="vm.view.loading === false && vm.hasRelations === true">
 
-        <umb-property property="vm.properties.selectedEditorId">
-            <div>{{vm.content.selectedEditor}}</div>
-        </umb-property>
+                <div ng-if="vm.relations.documentTypes.length < 1">
+                    <localize key="relation_noDocumentType">No relations for Document Types.</localize>
+                </div>
+                <div ng-if="vm.relations.documentTypes.length > 0">
+                    <table class="table">
+                        <tr>
+                            <th colspan="2"><localize key="general_name">Name</localize></th>
+                            <th><localize key="content_alias">Alias</localize></th>
+                            <th></th>
+                        </tr>
+                        <tr ng-repeat="relation in vm.relations.documentTypes">
+                            <td style="width:12px"><i class="icon icon-{{relation.icon}}"></i></td>
+                            <td>{{relation.name}}</td>
+                            <td>{{relation.alias}}</td>
+                            <td style="width:32px"><a href="{{relation.udi}}"><localize key="general_open">Open</localize><a></td>
+                        </tr>
+                    </table>
+                </div>
+                
+            </umb-control-group>
 
-        <umb-property property="preValue"
-                      ng-repeat="preValue in vm.preValues">
-            <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
-        </umb-property>
+            <!-- Media Types -->
+            <umb-control-group label="@relation_labelToMediaTypes" ng-if="vm.view.loading === false && vm.hasRelations === true">
 
-    </umb-box-content>
+                <div ng-if="vm.relations.mediaTypes.length < 1">
+                    <localize key="relation_noMediaType">No relations for Media Types.</localize>
+                </div>
+                <div ng-if="vm.relations.mediaTypes.length > 0">
+                    <table class="table">
+                        <tr>
+                            <th colspan="2"><localize key="general_name">Name</localize></th>
+                            <th><localize key="content_alias">Alias</localize></th>
+                            <th></th>
+                        </tr>
+                        <tr ng-repeat="relation in vm.relations.mediaTypes">
+                            <td style="width:12px"><i class="icon icon-{{relation.icon}}"></i></td>
+                            <td>{{relation.name}}</td>
+                            <td>{{relation.alias}}</td>
+                            <td style="width:32px"><a href="{{relation.udi}}"><localize key="general_open">Open</localize><a></td>
+                        </tr>
+                    </table>
+                </div>
+                
+            </umb-control-group>
 
-</umb-box>
+            <!-- Member Types -->
+            <umb-control-group label="@relation_labelToMemberTypes" ng-if="vm.view.loading === false && vm.hasRelations === true">
+
+                    <div ng-if="vm.relations.memberTypes.length < 1">
+                        <localize key="relation_noMemberType">No relations for Member Types.</localize>
+                    </div>
+                    <div ng-if="vm.relations.memberTypes.length > 0">
+                        <table class="table">
+                            <tr>
+                                <th colspan="2"><localize key="general_name">Name</localize></th>
+                                <th><localize key="content_alias">Alias</localize></th>
+                                <th></th>
+                            </tr>
+                            <tr ng-repeat="relation in vm.relations.memberTypes">
+                                <td style="width:12px"><i class="icon icon-{{relation.icon}}"></i></td>
+                                <td>{{relation.name}}</td>
+                                <td>{{relation.alias}}</td>
+                                <td style="width:32px"><a href="{{relation.udi}}"><localize key="general_open">Open</localize><a></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                </umb-control-group>
+
+        </umb-box-content>
+
+    </umb-box>
+</div>

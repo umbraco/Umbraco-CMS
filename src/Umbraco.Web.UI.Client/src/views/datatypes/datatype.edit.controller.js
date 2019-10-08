@@ -14,7 +14,10 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
     //setup scope vars
     vm.page = {};
     vm.page.loading = false;
-    
+    vm.page.menu = {};
+    vm.page.menu.currentSection = appState.getSectionState("currentSection");
+    vm.page.menu.currentNode = null;
+
     //set up the standard data type props
     vm.properties = {
         selectedEditor: {
@@ -51,7 +54,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
     
     function setHeaderNameState(content) {
         if(content.isSystem == 1) {
-            $scope.page.nameLocked = true;
+            vm.page.nameLocked = true;
         }
     }
     
@@ -88,6 +91,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 vm.page.loading = false;
 
             });
+
     }
 
     function saveDataType() {
@@ -208,7 +212,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
         
         var labelKeys = [
             "general_settings",
-            "macro_parameters"
+            "editdatatype_relations"
         ];
         
         localizationService.localizeMany(labelKeys).then(function (values) {
@@ -224,7 +228,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 {
                     "name": values[1],
                     "alias": "parameters",
-                    "icon": "icon-list",
+                    "icon": "icon-molecular-network",
                     "view": "views/datatypes/views/datatype.relations.html"
                 }
             ];

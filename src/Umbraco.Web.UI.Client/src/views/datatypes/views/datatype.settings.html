@@ -2,17 +2,17 @@
 
     <umb-box-content>
 
-        <umb-control-group label="Id" ng-if="showIdentifier">
-            <div>{{content.id}}</div>
-            <small>{{content.key}}</small>
+        <umb-control-group label="Id" ng-if="model.showIdentifier">
+            <div>{{model.content.id}}</div>
+            <small>{{model.content.key}}</small>
         </umb-control-group>
 
-        <umb-property property="properties.selectedEditor">
+        <umb-property property="model.properties.selectedEditor">
             <div>
                 <select name="selectedEditor"
-                        ng-model="content.selectedEditor"
+                        ng-model="model.content.selectedEditor"
                         required
-                        ng-options="e.alias as e.name for e in content.availableEditors"></select>
+                        ng-options="e.alias as e.name for e in model.content.availableEditors"></select>
                 <span ng-messages="contentForm.selectedEditor.$error" show-validation-on-submit>
                     <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
                 </span>
@@ -20,12 +20,12 @@
 
         </umb-property>
 
-        <umb-property property="properties.selectedEditorId">
-            <div>{{content.selectedEditor}}</div>
+        <umb-property property="model.properties.selectedEditorId">
+            <div>{{model.content.selectedEditor}}</div>
         </umb-property>
 
         <umb-property property="preValue"
-                      ng-repeat="preValue in preValues">
+                    ng-repeat="preValue in model.preValues">
             <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
         </umb-property>
 
