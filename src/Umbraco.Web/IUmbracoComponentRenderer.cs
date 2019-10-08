@@ -42,5 +42,15 @@ namespace Umbraco.Web
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
         IHtmlString RenderMacro(int contentId, string alias, IDictionary<string, object> parameters);
+
+        /// <summary>
+        /// Renders the macro with the specified alias, passing in the specified parameters.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="alias">The alias.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns></returns>
+        IHtmlString RenderMacro(IPublishedContent content, string alias, IDictionary<string, object> parameters);
+
     }
 }
