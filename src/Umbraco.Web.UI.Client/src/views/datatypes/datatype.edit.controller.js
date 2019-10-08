@@ -212,7 +212,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
         
         var labelKeys = [
             "general_settings",
-            "editdatatype_relations"
+            "relations_tabName"
         ];
         
         localizationService.localizeMany(labelKeys).then(function (values) {
