@@ -20,15 +20,11 @@ function DataTypeRelationsController($scope, $routeParams, dataTypeResource) {
     dataTypeResource.getRelations($routeParams.id)
     .then(function(data) {
 
-        console.log("got: ", data);
-
         vm.view.loading = false;
         vm.relations = data;
 
         vm.hasRelations = vm.relations.documentTypes.length > 0 || vm.relations.mediaTypes.length > 0 || vm.relations.memberTypes.length > 0;
 
-
-        console.log("vm: ", vm);
 
     });
 
