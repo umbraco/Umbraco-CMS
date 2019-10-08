@@ -105,7 +105,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
                 CreateDateUtc = redirectUrl.CreateDateUtc,
                 Url = redirectUrl.Url,
                 Culture = redirectUrl.Culture,
-                UrlHash = redirectUrl.Url.ToSHA1()
+                UrlHash = redirectUrl.Url.GenerateHash()
             };
         }
 
@@ -134,7 +134,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl Get(string url, Guid contentKey, string culture)
         {
-            var urlHash = url.ToSHA1();
+            var urlHash = url.GenerateHash();
             var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash && x.ContentKey == contentKey && x.Culture == culture);
             var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
@@ -157,7 +157,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl GetMostRecentUrl(string url)
         {
-            var urlHash = url.ToSHA1();
+            var urlHash = url.GenerateHash();
             var sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash)
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);

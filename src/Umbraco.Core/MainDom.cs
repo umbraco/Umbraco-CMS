@@ -65,7 +65,7 @@ namespace Umbraco.Core
             // a new process for the same application path
 
             var appPath = HostingEnvironment.ApplicationPhysicalPath;
-            var hash = (appId + ":::" + appPath).ToSHA1();
+            var hash = (appId + ":::" + appPath).GenerateHash();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
             _asyncLock = new AsyncLock(lockName);
