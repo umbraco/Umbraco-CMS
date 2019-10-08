@@ -164,7 +164,7 @@ function mediaHelper(umbRequestHelper, $log) {
             }
             else {
                 return mediaPath;
-            }            
+            }
         },
 
         /**
@@ -298,6 +298,11 @@ function mediaHelper(umbRequestHelper, $log) {
          * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
          */
         getThumbnailFromPath: function (imagePath) {
+
+            // Check if file is a svg
+            if (this.getFileExtension(imagePath) === "svg") {
+                return imagePath;
+            }
 
             // Check if file is a svg
             if (this.getFileExtension(imagePath) === "svg") {
