@@ -16,23 +16,19 @@
 
         <!-- Document Types -->
 
-        <h5 class="mt4" style="margin-bottom: 20px;">
-            <localize key="relations_labelUsedByDocumentTypes"></localize>
-        </h5>
+        <div ng-if="vm.relations.documentTypes.length > 0">
 
-        <div class="umb-table" ng-if="vm.view.loading === false && vm.hasRelations === true">
-            
-            <umb-empty-state size="small" ng-if="vm.relations.documentTypes.length < 1">
-                <localize key="relations_noDocumentTypes">No relations for Document Types.</localize>
-            </umb-empty-state>
+            <h5 class="mt4" style="margin-bottom: 20px;">
+                <localize key="relations_labelUsedByDocumentTypes"></localize>
+            </h5>
 
-            <div ng-if="vm.relations.documentTypes.length > 0">
+            <div class="umb-table">
                 <div class="umb-table-head">
                     <div class="umb-table-row">
                         <div class="umb-table-cell"></div>
                         <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
                         <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                        <div class="umb-table-cell"></div>
+                        <div class="umb-table-cell umb-table-cell--auto-width"></div>
                     </div>
                 </div>
                 <div class="umb-table-body">
@@ -40,7 +36,7 @@
                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
                         <div class="umb-table-cell umb-table__name">{{relation.name}}</div>
                         <div class="umb-table-cell">{{relation.alias}}</div>
-                        <div class="umb-table-cell" style="width:32px"><a href="#/settings/documentTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
+                        <div class="umb-table-cell umb-table-cell--auto-width"><a href="#/settings/documentTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
             </div>
@@ -48,24 +44,19 @@
 
 
         <!-- Media Types -->
+        <div ng-if="vm.relations.mediaTypes.length > 0">
 
-        <h5 class="mt4" style="margin-bottom: 20px;">
-            <localize key="relations_labelUsedByMediaTypes"></localize>
-        </h5>
+            <h5 class="mt4" style="margin-bottom: 20px;">
+                <localize key="relations_labelUsedByMediaTypes"></localize>
+            </h5>
 
-        <div class="umb-table" ng-if="vm.view.loading === false && vm.hasRelations === true">
-            
-            <umb-empty-state size="small" ng-if="vm.relations.mediaTypes.length < 1">
-                <localize key="relations_noMediaTypes">No relations for Media Types.</localize>
-            </umb-empty-state>
-
-            <div ng-if="vm.relations.mediaTypes.length > 0">
+            <div class="umb-table">
                 <div class="umb-table-head" ng-if="vm.relations.mediaTypes.length > 0">
                     <div class="umb-table-row">
                         <div class="umb-table-cell"></div>
                         <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
                         <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                        <div class="umb-table-cell"></div>
+                        <div class="umb-table-cell umb-table-cell--auto-width"></div>
                     </div>
                 </div>
                 <div class="umb-table-body">
@@ -73,33 +64,27 @@
                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
                         <div class="umb-table-cell umb-table__name">{{relation.name}}</div>
                         <div class="umb-table-cell">{{relation.alias}}</div>
-                        <div class="umb-table-cell" style="width:32px"><a href="#/settings/mediaTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
+                        <div class="umb-table-cell umb-table-cell--auto-width"><a href="#/settings/mediaTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
-
             </div>
         </div>
 
 
         <!-- Member Types -->
+        <div ng-if="vm.relations.memberTypes.length > 0">
 
-        <h5 class="mt4" style="margin-bottom: 20px;">
-            <localize key="relations_labelUsedByMemberTypes"></localize>
-        </h5>
+            <h5 class="mt4" style="margin-bottom: 20px;">
+                <localize key="relations_labelUsedByMemberTypes"></localize>
+            </h5>
 
-        <div class="umb-table" ng-if="vm.view.loading === false && vm.hasRelations === true">
-
-            <umb-empty-state size="small" ng-if="vm.relations.memberTypes.length < 1">
-                <localize key="relations_noMemberTypes">No relations for Member Types.</localize>
-            </umb-empty-state>
-
-            <div ng-if="vm.relations.memberTypes.length > 0">
-                <div class="umb-table-head" ng-if="vm.relations.memberTypes.length > 0">
+            <div class="umb-table">
+                <div class="umb-table-head">
                     <div class="umb-table-row">
                         <div class="umb-table-cell"></div>
                         <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
                         <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                        <div class="umb-table-cell"></div>
+                        <div class="umb-table-cell umb-table-cell--auto-width"></div>
                     </div>
                 </div>
                 <div class="umb-table-body">
@@ -107,13 +92,12 @@
                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
                         <div class="umb-table-cell umb-table__name">{{relation.name}}</div>
                         <div class="umb-table-cell">{{relation.alias}}</div>
-                        <div class="umb-table-cell" style="width:32px"><a href="#/settings/memberTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
+                        <div class="umb-table-cell umb-table-cell--auto-width"><a href="#/settings/memberTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
-
             </div>
-        </div>
 
+        </div>
 
 
     </div>
