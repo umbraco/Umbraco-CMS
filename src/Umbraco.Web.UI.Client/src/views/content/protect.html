@@ -18,25 +18,23 @@
                         <localize key="publicAccess_paHowWould" tokens="[currentNode.name]">Choose how to restrict access to this page</localize>
                     </p>
 
-                    <umb-pane>
-                        <div class="pa-select-type">
-                            <input id="protectionTypeMember" type="radio" name="protectionType" value="member" ng-model="vm.type">
+                    <div class="pa-select-type">
+                        <umb-radiobutton input-id="protectionTypeMember" name="protectionType" value="member" model="vm.type" text="" />
 
-                            <label for="protectionTypeMember">
-                                <h5 class="pa-access-header"><localize key="publicAccess_paMembers">Specific members protection</localize></h5>
-                                <p><localize key="publicAccess_paMembersHelp">If you want to grant access to specific members</localize></p>
-                            </label>
-                        </div>
+                        <label for="protectionTypeMember" class="flex flex-column">
+                            <strong class="pa-access-header"><localize key="publicAccess_paMembers">Specific members protection</localize></strong>
+                            <span class=""><localize key="publicAccess_paMembersHelp">If you want to grant access to specific members</localize></span>
+                        </label>
+                    </div>
 
-                        <div class="pa-select-type">
-                            <input id="protectionTypeGroup" type="radio" name="protectionType" value="group" ng-model="vm.type">
+                    <div class="pa-select-type">
+                        <umb-radiobutton input-id="protectionTypeGroup" name="protectionType" value="group" model="vm.type" />
 
-                            <label for="protectionTypeGroup">
-                                <h5 class="pa-access-header"><localize key="publicAccess_paGroups">Group based protection</localize></h5>
-                                <p><localize key="publicAccess_paGroupsHelp">If you want to grant access to all members of specific member groups</localize></p>
-                            </label>
-                        </div>
-                    </umb-pane>
+                        <label for="protectionTypeGroup" class="flex flex-column">
+                            <strong class="pa-access-header"><localize key="publicAccess_paGroups">Group based protection</localize></strong>
+                            <span><localize key="publicAccess_paGroupsHelp">If you want to grant access to all members of specific member groups</localize></span>
+                        </label>
+                    </div>
                 </div>
 
                 <div ng-show="vm.step && !vm.loading && !vm.removing">

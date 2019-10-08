@@ -55,6 +55,7 @@
         controllerAs: 'vm',
         bindings: {
             model: "=",
+            inputId: "@",
             value: "@",
             name: "@",
             text: "@",
