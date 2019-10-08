@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Logging;
 
@@ -38,14 +39,28 @@ namespace Umbraco.Core.Composing
         {
             using (_logger.DebugDuration<ComponentCollection>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
             {
+                var exceptions = new List<Exception>();
+
                 foreach (var component in this.Reverse()) // terminate components in reverse order
                 {
                     var componentType = component.GetType();
                     using (_logger.DebugDuration<ComponentCollection>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
-                        component.Terminate();
-                        component.DisposeIfDisposable();
+                        try
+                        {
+                            component.Terminate();
+                            component.DisposeIfDisposable();
+                        }
+                        catch (Exception ex)
+                        {
+                            exceptions.Add(ex);
+                        }
                     }
+                }
+
+                if (exceptions.Count > 0)
+                {
+                    throw new AggregateException("One or more errors occurred while terminating components.", exceptions);
                 }
             }
         }
