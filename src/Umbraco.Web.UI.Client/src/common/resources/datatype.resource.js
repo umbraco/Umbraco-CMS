@@ -45,6 +45,112 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#getRelations
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Retrieves relations of a given data type.
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.getRelation(1234)
+         *    .then(function(relations) {
+         *        alert('its gone!');
+         *    });
+         * </pre>
+         *
+         * @param {Int} id id of datatype to retrieve relations for
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getRelations: function (id) {
+            
+            return $q((resolve, reject) => {
+
+                
+var fakeData = {
+    "documentTypes": [
+        {
+            "name": "Home",
+            "alias": "home",
+            "icon": "icon-home",
+            "udi": "document-type://B6C7EFA7-1D03-46BF-B6D3-9187EF4CD176",
+            "id": 1234,
+            "properties": [
+                {
+                    "alias": "bodyText",
+                    "name": "Body Text"
+                },
+                {
+                    "alias": "description",
+                    "name": "Description"
+                }
+            ]
+        },
+        {
+            "name": "News",
+            "alias": "news",
+            "icon": "icon-newspaper",
+            "udi": "document-type://FAB4F78E-530E-4F5D-959A-82441958460C",
+            "id": 9876,
+            "properties": [
+                {
+                    "alias": "article",
+                    "name": "Article"
+                }
+            ]
+        }
+    ],
+    "mediaTypes": [
+        {
+            "name": "Image",
+            "alias": "image",
+            "icon": "icon-umb-media",
+            "udi": "media-type://488152AF-0C03-4F2D-9DE0-FDECC80212AD",
+            "id": 9999,
+            "properties": [
+                {
+                    "alias": "altText",
+                    "name": "Alt Text"
+                }
+            ]
+        }
+    ],
+    "memberTypes": [
+        {
+            "name": "Member",
+            "alias": "member",
+            "icon": "icon-people-alt-2",
+            "udi": "member-type://93773B7C-2D83-4529-92D9-B9759220384C",
+            "id": 7777,
+            "properties": [
+                {
+                    "alias": "bio",
+                    "name": "Bio"
+                }
+            ]
+        }
+    ]
+};
+
+                resolve(fakeData);
+            });
+            /*
+
+            TODO: get real data from server!
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetRelations",
+                        [{ id: id }])),
+                "Failed to retrieve relations for data type of id " + id);
+            */
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.resources.dataTypeResource#getById
          * @methodOf umbraco.resources.dataTypeResource
          *
