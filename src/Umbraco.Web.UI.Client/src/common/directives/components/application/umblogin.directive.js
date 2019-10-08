@@ -13,7 +13,7 @@
             }
         });
 
-    function UmbLoginController($scope, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, $q) {
+    function UmbLoginController($scope, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, $q, $route) {
 
         const vm = this;
 
@@ -60,7 +60,6 @@
         vm.loginSubmit = loginSubmit;
         vm.requestPasswordResetSubmit = requestPasswordResetSubmit;
         vm.setPasswordSubmit = setPasswordSubmit;
-
         vm.labels = {};
         localizationService.localizeMany([
             vm.usernameIsEmail ? "general_email" : "general_username", 
@@ -80,6 +79,8 @@
 
             // Check if it is a new user
             const inviteVal = $location.search().invite;
+
+            vm.baseTitle = $scope.$root.locationTitle;
             //1 = enter password, 2 = password set, 3 = invalid token
             if (inviteVal && (inviteVal === "1" || inviteVal === "2")) {
 
@@ -126,6 +127,7 @@
                 vm.showLogin();
             }
 
+            SetTitle();
         }
 
         function togglePassword() {
@@ -177,6 +179,7 @@
             vm.errorMsg = "";
             resetInputValidation();
             vm.view = "login";
+            SetTitle();
         }
 
         function showRequestPasswordReset() {
@@ -184,12 +187,14 @@
             resetInputValidation();
             vm.view = "request-password-reset";
             vm.showEmailResetConfirmation = false;
+            SetTitle();
         }
 
         function showSetPassword() {
             vm.errorMsg = "";
             resetInputValidation();
             vm.view = "set-password";
+            SetTitle();
         }
 
         function loginSubmit() {
@@ -407,6 +412,7 @@
             }
             vm.twoFactor.view = viewPath;
             vm.view = "2fa-login";
+            SetTitle();
         }
 
         function resetInputValidation() {
@@ -427,7 +433,28 @@
         }
 
 
+        function SetTitle() {
+            var title = null;
+            switch (vm.view.toLowerCase()) {
+                case "login":
+                    title = "Login";
+                    break;
+                case "password-reset-code-expired":
+                case "request-password-reset":
+                    title = "Password Reset";
+                    break;
+                case "set-password":
+                    title = "Change Password";
+                    break;
+                case "2fa-login":
+                    title = "Two Factor Authentication";
+                    break;
+            } 
 
+            if (title != null) {
+                $scope.$root.locationTitle = title + " - " + vm.baseTitle;
+            }
+        }
 
     }
 

@@ -1,31 +1,32 @@
 <div class="umb-property-editor umb-multiple-textbox" ng-controller="Umbraco.PropertyEditors.MultipleTextBoxController">
-
-  <div ui-sortable="sortableOptions" ng-model="model.value">
-    <div class="flex flex-wrap textbox-wrapper" ng-repeat="item in model.value track by $index">
-        <input type="text" name="item_{{$index}}" ng-model="item.value" class="umb-property-editor umb-textstring textstring flx-i"
-               ng-keyup="addRemoveOnKeyDown($event, $index)" focus-when="{{item.hasFocus}}"/>
-        <div class="icon-wrapper">
-            <i class="icon icon-navigation handle" localize="title" title="@general_move"></i>
-
-            <div class="umb-multiple-textbox__confirm" ng-show="model.value.length > model.config.min">
-                <button class="umb-multiple-textbox__confirm-action" type="button" prevet-default ng-click="showPrompt($index, item)" localize="title" title="@content_removeTextBox">
-                    <i class="icon-trash"></i>
-                </button>
-
-                <umb-confirm-action
-                    ng-if="promptIsVisible === $index"
-                    direction="left"
-                    on-confirm="remove($index)"
-                    on-cancel="hidePrompt()">
-                </umb-confirm-action>
-            </div>
-        </div>
+  <ng-form name="multipleTextboxForm">
+    <div ui-sortable="sortableOptions" ng-model="model.value">
+      <div class="flex flex-wrap textbox-wrapper" ng-repeat="item in model.value track by $index">
+          <input type="text" name="item_{{$index}}" ng-model="item.value" class="umb-property-editor umb-textstring textstring flx-i"
+                 ng-keyup="addRemoveOnKeyDown($event, $index)" focus-when="{{item.hasFocus}}"/>
+          <div class="icon-wrapper">
+              <i class="icon icon-navigation handle" localize="title" title="@general_move"></i>
+  
+              <div class="umb-multiple-textbox__confirm" ng-show="model.value.length > model.config.min">
+                  <button class="umb-multiple-textbox__confirm-action" type="button" prevet-default ng-click="showPrompt($index, item)" localize="title" title="@content_removeTextBox">
+                      <i class="icon-trash"></i>
+                  </button>
+  
+                  <umb-confirm-action
+                      ng-if="promptIsVisible === $index"
+                      direction="left"
+                      on-confirm="remove($index)"
+                      on-cancel="hidePrompt()">
+                  </umb-confirm-action>
+              </div>
+          </div>
+      </div>
     </div>
-  </div>
-  <a prevent-default href="" class="add-link" localize="title" title="@content_addTextBox"
-     ng-show="model.config.max <= 0 || model.value.length < model.config.max"
-     ng-click="add()">
-      <localize key="general_add">Add</localize>
-  </a>
-
+    <a prevent-default href="" class="add-link" localize="title" title="@content_addTextBox"
+       ng-show="model.config.max <= 0 || model.value.length < model.config.max"
+       ng-click="add()">
+        <localize key="general_add">Add</localize>
+    </a>
+    <input type="hidden" name="mandatory" ng-model="model.value" />
+  </ng-form>
 </div>

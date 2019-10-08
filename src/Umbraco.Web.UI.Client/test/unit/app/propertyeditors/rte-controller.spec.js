@@ -1,7 +1,23 @@
 describe('RTE controller tests', function () {
     var scope, controllerFactory;
-    
-    beforeEach(module('umbraco'));
+
+    //mock tinymce globals
+    if ((typeof tinymce) === "undefined") {
+        tinymce = {
+            DOM: {
+                events: {
+                    domLoaded: false
+                }
+            },
+            baseUrl: ""
+        }
+    }
+
+    beforeEach(module('LocalStorageModule'));
+
+    beforeEach(module('umbraco', function ($provide) {
+        $provide.value('tinyMceAssets', []);
+    }));
 
     beforeEach(inject(function ($rootScope, $controller) {
         controllerFactory = $controller;
@@ -21,3 +37,4 @@ describe('RTE controller tests', function () {
         
     });
 });
+

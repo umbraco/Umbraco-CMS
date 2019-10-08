@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.PublishedCache;
@@ -86,11 +84,8 @@ namespace Umbraco.Web.Cache
                 // don't try to be clever - refresh all
                 MemberCacheRefresher.RefreshMemberTypes(AppCaches);
 
-            // we have to refresh models before we notify the published snapshot
-            // service of changes, else factories may try to rebuild models while
-            // we are using the database to load content into caches
-
-            _publishedModelFactory.WithSafeLiveFactory(() =>
+            // refresh the models and cache
+            _publishedModelFactory.WithSafeLiveFactoryReset(() =>
                 _publishedSnapshotService.Notify(payloads));
 
             // now we can trigger the event

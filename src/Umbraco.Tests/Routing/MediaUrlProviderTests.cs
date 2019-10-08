@@ -82,6 +82,19 @@ namespace Umbraco.Tests.Routing
         }
 
         [Test]
+        public void Get_Media_Url_Returns_Absolute_Url_If_Stored_Url_Is_Absolute()
+        {
+            const string expected = "http://localhost/media/rfeiw584/test.jpg";
+
+            var umbracoContext = GetUmbracoContext("http://localhost", mediaUrlProviders: new[] { _mediaUrlProvider });
+            var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.UploadField, expected, null);
+
+            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, UrlMode.Relative);
+
+            Assert.AreEqual(expected, resolvedUrl);
+        }
+
+        [Test]
         public void Get_Media_Url_Returns_Empty_String_When_PropertyType_Is_Not_Supported()
         {
             var umbracoContext = GetUmbracoContext("/", mediaUrlProviders: new[] { _mediaUrlProvider });
