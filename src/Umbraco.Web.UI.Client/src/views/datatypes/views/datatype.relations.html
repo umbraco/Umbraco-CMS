@@ -6,14 +6,14 @@
             <umb-load-indicator ng-if="vm.view.loading === true"></umb-load-indicator>
 
             <umb-empty-state size="small" ng-if="vm.view.loading === false && vm.hasRelations === false">
-                <localize key="relation_DataTypenoRelations">This Data Type has no relations.</localize>
+                <localize key="relations_DataTypenoRelations">This Data Type has no relations.</localize>
             </umb-empty-state>
 
             <!-- Document Types -->
-            <umb-control-group label="@relation_labelToDocumentTypes" ng-if="vm.view.loading === false && vm.hasRelations === true">
+            <umb-control-group label="@relations_labelToDocumentTypes" ng-if="vm.view.loading === false && vm.hasRelations === true">
 
                 <div ng-if="vm.relations.documentTypes.length < 1">
-                    <localize key="relation_noDocumentType">No relations for Document Types.</localize>
+                    <localize key="relations_noDocumentType">No relations for Document Types.</localize>
                 </div>
                 <div ng-if="vm.relations.documentTypes.length > 0">
                     <table class="table">
@@ -34,10 +34,10 @@
             </umb-control-group>
 
             <!-- Media Types -->
-            <umb-control-group label="@relation_labelToMediaTypes" ng-if="vm.view.loading === false && vm.hasRelations === true">
+            <umb-control-group label="@relations_labelToMediaTypes" ng-if="vm.view.loading === false && vm.hasRelations === true">
 
                 <div ng-if="vm.relations.mediaTypes.length < 1">
-                    <localize key="relation_noMediaType">No relations for Media Types.</localize>
+                    <localize key="relations_noMediaType">No relations for Media Types.</localize>
                 </div>
                 <div ng-if="vm.relations.mediaTypes.length > 0">
                     <table class="table">
@@ -58,10 +58,10 @@
             </umb-control-group>
 
             <!-- Member Types -->
-            <umb-control-group label="@relation_labelToMemberTypes" ng-if="vm.view.loading === false && vm.hasRelations === true">
+            <umb-control-group label="@relations_labelToMemberTypes" ng-if="vm.view.loading === false && vm.hasRelations === true">
 
                     <div ng-if="vm.relations.memberTypes.length < 1">
-                        <localize key="relation_noMemberType">No relations for Member Types.</localize>
+                        <localize key="relations_noMemberType">No relations for Member Types.</localize>
                     </div>
                     <div ng-if="vm.relations.memberTypes.length > 0">
                         <table class="table">

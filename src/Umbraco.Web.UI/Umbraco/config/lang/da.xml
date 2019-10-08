@@ -1713,7 +1713,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
     <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
   </area>
-    <area alias="relations">
+  <area alias="relations">
     <key alias="tabName">Relationer</key>
     <key alias="DataTypenoRelations">Denne Data Type har ingen relationer.</key>
     <key alias="labelToDocumentTypes">Relationer til Dokument Typer</key>
