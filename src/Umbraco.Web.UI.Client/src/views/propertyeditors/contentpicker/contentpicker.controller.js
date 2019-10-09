@@ -16,7 +16,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     var vm = {
         labels: {
-            general_recycleBin: ""
+            general_recycleBin: "",
+            general_add: ""
         }
     };
 
@@ -78,6 +79,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.renderModel = [];
     $scope.sortableModel = [];
 
+    $scope.labels = vm.labels;
+
     $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
 
     //the default pre-values
@@ -117,6 +120,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
         //merge the server config on top of the default config, then set the server config to use the result
         $scope.model.config = angular.extend(defaultConfig, $scope.model.config);
+
+        // if the property is mandatory, set the minCount config to 1 (unless of course it is set to something already),
+        // that way the minCount/maxCount validation handles the mandatory as well
+        if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
+            $scope.model.config.minNumber = 1;
+        }
     }
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
@@ -473,9 +482,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     function init() {
-        localizationService.localizeMany(["general_recycleBin"])
+        localizationService.localizeMany(["general_recycleBin", "general_add"])
             .then(function(data) {
                 vm.labels.general_recycleBin = data[0];
+                vm.labels.general_add = data[1];
 
                 syncRenderModel(false).then(function () {
                     //everything is loaded, start the watch on the model

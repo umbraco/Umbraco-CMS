@@ -113,7 +113,7 @@ namespace Umbraco.Core.Models
         /// Gets of sets the alias of the property type.
         /// </summary>
         [DataMember]
-        public string Alias
+        public virtual string Alias
         {
             get => _alias;
             set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, nameof(Alias));

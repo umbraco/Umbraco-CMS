@@ -309,7 +309,11 @@ namespace Umbraco.Web.Editors
                         {
                             "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
                                 controller => controller.GetStatus())
-                        }
+                        },
+                        {
+                            "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
+                                controller => controller.UploadImage())
+                        },
                     }
                 },
                 {

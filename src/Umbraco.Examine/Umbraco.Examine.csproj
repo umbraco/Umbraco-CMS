@@ -72,6 +72,7 @@
     <Compile Include="IPublishedContentValueSetBuilder.cs" />
     <Compile Include="IUmbracoIndex.cs" />
     <Compile Include="IValueSetBuilder.cs" />
+    <Compile Include="LuceneIndexDiagnostics.cs" />
     <Compile Include="MediaIndexPopulator.cs" />
     <Compile Include="MediaValueSetBuilder.cs" />
     <Compile Include="MemberIndexPopulator.cs" />

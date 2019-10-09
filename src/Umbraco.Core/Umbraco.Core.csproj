@@ -210,6 +210,7 @@
     <Compile Include="Events\RecycleBinEventArgs.cs" />
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
+    <Compile Include="Exceptions\PanicException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
@@ -231,6 +232,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\IPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ListViewPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\MediaPickerPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\MarkdownEditorPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\NestedContentPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorCollection.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorCollectionBuilder.cs" />
@@ -238,6 +240,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DefaultPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RenamingPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RichTextPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DropDownFlexiblePreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
     <Compile Include="Models\Entities\EntityExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorBase.cs" />
@@ -298,6 +301,7 @@
     <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
+    <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
     <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Models\PublishedContent\UrlMode.cs" />

@@ -59,10 +59,10 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         if (dialogOptions.currentTarget) {
             // clone the current target so we don't accidentally update the caller's model while manipulating $scope.model.target
             $scope.model.target = angular.copy(dialogOptions.currentTarget);
-            //if we have a node ID, we fetch the current node to build the form data
+            // if we have a node ID, we fetch the current node to build the form data
             if ($scope.model.target.id || $scope.model.target.udi) {
 
-                //will be either a udi or an int
+                // will be either a udi or an int
                 var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
 
                 if ($scope.model.target.udi) {
@@ -93,7 +93,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     });
 
                 }
-            } else if ($scope.model.target.url.length) {
+            } else if ($scope.model.target.url && $scope.model.target.url.length) {
                 // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
                 // only do the substring if there's a # or a ?
                 var indexOfAnchor = $scope.model.target.url.search(/(#|\?)/);

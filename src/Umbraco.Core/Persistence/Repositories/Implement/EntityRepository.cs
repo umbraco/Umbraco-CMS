@@ -403,7 +403,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (isMedia)
             {
                 sql
-                    .InnerJoin<MediaVersionDto>().On<ContentVersionDto, MediaVersionDto>((left, right) => left.Id == right.Id);
+                    .LeftJoin<MediaVersionDto>().On<ContentVersionDto, MediaVersionDto>((left, right) => left.Id == right.Id);
             }
 
             //Any LeftJoin statements need to come last

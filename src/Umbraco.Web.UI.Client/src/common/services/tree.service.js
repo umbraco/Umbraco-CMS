@@ -69,12 +69,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 if (childPath.startsWith(p + ",")) {
                     //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
                     expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
-                    expandedPaths.push(childPath); //replace it
+                    if (expandedPaths.indexOf(childPath) === -1) {
+                        expandedPaths.push(childPath); //replace it
+                    }
                 }
                 else if (p.startsWith(childPath + ",")) {
                     //this means we've already tracked a deeper node so we shouldn't track this one
                 }
-                else {
+                else if (expandedPaths.indexOf(childPath) === -1) {
                     expandedPaths.push(childPath); //track it
                 }
             });

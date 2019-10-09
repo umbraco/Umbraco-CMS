@@ -102,17 +102,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-
             var list = new List<string>
                            {
                                //NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
                                // but we still need to remove them
-                               "DELETE FROM cmsLanguageText WHERE languageId = @id",
-                               "DELETE FROM umbracoPropertyData WHERE languageId = @id",
-                               "DELETE FROM umbracoContentVersionCultureVariation WHERE languageId = @id",
-                               "DELETE FROM umbracoDocumentCultureVariation WHERE languageId = @id",
-                               "DELETE FROM umbracoLanguage WHERE id = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id"
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.DictionaryValue + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE tagId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id)",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Language + " WHERE id = @id"
                            };
             return list;
         }
@@ -250,7 +250,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             lock (_codeIdMap)
             {
                 if (_codeIdMap.TryGetValue(isoCode, out var id)) return id;
-                if (isoCode.Contains('-') && _codeIdMap.TryGetValue(isoCode.Split('-').First(), out var invariantId)) return invariantId;
             }
             if (throwOnNotFound)
                 throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));

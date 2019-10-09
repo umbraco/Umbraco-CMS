@@ -101,14 +101,14 @@ angular.module('umbraco.directives')
             var eventBindings = [];
 
             function oneTimeClick(event) {
-                // ignore clicks on button groups toggles (i.e. the save and publish button)
-                var parents = $(event.target).closest("[data-element='button-group-toggle']");
-                if (parents.length > 0) {
-                    return;
-                }
+                var el = event.target.nodeName;
+
+                //ignore link and button clicks
+                var els = ["INPUT", "A", "BUTTON"];
+                if (els.indexOf(el) >= 0) { return; }
 
                 // ignore clicks on new overlay
-                parents = $(event.target).parents(".umb-overlay,.umb-tour");
+                var parents = $(event.target).parents("a,button,.umb-overlay,.umb-tour");
                 if (parents.length > 0) {
                     return;
                 }
@@ -128,12 +128,6 @@ angular.module('umbraco.directives')
                 // ignore clicks in flatpickr datepicker
                 var flatpickr = $(event.target).closest(".flatpickr-calendar");
                 if (flatpickr.length === 1) {
-                    return;
-                }
-
-                // ignore clicks on dialog actions
-                var actions = $(event.target).parents(".umb-action");
-                if (actions.length === 1) {
                     return;
                 }
 
@@ -239,4 +233,41 @@ angular.module('umbraco.directives')
                 });
             }
         };
+    })
+    
+    // A slightly modified version of https://github.com/myplanet/angular-deep-blur/blob/master/angular-deep-blur.js - Kudos to Ufuk Kayserilioglu (paracycle)
+    .directive('deepBlur', function ($timeout) {
+        return {
+
+            restrict: 'A',
+
+            controller: function ($scope, $element, $attrs) {
+                var leaveExpr = $attrs.deepBlur,
+                    dom = $element[0];
+
+                function containsDom(parent, dom) {
+                    while (dom) {
+                        if (dom === parent) {
+                            return true;
+                        }
+                        dom = dom.parentNode;
+                    }
+                    return false;
+                }
+
+                function onBlur(e) {
+                    var targetElement = e.relatedTarget;
+
+                    if (!containsDom(dom, targetElement)) {
+                        $timeout(function () {
+                            $scope.$apply(leaveExpr);
+                        }, 10);
+                    }
+                }
+
+                dom.addEventListener('blur', onBlur, true);
+            }
+        };
     });
+
+    

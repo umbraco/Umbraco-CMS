@@ -67,7 +67,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var sql = ContentSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && x.NodeId == id && !x.Trashed)
-                .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
             return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
@@ -77,7 +77,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var sql = ContentSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
-                .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
         }
@@ -91,7 +91,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
                 .Where<NodeDto>(x => x.NodeId == id, "x")
-                .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
         }
@@ -103,7 +103,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             var sql = ContentSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
                 .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
-                .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
         }
@@ -140,7 +140,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var sql = MediaSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && x.NodeId == id && !x.Trashed)
-                .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
             return dto == null ? new ContentNodeKit() : CreateMediaNodeKit(dto);
@@ -150,7 +150,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var sql = MediaSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
-                .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }
@@ -164,7 +164,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
                 .Where<NodeDto>(x => x.NodeId == id, "x")
-                .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }
@@ -176,7 +176,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             var sql = MediaSourcesSelect(scope)
                     .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
                     .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
-                    .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
+                    .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }

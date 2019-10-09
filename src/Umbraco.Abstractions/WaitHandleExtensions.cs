@@ -23,6 +23,8 @@ namespace Umbraco.Core
                     handle,
                     (state, timedOut) =>
                     {
+                        //TODO: We aren't checking if this is timed out
+
                         tcs.SetResult(null);
 
                         // we take a lock here to make sure the outer method has completed setting the local variable callbackHandle.
