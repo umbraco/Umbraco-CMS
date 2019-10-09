@@ -565,6 +565,8 @@
     <key alias="selectFolder">Select the folder to move</key>
     <key alias="inTheTree">to in the tree structure below</key>
     <key alias="wasMoved">was moved underneath</key>
+    <key alias="hasRelationDeleteConsequence"><![CDATA[Deleting <strong>%0%</strong> will have the following consequence]]></key>
+    <key alias="acceptDeleteConsequence">I understand this action will delete the properties and data based on this Data Type</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Your data has been saved, but before you can publish this page there are some errors you need to fix first:</key>
@@ -1139,7 +1141,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
-    
+
     <key alias="pathToFile">Path to file</key>
     <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>

@@ -564,6 +564,8 @@
     <key alias="selectFolder">Vælg den mappe, der skal flyttes</key>
     <key alias="inTheTree">til i træstrukturen nedenfor</key>
     <key alias="wasMoved">blev flyttet under</key>
+    <key alias="hasRelationDeleteConsequence"><![CDATA[!!!!!! <strong>%0%</strong> will have the following consequence]]></key>
+    <key alias="acceptDeleteConsequence">I understand this action will delete the properties and data based on this Data Type</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Dine data er blevet gemt, men før du kan udgive denne side er der nogle fejl der skal rettes:</key>
