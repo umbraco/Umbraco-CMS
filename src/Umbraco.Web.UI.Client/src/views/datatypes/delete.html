@@ -51,7 +51,7 @@
                                 <tbody>
                                     <tr ng-repeat="relation in vm.references.documentTypes">
                                         <td><span title="{{::relation.name}}({{::relation.alias}})"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</span></td>
-                                        <td><p><span class="red" ng-repeat="property in relation.properties"><i class="icon-alert red"></i>{{::property.name}}{{$last ? '' : ', '}}</span></p></td>
+                                        <td><span><span class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}{{$last ? '' : ', '}}</span></span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -75,7 +75,7 @@
                                 <tbody>
                                     <tr ng-repeat="relation in vm.references.mediaTypes">
                                         <td><span title="{{::relation.name}}({{::relation.alias}})"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</span></td>
-                                        <td><p><span class="red" ng-repeat="property in relation.properties"><i class="icon-alert red"></i>{{::property.name}}{{$last ? '' : ', '}}</span></p></td>
+                                        <td><span><span class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}{{$last ? '' : ', '}}</span></span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -99,7 +99,7 @@
                                     <tbody>
                                         <tr ng-repeat="relation in vm.references.memberTypes">
                                             <td><span title="{{::relation.name}}({{::relation.alias}})"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</span></td>
-                                            <td><p><span class="red" ng-repeat="property in relation.properties"><i class="icon-alert red"></i>{{::property.name}}{{$last ? '' : ', '}}</span></p></td>
+                                            <td><span><span class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}{{$last ? '' : ', '}}</span></span></td>
                                         </tr>
                                     </tbody>
                                 </table>
