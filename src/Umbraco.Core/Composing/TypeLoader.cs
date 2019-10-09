@@ -521,6 +521,17 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
+        /// Gets all the assembly attributes.
+        /// </summary>
+        /// <returns>
+        /// All assembly attributes.
+        /// </returns>
+        public IEnumerable<Attribute> GetAssemblyAttributes()
+        {
+            return AssembliesToScan.SelectMany(a => a.GetCustomAttributes()).ToList();
+        }
+
+        /// <summary>
         /// Gets the assembly attributes of the specified <paramref name="attributeTypes" />.
         /// </summary>
         /// <param name="attributeTypes">The attribute types.</param>
