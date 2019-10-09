@@ -155,13 +155,6 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
             eventsService.unsubscribe(evts[e]);
         }
     });
-    
-    
-    
-    
-    
-    
-
 
     function init() {
         
@@ -227,7 +220,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 },
                 {
                     "name": values[1],
-                    "alias": "parameters",
+                    "alias": "relations",
                     "icon": "icon-molecular-network",
                     "view": "views/datatypes/views/datatype.relations.html"
                 }
