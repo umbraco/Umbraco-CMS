@@ -330,7 +330,7 @@ namespace Umbraco.Tests.TestHelpers
                 throw new NotImplementedException();
             }
 
-            public IReadOnlyDictionary<Udi, IEnumerable<string>> FindUsages(int id)
+            public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
             {
                 throw new NotImplementedException();
             }

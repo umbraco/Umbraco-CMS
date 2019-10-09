@@ -466,7 +466,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IReadOnlyDictionary<Udi, IEnumerable<string>> FindUsages(int id)
+        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete:true))
             {

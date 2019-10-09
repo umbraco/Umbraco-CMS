@@ -283,6 +283,59 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
+        /// <summary>
+        /// Returns the references (usages) for the data type
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DataTypeReferences GetReferences(int id)
+        {
+            var result = new DataTypeReferences();
+            var usages = Services.DataTypeService.GetReferences(id);
+
+            foreach(var groupOfEntityType in usages.GroupBy(x => x.Key.EntityType))
+            {
+                //get all the GUIDs for the content types to find
+                var guidsAndPropertyAliases = groupOfEntityType.ToDictionary(i => ((GuidUdi)i.Key).Guid, i => i.Value);
+
+                if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType))
+                    result.DocumentTypes = GetContentTypeUsages(Services.ContentTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+                else if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.MediaType))
+                    result.MediaTypes = GetContentTypeUsages(Services.MediaTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+                else if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.MemberType))
+                    result.MemberTypes = GetContentTypeUsages(Services.MemberTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Maps the found content types and usages to the resulting model
+        /// </summary>
+        /// <param name="cts"></param>
+        /// <param name="usages"></param>
+        /// <returns></returns>
+        private IEnumerable<DataTypeReferences.ContentTypeReferences> GetContentTypeUsages(
+            IEnumerable<IContentTypeBase> cts,
+            IReadOnlyDictionary<Guid, IEnumerable<string>> usages)
+        {
+            return cts.Select(x => new DataTypeReferences.ContentTypeReferences
+            {
+                Key = x.Key,
+                Alias = x.Alias,
+                Icon = x.Icon,
+                Name = x.Name,
+                Udi = new GuidUdi(ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType), x.Key),
+                //only select matching properties
+                Properties = x.PropertyTypes.Where(p => usages[x.Key].InvariantContains(p.Alias))
+                    .Select(p => new DataTypeReferences.ContentTypeReferences.PropertyTypeReferences
+                    {
+                        Alias = p.Alias,
+                        Name = p.Name
+                    })
+            });
+        }
+
         #region ReadOnly actions to return basic data - allow access for: content ,media, members, settings, developer
         /// <summary>
         /// Gets the content json for all data types

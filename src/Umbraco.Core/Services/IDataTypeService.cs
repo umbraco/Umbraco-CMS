@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        IReadOnlyDictionary<Udi, IEnumerable<string>> FindUsages(int id);
+        IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
         
         Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
