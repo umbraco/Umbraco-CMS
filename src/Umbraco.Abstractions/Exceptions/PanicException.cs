@@ -7,7 +7,7 @@ namespace Umbraco.Core.Exceptions
     /// Internal exception that in theory should never ben thrown, it is only thrown in circumstances that should never happen
     /// </summary>
     [Serializable]
-    internal class PanicException : Exception
+    public class PanicException : Exception
     {
         public PanicException()
         {

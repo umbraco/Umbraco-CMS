@@ -210,7 +210,6 @@
     <Compile Include="Events\RecycleBinEventArgs.cs" />
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
-    <Compile Include="Exceptions\PanicException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />

@@ -15,7 +15,6 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -538,9 +537,9 @@ AND umbracoNode.id <> @id",
                     if (prop.IsPropertyDirty(nameof(prop.Variations)) && prop.Variations > entity.Variations)
                         throw new InvalidOperationException($"The property {prop.Alias} cannot have variations of {prop.Variations} with the content type variations of {entity.Variations}");
                 }
-                    
+
             }
-                
+
         }
 
         private IEnumerable<IContentTypeComposition> GetImpactedContentTypes(IContentTypeComposition contentType, IEnumerable<IContentTypeComposition> all)
@@ -671,12 +670,12 @@ AND umbracoNode.id <> @id",
                     case ContentVariation.Culture:
                         CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
                         CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedL);
-                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);                        
+                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
                         break;
                     case ContentVariation.Nothing:
                         CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
                         CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedL);
-                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);                        
+                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
                         break;
                     case ContentVariation.CultureAndSegment:
                     case ContentVariation.Segment:
@@ -1043,7 +1042,7 @@ AND umbracoNode.id <> @id",
 
             //keep track of this node/lang to mark or unmark a culture as edited
             var editedLanguageVersions = new Dictionary<(int nodeId, int? langId), bool>();
-            //keep track of which node to mark or unmark as edited 
+            //keep track of which node to mark or unmark as edited
             var editedDocument = new Dictionary<int, bool>();
             var nodeId = -1;
             var propertyTypeId = -1;
