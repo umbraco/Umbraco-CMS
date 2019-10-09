@@ -565,7 +565,7 @@
     <key alias="selectFolder">Select the folder to move</key>
     <key alias="inTheTree">to in the tree structure below</key>
     <key alias="wasMoved">was moved underneath</key>
-    <key alias="hasReferencesDeleteConsequence"><![CDATA[Deleting <strong>%0%</strong> will delete the properties based on it and their data from the following items]]></key>
+    <key alias="hasReferencesDeleteConsequence"><![CDATA[Deleting <strong>%0%</strong> will delete the properties and their data from the following items]]></key>
     <key alias="acceptDeleteConsequence">I understand this action will delete the properties and data based on this Data Type</key>
   </area>
   <area alias="errorHandling">
