@@ -210,7 +210,7 @@ namespace Umbraco.Web.Search
                         {
                             for (var index = 0; index < querywords.Length; index++)
                             {
-                                queryWordsReplaced[index] = querywords[index].Replace("\\-", " ").Trim(" ");
+                                queryWordsReplaced[index] = querywords[index].Replace("\\-", " ").Replace("_", " ").Trim(" ");
                             }
                         }
                         else
