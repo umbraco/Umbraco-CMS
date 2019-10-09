@@ -18,19 +18,31 @@ namespace Umbraco.Core.Composing
         private readonly Composition _composition;
         private readonly IProfilingLogger _logger;
         private readonly IEnumerable<Type> _composerTypes;
+        private readonly IEnumerable<Assembly> _assemblies;
 
         private const int LogThresholdMilliseconds = 100;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Composers"/> class.
+        /// Initializes a new instance of the <see cref="Composers" /> class.
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="composerTypes">The composer types.</param>
+        /// <param name="assemblies">The assemblies.</param>
         /// <param name="logger">A profiling logger.</param>
-        public Composers(Composition composition, IEnumerable<Type> composerTypes, IProfilingLogger logger)
+        /// <exception cref="ArgumentNullException">
+        /// composition
+        /// or
+        /// composerTypes
+        /// or
+        /// assemblies
+        /// or
+        /// logger
+        /// </exception>
+        public Composers(Composition composition, IEnumerable<Type> composerTypes, IEnumerable<Assembly> assemblies, IProfilingLogger logger)
         {
             _composition = composition ?? throw new ArgumentNullException(nameof(composition));
             _composerTypes = composerTypes ?? throw new ArgumentNullException(nameof(composerTypes));
+            _assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -103,7 +115,7 @@ namespace Umbraco.Core.Composing
                 .ToList();
 
             // enable or disable composers
-            EnableDisableComposers(composerTypeList);
+            EnableDisableComposers(composerTypeList, _assemblies);
 
             void GatherInterfaces<TAttribute>(Type type, Func<TAttribute, Type> getTypeInAttribute, HashSet<Type> iset, List<Type> set2)
                 where TAttribute : Attribute
@@ -218,7 +230,7 @@ namespace Umbraco.Core.Composing
             return text.ToString();
         }
 
-        private static void EnableDisableComposers(ICollection<Type> types)
+        private static void EnableDisableComposers(ICollection<Type> types, IEnumerable<Assembly> assemblies)
         {
             var enabled = new Dictionary<Type, EnableInfo>();
 
@@ -240,7 +252,6 @@ namespace Umbraco.Core.Composing
                 enableInfo.Weight = weight2;
             }
 
-            var assemblies = types.Select(x => x.Assembly).Distinct();
             foreach (var assembly in assemblies)
             {
                 foreach (var attr in assembly.GetCustomAttributes<EnableComposerAttribute>())

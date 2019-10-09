@@ -148,7 +148,7 @@ namespace Umbraco.Core.Runtime
                 // get composers, and compose
                 var composerTypes = ResolveComposerTypes(typeLoader);
                 composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-                var composers = new Composers(composition, composerTypes, ProfilingLogger);
+                var composers = new Composers(composition, composerTypes, typeLoader.AssembliesToScan, ProfilingLogger);
                 composers.Compose();
 
                 // create the factory
