@@ -205,7 +205,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
         
         var labelKeys = [
             "general_settings",
-            "relations_tabName"
+            "references_tabName"
         ];
         
         localizationService.localizeMany(labelKeys).then(function (values) {
@@ -220,9 +220,9 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 },
                 {
                     "name": values[1],
-                    "alias": "relations",
+                    "alias": "references",
                     "icon": "icon-molecular-network",
-                    "view": "views/datatypes/views/datatype.relations.html"
+                    "view": "views/datatypes/views/datatype.references.html"
                 }
             ];
         });

@@ -19,37 +19,37 @@
 
                     <umb-load-indicator ng-if="vm.loading === true"></umb-load-indicator>
 
-                    <div ng-if="vm.loading === false && vm.hasRelations === false">
+                    <div ng-if="vm.loading === false && vm.hasReferences === false">
                         <p class="abstract">
                             <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize>&nbsp;<strong>{{currentNode.name}}</strong>?
                         </p>
                     </div>
 
-                    <div ng-if="vm.loading === false && vm.hasRelations === true">
+                    <div ng-if="vm.loading === false && vm.hasReferences === true">
 
                         <p class="abstract">
-                            <localize key="editdatatype_hasRelationDeleteConsequence" tokens="[currentNode.name]">Deleting <strong>{{currentNode.name}}</strong> will have the following consequence</localize>
+                            <localize key="editdatatype_hasReferencesDeleteConsequence" tokens="[currentNode.name]">Deleting <strong>{{currentNode.name}}</strong> will have the following consequence</localize>
                         </p>
 
                         <hr/>
 
                         <!-- Document Types -->
 
-                        <div ng-if="vm.relations.documentTypes.length > 0">
+                        <div ng-if="vm.references.documentTypes.length > 0">
 
                             <h5 class="mt4" style="margin-bottom: 20px;">
-                                    <i class="icon-alert red"></i> <span class="red"><localize key="relations_labelUsedByDocumentTypes"></localize></span>
+                                    <i class="icon-alert red"></i> <span class="red"><localize key="references_labelUsedByDocumentTypes"></localize></span>
                             </h5>
 
                             <table class="table table-condensed table-bordered">
                                 <thead>
                                     <tr>
                                         <th><localize key="general_name">Name</localize></th>
-                                        <th><localize key="relations_usedByProperties">Used in</localize></th>
+                                        <th><localize key="references_usedByProperties">Used in</localize></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="relation in vm.relations.documentTypes">
+                                    <tr ng-repeat="relation in vm.references.documentTypes">
                                         <td><span title="{{::relation.name}}({{::relation.alias}})"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</span></td>
                                         <td><span>{{::relation.properties | CMS_joinArray:', ':'name'}}</span></td>
                                     </tr>
@@ -59,10 +59,10 @@
 
 
                         <!-- Media Types -->
-                        <div ng-if="vm.relations.mediaTypes.length > 0">
+                        <div ng-if="vm.references.mediaTypes.length > 0">
 
                             <h5 class="mt4" style="margin-bottom: 20px;">
-                                <localize key="relations_labelUsedByMediaTypes"></localize>
+                                <localize key="references_labelUsedByMediaTypes"></localize>
                             </h5>
 
                             <div class="umb-table">
@@ -70,11 +70,11 @@
                                     <div class="umb-table-row">
                                         <div class="umb-table-cell"></div>
                                         <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
-                                        <div class="umb-table-cell"><localize key="relations_usedByProperties">Used in</localize></div>
+                                        <div class="umb-table-cell"><localize key="references_usedByProperties">Used in</localize></div>
                                     </div>
                                 </div>
                                 <div class="umb-table-body">
-                                    <div class="umb-table-row" ng-repeat="relation in vm.relations.documentTypes">
+                                    <div class="umb-table-row" ng-repeat="relation in vm.references.documentTypes">
                                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
                                         <div class="umb-table-cell umb-table__name"><span title="{{::relation.name}}({{::relation.alias}})">{{::relation.name}}</span></div>
                                         <div class="umb-table-cell --noOverflow"><span>{{::relation.properties | CMS_joinArray:', ':'name'}}</span></div>
@@ -85,10 +85,10 @@
 
 
                         <!-- Member Types -->
-                        <div ng-if="vm.relations.memberTypes.length > 0">
+                        <div ng-if="vm.references.memberTypes.length > 0">
 
                             <h5 class="mt4" style="margin-bottom: 20px;">
-                                <localize key="relations_labelUsedByMemberTypes"></localize>
+                                <localize key="references_labelUsedByMemberTypes"></localize>
                             </h5>
 
                             <div class="umb-table">
@@ -96,11 +96,11 @@
                                     <div class="umb-table-row">
                                         <div class="umb-table-cell"></div>
                                         <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
-                                        <div class="umb-table-cell"><localize key="relations_usedByProperties">Used in</localize></div>
+                                        <div class="umb-table-cell"><localize key="references_usedByProperties">Used in</localize></div>
                                     </div>
                                 </div>
                                 <div class="umb-table-body">
-                                    <div class="umb-table-row" ng-repeat="relation in vm.relations.documentTypes">
+                                    <div class="umb-table-row" ng-repeat="relation in vm.references.documentTypes">
                                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
                                         <div class="umb-table-cell umb-table__name"><span title="{{::relation.name}}({{::relation.alias}})">{{::relation.name}}</span></div>
                                         <div class="umb-table-cell --noOverflow"><span>{{::relation.properties | CMS_joinArray:', ':'name'}}</span></div>
@@ -116,7 +116,7 @@
                     </div>
 
 
-                <umb-confirm ng-if="vm.confirmed || vm.hasRelations === false"
+                <umb-confirm ng-if="vm.confirmed || vm.hasReferences === false"
                             on-confirm="vm.performDelete"
                             on-cancel="vm.cancel"
                             confirm-button-style="danger"

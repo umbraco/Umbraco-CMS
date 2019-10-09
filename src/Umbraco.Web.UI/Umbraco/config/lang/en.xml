@@ -565,7 +565,7 @@
     <key alias="selectFolder">Select the folder to move</key>
     <key alias="inTheTree">to in the tree structure below</key>
     <key alias="wasMoved">was moved underneath</key>
-    <key alias="hasReferenceDeleteConsequence"><![CDATA[Deleting <strong>%0%</strong> will have the following consequence]]></key>
+    <key alias="hasReferencesDeleteConsequence"><![CDATA[Deleting <strong>%0%</strong> will delete the properties based on it and their data from the following items]]></key>
     <key alias="acceptDeleteConsequence">I understand this action will delete the properties and data based on this Data Type</key>
   </area>
   <area alias="errorHandling">
@@ -2152,15 +2152,15 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
   </area>
-  <area alias="relations">
-    <key alias="tabName">Relations</key>
-    <key alias="DataTypenoRelations">This Data Type has no relations.</key>
-    <key alias="labelUsedByDocumentTypes">Used by Document Types</key>
-    <key alias="noDocumentTypes">No relations to Document Types.</key>
-    <key alias="labelUsedByMediaTypes">Used by Media Types</key>
-    <key alias="noMediaTypes">No relations to Media Types.</key>
-    <key alias="labelUsedByMemberTypes">Used by Member Types</key>
-    <key alias="noMemberTypes">No relations to Member Types.</key>
+  <area alias="references">
+    <key alias="tabName">References</key>
+    <key alias="DataTypeNoReferences">This Data Type has no references.</key>
+    <key alias="labelUsedByDocumentTypes">Used in Document Types</key>
+    <key alias="noDocumentTypes">No references to Document Types.</key>
+    <key alias="labelUsedByMediaTypes">Used in Media Types</key>
+    <key alias="noMediaTypes">No references to Media Types.</key>
+    <key alias="labelUsedByMemberTypes">Used in Member Types</key>
+    <key alias="noMemberTypes">No references to Member Types.</key>
     <key alias="usedByProperties">Used by</key>
   </area>
 

@@ -10,8 +10,8 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
 
     var vm = this;
 
-    vm.hasRelations = false;
-    vm.relations = [];
+    vm.hasReferences = false;
+    vm.references = [];
 
     vm.performDelete = function() {
 
@@ -59,8 +59,6 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
 
     var init = function() {
 
-        console.log($scope.currentNode);
-
         if($scope.currentNode.nodeType === "dataTypes") {
 
             vm.loading = true;
@@ -68,11 +66,9 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
             dataTypeResource.getReferences($scope.currentNode.id)
                 .then(function (data) {
                     vm.loading = false;
-                    vm.relations = data;
+                    vm.references = data;
 
-                    console.log(data);
-
-                    vm.hasRelations = data.documentTypes.length > 0 || data.mediaTypes.length > 0 || data.memberTypes.length > 0;
+                    vm.hasReferences = data.documentTypes.length > 0 || data.mediaTypes.length > 0 || data.memberTypes.length > 0;
                 });
 
         }

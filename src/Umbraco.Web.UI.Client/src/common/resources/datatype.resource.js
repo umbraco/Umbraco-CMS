@@ -49,9 +49,9 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.dataTypeResource
          *
          * @description
-         * Retrieves relations of a given data type.
+         * Retrieves references of a given data type.
          *
-         * @param {Int} id id of datatype to retrieve relations for
+         * @param {Int} id id of datatype to retrieve references for
          * @returns {Promise} resourcePromise object.
          *
          */
