@@ -321,6 +321,7 @@ namespace Umbraco.Web.Editors
         {
             return cts.Select(x => new DataTypeReferences.ContentTypeReferences
             {
+                Id = x.Id,
                 Key = x.Key,
                 Alias = x.Alias,
                 Icon = x.Icon,
