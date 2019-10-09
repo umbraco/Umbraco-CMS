@@ -35,10 +35,10 @@
                 <div class="umb-table-body">
                     <div class="umb-table-row" ng-repeat="relation in vm.relations.documentTypes">
                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
-                        <div class="umb-table-cell umb-table__name"><span>{{relation.name}}</span></div>
-                        <div class="umb-table-cell"><span title="{{relation.alias}}">{{relation.alias}}</span></div>
-                        <div class="umb-table-cell --noOverflow"><span>{{relation.properties | CMS_joinArray:', ':'name'}}</span></div>
-                        <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
+                        <div class="umb-table-cell umb-table__name"><span>{{::relation.name}}</span></div>
+                        <div class="umb-table-cell"><span title="{{relation.alias}}">{{::relation.alias}}</span></div>
+                        <div class="umb-table-cell --noOverflow"><span>{{::relation.properties | CMS_joinArray:', ':'name'}}</span></div>
+                        <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{::relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
             </div>
@@ -65,10 +65,10 @@
                 <div class="umb-table-body">
                     <div class="umb-table-row" ng-repeat="relation in vm.relations.documentTypes">
                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
-                        <div class="umb-table-cell umb-table__name"><span>{{relation.name}}</span></div>
-                        <div class="umb-table-cell"><span title="{{relation.alias}}">{{relation.alias}}</span></div>
-                        <div class="umb-table-cell --noOverflow"><span>{{relation.properties | CMS_joinArray:', ':'name'}}</span></div>
-                        <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
+                        <div class="umb-table-cell umb-table__name"><span>{{::relation.name}}</span></div>
+                        <div class="umb-table-cell"><span title="{{relation.alias}}">{{::relation.alias}}</span></div>
+                        <div class="umb-table-cell --noOverflow"><span>{{::relation.properties | CMS_joinArray:', ':'name'}}</span></div>
+                        <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{::relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
             </div>
@@ -95,10 +95,10 @@
                 <div class="umb-table-body">
                     <div class="umb-table-row" ng-repeat="relation in vm.relations.documentTypes">
                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
-                        <div class="umb-table-cell umb-table__name"><span>{{relation.name}}</span></div>
-                        <div class="umb-table-cell"><span title="{{relation.alias}}">{{relation.alias}}</span></div>
-                        <div class="umb-table-cell --noOverflow"><span>{{relation.properties | CMS_joinArray:', ':'name'}}</span></div>
-                        <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
+                        <div class="umb-table-cell umb-table__name"><span>{{::relation.name}}</span></div>
+                        <div class="umb-table-cell"><span title="{{relation.alias}}">{{::relation.alias}}</span></div>
+                        <div class="umb-table-cell --noOverflow"><span>{{::relation.properties | CMS_joinArray:', ':'name'}}</span></div>
+                        <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{::relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
             </div>

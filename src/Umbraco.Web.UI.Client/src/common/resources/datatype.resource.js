@@ -55,7 +55,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object.
          *
          */
-        getReferences: function (id) {            
+        getReferences: function (id) {
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
