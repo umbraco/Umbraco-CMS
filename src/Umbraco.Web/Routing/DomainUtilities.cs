@@ -278,8 +278,7 @@ namespace Umbraco.Web.Routing
             // TODO: where are we matching ?!!?
             return domains
                 .Where(d => d.IsWildcard == false)
-                .Select(d => new DomainAndUri(d, uri))
-                .OrderByDescending(d => d.Uri.ToString());
+                .Select(d => new DomainAndUri(d, uri));
         }
 
         /// <summary>
