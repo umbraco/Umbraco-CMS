@@ -508,20 +508,20 @@ namespace Umbraco.Core.Composing
         #region Get Assembly Attributes
 
         /// <summary>
-        /// Gets the assembly attributes.
+        /// Gets the assembly attributes of the specified type <typeparamref name="T" />.
         /// </summary>
         /// <typeparam name="T">The attribute type.</typeparam>
         /// <returns>
-        /// The assembly attributes of the specified type.
+        /// The assembly attributes of the specified type <typeparamref name="T" />.
         /// </returns>
         public IEnumerable<T> GetAssemblyAttributes<T>()
             where T : Attribute
         {
-            return AssembliesToScan.SelectMany(a => a.GetCustomAttributes<T>());
+            return AssembliesToScan.SelectMany(a => a.GetCustomAttributes<T>()).ToList();
         }
 
         /// <summary>
-        /// Gets the assembly attributes.
+        /// Gets the assembly attributes of the specified <paramref name="attributeTypes" />.
         /// </summary>
         /// <param name="attributeTypes">The attribute types.</param>
         /// <returns>

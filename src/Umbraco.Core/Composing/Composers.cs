@@ -26,18 +26,16 @@ namespace Umbraco.Core.Composing
         /// Initializes a new instance of the <see cref="Composers" /> class.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        /// <param name="composerTypes">The composer types.</param>
-        /// <param name="enableDisableAttributes">The enable/disable attributes.</param>
-        /// <param name="logger">A profiling logger.</param>
-        /// <exception cref="ArgumentNullException">
-        /// composition
+        /// <param name="composerTypes">The <see cref="IComposer" /> types.</param>
+        /// <param name="enableDisableAttributes">The <see cref="EnableComposerAttribute" /> and/or <see cref="DisableComposerAttribute" /> attributes.</param>
+        /// <param name="logger">The profiling logger.</param>
+        /// <exception cref="ArgumentNullException">composition
         /// or
         /// composerTypes
         /// or
         /// enableDisableAttributes
         /// or
-        /// logger
-        /// </exception>
+        /// logger</exception>
 
         public Composers(Composition composition, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, IProfilingLogger logger)
         {
