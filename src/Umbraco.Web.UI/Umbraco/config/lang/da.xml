@@ -1722,6 +1722,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="noMediaTypes">Ingen relationer til Medie Typer.</key>
     <key alias="labelUsedByMemberTypes">Brugt af Medlems Typer</key>
     <key alias="noMemberTypes">Ingen relationer til Medlems Typer.</key>
+    <key alias="usedByProperties">Brugt af</key>
   </area>
 
 </language>
