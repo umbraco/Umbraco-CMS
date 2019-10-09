@@ -31,6 +31,7 @@
       (see FindAppConfigFile target in detailed build output)
     -->
     <AppConfig>Web.config</AppConfig>
+    <AdditionalFileItemNames>$(AdditionalFileItemNames);Content</AdditionalFileItemNames>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
