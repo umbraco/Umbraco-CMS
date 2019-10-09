@@ -5,15 +5,12 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Compose;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
-
-[assembly:DisableComposer(typeof(Umbraco.Tests.Components.ComponentTests.Composer26))]
 
 namespace Umbraco.Tests.Components
 {
@@ -356,14 +353,15 @@ namespace Umbraco.Tests.Components
             var typeLoader = MockTypeLoader();
             var composition = new Composition(register, typeLoader, Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var types = new[] { typeof(Composer26) }; // 26 disabled by assembly attribute
-            var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
+            var types = new[] { typeof(Composer26) };
+            var enableDisableAttributes = new[] { new DisableComposerAttribute(typeof(Composer26)) };
+            var composers = new Composers(composition, types, enableDisableAttributes, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             composers.Compose();
             Assert.AreEqual(0, Composed.Count); // 26 gone
 
             types = new[] { typeof(Composer26), typeof(Composer27) }; // 26 disabled by assembly attribute, enabled by 27
-            composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
+            composers = new Composers(composition, types, enableDisableAttributes, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             composers.Compose();
             Assert.AreEqual(2, Composed.Count); // both
@@ -519,7 +517,6 @@ namespace Umbraco.Tests.Components
         public class Composer25 : TestComposerBase, IComposer23
         { }
 
-        // disabled by assembly attribute
         public class Composer26 : TestComposerBase
         { }
 
