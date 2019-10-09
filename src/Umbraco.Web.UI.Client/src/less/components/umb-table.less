@@ -240,7 +240,7 @@ input.umb-table__input {
 .umb-table-cell {
     display: flex;
     flex-flow: row nowrap;
-    flex: 1 1 1%; //NOTE 1% is a Internet Explore hack, so that cells don't collapse
+    flex: 1 1 5%; //NOTE 1% is a Internet Explore hack, so that cells don't collapse
     position: relative;
     margin: auto 14px;
     padding: 6px 2px;
@@ -252,6 +252,11 @@ input.umb-table__input {
     overflow: hidden;
     white-space: nowrap; //NOTE Disable/Enable this to keep textstring on one line
     text-overflow: ellipsis;
+}
+.umb-table-cell.--noOverflow > * {
+    overflow: visible;
+    white-space: normal; //NOTE Disable/Enable this to keep textstring on one line
+    text-overflow: unset;
 }
 
 .umb-table-cell:first-of-type:not(.not-fixed) {
@@ -283,8 +288,8 @@ input.umb-table__input {
 
 // Increases the space for the name cell
 .umb-table__name {
-    flex: 1 1 25%;
-    max-width: 25%;
+    flex: 1 1 20%;
+    max-width: 300px;
 }
 
 .umb-table__loading-overlay {

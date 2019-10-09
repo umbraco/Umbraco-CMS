@@ -28,16 +28,16 @@
                         <div class="umb-table-cell"></div>
                         <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
                         <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                        <div class="umb-table-cell umb-table-cell--large"><localize key="relation_usedByProperties">Used in</localize></div>
+                        <div class="umb-table-cell"><localize key="relation_usedByProperties">Used in</localize></div>
                         <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
                     </div>
                 </div>
                 <div class="umb-table-body">
                     <div class="umb-table-row" ng-repeat="relation in vm.relations.documentTypes">
                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
-                        <div class="umb-table-cell umb-table__name">{{relation.name}}</div>
-                        <div class="umb-table-cell">{{relation.alias}}</div>
-                        <div class="umb-table-cell umb-table-cell--large">{{relation.properties | CMS_joinArray:', ':'name'}}</div>
+                        <div class="umb-table-cell umb-table__name"><span>{{relation.name}}</span></div>
+                        <div class="umb-table-cell"><span title="{{relation.alias}}">{{relation.alias}}</span></div>
+                        <div class="umb-table-cell --noOverflow"><span>{{relation.properties | CMS_joinArray:', ':'name'}}</span></div>
                         <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
@@ -58,16 +58,16 @@
                         <div class="umb-table-cell"></div>
                         <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
                         <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                        <div class="umb-table-cell umb-table-cell--large"><localize key="relation_usedByProperties">Used in</localize></div>
+                        <div class="umb-table-cell"><localize key="relation_usedByProperties">Used in</localize></div>
                         <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
                     </div>
                 </div>
                 <div class="umb-table-body">
                     <div class="umb-table-row" ng-repeat="relation in vm.relations.documentTypes">
                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
-                        <div class="umb-table-cell umb-table__name">{{relation.name}}</div>
-                        <div class="umb-table-cell">{{relation.alias}}</div>
-                        <div class="umb-table-cell umb-table-cell--large">{{relation.properties | CMS_joinArray:', ':'name'}}</div>
+                        <div class="umb-table-cell umb-table__name"><span>{{relation.name}}</span></div>
+                        <div class="umb-table-cell"><span title="{{relation.alias}}">{{relation.alias}}</span></div>
+                        <div class="umb-table-cell --noOverflow"><span>{{relation.properties | CMS_joinArray:', ':'name'}}</span></div>
                         <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
@@ -88,16 +88,16 @@
                         <div class="umb-table-cell"></div>
                         <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
                         <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                        <div class="umb-table-cell umb-table-cell--large"><localize key="relation_usedByProperties">Used in</localize></div>
+                        <div class="umb-table-cell"><localize key="relation_usedByProperties">Used in</localize></div>
                         <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
                     </div>
                 </div>
                 <div class="umb-table-body">
                     <div class="umb-table-row" ng-repeat="relation in vm.relations.documentTypes">
                         <div class="umb-table-cell"><i class="umb-table-body__icon {{relation.icon}}"></i></div>
-                        <div class="umb-table-cell umb-table__name">{{relation.name}}</div>
-                        <div class="umb-table-cell">{{relation.alias}}</div>
-                        <div class="umb-table-cell umb-table-cell--large">{{relation.properties | CMS_joinArray:', ':'name'}}</div>
+                        <div class="umb-table-cell umb-table__name"><span>{{relation.name}}</span></div>
+                        <div class="umb-table-cell"><span title="{{relation.alias}}">{{relation.alias}}</span></div>
+                        <div class="umb-table-cell --noOverflow"><span>{{relation.properties | CMS_joinArray:', ':'name'}}</span></div>
                         <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{relation.id}}"><localize key="general_open">Open</localize></a></div>
                     </div>
                 </div>
