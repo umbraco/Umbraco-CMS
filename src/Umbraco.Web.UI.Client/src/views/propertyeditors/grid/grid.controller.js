@@ -8,7 +8,8 @@ angular.module("umbraco")
             angularHelper,
             $element,
             eventsService,
-            editorService
+            editorService,
+            $interpolate
         ) {
 
             // Grid status variables
@@ -680,6 +681,11 @@ angular.module("umbraco")
                 $scope.showRowConfigurations = !$scope.showRowConfigurations;
             };
 
+            $scope.getTemplateName = function (control) {
+                if (control.editor.nameExp) return control.editor.nameExp(control)
+                return control.editor.name;
+            }
+
 
             // *********************************************
             // Initialization
@@ -923,6 +929,11 @@ angular.module("umbraco")
                     localizationService.localize("grid_" + value.alias, undefined, value.name).then(function (v) {
                         value.name = v;
                     });
+                    // setup nametemplate
+
+                    value.nameExp = !!value.nameTemplate
+                        ? $interpolate(value.nameTemplate)
+                        : undefined;
                 });
 
                 $scope.contentReady = true;
