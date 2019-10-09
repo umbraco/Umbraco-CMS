@@ -298,7 +298,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             return dtos.ToDictionary(
                 x => (Udi)new GuidUdi(ObjectTypes.GetUdiType(x.NodeDto.NodeObjectType.Value), x.NodeDto.UniqueId).EnsureClosed(),
-                x => (IEnumerable<string>)x.PropertyTypes.Select(x => x.Alias).ToList());
+                x => (IEnumerable<string>)x.PropertyTypes.Select(p => p.Alias).ToList());
         }
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
