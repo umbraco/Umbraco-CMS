@@ -505,6 +505,38 @@ namespace Umbraco.Core.Composing
 
         #endregion
 
+        #region Get Assembly Attributes
+
+        /// <summary>
+        /// Gets the assembly attributes.
+        /// </summary>
+        /// <typeparam name="T">The attribute type.</typeparam>
+        /// <returns>
+        /// The assembly attributes of the specified type.
+        /// </returns>
+        public IEnumerable<T> GetAssemblyAttributes<T>()
+            where T : Attribute
+        {
+            return AssembliesToScan.SelectMany(a => a.GetCustomAttributes<T>());
+        }
+
+        /// <summary>
+        /// Gets the assembly attributes.
+        /// </summary>
+        /// <param name="attributeTypes">The attribute types.</param>
+        /// <returns>
+        /// The assembly attributes of the specified types.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">attributeTypes</exception>
+        public IEnumerable<Attribute> GetAssemblyAttributes(params Type[] attributeTypes)
+        {
+            if (attributeTypes == null) throw new ArgumentNullException(nameof(attributeTypes));
+
+            return AssembliesToScan.SelectMany(a => attributeTypes.SelectMany(at => a.GetCustomAttributes(at))).ToList();
+        }
+
+        #endregion
+
         #region Get Types
 
         /// <summary>
