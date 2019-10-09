@@ -203,11 +203,26 @@ namespace Umbraco.Web.Search
 
                     foreach (var f in fields)
                     {
+                        var queryWordsReplaced = new string[querywords.Length];
+
+                        // when searching file names containing hyphens we need to replace the hyphens with spaces
+                        if (f.Equals(UmbracoExamineIndex.UmbracoFileFieldName))
+                        {
+                            for (var index = 0; index < querywords.Length; index++)
+                            {
+                                queryWordsReplaced[index] = querywords[index].Replace("\\-", " ").Trim(" ");
+                            }
+                        }
+                        else
+                        {
+                            queryWordsReplaced = querywords;
+                        }
+
                         //additional fields normally
                         sb.Append(f);
                         sb.Append(":");
                         sb.Append("(");
-                        foreach (var w in querywords)
+                        foreach (var w in queryWordsReplaced)
                         {
                             sb.Append(w.ToLower());
                             sb.Append("* ");
