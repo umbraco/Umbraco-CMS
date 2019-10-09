@@ -478,8 +478,6 @@ namespace umbraco
                     safeXml.AcceptChanges();
                 }
             }
-
-            ClearPreviewXmlContent(id);
         }
 
         /// <summary>
