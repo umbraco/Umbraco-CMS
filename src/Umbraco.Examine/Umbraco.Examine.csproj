@@ -68,7 +68,7 @@
     <Compile Include="IIndexCreator.cs" />
     <Compile Include="IIndexDiagnostics.cs" />
     <Compile Include="IIndexPopulator.cs" />
-    <Compile Include="UmbracoUmbracoIndexConfig.cs" />
+    <Compile Include="UmbracoIndexConfig.cs" />
     <Compile Include="IndexPopulator.cs" />
     <Compile Include="IndexRebuilder.cs" />
     <Compile Include="IPublishedContentValueSetBuilder.cs" />

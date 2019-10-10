@@ -88,12 +88,12 @@ namespace Umbraco.Web.Search
                 );
             return index;
         }
-        [Obsolete]
+        [Obsolete("This method should not be used and will be removed in future versions. GetContentValueSetValidator was moved to IUmbracoIndexConfig")]
         public virtual IContentValueSetValidator GetContentValueSetValidator()
         {
             return UmbracoIndexConfig.GetContentValueSetValidator();
         }
-        [Obsolete]
+        [Obsolete("This method should not be used and will be removed in future versions. GetPublishedContentValueSetValidator was moved to IUmbracoIndexConfig")]
         public virtual IContentValueSetValidator GetPublishedContentValueSetValidator()
         {
             return UmbracoIndexConfig.GetPublishedContentValueSetValidator();
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Search
         /// Returns the <see cref="IValueSetValidator"/> for the member indexer
         /// </summary>
         /// <returns></returns>
-        [Obsolete]
+        [Obsolete("This method should not be used and will be removed in future versions. GetMemberValueSetValidator was moved to IUmbracoIndexConfig")]
         public virtual IValueSetValidator GetMemberValueSetValidator()
         {
             return UmbracoIndexConfig.GetMemberValueSetValidator();
