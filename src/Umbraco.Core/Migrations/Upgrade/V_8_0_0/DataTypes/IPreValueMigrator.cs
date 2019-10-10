@@ -31,6 +31,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
         /// <param name="dataTypeId">The data type identifier.</param>
         /// <param name="editorAlias">The data type editor alias.</param>
         /// <param name="preValues">PreValues.</param>
-        object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues);
+        object GetConfiguration(int dataTypeId, string editorAlias, IEnumerable<PreValueDto> preValues);
     }
 }

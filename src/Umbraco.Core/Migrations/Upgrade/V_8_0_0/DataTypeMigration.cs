@@ -76,7 +76,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
                 // migrate the preValues to configuration
                 var migrator = _preValueMigrators.GetMigrator(dataType.EditorAlias) ?? new DefaultPreValueMigrator();
-                var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, group.ToDictionary(x => x.Alias, x => x));
+                var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, group);
                 var json = JsonConvert.SerializeObject(config);
 
                 // validate - and kill the migration if it fails

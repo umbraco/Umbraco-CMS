@@ -8,7 +8,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
         public override bool CanMigrate(string editorAlias)
             => editorAlias == "Umbraco.Slider";
 
-        public override object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)
+        public override object GetConfiguration(int dataTypeId, string editorAlias, IEnumerable<PreValueDto> preValues)
         {
             return new SliderConfiguration
             {

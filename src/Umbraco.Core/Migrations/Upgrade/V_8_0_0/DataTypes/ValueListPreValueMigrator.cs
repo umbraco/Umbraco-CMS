@@ -22,10 +22,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
         public virtual string GetNewAlias(string editorAlias)
             => null;
 
-        public object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)
+        public object GetConfiguration(int dataTypeId, string editorAlias, IEnumerable<PreValueDto> preValues)
         {
             var config = new ValueListConfiguration();
-            foreach (var preValue in preValues.Values)
+            foreach (var preValue in preValues)
                 config.Items.Add(new ValueListConfiguration.ValueListItem { Id = preValue.Id, Value = preValue.Value });
             return config;
         }
