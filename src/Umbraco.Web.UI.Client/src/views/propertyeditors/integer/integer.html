@@ -2,9 +2,11 @@
     <ng-form name="integerFieldForm">
         <input name="integerField"
                type="number"
-               pattern="[0-9]*"
+               pattern="[\-0-9]*"
                class="umb-property-editor umb-number"
                ng-model="model.value"
+               ng-required="model.validation.mandatory"
+               aria-required="{{model.validation.mandatory}}"
                id="{{model.alias}}"
                val-server="value"
                fix-number min="{{model.config.min}}" max="{{model.config.max}}" step="{{model.config.step}}" />

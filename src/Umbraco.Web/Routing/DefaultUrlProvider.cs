@@ -29,17 +29,17 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public virtual UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
+        public virtual UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
 
             // will not use cache if previewing
-            var route = umbracoContext.ContentCache.GetRouteById(content.Id, culture);
+            var route = umbracoContext.Content.GetRouteById(content.Id, culture);
 
             return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
         }
 
-        internal UrlInfo GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture)
+        internal UrlInfo GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlMode mode, string culture)
         {
             if (string.IsNullOrWhiteSpace(route))
             {
@@ -47,15 +47,13 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
-            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
-
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
             var domainUri = pos == 0
                 ? null
-                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current, culture);
+                : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, int.Parse(route.Substring(0, pos)), current, culture);
 
             // assemble the url from domainUri (maybe null) and path
             var url = AssembleUrl(domainUri, path, current, mode).ToString();
@@ -80,19 +78,17 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            var node = umbracoContext.ContentCache.GetById(id);
+            var node = umbracoContext.Content.GetById(id);
             if (node == null)
                 yield break;
 
-            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
-
             // look for domains, walking up the tree
             var n = node;
-            var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
+            var domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 n = n.Parent; // move to parent node
-                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, excludeDefault: true);
+                domainUris = n == null ? null : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, excludeDefault: true);
             }
 
             // no domains = exit
@@ -104,7 +100,7 @@ namespace Umbraco.Web.Routing
                 var culture = d?.Culture?.Name;
 
                 //although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
-                var route = umbracoContext.ContentCache.GetRouteById(id, culture);
+                var route = umbracoContext.Content.GetRouteById(id, culture);
                 if (route == null) continue;
 
                 //need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
@@ -121,7 +117,7 @@ namespace Umbraco.Web.Routing
 
         #region Utilities
 
-        Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, UrlProviderMode mode)
+        Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, UrlMode mode)
         {
             Uri uri;
 
@@ -130,15 +126,15 @@ namespace Umbraco.Web.Routing
             if (domainUri == null) // no domain was found
             {
                 if (current == null)
-                    mode = UrlProviderMode.Relative; // best we can do
+                    mode = UrlMode.Relative; // best we can do
 
                 switch (mode)
                 {
-                    case UrlProviderMode.Absolute:
+                    case UrlMode.Absolute:
                         uri = new Uri(current.GetLeftPart(UriPartial.Authority) + path);
                         break;
-                    case UrlProviderMode.Relative:
-                    case UrlProviderMode.Auto:
+                    case UrlMode.Relative:
+                    case UrlMode.Auto:
                         uri = new Uri(path, UriKind.Relative);
                         break;
                     default:
@@ -147,21 +143,21 @@ namespace Umbraco.Web.Routing
             }
             else // a domain was found
             {
-                if (mode == UrlProviderMode.Auto)
+                if (mode == UrlMode.Auto)
                 {
                     //this check is a little tricky, we can't just compare domains
                     if (current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
-                        mode = UrlProviderMode.Relative;
+                        mode = UrlMode.Relative;
                     else
-                        mode = UrlProviderMode.Absolute;
+                        mode = UrlMode.Absolute;
                 }
 
                 switch (mode)
                 {
-                    case UrlProviderMode.Absolute:
+                    case UrlMode.Absolute:
                         uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
                         break;
-                    case UrlProviderMode.Relative:
+                    case UrlMode.Relative:
                         uri = new Uri(CombinePaths(domainUri.Uri.AbsolutePath, path), UriKind.Relative);
                         break;
                     default:

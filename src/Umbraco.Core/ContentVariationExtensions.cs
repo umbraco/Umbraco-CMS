@@ -66,44 +66,44 @@ namespace Umbraco.Core
         /// <summary>
         /// Determines whether the content type is invariant.
         /// </summary>
-        public static bool VariesByNothing(this PublishedContentType contentType) => contentType.Variations.VariesByNothing();
+        public static bool VariesByNothing(this IPublishedContentType contentType) => contentType.Variations.VariesByNothing();
 
         /// <summary>
         /// Determines whether the content type varies by culture.
         /// </summary>
         /// <remarks>And then it could also vary by segment.</remarks>
-        public static bool VariesByCulture(this PublishedContentType contentType) => contentType.Variations.VariesByCulture();
+        public static bool VariesByCulture(this IPublishedContentType contentType) => contentType.Variations.VariesByCulture();
 
         /// <summary>
         /// Determines whether the content type varies by segment.
         /// </summary>
         /// <remarks>And then it could also vary by culture.</remarks>
-        public static bool VariesBySegment(this PublishedContentType contentType) => contentType.Variations.VariesBySegment();
+        public static bool VariesBySegment(this IPublishedContentType contentType) => contentType.Variations.VariesBySegment();
 
         /// <summary>
         /// Determines whether the content type varies by culture and segment.
         /// </summary>
-        public static bool VariesByCultureAndSegment(this PublishedContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
+        public static bool VariesByCultureAndSegment(this IPublishedContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
 
         /// <summary>
         /// Determines whether the property type is invariant.
         /// </summary>
-        public static bool VariesByNothing(this PublishedPropertyType propertyType) => propertyType.Variations.VariesByNothing();
+        public static bool VariesByNothing(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByNothing();
 
         /// <summary>
         /// Determines whether the property type varies by culture.
         /// </summary>
-        public static bool VariesByCulture(this PublishedPropertyType propertyType) => propertyType.Variations.VariesByCulture();
+        public static bool VariesByCulture(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByCulture();
 
         /// <summary>
         /// Determines whether the property type varies by segment.
         /// </summary>
-        public static bool VariesBySegment(this PublishedPropertyType propertyType) => propertyType.Variations.VariesBySegment();
+        public static bool VariesBySegment(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesBySegment();
 
         /// <summary>
         /// Determines whether the property type varies by culture and segment.
         /// </summary>
-        public static bool VariesByCultureAndSegment(this PublishedPropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
+        public static bool VariesByCultureAndSegment(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
 
         /// <summary>
         /// Determines whether a variation is invariant.
@@ -150,39 +150,46 @@ namespace Umbraco.Core
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();
 
-            bool Validate(bool variesBy, string value)
-            {
-                if (variesBy)
-                {
-                    // varies by
-                    // in exact mode, the value cannot be null (but it can be a wildcard)
-                    // in !wildcards mode, the value cannot be a wildcard (but it can be null)
-                    if ((exact && value == null) || (!wildcards && value == "*"))
-                        return false;
-                }
-                else
-                {
-                    // does not vary by value
-                    // the value cannot have a value
-                    // unless wildcards and it's "*"
-                    if (value != null && (!wildcards || value != "*"))
-                        return false;
-                }
-
-                return true;
-            }
-
-            if (!Validate(variation.VariesByCulture(), culture))
+            // if wildcards are disabled, do not allow "*"
+            if (!wildcards && (culture == "*" || segment == "*"))
             {
                 if (throwIfInvalid)
-                    throw new NotSupportedException($"Culture value \"{culture ?? "<null>"}\" is invalid.");
+                    throw new NotSupportedException($"Variation wildcards are not supported.");
                 return false;
             }
 
-            if (!Validate(variation.VariesBySegment(), segment))
+            if (variation.VariesByCulture())
+            {
+                // varies by culture
+                // in exact mode, the culture cannot be null                
+                if (exact && culture == null)
+                {
+                    if (throwIfInvalid)
+                        throw new NotSupportedException($"Culture may not be null because culture variation is enabled.");
+                    return false;
+                }    
+            }
+            else
+            {
+                // does not vary by culture
+                // the culture cannot have a value
+                // unless wildcards and it's "*"
+                if (culture != null && !(wildcards && culture == "*"))
+                {
+                    if (throwIfInvalid)
+                        throw new NotSupportedException($"Culture \"{culture}\" is invalid because culture variation is disabled.");
+                    return false;
+                }
+            }          
+
+            // if it does not vary by segment
+            // the segment cannot have a value
+            // segment may always be null, even when the ContentVariation.Segment flag is set for this variation,
+            // therefore the exact parameter is not used in segment validation.
+            if (!variation.VariesBySegment() && segment != null && !(wildcards && segment == "*"))
             {
                 if (throwIfInvalid)
-                    throw new NotSupportedException($"Segment value \"{segment ?? "<null>"}\" is invalid.");
+                    throw new NotSupportedException($"Segment \"{segment}\" is invalid because segment variation is disabled.");
                 return false;
             }
 

@@ -15,20 +15,6 @@
         text-decoration: none;
     }
 
-    ins {
-        margin: -4px 0 0 -16px;
-        width: 16px;
-        height: 16px;
-        visibility: hidden;
-        text-decoration: none;
-        font-size: 12px;
-        transition: color 120ms;
-
-        &:hover {
-            color: @ui-option-type-hover;
-        }
-    }
-
     i.noSpr {
         display: inline-block;
         margin-top: 1px;
@@ -47,12 +33,6 @@
             display: none;
         }
     }
-    
-    //loader defaults
-    .umb-loader {
-        height: 10px;
-        margin: 10px 10px 10px 10px;
-    }
 
     .search-subtitle {
         color: @gray-7;
@@ -62,7 +42,7 @@
 }
 
 body.touch .umb-tree {
-    ins {
+    .umb-tree-item__arrow {
         font-size: 14px;
         visibility: visible;
         padding: 7px;
@@ -86,9 +66,7 @@ body.touch .umb-tree {
     overflow: hidden;
     display: flex;
     flex-wrap: nowrap;
-    align-items: center;
-    
-    border:2px solid transparent;
+    align-items: center;  
     
     color: @ui-option-type;
     a {
@@ -104,13 +82,23 @@ body.touch .umb-tree {
         }
         
         > .umb-options {
-            visibility: visible;
+            position: relative;
+            width: auto;
+            height: auto;
+            margin: 0 10px 0 auto;
+            padding: 9px 5px;
+            overflow: visible;
+            clip: auto;
         }
         
         .umb-tree-icon {
             color: @ui-option-type-hover;
         }
     }
+}
+
+.umb-tree-item__inner {
+    border: 2px solid transparent;
 }
 
 .umb-tree-header {
@@ -178,7 +166,7 @@ body.touch .umb-tree {
 }
 
 .umb-options {
-    visibility: hidden;
+    position: relative;
     display: flex;
     flex: 0 0 auto;
     justify-content: flex-end;
@@ -190,6 +178,19 @@ body.touch .umb-tree {
 
     &:hover {
         background: @btnBackgroundHighlight;
+    }
+    // NOTE - We're having to repeat ourselves here due to an .sr-only class appearing in umbraco/lib/font-awesome/css/font-awesome.min.css
+    &.sr-only--hoverable:hover,
+    &.sr-only--focusable:focus {
+        position: relative;
+        display: flex;
+        flex: 0 0 auto;
+        justify-content: flex-end;
+        padding: 9px 5px;
+        text-align: center;
+        margin: 0 10px 0 auto;
+        cursor: pointer;
+        border-radius: 3px;
     }
 
     i {

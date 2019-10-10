@@ -71,12 +71,10 @@
                                             sections="userGroup.sections"
                                             content-start-node="userGroup.contentStartNode"
                                             media-start-node="userGroup.mediaStartNode"
-                                            allow-remove="!model.user.isCurrentUser"
                                             on-remove="model.removeSelectedItem($index, model.user.userGroups)">
                     </umb-user-group-preview>
 
                     <a href=""
-                       ng-if="!model.user.isCurrentUser"
                        style="max-width: 100%;"
                        class="umb-node-preview-add"
                        ng-click="model.openUserGroupPicker()"
@@ -92,7 +90,7 @@
                                       ng-repeat="node in model.user.startContentIds"
                                       icon="node.icon"
                                       name="node.name"
-                                      allow-remove="!model.user.isCurrentUser"
+                                      allow-remove="true"
                                       on-remove="model.removeSelectedItem($index, model.user.startContentIds)">
                     </umb-node-preview>
 
@@ -102,7 +100,6 @@
                     </umb-node-preview>
 
                     <a href=""
-                       ng-if="!model.user.isCurrentUser"
                        class="umb-node-preview-add"
                        id="content-start-add"
                        ng-click="model.openContentPicker()"
@@ -118,7 +115,7 @@
                                       ng-repeat="node in model.user.startMediaIds"
                                       icon="node.icon"
                                       name="node.name"
-                                      allow-remove="!model.user.isCurrentUser"
+                                      allow-remove="true"
                                       on-remove="model.removeSelectedItem($index, model.user.startMediaIds)">
                     </umb-node-preview>
 
@@ -128,7 +125,6 @@
                     </umb-node-preview>
 
                     <a href=""
-                       ng-if="!model.user.isCurrentUser"
                        class="umb-node-preview-add"
                        ng-click="model.openMediaPicker()"
                        id="media-start-add"
@@ -261,7 +257,8 @@
                         </umb-button>
                     </div>
                     <div>
-                        <umb-button type="button" ng-if="model.changePasswordModel.isChanging === false && model.user.userDisplayState.key !== 'Invited'"
+
+                        <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited' && model.changePasswordModel.isChanging === false"
                                     button-style="[info,block]"
                                     action="model.toggleChangePassword()"
                                     label="Change password"

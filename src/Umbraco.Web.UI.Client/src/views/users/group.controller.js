@@ -81,10 +81,6 @@
                 saveMethod: userGroupsResource.saveUserGroup,
                 scope: $scope,
                 content: vm.userGroup,
-                // We do not redirect on failure for users - this is because it is not possible to actually save a user
-                // when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) { }
             }).then(function (saved) {
 
@@ -104,14 +100,14 @@
         }
 
         function openSectionPicker() {
-            var oldSelection = angular.copy(vm.userGroup.sections);
+            var currentSelection = [];
+            angular.copy(vm.userGroup.sections, currentSelection);
             var sectionPicker = {
-                selection: vm.userGroup.sections,
+                selection: currentSelection,
                 submit: function (model) {
                     editorService.close();
                 },
                 close: function () {
-                    vm.userGroup.sections = oldSelection;
                     editorService.close();
                 }
             };
@@ -168,14 +164,14 @@
         }
 
         function openUserPicker() {
-            var oldSelection = angular.copy(vm.userGroup.users);
+            var currentSelection = [];
+            angular.copy(vm.userGroup.users, currentSelection);
             var userPicker = {
-                selection: vm.userGroup.users,
+                selection: currentSelection,
                 submit: function () {
                     editorService.close();
                 },
                 close: function () {
-                    vm.userGroup.users = oldSelection;
                     editorService.close();
                 }
             };

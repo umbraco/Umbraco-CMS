@@ -13,7 +13,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($routeParams, $location, $q, $timeout, $injector, eventsService, umbModelMapper, treeService, appState) {
+function navigationService($routeParams, $location, $q, $injector, eventsService, umbModelMapper, treeService, appState) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();
@@ -29,10 +29,9 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
     
 
     //A list of query strings defined that when changed will not cause a reload of the route
-    var nonRoutingQueryStrings = ["mculture", "cculture", "lq"];
+    var nonRoutingQueryStrings = ["mculture", "cculture", "lq", "sr"];
     var retainedQueryStrings = ["mculture"];
-
-        
+    
     function setMode(mode) {
         switch (mode) {
         case 'tree':
@@ -115,16 +114,17 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
     }
 
     var service = {
-
+        
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#isRouteChangingNavigation
          * @methodOf umbraco.services.navigationService
          *
          * @description
-         * Detects if the route param differences will cause a navigation change or if the route param differences are
+         * Detects if the route param differences will cause a navigation/route change or if the route param differences are
          * only tracking state changes.
-         * This is used for routing operations where reloadOnSearch is false and when detecting form dirty changes when navigating to a different page.
+         * This is used for routing operations where "reloadOnSearch: false" or "reloadOnUrl: false", when detecting form dirty changes when navigating to a different page,
+         * and when we are creating new entities and moving from a route with the ?create=true parameter to an ID based parameter once it's created.
          * @param {object} currUrlParams Either a string path or a dictionary of route parameters
          * @param {object} nextUrlParams Either a string path or a dictionary of route parameters
          */
@@ -136,6 +136,11 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
 
             if (angular.isString(nextUrlParams)) {
                 nextUrlParams = pathToRouteParts(nextUrlParams);
+            }
+
+            //check if there is a query string to indicate that a "soft redirect" is taking place, if so we are not changing navigation
+            if (nextUrlParams.sr === true) {
+                return false;
             }
 
             var allowRoute = true;
@@ -192,6 +197,18 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
                     $location.search(k, currentSearch[k]);
                 }
             });
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#setSoftRedirect
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * utility to set a special query string to indicate that the pending navigation change is a soft redirect
+         */
+        setSoftRedirect: function () {
+            $location.search("sr", true);
         },
 
         /**
@@ -339,7 +356,7 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
         
         reloadSection: function(sectionAlias) {
             return navReadyPromise.promise.then(function () {
-                mainTreeApi.clearCache({ section: sectionAlias });
+                treeService.clearCache({ section: sectionAlias });
                 return mainTreeApi.load(sectionAlias);
             });
         },

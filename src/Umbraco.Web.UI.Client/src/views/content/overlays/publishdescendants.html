@@ -1,15 +1,15 @@
 <div ng-controller="Umbraco.Overlays.PublishDescendantsController as vm">
 
     <div ng-if="vm.variants.length === 1">
-        <div style="margin-bottom: 15px;">
+        <div class="mb3">
             <p><localize key="{{vm.labels.help.key}}" tokens="vm.labels.help.tokens"></localize></p>
         </div>
 
-        <div style="margin-bottom: 15px;">
-            <label>
-                <input type="checkbox"
-                       ng-model="model.includeUnpublished"
-                       style="margin-right: 8px;" />
+        <div class="flex mb3">
+
+            <umb-checkbox input-id="includeUnpublishedSelector" model="model.includeUnpublished" />
+
+            <label for="includeUnpublishedSelector">
                 <localize key="content_includeUnpublished"></localize>
             </label>
         </div>
@@ -18,29 +18,26 @@
 
     <div ng-if="vm.variants.length > 1">
 
-        <div style="margin-bottom: 15px;">
+        <div class="mb3">
             <p><localize key="content_publishDescendantsWithVariantsHelp"></localize></p>
         </div>
 
-        <div style="margin-bottom: 15px;" class="flex">
+        <div class="flex mb3">
 
-            <umb-checkbox
-                input-id="includeUnpublishedSelector"
-                model="model.includeUnpublished" />
+            <umb-checkbox input-id="includeUnpublishedSelector" model="model.includeUnpublished" />
 
             <label for="includeUnpublishedSelector">
                 <localize key="content_includeUnpublished"></localize>
             </label>
         </div>
 
-        <div class="bold" style="margin-bottom: 5px;">
+        <div class="bold mb1">
             <localize key="treeHeaders_languages"></localize>
         </div>
 
         <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list-item umb-list--condensed"
-                 ng-repeat="variant in vm.variants">
+            <div class="umb-list-item umb-list--condensed" ng-repeat="variant in vm.variants">
                 <ng-form name="publishVariantSelectorForm">
                     <div class="flex" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
 

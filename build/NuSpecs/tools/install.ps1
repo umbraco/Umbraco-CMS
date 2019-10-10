@@ -18,9 +18,20 @@ if ($project) {
 
 	# Copy umbraco and umbraco_files from package to project folder
 	$umbracoFolder = Join-Path $projectPath "Umbraco"
-	New-Item -ItemType Directory -Force -Path $umbracoFolder
+	New-Item -ItemType Directory -Force -Path $umbracoFolder	
 	$umbracoFolderSource = Join-Path $installPath "UmbracoFiles\Umbraco"		
-	robocopy $umbracoFolderSource $umbracoFolder /is /it /e /xf UI.xml /LOG:$copyLogsPath\UmbracoCopy.log
+
+    Write-Host "copying files to $umbracoFolder ..."
+    # see https://support.microsoft.com/en-us/help/954404/return-codes-that-are-used-by-the-robocopy-utility-in-windows-server-2
+    robocopy $umbracoFolderSource $umbracoFolder /is /it /e
+    if (($lastexitcode -eq 1) -or ($lastexitcode -eq 3) -or ($lastexitcode -eq 5) -or ($lastexitcode -eq 7))
+    {
+        write-host "Copy succeeded!"
+    }
+    else
+    {
+        write-host "Copy failed with exit code:" $lastexitcode
+    }
 
 	$copyWebconfig = $true
 	$destinationWebConfig = Join-Path $projectPath "Web.config"
@@ -40,7 +51,11 @@ if ($project) {
 				}
 			}
 		} 
-		Catch { }
+		Catch 
+		{ 
+			Write-Host "An error occurred:"
+  			Write-Host $_
+		}
 	}
 	
 	if($copyWebconfig -eq $true) 
@@ -74,7 +89,9 @@ if ($project) {
 		} 
 		Catch 
 		{
-			# Not a big problem if this fails, let it go
+            # Not a big problem if this fails, let it go
+			# Write-Host "An error occurred:"
+  			# Write-Host $_			
 		}
 	}
 	

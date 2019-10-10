@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
@@ -16,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
     {
-        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository)
-            : base(scopeAccessor, cache, logger, commonRepository)
+        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository)
+            : base(scopeAccessor, cache, logger, commonRepository, languageRepository)
         { }
 
         protected override bool SupportsPublishing => MediaType.SupportsPublishingConst;
@@ -49,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             // the cache policy will always want everything
             // even GetMany(ids) gets everything and filters afterwards
-            if (ids.Any()) throw new Exception("panic");
+            if (ids.Any()) throw new PanicException("There can be no ids specified");
             return CommonRepository.GetAllTypes().OfType<IMediaType>();
         }
 
@@ -102,7 +104,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IMediaType entity)
         {
-            ((MediaType)entity).AddingEntity();
+            entity.AddingEntity();
 
             PersistNewBaseContentType(entity);
 
@@ -114,7 +116,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             ValidateAlias(entity);
 
             //Updates Modified date
-            ((MediaType)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))

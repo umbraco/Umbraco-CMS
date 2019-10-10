@@ -1,7 +1,7 @@
+
 <div>
 
     <div class="umb-app-header">
-        
         <umb-sections
             ng-if="authenticated"
             sections="sections">
@@ -10,25 +10,35 @@
         <div class="flex items-center">
             <ul class="umb-app-header__actions">
                 <li data-element="global-search" class="umb-app-header__action">
-                    <a href="#" hotkey="ctrl+space" ng-click="searchClick()" prevent-default style="font-size: 20px;">
-                        <i class="umb-app-header__action-icon icon-search"></i>
-                    </a>
+                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+space" ng-click="searchClick()" ng-mousedown="rememberFocus()">
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_openBackofficeSearch">Open backoffice search</localize>...
+                        </span>
+                        <i class="umb-app-header__action-icon icon-search" aria-hidden="true"></i>
+                    </button>
                 </li>
                 <li data-element="global-help" class="umb-app-header__action">
-                    <a href="#" hotkey="ctrl+shift+h" ng-click="helpClick()" prevent-default>
-                        <i class="umb-app-header__action-icon icon-help-alt"></i>
-                    </a>
+                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+shift+h" ng-click="helpClick()">
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_openCloseBackofficeHelp">Open/Close backoffice help</localize>...
+                        </span>
+                        <i class="umb-app-header__action-icon icon-help-alt" aria-hidden="true"></i>
+                    </button>
                 </li>
                 <li data-element="global-user" class="umb-app-header__action">
-                    <a ng-href="" href="" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
+                   <button type="button" class="umb-app-header__button btn-reset" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}">
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_openCloseBackofficeProfileOptions">Open/Close your profile options</localize>...
+                        </span>
                         <umb-avatar
+                            class="umb-app-header__action-icon"
                             size="xxs"
                             color="secondary"
                             name="{{user.name}}"
                             img-src="{{avatar[0].value}}"
                             img-srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x">
                         </umb-avatar>
-                    </a>
+                    </button>
                 </li>
             </ul>
         </div>
@@ -44,4 +54,3 @@
     </umb-overlay>
 
 </div>
-

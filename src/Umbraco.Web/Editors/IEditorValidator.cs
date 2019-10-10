@@ -21,7 +21,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// Provides a general object validator.
     /// </summary>
-    internal interface IEditorValidator : IDiscoverable
+    public interface IEditorValidator : IDiscoverable
     {
         /// <summary>
         /// Gets the object type validated by this validator.

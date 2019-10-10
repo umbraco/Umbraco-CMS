@@ -1,6 +1,6 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
-    function (userService, $q, $log, $rootScope, $route, $location, urlHelper, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
+app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 'appState', 'assetsService', 'eventsService', '$cookies', 'tourService',
+    function ($rootScope, $route, $location, urlHelper, navigationService, appState, assetsService, eventsService, $cookies, tourService) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
@@ -43,7 +43,13 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
         }
 
         var currentRouteParams = null;
-        
+
+        var originalTitle = "";
+
+        $rootScope.$on('$changeTitle', function (event, titlePrefix) {
+            $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+        });
+
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 
@@ -90,14 +96,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
 
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
             }
-
-            //reset the editorState on each successful route chage
-            editorState.reset();
-
-            //reset the file manager on each route change, the file collection is only relavent
-            // when working in an editor and submitting data to the server.
-            //This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
-            fileManager.clearFiles();
+            originalTitle = $rootScope.locationTitle;
         });
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
@@ -122,7 +121,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
         });
 
         //Bind to $routeUpdate which will execute anytime a location changes but the route is not triggered.
-        //This is the case when a route uses reloadOnSearch: false which is the case for many or our routes so that we are able to maintain
+        //This is the case when a route uses "reloadOnSearch: false" or "reloadOnUrl: false" which is the case for many or our routes so that we are able to maintain
         //global state query strings without force re-loading views.
         //We can then detect if it's a location change that should force a route or not programatically.
         $rootScope.$on('$routeUpdate', function (event, next) {
@@ -156,7 +155,13 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                         currentRouteParams = toRetain;
                     }
                     else {
-                        currentRouteParams = angular.copy(next.params); 
+                        currentRouteParams = angular.copy(next.params);
+                    }
+
+                    //always clear the 'sr' query string (soft redirect) if it exists
+                    if (currentRouteParams.sr) {
+                        currentRouteParams.sr = null;
+                        $route.updateParams(currentRouteParams);
                     }
                     
                 }

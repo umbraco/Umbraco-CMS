@@ -106,7 +106,7 @@ namespace Umbraco.Web.Cache
 
         public static void RefreshAllContentCache(this DistributedCache dc)
         {
-            var payloads = new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) };
+            var payloads = new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
 
             // note: refresh all content cache does refresh content types too
             dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
@@ -117,7 +117,7 @@ namespace Umbraco.Web.Cache
             if (changes.Length == 0) return;
 
             var payloads = changes
-                .Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Id, x.ChangeTypes));
+                .Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes));
 
             dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
         }
@@ -157,7 +157,7 @@ namespace Umbraco.Web.Cache
 
         public static void RefreshAllMediaCache(this DistributedCache dc)
         {
-            var payloads = new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) };
+            var payloads = new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
 
             // note: refresh all media cache does refresh content types too
             dc.RefreshByPayload(MediaCacheRefresher.UniqueId, payloads);
@@ -168,7 +168,7 @@ namespace Umbraco.Web.Cache
             if (changes.Length == 0) return;
 
             var payloads = changes
-                .Select(x => new MediaCacheRefresher.JsonPayload(x.Item.Id, x.ChangeTypes));
+                .Select(x => new MediaCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes));
 
             dc.RefreshByPayload(MediaCacheRefresher.UniqueId, payloads);
         }

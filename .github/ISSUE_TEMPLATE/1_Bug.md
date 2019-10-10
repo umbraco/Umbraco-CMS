@@ -12,7 +12,7 @@ thoroughly. Then, proceed by filling out the rest of the details in the issue
 template below. The more details you can give us, the easier it will be for us
 to determine the cause of a problem.
 
-See: https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/.github/CONTRIBUTING.md
+See: https://github.com/umbraco/Umbraco-CMS/blob/v8/dev/.github/CONTRIBUTING.md
 
 -->
 

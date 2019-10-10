@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService) {
+    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService, overlayService) {
 
         var vm = this;
 
@@ -136,7 +136,10 @@
 
                 //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
                 if (vm.user.changePassword) {
-                    vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+                    //NOTE: the check for allowManuallyChangingPassword is due to this legacy user membership provider setting, if that is true, then the current user
+                    //can change their own password without entering their current one (this is a legacy setting since that is a security issue but we need to maintain compat).
+                    //if allowManuallyChangingPassword=false, then we are using default settings and the user will need to enter their old password to change their own password.
+                    vm.user.changePassword.reset = (!vm.user.changePassword.oldPassword && !vm.user.isCurrentUser) || vm.changePasswordModel.config.allowManuallyChangingPassword;
                 }
 
                 vm.page.saveButtonState = "busy";
@@ -169,8 +172,8 @@
                     }, function (err) {
 
                         contentEditingHelper.handleSaveError({
-                            redirectOnFailure: false,
-                            err: err
+                            err: err,
+                            showNotifications: true
                         });
                         
                         vm.page.saveButtonState = "error";
@@ -210,9 +213,10 @@
         }
 
         function openUserGroupPicker() {
-            var oldSelection = angular.copy(vm.user.userGroups);
+            var currentSelection = [];
+            angular.copy(vm.user.userGroups, currentSelection);
             var userGroupPicker = {
-                selection: vm.user.userGroups,
+                selection: currentSelection,
                 submit: function (model) {
                     // apply changes
                     if (model.selection) {
@@ -220,9 +224,7 @@
                     }
                     editorService.close();
                 },
-                close: function () {
-                    // roll back the selection
-                    vm.user.userGroups = oldSelection;
+                close: function () {        
                     editorService.close();
                 }
             };
@@ -369,11 +371,32 @@
             vm.deleteNotLoggedInUserButtonState = "busy";
 
             var confirmationMessage = vm.labels.deleteUserConfirmation;
-            if (!confirm(confirmationMessage)) {
-                vm.deleteNotLoggedInUserButtonState = "danger";
-                return;
-            }
 
+            localizationService.localizeMany(["general_delete", "general_cancel", "contentTypeEditor_yesDelete"])
+                .then(function (data) {
+
+                    const overlay = {
+                        view: "confirm",
+                        title: data[0],
+                        content: confirmationMessage,
+                        closeButtonLabel: data[1],
+                        submitButtonLabel: data[2],
+                        submitButtonStyle: "danger",
+                        close: function () {
+                            vm.deleteNotLoggedInUserButtonState = "danger";
+                            overlayService.close();
+                        },
+                        submit: function () {
+                            performDelete();
+                            overlayService.close();
+                        }
+                    };
+                    overlayService.open(overlay);
+
+                });
+        }
+
+        function performDelete() {
             usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
                 formHelper.showNotifications(data);
                 goToPage(vm.breadcrumbs[0]);
