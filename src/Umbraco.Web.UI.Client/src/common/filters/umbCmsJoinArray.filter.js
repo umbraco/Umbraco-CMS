@@ -1,7 +1,7 @@
 /**
  * @ngdoc filter
  * @name umbraco.filters.filter:CMS_joinArray
- * @namespace CMS_joinArrayFilter
+ * @namespace umbCmsJoinArray
  * 
  * param {array} array of string or objects, if an object use the third argument to specify which prop to list.
  * param {seperator} string containing the seperator to add between joined values.
@@ -11,7 +11,7 @@
  * Join an array of string or an array of objects, with a costum seperator.
  * 
  */
-angular.module("umbraco.filters").filter('CMS_joinArray', function () {
+angular.module("umbraco.filters").filter('umbCmsJoinArray', function () {
     return function join(array, separator, prop) {
         return (!angular.isUndefined(prop) ? array.map(function (item) {
             return item[prop];
