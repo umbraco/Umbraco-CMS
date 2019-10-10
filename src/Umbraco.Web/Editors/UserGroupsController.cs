@@ -154,8 +154,8 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostDeleteUserGroups([FromUri] int[] userGroupIds)
         {
             var userGroups = Services.UserService.GetAllUserGroups(userGroupIds)
-                //never delete the admin group or translators group
-                .Where(x => x.Alias != Constants.Security.AdminGroupAlias && x.Alias != Constants.Security.TranslatorGroupAlias)
+                //never delete the admin group, sensitive data or translators group
+                .Where(x => !x.IsSystemUserGroup())
                 .ToArray();
             foreach (var userGroup in userGroups)
             {
