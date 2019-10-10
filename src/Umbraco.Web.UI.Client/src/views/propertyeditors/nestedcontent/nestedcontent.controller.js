@@ -1,18 +1,39 @@
 ﻿angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.DocTypePickerController", [
 
     "$scope",
+    "editorService",
     "Umbraco.PropertyEditors.NestedContent.Resources",
 
-    function ($scope, ncResources) {
+    function ($scope, editorService, ncResources) {
 
         $scope.add = function () {
-            $scope.model.value.push({
-                // As per PR #4, all stored content type aliases must be prefixed "nc" for easier recognition.
-                // For good measure we'll also prefix the tab alias "nc"
-                ncAlias: "",
-                ncTabAlias: "",
-                nameTemplate: ""
-            });
+            var editor = {
+                multiPicker: false,
+                filterCssClass: "not-allowed not-published",
+                filter: function(contentType) {
+                    if (!contentType.metaData.isElement) {
+                        return true;
+                    }
+                    return _.find($scope.model.value, function(config) {
+                        return config.ncAlias === contentType.alias;
+                    }) != null;
+                },
+                submit: function (model) {
+                    var selected = _.findWhere($scope.model.docTypes, { id: model.selection[0].id });
+                    if (selected) {
+                        $scope.model.value.push({
+                            ncAlias: selected.alias,
+                            ncTabAlias: "",
+                            nameTemplate: ""
+                        });
+                    }
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+            editorService.contentTypePicker(editor);
         }
 
         $scope.canAdd = function () {
@@ -62,36 +83,30 @@
         ncResources.getContentTypes().then(function (docTypes) {
             $scope.model.docTypes = docTypes;
 
-            // Count doctype name occurrences
-            var docTypeNameOccurrences = _.countBy(docTypes, 'name');
-            
             // Populate document type tab dictionary
-            // And append alias to name if multiple doctypes have the same name
             docTypes.forEach(function (value) {
                 $scope.docTypeTabs[value.alias] = value.tabs;
-
-                value.displayName = value.name;
-
-                if (docTypeNameOccurrences[value.name] > 1) {
-                    value.displayName += " (" + value.alias + ")";
-                }
             });
         });
 
-        $scope.selectableDocTypesFor = function (config) {
-            // return all doctypes that are:
-            // 1. either already selected for this config, or
-            // 2. not selected in any other config
-            return _.filter($scope.model.docTypes, function (docType) {
-                return docType.alias === config.ncAlias || !_.find($scope.model.value, function(c) {
-                    return docType.alias === c.ncAlias;
-                });
-            });
+        $scope.displayNameFor = function(config) {
+            var docType = _.findWhere($scope.model.docTypes, { alias: config.ncAlias });
+            if (!docType) {
+                return "(deleted)";
+            }
+            return docType.name;
         }
 
+        $scope.iconFor = function (config) {
+            var docType = _.findWhere($scope.model.docTypes, { alias: config.ncAlias });
+            if (!docType) {
+                return "";
+            }
+            return docType.icon;
+        }
+        
         if (!$scope.model.value) {
             $scope.model.value = [];
-            $scope.add();
         }
     }
 ]);

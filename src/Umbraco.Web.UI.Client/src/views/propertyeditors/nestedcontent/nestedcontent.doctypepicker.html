@@ -1,6 +1,6 @@
 ﻿<div id="{{model.alias}}" class="umb-nested-content__doctypepicker" ng-controller="Umbraco.PropertyEditors.NestedContent.DocTypePickerController">
     <div>
-        <table class="table table-striped">
+        <table class="table table-striped table-condensed">
             <thead>
                 <tr>
                     <th/>
@@ -22,9 +22,13 @@
                         <i class="icon icon-navigation handle"></i>
                     </td>
                     <td>
-                        <select id="{{model.alias}}_doctype_select"
-                            ng-options="dt.alias as dt.displayName for dt in selectableDocTypesFor(config) | orderBy: 'name'"
-                            ng-model="config.ncAlias" required></select>
+                        <umb-node-preview
+                            icon="iconFor(config)"
+                            name="displayNameFor(config)"
+                            description="config.ncAlias"
+                            allow-edit="false"
+                            allow-remove="false">
+                        </umb-node-preview>
                     </td>
                     <td>
                         <select id="{{model.alias}}_tab_select"
