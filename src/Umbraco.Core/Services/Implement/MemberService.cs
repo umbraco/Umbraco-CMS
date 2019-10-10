@@ -816,18 +816,8 @@ namespace Umbraco.Core.Services.Implement
         {
             //trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
-            member.Email = member.Email.Trim();
-            if(member.Username.Length > 255)
-            {
-                throw new InvalidOperationException("Username cannot be more than 255 characters in length.");
-            }
-
-            if (member.Email.Length > 255)
-            {
-                throw new InvalidOperationException("Email cannot be more than 255 characters in length.");
-            }
+            member.Email = member.Email.Trim();         
             
-
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
