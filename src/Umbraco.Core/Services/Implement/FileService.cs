@@ -405,6 +405,11 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Constants.Security.SuperUserId)
         {
+            if (name != null && name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
             // file might already be on disk, if so grab the content to avoid overwriting
             var template = new Template(name, alias)
             {
@@ -539,6 +544,12 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId"></param>
         public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
         {
+            if (template.Name != null && template.Name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 if (scope.Events.DispatchCancelable(SavingTemplate, this, new SaveEventArgs<ITemplate>(template)))
