@@ -3,29 +3,31 @@
 namespace Umbraco.Core.Composing
 {
     /// <summary>
-    /// Indicates that a composer should be enabled.
+    /// Indicates that an <see cref="IComposer" /> should be enabled.
     /// </summary>
     /// <remarks>
-    /// <para>If a type is specified, enables the composer of that type, else enables the composer marked with the attribute.</para>
-    /// <para>This attribute is *not* inherited.</para>
-    /// <para>This attribute applies to classes only, it is not possible to enable/disable interfaces.</para>
-    /// <para>Assembly-level <see cref="DisableComposerAttribute"/> has greater priority than <see cref="DisableAttribute"/>
-    /// attribute when it is marking the composer itself, but lower priority that when it is referencing another composer.</para>
+    /// This attribute has greater priority than the <see cref="DisableAttribute" /> when it's marking the composer itself, but lower priority when it's referencing another.
     /// </remarks>
+    /// <seealso cref="System.Attribute" />
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
     public class EnableComposerAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EnableComposerAttribute"/> class.
+        /// Gets the enabled type.
         /// </summary>
-        public EnableComposerAttribute(Type enabledType)
-        {
-            EnabledType = enabledType;
-        }
+        /// <value>
+        /// The enabled type.
+        /// </value>
+        public Type EnabledType { get; }
 
         /// <summary>
-        /// Gets the enabled type, or null if it is the composer marked with the attribute.
+        /// Initializes a new instance of the <see cref="EnableComposerAttribute" /> class.
         /// </summary>
-        public Type EnabledType { get; }
+        /// <param name="enabledType">The <see cref="IComposer" /> type to enable.</param>
+        /// <exception cref="System.ArgumentNullException">enabledType</exception>
+        public EnableComposerAttribute(Type enabledType)
+        {
+            EnabledType = enabledType ?? throw new ArgumentNullException(nameof(enabledType));
+        }
     }
 }
