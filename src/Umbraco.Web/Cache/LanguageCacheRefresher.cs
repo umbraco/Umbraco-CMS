@@ -45,6 +45,8 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<ILanguage>();
             //if a language is removed, then all dictionary cache needs to be removed
             ClearAllIsolatedCacheByEntityType<IDictionaryItem>();
+            // clear since each IContent contains a reference to a string culture
+            ClearAllIsolatedCacheByEntityType<IContent>();
             RefreshDomains(id);
             base.Remove(id);
         }
