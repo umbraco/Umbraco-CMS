@@ -1679,9 +1679,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(response);
             }
 
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
+            var assignedPermissions = Services.UserService.GetAssignedPermissions(Security.CurrentUser, node.Id);
 
-            if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
+            if (assignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");
