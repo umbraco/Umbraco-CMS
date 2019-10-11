@@ -20,8 +20,8 @@
 
                     <umb-pane>
                         <div class="pa-select-type">
-                            <input id="protectionTypeMember" type="radio" name="protectionType" value="member" ng-model="vm.type">
-
+                            <!--<input id="protectionTypeMember" type="radio" name="protectionType" value="member" ng-model="vm.type">-->
+                            <umb-radiobutton id="protectionTypeMember" name="protectionType" value="member" model="vm.type" />
                             <label for="protectionTypeMember">
                                 <h5 class="pa-access-header"><localize key="publicAccess_paMembers">Specific members protection</localize></h5>
                                 <p><localize key="publicAccess_paMembersHelp">If you want to grant access to specific members</localize></p>
@@ -29,8 +29,8 @@
                         </div>
 
                         <div class="pa-select-type">
-                            <input id="protectionTypeGroup" type="radio" name="protectionType" value="group" ng-model="vm.type">
-
+                            <!--<input id="protectionTypeGroup" type="radio" name="protectionType" value="group" ng-model="vm.type">-->
+                            <umb-radiobutton id="protectionTypeGroup" name="protectionType" value="group" model="vm.type" />
                             <label for="protectionTypeGroup">
                                 <h5 class="pa-access-header"><localize key="publicAccess_paGroups">Group based protection</localize></h5>
                                 <p><localize key="publicAccess_paGroupsHelp">If you want to grant access to all members of specific member groups</localize></p>
