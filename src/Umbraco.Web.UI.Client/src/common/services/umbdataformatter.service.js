@@ -368,6 +368,7 @@
                             name: v.name || "", //if its null/empty,we must pass up an empty string else we get json converter errors
                             properties: getContentProperties(v.tabs),
                             culture: v.language ? v.language.culture : null,
+                            segment: v.segment,
                             publish: v.publish,
                             save: v.save,
                             releaseDate: v.releaseDate,
