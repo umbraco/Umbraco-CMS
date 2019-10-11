@@ -15,6 +15,6 @@ angular.module("umbraco.filters").filter('umbCmsJoinArray', function () {
     return function join(array, separator, prop) {
         return (!angular.isUndefined(prop) ? array.map(function (item) {
             return item[prop];
-        }) : array).join(separator);
+        }) : array).join(separator || '');
     };
 });
