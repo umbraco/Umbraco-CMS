@@ -6,12 +6,12 @@
 
         function link($scope, $element, $attrs) {
             
-            var appRootNode = $element[0];
+            var $appRootNode = $element.first();
             
             // Directive for cached property groups.
             var propertyGroupNodesDictionary = {};
             
-            var scrollableNode = appRootNode.closest(".umb-scrollable");
+            var scrollableNode = $appRootNode.closest(".umb-scrollable")[0];
             scrollableNode.addEventListener("scroll", onScroll);
             scrollableNode.addEventListener("mousewheel", cancelScrollTween);
             

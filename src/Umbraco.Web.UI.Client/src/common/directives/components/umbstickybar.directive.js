@@ -39,7 +39,7 @@ Use this directive make an element sticky and follow the page when scrolling. `u
         const addSentinel = current => {
             const sentinel = document.createElement('div');
             sentinel.classList.add('umb-sticky-sentinel', '-top');
-            current.parentElement.prepend(sentinel);
+            $(current.parentElement).prepend(sentinel);
         };
 
         /**
@@ -67,10 +67,11 @@ Use this directive make an element sticky and follow the page when scrolling. `u
             headerObserver.observe(current.parentElement.querySelector('.umb-sticky-sentinel.-top'));
         };
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope, $el, attr, ctrl) {
 
-            let current = el[0];
-            let container = current.closest('.umb-editor-container') || current.closest('.umb-dashboard');
+            let $current = $el.first();
+            let current = $current[0];
+            let container = $current.closest('.umb-editor-container')[0] || $current.closest('.umb-dashboard')[0];
 
             if (container) {
                 addSentinel(current);
