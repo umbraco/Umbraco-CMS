@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors.Binders
             {
                 foreach (var variant in model.Variants)
                 {
-                    if (variant.Culture.IsNullOrWhiteSpace())
+                    if (variant.Culture.IsNullOrWhiteSpace() && variant.Segment.IsNullOrWhiteSpace())
                     {
                         //map the property dto collection (no culture is passed to the mapping context so it will be invariant)
                         variant.PropertyCollectionDto = Current.Mapper.Map<ContentPropertyCollectionDto>(model.PersistedContent);
@@ -59,7 +59,11 @@ namespace Umbraco.Web.Editors.Binders
                         //map the property dto collection with the culture of the current variant
                         variant.PropertyCollectionDto = Current.Mapper.Map<ContentPropertyCollectionDto>(
                             model.PersistedContent,
-                            context => context.SetCulture(variant.Culture));
+                            context =>
+                            {
+                                context.SetCulture(variant.Culture);
+                                context.SetSegment(variant.Segment);
+                            });
                     }
 
                     //now map all of the saved values to the dto
@@ -87,6 +91,5 @@ namespace Umbraco.Web.Editors.Binders
                 model.ParentId,
                 contentType);
         }
-        
     }
 }
