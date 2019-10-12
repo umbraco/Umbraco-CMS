@@ -20,6 +20,12 @@
         domNodes.editor = document.querySelector('.umb-editor');
     }
 
+    function resetFocus(elm){
+        setTimeout(function(){
+            elm.focus();
+        }, 100);
+    }
+
     function focusLockService() {
 
         var service = {
@@ -78,12 +84,6 @@
                 }
             }
         };
-
-        function resetFocus(elm){
-            setTimeout(function(){
-                elm.focus();
-            }, 100);
-        }
 
         return service;
 
