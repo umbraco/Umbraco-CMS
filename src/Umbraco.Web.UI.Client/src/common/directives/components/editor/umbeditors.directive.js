@@ -1,66 +1,66 @@
 (function () {
     'use strict';
 
-    function EditorsDirective($timeout, eventsService) {
+    function EditorsDirective($timeout, eventsService, focusLockService) {
 
         function link(scope, el, attr, ctrl) {
 
             var evts = [];
             var allowedNumberOfVisibleEditors = 3;
-            
+
             scope.editors = [];
-            
+
             function addEditor(editor) {
                 editor.inFront = true;
                 editor.moveRight = true;
                 editor.level = 0;
                 editor.styleIndex = 0;
-                                
+
                 // push the new editor to the dom
                 scope.editors.push(editor);
-                
+
                 $timeout(() => {
                     editor.moveRight = false;
                 })
-                
+
                 editor.animating = true;
                 setTimeout(revealEditorContent.bind(this, editor), 400);
-                
+
                 updateEditors();
             }
-            
+
             function removeEditor(editor) {
                 editor.moveRight = true;
-                
+
                 editor.animating = true;
                 setTimeout(removeEditorFromDOM.bind(this, editor), 400);
-                
+
                 updateEditors(-1);
-                
+
             }
-            
+
             function revealEditorContent(editor) {
-                
+
                 editor.animating = false;
-                
+
                 scope.$digest();
-                
+
             }
-            
+
             function removeEditorFromDOM(editor) {
-                
+
                 // push the new editor to the dom
                 var index = scope.editors.indexOf(editor);
                 if (index !== -1) {
                     scope.editors.splice(index, 1);
                 }
-                
+
                 updateEditors();
-                
+
                 scope.$digest();
-                
+
             }
-            
+
             /** update layer positions. With ability to offset positions, needed for when an item is moving out, then we dont want it to influence positions */
             function updateEditors(offset) {
                 offset = offset || 0;// fallback value.
@@ -79,14 +79,16 @@
                     i++;
                 }
             }
-            
+
             evts.push(eventsService.on("appState.editors.open", function (name, args) {
+                focusLockService.addFocusLock(el);
                 addEditor(args.editor);
             }));
 
             evts.push(eventsService.on("appState.editors.close", function (name, args) {
                 // remove the closed editor
                 if(args && args.editor) {
+                    focusLockService.removeFocusLock(el);
                     removeEditor(args.editor);
                 }
                 // close all editors
