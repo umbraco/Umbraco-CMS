@@ -9,17 +9,19 @@
 
 (function () {
     "use strict";
+    var elementsToToggle = {
+        'appHeader': document.querySelector('.umb-app-header'),
+        'mainWrapper': document.querySelector('#mainWrapper'),
+        'umbEditors': document.querySelector('.umb-editors'),
+        'umbModalColumn': document.querySelector('.umb-modalcolumn')
+    };
 
     function focusLockService() {
 
-        var service = {
-            elementsToLock: {
-                appHeader = document.querySelector('.umb-app-header'),
-                mainWrapper = document.querySelector('#mainWrapper'),
-                umbEditors = document.querySelector('.umb-editors'),
-                umbModalColumn = document.querySelector('.umb-modalcolumn')
-            },
+        // TODO: Maybe add a helper method here, which is called in both addFocusLock and removeFocusLock, which also calls another method to get the 
+        // needed elements we want to toggle
 
+        var service = {
             /**
              * @ngdoc function
              * @name umbraco.services.focusLockService#addFocusLock
@@ -31,18 +33,31 @@
              *
              */
 
+             // Add a mode param so the logic can be split into different functions!
+
             addFocusLock: function(element) {
-                var elm = element[0];
+                // TODO:
+                // * Add mode param in order to call the proper method!
+                // * Add inert attribute for appHeader, umbEditorsPrevSibiling and umbModalColum when we're dealing with infinite editing and children of course
+                // * Add inert attribute for "mainWrapper" when it's "normal" overlay mode
+                var appHeader = document.querySelector('.umb-app-header');
+                var mainWrapper = document.querySelector('#mainwrapper'); //Only if it's an "ordinary" overlay
+                var umbEditors = document.querySelector('.umb-editors');
+                var umbEditorsPrevSibiling = umbEditors.previousElementSibling;
+                var umbModalColumn = document.querySelector('.umb-modalcolumn');
+
                 var children = element.children();
 
-                console.log(elementsToLock,'elements to lock');
+                appHeader.setAttribute('inert','');
+                umbModalColumn.setAttribute('inert','');
+                umbEditorsPrevSibiling.setAttribute('inert','');
+
+                // console.log(elementsToLock,'elements to lock');
                 // The DOM does not update synchronously so the latest triggered overlay will never be added to the array/collection
                 if(children.length){
-                    console.log(children, ' children');
                     children.attr('inert','true');
                 }
 
-                // TODO: Maybe Push each child into a new array except the last one?
             },
 
             removeFocusLock: function(element) {
