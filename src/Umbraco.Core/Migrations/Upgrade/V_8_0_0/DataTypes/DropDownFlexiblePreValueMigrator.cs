@@ -12,10 +12,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
         public virtual string GetNewAlias(string editorAlias)
             => null;
 
-        public object GetConfiguration(int dataTypeId, string editorAlias, IEnumerable<PreValueDto> preValues)
+        public object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)
         {
             var config = new DropDownFlexibleConfiguration();
-            foreach (var preValue in preValues)
+            foreach (var preValue in preValues.Values)
             {
                 if (preValue.Alias == "multiple")
                 {
