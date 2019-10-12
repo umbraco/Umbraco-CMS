@@ -81,14 +81,14 @@
             }
 
             evts.push(eventsService.on("appState.editors.open", function (name, args) {
-                focusLockService.addFocusLock(scope.editors.length);
+                focusLockService.addInfiniteFocusLock(el, scope.editors.length);
                 addEditor(args.editor);
             }));
 
             evts.push(eventsService.on("appState.editors.close", function (name, args) {
                 // remove the closed editor
                 if(args && args.editor) {
-                    focusLockService.removeFocusLock(scope.editors.length);
+                    focusLockService.removeInfiniteFocusLock(el, scope.editors.length);
                     removeEditor(args.editor);
                 }
                 // close all editors
