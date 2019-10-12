@@ -40,7 +40,7 @@ namespace Umbraco.Core.PropertyEditors
         bool CanCopy { get; }
 
         /// <summary>
-        /// Validates a property value using custom messages.
+        /// Validates a property value.
         /// </summary>
         /// <param name="value">The property value.</param>
         /// <param name="required">A value indicating whether the property value is required.</param>
