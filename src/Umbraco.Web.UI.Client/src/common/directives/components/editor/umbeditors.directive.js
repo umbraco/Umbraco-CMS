@@ -81,14 +81,14 @@
             }
 
             evts.push(eventsService.on("appState.editors.open", function (name, args) {
-                focusLockService.addFocusLock(el);
+                focusLockService.addFocusLock(el, 'infinite-overlay');
                 addEditor(args.editor);
             }));
 
             evts.push(eventsService.on("appState.editors.close", function (name, args) {
                 // remove the closed editor
                 if(args && args.editor) {
-                    focusLockService.removeFocusLock(el);
+                    focusLockService.removeFocusLock(el, 'infinite-overlay');
                     removeEditor(args.editor);
                 }
                 // close all editors
