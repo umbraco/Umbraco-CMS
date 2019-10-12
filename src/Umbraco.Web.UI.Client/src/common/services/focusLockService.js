@@ -12,6 +12,9 @@
 
     var domNodes = {};
 
+    /**
+     * Helper method to fetch the DOM nodes that needs to be disabled/enabled
+     */
     function getDOMNodes (){
         domNodes.appHeader = document.querySelector('.umb-app-header');
         domNodes.leftColumn = document.querySelector('#leftcolumn');
@@ -20,6 +23,10 @@
         domNodes.editor = document.querySelector('.umb-editor');
     }
 
+    /**
+     * Helper method to reset focus on the first possible element in an overlay
+     * @param {HTMLElement} elm 
+     */
     function resetFocus(elm){
         setTimeout(function(){
             elm.focus();
@@ -29,20 +36,20 @@
     function focusLockService() {
 
         var service = {
+
             /**
              * @ngdoc function
-             * @name umbraco.services.focusLockService#addFocusLock
+             * @name umbraco.services.focusLockService#addInfiniteFocusLock
              * @methodOf umbraco.services.focusLockService
              * @function
              *
              * @description
-             * Call this before a new overlay/modal is activated, to ensure focus is locked inside the opened overlay/modal
+             * Call this method before a new infinite overlay is activated to ensure focus is locked inside it
              *
-             * @param {Object} element angularJS object containing the element
-             * @param {String} mode can be either "overlay" or "infinite-overlay"
+             * @param {Array} element array containing an element
+             * @param {Number} overlays a number of overlays that are open
              *
              */
-
             addInfiniteFocusLock: function(elm, overlays) {
                 var children = elm.children();
 
@@ -62,6 +69,19 @@
                 }
             },
 
+            /**
+             * @ngdoc function
+             * @name umbraco.services.focusLockService#removeInfiniteFocusLock
+             * @methodOf umbraco.services.focusLockService
+             * @function
+             *
+             * @description
+             * Call this method when an infinite editor is closed to enable the locked elements in the DOM again
+             *
+             * @param {Array} element array containing an element
+             * @param {Number} overlays a number of overlays that are open
+             *
+             */
             removeInfiniteFocusLock: function(elm, overlays) {
                 var children = elm.children();
                 var secondLastChildIndex = children.length - 2;
@@ -82,6 +102,37 @@
                     // Set focus on the first possible element in the editor that is unlocked
                     resetFocus(firstFocusableElement);
                 }
+            },
+
+            /**
+             * @ngdoc function
+             * @name umbraco.services.focusLockService#addFocusLock
+             * @methodOf umbraco.services.focusLockService
+             * @function
+             *
+             * @description
+             * Call this method before a new overlay is activated to ensure focus is locked inside it
+             *
+             */
+            addFocusLock: function() {
+                // Get the DOM nodes we need to add/remove the inert attribute for
+                getDOMNodes();
+
+                domNodes.mainWrapper.setAttribute('inert','');
+            },
+
+            /**
+             * @ngdoc function
+             * @name umbraco.services.focusLockService#removeFocusLock
+             * @methodOf umbraco.services.focusLockService
+             * @function
+             *
+             * @description
+             * Call this method when an overlay is closed to enable the locked element in the DOM again
+             *
+             */
+            removeFocusLock: function(){
+                domNodes.mainWrapper.removeAttribute('inert');
             }
         };
 
