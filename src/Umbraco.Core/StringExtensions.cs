@@ -724,13 +724,13 @@ namespace Umbraco.Core
         /// <summary>
         /// Generates a hash of a string based on the FIPS compliance setting.
         /// </summary>
-        /// <param name="str">Refers to itself</param>
-        /// <returns>The hashed string</returns>
+        /// <param name="str">The <see cref="string" /> to hash.</param>
+        /// <returns>
+        /// The hashed string.
+        /// </returns>
         public static string GenerateHash(this string str)
         {
-            return CryptoConfig.AllowOnlyFipsAlgorithms
-                ? str.ToSHA1()
-                : str.ToMd5();
+            return str.GenerateHash(CryptoConfig.AllowOnlyFipsAlgorithms ? "SHA1" : "MD5");
         }
 
         /// <summary>
@@ -755,36 +755,33 @@ namespace Umbraco.Core
             return stringToConvert.GenerateHash("SHA1");
         }
 
-        /// <summary>Generate a hash of a string based on the hashType passed in
+        /// <summary>
+        /// Generate a hash of a string based on the specified <paramref name="hashType" />.
         /// </summary>
-        /// <param name="str">Refers to itself</param>
-        /// <param name="hashType">String with the hash type.  See remarks section of the CryptoConfig Class in MSDN docs for a list of possible values.</param>
-        /// <returns>The hashed string</returns>
-        private static string GenerateHash(this string str, string hashType)
+        /// <param name="str">The <see cref="string" /> to hash.</param>
+        /// <param name="hashType">The hash algorithm implementation to use.</param>
+        /// <returns>
+        /// The hashed string.
+        /// </returns>
+        /// <exception cref="System.InvalidOperationException">No hashing type found by name <paramref name="hashType" />.</exception>
+        /// <seealso cref="https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.hashalgorithm.create#System_Security_Cryptography_HashAlgorithm_Create_System_String_" />
+        internal static string GenerateHash(this string str, string hashType)
         {
-            //create an instance of the correct hashing provider based on the type passed in
             var hasher = HashAlgorithm.Create(hashType);
-            if (hasher == null) throw new InvalidOperationException("No hashing type found by name " + hashType);
+            if (hasher == null) throw new InvalidOperationException($"No hashing type found by name {hashType}.");
+
             using (hasher)
             {
-                //convert our string into byte array
                 var byteArray = Encoding.UTF8.GetBytes(str);
-
-                //get the hashed values created by our selected provider
                 var hashedByteArray = hasher.ComputeHash(byteArray);
 
-                //create a StringBuilder object
-                var stringBuilder = new StringBuilder();
-
-                //loop to each byte
+                var sb = new StringBuilder();
                 foreach (var b in hashedByteArray)
                 {
-                    //append it to our StringBuilder
-                    stringBuilder.Append(b.ToString("x2"));
+                    sb.Append(b.ToString("x2"));
                 }
 
-                //return the hashed value
-                return stringBuilder.ToString();
+                return sb.ToString();
             }
         }
 
