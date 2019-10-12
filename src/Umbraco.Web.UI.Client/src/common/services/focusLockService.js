@@ -14,9 +14,9 @@
 
     function getDOMNodes (){
         domNodes.appHeader = document.querySelector('.umb-app-header');
-        domNodes.navigation = document.querySelector('#navigation');
+        domNodes.leftColumn = document.querySelector('#leftcolumn');
         domNodes.mainWrapper = document.querySelector('#mainwrapper');
-        domNodes.umbEditorsPrevSibling = document.querySelector('.umb-editors').previousElementSibling;
+        domNodes.editorsPrevSibling = document.querySelector('.umb-editors').previousElementSibling;
     }
 
     function focusLockService() {
@@ -39,7 +39,7 @@
              // Add a mode param so the logic can be split into different functions!
 
             addFocusLock: function() {
-
+                getDOMNodes();
                 // // If the string "infinite-overlay" is passed we activate the methods needed for 
                 // if(mode === 'infinite-overlay'){
                 //     var children = element.children();
@@ -58,15 +58,16 @@
                 //     getElementsToToggle(elementsToTogleForOverlayMode, true);
                 // }
                 console.log('add focus lock');
+                domNodes.leftColumn.setAttribute('inert','');
+                domNodes.appHeader.setAttribute('inert','');
+                domNodes.editorsPrevSibling.setAttribute('inert','');
             },
 
             removeFocusLock: function() {
                 console.log('remove focus lock');
-            },
-
-            toggleFocusLock: function(){
-                // Populate our DOMnodes object
-                getDOMNodes();
+                domNodes.leftColumn.removeAttribute('inert','');
+                domNodes.appHeader.removeAttribute('inert','');
+                domNodes.editorsPrevSibling.removeAttribute('inert','');
             }
         };
 
