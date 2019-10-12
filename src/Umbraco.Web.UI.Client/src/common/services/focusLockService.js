@@ -9,17 +9,17 @@
 
 (function () {
     "use strict";
-    var elementsToToggle = {
-        'appHeader': document.querySelector('.umb-app-header'),
-        'mainWrapper': document.querySelector('#mainWrapper'),
-        'umbEditors': document.querySelector('.umb-editors'),
-        'umbModalColumn': document.querySelector('.umb-modalcolumn')
-    };
+
+    var domNodes = {};
+
+    function getDOMNodes (){
+        domNodes.appHeader = document.querySelector('.umb-app-header');
+        domNodes.navigation = document.querySelector('#navigation');
+        domNodes.mainWrapper = document.querySelector('#mainwrapper');
+        domNodes.umbEditorsPrevSibling = document.querySelector('.umb-editors').previousElementSibling;
+    }
 
     function focusLockService() {
-
-        // TODO: Maybe add a helper method here, which is called in both addFocusLock and removeFocusLock, which also calls another method to get the 
-        // needed elements we want to toggle
 
         var service = {
             /**
@@ -31,38 +31,42 @@
              * @description
              * Call this before a new overlay/modal is activated, to ensure focus is locked inside the opened overlay/modal
              *
+             * @param {Object} element angularJS object containing the element
+             * @param {String} mode can be either "overlay" or "infinite-overlay"
+             *
              */
 
              // Add a mode param so the logic can be split into different functions!
 
-            addFocusLock: function(element) {
-                // TODO:
-                // * Add mode param in order to call the proper method!
-                // * Add inert attribute for appHeader, umbEditorsPrevSibiling and umbModalColum when we're dealing with infinite editing and children of course
-                // * Add inert attribute for "mainWrapper" when it's "normal" overlay mode
-                var appHeader = document.querySelector('.umb-app-header');
-                var mainWrapper = document.querySelector('#mainwrapper'); //Only if it's an "ordinary" overlay
-                var umbEditors = document.querySelector('.umb-editors');
-                var umbEditorsPrevSibiling = umbEditors.previousElementSibling;
-                var umbModalColumn = document.querySelector('.umb-modalcolumn');
+            addFocusLock: function() {
 
-                var children = element.children();
+                // // If the string "infinite-overlay" is passed we activate the methods needed for 
+                // if(mode === 'infinite-overlay'){
+                //     var children = element.children();
 
-                appHeader.setAttribute('inert','');
-                umbModalColumn.setAttribute('inert','');
-                umbEditorsPrevSibiling.setAttribute('inert','');
+                //     // The DOM does not update synchronously so the latest triggered overlay will never be added to the array/collection
+                //     if(children.length){
+                //         children.attr('inert','true');
+                //     }
 
-                // console.log(elementsToLock,'elements to lock');
-                // The DOM does not update synchronously so the latest triggered overlay will never be added to the array/collection
-                if(children.length){
-                    children.attr('inert','true');
-                }
+                //     //TODO: Set some kind of variable to ensure this call only happens once
+                //     getElementsToToggle(elementsToToggleForInfiniteOverlayMode, true);
+                // }
 
+                // // if we get a value of "overlay" or if it's empty
+                // if(mode === 'overlay' || !mode){
+                //     getElementsToToggle(elementsToTogleForOverlayMode, true);
+                // }
+                console.log('add focus lock');
             },
 
-            removeFocusLock: function(element) {
+            removeFocusLock: function() {
                 console.log('remove focus lock');
-                console.log('element: ', element);
+            },
+
+            toggleFocusLock: function(){
+                // Populate our DOMnodes object
+                getDOMNodes();
             }
         };
 
@@ -73,3 +77,10 @@
     angular.module("umbraco.services").factory("focusLockService", focusLockService);
 
 })();
+
+// TODO: Ved infinite fjernes alle inert på "ydre" elementer, før når den sidste er lukket...
+// TODO: Så der skal laves et check for at se om removeFocus lock skal kaldes
+// TODO: Make DOM method more generic...
+
+
+// getDOM method that returns all of the DOM nodes we might be interested in and which can be used to cache the DOM, so 
