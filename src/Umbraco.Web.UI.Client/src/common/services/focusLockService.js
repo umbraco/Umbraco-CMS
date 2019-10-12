@@ -37,60 +37,53 @@
              *
              */
 
-             // Add a mode param so the logic can be split into different functions!
+            addInfiniteFocusLock: function(elm, overlays) {
+                var children = elm.children();
 
-            addFocusLock: function(overlays) {
+                // Get the DOM nodes we need to add/remove the inert attribute for
                 getDOMNodes();
 
-                console.log('add focus lock');
-
-                // // If the string "infinite-overlay" is passed we activate the methods needed for 
-                // if(mode === 'infinite-overlay'){
-                //     var children = element.children();
-
-                //     // The DOM does not update synchronously so the latest triggered overlay will never be added to the array/collection
-                //     if(children.length){
-                //         children.attr('inert','true');
-                //     }
-
-                //     //TODO: Set some kind of variable to ensure this call only happens once
-                //     getElementsToToggle(elementsToToggleForInfiniteOverlayMode, true);
-                // }
-
-                // // if we get a value of "overlay" or if it's empty
-                // if(mode === 'overlay' || !mode){
-                //     getElementsToToggle(elementsToTogleForOverlayMode, true);
-                // }
-
-                // IF we deal with an ordinary overlay
-                // addOuterFocusLock
-
-                // IF we deal with and infinite editor
-                // addOuterFocusLock
-                // addInnerFocusLock
+                // Disable "outer" elements once
                 if(overlays === 0){
                     domNodes.leftColumn.setAttribute('inert','');
                     domNodes.appHeader.setAttribute('inert','');
                     domNodes.editorsPrevSibling.setAttribute('inert','');
                 }
+
+                // Disable infinite editors if they're not the current editor
+                if(children.length){
+                    children.attr('inert','');
+                }
             },
 
-            removeFocusLock: function(overlays) {
-                console.log('remove focus lock');
+            removeInfiniteFocusLock: function(elm, overlays) {
+                var children = elm.children();
+                var secondLastChildIndex = children.length - 2;
+                var secondLastChild = children[secondLastChildIndex];
+                var focusableElementsString = 'a[href], area[href], input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), iframe, object, embed, [tabindex="0"], [contenteditable]';
 
-                // IF we deal with an ordinary overlay
-                // removeOuterFocusLock
-
-                // IF we deal with an infinite editor
-                // addOuterFocusLock
-                // addInnerFocusLock
+                // Enable "outer" elements once
                 if(overlays === 1){
                     domNodes.leftColumn.removeAttribute('inert','');
                     domNodes.appHeader.removeAttribute('inert','');
                     domNodes.editor.removeAttribute('inert','');
                 }
+
+                if(secondLastChild) {
+                    var firstFocusableElement = secondLastChild.querySelector(focusableElementsString);
+                    secondLastChild.removeAttribute('inert','');
+
+                    // Set focus on the first possible element in the editor that is unlocked
+                    resetFocus(firstFocusableElement);
+                }
             }
         };
+
+        function resetFocus(elm){
+            setTimeout(function(){
+                elm.focus();
+            }, 100);
+        }
 
         return service;
 
