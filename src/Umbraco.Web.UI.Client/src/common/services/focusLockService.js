@@ -17,6 +17,7 @@
         domNodes.leftColumn = document.querySelector('#leftcolumn');
         domNodes.mainWrapper = document.querySelector('#mainwrapper');
         domNodes.editorsPrevSibling = document.querySelector('.umb-editors').previousElementSibling;
+        domNodes.editor = document.querySelector('.umb-editor');
     }
 
     function focusLockService() {
@@ -38,8 +39,11 @@
 
              // Add a mode param so the logic can be split into different functions!
 
-            addFocusLock: function() {
+            addFocusLock: function(overlays) {
                 getDOMNodes();
+
+                console.log('add focus lock');
+
                 // // If the string "infinite-overlay" is passed we activate the methods needed for 
                 // if(mode === 'infinite-overlay'){
                 //     var children = element.children();
@@ -57,17 +61,34 @@
                 // if(mode === 'overlay' || !mode){
                 //     getElementsToToggle(elementsToTogleForOverlayMode, true);
                 // }
-                console.log('add focus lock');
-                domNodes.leftColumn.setAttribute('inert','');
-                domNodes.appHeader.setAttribute('inert','');
-                domNodes.editorsPrevSibling.setAttribute('inert','');
+
+                // IF we deal with an ordinary overlay
+                // addOuterFocusLock
+
+                // IF we deal with and infinite editor
+                // addOuterFocusLock
+                // addInnerFocusLock
+                if(overlays === 0){
+                    domNodes.leftColumn.setAttribute('inert','');
+                    domNodes.appHeader.setAttribute('inert','');
+                    domNodes.editorsPrevSibling.setAttribute('inert','');
+                }
             },
 
-            removeFocusLock: function() {
+            removeFocusLock: function(overlays) {
                 console.log('remove focus lock');
-                domNodes.leftColumn.removeAttribute('inert','');
-                domNodes.appHeader.removeAttribute('inert','');
-                domNodes.editorsPrevSibling.removeAttribute('inert','');
+
+                // IF we deal with an ordinary overlay
+                // removeOuterFocusLock
+
+                // IF we deal with an infinite editor
+                // addOuterFocusLock
+                // addInnerFocusLock
+                if(overlays === 1){
+                    domNodes.leftColumn.removeAttribute('inert','');
+                    domNodes.appHeader.removeAttribute('inert','');
+                    domNodes.editor.removeAttribute('inert','');
+                }
             }
         };
 
@@ -78,10 +99,3 @@
     angular.module("umbraco.services").factory("focusLockService", focusLockService);
 
 })();
-
-// TODO: Ved infinite fjernes alle inert på "ydre" elementer, før når den sidste er lukket...
-// TODO: Så der skal laves et check for at se om removeFocus lock skal kaldes
-// TODO: Make DOM method more generic...
-
-
-// getDOM method that returns all of the DOM nodes we might be interested in and which can be used to cache the DOM, so 
