@@ -734,28 +734,6 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Converts the string to MD5
-        /// </summary>
-        /// <param name="stringToConvert">Refers to itself</param>
-        /// <returns>The MD5 hashed string</returns>
-        [Obsolete("Please use the GenerateHash method instead. This may be removed in future versions")]
-        internal static string ToMd5(this string stringToConvert)
-        {
-            return stringToConvert.GenerateHash("MD5");
-        }
-
-        /// <summary>
-        /// Converts the string to SHA1
-        /// </summary>
-        /// <param name="stringToConvert">refers to itself</param>
-        /// <returns>The SHA1 hashed string</returns>
-        [Obsolete("Please use the GenerateHash method instead. This may be removed in future versions")]
-        internal static string ToSHA1(this string stringToConvert)
-        {
-            return stringToConvert.GenerateHash("SHA1");
-        }
-
-        /// <summary>
         /// Generate a hash of a string based on the specified <paramref name="hashType" />.
         /// </summary>
         /// <param name="str">The <see cref="string" /> to hash.</param>
