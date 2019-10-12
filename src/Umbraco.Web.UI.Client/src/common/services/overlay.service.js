@@ -8,7 +8,7 @@
 (function () {
     "use strict";
 
-    function overlayService(eventsService, backdropService) {
+    function overlayService(eventsService, backdropService, focusLockService) {
 
         var currentOverlay = null;
 
@@ -45,6 +45,7 @@
             overlay.show = true;
             backdropService.open(backdropOptions);
             currentOverlay = overlay;
+            focusLockService.addFocusLock();
             eventsService.emit("appState.overlay", overlay);
         }
 
@@ -52,6 +53,7 @@
             backdropService.close();
             currentOverlay = null;
 
+            focusLockService.removeFocusLock();
             eventsService.emit("appState.overlay", null);
         }
 
