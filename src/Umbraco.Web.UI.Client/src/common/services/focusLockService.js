@@ -15,17 +15,20 @@
 
     /**
      * Focus lock method that needs to be called when we add overlays
-     * 
-     * @param {HTMLElement} elm 
+     *
+     * @param {HTMLElement} elm
      */
     function focusLock(elm){
         setTimeout(() =>{
-            var focusableElsInEditor = elm.querySelectorAll(focusableEls);
+            var overlayElement = document.querySelector('.umb-overlay');
+            var target = elm ? elm : overlayElement; // If an element is passed use that otherwise fallback to the default overlayElement
+
+            var focusableElsInEditor = target.querySelectorAll(focusableEls);
             var firstFocusableEl = focusableElsInEditor[0];
             var lastFocusableEl = focusableElsInEditor[focusableElsInEditor.length -1];
             var tabKey = 9;
 
-            elm.addEventListener('keydown', function(event){
+            target.addEventListener('keydown', function(event){
                 var isTabPressed = (event.key === 'Tab' || event.keyCode === tabKey);
 
                 if (!isTabPressed){
@@ -177,9 +180,11 @@
              * Call this method before a new overlay is activated to ensure focus is locked inside it
              *
              */
-            addFocusLock: function() {
+            addFocusLock: function(view) {
                 // Get the DOM nodes we need to add/remove the inert attribute for
                 getDOMNodes();
+
+                focusLock();
 
                 domNodes.mainWrapper.setAttribute('inert','');
             },
