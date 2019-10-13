@@ -53,6 +53,12 @@
         }, 500);
     }
 
+    function resetFocus(elm){
+        setTimeout(() =>{
+            elm.focus();
+        }, 100);
+    }
+
     /**
      * Helper method to fetch the DOM nodes that needs to be disabled/enabled
      */
@@ -60,7 +66,6 @@
         domNodes.appHeader = document.querySelector('.umb-app-header');
         domNodes.leftColumn = document.querySelector('#leftcolumn');
         domNodes.mainWrapper = document.querySelector('#mainwrapper');
-        // domNodes.editorsPrevSibling = document.querySelector('.umb-editors').previousElementSibling;
         domNodes.editor = document.querySelector('.umb-editor');
     }
 
@@ -91,12 +96,10 @@
         else{
             editorArray.forEach((editor, idx) => {
                 if(idx === currentEditorIndex){
-                    // TODO: Handle within the focus trap function!
                     var firstFocusableElement = editor.querySelector(focusableEls);
 
                     editor.removeAttribute('inert','');
 
-                    // TODO: Somehow enable focus trap! so we can skip this bit!
                     resetFocus(firstFocusableElement);
                 }
             });
