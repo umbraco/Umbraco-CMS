@@ -13,6 +13,11 @@
     var domNodes = {};
     var focusableEls = 'a[href]:not([disabled]), a[ng-href]:not([disabled]), input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), [tabindex="0"]';
 
+    /**
+     * Focus lock method that needs to be called when we add overlays
+     * 
+     * @param {HTMLElement} elm 
+     */
     function focusLock(elm){
         setTimeout(() =>{
             var focusableElsInEditor = elm.querySelectorAll(focusableEls);
@@ -60,15 +65,11 @@
     }
 
     /**
-     * Helper method to reset focus on the first possible element in an overlay
-     * @param {HTMLElement} elm 
+     * Helper method to enable or disable the editors so they can't be navigated to using keyboard or screen readers
+     *
+     * @param {Array} editors 
+     * @param {Boolean} boolean 
      */
-    function resetFocus(elm){
-        setTimeout(function(){
-            elm.focus();
-        }, 100);
-    }
-
     function disableOrEnableEditors(editors, boolean){
         var editorArray = Array.from(editors)
         var currentEditorIndex = editors.length - 1;
