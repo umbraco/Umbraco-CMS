@@ -71,6 +71,34 @@
         }, 100);
     }
 
+    function disableOrEnableEditors(editors, boolean){
+        var editorArray = Array.from(editors)
+        var currentEditorIndex = editors.length - 1;
+
+        // Disable editors that are not current
+        if(boolean){
+            editorArray.forEach((editor, idx) => {
+                if(idx !== currentEditorIndex){
+                    editor.setAttribute('inert','');
+                }
+            });
+        }
+        // Enable current editor
+        else{
+            editorArray.forEach((editor, idx) => {
+                if(idx === currentEditorIndex){
+                    // TODO: Handle within the focus trap function!
+                    var firstFocusableElement = editor.querySelector(focusableEls);
+
+                    editor.removeAttribute('inert','');
+
+                    // TODO: Somehow enable focus trap! so we can skip this bit!
+                    resetFocus(firstFocusableElement);
+                }
+            });
+        }
+    }
+
     function focusLockService() {
 
         var service = {
@@ -89,7 +117,7 @@
              *
              */
             addInfiniteFocusLock: function(elm, overlays) {
-                var children = elm.children();
+                var children = elm[0].children;
 
                 // Get the DOM nodes we need to add/remove the inert attribute for
                 getDOMNodes();
@@ -101,16 +129,10 @@
                     domNodes.editor.setAttribute('inert','');
                 }
 
-                // TODO: Make sure to inert the previous editor when a new one opens
+                // disable child editors if they're not current
+                disableOrEnableEditors(children, true);
+
                 // TODO: Make sure to add the focusTrap
-
-                // Disable infinite editors if they're not the current editor
-                // if(children.length){
-                //     children.attr('inert','');
-                // }
-
-                console.log('children: ', children);
-
                 // Add foucsTrap call here!
                 // setTimeout(function(){
                 //     focusTrap(elm);
@@ -131,9 +153,7 @@
              *
              */
             removeInfiniteFocusLock: function(elm, overlays) {
-                var children = elm.children();
-                var secondLastChildIndex = children.length - 2;
-                var secondLastChild = children[secondLastChildIndex];
+                var children = elm[0].children;
 
                 // Enable "outer" elements once
                 if(overlays === 0){
@@ -142,13 +162,8 @@
                     domNodes.editor.removeAttribute('inert','');
                 }
 
-                // if(secondLastChild) {
-                //     var firstFocusableElement = secondLastChild.querySelector(focusableEls);
-                //     secondLastChild.removeAttribute('inert','');
-
-                //     // Set focus on the first possible element in the editor that is unlocked
-                //     resetFocus(firstFocusableElement);
-                // }
+                // enable editor if it's current
+                disableOrEnableEditors(children, false);
             },
 
             /**
