@@ -10,45 +10,43 @@
 (function () {
     "use strict";
 
-    var focusableEls = 'a[href]:not([disabled]), input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), [tabindex="0"]';
-
-    function focusTrap(elm){
-        var unwrappedElm = elm[0];
-        var editorElm = unwrappedElm.querySelector('.umb-editor--infiniteMode');
-
-        console.log(unwrappedElm);
-        console.log(unwrappedElm.querySelector(focusableEls));
-        console.log(editorElm);
-    }
-
-    // function focusTrap(element, namespace) {
-    //         var firstFocusableEl = focusableEls[0];  
-    //         var lastFocusableEl = focusableEls[focusableEls.length - 1];
-    //         var KEYCODE_TAB = 9;
-    
-    //     element.addEventListener('keydown', function(e) {
-    //         var isTabPressed = (e.key === 'Tab' || e.keyCode === KEYCODE_TAB);
-    
-    //         if (!isTabPressed) { 
-    //             return; 
-    //         }
-    
-    //         if ( e.shiftKey ) /* shift + tab */ {
-    //             if (document.activeElement === firstFocusableEl) {
-    //                 lastFocusableEl.focus();
-    //                 e.preventDefault();
-    //             }
-    //         } else /* tab */ {
-    //             if (document.activeElement === lastFocusableEl) {
-    //                 firstFocusableEl.focus();
-    //                 e.preventDefault();
-    //             }
-    //         }
-    
-    //     });
-    // }
-
     var domNodes = {};
+    var focusableEls = 'a[href]:not([disabled]), a[ng-href]:not([disabled]), input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), [tabindex="0"]';
+
+    function focusLock(elm){
+        setTimeout(() =>{
+            var focusableElsInEditor = elm.querySelectorAll(focusableEls);
+            var firstFocusableEl = focusableElsInEditor[0];
+            var lastFocusableEl = focusableElsInEditor[focusableElsInEditor.length -1];
+            var tabKey = 9;
+
+            elm.addEventListener('keydown', function(event){
+                var isTabPressed = (event.key === 'Tab' || event.keyCode === tabKey);
+
+                if (!isTabPressed){
+                    return;
+                }
+
+                // If shift + tab key
+                if(event.shiftKey){
+                    // Set focus on the last focusable element if shift+tab are pressed meaning we go backwards
+                    if(document.activeElement === firstFocusableEl){
+                        lastFocusableEl.focus();
+                        event.preventDefault();
+                    }
+                }
+                // Else only the tab key is pressed
+                else{
+                    // Using only the tab key we set focus on the first focusable element mening we go forward
+                    if (document.activeElement === lastFocusableEl) {
+                        firstFocusableEl.focus();
+                        event.preventDefault();
+                    }
+                }
+            });
+
+        }, 100);
+    }
 
     /**
      * Helper method to fetch the DOM nodes that needs to be disabled/enabled
@@ -78,8 +76,13 @@
         // Disable editors that are not current
         if(boolean){
             editorArray.forEach((editor, idx) => {
+                // Disable editors that are not current
                 if(idx !== currentEditorIndex){
                     editor.setAttribute('inert','');
+                }
+                // Add focusLock to current editor
+                else{
+                    focusLock(editor);
                 }
             });
         }
@@ -131,12 +134,6 @@
 
                 // disable child editors if they're not current
                 disableOrEnableEditors(children, true);
-
-                // TODO: Make sure to add the focusTrap
-                // Add foucsTrap call here!
-                // setTimeout(function(){
-                //     focusTrap(elm);
-                // }, 100);
             },
 
             /**
