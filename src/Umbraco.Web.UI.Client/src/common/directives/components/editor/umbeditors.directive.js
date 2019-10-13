@@ -36,7 +36,6 @@
                 setTimeout(removeEditorFromDOM.bind(this, editor), 400);
 
                 updateEditors(-1);
-
             }
 
             function revealEditorContent(editor) {
@@ -44,6 +43,8 @@
                 editor.animating = false;
 
                 scope.$digest();
+
+                focusLockService.addInfiniteFocusLock(el, scope.editors.length);
 
             }
 
@@ -59,6 +60,7 @@
 
                 scope.$digest();
 
+                focusLockService.removeInfiniteFocusLock(el, scope.editors.length);
             }
 
             /** update layer positions. With ability to offset positions, needed for when an item is moving out, then we dont want it to influence positions */
@@ -81,14 +83,12 @@
             }
 
             evts.push(eventsService.on("appState.editors.open", function (name, args) {
-                focusLockService.addInfiniteFocusLock(el, scope.editors.length);
                 addEditor(args.editor);
             }));
 
             evts.push(eventsService.on("appState.editors.close", function (name, args) {
                 // remove the closed editor
                 if(args && args.editor) {
-                    focusLockService.removeInfiniteFocusLock(el, scope.editors.length);
                     removeEditor(args.editor);
                 }
                 // close all editors
