@@ -10,6 +10,44 @@
 (function () {
     "use strict";
 
+    var focusableEls = 'a[href]:not([disabled]), input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), [tabindex="0"]';
+
+    function focusTrap(elm){
+        var unwrappedElm = elm[0];
+        var editorElm = unwrappedElm.querySelector('.umb-editor--infiniteMode');
+
+        console.log(unwrappedElm);
+        console.log(unwrappedElm.querySelector(focusableEls));
+        console.log(editorElm);
+    }
+
+    // function focusTrap(element, namespace) {
+    //         var firstFocusableEl = focusableEls[0];  
+    //         var lastFocusableEl = focusableEls[focusableEls.length - 1];
+    //         var KEYCODE_TAB = 9;
+    
+    //     element.addEventListener('keydown', function(e) {
+    //         var isTabPressed = (e.key === 'Tab' || e.keyCode === KEYCODE_TAB);
+    
+    //         if (!isTabPressed) { 
+    //             return; 
+    //         }
+    
+    //         if ( e.shiftKey ) /* shift + tab */ {
+    //             if (document.activeElement === firstFocusableEl) {
+    //                 lastFocusableEl.focus();
+    //                 e.preventDefault();
+    //             }
+    //         } else /* tab */ {
+    //             if (document.activeElement === lastFocusableEl) {
+    //                 firstFocusableEl.focus();
+    //                 e.preventDefault();
+    //             }
+    //         }
+    
+    //     });
+    // }
+
     var domNodes = {};
 
     /**
@@ -19,7 +57,7 @@
         domNodes.appHeader = document.querySelector('.umb-app-header');
         domNodes.leftColumn = document.querySelector('#leftcolumn');
         domNodes.mainWrapper = document.querySelector('#mainwrapper');
-        domNodes.editorsPrevSibling = document.querySelector('.umb-editors').previousElementSibling;
+        // domNodes.editorsPrevSibling = document.querySelector('.umb-editors').previousElementSibling;
         domNodes.editor = document.querySelector('.umb-editor');
     }
 
@@ -46,7 +84,7 @@
              * @description
              * Call this method before a new infinite overlay is activated to ensure focus is locked inside it
              *
-             * @param {Array} element array containing an element
+             * @param {Array} elm array containing an element
              * @param {Number} overlays a number of overlays that are open
              *
              */
@@ -57,16 +95,26 @@
                 getDOMNodes();
 
                 // Disable "outer" elements once
-                if(overlays === 0){
+                if(overlays === 1){
                     domNodes.leftColumn.setAttribute('inert','');
                     domNodes.appHeader.setAttribute('inert','');
-                    domNodes.editorsPrevSibling.setAttribute('inert','');
+                    domNodes.editor.setAttribute('inert','');
                 }
 
+                // TODO: Make sure to inert the previous editor when a new one opens
+                // TODO: Make sure to add the focusTrap
+
                 // Disable infinite editors if they're not the current editor
-                if(children.length){
-                    children.attr('inert','');
-                }
+                // if(children.length){
+                //     children.attr('inert','');
+                // }
+
+                console.log('children: ', children);
+
+                // Add foucsTrap call here!
+                // setTimeout(function(){
+                //     focusTrap(elm);
+                // }, 100);
             },
 
             /**
@@ -78,7 +126,7 @@
              * @description
              * Call this method when an infinite editor is closed to enable the locked elements in the DOM again
              *
-             * @param {Array} element array containing an element
+             * @param {Array} elm array containing an element
              * @param {Number} overlays a number of overlays that are open
              *
              */
@@ -86,22 +134,21 @@
                 var children = elm.children();
                 var secondLastChildIndex = children.length - 2;
                 var secondLastChild = children[secondLastChildIndex];
-                var focusableElementsString = 'a[href], area[href], input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), iframe, object, embed, [tabindex="0"], [contenteditable]';
 
                 // Enable "outer" elements once
-                if(overlays === 1){
+                if(overlays === 0){
                     domNodes.leftColumn.removeAttribute('inert','');
                     domNodes.appHeader.removeAttribute('inert','');
                     domNodes.editor.removeAttribute('inert','');
                 }
 
-                if(secondLastChild) {
-                    var firstFocusableElement = secondLastChild.querySelector(focusableElementsString);
-                    secondLastChild.removeAttribute('inert','');
+                // if(secondLastChild) {
+                //     var firstFocusableElement = secondLastChild.querySelector(focusableEls);
+                //     secondLastChild.removeAttribute('inert','');
 
-                    // Set focus on the first possible element in the editor that is unlocked
-                    resetFocus(firstFocusableElement);
-                }
+                //     // Set focus on the first possible element in the editor that is unlocked
+                //     resetFocus(firstFocusableElement);
+                // }
             },
 
             /**
