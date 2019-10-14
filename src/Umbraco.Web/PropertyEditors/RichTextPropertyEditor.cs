@@ -114,16 +114,16 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
-                var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(editorValue.Value.ToString());
-                var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
-
                 var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
 
                 var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(parseAndSavedTempImages);
+                var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
+
                 return parsed;
             }
         }
