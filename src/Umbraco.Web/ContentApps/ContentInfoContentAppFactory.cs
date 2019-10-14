@@ -39,7 +39,7 @@ namespace Umbraco.Web.ContentApps
                         Weight = Weight
                     });
                 case IMember _:
-                    return _mediaApp ?? (_mediaApp = new ContentApp
+                    return _memberApp ?? (_memberApp = new ContentApp
                     {
                         Alias = "umbInfo",
                         Name = "Info",
