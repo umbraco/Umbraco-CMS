@@ -260,6 +260,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
             MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
+
+            LocalizationService.SavedLanguage += OnLanguageSaved;
         }
 
         private void TearDownRepositoryEvents()
@@ -277,6 +279,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
             MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
+
+            LocalizationService.SavedLanguage -= OnLanguageSaved;
         }
 
         public override void Dispose()
@@ -1307,6 +1311,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var memberTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (memberTypeIds.Any())
                 RebuildMemberDbCache(contentTypeIds: memberTypeIds);
+        }
+
+        /// <summary>
+        /// If a <see cref="ILanguage"/> is ever saved with a different culture, we need to rebuild all of the content nucache table
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLanguageSaved(ILocalizationService sender, Core.Events.SaveEventArgs<ILanguage> e)
+        {
+            var cultureChanged = e.SavedEntities.Any(x => x.WasPropertyDirty(nameof(ILanguage.IsoCode)));
+            if(cultureChanged)
+            {
+                RebuildContentDbCache();
+            }
         }
 
         private ContentNuDto GetDto(IContentBase content, bool published)

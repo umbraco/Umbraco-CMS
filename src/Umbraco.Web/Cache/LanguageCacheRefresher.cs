@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.PublishedCache;
+using static Umbraco.Web.Cache.LanguageCacheRefresher.JsonPayload;
 
 namespace Umbraco.Web.Cache
 {
@@ -12,11 +13,10 @@ namespace Umbraco.Web.Cache
 
     //CacheRefresherBase<LanguageCacheRefresher>
     {
-        public LanguageCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IDomainService domainService)
+        public LanguageCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService)
             : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
-            _domainService = domainService;
         }
 
         #region Define
@@ -45,20 +45,21 @@ namespace Umbraco.Web.Cache
             //clear all no matter what type of payload
             ClearAllIsolatedCacheByEntityType<ILanguage>();
 
+            //clear all no matter what type of payload
+            RefreshDomains();
+
             foreach (var payload in payloads)
             {   
-                RefreshDomains(payload.Id);
-
                 switch (payload.ChangeType)
                 {
-                    case JsonPayload.LanguageChangeType.Update:
+                    case LanguageChangeType.Update:
                         clearDictionary = true;
                         break;
-                    case JsonPayload.LanguageChangeType.Remove:
+                    case LanguageChangeType.Remove:
                         clearDictionary = true;
                         clearContent = true;
                         break;
-                    case JsonPayload.LanguageChangeType.ChangeCulture:
+                    case LanguageChangeType.ChangeCulture:
                         clearDictionary = true;
                         clearContent = true;
                         break;
@@ -70,11 +71,13 @@ namespace Umbraco.Web.Cache
                 ClearAllIsolatedCacheByEntityType<IDictionaryItem>();
             }
 
-            //if this flag is set, we will tell the published snapshot service to refresh ALL content
+            //if this flag is set, we will tell the published snapshot service to refresh ALL content and evict ALL IContent items
             if (clearContent)
             {
+                ContentCacheRefresher.RefreshContentTypes(AppCaches); // we need to evict all IContent items
+                //now refresh all nucache
                 var clearContentPayload = new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
-                ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, clearContentPayload);
+                ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, clearContentPayload);                
             }
 
             // then trigger event
@@ -94,23 +97,19 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        private void RefreshDomains(int langId)
+        /// <summary>
+        /// Clears all domain caches
+        /// </summary>
+        private void RefreshDomains()
         {
-            var assignedDomains = _domainService.GetAll(true).Where(x => x.LanguageId.HasValue && x.LanguageId.Value == langId).ToList();
+            ClearAllIsolatedCacheByEntityType<IDomain>();
 
-            if (assignedDomains.Count > 0)
-            {
-                // TODO: this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
-                // and we cannot inject the CacheRefresherCollection since that would be a circular reference, so what is the best way to call directly in to the
-                // DomainCacheRefresher?
+            // note: must do what's above FIRST else the repositories still have the old cached
+            // content and when the PublishedCachesService is notified of changes it does not see
+            // the new content...
 
-                ClearAllIsolatedCacheByEntityType<IDomain>();
-                // note: must do what's above FIRST else the repositories still have the old cached
-                // content and when the PublishedCachesService is notified of changes it does not see
-                // the new content...
-                // notify
-                _publishedSnapshotService.Notify(assignedDomains.Select(x => new DomainCacheRefresher.JsonPayload(x.Id, DomainChangeTypes.Remove)).ToArray());
-            }
+            var payloads = new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) };
+            _publishedSnapshotService.Notify(payloads);
         }
 
         #region Json
