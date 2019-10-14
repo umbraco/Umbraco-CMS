@@ -417,6 +417,7 @@
     <key alias="insertMacro">Click to add a Macro</key>
     <key alias="inserttable">Insert table</key>
     <key alias="languagedeletewarning">This will delete the language</key>
+    <key alias="languageChangeWarning">Changing the culture for a language may be an expensive operation and will result in the content cache and indexes being rebuilt</key>
     <key alias="lastEdited">Last Edited</key>
     <key alias="link">Link</key>
     <key alias="linkinternal">Internal link:</key>
@@ -1273,6 +1274,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
   </area>
   <area alias="mediaPicker">
+    <key alias="deletedItem">Deleted item</key>
     <key alias="pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</key>
     <key alias="trashed">Trashed</key>
@@ -2152,6 +2154,15 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="goBack">Go back</key>
     <key alias="activeListLayout">Active layout:</key>
     <key alias="jumpTo">Jump to</key>
-    <key alias="group">group</key>    
+    <key alias="group">group</key>
+    <key alias="passed">passed</key>
+    <key alias="warning">warning</key>
+    <key alias="failed">failed</key>
+    <key alias="suggestion">suggestion</key>
+    <key alias="checkPassed">Check passed</key>
+    <key alias="checkFailed">Check failed</key>
+    <key alias="openBackofficeSearch">Open backoffice search</key>
+    <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
+    <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
   </area>
 </language>
