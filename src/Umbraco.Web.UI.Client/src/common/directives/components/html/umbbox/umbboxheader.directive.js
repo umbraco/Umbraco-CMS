@@ -63,7 +63,7 @@ Use this directive to construct a title. Recommended to use it inside an {@link 
                 scope.titleLabel = scope.title;
 
                 if (scope.titleKey) {
-                    localizationService.localize(scope.titleKey).then((data) => {
+                    localizationService.localize(scope.titleKey, [], scope.title).then((data) => {
                         scope.titleLabel = data;
                     });
 
@@ -72,7 +72,7 @@ Use this directive to construct a title. Recommended to use it inside an {@link 
                 scope.descriptionLabel = scope.description;
 
                 if (scope.descriptionKey) {
-                    localizationService.localize(scope.descriptionKey).then((data) => {
+                    localizationService.localize(scope.descriptionKey, [], scope.description).then((data) => {
                         scope.descriptionLabel = data;
                     });
 
