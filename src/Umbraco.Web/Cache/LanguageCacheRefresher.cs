@@ -45,9 +45,6 @@ namespace Umbraco.Web.Cache
             //clear all no matter what type of payload
             ClearAllIsolatedCacheByEntityType<ILanguage>();
 
-            //clear all no matter what type of payload
-            RefreshDomains();
-
             foreach (var payload in payloads)
             {   
                 switch (payload.ChangeType)
@@ -56,9 +53,6 @@ namespace Umbraco.Web.Cache
                         clearDictionary = true;
                         break;
                     case LanguageChangeType.Remove:
-                        clearDictionary = true;
-                        clearContent = true;
-                        break;
                     case LanguageChangeType.ChangeCulture:
                         clearDictionary = true;
                         clearContent = true;
@@ -74,6 +68,8 @@ namespace Umbraco.Web.Cache
             //if this flag is set, we will tell the published snapshot service to refresh ALL content and evict ALL IContent items
             if (clearContent)
             {
+                //clear all domain caches
+                RefreshDomains();
                 ContentCacheRefresher.RefreshContentTypes(AppCaches); // we need to evict all IContent items
                 //now refresh all nucache
                 var clearContentPayload = new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
