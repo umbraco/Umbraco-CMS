@@ -180,7 +180,6 @@
     <key alias="linkinternal"><![CDATA[Link interno:]]></key>
     <key alias="linklocaltip"><![CDATA[Quando usi il link locale, inserisci # prima del link]]></key>
     <key alias="linknewwindow"><![CDATA[Apri in nuova finestra?]]></key>
-    <key alias="macroContainerSettings">Impostazioni Macro</key>
     <key alias="macroDoesNotHaveProperties"><![CDATA[Questa macro non contiene proprietà editabili]]></key>
     <key alias="paste">Incolla</key>
     <key alias="permissionsEdit">Modifica il Permesso per</key>
