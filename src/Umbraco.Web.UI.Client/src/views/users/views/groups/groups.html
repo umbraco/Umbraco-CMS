@@ -86,7 +86,7 @@
             <div class="umb-table-row"
                 ng-repeat="group in vm.filteredUserGroups track by $index"
                 ng-click="vm.selectUserGroup(group, $index, $event)"
-                ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && group.alias !== 'admin' && group.alias !== 'translator'}">
+                ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && !group.isSystemUserGroup}">
 
                 <div class="umb-table-cell">
                     <i ng-if="group.icon" class="umb-table-body__icon umb-table-body__fileicon {{ group.icon }}"></i>

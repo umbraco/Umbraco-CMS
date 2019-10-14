@@ -155,7 +155,13 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                         currentRouteParams = toRetain;
                     }
                     else {
-                        currentRouteParams = angular.copy(next.params); 
+                        currentRouteParams = angular.copy(next.params);
+                    }
+
+                    //always clear the 'sr' query string (soft redirect) if it exists
+                    if (currentRouteParams.sr) {
+                        currentRouteParams.sr = null;
+                        $route.updateParams(currentRouteParams);
                     }
                     
                 }
