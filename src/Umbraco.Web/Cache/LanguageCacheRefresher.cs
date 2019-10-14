@@ -8,7 +8,9 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class LanguageCacheRefresher : CacheRefresherBase<LanguageCacheRefresher>
+    public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageCacheRefresher, LanguageCacheRefresher.JsonPayload>
+
+    //CacheRefresherBase<LanguageCacheRefresher>
     {
         public LanguageCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IDomainService domainService)
             : base(appCaches)
@@ -33,21 +35,62 @@ namespace Umbraco.Web.Cache
 
         #region Refresher
 
-        public override void Refresh(int id)
+        public override void Refresh(JsonPayload[] payloads)
         {
+            if (payloads.Length == 0) return;
+
+            var clearDictionary = false;
+            var clearContent = false;
+
+            //clear all no matter what type of payload
             ClearAllIsolatedCacheByEntityType<ILanguage>();
-            RefreshDomains(id);
-            base.Refresh(id);
+
+            foreach (var payload in payloads)
+            {   
+                RefreshDomains(payload.Id);
+
+                switch (payload.ChangeType)
+                {
+                    case JsonPayload.LanguageChangeType.Update:
+                        clearDictionary = true;
+                        break;
+                    case JsonPayload.LanguageChangeType.Remove:
+                        clearDictionary = true;
+                        clearContent = true;
+                        break;
+                    case JsonPayload.LanguageChangeType.ChangeCulture:
+                        clearDictionary = true;
+                        clearContent = true;
+                        break;
+                }
+            }
+
+            if (clearDictionary)
+            {
+                ClearAllIsolatedCacheByEntityType<IDictionaryItem>();
+            }
+
+            //if this flag is set, we will tell the published snapshot service to refresh ALL content
+            if (clearContent)
+            {
+                var clearContentPayload = new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
+                ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, clearContentPayload);
+            }
+
+            // then trigger event
+            base.Refresh(payloads);
         }
 
-        public override void Remove(int id)
-        {
-            ClearAllIsolatedCacheByEntityType<ILanguage>();
-            //if a language is removed, then all dictionary cache needs to be removed
-            ClearAllIsolatedCacheByEntityType<IDictionaryItem>();
-            RefreshDomains(id);
-            base.Remove(id);
-        }
+        // these events should never trigger
+        // everything should be PAYLOAD/JSON
+
+        public override void RefreshAll() => throw new NotSupportedException();
+
+        public override void Refresh(int id) => throw new NotSupportedException();
+
+        public override void Refresh(Guid id) => throw new NotSupportedException();
+
+        public override void Remove(int id) => throw new NotSupportedException();
 
         #endregion
 
@@ -69,5 +112,46 @@ namespace Umbraco.Web.Cache
                 _publishedSnapshotService.Notify(assignedDomains.Select(x => new DomainCacheRefresher.JsonPayload(x.Id, DomainChangeTypes.Remove)).ToArray());
             }
         }
+
+        #region Json
+
+        public class JsonPayload
+        {
+            public JsonPayload(int id, string isoCode, LanguageChangeType changeType)
+            {
+                Id = id;
+                IsoCode = isoCode;
+                ChangeType = changeType;
+            }
+
+            public int Id { get; }
+            public string IsoCode { get; }
+            public LanguageChangeType ChangeType { get; }
+
+            public enum LanguageChangeType
+            {
+                /// <summary>
+                /// A new languages has been added
+                /// </summary>
+                Add = 0,
+
+                /// <summary>
+                /// A language has been deleted
+                /// </summary>
+                Remove = 1,
+
+                /// <summary>
+                /// A language has been updated - but it's culture remains the same
+                /// </summary>
+                Update = 2,
+
+                /// <summary>
+                /// A language has been updated - it's culture has changed
+                /// </summary>
+                ChangeCulture = 3
+            }
+        }
+
+        #endregion
     }
 }
