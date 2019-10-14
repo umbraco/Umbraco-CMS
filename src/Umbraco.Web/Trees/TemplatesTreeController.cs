@@ -3,12 +3,18 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Search;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -20,6 +26,13 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class TemplatesTreeController : TreeController, ISearchableTree
     {
+        private readonly UmbracoTreeSearcher _treeSearcher;
+
+        public TemplatesTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+            _treeSearcher = treeSearcher;
+        }
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
@@ -119,10 +132,6 @@ namespace Umbraco.Web.Trees
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-        {
-            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.Template, pageIndex, pageSize, out totalFound,
-                filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
-            return Mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
-        }
+            => _treeSearcher.EntitySearch(UmbracoObjectTypes.Template, query, pageSize, pageIndex, out totalFound, searchFrom);
     }
 }
