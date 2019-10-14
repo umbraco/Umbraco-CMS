@@ -489,6 +489,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         const dialog = {
             view: "views/propertyeditors/listview/overlays/listviewunpublish.html",
             submitButtonLabelKey: "actions_unpublish",
+            submitButtonStyle: "warning",
             submit: function (model) {
 
                 // create a comma separated array of selected cultures
