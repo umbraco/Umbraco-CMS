@@ -60,6 +60,9 @@ namespace Umbraco.Web.PropertyEditors
             Description = "The bulk actions that are allowed from the list view")]
         public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // TODO: managing defaults?
 
+        [ConfigurationField("icon", "Content app icon", "views/propertyeditors/listview/icon.prevalues.html", Description = "The icon of the listview content app")]
+        public string Icon { get; set; }
+
         [ConfigurationField("tabName", "Content app name", "textstring", Description = "The name of the listview content app (default if empty: 'Child Items')")]
         public string TabName { get; set; }
 
