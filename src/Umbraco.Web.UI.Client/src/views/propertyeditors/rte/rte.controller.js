@@ -89,7 +89,10 @@ angular.module("umbraco")
                 
                 angular.extend(baseLineConfigObj, standardConfig);
                 
-                tinymce.init(baseLineConfigObj);
+                // We need to wait for DOM to have rendered before we can find the element by ID.
+                $timeout(function () {
+                    tinymce.init(baseLineConfigObj);
+                }, 150);
                 
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 var unsubscribe = $scope.$on("formSubmitting", function () {
