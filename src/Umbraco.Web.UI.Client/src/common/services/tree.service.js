@@ -810,8 +810,17 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             var node = args.node;
 
             var doSync = function () {
-                //check if it exists in the already loaded children
-                var child = self.getChildNode(node, args.path[currPathIndex]);
+                // dig through the rest of the path to find the applicable child (the tree path may not be complete for users with start nodes)
+                var child = null;
+                _.find(_.rest(args.path, currPathIndex), function (id) {
+                    child = self.getChildNode(node, id);
+                    if (child != null) {
+                        // fast forward the current index to the index of the found child
+                        currPathIndex = _.indexOf(args.path, id);
+                        return true;
+                    }
+                    return false;
+                });
                 if (child) {
                     if (args.path.length === (currPathIndex + 1)) {
                         //woot! synced the node

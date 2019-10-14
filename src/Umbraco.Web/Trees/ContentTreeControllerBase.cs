@@ -184,19 +184,7 @@ namespace Umbraco.Web.Trees
             GetUserStartNodes(out var userStartNodes, out var userStartNodePaths);
 
             nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
-
-            // if the user does not have access to the root node, what we have is the start nodes,
-            // but to provide some context we also need to add their topmost nodes when they are not
-            // topmost nodes themselves (level > 1).
-            if (id == rootIdString && hasAccessToRoot == false)
-            {
-                var topNodeIds = entities.Where(x => x.Level > 1).Select(GetTopNodeId).Where(x => x != 0).Distinct().ToArray();
-                if (topNodeIds.Length > 0)
-                {
-                    var topNodes = Services.EntityService.GetAll(UmbracoObjectType, topNodeIds.ToArray());
-                    nodes.AddRange(topNodes.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
-                }
-            }
+            
 
             return nodes;
         }
