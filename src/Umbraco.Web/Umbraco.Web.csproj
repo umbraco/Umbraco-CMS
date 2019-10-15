@@ -486,8 +486,6 @@
     <Compile Include="PropertyEditors\IntegerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ListViewConfiguration.cs" />
     <Compile Include="PropertyEditors\ListViewConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\MacroContainerConfiguration.cs" />
-    <Compile Include="PropertyEditors\MacroContainerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MarkdownConfiguration.cs" />
     <Compile Include="PropertyEditors\MarkdownConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
@@ -810,7 +808,6 @@
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="PropertyEditors\GridPropertyEditor.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MacroContainerValueConverter.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
     <Compile Include="PublishedCache\PublishedMember.cs" />
     <Compile Include="Models\ContentModelOfTContent.cs" />
@@ -848,7 +845,6 @@
     <Compile Include="PropertyEditors\ImageCropperPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MacroContainerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MarkdownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberGroupPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
