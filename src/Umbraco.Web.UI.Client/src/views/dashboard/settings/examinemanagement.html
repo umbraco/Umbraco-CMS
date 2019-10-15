@@ -159,10 +159,7 @@
                                                                 <td>
                                                                     <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
                                                                     <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
-                                                                    &nbsp;
-                                                                    <button type="button" class="color-green" ng-click="vm.showSearchResultDialog(result.values)">
-                                                                        <em>({{result.fieldCount}} fields)</em>
-                                                                    </button>
+                                                                    <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -302,10 +299,7 @@
                                                                 <td>
                                                                     <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
                                                                     <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
-                                                                    &nbsp;
-                                                                    <button type="button" class="color-green" ng-click="vm.showSearchResultDialog(result.values)">
-                                                                        <em>({{result.fieldCount}} fields)</em>
-                                                                    </button>
+                                                                    <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>

@@ -512,6 +512,7 @@
     <key alias="searchDescription">Søg i indekset og se resultaterne</key>
     <key alias="tools">Værktøjer</key>
     <key alias="toolsDescription">Værktøjer til at administrere indekset</key>
+    <key alias="fields">felter</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
