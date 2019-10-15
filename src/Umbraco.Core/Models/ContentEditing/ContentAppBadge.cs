@@ -11,6 +11,14 @@
     public class ContentAppBadge
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ContentAppBadge"/> class.
+        /// </summary>
+        public ContentAppBadge()
+        {
+            this.Type = ContentAppBadgeType.Default;
+        }
+
+        /// <summary>
         /// Gets or sets the number displayed in the badge
         /// </summary>
         [DataMember(Name = "count")]
