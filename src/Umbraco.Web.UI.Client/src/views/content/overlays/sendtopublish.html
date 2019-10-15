@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.SendToPublishController as vm">
 
-    <div style="margin-bottom: 15px;">
+    <div class="mb3">
         <p><localize key="content_languagesToSendForApproval"></localize></p>
     </div>
 
@@ -46,7 +46,7 @@
     </div>
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading && (vm.variants | filter:vm.unmodifiedVariantFilter).length > 0">
-        <div style="margin-bottom: 15px; font-weight: bold;">
+        <div class="bold mb3">
             <p><localize key="content_unmodifiedLanguages"></localize></p>
         </div>
 

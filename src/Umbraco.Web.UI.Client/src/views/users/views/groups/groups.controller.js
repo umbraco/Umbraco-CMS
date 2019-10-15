@@ -81,7 +81,7 @@
             }
             // Disallow selection of the admin/translators group, the checkbox is not visible in the UI, but clicking(and thus selecting) is still possible.
             // Currently selection can only be used for deleting, and the Controller will also disallow deleting the admin group.
-            if (userGroup.alias === "admin" || userGroup.alias === "translator")
+            if (userGroup.isSystemUserGroup)
                 return;
             
             listViewHelper.selectHandler(userGroup, $index, vm.userGroups, vm.selection, $event);
