@@ -230,7 +230,7 @@ namespace Umbraco.Web.Models.Mapping
                     // NOTE: this case covers both content and media entities
                     return contentEntity.ContentTypeIcon;
                 case MemberEntitySlim memberEntity:
-                    return memberEntity.ContentTypeIcon;
+                    return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(Constants.Icons.Member);
             }
 
             return null;
