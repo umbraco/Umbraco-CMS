@@ -56,7 +56,6 @@
             }
 
             vm.loading = false;
-            
         }
 
         onInit();
