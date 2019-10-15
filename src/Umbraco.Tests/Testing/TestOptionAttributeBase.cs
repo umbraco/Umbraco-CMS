@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Testing
             var test = TestContext.CurrentContext.Test;
             var typeName = test.ClassName;
             var methodName = test.MethodName;
-            var type = Type.GetType(typeName, true);
+            var type = Type.GetType(typeName, false);
             if (type == null)
             {
                 type = ScanAssemblies
