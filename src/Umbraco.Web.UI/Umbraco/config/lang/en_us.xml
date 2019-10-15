@@ -342,6 +342,7 @@
     <key alias="noDocumentTypesWithNoSettingsAccess">The selected page in the content tree doesn't allow for any pages to be created below it.</key>
     <key alias="noDocumentTypesEditPermissions">Edit permissions for this document type</key>
     <key alias="noDocumentTypesCreateNew">Create a new document type</key>
+    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
     <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>

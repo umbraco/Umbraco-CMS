@@ -22,7 +22,12 @@ function contentCreateController($scope,
     function initialize() {
         $scope.loading = true;
         $scope.allowedTypes = null;
+        $scope.countTypes = 0;
 
+        var getCount = contentTypeResource.getCount().then(function (data) {
+            $scope.countTypes = data;
+        });
+        
         var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
         });
@@ -37,7 +42,7 @@ function contentCreateController($scope,
             }
         });
 
-        $q.all([getAllowedTypes, getCurrentUser]).then(function() {
+        $q.all([getCount, getAllowedTypes, getCurrentUser]).then(function() {
             $scope.loading = false;
         });
 
@@ -97,7 +102,7 @@ function contentCreateController($scope,
 
     $scope.close = function() {
         close();
-    }
+    };
 
     $scope.closeDialog = function (showMenu) {
         navigationService.hideDialog(showMenu);
@@ -106,12 +111,12 @@ function contentCreateController($scope,
     $scope.createContentType = function () {
         $location.path("/settings/documenttypes/edit/-1").search("create", "true");
         close();
-    }
+    };
 
     $scope.editContentType = function () {
         $location.path("/settings/documenttypes/edit/" + $scope.contentTypeId).search("view", "permissions");
         close();
-    }
+    };
 
     $scope.createBlank = createBlank;
     $scope.createOrSelectBlueprintIfAny = createOrSelectBlueprintIfAny;
