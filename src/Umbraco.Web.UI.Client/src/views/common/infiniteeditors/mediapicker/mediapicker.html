@@ -54,22 +54,33 @@
                 <div class="row umb-control-group" ng-show="!vm.searchOptions.filter">
                     <ul class="umb-breadcrumbs">
                         <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
-                            <a href ng-click="vm.gotoFolder()" prevent-default><localize key="treeHeaders_media">Media</localize></a>
-                            <span class="umb-breadcrumbs__separator">&#47;</span>
+                            <button type="button" class="umb-breadcrumbs__action" ng-click="vm.gotoFolder()">
+                                <localize key="treeHeaders_media">Media</localize>
+                            </button>
+                            <span class="umb-breadcrumbs__separator" aria-hidden="true">&#47;</span>
                         </li>
 
                         <li ng-repeat="item in path" class="umb-breadcrumbs__ancestor">
-                            <a href ng-click="vm.gotoFolder(item)" prevent-default>{{item.name}}</a>
-                            <span class="umb-breadcrumbs__separator">&#47;</span>
+                            <button type="button" class="umb-breadcrumbs__action" ng-click="vm.gotoFolder(item)">{{item.name}}</button>
+                            <span class="umb-breadcrumbs__separator" aria-hidden="true">&#47;</span>
                         </li>
 
                         <li class="umb-breadcrumbs__ancestor" ng-show="!lockedFolder">
-                            <a role="button" aria-label="Create new folder"  ng-hide="model.showFolderInput" ng-click="model.showFolderInput = true">
-                                <i class="icon icon-add small"></i>
-                            </a>
+                            <button type="button" class="umb-breadcrumbs__action" ng-hide="model.showFolderInput" ng-click="model.showFolderInput = true">
+                                <i class="icon icon-add small" aria-hidden="true"></i>
+                                <span class="sr-only">
+                                    <localize key="visuallyHiddenTexts_createNewFolder">Create new folder</localize>
+                                </span>
+                            </button>
 
-                            <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="model.showFolderInput" ng-model="model.newFolderName" ng-keydown="enterSubmitFolder($event)"
-                                ng-blur="vm.submitFolder()" focus-when="{{model.showFolderInput}}" />
+                            <input type="text"
+                                class="umb-breadcrumbs__add-ancestor"
+                                ng-show="model.showFolderInput"
+                                ng-model="model.newFolderName"
+                                ng-keydown="enterSubmitFolder($event)"
+                                ng-blur="vm.submitFolder()"
+                                focus-when="{{model.showFolderInput}}"
+                            />
                         </li>
                     </ul>
                     <div class="umb-loader" ng-if="model.creatingFolder"></div>
