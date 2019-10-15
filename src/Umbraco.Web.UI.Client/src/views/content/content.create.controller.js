@@ -22,11 +22,7 @@ function contentCreateController($scope,
     function initialize() {
         $scope.loading = true;
         $scope.allowedTypes = null;
-        $scope.countTypes = 0;
-
-        var getCount = contentTypeResource.getCount().then(function (data) {
-            $scope.countTypes = data;
-        });
+        $scope.countTypes = contentTypeResource.getCount;
         
         var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
@@ -42,7 +38,7 @@ function contentCreateController($scope,
             }
         });
 
-        $q.all([getCount, getAllowedTypes, getCurrentUser]).then(function() {
+        $q.all([getAllowedTypes, getCurrentUser]).then(function() {
             $scope.loading = false;
         });
 
