@@ -993,7 +993,7 @@ namespace Umbraco.Web
                     {
                         if (contentTypeAliasFilter.IsNullOrWhiteSpace() == false)
                         {
-                            if (!n.ContentType.Alias.InvariantEquals(contentTypeAliasFilter))
+                            if (n.ContentType.Alias.InvariantEquals(contentTypeAliasFilter) == false)
                                 continue; //skip this one, it doesn't match the filter
                         }
 
