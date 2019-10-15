@@ -169,7 +169,7 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             {
                 var i = db.Execute(@"UPDATE umbracoLock SET value = value*-1 WHERE id=@id", new { id = lockId });
                 if (i == 0) // ensure we are actually locking!
-                    throw new InvalidOperationException($"LockObject with id={lockId} does not exist.");
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
             }
         }
         
@@ -185,7 +185,7 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             {
                 var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
                 if (i == null) // ensure we are actually locking!
-                    throw new InvalidOperationException($"LockObject with id={lockId} does not exist.");
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
             }
         }
 
