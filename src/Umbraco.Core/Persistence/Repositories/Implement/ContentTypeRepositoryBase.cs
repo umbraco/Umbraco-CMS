@@ -219,6 +219,7 @@ AND umbracoNode.nodeObjectType = @objectType",
 
         protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
         {
+            CorrectPropertyTypeVariations(entity);
             ValidateVariations(entity);
 
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
@@ -411,15 +412,7 @@ AND umbracoNode.id <> @id",
             // note: this only deals with *local* property types, we're dealing w/compositions later below
             foreach (var propertyType in entity.PropertyTypes)
             {
-                // Update property variations
-
-                // Determine target variation of the property type.
-                // The property is only considered culture variant when the base content type is also culture variant.
-                // The property is only considered segment variant when the base content type is also segment variant.
-                // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
-                propertyType.Variations = newContentTypeVariation & propertyType.Variations;
-
-                // then, track each property individually
+                // track each property individually
                 if (propertyType.IsPropertyDirty("Variations"))
                 {
                     // allocate the list only when needed
@@ -508,6 +501,25 @@ AND umbracoNode.id <> @id",
                     DeletePropertyType(entity.Id, id);
 
             CommonRepository.ClearCache(); // always
+        }
+
+        /// <summary>
+        /// Corrects the property type variations for the given entity
+        /// to make sure the property type variation is compatible with the
+        /// variation set on the entity itself.        
+        /// </summary>
+        /// <param name="entity">Entity to correct properties for</param>
+        private void CorrectPropertyTypeVariations(IContentTypeComposition entity)
+        {
+            // Update property variations based on the content type variation
+            foreach (var propertyType in entity.PropertyTypes)
+            {
+                // Determine variation for the property type.
+                // The property is only considered culture variant when the base content type is also culture variant.
+                // The property is only considered segment variant when the base content type is also segment variant.
+                // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
+                propertyType.Variations = entity.Variations & propertyType.Variations;
+            }
         }
 
         /// <summary>
