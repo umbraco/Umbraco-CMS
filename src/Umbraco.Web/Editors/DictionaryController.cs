@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -197,6 +198,47 @@ namespace Umbraco.Web.Editors
                 Logger.Error(GetType(), ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary"));
             }
+        }
+
+        /// <summary>
+        /// Moves a dictionary item
+        /// </summary>
+        /// <param name="moveOrCopy"></param>
+        /// <returns>
+        /// </returns>
+        public HttpResponseMessage PostMove(MoveOrCopy moveOrCopy)
+        {
+            var dictionaryItem = Services.LocalizationService.GetDictionaryItemById(moveOrCopy.Id);
+            if (dictionaryItem == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (moveOrCopy.ParentId != -1)
+            {
+                var parentDictionaryItem = Services.LocalizationService.GetDictionaryItemById(moveOrCopy.ParentId);
+                if (parentDictionaryItem == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+
+                var parent = Mapper.Map<IDictionaryItem, DictionaryDisplay>(parentDictionaryItem);
+
+                // Check on paths
+                if ($",{parent.Path},".IndexOf($",{dictionaryItem.Id},", StringComparison.Ordinal) > -1)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedByPath")));
+                }
+            }
+
+            Services.LocalizationService.Move(dictionaryItem, moveOrCopy.ParentId);
+
+            var moved = Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(moved.Path, Encoding.UTF8, "text/plain");
+            return response;
         }
 
         /// <summary>

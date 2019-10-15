@@ -119,6 +119,40 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
     }
 
     /**
+        * @ngdoc method
+        * @name umbraco.resources.dictionaryResource#move
+        * @methodOf umbraco.resources.dictionaryResource
+        *
+        * @description
+        * Moves a dictionary
+        *
+        * @param {Object} args arguments object
+        * @param {Int} args.id the ID of the node to move
+        * @param {Int} args.parentId the ID of the parent node to move to
+        * @returns {Promise} resourcePromise object.
+        *
+        */
+    function move(args) {
+        if (!args) {
+            throw "args cannot be null";
+        }
+        if (!args.parentId) {
+            throw "args.parentId cannot be null";
+        }
+        if (!args.id) {
+            throw "args.id cannot be null";
+        }
+
+        return umbRequestHelper.resourcePromise(
+            $http.post(umbRequestHelper.getApiUrl("dictionaryApiBaseUrl", "PostMove"),
+                {
+                    parentId: args.parentId,
+                    id: args.id
+                }, { responseType: "text" }),
+            "Failed to move dictionary");
+    }
+
+    /**
          * @ngdoc method
          * @name umbraco.resources.dictionaryResource#getList
          * @methodOf umbraco.resources.dictionaryResource
@@ -151,6 +185,7 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
     create: create,
     getById: getById,
     save: save,
+    move: move,
     getList : getList
   };
 

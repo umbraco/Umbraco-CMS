@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -130,7 +131,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var translation in dictionaryItem.Translations)
                 translation.Value = translation.Value.ToValidXmlString();
-            
+
             var dto = DictionaryItemFactory.BuildDto(dictionaryItem);
 
             var id = Convert.ToInt32(Database.Insert(dto));
@@ -152,7 +153,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var translation in entity.Translations)
                 translation.Value = translation.Value.ToValidXmlString();
-            
+
             var dto = DictionaryItemFactory.BuildDto(entity);
 
             Database.Update(dto);
@@ -245,6 +246,42 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var columns = new[] { "key", "id" }.Select(x => (object) SqlSyntax.GetQuotedColumnName(x)).ToArray();
             var sql = Sql().Select(columns).From<DictionaryDto>();
             return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToDictionary(x => x.Key, x => x.Id);
+        }
+
+        public IEnumerable<MoveEventInfo<IDictionaryItem>> Move(IDictionaryItem toMove, IDictionaryItem parent)
+        {
+            Guid? parentId = null;
+            if (parent != null)
+            {
+                parentId = parent.Key;
+            }
+
+            //used to track all the moved entities to be given to the event
+            var moveInfo = new List<MoveEventInfo<IDictionaryItem>>
+            {
+                new MoveEventInfo<IDictionaryItem>(toMove, null, parent?.Id ?? -1)
+            };
+
+            //do the move to a new parent
+            toMove.ParentId = parentId;
+
+            Save(toMove);
+
+            var descendants = GetDictionaryItemDescendants(parentId);
+
+            foreach (var descendant in descendants)
+            {
+                var curParentId = -1;
+                if (descendant.ParentId.HasValue)
+                {
+                    var curParent = Get(descendant.ParentId.Value);
+                    if (curParent != null)
+                        curParentId = curParent.Id;
+                }
+                moveInfo.Add(new MoveEventInfo<IDictionaryItem>(descendant, null, curParentId));
+            }
+
+            return moveInfo;
         }
 
         private class DictionaryItemKeyIdDto

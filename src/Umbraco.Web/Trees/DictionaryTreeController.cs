@@ -105,7 +105,10 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
             if (id != Constants.System.RootString)
+            {
+                menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
                 menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
+            }
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));
 

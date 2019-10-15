@@ -363,6 +363,33 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
         }
 
+
+        [Test]
+        public void Can_Move()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+
+            using (provider.CreateScope())
+            {
+                var repository = CreateRepository();
+                IDictionaryItem dictionaryItem = new DictionaryItem("di1");
+                repository.Save(dictionaryItem);
+
+                IDictionaryItem dictionaryItem2 = new DictionaryItem("di2");
+                repository.Save(dictionaryItem2);
+
+                var result = repository.Move(dictionaryItem, dictionaryItem2).ToArray();
+
+                Assert.AreEqual(2, result.Length);
+
+                //re-get
+                dictionaryItem = repository.Get(dictionaryItem.Id);
+                dictionaryItem2 = repository.Get(dictionaryItem2.Id);
+
+                Assert.AreEqual(dictionaryItem2.Key, dictionaryItem.ParentId);
+            }
+        }
+
         [TearDown]
         public override void TearDown()
         {
