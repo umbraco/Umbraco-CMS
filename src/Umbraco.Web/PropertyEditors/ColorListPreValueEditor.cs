@@ -81,8 +81,8 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             var result = new Dictionary<string, object> { { "items", items2 } };
-            var useLabel = dictionary.ContainsKey("useLabel") && dictionary["useLabel"].Value == "1";
-            if (useLabel)
+            var hasUseLabelValue = dictionary.ContainsKey("useLabel");
+            if (hasUseLabelValue)
                 result["useLabel"] = dictionary["useLabel"].Value;
 
             return result;
