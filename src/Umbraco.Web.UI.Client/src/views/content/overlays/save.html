@@ -1,13 +1,11 @@
 <div ng-controller="Umbraco.Overlays.SaveContentController as vm">
 
-
-
     <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
         <umb-load-indicator></umb-load-indicator>
     </div>
 
     <div ng-if="!vm.loading">
-        <div style="margin-bottom: 15px;">
+        <div class="mb3">
             <p>
                 <localize ng-if="!vm.isNew" key="content_languagesToSave"></localize>
                 <localize ng-if="vm.isNew" key="content_languagesToSaveForFirstTime"></localize>
@@ -53,7 +51,7 @@
         </div>
 
         <div class="umb-list umb-list--condensed" ng-if="vm.hasPristineVariants">
-            <div style="margin-bottom: 15px; font-weight: bold;">
+            <div class="bold mb3">
                 <p>
                     <localize ng-if="!vm.isNew" key="content_unmodifiedLanguages"></localize>
                     <localize ng-if="vm.isNew" key="content_untouchedLanguagesForFirstTime"></localize>

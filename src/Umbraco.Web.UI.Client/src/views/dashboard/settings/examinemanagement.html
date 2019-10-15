@@ -157,7 +157,9 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <span>{{result.values['nodeName']}}</span>&nbsp;
+                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
+                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
+                                                                    &nbsp;
                                                                     <button type="button" class="color-green" ng-click="vm.showSearchResultDialog(result.values)">
                                                                         <em>({{result.fieldCount}} fields)</em>
                                                                     </button>
@@ -298,7 +300,9 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <span>{{result.values['nodeName']}}</span>&nbsp;
+                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
+                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
+                                                                    &nbsp;
                                                                     <button type="button" class="color-green" ng-click="vm.showSearchResultDialog(result.values)">
                                                                         <em>({{result.fieldCount}} fields)</em>
                                                                     </button>
