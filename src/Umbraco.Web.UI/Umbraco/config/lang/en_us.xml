@@ -480,7 +480,7 @@
     <key alias="account">account</key>
     <key alias="selectEditor">Select editor</key>
     <key alias="selectSnippet">Select snippet</key>
-    <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</key>
+    <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
