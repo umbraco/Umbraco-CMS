@@ -17,11 +17,11 @@
 
 
         <div class="content" >
-            <p>
+            <p aria-hidden="true">
                 <localize key="media_dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</localize>
             </p>
             <!-- Drag and drop illustration -->
-            <img class="illustration" src="assets/img/uploader/upload-illustration.svg" alt="" draggable="false" />
+            <img class="illustration" src="assets/img/uploader/upload-illustration.svg" alt="" aria-hidden="true" draggable="false" />
 
 
             <!-- Select files -->
@@ -36,7 +36,7 @@
                  ngf-multiple="true"
                  ngf-pattern="{{ accept }}"
                  ngf-max-size="{{ maxFileSize }}">
-                 -&nbsp;<localize key="media_orClickHereToUpload">or click here to choose files</localize>
+                 -&nbsp;<localize key="media_orClickHereToUpload">Click here to upload your files</localize>
             </button>
         </div>
     </div>
