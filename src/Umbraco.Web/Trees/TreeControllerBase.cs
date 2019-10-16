@@ -15,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -264,6 +265,7 @@ namespace Umbraco.Web.Trees
             treeNode.Path = entity.Path;
             treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
+            treeNode.Trashed = entity.Trashed;
             return treeNode;
         }
 

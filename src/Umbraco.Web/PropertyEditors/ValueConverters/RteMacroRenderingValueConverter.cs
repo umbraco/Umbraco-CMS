@@ -11,6 +11,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
+using System.Web;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -24,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         {
             // because that version of RTE converter parses {locallink} and executes macros, its value has
             // to be cached at the published snapshot level, because we have no idea what the macros may depend on actually.
@@ -63,7 +64,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
         }
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        {
+            var converted = Convert(inter, preview);
+
+            return new HtmlString(converted == null ? string.Empty : converted);
+        }
+
+        private string Convert(object source, bool preview)
         {
             if (source == null)
             {

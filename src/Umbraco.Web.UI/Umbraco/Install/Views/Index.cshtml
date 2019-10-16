@@ -19,11 +19,13 @@
 
     <img src="assets/img/application/logo_white.png" id="logo" />
 
-    <div class="umb-loader-container" ng-style="{'width': installer.progress}">
-        <div class="umb-loader" id="loader" ng-if="installer.loading"></div>
-    </div>
+    <umb-loader position="bottom"
+                class="umb-installer-loader"
+                ng-if="installer.loading"
+                ng-style="{'width': installer.progress}">
+    </umb-loader>
 
-    <div id="overlay"  ng-cloak ng-animate="'fade'" ng-show="installer.done"></div>
+    <div id="overlay" ng-cloak ng-animate="'fade'" ng-show="installer.done"></div>
 
     <div id="installer" class="absolute-center clearfix"
          ng-cloak

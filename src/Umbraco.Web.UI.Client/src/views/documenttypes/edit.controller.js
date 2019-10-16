@@ -56,7 +56,7 @@
 
         function onInit() {
             // get init values from model when in infinite mode
-            if(infiniteMode) {
+            if (infiniteMode) {
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
                 noTemplate = $scope.model.notemplate;
@@ -89,8 +89,7 @@
                     "name": vm.labels.design,
                     "alias": "design",
                     "icon": "icon-document-dashed-line",
-                    "view": "views/documenttypes/views/design/design.html",
-                    "active": true
+                    "view": "views/documenttypes/views/design/design.html"
                 },
                 {
                     "name": vm.labels.listview,
@@ -291,6 +290,28 @@
                 });
 
             vm.page.navigation = buttons;
+            initializeActiveNavigationPanel();
+        }
+
+        function initializeActiveNavigationPanel() {
+            // Initialise first loaded panel based on page route paramater
+            // i.e. ?view=design|listview|permissions
+            var initialViewSetFromRouteParams = false;
+            var view = $routeParams.view;
+            if (view) {
+                var viewPath = "views/documenttypes/views/" + view + "/" + view + ".html";
+                for (var i = 0; i < vm.page.navigation.length; i++) {
+                    if (vm.page.navigation[i].view === viewPath) {
+                        vm.page.navigation[i].active = true;
+                        initialViewSetFromRouteParams = true;
+                        break;
+                    }
+                }
+            }
+
+            if (initialViewSetFromRouteParams === false) {
+                vm.page.navigation[0].active = true;
+            }
         }
 
         /* ---------- SAVE ---------- */
@@ -317,6 +338,7 @@
                     saveMethod: contentTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,
+                    infiniteMode: infiniteMode,
                     // we need to rebind... the IDs that have been created!
                     rebindCallback: function (origContentType, savedContentType) {
                         vm.contentType.id = savedContentType.id;
@@ -476,6 +498,12 @@
             loadDocumentType();
         }));
 
+        evts.push(eventsService.on("editors.documentType.reload", function (name, args) {
+            if (args && args.node && vm.contentType.id === args.node.id) {
+                loadDocumentType();
+            }
+        }));
+
         evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
             if(args.documentType.allowedTemplates.length > 0){
                 navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
@@ -483,6 +511,10 @@
                         navigationService.reloadNode(syncArgs.node)
                     });
             }
+        }));
+
+        evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
+            angularHelper.getCurrentForm($scope).$setDirty();
         }));
 
         //ensure to unregister from all events!

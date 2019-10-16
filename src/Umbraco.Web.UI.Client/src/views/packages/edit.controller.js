@@ -5,6 +5,9 @@
 
         const vm = this;
 
+        const packageId = $routeParams.id;
+        const create = $routeParams.create;
+
         vm.showBackButton = true;
 
         // open all expansion panels
@@ -24,36 +27,48 @@
         vm.downloadFile = downloadFile;
         vm.contributorsEditor = null;
 
-        vm.buttonLabel = "";
+        vm.selectDocumentType = selectDocumentType;
+        vm.selectTemplate = selectTemplate;
+        vm.selectStyleSheet = selectStyleSheet;
+        vm.selectMacro = selectMacro;
+        vm.selectLanguage = selectLanguage;
+        vm.selectDictionaryItem = selectDictionaryItem;
+        vm.selectDataType = selectDataType;
 
-        const packageId = $routeParams.id;
-        const create = $routeParams.create;
+        vm.labels = {};
+
+        vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;  
 
         function onInit() {
 
             if (create) {
-                //pre populate package with some values
+                // Pre populate package with some values
                 packageResource.getEmpty().then(scaffold => {
                     vm.package = scaffold;
 
+                    loadResources();
+
                     buildContributorsEditor(vm.package);
 
                     vm.loading = false;
                 });
 
-                localizationService.localize("general_create").then(function(value) {
-                    vm.buttonLabel = value;
+                localizationService.localize("general_create").then(function (value) {
+                    vm.labels.button = value;
                 });
             } else {
-                // load package
+                // Load package
                 packageResource.getCreatedById(packageId).then(createdPackage => {
                     vm.package = createdPackage;
 
+                    loadResources();
+
                     buildContributorsEditor(vm.package);
 
                     vm.loading = false;
-                    // get render model for content node
-                    if(vm.package.contentNodeId) {
+
+                    // Get render model for content node
+                    if (vm.package.contentNodeId) {
                         entityResource.getById(vm.package.contentNodeId, "Document")
                             .then((entity) => {
                                 vm.contentNodeDisplayModel = entity;
@@ -62,71 +77,86 @@
 
                 });
 
-                localizationService.localize("buttons_save").then(function (value) {
-                    vm.buttonLabel = value;
+                localizationService.localizeMany(["buttons_save", "packager_includeAllChildNodes"]).then(function (values) {
+                    vm.labels.button = values[0];
+                    vm.labels.includeAllChildNodes = values[1];
                 });
-            }
 
-            // get all doc types
+            }
+        }
+
+        function loadResources() {
+
+            // Get all document types
             entityResource.getAll("DocumentType").then(documentTypes => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 documentTypes.forEach(documentType => {
                     documentType.id = documentType.id.toString();
+                    documentType.selected = vm.package.documentTypes.indexOf(documentType.id) !== -1;
                 });
                 vm.documentTypes = documentTypes;
             });
 
-            // get all templates
+            // Get all templates
             entityResource.getAll("Template").then(templates => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 templates.forEach(template => {
                     template.id = template.id.toString();
+                    template.selected = vm.package.templates.indexOf(template.id) >= 0;
                 });
                 vm.templates = templates;
             });
 
-            // get all stylesheets
+            // Get all stylesheets
             entityResource.getAll("Stylesheet").then(stylesheets => {
+                stylesheets.forEach(stylesheet => {
+                    stylesheet.selected = vm.package.stylesheets.indexOf(stylesheet.name) >= 0;
+                });
                 vm.stylesheets = stylesheets;
             });
 
+            // Get all macros
             entityResource.getAll("Macro").then(macros => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 macros.forEach(macro => {
                     macro.id = macro.id.toString();
+                    macro.selected = vm.package.macros.indexOf(macro.id) !== -1;
                 });
                 vm.macros = macros;
             });
 
-            // get all languages
+            // Get all languages
             entityResource.getAll("Language").then(languages => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 languages.forEach(language => {
                     language.id = language.id.toString();
+                    language.selected = vm.package.languages.indexOf(language.id) !== -1;
                 });
                 vm.languages = languages;
             });
 
-            // get all dictionary items
+            // Get all dictionary items
             entityResource.getAll("DictionaryItem").then(dictionaryItems => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 dictionaryItems.forEach(dictionaryItem => {
                     dictionaryItem.id = dictionaryItem.id.toString();
+                    dictionaryItem.selected = vm.package.dictionaryItems.indexOf(dictionaryItem.id) !== -1;
                 });
                 vm.dictionaryItems = dictionaryItems;
             });
 
-            // get all data types items
+            // Get all data types
             entityResource.getAll("DataType").then(dataTypes => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 dataTypes.forEach(dataType => {
                     dataType.id = dataType.id.toString();
+                    dataType.selected = vm.package.dataTypes.indexOf(dataType.id) !== -1;
                 });
                 vm.dataTypes = dataTypes;
             });
@@ -213,7 +243,7 @@
                 select: function(node) {
                     node.selected = !node.selected;
 
-                    const id = unescape(node.id);
+                    const id = decodeURIComponent(node.id.replace(/\+/g, " "));
                     const index = selection.indexOf(id);
 
                     if(node.selected) {
@@ -254,7 +284,7 @@
                 },
                 filterCssClass: "not-allowed",
                 select: function(node) {
-                    const id = unescape(node.id);
+                    const id = decodeURIComponent(node.id.replace(/\+/g, " "));
                     vm.package.packageView = id;
                     editorService.close();
                 },
@@ -267,6 +297,90 @@
 
         function removePackageView() {
             vm.package.packageView = null;
+        }
+
+        function selectDocumentType(doctype) {
+
+            // Check if the document type is already selected.
+            var index = vm.package.documentTypes.indexOf(doctype.id);
+
+            if (index === -1) {
+                vm.package.documentTypes.push(doctype.id);
+            } else {
+                vm.package.documentTypes.splice(index, 1);
+            }
+        }
+
+        function selectTemplate(template) {
+
+            // Check if the template is already selected.
+            var index = vm.package.templates.indexOf(template.id);
+
+            if (index === -1) {
+                vm.package.templates.push(template.id);
+            } else {
+                vm.package.templates.splice(index, 1);
+            }
+        }
+
+        function selectStyleSheet(stylesheet) {
+
+            // Check if the style sheet is already selected.
+            var index = vm.package.stylesheets.indexOf(stylesheet.name);
+
+            if (index === -1) {
+                vm.package.stylesheets.push(stylesheet.name);
+            } else {
+                vm.package.stylesheets.splice(index, 1);
+            }
+        }
+
+        function selectMacro(macro) {
+
+            // Check if the macro is already selected.
+            var index = vm.package.macros.indexOf(macro.id);
+
+            if (index === -1) {
+                vm.package.macros.push(macro.id);
+            } else {
+                vm.package.macros.splice(index, 1);
+            }
+        }
+
+        function selectLanguage(language) {
+
+            // Check if the language is already selected.
+            var index = vm.package.languages.indexOf(language.id);
+
+            if (index === -1) {
+                vm.package.languages.push(language.id);
+            } else {
+                vm.package.languages.splice(index, 1);
+            }
+        }
+
+        function selectDictionaryItem(dictionaryItem) {
+
+            // Check if the dictionary item is already selected.
+            var index = vm.package.dictionaryItems.indexOf(dictionaryItem.id);
+
+            if (index === -1) {
+                vm.package.dictionaryItems.push(dictionaryItem.id);
+            } else {
+                vm.package.dictionaryItems.splice(index, 1);
+            }
+        }
+
+        function selectDataType(dataType) {
+
+            // Check if the dictionary item is already selected.
+            var index = vm.package.dataTypes.indexOf(dataType.id);
+
+            if (index === -1) {
+                vm.package.dataTypes.push(dataType.id);
+            } else {
+                vm.package.dataTypes.splice(index, 1);
+            }
         }
 
         function buildContributorsEditor(pkg) {

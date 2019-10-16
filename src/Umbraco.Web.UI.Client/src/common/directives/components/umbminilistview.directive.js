@@ -71,15 +71,14 @@
                             }
                             // set published state for content
                             if (c.metaData) {
-                                c.hasChildren = c.metaData.HasChildren;
+                                c.hasChildren = c.metaData.hasChildren;
                                 if(scope.entityType === "Document") {
                                     c.published = c.metaData.IsPublished;
                                 }
                             }
                              
-                            // filter items if there is a filter and it's not advanced
-                            // ** ignores advanced filter at the moment
-                            if (scope.entityTypeFilter && !scope.entityTypeFilter.filterAdvanced) {
+                            // filter items if there is a filter and it's not advanced (advanced filtering is handled below)
+                            if (scope.entityTypeFilter && scope.entityTypeFilter.filter && !scope.entityTypeFilter.filterAdvanced) {
                                 var a = scope.entityTypeFilter.filter.toLowerCase().replace(/\s/g, '').split(',');
                                 var found = a.indexOf(c.metaData.ContentTypeAlias.toLowerCase()) >= 0;
                                 
@@ -88,6 +87,15 @@
                                 }
                             }
                         });
+
+                        // advanced item filtering is handled here
+                        if (scope.entityTypeFilter && scope.entityTypeFilter.filter && scope.entityTypeFilter.filterAdvanced) {
+                            var filtered = angular.isFunction(scope.entityTypeFilter.filter)
+                                ? _.filter(miniListView.children, scope.entityTypeFilter.filter)
+                                : _.where(miniListView.children, scope.entityTypeFilter.filter);
+                            _.each(filtered, (node) => node.allowed = false);
+                        }
+
                         // update pagination
                         miniListView.pagination.totalItems = data.totalItems;
                         miniListView.pagination.totalPages = data.totalPages;

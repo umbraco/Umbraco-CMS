@@ -12,6 +12,11 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
 {
@@ -21,6 +26,13 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class DataTypeTreeController : TreeController, ISearchableTree
     {
+        private readonly UmbracoTreeSearcher _treeSearcher;
+
+        public DataTypeTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+            _treeSearcher = treeSearcher;
+        }
+
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
@@ -53,11 +65,11 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, "icon-autofill", false);
+                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, Constants.Icons.DataType, false);
                         node.Path = dt.Path;
                         if (systemListViewDataTypeIds.Contains(dt.Id))
                         {
-                            node.Icon = "icon-thumbnail-list";
+                            node.Icon = Constants.Icons.ListView;
                         }
                         return node;
                     }));
@@ -72,7 +84,15 @@ namespace Umbraco.Web.Trees
         {
             var systemIds = new[]
             {
-                Constants.System.DefaultLabelDataTypeId
+                Constants.DataTypes.Boolean, // Used by the Member Type: "Member"
+                Constants.DataTypes.Textarea, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelBigint, // Used by the Media Type: "Image"; Used by the Media Type: "File"
+                Constants.DataTypes.LabelDateTime, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelDecimal, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelInt, // Used by the Media Type: "Image"; Used by the Member Type: "Member"
+                Constants.DataTypes.LabelString, // Used by the Media Type: "Image"; Used by the Media Type: "File"
+                Constants.DataTypes.ImageCropper, // Used by the Media Type: "Image"
+                Constants.DataTypes.Upload, // Used by the Media Type: "File"
             };
 
             return systemIds.Concat(GetNonDeletableSystemListViewDataTypeIds());
@@ -140,10 +160,6 @@ namespace Umbraco.Web.Trees
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-        {
-            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DataType, pageIndex, pageSize, out totalFound,
-                filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
-            return Mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
-        }
+            => _treeSearcher.EntitySearch(UmbracoObjectTypes.DataType, query, pageSize, pageIndex, out totalFound, searchFrom);
     }
 }

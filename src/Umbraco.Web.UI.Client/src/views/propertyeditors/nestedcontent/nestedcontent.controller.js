@@ -15,6 +15,10 @@
             });
         }
 
+        $scope.canAdd = function () {
+            return !$scope.model.docTypes || !$scope.model.value || $scope.model.value.length < $scope.model.docTypes.length;
+        }
+
         $scope.remove = function (index) {
             $scope.model.value.splice(index, 1);
         }
@@ -57,10 +61,20 @@
 
         ncResources.getContentTypes().then(function (docTypes) {
             $scope.model.docTypes = docTypes;
+
+            // Count doctype name occurrences
+            var docTypeNameOccurrences = _.countBy(docTypes, 'name');
             
             // Populate document type tab dictionary
+            // And append alias to name if multiple doctypes have the same name
             docTypes.forEach(function (value) {
                 $scope.docTypeTabs[value.alias] = value.tabs;
+
+                value.displayName = value.name;
+
+                if (docTypeNameOccurrences[value.name] > 1) {
+                    value.displayName += " (" + value.alias + ")";
+                }
             });
         });
 
@@ -93,8 +107,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "iconHelper",
     "clipboardService",
     "eventsService",
+    "overlayService",
     
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService) {
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState) {
         
         var contentTypeAliases = [];
         _.each($scope.model.config.contentTypes, function (contentType) {
@@ -231,18 +246,33 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         };
 
         $scope.deleteNode = function (idx) {
-            if ($scope.nodes.length > $scope.model.config.minItems) {
-                $scope.nodes.splice(idx, 1);
-                $scope.setDirty();
-                updateModel();
-            }
+            $scope.nodes.splice(idx, 1);
+            $scope.setDirty();
+            updateModel();
         };
         $scope.requestDeleteNode = function (idx) {
+            if ($scope.nodes.length <= $scope.model.config.minItems) {
+                return;
+            }
+
             if ($scope.model.config.confirmDeletes === true) {
-                localizationService.localize("content_nestedContentDeleteItem").then(function (value) {
-                    if (confirm(value)) {
-                        $scope.deleteNode(idx);
-                    }
+                localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
+                    const overlay = {
+                        title: data[1],
+                        content: data[0],
+                        closeButtonLabel: data[2],
+                        submitButtonLabel: data[3],
+                        submitButtonStyle: "danger",
+                        close: function () {
+                            overlayService.close();
+                        },
+                        submit: function () {
+                            $scope.deleteNode(idx);
+                            overlayService.close();
+                        }
+                    };
+
+                    overlayService.open(overlay);
                 });
             } else {
                 $scope.deleteNode(idx);
@@ -475,32 +505,30 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             
             node.key = fromNcEntry && fromNcEntry.key ? fromNcEntry.key : String.CreateGuid();
             
-            for (var v = 0; v < node.variants.length; v++) {
-                var variant = node.variants[v];
-                
-                for (var t = 0; t < variant.tabs.length; t++) {
-                    var tab = variant.tabs[t];
+            var variant = node.variants[0];
+
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
                     
-                    for (var p = 0; p < tab.properties.length; p++) {
-                        var prop = tab.properties[p];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
                         
-                        prop.propertyAlias = prop.alias;
-                        prop.alias = $scope.model.alias + "___" + prop.alias;
-                        // Force validation to occur server side as this is the
-                        // only way we can have consistency between mandatory and
-                        // regex validation messages. Not ideal, but it works.
-                        prop.validation = {
-                            mandatory: false,
-                            pattern: ""
-                        };
+                    prop.propertyAlias = prop.alias;
+                    prop.alias = $scope.model.alias + "___" + prop.alias;
+                    // Force validation to occur server side as this is the
+                    // only way we can have consistency between mandatory and
+                    // regex validation messages. Not ideal, but it works.
+                    prop.validation = {
+                        mandatory: false,
+                        pattern: ""
+                    };
                         
-                        if (fromNcEntry && fromNcEntry[prop.propertyAlias]) {
-                            prop.value = fromNcEntry[prop.propertyAlias];
-                        }
+                    if (fromNcEntry && fromNcEntry[prop.propertyAlias]) {
+                        prop.value = fromNcEntry[prop.propertyAlias];
                     }
                 }
             }
-            
+
             $scope.nodes.push(node);
 
             return node;
