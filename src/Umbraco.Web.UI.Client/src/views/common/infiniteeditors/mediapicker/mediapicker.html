@@ -121,6 +121,20 @@
             </div>
 
             <umb-overlay ng-if="vm.mediaPickerDetailsOverlay.show" model="vm.mediaPickerDetailsOverlay" position="right">
+                
+                <div class="umb-control-group" ng-if="!target.id">
+                    <h5>
+                        <localize key="@general_url"></localize>
+                    </h5>
+                    <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url" />
+                </div>
+
+                <div class="umb-control-group">
+                    <h5>
+                        <localize key="@content_altTextOptional"></localize>
+                    </h5>
+                    <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
+                </div>
 
                 <div class="umb-control-group">
 
@@ -161,21 +175,6 @@
                     </div>
 
                 </div>
-
-                <div class="umb-control-group" ng-if="!target.id">
-                    <h5>
-                        <localize key="@general_url"></localize>
-                    </h5>
-                    <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url" />
-                </div>
-
-                <div class="umb-control-group">
-                    <h5>
-                        <localize key="@content_altTextOptional"></localize>
-                    </h5>
-                    <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
-                </div>
-
 
             </umb-overlay>
 
