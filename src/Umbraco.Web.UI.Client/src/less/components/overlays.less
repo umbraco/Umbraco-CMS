@@ -20,11 +20,11 @@
 }
 
 .umb-overlay .umb-overlay-header {
-    border-bottom: 1px solid @purple-l3;
+    border-bottom: 1px solid @gray-9;
     margin-top: 0;
     flex-grow: 0;
     flex-shrink: 0;
-    padding: 20px 30px 0;
+    padding: 20px 20px 0;
 }
 
 .umb-overlay__section-header {
@@ -48,11 +48,11 @@
 }
 
 .umb-overlay__title {
-    font-size: @fontSizeLarge;
+    font-size: 16px;
     color: @black;
-    line-height: 20px;
+    line-height: 16px;
     font-weight: bold;
-    margin: 7px 0;
+    margin: 5px 0;
 }
 
 .umb-overlay__subtitle {
@@ -66,8 +66,8 @@
     flex-shrink: 1;
     flex-basis: auto;
     position: relative;
-    padding: 0 30px;
-    margin-bottom: 10px;
+    padding: 20px;
+    background: @white;
     max-height: calc(100vh - 170px);
     overflow-y: auto;
 }
@@ -75,11 +75,11 @@
 .umb-overlay-drawer {
     flex-grow: 0;
     flex-shrink: 0;
-    flex-basis: 31px;
-    padding: 10px 20px;
+    flex-basis: 33px;
+    padding: 8px 20px;
     margin: 0;
-    background: @gray-10;
-    border-top: 1px solid @purple-l3;
+    background: @white;
+    border-top: 1px solid @gray-9;
 }
 
 .umb-overlay-drawer.-auto-height {
@@ -140,7 +140,6 @@
 .umb-overlay.umb-overlay-target .umb-overlay-drawer {
     border: none;
     background: transparent;
-    padding: 0 30px 20px;
 }
 
 /* ---------- OVERLAY RIGHT ---------- */
@@ -158,7 +157,7 @@
 }
 
 .umb-overlay.umb-overlay-right .umb-overlay-header {
-    flex-basis: 100px;
+    flex-basis: 70px;
     box-sizing: border-box;
 }
 
