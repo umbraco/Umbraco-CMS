@@ -1271,7 +1271,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <param name="e"></param>
         private void OnLanguageSaved(ILocalizationService sender, Core.Events.SaveEventArgs<ILanguage> e)
         {
-            var cultureChanged = e.SavedEntities.Any(x => x.WasPropertyDirty(nameof(ILanguage.IsoCode)));
+            //culture changed on an existing language
+            var cultureChanged = e.SavedEntities.Any(x => !x.WasPropertyDirty(nameof(ILanguage.Id)) && x.WasPropertyDirty(nameof(ILanguage.IsoCode)));
             if(cultureChanged)
             {
                 RebuildContentDbCache();
