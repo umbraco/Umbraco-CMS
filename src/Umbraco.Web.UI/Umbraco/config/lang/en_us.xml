@@ -517,6 +517,7 @@
     <key alias="searchDescription">Search the index and view the results</key>
     <key alias="tools">Tools</key>
     <key alias="toolsDescription">Tools to manage the index</key>
+    <key alias="fields">fields</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
