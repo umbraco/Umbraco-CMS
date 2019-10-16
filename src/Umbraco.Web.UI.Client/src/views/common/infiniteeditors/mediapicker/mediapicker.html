@@ -124,43 +124,55 @@
 
                 <div class="umb-control-group">
 
-                    <div ng-if="target.url">
-                        <umb-image-gravity
-                            src="target.url"
-                            center="target.focalPoint"
-							on-value-changed="vm.focalPointChanged(left, top)">
-                        </umb-image-gravity>
-                    </div>
-
-                    <div ng-if="cropSize">
-
+                    <div ng-if="vm.mediaPickerDetailsOverlay.disableFocalPoint && target.thumbnail">
                         <h5>
                             <localize key="general_preview">Preview</localize>
                         </h5>
 
-                        <umb-image-thumbnail center="target.focalPoint"
-                                             src="target.url"
-                                             height="{{cropSize.height}}"
-                                             width="{{cropSize.width}}"
-                                             max-size="400">
-                        </umb-image-thumbnail>
+                        <img ng-src="{{target.thumbnail}}" alt="{{target.name}}" />
+                    </div>
 
+                    <div ng-if="!vm.mediaPickerDetailsOverlay.disableFocalPoint">
+                        <h5>
+                            <localize key="@general_focalPoint">Focal point</localize>
+                        </h5>
+
+                        <div ng-if="target.url">
+                            <umb-image-gravity src="target.url"
+                                               center="target.focalPoint"
+                                               on-value-changed="vm.focalPointChanged(left, top)">
+                            </umb-image-gravity>
+                        </div>
+
+                        <div ng-if="cropSize">
+
+                            <h5>
+                                <localize key="general_preview">Preview</localize>
+                            </h5>
+
+                            <umb-image-thumbnail center="target.focalPoint"
+                                                 src="target.url"
+                                                 height="{{cropSize.height}}"
+                                                 width="{{cropSize.width}}"
+                                                 max-size="400">
+                            </umb-image-thumbnail>
+
+                        </div>
                     </div>
 
                 </div>
 
-                <div class="umb-control-group">
-                    <label>
+                <div class="umb-control-group" ng-if="!target.id">
+                    <h5>
                         <localize key="@general_url"></localize>
-                    </label>
-                    <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url"
-                        ng-disabled="target.id" />
+                    </h5>
+                    <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url" />
                 </div>
 
                 <div class="umb-control-group">
-                    <label>
+                    <h5>
                         <localize key="@content_altTextOptional"></localize>
-                    </label>
+                    </h5>
                     <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
                 </div>
 
