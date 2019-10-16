@@ -16,11 +16,5 @@
         </span>
     </span>
 
-    <!-- If there is no labelKey set then render the vm.text -->
-    <span class="umb-form-check__text" ng-if="vm.labelKey === undefined">{{vm.text}}</span>
-
-    <!-- If there is a labelKey set then render the vm.labelKey with a fallback to vm.text -->
-    <span class="umb-form-check__text" ng-if="vm.labelKey.length > 0">
-        <localize key="{{::vm.labelKey}}">{{vm.text}}</localize>
-    </span>
+    <span class="umb-form-check__text">{{vm.text}}</span>
 </label>

@@ -37,11 +37,23 @@
 (function () {
     'use strict';
 
-    function UmbCheckboxController($timeout) {
+    function UmbCheckboxController($timeout, localizationService) {
 
         var vm = this;
 
+        vm.$onInit = onInit;
         vm.change = change;
+
+        function onInit() {
+            // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
+            if (vm.labelKey) {
+                 localizationService.localize(vm.labelKey).then(function (data) {
+                      if(data.indexOf('[') === -1){
+                        vm.text = data;
+                      }
+                 });
+            }
+        }
 
         function change() {
             if (vm.onChange) {
@@ -62,7 +74,7 @@
             value: "@",
             name: "@",
             text: "@",
-            labelKey: "@",
+            labelKey: "@?",
             serverValidationField: "@",
             disabled: "<",
             required: "<",
