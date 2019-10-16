@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.UnpublishController as vm">
 
-    <!-- 1 language -->
+    <!-- Single language -->
     <div ng-if="vm.variants.length === 1">
         <p><localize key="prompt_confirmUnpublish"></localize></p>
     </div>
@@ -43,7 +43,7 @@
         </div>
             
         <div class="umb-list umb-list--condensed" ng-if="!vm.loading && (vm.variants | filter:vm.unpublishedVariantFilter).length > 0">
-            <div style="margin-bottom: 15px; font-weight: bold;">
+            <div class="bold mb3">
                 <p><localize key="content_unpublishedLanguages"></localize></p>
             </div>
     

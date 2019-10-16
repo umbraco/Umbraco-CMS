@@ -464,6 +464,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     "properties",
                     "apps",
                     "createDateFormatted",
+                    "releaseDateFormatted",
+                    "expireDateFormatted",
                     "releaseDate",
                     "expireDate"
                 ], function (i) {
