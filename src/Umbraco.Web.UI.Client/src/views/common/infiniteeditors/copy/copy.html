@@ -60,10 +60,9 @@
                         </div>
                     
                         <div class="umb-control-group -no-border">
-                            <label>
-                                <input type="checkbox" class="pull-left" style="margin-right: 10px;" ng-model="model.relateToOriginal" />
-                                <localize key="defaultdialogs_relateToOriginalLabel">Relate to originalt</localize>
-                            </label>
+                            <div class="flex">
+                                <umb-checkbox input-id="relateToOriginal" model="model.relateToOriginal" text="{{vm.labels.relateToOriginal}}" />
+                            </div>
                         </div>
                     </umb-box-content>
                 </umb-box>

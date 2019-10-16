@@ -263,7 +263,9 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
     <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\Entities\IMediaEntitySlim.cs" />
+    <Compile Include="Models\Entities\IMemberEntitySlim.cs" />
     <Compile Include="Models\Entities\MediaEntitySlim.cs" />
+    <Compile Include="Models\Entities\MemberEntitySlim.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />

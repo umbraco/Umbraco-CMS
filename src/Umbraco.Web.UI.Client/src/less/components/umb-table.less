@@ -27,14 +27,13 @@
 
 }
 
+.umb-table__action,
 .umb-table a {
+    background: transparent;
+    border: 0 none;
     text-decoration: none;
-    cursor: pointer;
-
-    &:focus {
-        outline: none;
-        text-decoration: none;
-    }
+    padding: 0;
+    margin-left: 1px;
 }
 
 input.umb-table__input {
@@ -51,20 +50,26 @@ input.umb-table__input {
 }
 
 .umb-table-head__link {
+    background: transparent;
+    border: 0 none;
     position: relative;
-    cursor: default;
     text-decoration: none;
     color: @gray-3;
+    font-size: inherit;
+    font-weight: inherit;
+    padding: 0 1px;
+
     &:hover {
         text-decoration: none;
+        cursor: default;
         color: @gray-3;
     }
 }
 
-.umb-table-head__link .sortable {
+.umb-table-head__link.sortable {
+    cursor: pointer;
     &:hover {
         text-decoration: none;
-        cursor: pointer;
         color: @black;
     }
 }
@@ -136,15 +141,15 @@ input.umb-table__input {
 }
 
 .umb-table-body__link {
-    
     color: @ui-option-type;
     font-size: 14px;
     font-weight: bold;
     text-decoration: none;
-    
+
     &:hover, &:focus {
         color: @ui-option-type-hover;
         text-decoration: underline;
+        outline: none;
     }
 }
 

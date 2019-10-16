@@ -248,7 +248,6 @@
     <key alias="linkinternal">內部連結：</key>
     <key alias="linklocaltip">本地連結請用“#”號開頭</key>
     <key alias="linknewwindow">在新視窗中打開？</key>
-    <key alias="macroContainerSettings">巨集設置</key>
     <key alias="macroDoesNotHaveProperties">本巨集沒有包含您可以編輯的屬性</key>
     <key alias="paste">粘貼</key>
     <key alias="permissionsEdit">編輯許可權</key>

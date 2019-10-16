@@ -1346,8 +1346,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var content = e.content;
 
                 // Upload BLOB images (dragged/pasted ones)
-                if(content.indexOf('<img src="blob:') > -1){
-
+                // find src attribute where value starts with `blob:`
+                // search is case-insensitive and allows single or double quotes 
+                if(content.search(/src=["']blob:.*?["']/gi) !== -1){
                     args.editor.uploadImages(function(data) {
                         // Once all images have been uploaded
                         data.forEach(function(item) {
