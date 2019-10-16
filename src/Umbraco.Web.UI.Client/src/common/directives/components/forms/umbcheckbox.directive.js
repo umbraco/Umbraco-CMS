@@ -36,9 +36,9 @@
 
 (function () {
     'use strict';
-    
+
     function UmbCheckboxController($timeout) {
-        
+
         var vm = this;
 
         vm.change = change;
@@ -51,7 +51,7 @@
             }
         }
     }
-    
+
     var component = {
         templateUrl: 'views/components/forms/umb-checkbox.html',
         controller: UmbCheckboxController,
