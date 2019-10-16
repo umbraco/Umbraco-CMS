@@ -144,7 +144,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
-            target.Path = "-1" + source.Id;
+            target.Path = $"-1,{source.Id}";
             target.Udi = Udi.Create(Constants.UdiEntityType.MemberGroup, source.Key);
         }
 

@@ -16,6 +16,10 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Web.Trees
 {
@@ -35,7 +39,7 @@ namespace Umbraco.Web.Trees
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
 
-        public MediaTreeController(UmbracoTreeSearcher treeSearcher)
+        public MediaTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeSearcher = treeSearcher;
         }
