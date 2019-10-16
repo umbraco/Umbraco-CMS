@@ -76,7 +76,7 @@
                                            id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
                                            checklist-model="model.compositeContentTypes"
                                            checklist-value="compositeContentType.contentType.alias"
-                                           ng-change="c"
+                                           ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
                                            ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />                                  
 
                                 </div>
