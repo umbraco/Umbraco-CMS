@@ -28,7 +28,7 @@
                         <i class="large icon icon-thumbnail-list"></i>
                         <span class="menu-label">
                             Document Type Collection...
-                            <!--                        <localize key="content_documentType_collection">Document Type Collection</localize>-->
+                            <!--<localize key="content_documentType_collection">Document Type Collection</localize>-->
                         </span>
                     </button>
                 </li>
@@ -81,18 +81,20 @@
 
                 <umb-control-group label="Name of the Parent Document Type" hide-label="false">
                     <input type="text" name="collectionName" ng-model="model.collectionName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
-                    <span ng-if="model.disableTemplates === false">
-                    <input id="collectionCreateTemplate" name="collectionCreateTemplate" type="checkbox" ng-model="model.collectionCreateTemplate" style="margin-top: 0;" />
-                    <label for="collectionCreateTemplate" style="margin-bottom: 0; padding-left: 2px;">Create template for the Parent Document Type</label>
-                    </span>
+
+                    <div ng-if="model.disableTemplates === false" class="flex">
+                        <umb-checkbox input-id="collectionCreateTemplate" name="collectionCreateTemplate" model="model.collectionCreateTemplate" />
+                        <label for="collectionCreateTemplate" class="mb0">Create template for the Parent Document Type</label>
+                    </div>
                 </umb-control-group>
 
                 <umb-control-group label="Name of the Item Document Type" hide-label="false">
                     <input type="text" name="collectionItemName" ng-model="model.collectionItemName" class="umb-textstring textstring input-block-level" required />
-                    <span ng-if="model.disableTemplates === false">
-                    <input id="collectionItemCreateTemplate" name="collectionItemCreateTemplate" type="checkbox" ng-model="model.collectionItemCreateTemplate" style="margin-top: 0;" />
-                    <label for="collectionItemCreateTemplate" style="margin-bottom: 0; padding-left: 2px;">Create template for the Item Document Type</label>
-                    </span>
+
+                    <div ng-if="model.disableTemplates === false" class="flex">
+                        <umb-checkbox input-id="collectionItemCreateTemplate" name="collectionItemCreateTemplate" model="model.collectionItemCreateTemplate" />
+                        <label for="collectionItemCreateTemplate" class="mb0">Create template for the Item Document Type</label>
+                    </div>
                 </umb-control-group>
 
                 <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
