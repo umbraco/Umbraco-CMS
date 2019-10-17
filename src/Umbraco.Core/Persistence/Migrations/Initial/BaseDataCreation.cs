@@ -277,7 +277,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateCmsDataTypePreValuesData()
         {
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 3, Alias = "", SortOrder = 0, DataTypeNodeId = -87, Value = ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|" });
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 4, Alias = "group", SortOrder = 0, DataTypeNodeId = 1041, Value = "default" });
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 5, Alias = "storageType", SortOrder = 0, DataTypeNodeId = 1041, Value = "Json" });
 
@@ -306,6 +305,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             // Defaults for multiple item dropdown
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 8, Alias = "multiple", SortOrder = 0, DataTypeNodeId = -39, Value = "1" });
+
+            // Defaults for rich text editor
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 3, Alias = "editor", SortOrder = 0, DataTypeNodeId = Constants.System.DefaultRichTextEditorDataTypeId, Value = "{ \"toolbar\": [ \"code\", \"styleselect\", \"bold\", \"italic\", \"alignleft\", \"aligncenter\", \"alignright\", \"bullist\", \"numlist\", \"outdent\", \"indent\", \"link\", \"umbmediapicker\", \"umbmacro\", \"umbembeddialog\" ], \"stylesheets\": [], \"dimensions\": { \"height\": 500 }, \"maxImageSize\": 500 }" });
         }
 
         private void CreateUmbracoRelationTypeData()

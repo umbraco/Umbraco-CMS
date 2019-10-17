@@ -11,6 +11,24 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.TinyMCEAlias, "Rich Text Editor", "rte", ValueType = PropertyEditorValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
     public class RichTextPropertyEditor : PropertyEditor
     {
+        public RichTextPropertyEditor()
+        {
+            _defaultPreVals = new Dictionary<string, object>
+                {
+                    {"editor", null},
+                    {Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, false},
+                    {"hideLabel", false}
+                };
+        }
+
+        private IDictionary<string, object> _defaultPreVals;
+
+        public override IDictionary<string, object> DefaultPreValues
+        {
+            get { return _defaultPreVals; }
+            set { _defaultPreVals = value; }
+        }
+
         /// <summary>
         /// Create a custom value editor
         /// </summary>
