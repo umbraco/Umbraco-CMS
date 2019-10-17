@@ -343,7 +343,8 @@ namespace Umbraco.Core.Mapping
 
             if (ctor == null) return null;
 
-            _ctors.AddOrUpdate(sourceType, sourceCtor, (k, v) => {
+            _ctors.AddOrUpdate(sourceType, sourceCtor, (k, v) =>
+            {
                 // Add missing constructors
                 foreach (var c in sourceCtor)
                 {
