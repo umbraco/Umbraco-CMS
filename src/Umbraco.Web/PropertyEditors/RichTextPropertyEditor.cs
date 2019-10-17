@@ -114,7 +114,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
-                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
+                var userId = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
 
                 var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
                 var mediaParent = config?.MediaParentId;
