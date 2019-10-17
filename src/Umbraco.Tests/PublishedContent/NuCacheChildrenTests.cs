@@ -1079,7 +1079,7 @@ namespace Umbraco.Tests.PublishedContent
         ///  1) RefreshBranch with kits for a branch where the top most node is unpublished
         ///  2) RefreshBranch with kits for the branch where the top most node is published
         ///  3) RefreshBranch with kits for the branch where the top most node is published
-        ///  4) RefreshBranch with kits for the branch where the top most node is published
+        ///  4) RefreshNode
         ///  5) RefreshBranch with kits for the branch where the top most node is published
         /// </remarks>
         [Test]
@@ -1093,12 +1093,17 @@ namespace Umbraco.Tests.PublishedContent
                 var paths = new Dictionary<int, string> { { -1, "-1" } };
 
                 //root
-                yield return CreateInvariantKit(1, -1, 1, paths);
+                yield return CreateInvariantKit(100, -1, 1, paths);
 
-                //children
-                yield return CreateInvariantKit(2, 1, 1, paths);
-                yield return CreateInvariantKit(3, 1, 2, paths); //middle child
-                yield return CreateInvariantKit(4, 1, 3, paths);
+                //site
+                yield return CreateInvariantKit(2, 100, 1, paths);
+                yield return CreateInvariantKit(1, 100, 1, paths); //middle child
+                yield return CreateInvariantKit(3, 100, 1, paths);
+
+                //children of 1
+                yield return CreateInvariantKit(20, 1, 1, paths);
+                yield return CreateInvariantKit(30, 1, 2, paths); 
+                yield return CreateInvariantKit(40, 1, 3, paths);
             }
 
             //init with all published
@@ -1109,7 +1114,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var rootKit = _source.Kits[1].Clone();
 
-            void ChangePublishFlagOfRoot(bool published, int assertGen)
+            void ChangePublishFlagOfRoot(bool published, int assertGen, TreeChangeTypes changeType)
             {
                 //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
                 contentStore.CreateSnapshot();
@@ -1124,7 +1129,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 _snapshotService.Notify(new[]
                 {
-                    new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch)
+                    new ContentCacheRefresher.JsonPayload(1, Guid.Empty, changeType)
                 }, out _, out _);
 
                 Assert.AreEqual(assertGen, contentStore.Test.LiveGen);
@@ -1132,19 +1137,19 @@ namespace Umbraco.Tests.PublishedContent
             }
 
             //unpublish the root
-            ChangePublishFlagOfRoot(false, 2);
+            ChangePublishFlagOfRoot(false, 2, TreeChangeTypes.RefreshBranch);
 
-            //publish the root
-            ChangePublishFlagOfRoot(true, 3);
-
-            //publish root + descendants
-            ChangePublishFlagOfRoot(true, 4);
-
-            //publish the root
-            ChangePublishFlagOfRoot(true, 5);
+            //publish the root (since it's not published, it will cause a RefreshBranch)
+            ChangePublishFlagOfRoot(true, 3, TreeChangeTypes.RefreshBranch);
 
             //publish root + descendants
-            ChangePublishFlagOfRoot(true, 6); //TODO: This should fail, need to figure out what the diff is between this and a website
+            ChangePublishFlagOfRoot(true, 4, TreeChangeTypes.RefreshBranch);
+
+            //save/publish the root (since it's already published, it will just cause a RefreshNode
+            ChangePublishFlagOfRoot(true, 5, TreeChangeTypes.RefreshNode);
+
+            //publish root + descendants
+            ChangePublishFlagOfRoot(true, 6, TreeChangeTypes.RefreshBranch); //TODO: This should fail, need to figure out what the diff is between this and a website
         }
 
         [Test]
