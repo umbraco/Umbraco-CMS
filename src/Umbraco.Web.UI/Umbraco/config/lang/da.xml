@@ -935,7 +935,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="pathToFile">Sti til fil</key>
     <key alias="pathToFileDescription">Absolut sti til fil (f.eks.: /bin/umbraco.bin)</key>
     <key alias="installed">Installeret</key>
-    <key alias="installedPackages">Installeret pakker</key>
+    <key alias="installedPackages">Installerede pakker</key>
     <key alias="installLocal">Installér lokal</key>
     <key alias="installFinish">Afslut</key>
     <key alias="noConfigurationView">Denne pakke har ingen konfigurationsvisning</key>
