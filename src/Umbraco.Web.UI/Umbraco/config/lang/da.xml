@@ -927,7 +927,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="includeAllChildNodes">Inkludér alle underliggende sider</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge pakkefil</key>
     <key alias="uploadPackage">Upload pakke</key>
-    <key alias="localPackageDescription">Installer en lokal pakke ved at vælge den fra din computer. Installer kun pakker fra kilder, du kender og stoler på</key>
+    <key alias="localPackageDescription">Installér en lokal pakke ved at vælge den fra din computer. Installér kun pakker fra kilder, du kender og stoler på</key>
     <key alias="uploadAnother">Upload en anden pakke</key>
     <key alias="cancelAndUploadAnother">Annuller og upload en anden pakke</key>
     <key alias="accept">Jeg accepterer</key>
