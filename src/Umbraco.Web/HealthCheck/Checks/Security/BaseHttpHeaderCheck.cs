@@ -115,7 +115,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private bool DoHttpHeadersContainHeader(WebResponse response)
         {
-            return response.Headers.AllKeys.Contains(_header);
+             return response.Headers.AllKeys.Contains(_header, StringComparer.InvariantCultureIgnoreCase);
         }
 
         private bool DoMetaTagsContainKeyForHeader(WebResponse response)
