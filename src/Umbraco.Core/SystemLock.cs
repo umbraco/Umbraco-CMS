@@ -100,6 +100,12 @@ namespace Umbraco.Core
                 _handle = GCHandle.Alloc(_semaphore);
             }
 
+            #region IDisposable Support
+
+            // This code added to correctly implement the disposable pattern.
+
+            private bool disposedValue = false; // To detect redundant calls
+
             public void Dispose()
             {
                 Dispose(true);
@@ -108,12 +114,21 @@ namespace Umbraco.Core
 
             private void Dispose(bool disposing)
             {
-                // critical
-                _handle.Free();
-                _semaphore.Release();
-                _semaphore.Dispose();
-            }
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        _semaphore.Release();
+                        _semaphore.Dispose();
+                    }
 
+                    // free unmanaged resources (unmanaged objects) and override a finalizer below.
+                    _handle.Free();
+
+                    disposedValue = true;
+                }
+            }
+            
             // we WANT to release the semaphore because it's a system object, ie a critical
             // non-managed resource - and if it is not released then noone else can acquire
             // the lock - so we inherit from CriticalFinalizerObject which means that the
@@ -142,6 +157,9 @@ namespace Umbraco.Core
                     // we do NOT want the finalizer to throw - never ever
                 }
             }
+
+            #endregion
+
         }
 
         private class SemaphoreSlimReleaser : IDisposable
