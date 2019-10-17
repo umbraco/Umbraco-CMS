@@ -734,6 +734,20 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Generate a hash of a string based on the specified hash algorithm.
+        /// </summary>
+        /// <typeparam name="T">The hash algorithm implementation to use.</typeparam>
+        /// <param name="str">The <see cref="string" /> to hash.</param>
+        /// <returns>
+        /// The hashed string.
+        /// </returns>
+        internal static string GenerateHash<T>(this string str)
+            where T : HashAlgorithm
+        {
+            return str.GenerateHash(typeof(T).FullName);
+        }
+
+        /// <summary>
         /// Generate a hash of a string based on the specified <paramref name="hashType" />.
         /// </summary>
         /// <param name="str">The <see cref="string" /> to hash.</param>
