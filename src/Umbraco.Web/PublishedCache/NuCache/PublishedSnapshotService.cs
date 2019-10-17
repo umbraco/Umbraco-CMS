@@ -128,10 +128,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         var path = GetLocalFilesPath();
                         var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
                         var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-                        _localDbExists = File.Exists(localContentDbPath) && File.Exists(localMediaDbPath);
+                        var localContentDbExists = File.Exists(localContentDbPath);
+                        var localMediaDbExists = File.Exists(localMediaDbPath);
+                        _localDbExists = localContentDbExists && localMediaDbExists;
                         // if both local databases exist then GetTree will open them, else new databases will be created
-                        _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
-                        _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
+                        _localContentDb = BTree.GetTree(localContentDbPath, localContentDbExists);
+                        _localMediaDb = BTree.GetTree(localMediaDbPath, localMediaDbExists);
                     },
                     () =>
                     {
