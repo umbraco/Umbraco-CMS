@@ -202,7 +202,9 @@
             }));
 
             evts.push(eventsService.on("rte.shortcut.save", function(){
-                $scope.save();
+                if ($scope.page.showSaveButton) {
+                    $scope.save();
+                }
             }));
 
             evts.push(eventsService.on("content.saved", function(){
