@@ -1065,6 +1065,60 @@ namespace Umbraco.Tests.PublishedContent
             AssertLinkedNode(child3.contentNode, 1, 2, -1, -1, -1);
         }
 
+        [Test]
+        public void Refresh_Node_Ensures_Linked_list()
+        {
+            // NOTE: these tests are not using real scopes, in which case a Scope does not control
+            // how the snapshots generations work. We are forcing new snapshot generations manually.
+
+            IEnumerable<ContentNodeKit> GetKits()
+            {
+                var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+                //root
+                yield return CreateInvariantKit(100, -1, 1, paths);
+
+                //site
+                yield return CreateInvariantKit(2, 100, 1, paths);
+                yield return CreateInvariantKit(1, 100, 2, paths); //middle child
+                yield return CreateInvariantKit(3, 100, 3, paths);
+
+                //children of 1
+                yield return CreateInvariantKit(20, 1, 1, paths);
+                yield return CreateInvariantKit(30, 1, 2, paths);
+                yield return CreateInvariantKit(40, 1, 3, paths);
+            }
+
+            Init(GetKits());
+
+            var snapshotService = (PublishedSnapshotService)_snapshotService;
+            var contentStore = snapshotService.GetContentStore();
+
+            Assert.AreEqual(1, contentStore.Test.LiveGen);
+            Assert.IsTrue(contentStore.Test.NextGen);
+
+            var middleNode = contentStore.Test.GetValues(1)[0];
+            Assert.AreEqual(1, middleNode.gen);
+            AssertLinkedNode(middleNode.contentNode, 100, 2, 3, 20, 40);
+
+            //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
+            contentStore.CreateSnapshot();
+
+            Assert.IsFalse(contentStore.Test.NextGen);
+
+            _snapshotService.Notify(new[]
+            {
+                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshNode) 
+            }, out _, out _);
+
+            Assert.AreEqual(2, contentStore.Test.LiveGen);
+            Assert.IsTrue(contentStore.Test.NextGen);
+
+            middleNode = contentStore.Test.GetValues(1)[0];
+            Assert.AreEqual(2, middleNode.gen);
+            AssertLinkedNode(middleNode.contentNode, 100, 2, 3, 20, 40);
+        }
+
         /// <summary>
         /// This addresses issue: https://github.com/umbraco/Umbraco-CMS/issues/6698
         /// </summary>
