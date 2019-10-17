@@ -1013,14 +1013,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // i think this used to but it doesn't seem bad anymore that I can see...
             while (child.NextSiblingContentId > 0)
             {
-                if (child.NextSiblingContentId == content.Id)
-                {
-                    content.PreviousSiblingContentId = child.Id;
-                    child = content;
-                    continue;
-                }
-
-
                 // get next child
                 var nextChildLink = GetRequiredLinkedNode(child.NextSiblingContentId, "next child", null);
                 var nextChild = nextChildLink.Value;
