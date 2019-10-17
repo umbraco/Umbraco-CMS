@@ -172,17 +172,27 @@ namespace Umbraco.Core
                 // if more than 1 instance reach that point, one will get the lock
                 // and the other one will timeout, which is accepted
 
-                //TODO: This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset?
-                _asyncLocker = _asyncLock.Lock(LockTimeoutMilliseconds);
+                //This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset.
+                try
+                {
+                    _asyncLocker = _asyncLock.Lock(LockTimeoutMilliseconds);
+                }
+                catch
+                {
+                    throw;
+                }
+                finally
+                {
+                    // we need to reset the event, because otherwise we would end up
+                    // signaling ourselves and committing suicide immediately.
+                    // only 1 instance can reach that point, but other instances may
+                    // have started and be trying to get the lock - they will timeout,
+                    // which is accepted
+
+                    _signal.Reset();
+                }
                 _isMainDom = true;
-
-                // we need to reset the event, because otherwise we would end up
-                // signaling ourselves and committing suicide immediately.
-                // only 1 instance can reach that point, but other instances may
-                // have started and be trying to get the lock - they will timeout,
-                // which is accepted
-
-                _signal.Reset();
+               
 
                 //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
 
