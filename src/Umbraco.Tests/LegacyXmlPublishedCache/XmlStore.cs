@@ -305,7 +305,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private XmlDocument _xmlDocument; // supplied xml document (for tests)
         private volatile XmlDocument _xml; // master xml document
-        private readonly AsyncLock _xmlLock = new AsyncLock(); // protects _xml
+        private readonly SystemLock _xmlLock = new SystemLock(); // protects _xml
 
         // to be used by PublishedContentCache only
         // for non-preview content only

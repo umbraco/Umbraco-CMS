@@ -21,18 +21,18 @@ namespace Umbraco.Core
     // been closed, the Semaphore system object is destroyed - so in any case
     // an iisreset should clean up everything
     //
-    internal class AsyncLock
+    internal class SystemLock
     {
         private readonly SemaphoreSlim _semaphore;
         private readonly Semaphore _semaphore2;
         private readonly IDisposable _releaser;
         private readonly Task<IDisposable> _releaserTask;
 
-        public AsyncLock()
+        public SystemLock()
             : this (null)
         { }
 
-        public AsyncLock(string name)
+        public SystemLock(string name)
         {
             // WaitOne() waits until count > 0 then decrements count
             // Release() increments count
@@ -66,35 +66,6 @@ namespace Umbraco.Core
                 ? _releaser // (IDisposable)new SemaphoreSlimReleaser(_semaphore)
                 : new NamedSemaphoreReleaser(_semaphore2);
         }
-
-        //NOTE: We don't use the "Async" part of this lock at all
-        //TODO: Remove this and rename this class something like SystemWideLock, then we can re-instate this logic if we ever need an Async lock again
-
-        //public Task<IDisposable> LockAsync()
-        //{
-        //    var wait = _semaphore != null
-        //        ? _semaphore.WaitAsync()
-        //        : _semaphore2.WaitOneAsync();
-
-        //    return wait.IsCompleted
-        //        ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
-        //        : wait.ContinueWith((_, state) => (((AsyncLock) state).CreateReleaser()),
-        //            this, CancellationToken.None,
-        //            TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-        //}
-
-        //public Task<IDisposable> LockAsync(int millisecondsTimeout)
-        //{
-        //    var wait = _semaphore != null
-        //        ? _semaphore.WaitAsync(millisecondsTimeout)
-        //        : _semaphore2.WaitOneAsync(millisecondsTimeout);
-
-        //    return wait.IsCompleted
-        //        ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
-        //        : wait.ContinueWith((_, state) => (((AsyncLock)state).CreateReleaser()),
-        //            this, CancellationToken.None,
-        //            TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-        //}
 
         public IDisposable Lock()
         {

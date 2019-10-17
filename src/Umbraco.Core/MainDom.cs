@@ -25,7 +25,7 @@ namespace Umbraco.Core
         private readonly object _locko = new object();
 
         // async lock representing the main domain lock
-        private readonly AsyncLock _asyncLock;
+        private readonly SystemLock _asyncLock;
         private IDisposable _asyncLocker;
 
         // event wait handle used to notify current main domain that it should
@@ -68,7 +68,7 @@ namespace Umbraco.Core
             var hash = (appId + ":::" + appPath).ToSHA1();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
-            _asyncLock = new AsyncLock(lockName);
+            _asyncLock = new SystemLock(lockName);
 
             var eventName = "UMBRACO-" + hash + "-MAINDOM-EVT";
             _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
