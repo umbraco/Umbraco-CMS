@@ -66,16 +66,29 @@
         }
 
         function confirm(overlay) {
+
             if (!overlay.closeButtonLabelKey) overlay.closeButtonLabelKey = "general_cancel";
-            if (!overlay.submitButtonLabelKey) overlay.submitButtonLabelKey = "general_confirm";
             if (!overlay.view) overlay.view = "views/common/overlays/confirm/confirm.html";
             if (!overlay.close) overlay.close = function () { close(); };
+
+            switch (overlay.confirmType) {
+
+                case "delete":
+                    if (!overlay.confirmMessageStyle) overlay.confirmMessageStyle = "danger";
+                    if (!overlay.submitButtonStyle) overlay.submitButtonStyle = "danger";
+                    if (!overlay.submitButtonLabelKey) overlay.submitButtonLabelKey = "contentTypeEditor_yesDelete";
+                    break;
+                
+                default:
+                    if (!overlay.submitButtonLabelKey) overlay.submitButtonLabelKey = "general_confirm";
+
+            }
+
             open(overlay);
+
         }
 
         function confirmDelete(overlay) {
-            if (!overlay.submitButtonStyle) overlay.submitButtonStyle = "danger";
-            if (!overlay.submitButtonLabelKey) overlay.submitButtonLabelKey = "contentTypeEditor_yesDelete";
             confirm(overlay);
         }
 
