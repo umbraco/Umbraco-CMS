@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Web.Hosting;
 using Umbraco.Core.Logging;
@@ -65,7 +65,7 @@ namespace Umbraco.Core
             // a new process for the same application path
 
             var appPath = HostingEnvironment.ApplicationPhysicalPath;
-            var hash = (appId + ":::" + appPath).GenerateHash("SHA1");
+            var hash = (appId + ":::" + appPath).GenerateHash<SHA1>();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
             _asyncLock = new AsyncLock(lockName);
