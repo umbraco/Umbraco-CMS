@@ -525,7 +525,7 @@
     <key alias="label">Label...</key>
     <key alias="enterDescription">Indtast beskrivelse</key>
     <key alias="search">Søg...</key>
-    <key alias="filter">Filtrer...</key>
+    <key alias="filter">Filtrér...</key>
     <key alias="enterTags">Indtast nøgleord (tryk på Enter efter hvert nøgleord)...</key>
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
