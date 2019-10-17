@@ -1097,8 +1097,8 @@ namespace Umbraco.Tests.PublishedContent
 
                 //site
                 yield return CreateInvariantKit(2, 100, 1, paths);
-                yield return CreateInvariantKit(1, 100, 1, paths); //middle child
-                yield return CreateInvariantKit(3, 100, 1, paths);
+                yield return CreateInvariantKit(1, 100, 2, paths); //middle child
+                yield return CreateInvariantKit(3, 100, 3, paths);
 
                 //children of 1
                 yield return CreateInvariantKit(20, 1, 1, paths);
@@ -1134,11 +1134,17 @@ namespace Umbraco.Tests.PublishedContent
 
                 Assert.AreEqual(assertGen, contentStore.Test.LiveGen);
                 Assert.IsTrue(contentStore.Test.NextGen);
+
+                //get the latest gen for content Id 1
+                var (gen, contentNode) = contentStore.Test.GetValues(1)[0];
+                Assert.AreEqual(assertGen, gen);
+                //even when unpublishing/re-publishing/etc... the linked list is always maintained
+                AssertLinkedNode(contentNode, 100, 2, 3, 20, 40); 
             }
 
             //unpublish the root
             ChangePublishFlagOfRoot(false, 2, TreeChangeTypes.RefreshBranch);
-
+            
             //publish the root (since it's not published, it will cause a RefreshBranch)
             ChangePublishFlagOfRoot(true, 3, TreeChangeTypes.RefreshBranch);
 
@@ -1149,7 +1155,7 @@ namespace Umbraco.Tests.PublishedContent
             ChangePublishFlagOfRoot(true, 5, TreeChangeTypes.RefreshNode);
 
             //publish root + descendants
-            ChangePublishFlagOfRoot(true, 6, TreeChangeTypes.RefreshBranch); //TODO: This should fail, need to figure out what the diff is between this and a website
+            ChangePublishFlagOfRoot(true, 6, TreeChangeTypes.RefreshBranch);
         }
 
         [Test]
