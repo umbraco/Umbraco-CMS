@@ -36,6 +36,12 @@ namespace Umbraco.Tests.PublishedContent
         private ContentType _contentType;
         private PropertyType _propertyType;
 
+        [TearDown]
+        public void Teardown()
+        {
+            _snapshotService?.Dispose();
+        }
+
         private void Init()
         {
             Current.Reset();
@@ -303,5 +309,6 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsFalse(c2.IsPublished("dk-DA"));
             Assert.IsTrue(c2.IsPublished("de-DE"));
         }
+
     }
 }
