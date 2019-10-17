@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System.Collections.Generic;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -6,6 +7,23 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.TextboxMultipleAlias, "Textarea", "textarea", IsParameterEditor = true, ValueType = PropertyEditorValueTypes.Text, Icon="icon-application-window-alt")]
     public class TextAreaPropertyEditor : PropertyEditor
     {
+        public TextAreaPropertyEditor()
+        {
+            _defaultPreVals = new Dictionary<string, object>
+                {
+                    {"maxChars", null},
+                    {"rows", null}
+                };
+        }
+
+        private IDictionary<string, object> _defaultPreVals;
+
+        public override IDictionary<string, object> DefaultPreValues
+        {
+            get { return _defaultPreVals; }
+            set { _defaultPreVals = value; }
+        }
+
         protected override PropertyValueEditor CreateValueEditor()
         {
             return new TextOnlyValueEditor(base.CreateValueEditor());

@@ -18,6 +18,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 return new Dictionary<string, object>
                 {
+                    {"tabName", ""},
                     {"pageSize", "10"},
                     {"displayAtTabNumber", "1"},
                     {"orderBy", "SortOrder"},

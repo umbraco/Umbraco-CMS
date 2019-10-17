@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System.Collections.Generic;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -6,6 +7,23 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.TrueFalseAlias, "Checkbox", PropertyEditorValueTypes.Integer, "boolean", IsParameterEditor = true, Group = "Common", Icon="icon-checkbox")]
     public class TrueFalsePropertyEditor : PropertyEditor
     {
+        public TrueFalsePropertyEditor()
+        {
+            _defaultPreVals = new Dictionary<string, object>
+                {
+                    {"default", false},
+                    {"labelOn", ""}
+                };
+        }
+
+        private IDictionary<string, object> _defaultPreVals;
+
+        public override IDictionary<string, object> DefaultPreValues
+        {
+            get { return _defaultPreVals; }
+            set { _defaultPreVals = value; }
+        }
+
         protected override PreValueEditor CreatePreValueEditor()
         {
             return new TrueFalsePreValueEditor();

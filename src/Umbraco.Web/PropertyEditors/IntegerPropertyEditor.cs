@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
@@ -6,6 +7,24 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.IntegerAlias, "Numeric", "integer", IsParameterEditor = true, ValueType = PropertyEditorValueTypes.IntegerAlternative)]
     public class IntegerPropertyEditor : PropertyEditor
     {
+        public IntegerPropertyEditor()
+        {
+            _defaultPreVals = new Dictionary<string, object>
+                {
+                    {"min", null},
+                    {"step", null},
+                    {"max", null}
+                };
+        }
+
+        private IDictionary<string, object> _defaultPreVals;
+
+        public override IDictionary<string, object> DefaultPreValues
+        {
+            get { return _defaultPreVals; }
+            set { _defaultPreVals = value; }
+        }
+
         /// <summary>
         /// Overridden to ensure that the value is validated
         /// </summary>

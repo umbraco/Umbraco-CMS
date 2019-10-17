@@ -14,7 +14,12 @@ namespace Umbraco.Web.PropertyEditors
         {
             InternalPreValues = new Dictionary<string, object>
             {
-                {"idType", "udi"}
+                {"idType", "udi"},
+                {"multiPicker", false},
+                {"onlyImages", false},
+                {"disableFolderSelect", false},
+                {Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, false},
+                {"startNodeId", null}
             };
         }
 

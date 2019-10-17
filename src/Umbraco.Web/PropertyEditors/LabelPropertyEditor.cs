@@ -10,6 +10,24 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.NoEditAlias, "Label", "readonlyvalue", Icon = "icon-readonly")]
     public class LabelPropertyEditor : PropertyEditor
     {
+        private const string LegacyPropertyEditorValuesKey = "values";
+
+        public LabelPropertyEditor()
+        {
+            _defaultPreVals = new Dictionary<string, object>
+                {
+                    {LegacyPropertyEditorValuesKey, null}
+                };
+        }
+
+        private IDictionary<string, object> _defaultPreVals;
+
+        public override IDictionary<string, object> DefaultPreValues
+        {
+            get { return _defaultPreVals; }
+            set { _defaultPreVals = value; }
+        }
+
         protected override PropertyValueEditor CreateValueEditor()
         {
             return new LabelPropertyValueEditor(base.CreateValueEditor());
@@ -41,7 +59,6 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class LabelPreValueEditor : PreValueEditor
         {
-            private const string LegacyPropertyEditorValuesKey = "values";
 
             public LabelPreValueEditor()
             {

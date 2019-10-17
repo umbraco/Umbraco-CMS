@@ -12,6 +12,22 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.TextboxAlias, "Textbox", "textbox", IsParameterEditor = true, Group = "Common")]
     public class TextboxPropertyEditor : PropertyEditor
     {
+        public TextboxPropertyEditor()
+        {
+            _defaultPreVals = new Dictionary<string, object>
+                {
+                    {"maxChars", null}
+                };
+        }
+
+        private IDictionary<string, object> _defaultPreVals;
+
+        public override IDictionary<string, object> DefaultPreValues
+        {
+            get { return _defaultPreVals; }
+            set { _defaultPreVals = value; }
+        }
+
         protected override PropertyValueEditor CreateValueEditor()
         {
             return new TextOnlyValueEditor(base.CreateValueEditor());

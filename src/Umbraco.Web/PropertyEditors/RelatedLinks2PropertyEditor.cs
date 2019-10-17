@@ -15,6 +15,7 @@ namespace Umbraco.Web.PropertyEditors
             InternalPreValues = new Dictionary<string, object>
             {
                 {Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes, "0"},
+                {"max", 0},
                 {"idType", "udi"}
             };
         }
