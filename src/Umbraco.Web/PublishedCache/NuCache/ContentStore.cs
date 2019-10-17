@@ -574,7 +574,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     // replacing existing, handle siblings
                     kit.Node.NextSiblingContentId = existing.NextSiblingContentId;
-                    //TODO: What about previous sibling??
                     kit.Node.PreviousSiblingContentId = existing.PreviousSiblingContentId;
                 }
 
