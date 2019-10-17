@@ -235,11 +235,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var lockInfo = new WriteLockInfo();
             try
             {
-                Lock(lockInfo);
-
-                if (_localDb == null) return;
-                _localDb.Dispose();
-                _localDb = null;
+                try{
+                    // Trying to lock could throw exceptions so always make sure to clean up.
+                    Lock(lockInfo);
+                }
+                catch 
+                {
+                    if (_localDb == null) return;
+                    _localDb.Dispose();
+                    _localDb = null;
+                }
+                
             }
             finally
             {
