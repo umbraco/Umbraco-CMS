@@ -145,10 +145,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         {
                             _contentStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                             // Make sure the local dbs are disposed of if the content store was not created.
-                            _localContentDb?.Dispose();
+                            try
+                            {
+                                _localContentDb?.Dispose();
+                            }
+                            catch { /* Carry on with cleanup */ }
                             _localContentDb = null;
                             _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
-                            _localMediaDb?.Dispose();
+                            try
+                            {
+                                _localMediaDb?.Dispose();
+                            }
+                            catch { }
                             _localMediaDb = null;
                         }
 
