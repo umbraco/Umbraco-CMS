@@ -25,8 +25,8 @@ namespace Umbraco.Core
         private readonly object _locko = new object();
 
         // async lock representing the main domain lock
-        private readonly SystemLock _asyncLock;
-        private IDisposable _asyncLocker;
+        private readonly SystemLock _systemLock;
+        private IDisposable _systemLocker;
 
         // event wait handle used to notify current main domain that it should
         // release the lock because a new domain wants to be the main domain
@@ -48,6 +48,8 @@ namespace Umbraco.Core
         // initializes a new instance of MainDom
         public MainDom(ILogger logger)
         {
+            HostingEnvironment.RegisterObject(this);
+
             _logger = logger;
 
             var appId = string.Empty;
@@ -68,7 +70,7 @@ namespace Umbraco.Core
             var hash = (appId + ":::" + appPath).ToSHA1();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
-            _asyncLock = new SystemLock(lockName);
+            _systemLock = new SystemLock(lockName);
 
             var eventName = "UMBRACO-" + hash + "-MAINDOM-EVT";
             _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
@@ -142,7 +144,7 @@ namespace Umbraco.Core
             {
                 // in any case...
                 _isMainDom = false;
-                _asyncLocker.Dispose();
+                _systemLocker?.Dispose();
                 _logger.Info<MainDom>("Released ({SignalSource})", source);
             }
         }
@@ -173,7 +175,7 @@ namespace Umbraco.Core
                 // and the other one will timeout, which is accepted
 
                 //TODO: This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset?
-                _asyncLocker = _asyncLock.Lock(LockTimeoutMilliseconds);
+                _systemLocker = _systemLock.Lock(LockTimeoutMilliseconds);
                 _isMainDom = true;
 
                 // we need to reset the event, because otherwise we would end up
@@ -188,8 +190,6 @@ namespace Umbraco.Core
 
                 _signal.WaitOneAsync()
                     .ContinueWith(_ => OnSignal("signal"));
-
-                HostingEnvironment.RegisterObject(this);
 
                 _logger.Info<MainDom>("Acquired.");
                 return true;
