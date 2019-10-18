@@ -20,6 +20,7 @@
 ._.DS_Store
 .vs/
 /local/
+thumbs.db
 
 # build directories
 [Bb]in/
