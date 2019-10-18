@@ -238,11 +238,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // Trying to lock could throw exceptions so always make sure to clean up.
                     Lock(lockInfo);
                 }
-                catch 
+                catch { throw; }
+                finally 
                 {
-                    if (_localDb == null) return;
-                    _localDb.Dispose();
-                    _localDb = null;
+                    if (_localDb != null)
+                    {
+                        try
+                        {
+                            _localDb.Dispose();
+                        }
+                        catch { /* TBD: May already be throwing so don't throw again */}
+                        finally
+                        {
+                            _localDb = null;
+                        }
+                    }
                 }
                 
             }
