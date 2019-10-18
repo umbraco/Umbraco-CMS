@@ -69,6 +69,8 @@ namespace Umbraco.Core
             var hash = (appId + ":::" + appPath).ToSHA1();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
+            // Make sure no subtle changes to lock name used to create semaphore.
+            _logger.Info<MainDom>("LockName ({lockName})", lockName);
             _asyncLock = new AsyncLock(lockName);
 
             var eventName = "UMBRACO-" + hash + "-MAINDOM-EVT";
