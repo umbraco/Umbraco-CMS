@@ -2482,6 +2482,8 @@ namespace Umbraco.Core.Services
                         //add or update the published xml
                         repository.AddOrUpdateContentXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                         updated.Add(item.Result.ContentItem);
+
+                        Audit(uow, AuditType.Publish, "Publish performed by user", userId, item.Result.ContentItem.Id);
                     }
 
                     //Save xml to db and call following method to fire event:

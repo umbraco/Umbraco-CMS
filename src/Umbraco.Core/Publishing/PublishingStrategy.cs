@@ -197,7 +197,7 @@ namespace Umbraco.Core.Publishing
                     }
 
                     //Check if this item has never been published (and that it is not at the root level)
-                    if (item.Level != firstLevel && !includeUnpublishedDocuments && !item.HasPublishedVersion())
+                    if (item.Level != firstLevel && !includeUnpublishedDocuments && !item.HasPublishedVersion)
                     {
                         //this item does not have a published version and the flag is set to not include them
                         parentsIdsCancelled.Add(item.Id);
@@ -283,6 +283,8 @@ namespace Umbraco.Core.Publishing
                         string.Format("Content '{0}' with Id '{1}' has been published.",
                                       item.Name, item.Id));
 
+                    // TODO: Do this for all the things? Parent AND subs?
+                    // Logs only reflect unpublished
                     statuses.Add(Attempt.Succeed(new PublishStatus(item, evtMsgs)));
                 }
 
