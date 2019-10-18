@@ -41,6 +41,10 @@
 
         function onInit() {
 
+            localizationService.localize("packager_includeAllChildNodes").then(function (value) {
+                vm.labels.includeAllChildNodes = value;
+            });
+
             if (create) {
                 // Pre populate package with some values
                 packageResource.getEmpty().then(scaffold => {
@@ -77,11 +81,9 @@
 
                 });
 
-                localizationService.localizeMany(["buttons_save", "packager_includeAllChildNodes"]).then(function (values) {
-                    vm.labels.button = values[0];
-                    vm.labels.includeAllChildNodes = values[1];
+                localizationService.localize("buttons_save").then(function (value) {
+                    vm.labels.button = value;
                 });
-
             }
         }
 
