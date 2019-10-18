@@ -283,8 +283,6 @@ namespace Umbraco.Core.Publishing
                         string.Format("Content '{0}' with Id '{1}' has been published.",
                                       item.Name, item.Id));
 
-                    // TODO: Do this for all the things? Parent AND subs?
-                    // Logs only reflect unpublished
                     statuses.Add(Attempt.Succeed(new PublishStatus(item, evtMsgs)));
                 }
 
