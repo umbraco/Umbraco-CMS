@@ -64,7 +64,7 @@ namespace Umbraco.Core
             // for anonymous semaphore, use the unique releaser, else create a new one
             return _semaphore != null
                 ? _releaser // (IDisposable)new SemaphoreSlimReleaser(_semaphore)
-                : new NamedSemaphoreReleaser(_semaphore2);
+                : new SystemSemaphoreReleaser(_semaphore2);
         }
 
         //NOTE: We don't use the "Async" part of this lock at all
@@ -117,6 +117,43 @@ namespace Umbraco.Core
 
         // note - before making those classes some structs, read
         // about "impure methods" and mutating readonly structs...
+
+         // Why don't we go with the KISS principle on this 
+        public class SystemSemaphoreReleaser : IDisposable
+        {
+            private readonly Semaphore _semaphore;
+            internal SystemSemaphoreReleaser(Semaphore semaphore)
+            {
+                _semaphore = semaphore;
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    try
+                    {
+                        _semaphore.Release();
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            _semaphore.Dispose();
+
+                        }
+                        catch { }
+
+                    }
+                }
+            }
+        }
+
 
         private class NamedSemaphoreReleaser : CriticalFinalizerObject, IDisposable
         {
