@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
                 var preValue = preValues.SingleOrDefault(x => x.Key.InvariantEquals(field.Key));
                 if (preValue.Key == null)
                 {
-                    LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field {0} on property editor {1}", () => field.Key, () => editorAlias);
+                    LogHelper.Debug<PreValueDisplayResolver>("Could not find default or persisted pre-value for field {0} on property editor {1}", () => field.Key, () => editorAlias);
                     continue;
                 }
 
