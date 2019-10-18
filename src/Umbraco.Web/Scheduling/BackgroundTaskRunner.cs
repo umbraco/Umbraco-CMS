@@ -700,16 +700,23 @@ namespace Umbraco.Web.Scheduling
                 // processing asynchronously before calling the UnregisterObject method.
 
                 _logger.Info<BackgroundTaskRunner>("{LogPrefix} Waiting for tasks to complete", _logPrefix);
-                Shutdown(false, false); // do not accept any more tasks, flush the queue, do not wait
 
-                // raise the completed event only after the running threading task has completed
-                lock (_locker)
+                try
                 {
-                    if (_runningTask != null)
-                        _runningTask.ContinueWith(_ => Terminate(false));
-                    else
-                        Terminate(false);
+                    Shutdown(false, false); // do not accept any more tasks, flush the queue, do not wait
                 }
+                finally
+                {
+                    // raise the completed event only after the running threading task has completed
+                    lock (_locker)
+                    {
+                        if (_runningTask != null)
+                            _runningTask.ContinueWith(_ => Terminate(false));
+                        else
+                            Terminate(false);
+                    }
+                }
+                
             }
             else
             {
@@ -719,8 +726,14 @@ namespace Umbraco.Web.Scheduling
                 // otherwise, its registration will be removed by the application manager.
 
                 _logger.Info<BackgroundTaskRunner>("{LogPrefix} Canceling tasks", _logPrefix);
-                Shutdown(true, true); // cancel all tasks, wait for the current one to end
-                Terminate(true);
+                try
+                {
+                    Shutdown(true, true); // cancel all tasks, wait for the current one to end
+                }
+                finally
+                {
+                    Terminate(true);
+                }
             }
         }
 
@@ -732,7 +745,13 @@ namespace Umbraco.Web.Scheduling
             // raise the Terminated event
             // complete the awaitable completion source, if any
 
-            HostingEnvironment.UnregisterObject(this);
+            if (immediate)
+            {
+                //only unregister when it's the final call, else we won't be notified of the final call
+                HostingEnvironment.UnregisterObject(this);
+            }
+
+            if (_terminated) return; // already taken care of
 
             TaskCompletionSource<int> terminatedSource;
             lock (_locker)
@@ -747,7 +766,7 @@ namespace Umbraco.Web.Scheduling
 
             OnEvent(Terminated, "Terminated");
 
-            terminatedSource.SetResult(0);
+            terminatedSource.TrySetResult(0);
         }
     }
 }

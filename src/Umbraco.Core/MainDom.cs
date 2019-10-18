@@ -15,7 +15,7 @@ namespace Umbraco.Core
     /// <para>When an AppDomain starts, it tries to acquire the main domain status.</para>
     /// <para>When an AppDomain stops (eg the application is restarting) it should release the main domain status.</para>
     /// </remarks>
-    internal class MainDom : IMainDom, IRegisteredObject
+    internal class MainDom : IMainDom, IRegisteredObject, IDisposable
     {
         #region Vars
 
@@ -204,14 +204,43 @@ namespace Umbraco.Core
         // IRegisteredObject
         void IRegisteredObject.Stop(bool immediate)
         {
-            try
+            OnSignal("environment"); // will run once
+            
+            if (immediate)
             {
-                OnSignal("environment"); // will run once
-            }
-            finally
-            {
+                //only unregister when it's the final call, else we won't be notified of the final call
                 HostingEnvironment.UnregisterObject(this);
+
+                // The web app is stopping immediately, dispose eagerly
+                Dispose(true);
             }
         }
+
+        #region IDisposable Support
+
+        // This code added to correctly implement the disposable pattern.
+
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _signal?.Close();
+                    _signal?.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+                
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        #endregion
     }
 }

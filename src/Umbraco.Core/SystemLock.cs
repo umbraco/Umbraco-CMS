@@ -120,6 +120,8 @@ namespace Umbraco.Core
                     {
                         _semaphore.Release();
                         _semaphore.Dispose();
+
+                        
                     }
 
                     // free unmanaged resources (unmanaged objects) and override a finalizer below.
