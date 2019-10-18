@@ -187,7 +187,7 @@ namespace Umbraco.Web.PropertyEditors
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
                                 if(propEditor == null)
                                 {
-                                    propValues[propAlias] = "Could not find an editor for this property type.";
+                                    propValues[propAlias] = tempProp.GetValue()?.ToString();
                                     continue;
                                 }
                                 var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
