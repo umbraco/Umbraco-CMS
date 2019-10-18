@@ -185,6 +185,11 @@ namespace Umbraco.Web.PropertyEditors
 
                                 // convert that temp property, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                                if(propEditor == null)
+                                {
+                                    propValues[propAlias] = "Could not find an editor for this property type.";
+                                    continue;
+                                }
                                 var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
                                 var convValue = valEditor.ToEditor(tempProp, dataTypeService);
