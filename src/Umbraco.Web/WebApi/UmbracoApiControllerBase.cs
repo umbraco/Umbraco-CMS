@@ -40,14 +40,15 @@ namespace Umbraco.Web.WebApi
                 Current.Factory.GetInstance<AppCaches>(),
                 Current.Factory.GetInstance<IProfilingLogger>(),
                 Current.Factory.GetInstance<IRuntimeState>(),
-                Current.Factory.GetInstance<UmbracoHelper>()
+                Current.Factory.GetInstance<UmbracoHelper>(),
+                Current.Factory.GetInstance<UmbracoMapper>()
             )
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
             GlobalSettings = globalSettings;
@@ -57,9 +58,7 @@ namespace Umbraco.Web.WebApi
             Logger = logger;
             RuntimeState = runtimeState;
             Umbraco = umbracoHelper;
-
-            // fixme - can we break all ctors?
-            Mapper = Current.Mapper;
+            Mapper = umbracoMapper;
         }
 
         /// <summary>
