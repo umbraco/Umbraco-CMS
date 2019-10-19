@@ -71,7 +71,7 @@
 
             scope.openSVG = function () {
                 var popup = window.open('', '_blank');
-                var html = '<!DOCTYPE html><body><img src="' + scope.nodeUrl + '"/>' +
+                var html = '<!DOCTYPE html><body><img src="' + scope.nodeUrl + '">' +
                     '<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
                 
                 popup.document.open();

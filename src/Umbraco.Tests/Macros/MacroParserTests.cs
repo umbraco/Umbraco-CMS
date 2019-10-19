@@ -287,7 +287,7 @@ asdfsdf
         {
             var content = @"<p>asdfasdf</p>
 <p>asdfsadf</p>
-<?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" ><img src='blah.jpg'/></?UMBRACO_MACRO>
+<?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" ><img src='blah.jpg'></?UMBRACO_MACRO>
 <p>asdfasdf</p>";
             var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
 

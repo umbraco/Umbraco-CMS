@@ -33,7 +33,7 @@
                         <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
 
                             <div class="umb-package-icon">
-                                <img ng-src="{{package.icon}}" alt="" />
+                                <img ng-src="{{package.icon}}" alt="">
                             </div>
 
                             <div class="umb-package-info">
@@ -67,7 +67,7 @@
                         <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
 
                             <div class="umb-package-icon">
-                                <img ng-src="{{package.icon}}" alt="" />
+                                <img ng-src="{{package.icon}}" alt="">
                             </div>
 
                             <div class="umb-package-info">
@@ -141,7 +141,7 @@
                             <div class="umb-gallery">
                                 <div class="umb-gallery__thumbnails">
                                 <a class="umb-gallery__thumbnail" ng-repeat="image in vm.package.images" ng-click="vm.openLightbox($index, vm.package.images)">
-                                        <img ng-src="{{ image.thumbnail }}" />
+                                        <img ng-src="{{ image.thumbnail }}">
                                     </a>
                                 </div>
                             </div>
@@ -305,7 +305,7 @@
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
                             <i ng-if="!vm.localPackage.icon" class="icon-box"></i>
-                            <img ng-if="vm.localPackage.icon" ng-src="{{vm.localPackage.icon}}" alt="" />
+                            <img ng-if="vm.localPackage.icon" ng-src="{{vm.localPackage.icon}}" alt="">
                         </div>
 
 

@@ -1,4 +1,4 @@
-﻿<div class="umb-property-file-upload">
+<div class="umb-property-file-upload">
 
     <ng-form name="vm.fileUploadForm">
         <input type="hidden" ng-model="mandatoryValidator" ng-required="vm.required && !vm.files.length" />
@@ -19,9 +19,9 @@
                     <div ng-if="file.isImage || file.extension === 'svg'">
                         <div class="gravity-container">
                             <div class="viewport">
-                                <img ng-if="file.isClientSide" ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}"/>
+                                <img ng-if="file.isClientSide" ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}">
                                 <a ng-if="!file.isClientSide" href="{{file.fileSrc}}" target="_blank">
-                                    <img ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}" />
+                                    <img ng-src="{{file.fileSrc}}" style="max-width: 100%; max-height: 100%" alt="{{file.fileName}}">
                                 </a>
                             </div>
                         </div>

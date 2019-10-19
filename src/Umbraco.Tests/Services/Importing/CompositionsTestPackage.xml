@@ -741,7 +741,7 @@
                         <section>
                             @if (string.IsNullOrWhiteSpace(CurrentPage.Image) == false)
                             {
-                                <span class="image image-full"><img src="@CurrentPage.Image" alt="" /></span>
+                                <span class="image image-full"><img src="@CurrentPage.Image" alt=""></span>
                             }
 
                             @CurrentPage.BodyText
@@ -836,7 +836,7 @@
 
                                 @if (string.IsNullOrWhiteSpace(item.Image) == false)
                                 {
-                                    <a href="@item.Url" class="image image-full"><img src="@item.Image" alt="" /></a>
+                                    <a href="@item.Url" class="image image-full"><img src="@item.Image" alt=""></a>
                                 }
 
                                 @Umbraco.Truncate(item.BodyText, 200)
@@ -888,7 +888,7 @@
                         <section>
                             @if (string.IsNullOrWhiteSpace(CurrentPage.Image) == false)
                             {
-                                <span class="image image-full"><img src="@CurrentPage.Image" alt="" /></span>
+                                <span class="image image-full"><img src="@CurrentPage.Image" alt=""></span>
                             }
 
                             @CurrentPage.BodyText

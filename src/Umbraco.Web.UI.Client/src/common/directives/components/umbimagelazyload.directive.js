@@ -10,7 +10,7 @@ Use this directive to lazy-load an image only when it is scrolled into view.
 <h3>Markup example</h3>
 <pre>
     <div ng-controller="My.Controller as vm">
-        <img umb-image-lazy-load="{{vm.imageUrl}}" />
+        <img umb-image-lazy-load="{{vm.imageUrl}}">
     </div>
 </pre>
 

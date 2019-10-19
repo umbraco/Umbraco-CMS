@@ -20,13 +20,13 @@
                 <img ng-if="media.thumbnail && media.extension !== 'svg'"
                      ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
                      ng-attr-title="{{media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + media.name : media.name}}"
-                     alt="{{media.name}}" />
+                     alt="{{media.name}}">
 
                 <!-- SVG -->
                 <img ng-if="media.thumbnail && media.extension === 'svg'"
                      ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
                      ng-attr-title="{{media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + media.name : media.name}}"
-                     alt="{{media.name}}" />
+                     alt="{{media.name}}">
 
                 <!-- FILE -->
                 <umb-file-icon ng-hide="media.thumbnail" ng-class="{'trashed': media.trashed}"

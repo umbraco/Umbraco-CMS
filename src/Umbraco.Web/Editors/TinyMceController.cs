@@ -94,7 +94,7 @@ namespace Umbraco.Web.Editors
                 // Move the file from bodypart to a real filename
                 // This is what we return from this API so RTE updates img src path
                 // Until we fully persist & save the media item when persisting
-                // If we find <img data-temp-img /> data attribute
+                // If we find <img data-temp-img> data attribute
                 File.Move(currentFile, newFilePath);
             }
             catch (Exception ex)

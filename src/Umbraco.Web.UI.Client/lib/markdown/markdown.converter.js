@@ -1,4 +1,4 @@
-﻿var Markdown;
+var Markdown;
 
 if (typeof exports === "object" && typeof require === "function") // we're in a CommonJS (e.g. Node.js) module
 	Markdown = exports;
@@ -703,7 +703,7 @@ else
 			result += " title=\"" + title + "\"";
 			//}
 
-			result += " />";
+			result += ">";
 
 			return result;
 		}

@@ -13,7 +13,7 @@
                         <td class="flex items-center">
                             <div class="umb-package-list__item-icon">
                                 <i ng-if="!installedPackage.iconUrl" class="icon-box"></i>
-                                <img ng-if="installedPackage.iconUrl" ng-src="{{installedPackage.iconUrl}}" />
+                                <img ng-if="installedPackage.iconUrl" ng-src="{{installedPackage.iconUrl}}">
                             </div>
                             <div class="umb-package-list__item-content">
                                 <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
@@ -68,7 +68,7 @@
                 <form novalidate name="uninstallForm" class="w-100">
                     <div class="umb-package-icon">
                         <i ng-if="!vm.package.iconUrl" class="icon-box"></i>
-                        <img ng-if="vm.package.iconUrl" ng-src="{{vm.package.iconUrl}}" alt="" />
+                        <img ng-if="vm.package.iconUrl" ng-src="{{vm.package.iconUrl}}" alt="">
                     </div>
 
 

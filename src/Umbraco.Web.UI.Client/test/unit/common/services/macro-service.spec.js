@@ -65,7 +65,7 @@ describe('macro service tests', function () {
         
         it('can parse syntax for macros with body', function () {
 
-            var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map' test1=\"asdf\" test2='hello' ><img src='blah.jpg'/></?UMBRACO_MACRO>");
+            var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map' test1=\"asdf\" test2='hello' ><img src='blah.jpg'></?UMBRACO_MACRO>");
 
             expect(result).not.toBeNull();
             expect(result.macroAlias).toBe("Map");

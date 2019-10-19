@@ -5,7 +5,7 @@ Umbraco is the friendliest, most flexible and fastest growing ASP.NET CMS, and u
 Learn more at [umbraco.com](https://umbraco.com)
 
 <p align="center">
-  <img src="img/logo.png" alt="Umbraco Logo" />
+  <img src="img/logo.png" alt="Umbraco Logo">
 </p>
 
 See the official [Umbraco website](https://umbraco.com) for an introduction, core mission and values of the product and team behind it.

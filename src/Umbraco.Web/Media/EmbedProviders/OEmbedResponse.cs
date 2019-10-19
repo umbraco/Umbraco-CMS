@@ -52,7 +52,7 @@ namespace Umbraco.Web.Media.EmbedProviders
         {
             if (Type == "photo")
             {
-                return "<img src=\"" + Url + "\" width=\"" + Width + "\" height=\"" + Height + "\" alt=\"" + HttpUtility.HtmlEncode(Title) + "\" />";
+                return "<img src=\"" + Url + "\" width=\"" + Width + "\" height=\"" + Height + "\" alt=\"" + HttpUtility.HtmlEncode(Title) + "\">";
             }
 
             return string.IsNullOrEmpty(Html) == false ? Html : string.Empty;
