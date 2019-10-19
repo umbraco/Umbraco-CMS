@@ -419,7 +419,7 @@
       };
 
       scope.canRemoveGroup = function(group){
-        return _.find(group.properties, function(property) { return property.locked === true; }) == null;
+        return group.inherited !== true && _.find(group.properties, function(property) { return property.locked === true; }) == null;
       }
 
       scope.removeGroup = function(groupIndex) {
