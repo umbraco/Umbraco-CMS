@@ -397,8 +397,20 @@ angular.module("umbraco")
                             setMediaMetaData(mediaItem);
                         });
 
-                        // update images
-                        $scope.images = data.items ? data.items : [];
+                        // filter search result according to config and search state
+                        $scope.images = _.filter(data.items ? data.items : [], function (item) {
+                            // remove non-images when onlyImages is set to true
+                            if ($scope.onlyImages) {
+                                return item.isFolder || item.thumbnail;
+                            }
+
+                            // if subfolder search is not enabled, remove the media items that do not reside in the current folder
+                            if (!vm.includeFromSubFolders) {
+                                return $scope.currentFolder.id === item.parentId;
+                            }
+
+                            return true;
+                        });
 
                         // update pagination
                         if (data.pageNumber > 0)

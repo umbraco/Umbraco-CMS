@@ -120,26 +120,6 @@ Use this directive to generate a thumbnail grid of media items.
                     setOriginalSize(item, itemMaxHeight);
                     
                     item.selectable = getSelectableState(item);
-                    
-                    // remove non images when onlyImages is set to true
-                    if (scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
-                        scope.items.splice(i, 1);
-                        i--;
-                    }
-
-                    // If subfolder search is not enabled remove the media items that's not needed
-                    // Make sure that includeSubFolder is not undefined since the directive is used
-                    // in contexts where it should not be used. Currently only used when we trigger
-                    // a media picker
-                    if (scope.includeSubFolders !== undefined) {
-                        if (scope.includeSubFolders !== 'true') {
-                            if (item.parentId !== parseInt(scope.currentFolderId)) {
-                                scope.items.splice(i, 1);
-                                i--;
-                            }
-                        }
-                    }
-
                 }
                 
                 if (scope.items.length > 0) {
@@ -350,9 +330,7 @@ Use this directive to generate a thumbnail grid of media items.
                 itemMinHeight: "@",
                 disableFolderSelect: "@",
                 onlyImages: "@",
-                onlyFolders: "@",
-                includeSubFolders: "@",
-                currentFolderId: "@"
+                onlyFolders: "@"
             },
             link: link
         };

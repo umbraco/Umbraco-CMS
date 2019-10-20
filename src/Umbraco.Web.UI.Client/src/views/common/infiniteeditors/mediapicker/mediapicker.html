@@ -33,7 +33,7 @@
 
                         <div class="form-search__toggle">
                             <label>
-                                <input type="checkbox" ng-model="showChilds" ng-change="vm.toggle()" />
+                                <input type="checkbox" ng-model="vm.includeFromSubFolders" ng-change="vm.toggle()" />
                                 <localize key="general_includeFromsubFolders">Include subfolders in search</localize>
                             </label>
                         </div>
@@ -100,9 +100,7 @@
                         item-min-height="100"
                         disable-folder-select={{disableFolderSelect}}
                         only-images={{onlyImages}}
-                        only-folders={{onlyFolders}}
-                        include-sub-folders={{showChilds}}
-                        current-folder-id="{{currentFolder.id}}">
+                        only-folders={{onlyFolders}}>
                 </umb-media-grid>
 
                 <div class="flex justify-center">
