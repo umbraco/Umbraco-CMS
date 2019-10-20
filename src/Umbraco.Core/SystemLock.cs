@@ -92,12 +92,12 @@ namespace Umbraco.Core
         private class NamedSemaphoreReleaser : CriticalFinalizerObject, IDisposable
         {
             private readonly Semaphore _semaphore;
-            private GCHandle _handle;
+            //private GCHandle _handle;
 
             internal NamedSemaphoreReleaser(Semaphore semaphore)
             {
                 _semaphore = semaphore;
-                _handle = GCHandle.Alloc(_semaphore);
+                //_handle = GCHandle.Alloc(_semaphore);
             }
 
             #region IDisposable Support
@@ -116,16 +116,25 @@ namespace Umbraco.Core
             {
                 if (!disposedValue)
                 {
-                    if (disposing)
+                    // If this is called from the finalizer - the semaphore must be released to avoid locking up the system.
+                    // Hence a non-standard implementation of IDisposable
+                    // Also binned the use of _handle.
+                    try
                     {
                         _semaphore.Release();
-                        _semaphore.Dispose();
 
-                        
+                    }
+                    catch { }
+                    finally {
+                        try
+                        {
+                            _semaphore.Dispose();
+                        }
+                        catch { }
                     }
 
                     // free unmanaged resources (unmanaged objects) and override a finalizer below.
-                    _handle.Free();
+                    //_handle.Free();
 
                     disposedValue = true;
                 }
