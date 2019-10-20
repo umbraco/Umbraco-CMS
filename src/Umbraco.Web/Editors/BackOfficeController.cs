@@ -239,8 +239,8 @@ namespace Umbraco.Web.Editors
             var gridConfig = UmbracoConfig.For.GridConfig(
                 Logger,
                 ApplicationContext.ApplicationCache.RuntimeCache,
-                new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
-                new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
+                new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins)),
+                new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)),
                 HttpContext.IsDebuggingEnabled);
             return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
         }
