@@ -24,6 +24,10 @@ namespace Umbraco.Core
         // our own lock for local consistency
         private readonly object _locko = new object();
 
+        // Test: Binned my forked repo - and re-forked it and set the default branch to "v8/bugfix/6546-MainDom-Cleanup"
+        // Then cloned to Visual Studio - and the desired branch code is present.
+        // Let me test checking this in - please ignore and reject.
+
         // async lock representing the main domain lock
         private readonly SystemLock _systemLock;
         private IDisposable _systemLocker;
