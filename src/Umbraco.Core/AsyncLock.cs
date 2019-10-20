@@ -118,8 +118,11 @@ namespace Umbraco.Core
         // note - before making those classes some structs, read
         // about "impure methods" and mutating readonly structs...
 
-         // Why don't we go with the KISS principle on this 
-        public class SystemSemaphoreReleaser : IDisposable
+
+        //CriticalFinalizerObject - seems to be the best option for releasing a semaphore
+        //on forced app domain unload or thread abort.
+        //https://stackoverflow.com/questions/5231569/automatic-semaphore-release-on-process-exit
+        public class SystemSemaphoreReleaser : CriticalFinalizerObject, IDisposable
         {
             private readonly Semaphore _semaphore;
             internal SystemSemaphoreReleaser(Semaphore semaphore)
@@ -130,6 +133,7 @@ namespace Umbraco.Core
             public void Dispose()
             {
                 Dispose(true);
+                GC.SuppressFinalize(this); // finalize will not run
             }
 
             protected virtual void Dispose(bool disposing)
@@ -140,6 +144,7 @@ namespace Umbraco.Core
                     {
                         _semaphore.Release();
                     }
+                    catch { }
                     finally
                     {
                         try
@@ -150,6 +155,25 @@ namespace Umbraco.Core
                         catch { }
 
                     }
+                }
+            }
+
+            ~SystemSemaphoreReleaser()
+            {
+                try
+                {
+                    // This is only called when the thread did not exit normally.
+                    // It is a full backup for dispose NOT being called.
+                    // Dispose would normally be called with false here to only clean up unmanaged resources - but the semaphore needs to be released.
+                    // Note: The semaphore Release method is marked with
+                    //   [PrePrepareMethod] and
+                    //   [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)] so is fine to be called in a CER (constrained execution region).
+                    // Garbage Collection will run when an AppDomain is being unloaded.
+                     Dispose(true);
+                }
+                catch
+                {
+                    // we do NOT want the finalizer to throw - never ever
                 }
             }
         }
