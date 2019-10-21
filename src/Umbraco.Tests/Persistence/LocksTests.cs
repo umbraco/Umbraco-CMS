@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.Servers);
+                scope.ReadLock(Constants.Locks.Servers);
                 scope.Complete();
             }
         }

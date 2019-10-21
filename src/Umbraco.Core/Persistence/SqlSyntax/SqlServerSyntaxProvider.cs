@@ -261,7 +261,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             foreach (var lockId in lockIds)
             {
                 db.Execute(@"SET LOCK_TIMEOUT 1800;");
-                var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = value*-1 WHERE id=@id", new { id = lockId });
+                var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
                 if (i == 0) // ensure we are actually locking!
                     throw new ArgumentException($"LockObject with id={lockId} does not exist.");
             }

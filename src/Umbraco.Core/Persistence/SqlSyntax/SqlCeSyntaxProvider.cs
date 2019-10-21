@@ -167,12 +167,12 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
             {
-                var i = db.Execute(@"UPDATE umbracoLock SET value = value*-1 WHERE id=@id", new { id = lockId });
+                var i = db.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
                 if (i == 0) // ensure we are actually locking!
                     throw new ArgumentException($"LockObject with id={lockId} does not exist.");
             }
         }
-        
+
         public override void ReadLock(IDatabase db, params int[] lockIds)
         {
             // soon as we get Database, a transaction is started
