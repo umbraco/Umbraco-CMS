@@ -12,6 +12,7 @@ var app = angular.module('umbraco', [
     'ngSanitize',
     'ngTouch',
     'ngMessages',
+    'ngAria',
     'tmh.dynamicLocale',
     'ngFileUpload',
     'LocalStorageModule',

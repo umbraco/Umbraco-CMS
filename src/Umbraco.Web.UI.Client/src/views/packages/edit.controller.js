@@ -243,7 +243,7 @@
                 select: function(node) {
                     node.selected = !node.selected;
 
-                    const id = unescape(node.id);
+                    const id = decodeURIComponent(node.id.replace(/\+/g, " "));
                     const index = selection.indexOf(id);
 
                     if(node.selected) {
@@ -284,7 +284,7 @@
                 },
                 filterCssClass: "not-allowed",
                 select: function(node) {
-                    const id = unescape(node.id);
+                    const id = decodeURIComponent(node.id.replace(/\+/g, " "));
                     vm.package.packageView = id;
                     editorService.close();
                 },

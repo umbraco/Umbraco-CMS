@@ -47,7 +47,11 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
         var originalTitle = "";
 
         $rootScope.$on('$changeTitle', function (event, titlePrefix) {
-            $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+            if (titlePrefix) {
+                $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+            } else {
+                $rootScope.locationTitle = originalTitle;
+            }
         });
 
         /** execute code on each successful route */
@@ -155,7 +159,13 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                         currentRouteParams = toRetain;
                     }
                     else {
-                        currentRouteParams = angular.copy(next.params); 
+                        currentRouteParams = angular.copy(next.params);
+                    }
+
+                    //always clear the 'sr' query string (soft redirect) if it exists
+                    if (currentRouteParams.sr) {
+                        currentRouteParams.sr = null;
+                        $route.updateParams(currentRouteParams);
                     }
                     
                 }
