@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    [DataContract(Name = "dataTypeUsages", Namespace = "")]
+    [DataContract(Name = "dataTypeReferences", Namespace = "")]
     public class DataTypeReferences
     {
         [DataMember(Name = "documentTypes")]
