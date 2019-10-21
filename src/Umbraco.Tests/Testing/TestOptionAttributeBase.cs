@@ -39,7 +39,8 @@ namespace Umbraco.Tests.Testing
                     .FirstOrDefault(x => x != null);
                 if (type == null)
                 { 
-                    throw new PanicException($"Could not resolve the running test fixture from type name {typeName}"); // makes no sense
+                    throw new PanicException($"Could not resolve the running test fixture from type name {typeName}.\n" +
+                                             $"To use base classes from Umbraco.Tests, add your test assembly to TestOptionAttributeBase.ScanAssemblies");
                 }
             }
             var methodInfo = type.GetMethod(methodName); // what about overloads?
