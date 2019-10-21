@@ -29,6 +29,12 @@
                 var firstFocusableEl = focusableElsInEditor[0];
                 var lastFocusableEl = focusableElsInEditor[focusableElsInEditor.length -1];
                 var tabKey = 9;
+                var focusedElement = document.querySelector(':focus');
+
+                // If focus has not been set then put focus on the first focusable element
+                if(focusedElement === null){
+                    firstFocusableEl.focus();
+                }
 
                 target.addEventListener('keydown', function(event){
                     var isTabPressed = (event.key === 'Tab' || event.keyCode === tabKey);
