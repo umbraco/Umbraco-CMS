@@ -180,7 +180,7 @@
              * Call this method before a new overlay is activated to ensure focus is locked inside it
              *
              */
-            addFocusLock: function(view) {
+            addFocusLock: function() {
                 // Get the DOM nodes we need to add/remove the inert attribute for
                 getDOMNodes();
 
