@@ -10,6 +10,13 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IDataTypeService : IService
     {
+        /// <summary>
+        /// Returns a dictionary of content type <see cref="Udi"/>s and the property type aliases that use a <see cref="IDataType"/>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
+        
         Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
         EntityContainer GetContainer(int containerId);

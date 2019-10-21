@@ -21,7 +21,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     /// <summary>
     /// Implements a published snapshot service.
     /// </summary>
-    internal class PublishedSnapshotService : PublishedSnapshotServiceBase
+    internal class XmlPublishedSnapshotService : PublishedSnapshotServiceBase
     {
         private readonly XmlStore _xmlStore;
         private readonly RoutesCache _routesCache;
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         #region Constructors
 
         // used in WebBootManager + tests
-        public PublishedSnapshotService(ServiceContext serviceContext,
+        public XmlPublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
             IAppCache requestCache,
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         }
 
         // used in some tests
-        internal PublishedSnapshotService(ServiceContext serviceContext,
+        internal XmlPublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
             IAppCache requestCache,

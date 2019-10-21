@@ -1,81 +1,33 @@
-<div data-element="editor-data-types" ng-controller="Umbraco.Editors.DataType.EditController">
+<div data-element="editor-data-types" ng-controller="Umbraco.Editors.DataType.EditController as vm">
 
-   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+    <form name="contentForm" novalidate val-form-manager ng-submit="vm.save()">
+        <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+        <umb-editor-view ng-if="!vm.page.loading">
+            <umb-editor-header name="vm.content.name"
+                            name-locked="vm.page.nameLocked"
+                            hide-icon="true"
+                            hide-description="true"
+                            hide-alias="true"
+                            navigation="vm.page.navigation">
+            </umb-editor-header>
 
-   <form name="contentForm"
-      ng-submit="save()"
-      novalidate
-      val-form-manager>
+            <umb-editor-container class="form-horizontal">
+                <umb-editor-sub-views sub-views="vm.page.navigation" model="vm">
+                </umb-editor-sub-views>
+            </umb-editor-container>
 
-      <umb-editor-view ng-if="!page.loading">
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <umb-button type="submit"
+                                button-style="success"
+                                state="vm.page.saveButtonState"
+                                shortcut="ctrl+s"
+                                label="Save"
+                                label-key="buttons_save">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>
+        </umb-editor-view>
+    </form>
 
-         <umb-editor-header
-            name="content.name"
-            name-locked="page.nameLocked"
-            hide-icon="true"
-            hide-description="true"
-            hide-alias="true">
-         </umb-editor-header>
-
-
-         <umb-editor-container class="form-horizontal">
-             
-            <umb-box>
-
-                <umb-box-content>
-
-                    <umb-control-group label="Id" ng-if="showIdentifier">
-                        <div>{{content.id}}</div>
-                        <small>{{content.key}}</small>
-                    </umb-control-group>
-
-                    <umb-property property="properties.selectedEditor">
-                        <div>
-                            <select name="selectedEditor"
-                                    ng-model="content.selectedEditor"
-                                    required
-                                    ng-options="e.alias as e.name for e in content.availableEditors"></select>
-                            <span ng-messages="contentForm.selectedEditor.$error" show-validation-on-submit>
-                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
-                            </span>
-                        </div>
-
-                    </umb-property>
-
-                    <umb-property property="properties.selectedEditorId">
-                        <div>{{content.selectedEditor}}</div>
-                    </umb-property>
-
-                    <umb-property property="preValue"
-                                  ng-repeat="preValue in preValues">
-                        <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
-                    </umb-property>
-
-                </umb-box-content>
-
-            </umb-box>
-
-         </umb-editor-container>
-
-         <umb-editor-footer>
-
-            <umb-editor-footer-content-right>
-
-               <umb-button
-                  type="submit"
-                  button-style="success"
-                  state="page.saveButtonState"
-                  shortcut="ctrl+s"
-                  label="Save"
-                  label-key="buttons_save">
-               </umb-button>
-
-            </umb-editor-footer-content-right>
-
-         </umb-editor-footer>
-
-
-      </umb-editor-view>
-
-   </form>
 </div>

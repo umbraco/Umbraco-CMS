@@ -53,6 +53,12 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             dateFormat: dateFormat,
             time_24hr: true
         };
+
+        // Don't show calendar if date format has been set to only time
+        if ($scope.model.config.format === "HH:mm:ss" || $scope.model.config.format === "HH:mm" || $scope.model.config.format === "HH") {
+            $scope.datePickerConfig.enableTime = true;
+            $scope.datePickerConfig.noCalendar = true;
+        }
             
         setDatePickerVal();
 
