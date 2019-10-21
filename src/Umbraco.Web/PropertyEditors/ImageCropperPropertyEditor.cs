@@ -27,7 +27,7 @@ namespace Umbraco.Web.PropertyEditors
         HideLabel = false,
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-crop")]
-    public class ImageCropperPropertyEditor : DataEditor
+    public class ImageCropperPropertyEditor : DataEditor, IDataEditorWithMediaPath
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSettings;
@@ -47,6 +47,9 @@ namespace Umbraco.Web.PropertyEditors
             // TODO: inject?
             _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, _contentSettings);
         }
+
+        public string GetMediaPath(Property property, string culture = null, string segment = null) =>
+            GetFileSrcFromPropertyValue(property.GetValue(culture), out _);
 
         /// <summary>
         /// Creates the corresponding property value editor.
