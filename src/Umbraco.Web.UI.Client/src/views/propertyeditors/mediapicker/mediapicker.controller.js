@@ -3,11 +3,15 @@
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
     function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper) {
 
-        var vm = {
-            labels: {
-                 mediaPicker_deletedItem: ""
-            }
-        }
+        var vm = this;
+
+        vm.labels = {};
+        vm.labels.deletedItem = "";
+
+        vm.add = add;
+        vm.remove = remove;
+        vm.editItem = editItem;
+        vm.showAdd = showAdd;
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
@@ -57,7 +61,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                                 return found;
                             } else {
                                 return {
-                                    name: vm.labels.mediaPicker_deletedItem,
+                                    name: vm.labels.deletedItem,
                                     id: $scope.model.config.idType !== "udi" ? id : null,
                                     udi: $scope.model.config.idType === "udi" ? id : null,
                                     icon: "icon-picture",
@@ -77,10 +81,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             // if there is no thumbnail, try getting one if the media is not a placeholder item
                             if (!media.thumbnail && media.id && media.metaData) {
                                 media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
-
-                                if (!media.thumbnail && media.extension === "svg") {
-                                    media.thumbnail = media.metaData.MediaPath;
-                                }
                             }
 
                             $scope.mediaItems.push(media);
@@ -126,22 +126,29 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         function init() {
 
-            localizationService.localizeMany(["mediaPicker_deletedItem"])
+            // localize labels
+            var labelKeys = [
+                "mediaPicker_deletedItem",
+                "mediaPicker_trashed"
+            ];
+
+            localizationService.localizeMany(labelKeys)
                 .then(function(data) {
-                    vm.labels.mediaPicker_deletedItem = data[0];
+                    vm.labels.deletedItem = data[0];
+                    vm.labels.trashed = data[1];
 
                     userService.getCurrentUser().then(function (userData) {
 
                         if (!$scope.model.config.startNodeId) {
-                    if ($scope.model.config.ignoreUserStartNodes === true) {
-                        $scope.model.config.startNodeId = -1;
-                        $scope.model.config.startNodeIsVirtual = true;
-                    }
-                    else {
-                        $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                        $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-                    }  
-                }
+                            if ($scope.model.config.ignoreUserStartNodes === true) {
+                                $scope.model.config.startNodeId = -1;
+                                $scope.model.config.startNodeIsVirtual = true;
+                            }
+                            else {
+                                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                            }  
+                        }
 
                         // only allow users to add and edit media if they have access to the media section
                         var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;
@@ -153,14 +160,14 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 });
         }
 
-        $scope.remove = function (index) {
+        function remove(index) {
             $scope.mediaItems.splice(index, 1);
             $scope.ids.splice(index, 1);
             sync();
             setDirty();
-        };
+        }
 
-        $scope.editItem = function (item) {
+        function editItem(item) {
             var mediaEditor = {
                 id: item.id,
                 submit: function (model) {
@@ -187,9 +194,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 }
             };
             editorService.mediaEditor(mediaEditor);
-        };
+        }
 
-        $scope.add = function () {
+        function add() {
             var mediaPicker = {
                 startNodeId: $scope.model.config.startNodeId,
                 startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
@@ -197,7 +204,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 multiPicker: multiPicker,
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,
-
                 allowMediaEdit: true,
                 submit: function (model) {
 
@@ -230,8 +236,16 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             }
 
             editorService.mediaPicker(mediaPicker);
+        }
 
-        };
+        function showAdd() {
+            if (!multiPicker) {
+                if ($scope.model.value && $scope.model.value !== "") {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         $scope.sortableOptions = {
             containment: 'parent',
@@ -253,15 +267,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     sync();
                 });
             }
-        };
-
-        $scope.showAdd = function () {
-            if (!multiPicker) {
-                if ($scope.model.value && $scope.model.value !== "") {
-                    return false;
-                }
-            }
-            return true;
         };
 
         init();

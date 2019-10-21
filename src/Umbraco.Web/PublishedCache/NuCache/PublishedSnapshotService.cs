@@ -160,7 +160,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _domainStore = new SnapDictionary<int, Domain>();
 
-            publishedModelFactory.WithSafeLiveFactory(LoadCachesOnStartup);
+            LoadCachesOnStartup();
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
@@ -235,6 +235,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
             MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
+
+            LocalizationService.SavedLanguage += OnLanguageSaved;
         }
 
         private void TearDownRepositoryEvents()
@@ -252,6 +254,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
             MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
+
+            LocalizationService.SavedLanguage -= OnLanguageSaved;
         }
 
         public override void Dispose()
@@ -801,8 +805,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 using (_contentStore.GetScopedWriteLock(_scopeProvider))
                 using (_mediaStore.GetScopedWriteLock(_scopeProvider))
                 {
-                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
-                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
                 }
             }
 
@@ -1260,6 +1264,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 RebuildMemberDbCache(contentTypeIds: memberTypeIds);
         }
 
+        /// <summary>
+        /// If a <see cref="ILanguage"/> is ever saved with a different culture, we need to rebuild all of the content nucache table
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLanguageSaved(ILocalizationService sender, Core.Events.SaveEventArgs<ILanguage> e)
+        {
+            //culture changed on an existing language
+            var cultureChanged = e.SavedEntities.Any(x => !x.WasPropertyDirty(nameof(ILanguage.Id)) && x.WasPropertyDirty(nameof(ILanguage.IsoCode)));
+            if(cultureChanged)
+            {
+                RebuildContentDbCache();
+            }
+        }
+
         private ContentNuDto GetDto(IContentBase content, bool published)
         {
             // should inject these in ctor
@@ -1686,6 +1705,13 @@ AND cmsContentNu.nodeId IS NULL
             var mediaCollect = _mediaStore.CollectAsync();
             System.Threading.Tasks.Task.WaitAll(contentCollect, mediaCollect);
         }
+
+        #endregion
+
+        #region Internals/Testing
+
+        internal ContentStore GetContentStore() => _contentStore;
+        internal ContentStore GetMediaStore() => _mediaStore;
 
         #endregion
     }

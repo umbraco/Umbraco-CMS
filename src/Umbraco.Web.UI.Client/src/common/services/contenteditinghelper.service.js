@@ -80,17 +80,19 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
                         formHelper.resetForm({ scope: args.scope });
 
-                        self.handleSuccessfulSave({
-                            scope: args.scope,
-                            savedContent: data,
-                            softRedirect: args.softRedirect,
-                            rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, data]);
-                            }
-                        });
+                        if (!args.infiniteMode) {
+                            self.handleSuccessfulSave({
+                                scope: args.scope,
+                                savedContent: data,
+                                softRedirect: args.softRedirect,
+                                rebindCallback: function () {
+                                    rebindCallback.apply(self, [args.content, data]);
+                                }
+                            });
 
-                        //update editor state to what is current
-                        editorState.set(args.content);
+                            //update editor state to what is current
+                            editorState.set(args.content);
+                        }
 
                         return $q.resolve(data);
 
@@ -462,6 +464,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     "properties",
                     "apps",
                     "createDateFormatted",
+                    "releaseDateFormatted",
+                    "expireDateFormatted",
                     "releaseDate",
                     "expireDate"
                 ], function (i) {
@@ -614,7 +618,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         }
                     }
 
-                    if (!this.redirectToCreatedContent(args.err.data.id) || args.softRedirect) {
+                    if (!this.redirectToCreatedContent(args.err.data.id, args.softRedirect) || args.softRedirect) {
                         // If we are not redirecting it's because this is not newly created content, else in some cases we are
                         // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
 
@@ -660,7 +664,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 throw "args.savedContent cannot be null";
             }
 
-            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id) || args.softRedirect) {
+            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id, args.softRedirect) || args.softRedirect) {
 
                 // If we are not redirecting it's because this is not newly created content, else in some cases we are
                 // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
@@ -683,7 +687,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          * We need to decide if we need to redirect to edito mode or if we will remain in create mode.
          * We will only need to maintain create mode if we have not fulfilled the basic requirements for creating an entity which is at least having a name and ID
          */
-        redirectToCreatedContent: function (id) {
+        redirectToCreatedContent: function (id, softRedirect) {
 
             //only continue if we are currently in create mode and not in infinite mode and if the resulting ID is valid
             if ($routeParams.create && (isValidIdentifier(id))) {
@@ -695,9 +699,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
                 //clear the query strings
                 navigationService.clearSearch(["cculture"]);
-                
+                if (softRedirect) {
+                    navigationService.setSoftRedirect();
+                }
                 //change to new path
-                $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);
+                $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);                
                 //don't add a browser history for this
                 $location.replace();
                 return true;

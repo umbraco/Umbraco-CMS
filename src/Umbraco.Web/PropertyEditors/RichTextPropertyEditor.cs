@@ -1,15 +1,11 @@
-﻿using HtmlAgilityPack;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Umbraco.Core;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Templates;
 
@@ -30,21 +26,25 @@ namespace Umbraco.Web.PropertyEditors
     {
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private IUmbracoContextAccessor _umbracoContextAccessor;
+        private ILogger _logger;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RichTextPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider) : base(logger)
+        public RichTextPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor) : base(logger)
         {
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _logger = logger;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
@@ -57,12 +57,16 @@ namespace Umbraco.Web.PropertyEditors
         {
             private IMediaService _mediaService;
             private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+            private IUmbracoContextAccessor _umbracoContextAccessor;
+            private ILogger _logger;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
                 : base(attribute)
             {
                 _mediaService = mediaService;
                 _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+                _umbracoContextAccessor = umbracoContextAccessor;
+                _logger = logger;
             }
 
             /// <inheritdoc />
@@ -110,13 +114,16 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
-                var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(editorValue.Value.ToString());
+                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
+
+                var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
+                var mediaParent = config?.MediaParentId;
+                var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+
+                var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 
-                var userId = Current.UmbracoContext.Security.CurrentUser.Id;
-
-                // TODO: In future task(get the parent folder from this config) to save the media into
-                parsed = TemplateUtilities.FindAndPersistPastedTempImages(parsed, Constants.System.Root, userId, _mediaService, _contentTypeBaseServiceProvider);
                 return parsed;
             }
         }

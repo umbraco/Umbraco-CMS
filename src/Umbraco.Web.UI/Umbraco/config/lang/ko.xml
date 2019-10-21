@@ -174,7 +174,6 @@
     <key alias="linkinternal">내부링크:</key>
     <key alias="linklocaltip">내부링크를 사용하실 때 링크앞에 "#"를 넣어주세요</key>
     <key alias="linknewwindow">새 창으로 여시겠습니까?</key>
-    <key alias="macroContainerSettings">매크로 세팅</key>
     <key alias="macroDoesNotHaveProperties">이 매크로에는 편집할 수 있는 항목이 포함되어 있지 않습니다.</key>
     <key alias="paste">붙여넣기</key>
     <key alias="permissionsEdit">권한 편집</key>

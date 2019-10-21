@@ -8,12 +8,13 @@
            ng-model="vm.model"
            ng-disabled="vm.disabled"
            ng-required="vm.required"
-           ng-change="vm.onChange()"/>
+           ng-change="vm.change()"/>
 
     <span class="umb-form-check__state" aria-hidden="true">
         <span class="umb-form-check__check">
             <i class="umb-form-check__icon icon-check"></i>
         </span>
     </span>
+
     <span class="umb-form-check__text">{{vm.text}}</span>
 </label>

@@ -193,9 +193,14 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     _.each($scope.options.includeProperties, function (e, i) {
         e.allowSorting = true;
 
-        // Special case for members, only fields on the base table (cmsMember) can be used for sorting
-        if (e.isSystem && $scope.entityType == "member") {
-            e.allowSorting = e.alias == 'username' || e.alias == 'email';
+        // Special case for members, only the configured system fields should be enabled sorting
+        // (see MemberRepository.ApplySystemOrdering)
+        if (e.isSystem && $scope.entityType === "member") {
+            e.allowSorting = e.alias === "username" ||
+                e.alias === "email" ||
+                e.alias === "updateDate" ||
+                e.alias === "createDate" ||
+                e.alias === "contentTypeAlias";
         }
 
         if (e.isSystem) {
@@ -262,10 +267,10 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     $scope.getContent = function (contentId) {
 
-        $scope.reloadView($scope.contentId);
+        $scope.reloadView($scope.contentId, true);
     }
 
-    $scope.reloadView = function (id) {
+    $scope.reloadView = function (id, reloadActiveNode) {
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -297,9 +302,20 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
 
                 //reload!
-                $scope.reloadView(id);
+                $scope.reloadView(id, reloadActiveNode);
             }
-
+            // in the media section, the list view items are by default also shown in the tree, so we need 
+            // to refresh the current tree node when changing the folder contents (adding and removing)
+            else if (reloadActiveNode && section === "media") {
+                var activeNode = appState.getTreeState("selectedNode");
+                if (activeNode) {
+                    if (activeNode.expanded) {
+                        navigationService.reloadNode(activeNode);
+                    }
+                } else {
+                    navigationService.reloadSection(section);
+                }
+            }
         });
     };
 
@@ -383,6 +399,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
+            submitButtonStyle: "danger",
             submit: function (model) {
                 performDelete();
                 overlayService.close();
@@ -410,7 +427,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
                 return localizationService.localize(key, [total]);
             }).then(function () {
-                $scope.reloadView($scope.contentId);
+                $scope.reloadView($scope.contentId, true);
             });
     }
 
@@ -488,6 +505,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         const dialog = {
             view: "views/propertyeditors/listview/overlays/listviewunpublish.html",
             submitButtonLabelKey: "actions_unpublish",
+            submitButtonStyle: "warning",
             submit: function (model) {
 
                 // create a comma separated array of selected cultures
@@ -535,7 +553,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
                 return localizationService.localize(key, [total]);
             }).then(function () {
-                $scope.reloadView($scope.contentId);
+                $scope.reloadView($scope.contentId, true);
             });
     }
 
@@ -766,8 +784,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             case "published":
                 return "content_isPublished";
             case "contentTypeAlias":
-                // TODO: Check for members
-                return $scope.entityType === "content" ? "content_documentType" : "content_mediatype";
+                return $scope.entityType === "content"
+                    ? "content_documentType"
+                    : $scope.entityType === "media"
+                        ? "content_mediatype"
+                        : "content_membertype";
             case "email":
                 return "general_email";
             case "username":

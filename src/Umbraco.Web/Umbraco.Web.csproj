@@ -212,6 +212,7 @@
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
     <Compile Include="Models\AnchorsModel.cs" />
+    <Compile Include="Models\ContentEditing\DataTypeReferences.cs" />
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
@@ -222,6 +223,7 @@
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
+    <Compile Include="Mvc\StatusCodeFilterAttribute.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
@@ -230,11 +232,13 @@
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
+    <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
     <Compile Include="Routing\IMediaUrlProvider.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
+    <Compile Include="Scheduling\TempFileCleanup.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />
@@ -483,8 +487,6 @@
     <Compile Include="PropertyEditors\IntegerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ListViewConfiguration.cs" />
     <Compile Include="PropertyEditors\ListViewConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\MacroContainerConfiguration.cs" />
-    <Compile Include="PropertyEditors\MacroContainerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MarkdownConfiguration.cs" />
     <Compile Include="PropertyEditors\MarkdownConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
@@ -807,7 +809,6 @@
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="PropertyEditors\GridPropertyEditor.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MacroContainerValueConverter.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
     <Compile Include="PublishedCache\PublishedMember.cs" />
     <Compile Include="Models\ContentModelOfTContent.cs" />
@@ -845,7 +846,6 @@
     <Compile Include="PropertyEditors\ImageCropperPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MacroContainerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MarkdownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberGroupPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
