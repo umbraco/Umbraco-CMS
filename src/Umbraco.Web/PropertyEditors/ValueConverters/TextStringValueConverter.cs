@@ -11,9 +11,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class TextStringValueConverter : PropertyValueConverterBase
     {
-        public TextStringValueConverter(InternalLinkParser internalLinkParser)
+        public TextStringValueConverter(InternalLinkParser internalLinkParser, UrlParser urlParser)
         {
             _internalLinkParser = internalLinkParser;
+            _urlParser = urlParser;
         }
 
         private static readonly string[] PropertyTypeAliases =
@@ -22,6 +23,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             Constants.PropertyEditors.Aliases.TextArea
         };
         private readonly InternalLinkParser _internalLinkParser;
+        private readonly UrlParser _urlParser;
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => PropertyTypeAliases.Contains(propertyType.EditorAlias);
@@ -38,8 +40,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = _internalLinkParser.ParseInternalLinks(sourceString, preview);
-            sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
+            sourceString = _internalLinkParser.EnsureInternalLinks(sourceString, preview);
+            sourceString = _urlParser.EnsureUrls(sourceString);
 
             return sourceString;
         }

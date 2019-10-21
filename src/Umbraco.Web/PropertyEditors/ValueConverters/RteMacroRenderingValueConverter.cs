@@ -25,6 +25,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
         private readonly InternalLinkParser _internalLinkParser;
+        private readonly UrlParser _urlResolver;
+        private readonly MediaParser _mediaParser;
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         {
@@ -33,11 +35,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return PropertyCacheLevel.Snapshot;
         }
 
-        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, InternalLinkParser internalLinkParser)
+        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
+            InternalLinkParser internalLinkParser, UrlParser urlResolver, MediaParser mediaParser)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _macroRenderer = macroRenderer;
             _internalLinkParser = internalLinkParser;
+            _urlResolver = urlResolver;
+            _mediaParser = mediaParser;
         }
 
         // NOT thread-safe over a request because it modifies the
@@ -83,9 +88,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls and media are resolved correctly
-            sourceString = _internalLinkParser.ParseInternalLinks(sourceString, preview);
-            sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
-            sourceString = TemplateUtilities.ResolveMediaFromTextString(sourceString);
+            sourceString = _internalLinkParser.EnsureInternalLinks(sourceString, preview);
+            sourceString = _urlResolver.EnsureUrls(sourceString);
+            sourceString = _mediaParser.EnsureImageSources(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly
             sourceString = RenderRteMacros(sourceString, preview);

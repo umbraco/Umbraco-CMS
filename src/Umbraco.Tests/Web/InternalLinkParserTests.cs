@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Web
             {
                 var linkParser = new InternalLinkParser(umbracoContextAccessor);
 
-                var output = linkParser.ParseInternalLinks(input);
+                var output = linkParser.EnsureInternalLinks(input);
 
                 Assert.AreEqual(result, output);
             }

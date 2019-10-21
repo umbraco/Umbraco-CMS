@@ -23,17 +23,23 @@ namespace Umbraco.Web.Templates
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
-        public string ParseInternalLinks(string text, bool preview)
+        /// <summary>
+        /// Parses the string looking for the {localLink} syntax and updates them to their correct links.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="preview"></param>
+        /// <returns></returns>
+        public string EnsureInternalLinks(string text, bool preview)
         {
             if (_umbracoContextAccessor.UmbracoContext == null)
                 throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
 
             if (!preview)
-                return ParseInternalLinks(text);
+                return EnsureInternalLinks(text);
 
             using (_umbracoContextAccessor.UmbracoContext.ForcedPreview(preview)) // force for url provider
             {
-                return ParseInternalLinks(text);
+                return EnsureInternalLinks(text);
             }
         }
 
@@ -43,7 +49,7 @@ namespace Umbraco.Web.Templates
         /// <param name="text"></param>
         /// <param name="urlProvider"></param>
         /// <returns></returns>
-        public string ParseInternalLinks(string text)
+        public string EnsureInternalLinks(string text)
         {
             if (_umbracoContextAccessor.UmbracoContext == null)
                 throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");

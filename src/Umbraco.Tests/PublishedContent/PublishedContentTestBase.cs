@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -38,9 +39,11 @@ namespace Umbraco.Tests.PublishedContent
             base.Initialize();
 
             var converters = Factory.GetInstance<PropertyValueConverterCollection>();
+            var umbracoCtxAccessor = Mock.Of<IUmbracoContextAccessor>();
+            var logger = Mock.Of<ILogger>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new RichTextPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IUmbracoContextAccessor>())) { Id = 1 });
+                new DataType(new RichTextPropertyEditor(logger, umbracoCtxAccessor, new MediaParser(umbracoCtxAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>()))) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 

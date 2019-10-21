@@ -13,10 +13,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class MarkdownEditorValueConverter : PropertyValueConverterBase
     {
         private readonly InternalLinkParser _localLinkParser;
+        private readonly UrlParser _urlResolver;
 
-        public MarkdownEditorValueConverter(InternalLinkParser localLinkParser)
+        public MarkdownEditorValueConverter(InternalLinkParser localLinkParser, UrlParser urlResolver)
         {
             _localLinkParser = localLinkParser;
+            _urlResolver = urlResolver;
         }
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -34,8 +36,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = _localLinkParser.ParseInternalLinks(sourceString, preview);
-            sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
+            sourceString = _localLinkParser.EnsureInternalLinks(sourceString, preview);
+            sourceString = _urlResolver.EnsureUrls(sourceString);
 
             return sourceString;
         }
