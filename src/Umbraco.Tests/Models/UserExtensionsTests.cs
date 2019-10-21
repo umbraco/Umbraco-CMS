@@ -57,6 +57,9 @@ namespace Umbraco.Tests.Models
         [TestCase("1,-1", "1", "1")] // was an issue
         [TestCase("-1,1", "1", "1")] // was an issue
 
+        [TestCase("-1", "", "-1")]
+        [TestCase("", "-1", "-1")]
+
         public void CombineStartNodes(string groupSn, string userSn, string expected)
         {
             // 1
