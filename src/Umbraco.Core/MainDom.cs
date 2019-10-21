@@ -126,32 +126,32 @@ namespace Umbraco.Core
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
-            }
 
-            try
-            {
-                _logger.Info<MainDom>("Stopping ({SignalSource})", source);
-                foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
+                try
                 {
-                    try
+                    _logger.Info<MainDom>("Stopping ({SignalSource})", source);
+                    foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                     {
-                        callback(); // no timeout on callbacks
+                        try
+                        {
+                            callback(); // no timeout on callbacks
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.Error<MainDom>(e, "Error while running callback");
+                            continue;
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        _logger.Error<MainDom>(e, "Error while running callback, remaining callbacks will not run.");
-                        throw;
-                    }
-
+                    _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
                 }
-                _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
-            }
-            finally
-            {
-                // in any case...
-                _isMainDom = false;
-                _systemLocker?.Dispose();
-                _logger.Info<MainDom>("Released ({SignalSource})", source);
+                finally
+                {
+                    // in any case...
+                    _isMainDom = false;
+                    _systemLocker?.Dispose();
+                    _logger.Info<MainDom>("Released ({SignalSource})", source);
+                }
+
             }
         }
 
@@ -211,7 +211,7 @@ namespace Umbraco.Core
         void IRegisteredObject.Stop(bool immediate)
         {
             OnSignal("environment"); // will run once
-            
+
             if (immediate)
             {
                 //only unregister when it's the final call, else we won't be notified of the final call
@@ -241,7 +241,7 @@ namespace Umbraco.Core
                 disposedValue = true;
             }
         }
-                
+
         public void Dispose()
         {
             Dispose(true);
