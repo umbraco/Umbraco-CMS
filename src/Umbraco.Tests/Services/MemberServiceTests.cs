@@ -96,8 +96,7 @@ namespace Umbraco.Tests.Services
 
             var properties = pmember.Properties.ToList();
 
-            for (var i = 0; i < aliases.Length; i++)
-                Assert.AreEqual(properties[i].Alias, aliases[i]);
+            Assert.IsTrue(properties.Select(x => x.Alias).ContainsAll(aliases));
 
             var email = properties[aliases.IndexOf("Email")];
             Assert.AreEqual("xemail", email.GetSourceValue());
