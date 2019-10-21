@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches);
             var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository);
-            var repository = new DocumentRepository(scopeAccessor, appCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Factory.GetInstance<PropertyEditorCollection>());
+            var repository = new DocumentRepository(scopeAccessor, appCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 

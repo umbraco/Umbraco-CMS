@@ -33,18 +33,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IUmbracoEntity
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILanguageRepository languageRepository, ILogger logger, PropertyEditorCollection propertyEditors)
+        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILanguageRepository languageRepository, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {
             LanguageRepository = languageRepository;
-            PropertyEditors = propertyEditors;
         }
 
         protected abstract TRepository This { get; }
 
         protected ILanguageRepository LanguageRepository { get; }
 
-        protected PropertyEditorCollection PropertyEditors { get; }
+        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // TODO: inject
 
         #region Versions
 
