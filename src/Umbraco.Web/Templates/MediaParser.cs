@@ -9,6 +9,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Templates
 {
@@ -39,10 +40,12 @@ namespace Umbraco.Web.Templates
         public string EnsureImageSources(string text)
         {
             // don't attempt to proceed without a context
-            if (_umbracoContextAccessor?.UmbracoContext?.Media == null)
+            if (_umbracoContextAccessor?.UmbracoContext?.UrlProvider == null)
             {
                 return text;
             }
+
+            var urlProvider = _umbracoContextAccessor.UmbracoContext.UrlProvider;
 
             return ResolveImgPattern.Replace(text, match =>
             {
@@ -57,16 +60,15 @@ namespace Umbraco.Web.Templates
                 {
                     return match.Value;
                 }
-                var media = _umbracoContextAccessor?.UmbracoContext?.Media.GetById(guidUdi.Guid);
-                if (media == null)
+                var mediaUrl = urlProvider.GetMediaUrl(guidUdi.Guid);
+                if (mediaUrl == null)
                 {
                     // image does not exist - we could choose to remove the image entirely here (return empty string),
                     // but that would leave the editors completely in the dark as to why the image doesn't show
                     return match.Value;
                 }
 
-                var url = media.Url;
-                return $"{match.Groups[1].Value}{url}{match.Groups[3].Value}{udi}{match.Groups[5].Value}";
+                return $"{match.Groups[1].Value}{mediaUrl}{match.Groups[3].Value}{udi}{match.Groups[5].Value}";
             });
         }
 
