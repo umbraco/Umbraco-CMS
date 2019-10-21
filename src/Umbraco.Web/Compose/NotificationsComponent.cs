@@ -209,9 +209,6 @@ namespace Umbraco.Web.Compose
                 //group by the content type variation since the emails will be different
                 foreach(var contentVariantGroup in entities.GroupBy(x => x.ContentType.Variations))
                 {
-                    if (contentVariantGroup.Key == ContentVariation.CultureAndSegment || contentVariantGroup.Key == ContentVariation.Segment)
-                        throw new NotSupportedException("Segments are not yet supported in Umbraco");
-
                     _notificationService.SendNotifications(
                         sender,
                         contentVariantGroup,

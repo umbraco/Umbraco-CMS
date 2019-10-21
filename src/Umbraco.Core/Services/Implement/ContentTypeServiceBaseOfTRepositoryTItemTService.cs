@@ -390,6 +390,11 @@ namespace Umbraco.Core.Services.Implement
                 if (string.IsNullOrWhiteSpace(item.Name))
                     throw new ArgumentException("Cannot save item with empty name.");
 
+                if (item.Name != null && item.Name.Length > 255)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
+
                 scope.WriteLock(WriteLockIds);
 
                 // validate the DAG transform, within the lock
