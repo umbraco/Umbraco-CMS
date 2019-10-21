@@ -28,6 +28,7 @@ using Constants = Umbraco.Core.Constants;
 using umbraco.cms.businesslogic;
 using System.Collections;
 using umbraco;
+using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.Editors
 {
@@ -1170,6 +1171,12 @@ namespace Umbraco.Web.Editors
             //if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
             var path = contentItem != null ? contentItem.Path : nodeId.ToString();
             var permission = userService.GetPermissionsForPath(user, path);
+
+            // users are allowed to delete their own stuff - see ContentTreeControllerBase.GetAllowedUserMenuItemsForNode()
+            if(contentItem != null && contentItem.CreatorId == user.Id)
+            {
+                permission.PermissionsSet.Add(new EntityPermission(0, contentItem.Id, new [] { ActionDelete.Instance.Letter.ToString() } ));
+            }
 
             var allowed = true;
             foreach (var p in permissionsToCheck)
