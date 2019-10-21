@@ -174,7 +174,6 @@
     <key alias="linkinternal">Link interno:</key>
     <key alias="linklocaltip">Ao usar links locais insira "#" na frente do link</key>
     <key alias="linknewwindow">Abrir em nova janela?</key>
-    <key alias="macroContainerSettings">Configurações de Macro</key>
     <key alias="macroDoesNotHaveProperties">Este macro não contém nenhuma propriedade que possa ser editada</key>
     <key alias="paste">Colar</key>
     <key alias="permissionsEdit">Editar Permissões para</key>

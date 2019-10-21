@@ -29,6 +29,7 @@ namespace Umbraco.Web.Search
             composition.Register<MediaIndexPopulator>(Lifetime.Singleton);
 
             composition.Register<IndexRebuilder>(Lifetime.Singleton);
+            composition.RegisterUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
             composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(

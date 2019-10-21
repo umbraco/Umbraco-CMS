@@ -37,7 +37,7 @@ angular.module("umbraco")
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
             $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
-
+            
             var userStartNodes = [];
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -124,11 +124,15 @@ angular.module("umbraco")
                         gotoStartNode();
                     }
                 } else {
-                    //if a target is specified, go look it up - generally this target will just contain ids not the actual full
-                    //media object so we need to look it up
+                    // if a target is specified, go look it up - generally this target will just contain ids not the actual full
+                    // media object so we need to look it up
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
-                    entityResource.getById(id, "Media")
+                    
+                    // ID of a UDI or legacy int ID still could be null/undefinied here
+                    // As user may dragged in an image that has not been saved to media section yet
+                    if(id){
+                        entityResource.getById(id, "Media")
                         .then(function (node) {
                             $scope.target = node;
                             if (ensureWithinStartNode(node)) {
@@ -138,6 +142,12 @@ angular.module("umbraco")
                                 openDetailsDialog();
                             }
                         }, gotoStartNode);
+                    }
+                    else {
+                        // No ID set - then this is going to be a tmpimg that has not been uploaded
+                        // User editing this will want to be changing the ALT text
+                        openDetailsDialog();
+                    }
                 }
             }
 
@@ -216,7 +226,7 @@ angular.module("umbraco")
             }
 
             function clickHandler(media, event, index) {
-                
+
                 if (media.isFolder) {
                     if ($scope.disableFolderSelect) {
                         gotoFolder(media);
@@ -443,21 +453,25 @@ angular.module("umbraco")
             function getChildren(id) {
                 vm.loading = true;
                 return entityResource.getChildren(id, "Media", vm.searchOptions).then(function (data) {
-                        
-                        for (var i = 0; i < data.length; i++) {
-                            if (data[i].metaData.MediaPath !== null) {
-                                data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
-                                data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
-                            }
+
+                    var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
+
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].metaData.MediaPath !== null) {
+                            data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
+                            data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
                         }
 
-                        vm.searchOptions.filter = "";
-                        $scope.images = data ? data : [];
+                        data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
+                    }
 
-                        // set already selected medias to selected
-                        preSelectMedia();
-                        vm.loading = false;
-                    });
+                    vm.searchOptions.filter = "";
+                    $scope.images = data ? data : [];
+
+                    // set already selected medias to selected
+                    preSelectMedia();
+                    vm.loading = false;
+                });
             }
 
             function preSelectMedia() {
