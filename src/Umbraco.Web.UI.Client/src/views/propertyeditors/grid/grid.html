@@ -252,12 +252,12 @@
                        <button
                           class="iconBox btn-reset"
                           ng-click="toggleAddRow()"
-                          ng-if="!showRowConfigurations"
-                          title="@general_add"
-                          localize="title">
+                          ng-if="!showRowConfigurations">
 
                           <i class="icon icon-add" ></i>
-
+                          <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_addNewRow">Add new role</localize>
+                          </span>
                         </button>
 
                     </div>
