@@ -1145,7 +1145,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
-    
+
     <key alias="pathToFile">Path to file</key>
     <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
@@ -2158,4 +2158,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
   </area>
+  <area alias="references">
+    <key alias="tabName">References</key>
+    <key alias="DataTypeNoReferences">This Data Type has no references.</key>
+    <key alias="labelUsedByDocumentTypes">Used in Document Types</key>
+    <key alias="noDocumentTypes">No references to Document Types.</key>
+    <key alias="labelUsedByMediaTypes">Used in Media Types</key>
+    <key alias="noMediaTypes">No references to Media Types.</key>
+    <key alias="labelUsedByMemberTypes">Used in Member Types</key>
+    <key alias="noMemberTypes">No references to Member Types.</key>
+    <key alias="usedByProperties">Used by</key>
+  </area>
+
 </language>
