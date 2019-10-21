@@ -47,7 +47,11 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
         var originalTitle = "";
 
         $rootScope.$on('$changeTitle', function (event, titlePrefix) {
-            $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+            if (titlePrefix) {
+                $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+            } else {
+                $rootScope.locationTitle = originalTitle;
+            }
         });
 
         /** execute code on each successful route */

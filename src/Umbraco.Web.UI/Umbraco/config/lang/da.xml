@@ -332,9 +332,11 @@
     <key alias="createContentBlueprint">Vælg den dokumenttype, du vil oprette en indholdsskabelon til</key>
     <key alias="enterFolderName">Angiv et navn for mappen</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokumenttyper. Du skal tillade disse i indstillinger under <strong>"dokumenttyper"</strong>.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[There are no document types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.]]></key>
     <key alias="noDocumentTypesWithNoSettingsAccess">Den valgte side i træet tillader ikke at sider oprettes under den.</key>
     <key alias="noDocumentTypesEditPermissions">Rediger tilladelser for denne dokumenttype.</key>
+    <key alias="noDocumentTypesCreateNew">Opret en ny dokumenttype</key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">Det valgte medie i træet tillader ikke at medier oprettes under det.</key>
     <key alias="noMediaTypesEditPermissions">Rediger tilladelser for denne medietype.</key>
@@ -419,7 +421,6 @@
     <key alias="linkinternal">Internt link:</key>
     <key alias="linklocaltip">Ved lokalt link, indsæt da en "#" foran linket</key>
     <key alias="linknewwindow">Åben i nyt vindue?</key>
-    <key alias="macroContainerSettings">Makroindstillinger</key>
     <key alias="macroDoesNotHaveProperties">Denne makro har ingen egenskaber du kan redigere</key>
     <key alias="paste">Indsæt tekst</key>
     <key alias="permissionsEdit">Rediger rettigheder for</key>
@@ -511,6 +512,7 @@
     <key alias="searchDescription">Søg i indekset og se resultaterne</key>
     <key alias="tools">Værktøjer</key>
     <key alias="toolsDescription">Værktøjer til at administrere indekset</key>
+    <key alias="fields">felter</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -523,7 +525,7 @@
     <key alias="label">Label...</key>
     <key alias="enterDescription">Indtast beskrivelse</key>
     <key alias="search">Søg...</key>
-    <key alias="filter">Filtrer...</key>
+    <key alias="filter">Filtrér...</key>
     <key alias="enterTags">Indtast nøgleord (tryk på Enter efter hvert nøgleord)...</key>
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
@@ -935,7 +937,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="pathToFile">Sti til fil</key>
     <key alias="pathToFileDescription">Absolut sti til fil (f.eks.: /bin/umbraco.bin)</key>
     <key alias="installed">Installeret</key>
-    <key alias="installedPackages">Installeret pakker</key>
+    <key alias="installedPackages">Installerede pakker</key>
     <key alias="installLocal">Installér lokal</key>
     <key alias="installFinish">Afslut</key>
     <key alias="noConfigurationView">Denne pakke har ingen konfigurationsvisning</key>
@@ -1714,6 +1716,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="openBackofficeSearch">Åben backoffice søgning</key>
     <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
     <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
+    <key alias="currentLanguage">Aktivt sprog</key>
+    <key alias="switchLanguage">Skift sprog til</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>
