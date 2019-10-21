@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -168,7 +169,7 @@ namespace Umbraco.Tests.Services
                 var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, tRepository, AppCaches);
                 var languageRepository = new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
-                var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository);
+                var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository, Factory.GetInstance<PropertyEditorCollection>());
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -202,7 +203,7 @@ namespace Umbraco.Tests.Services
                 var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, tRepository, AppCaches);
                 var languageRepository = new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
-                var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository);
+                var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository, Factory.GetInstance<PropertyEditorCollection>());
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -234,7 +235,7 @@ namespace Umbraco.Tests.Services
                 var commonRepository = new ContentTypeCommonRepository((IScopeAccessor) provider, tRepository, AppCaches);
                 var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
-                var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository);
+                var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository, Factory.GetInstance<PropertyEditorCollection>());
 
                 // Act
                 var contents = repository.GetMany();
@@ -269,7 +270,7 @@ namespace Umbraco.Tests.Services
                 var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, tRepository, AppCaches);
                 var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);  
-                var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository);
+                var repository = new DocumentRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository, Factory.GetInstance<PropertyEditorCollection>());
 
                 // Act
                 var contents = repository.GetMany();

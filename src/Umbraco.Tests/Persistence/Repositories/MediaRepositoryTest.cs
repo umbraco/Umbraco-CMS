@@ -4,7 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Services;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger);
             mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
-            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
+            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), Factory.GetInstance<PropertyEditorCollection>());
             return repository;
         }
 
