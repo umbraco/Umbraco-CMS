@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Testing
 {
     public abstract class TestOptionAttributeBase : Attribute
     {
-        public static readonly List<string> ScanAssemblies = new List<string>();
+        public static readonly List<Assembly> ScanAssemblies = new List<Assembly>();
 
         public static TOptions GetTestOptions<TOptions>(MethodInfo method)
             where TOptions : TestOptionAttributeBase, new()
@@ -35,11 +35,11 @@ namespace Umbraco.Tests.Testing
             if (type == null)
             {
                 type = ScanAssemblies
-                    .Select(x => Type.GetType(typeName + ", " + x, false))
+                    .Select(assembly => assembly.GetType(typeName, false))
                     .FirstOrDefault(x => x != null);
                 if (type == null)
                 { 
-                    throw new PanicException($"Could not resolve the type from type name {typeName}"); // makes no sense
+                    throw new PanicException($"Could not resolve the running test fixture from type name {typeName}"); // makes no sense
                 }
             }
             var methodInfo = type.GetMethod(methodName); // what about overloads?
