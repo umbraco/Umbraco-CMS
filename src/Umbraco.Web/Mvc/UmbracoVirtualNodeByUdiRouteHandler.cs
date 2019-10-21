@@ -8,7 +8,7 @@ namespace Umbraco.Web.Mvc
     {
         private readonly Udi _realNodeUdi;
 
-        public UmbracoVirtualNodeByUdiRouteHandler(Udi realNodeUdi)
+        public UmbracoVirtualNodeByUdiRouteHandler(GuidUdi realNodeUdi)
         {
             _realNodeUdi = realNodeUdi;
         }
