@@ -44,7 +44,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             return selected.id;
         };
         createEditUrlCallback = function (item) {
-            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id + "?page=" + $scope.options.pageNumber;
+            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id 
+                + "?list=" + $routeParams.id + "&page=" + $scope.options.pageNumber + "&filter=" + $scope.options.filter 
+                + "&orderBy=" + $scope.options.orderBy + "&orderDirection=" + $scope.options.orderDirection;
         };
     }
 
@@ -53,7 +55,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     $scope.actionInProgress = false;
     $scope.selection = [];
     $scope.folders = [];
-    $scope.page = {};
+    $scope.page = {
+        createDropdownOpen: false
+    };
     $scope.listViewResultSet = {
         totalPages: 0,
         items: []
@@ -141,12 +145,13 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     }
 
+    var listParamsForCurrent = $routeParams.id == $routeParams.list;
     $scope.options = {
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
-        pageNumber: ($routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
-        filter: '',
-        orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
-        orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection.trim() : "desc",
+        pageNumber: (listParamsForCurrent && $routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
+        filter: (listParamsForCurrent && $routeParams.filter ? $routeParams.filter : '').trim(),
+        orderBy: (listParamsForCurrent && $routeParams.orderBy ? $routeParams.orderBy : $scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
+        orderDirection: (listParamsForCurrent && $routeParams.orderDirection ? $routeParams.orderDirection : $scope.model.config.orderDirection ? $scope.model.config.orderDirection : "desc").trim(),
         orderBySystemField: true,
         includeProperties: $scope.model.config.includeProperties ? $scope.model.config.includeProperties : [
             { alias: 'updateDate', header: 'Last edited', isSystem: 1 },
@@ -188,9 +193,14 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     _.each($scope.options.includeProperties, function (e, i) {
         e.allowSorting = true;
 
-        // Special case for members, only fields on the base table (cmsMember) can be used for sorting
-        if (e.isSystem && $scope.entityType == "member") {
-            e.allowSorting = e.alias == 'username' || e.alias == 'email';
+        // Special case for members, only the configured system fields should be enabled sorting
+        // (see MemberRepository.ApplySystemOrdering)
+        if (e.isSystem && $scope.entityType === "member") {
+            e.allowSorting = e.alias === "username" ||
+                e.alias === "email" ||
+                e.alias === "updateDate" ||
+                e.alias === "createDate" ||
+                e.alias === "contentTypeAlias";
         }
 
         if (e.isSystem) {
@@ -257,10 +267,10 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     $scope.getContent = function (contentId) {
 
-        $scope.reloadView($scope.contentId);
+        $scope.reloadView($scope.contentId, true);
     }
 
-    $scope.reloadView = function (id) {
+    $scope.reloadView = function (id, reloadActiveNode) {
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -292,9 +302,20 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
 
                 //reload!
-                $scope.reloadView(id);
+                $scope.reloadView(id, reloadActiveNode);
             }
-
+            // in the media section, the list view items are by default also shown in the tree, so we need 
+            // to refresh the current tree node when changing the folder contents (adding and removing)
+            else if (reloadActiveNode && section === "media") {
+                var activeNode = appState.getTreeState("selectedNode");
+                if (activeNode) {
+                    if (activeNode.expanded) {
+                        navigationService.reloadNode(activeNode);
+                    }
+                } else {
+                    navigationService.reloadSection(section);
+                }
+            }
         });
     };
 
@@ -378,6 +399,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
+            submitButtonStyle: "danger",
             submit: function (model) {
                 performDelete();
                 overlayService.close();
@@ -405,7 +427,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
                 return localizationService.localize(key, [total]);
             }).then(function () {
-                $scope.reloadView($scope.contentId);
+                $scope.reloadView($scope.contentId, true);
             });
     }
 
@@ -483,6 +505,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         const dialog = {
             view: "views/propertyeditors/listview/overlays/listviewunpublish.html",
             submitButtonLabelKey: "actions_unpublish",
+            submitButtonStyle: "warning",
             submit: function (model) {
 
                 // create a comma separated array of selected cultures
@@ -530,7 +553,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
                 return localizationService.localize(key, [total]);
             }).then(function () {
-                $scope.reloadView($scope.contentId);
+                $scope.reloadView($scope.contentId, true);
             });
     }
 
@@ -761,8 +784,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             case "published":
                 return "content_isPublished";
             case "contentTypeAlias":
-                // TODO: Check for members
-                return $scope.entityType === "content" ? "content_documentType" : "content_mediatype";
+                return $scope.entityType === "content"
+                    ? "content_documentType"
+                    : $scope.entityType === "media"
+                        ? "content_mediatype"
+                        : "content_membertype";
             case "email":
                 return "general_email";
             case "username":
@@ -795,8 +821,18 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             .search("blueprintId", blueprintId);
     }
 
+    function toggleDropdown () {
+        $scope.page.createDropdownOpen = !$scope.page.createDropdownOpen;
+    }
+
+    function leaveDropdown () {
+        $scope.page.createDropdownOpen = false;
+    }
+
     $scope.createBlank = createBlank;
     $scope.createFromBlueprint = createFromBlueprint;
+    $scope.toggleDropdown = toggleDropdown;
+    $scope.leaveDropdown = leaveDropdown;
 
     //GO!
     initView();

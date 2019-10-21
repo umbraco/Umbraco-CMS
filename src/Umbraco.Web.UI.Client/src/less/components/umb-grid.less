@@ -408,7 +408,19 @@
     margin-bottom: 10px;
 }
 
+.umb-grid .umb-editor-preview {
+    position: relative;
 
+    .umb-editor-preview-overlay {
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+}
 
 // Active states
 // -------------------------
@@ -625,9 +637,12 @@
 }
 
 .umb-grid .mce-toolbar {
-    border-bottom: 1px solid @gray-8;
-    background-color: rgba(250, 250, 250, 1);
+    border-bottom: 1px solid @gray-7;
+    background-color: white;
     display: none;
+    
+    left: 0;
+    right: 0;
 }
 
 .umb-grid .umb-control.-active .mce-toolbar {
@@ -640,6 +655,13 @@
 
 .umb-grid .mceContentBody {
     overflow-y: hidden!important;
+}
+
+// had to overwrite defaults from TinyMCE, needed for buttons panel to float to new line in narrow space.
+.umb-grid .mce-container > div {
+    white-space: normal;
+    left:0;
+    right:0;
 }
 
 

@@ -176,6 +176,11 @@
         }
 
         function getThumbnail(file) {
+
+            if (file.extension === 'svg') {
+                return file.fileName;
+            }
+
             if (!file.isImage) {
                 return null;
             }
@@ -293,7 +298,8 @@
              * Called when the file collection changes (i.e. a new file has been selected but maybe it wasn't this instance that caused the change)
              */
             onFilesChanged: "&",
-            onInit: "&"
+            onInit: "&",
+            required: "@"
         },
         transclude: true,
         controllerAs: 'vm',

@@ -85,16 +85,16 @@ namespace Umbraco.Core
                 /// ListView.
                 /// </summary>
                 public const string ListView = "Umbraco.ListView";
-
-                /// <summary>
-                /// Macro Container.
-                /// </summary>
-                public const string MacroContainer = "Umbraco.MacroContainer";
-
+                
                 /// <summary>
                 /// Media Picker.
                 /// </summary>
                 public const string MediaPicker = "Umbraco.MediaPicker";
+
+                /// <summary>
+                /// Multiple Media Picker.
+                /// </summary>
+                public const string MultipleMediaPicker = "Umbraco.MultipleMediaPicker";
 
                 /// <summary>
                 /// Member Picker.
@@ -202,6 +202,24 @@ namespace Umbraco.Core
                 /// </summary>
                 /// <remarks>Must be a valid <see cref="ValueTypes"/> value.</remarks>
                 public const string DataValueType = "umbracoDataValueType";
+            }
+
+            /// <summary>
+            /// Defines Umbraco's built-in property editor groups.
+            /// </summary>
+            public static class Groups
+            {
+                public const string Common = "Common";
+
+                public const string Lists = "Lists";
+
+                public const string Media = "Media";
+
+                public const string People = "People";
+
+                public const string Pickers = "Pickers";
+
+                public const string RichContent = "Rich Content";
             }
         }
     }

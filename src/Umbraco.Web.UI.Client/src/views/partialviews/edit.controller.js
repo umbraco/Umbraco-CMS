@@ -4,6 +4,18 @@
     function PartialViewsEditController($scope, $routeParams, codefileResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper, editorService) {
 
         var vm = this;
+        var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var id = infiniteMode ? $scope.model.id : $routeParams.id;
+        var create = infiniteMode ? $scope.model.create : $routeParams.create;
+        var snippet = infiniteMode ? $scope.model.snippet : $routeParams.snippet;
+
+        function close() {
+            if ($scope.model.close) {
+                $scope.model.close($scope.model);
+            }
+        }
+
+        vm.close = close;
 
         vm.page = {};
         vm.page.loading = true;
@@ -249,20 +261,18 @@
             //we need to load this somewhere, for now its here.
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
 
-            if ($routeParams.create) {
-                
-                var snippet = "Empty";
+            if (create) {
 
-                if($routeParams.snippet) {
-                    snippet = $routeParams.snippet;
+                if (!snippet) {
+                    snippet = "Empty";
                 }
 
-                codefileResource.getScaffold("partialViews", $routeParams.id, snippet).then(function (partialView) {
+                codefileResource.getScaffold("partialViews", id, snippet).then(function (partialView) {
                     ready(partialView, false);
                 });
                 
             } else {
-                codefileResource.getByPath('partialViews', $routeParams.id).then(function (partialView) {
+                codefileResource.getByPath('partialViews', id).then(function (partialView) {
                     ready(partialView, true);
                 });
             }
@@ -277,7 +287,7 @@
             //sync state
             editorState.set(vm.partialView);
 
-            if (syncTree) {
+            if (!infiniteMode && syncTree) {
                 navigationService.syncTree({ tree: "partialViews", path: vm.partialView.path, forceReload: true }).then(function (syncArgs) {
                     vm.page.menu.currentNode = syncArgs.node;
                 });
@@ -362,7 +372,7 @@
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
                     // else set the cursor at the bottom of the code editor
-                    if(!$routeParams.create) {
+                    if(!create) {
                         $timeout(function(){
                             vm.editor.navigateFileEnd();
                             vm.editor.focus();
