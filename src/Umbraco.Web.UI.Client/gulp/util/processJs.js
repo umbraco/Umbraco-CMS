@@ -9,26 +9,28 @@ var concat = require('gulp-concat');
 var wrap = require("gulp-wrap-js");
 var embedTemplates = require('gulp-angular-embed-templates');
 
-module.exports = function(files, out) {
-    
+module.exports = function (files, out) {
+
     var task = gulp.src(files);
-    
-    if (global.isProd === true) {
-        // check for js errors
-        task = task.pipe(eslint());
-        // outputs the lint results to the console
-        task = task.pipe(eslint.format());
-    }
-    
+
+    // check for js errors
+    task = task.pipe(eslint());
+    // outputs the lint results to the console
+    task = task.pipe(eslint.format());
+
     // sort files in stream by path or any custom sort comparator
     task = task.pipe(babel())
-        .pipe(sort())
-        .pipe(embedTemplates({ basePath: "./src/" }))
-        .pipe(concat(out))
+        .pipe(sort());
+
+    if (global.isProd === true) {
+        //in production, embed the templates
+        task = task.pipe(embedTemplates({ basePath: "./src/", minimize: { loose: true } }))
+    }
+    task = task.pipe(concat(out))
         .pipe(wrap('(function(){\n%= body %\n})();'))
         .pipe(gulp.dest(config.root + config.targets.js));
-    
-    
+
+
     return task;
-    
+
 };

@@ -96,7 +96,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     });
                 }
             }
-            if (vm.treeAlias === "documentTypes") {
+            else if (vm.treeAlias === "documentTypes") {
                 vm.entityType = "DocumentType";
                 if (!$scope.model.title) {
                     localizationService.localize("defaultdialogs_selectContentType").then(function(value){
@@ -107,15 +107,31 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             else if (vm.treeAlias === "member" || vm.section === "member") {
                 vm.entityType = "Member";
                 if (!$scope.model.title) {
-                    localizationService.localize("defaultdialogs_selectMember").then(function(value){
+                    localizationService.localize("defaultdialogs_selectMember").then(function(value) {
                         $scope.model.title = value;
-                    })
+                    });
+                }
+            }
+            else if (vm.treeAlias === "memberTypes") {
+                vm.entityType = "MemberType";
+                if (!$scope.model.title) {
+                    localizationService.localize("defaultdialogs_selectMemberType").then(function(value){
+                        $scope.model.title = value;
+                    });
                 }
             }
             else if (vm.treeAlias === "media" || vm.section === "media") {
                 vm.entityType = "Media";
                 if (!$scope.model.title) {
                     localizationService.localize("defaultdialogs_selectMedia").then(function(value){
+                        $scope.model.title = value;
+                    });
+                }
+            }
+            else if (vm.treeAlias === "mediaTypes") {
+                vm.entityType = "MediaType";
+                if (!$scope.model.title) {
+                    localizationService.localize("defaultdialogs_selectMediaType").then(function(value){
                         $scope.model.title = value;
                     });
                 }

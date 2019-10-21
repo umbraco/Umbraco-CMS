@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.PropertyEditors.textAreaController">
     <ng-form name="textareaFieldForm">
-        <textarea ng-model="model.value" id="{{model.alias}}" name="textarea" rows="{{model.config.rows || 10}}" class="umb-property-editor umb-textarea textstring" val-server="value" ng-keyup="model.change()"></textarea>
+        <textarea ng-model="model.value" id="{{model.alias}}" name="textarea" rows="{{model.config.rows || 10}}" class="umb-property-editor umb-textarea textstring" val-server="value" ng-keyup="model.change()" ng-required="model.validation.mandatory" aria-required="{{model.validation.mandatory}}"></textarea>
 
         <span ng-messages="textareaFieldForm.textarea.$error" show-validation-on-submit >
             <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>

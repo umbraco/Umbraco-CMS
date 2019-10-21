@@ -324,7 +324,6 @@
     <key alias="linkinternal">Lien interne :</key>
     <key alias="linklocaltip">Si vous utilisez des ancres, insérez # au début du lien</key>
     <key alias="linknewwindow">Ouvrir dans une nouvelle fenêtre?</key>
-    <key alias="macroContainerSettings">Paramètres de macro</key>
     <key alias="macroDoesNotHaveProperties">Cette macro ne contient aucune propriété éditable</key>
     <key alias="paste">Coller</key>
     <key alias="permissionsEdit">Editer les permissions pour</key>

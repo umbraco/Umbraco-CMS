@@ -1,4 +1,4 @@
-# Umbraco Cms Build
+# Umbraco CMS Build
 
 ## Are you sure?
 
@@ -66,7 +66,7 @@ The Visual Studio object is `null` when Visual Studio has not been detected (eg 
 * `Path`: Visual Studio installation path (eg some place under `Program Files`)
 * `Major`: Visual Studio major version (eg `15` for VS 2017)
 * `Minor`: Visual Studio minor version
-* `MsBUild`: the absolute path to the MsBuild executable
+* `MsBuild`: the absolute path to the MsBuild executable
 
 #### GetUmbracoVersion
 

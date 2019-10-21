@@ -397,11 +397,19 @@
   }
 }
 
-
+.checkeredBackground(@backgroundColor: #eee, @fillColor: #000, @fillOpacity: 0.25) {
+    background-image: url('data:image/svg+xml;charset=utf-8,\
+                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="@{fillColor}" fill-opacity="@{fillOpacity}" >\
+                            <rect x="50" width="50" height="50" />\
+                            <rect y="50" width="50" height="50" />\
+                        </svg>');
+    background-color: @backgroundColor;
+    background-size: 10px 10px;
+    background-repeat: repeat;
+}
 
 // COMPONENT MIXINS
 // --------------------------------------------------
-
 // Limit width of specific property editors
 .umb-property-editor--limit-width {
     max-width: 800px;

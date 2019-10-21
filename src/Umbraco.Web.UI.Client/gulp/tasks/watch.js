@@ -53,6 +53,6 @@ gulp.task('watch', function () {
         watch(config.sources.globs.js, { interval: watchInterval })
         .pipe(gulp.dest(config.root + config.targets.js))
     );
-
+    
     return stream;
 });
