@@ -12,17 +12,20 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
-    cursor: pointer;
+    background: transparent;
+    border: 0 none;
     border-bottom: 1px solid @gray-9;
     height: @editorHeaderHeight;
     box-sizing: border-box;
     color: @ui-option-type;
+    width: 100%;
 }
 
 .umb-language-picker__expand {
     font-size: 14px;
 }
 
+.umb-language-picker__toggle:focus,
 .umb-language-picker__toggle:hover {
     background: @ui-option-hover;
     color:@ui-option-type-hover;
@@ -43,20 +46,24 @@
     overflow: auto;
 }
 
-.umb-language-picker__dropdown a {
+.umb-language-picker__dropdown-item {
+    background: transparent;
+    border: 0 none;
     padding: 8px 20px;
     display: block;
     font-size: 14px;
+    width: 100%;
+    text-align: left;
 }
 
-.umb-language-picker__dropdown a:hover, 
-.umb-language-picker__dropdown a:focus {
+.umb-language-picker__dropdown-item:hover, 
+.umb-language-picker__dropdown-item:focus {
     background: @ui-option-hover;
     text-decoration: none;
     color:@ui-option-type-hover;
 }
 
-.umb-language-picker__dropdown a.umb-language-picker__dropdown-item--current {
+.umb-language-picker__dropdown .umb-language-picker__dropdown-item.umb-language-picker__dropdown-item--current {
     padding-left: 16px;
     border-left: 4px solid @ui-light-active-border;
     color:@ui-light-active-type;

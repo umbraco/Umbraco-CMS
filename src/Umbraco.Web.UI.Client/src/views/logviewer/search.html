@@ -17,79 +17,71 @@
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
             <form ng-submit="vm.search()">
+
                 <umb-editor-sub-header>
-                    <umb-editor-sub-header-content-left style="width:100%; line-height:30px;">
+                    <umb-editor-sub-header-content-left class="flex-auto flex-wrap">
+
                         <!-- Log Level filter -->
-                        <div style="position: relative;">
-                            <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter">
+                        <div class="flex" style="position: relative;">
+                            <a class="btn btn-link dropdown-toggle flex mb2" href="" ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter">
                                 <span>Log Levels:</span>
                                 <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.logLevels) }}</span>
                                 <span class="caret"></span>
                             </a>
-                            <umb-dropdown class="pull-right" ng-if="vm.page.showLevelFilter" on-close="vm.page.showLevelFilter = false;">
+                            <umb-dropdown class="pull-left" ng-if="vm.page.showLevelFilter" on-close="vm.page.showLevelFilter = false;">
                                 <umb-dropdown-item ng-repeat="level in vm.logLevels" style="padding: 8px 20px 8px 16px;">
                                     <div class="flex items-center">
-                                        <input
-                                            id="loglevel-{{$index}}"
-                                            type="checkbox"
-                                            ng-model="level.selected"
-                                            ng-change="vm.setLogLevelFilter(level)"
-                                            style="margin-right: 10px; margin-top: -3px;" />
+                                        <umb-checkbox input-id="loglevel-{{$index}}" name="loglevel" model="level.selected" on-change="vm.setLogLevelFilter(level)" />
                                         <label for="loglevel-{{$index}}">
-                                            <umb-badge size="s" color="{{ level.logTypeColor }}">{{ level.name }}</umb-badge>
+                                            <umb-badge size="s" color="{{level.logTypeColor}}">{{level.name}}</umb-badge>
                                         </label>
                                     </div>
                                 </umb-dropdown-item>
                             </umb-dropdown>
                         </div>
 
-                    </umb-editor-sub-header-content-left>
-                </umb-editor-sub-header>
+                        <div class="flex" style="width:100%;">
+                            <div class="flex-auto" style="position:relative;">
+                                <!-- Search/expression filter -->
+                                <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%; padding-right: 160px;" placeholder="Search logs&hellip;" />
 
-                <umb-editor-sub-header>
-                    <umb-editor-sub-header-content-left style="width:100%">
+                                <!-- Save Search & Clear Search icon buttons -->
+                                <ins class="icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="position: absolute; top: 0; line-height: 32px; right: 140px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
+                                <ins class="icon-wrong" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="position: absolute; top: 0; line-height: 32px; right: 120px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
 
-                        <div style="position:relative; width:100%;">
-                            <!-- Search/expression filter -->
-                            <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%; padding-right: 160px;" placeholder="Search logs&hellip;" />
+                                <!-- Saved Searches -->
+                                <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top: 1px; right: 0; position: absolute;">
+                                    <span class="ng-binding">Saved Searches</span>
+                                    <ins class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}" style="margin-top: 0;"></ins>
+                                </a>
 
-                            <!-- Save Search & Clear Search icon buttons -->
-                            <ins class="icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="position: absolute; top: 0; line-height: 32px; right: 140px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
-                            <ins class="icon-wrong" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="position: absolute; top: 0; line-height: 32px; right: 120px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
+                                <!-- Saved Searches Dropdown -->
+                                <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: -10px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                                    <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active}" ng-repeat="search in vm.searches">
+                                        <a href="" class="umb-variant-switcher__name-wrapper" ng-click="vm.selectSearch(search)" prevent-default>
+                                            <span class="umb-variant-switcher__name">{{search.name}}</span>
+                                            <span>{{ search.query }}</span>
+                                        </a>
+                                        <a href=""><span><i class="icon icon-trash text-error" title="Delete this search" ng-click="vm.deleteSavedSearch(search)"></i></span></a>
+                                    </umb-dropdown-item>
+                                </umb-dropdown>
+                            </div>
 
-                            <!-- Saved Searches -->
-                            <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top: 1px; right: 0; position: absolute;">
-                                <span class="ng-binding">Saved Searches</span>
-                                <ins class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}" style="margin-top: 0;"></ins>
-                            </a>
-
-                            <!-- Saved Searches Dropdown -->
-                            <umb-dropdown ng-if="vm.dropdownOpen"  style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: -10px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
-                                <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active}" ng-repeat="search in vm.searches">
-                                    <a href="" class="umb-variant-switcher__name-wrapper" ng-click="vm.selectSearch(search)" prevent-default>
-                                        <span class="umb-variant-switcher__name">{{search.name}}</span>
-                                        <span>{{ search.query }}</span>
-                                    </a>
-                                    <a href=""><span><i class="icon icon-trash text-error" title="Delete this search" ng-click="vm.deleteSavedSearch(search)"></i></span></a>
-                                </umb-dropdown-item>
-                            </umb-dropdown>
+                            <!-- Search Button -->
+                            <umb-button button-style="action"
+                                        type="submit"
+                                        action="vm.search()"
+                                        label-key="general_search">
+                            </umb-button>
                         </div>
-
-                        <!-- Search Button -->
-                        <umb-button
-                            button-style="button"
-                            type="submit"
-                            action="vm.search()"
-                            label-key="general_search">
-                        </umb-button>
 
                     </umb-editor-sub-header-content-left>
                 </umb-editor-sub-header>
             </form>
 
-            <div class=" ng-if="!vm.loading">
+            <div ng-if="!vm.loading">
 
-                <div class="">
+                <div>
 
                     <!-- Loader for the main logs content when paging -->
                     <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>
