@@ -10,106 +10,107 @@
 (function () {
     "use strict";
 
-    var domNodes = {};
-    var focusableEls = 'a[href]:not([disabled]), a[ng-href]:not([disabled]), input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), [tabindex="0"]';
-
-    /**
-     * Focus lock method that needs to be called when we add overlays
-     *
-     * @param {HTMLElement} elm
-     */
-    function focusLock(elm){
-        setTimeout(() =>{
-            var overlayElement = document.querySelector('.umb-overlay');
-            var target = elm ? elm : overlayElement; // If an element is passed use that otherwise fallback to the default overlayElement
-
-            var focusableElsInEditor = target.querySelectorAll(focusableEls);
-            var firstFocusableEl = focusableElsInEditor[0];
-            var lastFocusableEl = focusableElsInEditor[focusableElsInEditor.length -1];
-            var tabKey = 9;
-
-            target.addEventListener('keydown', function(event){
-                var isTabPressed = (event.key === 'Tab' || event.keyCode === tabKey);
-
-                if (!isTabPressed){
-                    return;
-                }
-
-                // If shift + tab key
-                if(event.shiftKey){
-                    // Set focus on the last focusable element if shift+tab are pressed meaning we go backwards
-                    if(document.activeElement === firstFocusableEl){
-                        lastFocusableEl.focus();
-                        event.preventDefault();
-                    }
-                }
-                // Else only the tab key is pressed
-                else{
-                    // Using only the tab key we set focus on the first focusable element mening we go forward
-                    if (document.activeElement === lastFocusableEl) {
-                        firstFocusableEl.focus();
-                        event.preventDefault();
-                    }
-                }
-            });
-
-        }, 500);
-    }
-
-    function resetFocus(elm){
-        setTimeout(() =>{
-            elm.focus();
-        }, 100);
-    }
-
-    /**
-     * Helper method to fetch the DOM nodes that needs to be disabled/enabled
-     */
-    function getDOMNodes (){
-        domNodes.appHeader = document.querySelector('.umb-app-header');
-        domNodes.leftColumn = document.querySelector('#leftcolumn');
-        domNodes.mainWrapper = document.querySelector('#mainwrapper');
-        domNodes.editor = document.querySelector('.umb-editor');
-    }
-
-    /**
-     * Helper method to enable or disable the editors so they can't be navigated to using keyboard or screen readers
-     *
-     * @param {Array} editors 
-     * @param {Boolean} boolean 
-     */
-    function disableOrEnableEditors(editors, boolean){
-        var editorArray = Array.from(editors)
-        var currentEditorIndex = editors.length - 1;
-
-        // Disable editors that are not current
-        if(boolean){
-            editorArray.forEach((editor, idx) => {
-                // Disable editors that are not current
-                if(idx !== currentEditorIndex){
-                    editor.setAttribute('inert','');
-                }
-                // Add focusLock to current editor
-                else{
-                    focusLock(editor);
-                }
-            });
-        }
-        // Enable current editor
-        else{
-            editorArray.forEach((editor, idx) => {
-                if(idx === currentEditorIndex){
-                    var firstFocusableElement = editor.querySelector(focusableEls);
-
-                    editor.removeAttribute('inert','');
-
-                    resetFocus(firstFocusableElement);
-                }
-            });
-        }
-    }
-
     function focusLockService() {
+
+        var domNodes = {};
+        var focusableEls = 'a[href]:not([disabled]), a[ng-href]:not([disabled]), input:not([disabled]):not(.ng-hide), select:not([disabled]), textarea:not([disabled]), button:not([disabled]):not([tabindex="-1"]), [tabindex="0"]';
+
+        /**
+         * Focus lock method that needs to be called when we add overlays
+         *
+         * @param {HTMLElement} elm
+         */
+        function focusLock(elm){
+            setTimeout(() =>{
+                var overlayElement = document.querySelector('.umb-overlay');
+                var target = elm ? elm : overlayElement; // If an element is passed use that otherwise fallback to the default overlayElement
+
+                var focusableElsInEditor = target.querySelectorAll(focusableEls);
+                var firstFocusableEl = focusableElsInEditor[0];
+                var lastFocusableEl = focusableElsInEditor[focusableElsInEditor.length -1];
+                var tabKey = 9;
+
+                target.addEventListener('keydown', function(event){
+                    var isTabPressed = (event.key === 'Tab' || event.keyCode === tabKey);
+
+                    if (!isTabPressed){
+                        return;
+                    }
+
+                    // If shift + tab key
+                    if(event.shiftKey){
+                        // Set focus on the last focusable element if shift+tab are pressed meaning we go backwards
+                        if(document.activeElement === firstFocusableEl){
+                            lastFocusableEl.focus();
+                            event.preventDefault();
+                        }
+                    }
+                    // Else only the tab key is pressed
+                    else{
+                        // Using only the tab key we set focus on the first focusable element mening we go forward
+                        if (document.activeElement === lastFocusableEl) {
+                            firstFocusableEl.focus();
+                            event.preventDefault();
+                        }
+                    }
+                });
+
+            }, 500);
+        }
+
+        function resetFocus(elm){
+            setTimeout(() =>{
+                elm.focus();
+            }, 100);
+        }
+
+        /**
+         * Helper method to fetch the DOM nodes that needs to be disabled/enabled
+         */
+        function getDOMNodes (){
+            domNodes.appHeader = document.querySelector('.umb-app-header');
+            domNodes.leftColumn = document.querySelector('#leftcolumn');
+            domNodes.mainWrapper = document.querySelector('#mainwrapper');
+            domNodes.editor = document.querySelector('.umb-editor');
+        }
+
+        /**
+         * Helper method to enable or disable the editors so they can't be navigated to using keyboard or screen readers
+         *
+         * @param {Array} editors 
+         * @param {Boolean} boolean 
+         */
+        function disableOrEnableEditors(editors, boolean){
+            var editorArray = Array.from(editors)
+            var currentEditorIndex = editors.length - 1;
+
+            // Disable editors that are not current
+            if(boolean){
+                editorArray.forEach((editor, idx) => {
+                    // Disable editors that are not current
+                    if(idx !== currentEditorIndex){
+                        editor.setAttribute('inert','');
+                    }
+                    // Add focusLock to current editor
+                    else{
+                        focusLock(editor);
+                    }
+                });
+            }
+            // Enable current editor
+            else{
+                editorArray.forEach((editor, idx) => {
+                    if(idx === currentEditorIndex){
+                        var firstFocusableElement = editor.querySelector(focusableEls);
+
+                        editor.removeAttribute('inert','');
+
+                        resetFocus(firstFocusableElement);
+                    }
+                });
+            }
+        }
+
 
             /**
              * @ngdoc function
