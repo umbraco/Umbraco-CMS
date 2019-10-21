@@ -24,6 +24,7 @@
                     <umb-breadcrumbs
                         ng-if="ancestors && ancestors.length > 0"
                         ancestors="ancestors"
+                        for-new-entity="page.isNew"
                         entity-type="content">
                     </umb-breadcrumbs>
 
@@ -68,7 +69,9 @@
                         sub-buttons="subButtons"
                         state="page.buttonGroupState"
                         direction="up"
-                        float="right">
+                        float="right"
+                        label-key="buttons_morePublishingOptions"
+                        label="More publishing options">
                     </umb-button-group>
 
                     <umb-button

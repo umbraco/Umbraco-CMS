@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService) {
+    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService, mediaHelper) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -28,6 +28,9 @@
 
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
+
+                // set media file extension initially
+                setMediaExtension();
             }
 
             function formatDatesToLocal() {
@@ -49,6 +52,10 @@
                 }
             }
 
+            function setMediaExtension() {
+                scope.node.extension = mediaHelper.getFileExtension(scope.nodeUrl);
+            }
+
             scope.openMediaType = function (mediaType) {
                 var editor = {
                     id: mediaType.id,
@@ -62,6 +69,16 @@
                 editorService.mediaTypeEditor(editor);
             };
 
+            scope.openSVG = function () {
+                var popup = window.open('', '_blank');
+                var html = '<!DOCTYPE html><body><img src="' + scope.nodeUrl + '"/>' +
+                    '<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
+                
+                popup.document.open();
+                popup.document.write(html);
+                popup.document.close();
+            }
+
             // watch for content updates - reload content when node is saved, published etc.
             scope.$watch('node.updateDate', function(newValue, oldValue){
                 if(!newValue) { return; }
@@ -72,6 +89,9 @@
 
                 // Update the create and update dates
                 formatDatesToLocal();
+
+                //Update the media file format
+                setMediaExtension();
             });
 
             //ensure to unregister from all events!

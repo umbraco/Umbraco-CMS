@@ -61,6 +61,12 @@ namespace Umbraco.Core.Models.PublishedContent
             return new PublishedPropertyType(contentType, propertyTypeAlias, dataTypeId, true, variations, _propertyValueConverters, _publishedModelFactory, this);
         }
 
+        /// <inheritdoc />
+        public IPublishedPropertyType CreateCorePropertyType(IPublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations = ContentVariation.Nothing)
+        {
+            return new PublishedPropertyType(contentType, propertyTypeAlias, dataTypeId, false, variations, _propertyValueConverters, _publishedModelFactory, this);
+        }
+
         /// <summary>
         /// This method is for tests and is not intended to be used directly from application code.
         /// </summary>

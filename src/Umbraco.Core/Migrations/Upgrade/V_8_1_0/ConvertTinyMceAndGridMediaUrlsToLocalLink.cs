@@ -50,10 +50,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                         var obj = JsonConvert.DeserializeObject<JObject>(value);
                         var allControls = obj.SelectTokens("$.sections..rows..areas..controls");
 
-                        foreach (var control in allControls.SelectMany(c => c))
+                        foreach (var control in allControls.SelectMany(c => c).OfType<JObject>())
                         {
                             var controlValue = control["value"];
-                            if (controlValue.Type == JTokenType.String)
+                            if (controlValue?.Type == JTokenType.String)
                             {
                                 control["value"] = UpdateMediaUrls(mediaLinkPattern, controlValue.Value<string>());
                             }

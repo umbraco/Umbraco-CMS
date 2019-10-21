@@ -5,6 +5,7 @@
         <umb-property-file-upload culture="{{model.culture}}"
                                   property-alias="{{model.alias}}"
                                   value="model.value.src"
+                                  required="model.validation.mandatory"
                                   on-files-selected="filesSelected(value, files)"
                                   on-files-changed="filesChanged(files)"
                                   on-init="fileUploaderInit(value, files)"
