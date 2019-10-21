@@ -111,8 +111,6 @@
 
     function focusLockService() {
 
-        var service = {
-
             /**
              * @ngdoc function
              * @name umbraco.services.focusLockService#addInfiniteFocusLock
@@ -126,7 +124,7 @@
              * @param {Number} overlays a number of overlays that are open
              *
              */
-            addInfiniteFocusLock: function(elm, overlays) {
+            function addInfiniteFocusLock(elm, overlays) {
                 var children = elm[0].children;
 
                 // Get the DOM nodes we need to add/remove the inert attribute for
@@ -141,7 +139,7 @@
 
                 // disable child editors if they're not current
                 disableOrEnableEditors(children, true);
-            },
+            }
 
             /**
              * @ngdoc function
@@ -156,7 +154,7 @@
              * @param {Number} overlays a number of overlays that are open
              *
              */
-            removeInfiniteFocusLock: function(elm, overlays) {
+            function removeInfiniteFocusLock(elm, overlays) {
                 var children = elm[0].children;
 
                 // Enable "outer" elements once
@@ -168,7 +166,7 @@
 
                 // enable editor if it's current
                 disableOrEnableEditors(children, false);
-            },
+            }
 
             /**
              * @ngdoc function
@@ -180,14 +178,14 @@
              * Call this method before a new overlay is activated to ensure focus is locked inside it
              *
              */
-            addFocusLock: function() {
+            function addFocusLock() {
                 // Get the DOM nodes we need to add/remove the inert attribute for
                 getDOMNodes();
 
                 focusLock();
 
                 domNodes.mainWrapper.setAttribute('inert','');
-            },
+            }
 
             /**
              * @ngdoc function
@@ -199,9 +197,15 @@
              * Call this method when an overlay is closed to enable the locked element in the DOM again
              *
              */
-            removeFocusLock: function(){
+            function removeFocusLock(){
                 domNodes.mainWrapper.removeAttribute('inert');
             }
+
+        var service = {
+            addInfiniteFocusLock: addInfiniteFocusLock,
+            removeInfiniteFocusLock: removeInfiniteFocusLock,
+            addFocusLock: addFocusLock,
+            removeFocusLock: removeFocusLock
         };
 
         return service;
