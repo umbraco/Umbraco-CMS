@@ -24,6 +24,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
+        private readonly InternalLinkParser _internalLinkParser;
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         {
@@ -32,10 +33,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return PropertyCacheLevel.Snapshot;
         }
 
-        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer)
+        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, InternalLinkParser internalLinkParser)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _macroRenderer = macroRenderer;
+            _internalLinkParser = internalLinkParser;
         }
 
         // NOT thread-safe over a request because it modifies the
@@ -81,7 +83,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls and media are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, Current.UmbracoContext);
+            sourceString = _internalLinkParser.ParseInternalLinks(sourceString, preview);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
             sourceString = TemplateUtilities.ResolveMediaFromTextString(sourceString);
 

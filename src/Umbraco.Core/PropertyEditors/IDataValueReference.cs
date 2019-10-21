@@ -3,7 +3,7 @@
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Used to resolve references from <see cref="IDataValueEditor"/> values
+    /// Resolve references from <see cref="IDataValueEditor"/> values
     /// </summary>
     public interface IDataValueReference
     {
