@@ -56,8 +56,7 @@
                                     <localize key="templateEditor_recursive">Recursive</localize>
                                 </label>
                                 <label for="recursive">
-                                    <input id="recursive" type="checkbox" name="recursive" ng-model="vm.recursive">
-                                    <localize key="templateEditor_recursiveDescr">Yes, make it recursive</localize>
+                                   <umb-checkbox model="vm.recursive" text="{{model.recursiveDescription}}"></umb-checkbox>
                                 </label>
                             </div>
                         </div>

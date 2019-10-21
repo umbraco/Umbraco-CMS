@@ -22,6 +22,10 @@
                     $scope.model.title = value;
                 });
             }
+            
+            localizationService.localize("templateEditor_recursiveDescr").then(function (value) {
+                $scope.model.recursiveDescription = value;
+            });
 
             // Load all fields
             contentTypeResource.getAllPropertyTypeAliases().then(function (array) {
