@@ -11,7 +11,7 @@
 
             <ul class="umb-actions umb-actions-child">
                 <li class="umb-action" ng-repeat="documentType in vm.documentTypes | orderBy:'name':false">
-                    <a href="" class="umb-action-link" ng-click="vm.createBlueprint(documentType)" prevent-default>
+                    <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.createBlueprint(documentType)" prevent-default>
                         <i class="large icon {{documentType.icon}}"></i>
                         <span class="menu-label">
                             {{documentType.name}}
@@ -19,7 +19,7 @@
                                 {{documentType.description}}
                             </small>
                         </span>
-                    </a>
+                    </button>
                 </li>
             </ul>
 

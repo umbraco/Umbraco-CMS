@@ -31,7 +31,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var accessor = (IScopeAccessor) provider;
             var templateRepository = Mock.Of<ITemplateRepository>();
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
-            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
+            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository);
             memberGroupRepository = new MemberGroupRepository(accessor, AppCaches.Disabled, Logger);
             var tagRepo = new TagRepository(accessor, AppCaches.Disabled, Logger);
             var repository = new MemberRepository(accessor, AppCaches.Disabled, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>());

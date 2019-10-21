@@ -350,9 +350,10 @@
         }
 
         function openUserGroupPicker() {
-            var oldSelection = angular.copy(vm.newUser.userGroups);
+            var currentSelection = [];
+            angular.copy(vm.newUser.userGroups, currentSelection);
             var userGroupPicker = {
-                selection: vm.newUser.userGroups,
+                selection: currentSelection,
                 submit: function (model) {
                     // apply changes
                     if (model.selection) {
@@ -362,7 +363,6 @@
                 },
                 close: function () {
                     // rollback on close
-                    vm.newUser.userGroups = oldSelection;
                     editorService.close();
                 }
             };

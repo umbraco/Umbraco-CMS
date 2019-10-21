@@ -360,7 +360,6 @@
     <key alias="linkinternal">Внутренняя ссылка:</key>
     <key alias="linklocaltip">Для того чтобы определить локальную ссылку, используйте "#" первым символом</key>
     <key alias="linknewwindow">Открыть в новом окне?</key>
-    <key alias="macroContainerSettings">Свойства макроса</key>
     <key alias="macroDoesNotHaveProperties">Этот макрос не имеет редактируемых свойств</key>
     <key alias="nodeNameLinkPicker">Заголовок ссылки</key>
     <key alias="noIconsFound">Ни одной пиктограммы не найдено</key>

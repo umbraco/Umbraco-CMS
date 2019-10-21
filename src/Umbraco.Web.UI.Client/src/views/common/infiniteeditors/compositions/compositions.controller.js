@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function CompositionsController($scope, $location, $filter) {
+    function CompositionsController($scope, $location, $filter, overlayService) {
 
         var vm = this;
         var oldModel = null;
@@ -56,19 +56,35 @@
             if ($scope.model && $scope.model.submit) {
 
                 // check if any compositions has been removed
-                vm.compositionRemoved = false;
+                var compositionRemoved = false;
                 for (var i = 0; oldModel.compositeContentTypes.length > i; i++) {
                     var oldComposition = oldModel.compositeContentTypes[i];
                     if (_.contains($scope.model.compositeContentTypes, oldComposition) === false) {
-                        vm.compositionRemoved = true;
+                        compositionRemoved = true;
                     }
                 }
 
                 /* submit the form if there havne't been removed any composition
                 or the confirm checkbox has been checked */
-                if (!vm.compositionRemoved || vm.allowSubmit) {
-                    $scope.model.submit($scope.model);
+                if (compositionRemoved) {
+                    vm.allowSubmit = false;
+                    const dialog = {
+                        view: "views/common/infiniteeditors/compositions/overlays/confirmremove.html",
+                        submitButtonLabelKey: "general_ok",
+                        closeButtonLabelKey: "general_cancel",
+                        submit: function (model) {
+                            $scope.model.submit($scope.model);
+                            overlayService.close();
+                        },
+                        close: function () {
+                            overlayService.close();
+                        }
+                    };
+                    overlayService.open(dialog);
+                    return;
                 }
+
+                $scope.model.submit($scope.model);
             }
         }
 

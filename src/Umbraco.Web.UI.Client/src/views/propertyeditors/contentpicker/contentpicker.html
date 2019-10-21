@@ -19,13 +19,17 @@
             </umb-node-preview>
         </div>
 
-        <a ng-show="model.config.multiPicker === true && renderModel.length < model.config.maxNumber || renderModel.length === 0 || !model.config.maxNumber"
-           class="umb-node-preview-add"
-           href=""
-           ng-click="openCurrentPicker()"
-           prevent-default>
+        <button
+            ng-show="model.config.multiPicker === true && renderModel.length < model.config.maxNumber || renderModel.length === 0 || !model.config.maxNumber"
+            type="button"
+            class="umb-node-preview-add"
+            ng-click="openCurrentPicker()"
+            id="{{model.alias}}"
+            aria-label="{{model.label}}: {{labels.general_add}}"
+        >
             <localize key="general_add">Add</localize>
-        </a>
+            <span class="sr-only">...</span>
+        </button>
 
         <div class="umb-contentpicker__min-max-help" ng-if="model.config.multiPicker === true">
 

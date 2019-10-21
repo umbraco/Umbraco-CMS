@@ -1926,10 +1926,8 @@ namespace Umbraco.Web.Editors
             }
             if (model.ParentId < 0)
             {
-                //cannot move if the content item is not allowed at the root unless there are
-                //none allowed at root (in which case all should be allowed at root)
-                var contentTypeService = Services.ContentTypeService;
-                if (toMove.ContentType.AllowedAsRoot == false && contentTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
+                //cannot move if the content item is not allowed at the root
+                if (toMove.ContentType.AllowedAsRoot == false)
                 {
                     throw new HttpResponseException(
                             Request.CreateNotificationValidationErrorResponse(
@@ -2297,7 +2295,7 @@ namespace Umbraco.Web.Editors
             }
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
-            if (entry == null)
+            if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -2379,7 +2377,7 @@ namespace Umbraco.Web.Editors
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
 
-            if (entry == null)
+            if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 entry = new PublicAccessEntry(content, loginPage, errorPage, new List<PublicAccessRule>());
 
