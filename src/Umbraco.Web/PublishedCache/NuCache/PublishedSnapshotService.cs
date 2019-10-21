@@ -132,6 +132,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         // if both local databases exist then GetTree will open them, else new databases will be created
                         _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
                         _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
+
+                        _logger.Info<PublishedSnapshotService>($"Registered with MainDom, local db exists? {_localDbExists}");
                     },
                     () =>
                     {
@@ -144,6 +146,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                             _localMediaDb = null;
                         }
+
+                        _logger.Info<PublishedSnapshotService>("Released from MainDom");
                     });
 
                 // stores are created with a db so they can write to it, but they do not read from it,

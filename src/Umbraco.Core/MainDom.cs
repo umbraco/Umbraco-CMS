@@ -101,6 +101,12 @@ namespace Umbraco.Core
             lock (_locko)
             {
                 if (_signaled) return false;
+                if (_isMainDom == false)
+                {
+                    _logger.Warn<MainDom>("Register called when MainDom has not been acquired");
+                    return false;
+                }
+
                 install?.Invoke();
                 if (release != null)
                     _callbacks.Add(new KeyValuePair<int, Action>(weight, release));
