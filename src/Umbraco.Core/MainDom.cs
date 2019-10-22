@@ -66,7 +66,7 @@ namespace Umbraco.Core
             // we *cannot* use the process ID here because when an AppPool restarts it is
             // a new process for the same application path
 
-            var appPath = HostingEnvironment.ApplicationPhysicalPath;
+            var appPath = HostingEnvironment.ApplicationPhysicalPath.ToLowerInvariant();
             var hash = (appId + ":::" + appPath).ToSHA1();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
