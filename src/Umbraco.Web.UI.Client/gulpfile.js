@@ -15,13 +15,12 @@ global.isProd = true;
 const { src, dest, series, parallel, lastRun } = require('gulp');
 
 const { dependencies } = require('./gulp/tasks/dependencies');
-const { docs, connectDocs, openDocs } = require('./gulp/tasks/docs');
 const { js } = require('./gulp/tasks/js');
 const { less } = require('./gulp/tasks/less');
 const { testE2e, testUnit } = require('./gulp/tasks/test');
 const { views } = require('./gulp/tasks/views');
-const { watch } = require('./gulp/tasks/watch');
-
+const { watchTask } = require('./gulp/tasks/watchTask');
+const { removeProductionMode } = require('./gulp/tasks/removeProductionMode');
 
 // Load local overwrites, can be used to overwrite paths in your local setup.
 var fs = require('fs');
@@ -35,18 +34,14 @@ overwrites.forEach(function(overwrite) {
 // ***********************************************************
 // These Exports are the new way of defining Tasks in Gulp 4.x
 // ***********************************************************
-exports.build = series(dependencies, js, less, views, testUnit);
-exports.dev = series(dependencies, js, less, views, watch);
-exports.fastdev = series(dependencies, js, less, views, watch);
-
-exports.docs = series(docs);
-exports.connectDocs = series(connectDocs);
-exports.openDocs = series(openDocs);
-exports.docserve = series(docs, connectDocs, openDocs);
-
-exports.js = series(js);
-exports.views = series(views);
-
-exports.runTests = series(js, testUnit);
+exports.build = series(parallel(dependencies, js, less, views), testUnit);
+exports.dev = series(parallel(dependencies, js, less, views), watchTask);
+exports.fastdev = series(removeProductionMode, parallel(dependencies, js, less, views), watchTask);
+exports.watch = series(watchTask);
+// 
+// exports.js = series(js);
+// exports.views = series(views);
+// 
+exports.runTests = series(js, parallel(testUnit, testE2e));
 exports.testUnit = series(testUnit);
 exports.testE2e = series(testE2e);

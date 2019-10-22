@@ -17,13 +17,14 @@ function js() {
     var stream = new MergeStream();
 
     stream.add(
-        gulp.src(config.sources.globs.js)
-            .pipe(gulp.dest(config.root + config.targets.js))
-        );
+        gulp.src(config.sources.globs.js).pipe( gulp.dest(config.root + config.targets.js) )
+    );
 
-     _.forEach(config.sources.js, function (group) {
-        stream.add (processJs(group.files, group.out) );
-     });
+    _.forEach(config.sources.js, function (group) {
+        stream.add(
+            processJs(group.files, group.out)
+        );
+    });
 
      return stream;
 };
