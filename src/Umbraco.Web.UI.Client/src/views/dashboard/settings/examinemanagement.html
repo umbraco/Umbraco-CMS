@@ -31,15 +31,15 @@
                         <div class="umb-panel-group__details-status" ng-repeat="indexer in vm.indexerDetails">
 
                             <div class="umb-panel-group__details-status-icon-container">
-                                <i class="umb-panel-status-icon"
+                                <i class="umb-panel-status-icon" aria-hidden="true"
                                    ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}"></i>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
                                 <div class="umb-panel-group__details-status-text">
-                                    <a class="btn-link -underline" href="" ng-click="vm.showIndexInfo(indexer)">
+                                    <button type="button" class="btn-link -underline" ng-click="vm.showIndexInfo(indexer)">
                                         {{indexer.name}}
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
 
@@ -67,14 +67,14 @@
                         <div class="umb-panel-group__details-status" ng-repeat="searcher in vm.searcherDetails">
 
                             <div class="umb-panel-group__details-status-icon-container">
-                                <i class="umb-panel-status-icon icon-info"></i>
+                                <i class="umb-panel-status-icon icon-info" aria-hidden="true"></i>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
                                 <div class="umb-panel-group__details-status-text">
-                                    <a class="btn-link -underline" href="" ng-click="vm.showSearcherInfo(searcher)">
+                                    <button type="button" class="btn-link -underline" ng-click="vm.showSearcherInfo(searcher)">
                                         {{searcher.name}}
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -157,10 +157,9 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <span>{{result.values['nodeName']}}</span>&nbsp;
-                                                                    <a class="color-green" href="" ng-click="vm.showSearchResultDialog(result.values)">
-                                                                        <em>({{result.fieldCount}} fields)</em>
-                                                                    </a>
+                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
+                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
+                                                                    <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -225,7 +224,7 @@
                             <div class="umb-panel-group__details-status">
 
                                 <div class="umb-panel-group__details-status-icon-container">
-                                    <i class="umb-panel-status-icon"
+                                    <i class="umb-panel-status-icon" aria-hidden="true"
                                        ng-class="{'icon-check color-green' : vm.selectedIndex.isHealthy, 'icon-delete color-red' : !vm.selectedIndex.isHealthy}"></i>
                                 </div>
 
@@ -298,10 +297,9 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <span>{{result.values['nodeName']}}</span>&nbsp;
-                                                                    <a class="color-green" href="" ng-click="vm.showSearchResultDialog(result.values)">
-                                                                        <em>({{result.fieldCount}} fields)</em>
-                                                                    </a>
+                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
+                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
+                                                                    <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
