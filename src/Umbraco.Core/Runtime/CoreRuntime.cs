@@ -140,24 +140,24 @@ namespace Umbraco.Core.Runtime
                 Compose(composition);
 
                 // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-                if (AcquireMainDom(mainDom))
-                {
-                    // determine our runtime level
-                    DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
+                AcquireMainDom(mainDom);
 
-                    // get composers, and compose
-                    var composerTypes = ResolveComposerTypes(typeLoader);
-                    composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-                    var composers = new Composers(composition, composerTypes, ProfilingLogger);
-                    composers.Compose();
+                // determine our runtime level
+                DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
-                    // create the factory
-                    _factory = Current.Factory = composition.CreateFactory();
+                // get composers, and compose
+                var composerTypes = ResolveComposerTypes(typeLoader);
+                composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+                var composers = new Composers(composition, composerTypes, ProfilingLogger);
+                composers.Compose();
 
-                    // create & initialize the components
-                    _components = _factory.GetInstance<ComponentCollection>();
-                    _components.Initialize();
-                }
+                // create the factory
+                _factory = Current.Factory = composition.CreateFactory();
+
+                // create & initialize the components
+                _components = _factory.GetInstance<ComponentCollection>();
+                _components.Initialize();
+
 
             }
             catch (Exception e)

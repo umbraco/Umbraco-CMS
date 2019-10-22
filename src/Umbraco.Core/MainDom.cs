@@ -184,11 +184,7 @@ namespace Umbraco.Core
                 try
                 {
                     _systemLocker = _systemLock.Lock(LockTimeoutMilliseconds);
-                }
-                catch
-                {
-                    throw;
-                }
+                }                
                 finally
                 {
                     // we need to reset the event, because otherwise we would end up
