@@ -56,12 +56,14 @@ namespace Umbraco.Web.PropertyEditors
         {
             private IUmbracoContextAccessor _umbracoContextAccessor;
             private readonly ImageSourceParser _mediaParser;
+            private readonly LocalLinkParser _localLinkParser;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, ImageSourceParser _mediaParser)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, ImageSourceParser mediaParser, LocalLinkParser localLinkParser)
                 : base(attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
-                this._mediaParser = _mediaParser;
+                _mediaParser = mediaParser;
+                _localLinkParser = localLinkParser;
             }
 
             /// <inheritdoc />
@@ -129,7 +131,15 @@ namespace Umbraco.Web.PropertyEditors
             /// <returns></returns>
             public IEnumerable<Udi> GetReferences(object value)
             {
-                return _mediaParser.FindUdisFromDataAttributes(value == null ? string.Empty : value is string str ? str : value.ToString()).ToList();
+                var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+                foreach (var udi in _mediaParser.FindUdisFromDataAttributes(asString))
+                    yield return udi;
+
+                foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
+                    yield return udi;
+
+                //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
             }
         }
 
