@@ -41,6 +41,12 @@ namespace Umbraco.Tests.PublishedContent
         private ContentType _contentTypeVariant;
         private TestDataSource _source;
 
+        [TearDown]
+        public void Teardown()
+        {
+            _snapshotService?.Dispose();
+        }
+
         private void Init(IEnumerable<ContentNodeKit> kits)
         {
             Current.Reset();

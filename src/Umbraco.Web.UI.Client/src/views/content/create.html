@@ -19,10 +19,16 @@
                     </button>
                 </div>
                 <div ng-if="hasSettingsAccess && currentNode.id < 0">
-                    <p class="abstract">
+                    <!-- There are existing document types, but none are allowed at root -->
+                    <p class="abstract" ng-if="countTypes > 0">
+                        <localize key="create_noDocumentTypesAllowedAtRoot" />
+                    </p>
+
+                    <!-- There's no document types, help people create one -->
+                    <p class="abstract" ng-if="countTypes === 0">
                         <localize key="create_noDocumentTypesAtRoot" />
                     </p>
-                    <button class="btn umb-outline" ng-click="createContentType()">
+                    <button class="btn umb-outline" ng-click="createContentType()" ng-if="countTypes === 0">
                         <localize key="create_noDocumentTypesCreateNew" />
                     </button>
                 </div>

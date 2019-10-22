@@ -342,6 +342,7 @@
     <key alias="noDocumentTypesWithNoSettingsAccess">The selected page in the content tree doesn't allow for any pages to be created below it.</key>
     <key alias="noDocumentTypesEditPermissions">Edit permissions for this document type</key>
     <key alias="noDocumentTypesCreateNew">Create a new document type</key>
+    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
     <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
@@ -419,6 +420,7 @@
     <key alias="insertMacro">Click to add a Macro</key>
     <key alias="inserttable">Insert table</key>
     <key alias="languagedeletewarning">This will delete the language</key>
+    <key alias="languageChangeWarning">Changing the culture for a language may be an expensive operation and will result in the content cache and indexes being rebuilt</key>
     <key alias="lastEdited">Last Edited</key>
     <key alias="link">Link</key>
     <key alias="linkinternal">Internal link:</key>
@@ -479,7 +481,7 @@
     <key alias="account">account</key>
     <key alias="selectEditor">Select editor</key>
     <key alias="selectSnippet">Select snippet</key>
-    <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</key>
+    <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
@@ -516,6 +518,7 @@
     <key alias="searchDescription">Search the index and view the results</key>
     <key alias="tools">Tools</key>
     <key alias="toolsDescription">Tools to manage the index</key>
+    <key alias="fields">fields</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -569,6 +572,8 @@
     <key alias="selectFolder">Select the folder to move</key>
     <key alias="inTheTree">to in the tree structure below</key>
     <key alias="wasMoved">was moved underneath</key>
+    <key alias="hasReferencesDeleteConsequence"><![CDATA[Deleting <strong>%0%</strong> will delete the properties and their data from the following items]]></key>
+    <key alias="acceptDeleteConsequence">I understand this action will delete the properties and data based on this Data Type</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Your data has been saved, but before you can publish this page there are some errors you need to fix first:</key>
@@ -2166,5 +2171,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
+  </area>
+  <area alias="references">
+    <key alias="tabName">References</key>
+    <key alias="DataTypeNoReferences">This Data Type has no references.</key>
+    <key alias="labelUsedByDocumentTypes">Used in Document Types</key>
+    <key alias="noDocumentTypes">No references to Document Types.</key>
+    <key alias="labelUsedByMediaTypes">Used in Media Types</key>
+    <key alias="noMediaTypes">No references to Media Types.</key>
+    <key alias="labelUsedByMemberTypes">Used in  Member Types</key>
+    <key alias="noMemberTypes">No references to Member Types.</key>
+    <key alias="usedByProperties">Used by</key>
   </area>
 </language>
