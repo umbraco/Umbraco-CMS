@@ -20,14 +20,14 @@
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
 
-                    <a class="umb-sortable-thumbnails__action -red" data-element="action-remove" href="" ng-click="remove()">
+                    <a role="button" aria-label="Remove" class="umb-sortable-thumbnails__action -red" data-element="action-remove" ng-click="remove()">
                         <i class="icon icon-delete"></i>
                     </a>
                 </div>
             </li>
 
             <li style="border: none;" class="add-wrapper unsortable" ng-hide="model.value">
-                <a data-element="sortable-thumbnails-add" href="#" class="add-link add-link-square" ng-click="add()" prevent-default>
+                <a role="button" aria-label="Open media picker" data-element="sortable-thumbnails-add" class="add-link add-link-square" ng-click="add()" prevent-default>
                     <i class="icon icon-add large"></i>
                 </a>
             </li>

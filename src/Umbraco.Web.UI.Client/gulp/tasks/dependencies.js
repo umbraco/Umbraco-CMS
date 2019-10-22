@@ -43,6 +43,11 @@ function dependencies() {
             "base": "./node_modules/angular"
         },
         {
+            "name": "angular-aria",
+            "src":  ["./node_modules/angular-aria/angular-aria.min.js"],
+            "base": "./node_modules/angular-aria"
+        },
+        {
             "name": "angular-cookies",
             "src":  ["./node_modules/angular-cookies/angular-cookies.js"],
             "base": "./node_modules/angular-cookies"
@@ -100,7 +105,7 @@ function dependencies() {
             "name": "angular-messages",
             "src":  ["./node_modules/angular-messages/angular-messages.js"],
             "base": "./node_modules/angular-messages"
-        },
+        },        
         {
             "name": "angular-mocks",
             "src":  ["./node_modules/angular-mocks/angular-mocks.js"],
