@@ -20,9 +20,6 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     public class UmbracoDatabase : Database, IUmbracoDatabase
     {
-        // Umbraco's default isolation level is RepeatableRead
-        private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
-
         private readonly ILogger _logger;
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
@@ -38,7 +35,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
         /// </remarks>
         public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
-            : base(connectionString, sqlContext.DatabaseType, provider, DefaultIsolationLevel)
+            : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
 
@@ -54,7 +51,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <remarks>Internal for unit tests only.</remarks>
         internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger logger)
-            : base(connection, sqlContext.DatabaseType, DefaultIsolationLevel)
+            : base(connection, sqlContext.DatabaseType, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
             _logger = logger;
