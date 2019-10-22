@@ -199,10 +199,10 @@ namespace Umbraco.ModelsBuilder.Building
             sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
                 itemType);
             WriteGeneratedCodeAttribute(sb, "\t\t");
-            sb.Append("\t\tpublic new static PublishedContentType GetModelContentType()\n");
+            sb.Append("\t\tpublic new static IPublishedContentType GetModelContentType()\n");
             sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);\n");
             WriteGeneratedCodeAttribute(sb, "\t\t");
-            sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
+            sb.AppendFormat("\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
             sb.Append("\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n");
             sb.Append("#pragma warning restore 0109\n\n");
