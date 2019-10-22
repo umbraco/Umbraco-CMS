@@ -3,7 +3,7 @@ using Umbraco.ModelsBuilder.Api;
 
 namespace Umbraco.ModelsBuilder.Building
 {
-    public static class TextHeaderWriter
+    internal static class TextHeaderWriter
     {
         /// <summary>
         /// Outputs an "auto-generated" header to a string builder.

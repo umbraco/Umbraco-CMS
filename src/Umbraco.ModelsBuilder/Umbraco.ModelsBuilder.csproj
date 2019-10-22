@@ -55,12 +55,10 @@
     <Compile Include="Building\TextHeaderWriter.cs" />
     <Compile Include="Building\TypeModel.cs" />
     <Compile Include="ConfigsExtensions.cs" />
-    <Compile Include="Configuration\ClrNameSource.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\ModelsMode.cs" />
     <Compile Include="Configuration\ModelsModeExtensions.cs" />
     <Compile Include="Dashboard\BuilderDashboardHelper.cs" />
-    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -93,6 +91,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
+      <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
+      <Name>Umbraco.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
       <Name>Umbraco.Core</Name>
