@@ -25,11 +25,16 @@ const { removeProductionMode } = require('./gulp/tasks/removeProductionMode');
 // Load local overwrites, can be used to overwrite paths in your local setup.
 var fs = require('fs');
 var onlyScripts = require('./gulp/util/scriptFilter');
-var overwrites = fs.readdirSync('./gulp/overwrites/').filter(onlyScripts);
-overwrites.forEach(function(overwrite) {
-	require('./gulp/overwrites/' + overwrite);
-});
-
+try {
+    if (fs.existsSync('./gulp/overwrites/')) {
+        var overwrites = fs.readdirSync('./gulp/overwrites/').filter(onlyScripts);
+        overwrites.forEach(function(overwrite) {
+            require('./gulp/overwrites/' + overwrite);
+        });
+    }
+} catch (err) {
+    console.error(err)
+  }
 
 // ***********************************************************
 // These Exports are the new way of defining Tasks in Gulp 4.x
