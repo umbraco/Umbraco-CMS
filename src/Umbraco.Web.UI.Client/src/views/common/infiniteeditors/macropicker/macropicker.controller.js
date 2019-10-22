@@ -41,8 +41,6 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
         macroResource.getMacroParameters($scope.model.selectedMacro.id)
             .then(function (data) {
 
-                
-
                 //go to next page if there are params otherwise we can just exit
                 if (!angular.isArray(data) || data.length === 0) {
 

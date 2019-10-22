@@ -263,7 +263,9 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
     <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\Entities\IMediaEntitySlim.cs" />
+    <Compile Include="Models\Entities\IMemberEntitySlim.cs" />
     <Compile Include="Models\Entities\MediaEntitySlim.cs" />
+    <Compile Include="Models\Entities\MemberEntitySlim.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
@@ -982,7 +984,6 @@
     <Compile Include="Persistence\DatabaseModelDefinitions\ModificationType.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\SystemMethods.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\TableDefinition.cs" />
-    <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
     <Compile Include="Persistence\DbCommandExtensions.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />
