@@ -212,13 +212,13 @@ namespace Umbraco.Core
         {
             OnSignal("environment"); // will run once
 
+            // The web app is stopping, dispose eagerly
+            Dispose(true);
+
             if (immediate)
             {
                 //only unregister when it's the final call, else we won't be notified of the final call
                 HostingEnvironment.UnregisterObject(this);
-
-                // The web app is stopping immediately, dispose eagerly
-                Dispose(true);
             }
         }
 

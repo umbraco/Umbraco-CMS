@@ -29,7 +29,7 @@ namespace Umbraco.Core
         private readonly Task<IDisposable> _releaserTask;
 
         public SystemLock()
-            : this (null)
+            : this(null)
         { }
 
         public SystemLock(string name)
@@ -92,12 +92,10 @@ namespace Umbraco.Core
         private class NamedSemaphoreReleaser : CriticalFinalizerObject, IDisposable
         {
             private readonly Semaphore _semaphore;
-            private GCHandle _handle;
 
             internal NamedSemaphoreReleaser(Semaphore semaphore)
             {
                 _semaphore = semaphore;
-                _handle = GCHandle.Alloc(_semaphore);
             }
 
             #region IDisposable Support
@@ -116,21 +114,22 @@ namespace Umbraco.Core
             {
                 if (!disposedValue)
                 {
-                    if (disposing)
+                    try
                     {
                         _semaphore.Release();
-                        _semaphore.Dispose();
-
-                        
                     }
-
-                    // free unmanaged resources (unmanaged objects) and override a finalizer below.
-                    _handle.Free();
-
+                    finally
+                    {
+                        try
+                        {
+                            _semaphore.Dispose();
+                        }
+                        catch { }
+                    }
                     disposedValue = true;
                 }
             }
-            
+
             // we WANT to release the semaphore because it's a system object, ie a critical
             // non-managed resource - and if it is not released then noone else can acquire
             // the lock - so we inherit from CriticalFinalizerObject which means that the
