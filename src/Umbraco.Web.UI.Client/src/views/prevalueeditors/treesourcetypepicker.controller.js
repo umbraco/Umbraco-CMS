@@ -45,7 +45,7 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
             filterCssClass: "not-allowed not-published",
             filter: function (item) {
                 // filter out folders (containers), element types (for content) and already selected items
-                return item.nodeType === "container" || item.metaData.isElement || _.findWhere(vm.itemTypes, { udi: item.udi }) !== null;
+                return item.nodeType === "container" || item.metaData.isElement || !!_.findWhere(vm.itemTypes, { udi: item.udi });
             },
             submit: function (model) {
                 var newItemTypes = _.map(model.selection,
