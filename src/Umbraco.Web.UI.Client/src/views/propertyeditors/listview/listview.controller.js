@@ -705,7 +705,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
 
             if (e.nameExp) {
-
                 var newValue = e.nameExp({ value });
                 if (newValue && (newValue = $.trim(newValue))) {
                     value = newValue;
