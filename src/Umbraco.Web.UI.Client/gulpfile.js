@@ -39,6 +39,6 @@ exports.dev = series(parallel(dependencies, js, less, views), watchTask);
 exports.fastdev = series(removeProductionMode, parallel(dependencies, js, less, views), watchTask);
 exports.watch = series(watchTask);
 // 
-exports.runTests = series(js, parallel(testUnit, testE2e));
+exports.runTests = series(js, testUnit);
 exports.testUnit = series(testUnit);
 exports.testE2e = series(testE2e);
