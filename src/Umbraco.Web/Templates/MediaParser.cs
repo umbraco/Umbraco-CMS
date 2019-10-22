@@ -13,6 +13,22 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Templates
 {
+    /// <summary>
+    /// Parses out UDIs in strings
+    /// </summary>
+    public sealed class UdiParser
+    {
+        /// <summary>
+        /// Parses out UDIs from an html string based on 'data-udi' html attributes
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public IEnumerable<Udi> ParseUdisFromDataAttributes(string text)
+        {
+
+        }
+    }
+
     public sealed class MediaParser
     {
         public MediaParser(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
