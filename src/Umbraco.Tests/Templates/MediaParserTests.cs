@@ -13,8 +13,9 @@ using System;
 using System.Linq;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Tests.Web
+namespace Umbraco.Tests.Templates
 {
+
     [TestFixture]
     public class MediaParserTests
     {
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.Web
         public void Ensure_Image_Sources()
         {
             //setup a mock url provider which we'll use for testing
-            
+
             var mediaType = new PublishedContentType(777, "image", PublishedItemType.Media, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var media = new Mock<IPublishedContent>();
             media.Setup(x => x.ContentType).Returns(mediaType);
@@ -91,7 +92,7 @@ namespace Umbraco.Tests.Web
 
             }
 
-            
+
         }
     }
 }
