@@ -31,7 +31,7 @@ namespace Umbraco.Web.Templates
 
         [Obsolete("Inject and use an instance of InternalLinkParser instead")]
         public static string ParseInternalLinks(string text, UrlProvider urlProvider)
-            => Current.Factory.GetInstance<InternalLinkParser>().EnsureInternalLinks(text);
+            => Current.Factory.GetInstance<LocalLinkParser>().EnsureInternalLinks(text);
 
         [Obsolete("Inject and use an instance of UrlResolver")]
         public static string ResolveUrlsFromTextString(string text)
@@ -43,14 +43,14 @@ namespace Umbraco.Web.Templates
 
         [Obsolete("Use MediaParser.EnsureImageSources instead")]
         public static string ResolveMediaFromTextString(string text)
-            => Current.Factory.GetInstance<MediaParser>().EnsureImageSources(text);
+            => Current.Factory.GetInstance<ImageSourceParser>().EnsureImageSources(text);
         
         [Obsolete("Use MediaParser.RemoveImageSources instead")]
         internal static string RemoveMediaUrlsFromTextString(string text)
-            => Current.Factory.GetInstance<MediaParser>().RemoveImageSources(text);
+            => Current.Factory.GetInstance<ImageSourceParser>().RemoveImageSources(text);
 
         [Obsolete("Use MediaParser.RemoveImageSources instead")]
         internal static string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ILogger logger)
-            => Current.Factory.GetInstance<MediaParser>().FindAndPersistPastedTempImages(html, mediaParentFolder, userId);
+            => Current.Factory.GetInstance<ImageSourceParser>().FindAndPersistPastedTempImages(html, mediaParentFolder, userId);
     }
 }

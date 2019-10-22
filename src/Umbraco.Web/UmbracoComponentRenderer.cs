@@ -27,9 +27,9 @@ namespace Umbraco.Web
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
         private readonly ITemplateRenderer _templateRenderer;
-        private readonly InternalLinkParser _internalLinkParser;
+        private readonly LocalLinkParser _internalLinkParser;
 
-        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer, InternalLinkParser internalLinkParser)
+        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer, LocalLinkParser internalLinkParser)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _macroRenderer = macroRenderer;

@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Web
                 mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
                 mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
-                var linkParser = new InternalLinkParser(umbracoContextAccessor);
+                var linkParser = new LocalLinkParser(umbracoContextAccessor);
 
                 var output = linkParser.EnsureInternalLinks(input);
 

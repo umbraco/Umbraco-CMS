@@ -12,10 +12,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MarkdownEditorValueConverter : PropertyValueConverterBase
     {
-        private readonly InternalLinkParser _localLinkParser;
+        private readonly LocalLinkParser _localLinkParser;
         private readonly UrlParser _urlResolver;
 
-        public MarkdownEditorValueConverter(InternalLinkParser localLinkParser, UrlParser urlResolver)
+        public MarkdownEditorValueConverter(LocalLinkParser localLinkParser, UrlParser urlResolver)
         {
             _localLinkParser = localLinkParser;
             _urlResolver = urlResolver;

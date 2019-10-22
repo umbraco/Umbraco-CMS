@@ -107,9 +107,9 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-            composition.RegisterUnique<InternalLinkParser>();
+            composition.RegisterUnique<LocalLinkParser>();
             composition.RegisterUnique<UrlParser>();
-            composition.RegisterUnique<MediaParser>();
+            composition.RegisterUnique<ImageSourceParser>();
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)

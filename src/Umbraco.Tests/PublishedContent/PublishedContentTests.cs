@@ -46,7 +46,7 @@ namespace Umbraco.Tests.PublishedContent
             var mediaService = Mock.Of<IMediaService>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
-            var mediaParser = new MediaParser(umbracoContextAccessor, logger, mediaService, contentTypeBaseServiceProvider);
+            var mediaParser = new ImageSourceParser(umbracoContextAccessor, logger, mediaService, contentTypeBaseServiceProvider);
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(logger)) { Id = 1 },

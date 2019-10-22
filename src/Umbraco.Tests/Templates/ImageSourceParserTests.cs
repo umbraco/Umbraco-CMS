@@ -12,19 +12,40 @@ using System.Web;
 using System;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Templates
 {
 
+
     [TestFixture]
-    public class MediaParserTests
+    public class ImageSourceParserTests
     {
+        [Test]
+        public void Returns_Udis_From_Data_Udi_Html_Attributes()
+        {
+            var input = @"<p>
+    <div>
+        <img src='/media/12312.jpg' data-udi='umb://media/D4B18427A1544721B09AC7692F35C264' />
+    </div>
+</p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" /></p>";
+
+            var logger = Mock.Of<ILogger>();
+            var umbracoContextAccessor = new TestUmbracoContextAccessor();
+            var mediaParser = new ImageSourceParser(umbracoContextAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
+
+            var result = mediaParser.FindUdisFromDataAttributes(input).ToList();
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(Udi.Parse("umb://media/D4B18427A1544721B09AC7692F35C264"), result[0]);
+            Assert.AreEqual(Udi.Parse("umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"), result[1]);
+        }
+
         [Test]
         public void Remove_Image_Sources()
         {
             var logger = Mock.Of<ILogger>();
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
-            var mediaParser = new MediaParser(umbracoContextAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
+            var mediaParser = new ImageSourceParser(umbracoContextAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
 
             var result = mediaParser.RemoveImageSources(@"<p>
 <div>
@@ -66,7 +87,7 @@ namespace Umbraco.Tests.Templates
                 var mediaCache = Mock.Get(reference.UmbracoContext.Media);
                 mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
-                var mediaParser = new MediaParser(umbracoContextAccessor, Mock.Of<ILogger>(), Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
+                var mediaParser = new ImageSourceParser(umbracoContextAccessor, Mock.Of<ILogger>(), Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
 
                 var result = mediaParser.EnsureImageSources(@"<p>
 <div>

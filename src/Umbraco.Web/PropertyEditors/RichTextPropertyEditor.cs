@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -25,12 +26,13 @@ namespace Umbraco.Web.PropertyEditors
     public class RichTextPropertyEditor : DataEditor
     {
         private IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly MediaParser _mediaParser;
+        private readonly ImageSourceParser _mediaParser;
+        
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, MediaParser mediaParser)
+        public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ImageSourceParser mediaParser)
             : base(logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -53,9 +55,9 @@ namespace Umbraco.Web.PropertyEditors
         internal class RichTextPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private IUmbracoContextAccessor _umbracoContextAccessor;
-            private readonly MediaParser _mediaParser;
+            private readonly ImageSourceParser _mediaParser;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, MediaParser _mediaParser)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, ImageSourceParser _mediaParser)
                 : base(attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
@@ -127,7 +129,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <returns></returns>
             public IEnumerable<Udi> GetReferences(object value)
             {
-                throw new NotImplementedException();
+                return _mediaParser.FindUdisFromDataAttributes(value == null ? string.Empty : value is string str ? str : value.ToString()).ToList();
             }
         }
 

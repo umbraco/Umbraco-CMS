@@ -43,7 +43,7 @@ namespace Umbraco.Tests.PublishedContent
             var logger = Mock.Of<ILogger>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new RichTextPropertyEditor(logger, umbracoCtxAccessor, new MediaParser(umbracoCtxAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>()))) { Id = 1 });
+                new DataType(new RichTextPropertyEditor(logger, umbracoCtxAccessor, new ImageSourceParser(umbracoCtxAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>()))) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 

@@ -28,10 +28,10 @@ namespace Umbraco.Web.PropertyEditors
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly MediaParser _mediaParser;
+        private readonly ImageSourceParser _mediaParser;
         private ILogger _logger;
 
-        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, MediaParser mediaParser)
+        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ImageSourceParser mediaParser)
             : base(logger)
         {
             _mediaService = mediaService;
@@ -57,9 +57,9 @@ namespace Umbraco.Web.PropertyEditors
             private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
             private IUmbracoContextAccessor _umbracoContextAccessor;
             private ILogger _logger;
-            private readonly MediaParser _mediaParser;
+            private readonly ImageSourceParser _mediaParser;
 
-            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, MediaParser _mediaParser)
+            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, ImageSourceParser _mediaParser)
                 : base(attribute)
             {
                 _mediaService = mediaService;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -10,7 +11,7 @@ namespace Umbraco.Web.Templates
     /// <summary>
     /// Utility class used to parse internal links
     /// </summary>
-    public sealed class InternalLinkParser
+    public sealed class LocalLinkParser
     {
 
         private static readonly Regex LocalLinkPattern = new Regex(@"href=""[/]?(?:\{|\%7B)localLink:([a-zA-Z0-9-://]+)(?:\}|\%7D)",
@@ -18,9 +19,18 @@ namespace Umbraco.Web.Templates
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public InternalLinkParser(IUmbracoContextAccessor umbracoContextAccessor)
+        public LocalLinkParser(IUmbracoContextAccessor umbracoContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
+        }
+
+        internal IEnumerable<Udi> FindUdisFromLocalLinks(string text)
+        {
+            foreach ((int? intId, GuidUdi udi, string tagValue) in FindLocalLinkIds(text))
+            {
+                if (udi != null)
+                    yield return udi; // In v8, we only care abuot UDIs
+            }
         }
 
         /// <summary>
@@ -56,6 +66,33 @@ namespace Umbraco.Web.Templates
 
             var urlProvider = _umbracoContextAccessor.UmbracoContext.UrlProvider;
 
+            foreach((int? intId, GuidUdi udi, string tagValue) in FindLocalLinkIds(text))
+            {
+                if (udi != null)
+                {
+                    var newLink = "#";
+                    if (udi.EntityType == Constants.UdiEntityType.Document)
+                        newLink = urlProvider.GetUrl(udi.Guid);
+                    else if (udi.EntityType == Constants.UdiEntityType.Media)
+                        newLink = urlProvider.GetMediaUrl(udi.Guid);
+
+                    if (newLink == null)
+                        newLink = "#";
+
+                    text = text.Replace(tagValue, "href=\"" + newLink);
+                }
+                else if (intId.HasValue)
+                {
+                    var newLink = urlProvider.GetUrl(intId.Value);
+                    text = text.Replace(tagValue, "href=\"" + newLink);
+                }
+            }
+
+            return text;
+        }
+
+        private IEnumerable<(int? intId, GuidUdi udi, string tagValue)> FindLocalLinkIds(string text)
+        {
             // Parse internal links
             var tags = LocalLinkPattern.Matches(text);
             foreach (Match tag in tags)
@@ -69,29 +106,16 @@ namespace Umbraco.Web.Templates
                     {
                         var guidUdi = udi as GuidUdi;
                         if (guidUdi != null)
-                        {
-                            var newLink = "#";
-                            if (guidUdi.EntityType == Constants.UdiEntityType.Document)
-                                newLink = urlProvider.GetUrl(guidUdi.Guid);
-                            else if (guidUdi.EntityType == Constants.UdiEntityType.Media)
-                                newLink = urlProvider.GetMediaUrl(guidUdi.Guid);
-
-                            if (newLink == null)
-                                newLink = "#";
-
-                            text = text.Replace(tag.Value, "href=\"" + newLink);
-                        }
+                            yield return (null, guidUdi, tag.Value);
                     }
 
                     if (int.TryParse(id, out var intId))
                     {
-                        var newLink = urlProvider.GetUrl(intId);
-                        text = text.Replace(tag.Value, "href=\"" + newLink);
+                        yield return (intId, null, tag.Value);
                     }
                 }
             }
 
-            return text;
         }
     }
 }

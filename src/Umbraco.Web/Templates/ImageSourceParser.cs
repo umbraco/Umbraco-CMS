@@ -14,9 +14,9 @@ using Umbraco.Web.Routing;
 namespace Umbraco.Web.Templates
 {
 
-    public sealed class MediaParser
+    public sealed class ImageSourceParser
     {
-        public MediaParser(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public ImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
@@ -31,6 +31,27 @@ namespace Umbraco.Web.Templates
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         const string TemporaryImageDataAttribute = "data-tmpimg";
+
+        private static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// Parses out UDIs from an html string based on 'data-udi' html attributes
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public IEnumerable<Udi> FindUdisFromDataAttributes(string text)
+        {
+            var matches = DataUdiAttributeRegex.Matches(text);
+            if (matches.Count == 0)
+                yield break;
+
+            foreach (Match match in matches)
+            {
+                if (match.Groups.Count == 2 && Udi.TryParse(match.Groups[1].Value, out var udi))
+                    yield return udi;
+            }
+        }
 
         /// <summary>
         /// Parses the string looking for Umbraco image tags and updates them to their up-to-date image sources.
@@ -178,7 +199,7 @@ namespace Umbraco.Web.Templates
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error(typeof(MediaParser), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+                        _logger.Error(typeof(ImageSourceParser), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
                     }
                 }
             }

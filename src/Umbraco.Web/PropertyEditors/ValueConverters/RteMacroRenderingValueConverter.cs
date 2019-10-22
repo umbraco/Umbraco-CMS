@@ -24,9 +24,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
-        private readonly InternalLinkParser _internalLinkParser;
+        private readonly LocalLinkParser _internalLinkParser;
         private readonly UrlParser _urlResolver;
-        private readonly MediaParser _mediaParser;
+        private readonly ImageSourceParser _mediaParser;
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         {
@@ -36,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
-            InternalLinkParser internalLinkParser, UrlParser urlResolver, MediaParser mediaParser)
+            LocalLinkParser internalLinkParser, UrlParser urlResolver, ImageSourceParser mediaParser)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _macroRenderer = macroRenderer;
