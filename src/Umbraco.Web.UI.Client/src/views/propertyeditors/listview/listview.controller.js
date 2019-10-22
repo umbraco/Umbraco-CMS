@@ -1,4 +1,4 @@
-function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
+function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -168,6 +168,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
         cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
     };
+    _.each($scope.options.includeProperties, function (property) {
+        property.nameExp = !!property.nameTemplate
+            ? $interpolate(property.nameTemplate)
+            : undefined;
+    });
 
     //watch for culture changes in the query strings and update accordingly
     $scope.$watch(function () {
@@ -697,6 +702,13 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             // If we have a date, format it
             if (isDate(value)) {
                 value = value.substring(0, value.length - 3);
+            }
+
+            if (e.nameExp) {
+                var newValue = e.nameExp({ value });
+                if (newValue && (newValue = $.trim(newValue))) {
+                    value = newValue;
+                }
             }
 
             // set what we've got on the result
