@@ -27,23 +27,25 @@ namespace Umbraco.Web.PropertyEditors
     {
         private IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ImageSourceParser _mediaParser;
-        
+        private readonly LocalLinkParser _localLinkParser;
+
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ImageSourceParser mediaParser)
+        public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ImageSourceParser mediaParser, LocalLinkParser localLinkParser)
             : base(logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _mediaParser = mediaParser;
+            _localLinkParser = localLinkParser;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, _mediaParser);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, _mediaParser, _localLinkParser);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
