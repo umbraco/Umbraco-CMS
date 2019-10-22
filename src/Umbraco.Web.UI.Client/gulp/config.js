@@ -20,6 +20,7 @@ module.exports = {
             installer: { files: "./src/installer/**/*.js", out: "umbraco.installer.js" },
             filters: { files: "./src/common/filters/**/*.js", out: "umbraco.filters.js" },
             resources: { files: "./src/common/resources/**/*.js", out: "umbraco.resources.js" },
+            services: { files: ["./src/common/services/**/*.js"], out: "umbraco.services.js" },
             security: { files: "./src/common/interceptors/**/*.js", out: "umbraco.interceptors.js" },
             
             //the controllers for views
