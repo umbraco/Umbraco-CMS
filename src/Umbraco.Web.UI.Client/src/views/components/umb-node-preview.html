@@ -1,15 +1,17 @@
 <div class="umb-node-preview" ng-class="{'umb-node-preview--sortable': sortable, 'umb-node-preview--unpublished': published === false }">
-    <i ng-if="icon" class="umb-node-preview__icon {{ icon }}" aria-hidden="true"></i>
-    <div class="umb-node-preview__content">
+    <div class="flex"> <!-- div keeps icon and nodename from wrapping -->
+        <i ng-if="icon" class="umb-node-preview__icon {{ icon }}" aria-hidden="true"></i>
+        <div class="umb-node-preview__content">
 
-        <div class="umb-node-preview__name" ng-attr-title="{{alias}}">{{ name }}</div>
-        <div class="umb-node-preview__description" ng-if="description">{{ description }}</div>
+            <div class="umb-node-preview__name" ng-attr-title="{{alias}}">{{ name }}</div>
+            <div class="umb-node-preview__description" ng-if="description">{{ description }}</div>
 
-        <div class="umb-user-group-preview__permissions" ng-if="permissions">
-            <span>
-                <span class="bold"><localize key="general_rights">Permissions</localize>:</span>
-                <span ng-repeat="permission in permissions" class="umb-user-group-preview__permission">{{ permission.name }}</span>
-            </span>
+            <div class="umb-user-group-preview__permissions" ng-if="permissions">
+                <span>
+                    <span class="bold"><localize key="general_rights">Permissions</localize>:</span>
+                    <span ng-repeat="permission in permissions" class="umb-user-group-preview__permission">{{ permission.name }}</span>
+                </span>
+            </div>
         </div>
     </div>
     <div class="umb-node-preview__actions">

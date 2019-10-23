@@ -27,6 +27,7 @@ namespace Umbraco.Web.Search
         private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
+        private readonly BackgroundIndexRebuilder _backgroundIndexRebuilder;
         private static object _isConfiguredLocker = new object();
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;        
@@ -47,7 +48,8 @@ namespace Umbraco.Web.Search
             IContentValueSetBuilder contentValueSetBuilder,
             IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
-            IValueSetBuilder<IMember> memberValueSetBuilder)
+            IValueSetBuilder<IMember> memberValueSetBuilder,
+            BackgroundIndexRebuilder backgroundIndexRebuilder)
         {
             _services = services;
             _scopeProvider = scopeProvider;
@@ -56,7 +58,7 @@ namespace Umbraco.Web.Search
             _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
             _mediaValueSetBuilder = mediaValueSetBuilder;
             _memberValueSetBuilder = memberValueSetBuilder;
-
+            _backgroundIndexRebuilder = backgroundIndexRebuilder;
             _mainDom = mainDom;
             _logger = profilingLogger;
             _indexCreator = indexCreator;
@@ -111,6 +113,7 @@ namespace Umbraco.Web.Search
             ContentTypeCacheRefresher.CacheUpdated += ContentTypeCacheRefresherUpdated;
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
+            LanguageCacheRefresher.CacheUpdated += LanguageCacheRefresherUpdated;
         }
 
         public void Terminate()
@@ -317,6 +320,25 @@ namespace Umbraco.Web.Search
                         }
                     }
                 }
+            }
+        }
+
+        private void LanguageCacheRefresherUpdated(LanguageCacheRefresher sender, CacheRefresherEventArgs e)
+        {
+            if (!(e.MessageObject is LanguageCacheRefresher.JsonPayload[] payloads))
+                return;
+
+            if (payloads.Length == 0) return;
+
+            var removedOrCultureChanged = payloads.Any(x =>
+                x.ChangeType == LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
+                    || x.ChangeType == LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove);
+
+            if (removedOrCultureChanged)
+            {
+                //if a lang is removed or it's culture has changed, we need to rebuild the indexes since
+                //field names and values in the index have a string culture value.
+                _backgroundIndexRebuilder.RebuildIndexes(false);
             }
         }
 
