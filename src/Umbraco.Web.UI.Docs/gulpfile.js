@@ -11,7 +11,7 @@ var gulpDocs = require('gulp-ngdocs');
 /**************************
  * Build Backoffice UI API documentation
  **************************/
-function docs(cb) {
+gulp.task('docs', [], function (cb) {
 
     var options = {
         html5Mode: false,
@@ -32,9 +32,9 @@ function docs(cb) {
     .pipe(gulpDocs.process(options))
     .pipe(gulp.dest('./api'));
     cb();
-};
+});
 
-function connectDocs(cb) {
+gulp.task('connect:docs', function (cb) {
     connect.server({
         root: './api',
         livereload: true,
@@ -42,17 +42,15 @@ function connectDocs(cb) {
         port: 8880
     });
     cb();
-};
+});
 
-function openDocs(cb) {
+gulp.task('open:docs', function (cb) {
 
     var options = {
         uri: 'http://localhost:8880/index.html'
     };
 
-    src(__filename)
+    gulp.src(__filename)
     .pipe(open(options));
     cb();
-};
-
-module.exports = { docs: docs, connectDocs: connectDocs, openDocs: openDocs };
+});
