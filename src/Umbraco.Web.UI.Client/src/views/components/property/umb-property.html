@@ -18,6 +18,9 @@
                         <strong class="umb-control-required">*</strong>
                     </span>
                     <small ng-bind-html="property.description | preserveNewLineInHtml"></small>
+
+                    <umb-property-actions actions="property.actions"></umb-property-actions>
+
                 </label>
 
                 <div class="controls" ng-transclude>
