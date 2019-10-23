@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Web.Hosting;
+using Umbraco.Core.Exceptions;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Dashboard;
@@ -30,7 +31,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         public ModelsBuilderBackOfficeController(UmbracoServices umbracoServices, Config config)
         {
-            _umbracoServices = umbracoServices;
+            //_umbracoServices = umbracoServices;
             _config = config;
         }
 
@@ -54,7 +55,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                 var bin = HostingEnvironment.MapPath("~/bin");
                 if (bin == null)
-                    throw new Exception("Panic: bin is null.");
+                    throw new PanicException("bin is null.");
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
                 GenerateModels(modelsDirectory);
