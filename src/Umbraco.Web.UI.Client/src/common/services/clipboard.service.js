@@ -52,6 +52,15 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         
         return false;
     }
+
+    var prepareEntryForStorage = function(entryData) {
+
+        var shallowCloneData = Object.assign({}, entryData);// Notice only a shallow copy, since we dont need to deep copy. (that will happen when storing the data)
+        delete shallowCloneData.key;
+        delete shallowCloneData.$$hashKey;
+        
+        return shallowCloneData;
+    }
     
     
     var service = {};
@@ -62,21 +71,17 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @methodOf umbraco.services.clipboardService
     *
     * @param {string} type A string defining the type of data to storing, example: 'elementType', 'contentNode'
-    * @param {string} alias A string defining the alias of the data to store, example: 'product'
+    * @param {string} alias A string defining the alias of the data to store, example: 'product' or ['banana', 'apple']
     * @param {object} data A object containing the properties to be saved.
     *
     * @description
     * Saves a single JS-object with a type and alias to the clipboard.
     */
-    service.copy = function(type, alias, data) {
+    service.copy = function(type, alias, entryData) {
         
         var storage = retriveStorage();
-        
-        var shallowCloneData = Object.assign({}, data);// Notice only a shallow copy, since we dont need to deep copy. (that will happen when storing the data)
-        delete shallowCloneData.key;
-        delete shallowCloneData.$$hashKey;
-        
-        var key = data.key || data.$$hashKey || console.error("missing unique key for this content");
+
+        var key = entryData.key || entryData.$$hashKey || console.error("missing unique key for this content");
         
         // remove previous copies of this entry:
         storage.entries = storage.entries.filter(
@@ -85,7 +90,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
             }
         );
         
-        var entry = {unique:key, type:type, alias:alias, data:shallowCloneData};
+        var entry = {unique:key, type:type, alias:alias, data:prepareEntryForStorage(entryData)};
         storage.entries.push(entry);
         
         if (saveStorage(storage) === true) {
@@ -95,6 +100,42 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         }
         
     };
+
+
+    /**
+    * @ngdoc method
+    * @name umbraco.services.clipboardService#copyArray
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @param {string} type A string defining the type of data to storing, example: 'elementTypeArray', 'contentNodeArray'
+    * @param {string} aliases An array of strings defining the alias of the data to store, example: 'product' or ['banana', 'apple']
+    * @param {object} entries An array of objects of objects containing the properties to be saved.
+    * @param {string} displayLabel A string or array of string defining the alias of the data to store, example: 'product' or ['banana', 'apple']
+    *
+    * @description
+    * Saves a single JS-object with a type and alias to the clipboard.
+    */
+   service.copyArray = function(type, aliases, entries, displayLabel, key) {
+        
+    var storage = retriveStorage();
+    
+    // Clean up each entry
+    var copiedEntries = entries.filter(
+        (entry) => {
+            return prepareEntryForStorage(entry);
+        }
+    );
+    
+    var entry = {unique:key, type:type, aliases:aliases, data:copiedEntries};
+    storage.entries.push(entry);
+    
+    if (saveStorage(storage) === true) {
+        notificationsService.success("Clipboard", "Copied to clipboard.");
+    } else {
+        notificationsService.success("Clipboard", "Couldnt copy this data to clipboard.");
+    }
+    
+};
     
     
     /**
@@ -140,14 +181,20 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @description
     * Returns an array of entries matching the given type and one of the provided aliases.
     */
-    service.retriveEntriesOfType = function(type, aliases) {
+    service.retriveEntriesOfType = function(type, allowedAliases) {
         
         var storage = retriveStorage();
         
         // Find entries that are fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
-                return (entry.type === type && aliases.filter(alias => alias === entry.alias).length > 0);
+                return (
+                    entry.type === type
+                    && 
+                    (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
+                    || 
+                    (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length > 0)
+                );
             }
         );
         
@@ -187,7 +234,13 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         // Find entries that are NOT fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
-                return !(entry.type === type && aliases.filter(alias => alias === entry.alias).length > 0);
+                return !(
+                    entry.type === type
+                    && 
+                    (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
+                    || 
+                    (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length > 0)
+                );
             }
         );
         
@@ -199,5 +252,8 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     
     
     return service;
-}
-angular.module("umbraco.services").factory("clipboardService", clipboardService);
+}
+
+
+angular.module("umbraco.services").factory("clipboardService", clipboardService);
+

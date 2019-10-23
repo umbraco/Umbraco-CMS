@@ -32,6 +32,15 @@ angular.module("umbraco.directives")
                 self.setPropertyError = function (errorMsg) {
                     $scope.property.propertyErrorMessage = errorMsg;
                 };
+
+                $scope.$on("ExposePropertyEditorAPI", function(event, api) {
+
+                    //avoid eventual parent properties to capture this.
+                    event.stopPropagation();
+                    
+                    $scope.propertyActions = api.propertyActions;
+                });
+
             }
         };
     });

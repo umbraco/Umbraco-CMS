@@ -390,6 +390,18 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $event.stopPropagation();
         }
         
+        var copyAllEntries = function() {
+            
+            syncCurrentNode();
+            
+            var aliases = _.reduce($scope.nodes, function (node) {
+                return node.contentTypeAlias;
+            });
+            
+            clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes);
+            $event.stopPropagation();
+        }
+        
         $scope.pasteFromClipboard = function(newNode) {
             
             if (newNode === undefined) {
@@ -574,6 +586,18 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             updateModel();
             $scope.realCurrentNode = newVal;
         });
+
+        
+        $scope.propertyActions = [
+            {
+                labelKey: 'actions_copy',
+                icon: 'documents',
+                method: copyAllEntries
+            }
+        ];
+
+        $scope.$emit("ExposePropertyEditorAPI", $scope);// must be executed at a state where the API is set.
+
 
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
             updateModel();

@@ -5,7 +5,7 @@
         <li role="menuitem" lass="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in vm.actions">
             <button type="button" ng-click="vm.executeAction(action)">
                 <i class="icon icon-{{action.icon}}" aria-hidden="true"></i>
-                <span class="menu-label">{{::action.label}}</span>
+                <span class="menu-label"><localize key="{{::action.labelKey}}"></localize></span>
             </button>
         </li>
     </ul>
