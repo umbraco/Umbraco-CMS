@@ -107,21 +107,6 @@ namespace Umbraco.Tests.Testing.TestingTests
 
             Assert.Pass();
         }
-
-        [Test]
-        public void Can_Mock_UmbracoApiController_Dependencies_With_ServiceLocator_UmbracoMapper()
-        {
-            var umbracoContext = TestObjects.GetUmbracoContextMock();
-
-            var membershipHelper = new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>());
-            var umbracoHelper = new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper);
-            Composition.Register(new UmbracoMapper(new MapDefinitionCollection(new[] { Mock.Of<IMapDefinition>() })));
-
-            // ReSharper disable once UnusedVariable
-            var umbracoApiController = new FakeUmbracoApiController(Mock.Of<IGlobalSettings>(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), umbracoHelper);
-
-            Assert.Pass();
-        }
     }
 
     internal class FakeUmbracoApiController : UmbracoApiController
