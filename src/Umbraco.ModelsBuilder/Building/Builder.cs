@@ -57,7 +57,7 @@ namespace Umbraco.ModelsBuilder.Building
         /// <summary>
         /// Gets the list of models to generate.
         /// </summary>
-        /// <returns>The models to generate, ie those that are not ignored.</returns>
+        /// <returns>The models to generate</returns>
         public IEnumerable<TypeModel> GetModelsToGenerate()
         {
             return _typeModels;
@@ -102,10 +102,6 @@ namespace Umbraco.ModelsBuilder.Building
         /// <summary>
         /// Prepares generation by processing the result of code parsing.
         /// </summary>
-        /// <remarks>
-        ///     Preparation includes figuring out from the existing code which models or properties should
-        ///     be ignored or renamed, etc. -- anything that comes from the attributes in the existing code.
-        /// </remarks>
         private void Prepare()
         {
             TypeModel.MapModelTypes(_typeModels, ModelsNamespace);
