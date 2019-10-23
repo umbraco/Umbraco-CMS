@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
@@ -49,8 +50,8 @@ namespace Umbraco.Web.Templates
         internal static string RemoveMediaUrlsFromTextString(string text)
             => Current.Factory.GetInstance<HtmlImageSourceParser>().RemoveImageSources(text);
 
-        [Obsolete("Use " + nameof(HtmlImageSourceParser) + "." + nameof(HtmlImageSourceParser.FindAndPersistPastedTempImages) + " instead")]
+        [Obsolete("Use " + nameof(HtmlImageSourceParser) + "." + nameof(RichTextEditorPastedImages.FindAndPersistPastedTempImages) + " instead")]
         internal static string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ILogger logger)
-            => Current.Factory.GetInstance<HtmlImageSourceParser>().FindAndPersistPastedTempImages(html, mediaParentFolder, userId);
+            => Current.Factory.GetInstance<RichTextEditorPastedImages>().FindAndPersistPastedTempImages(html, mediaParentFolder, userId);
     }
 }

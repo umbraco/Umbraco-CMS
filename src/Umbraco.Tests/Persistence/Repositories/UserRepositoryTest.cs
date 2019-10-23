@@ -14,6 +14,8 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
+using System;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -29,7 +31,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var languageRepository = new LanguageRepository(accessor, AppCaches, Logger);
             mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches, Mock.Of<ILogger>(), commonRepository, languageRepository);
             var tagRepository = new TagRepository(accessor, AppCaches, Mock.Of<ILogger>());
-            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, propertyEditors);
             return repository;
         }
 
@@ -47,7 +52,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
             var languageRepository = new LanguageRepository(accessor, AppCaches, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, commonRepository, languageRepository);
-            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, propertyEditors);
             return repository;
         }
 

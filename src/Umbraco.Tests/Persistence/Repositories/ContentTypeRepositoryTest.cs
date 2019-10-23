@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -35,7 +36,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, langRepository);
             var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger);
-            var repository = new DocumentRepository(scopeAccessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
+            var relationRepository = new RelationRepository(scopeAccessor, Logger, relationTypeRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var repository = new DocumentRepository(scopeAccessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, propertyEditors);
             return repository;
         }
 

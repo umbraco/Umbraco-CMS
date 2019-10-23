@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
@@ -25,8 +26,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository)
-            : base(scopeAccessor, cache, languageRepository, logger)
+        public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
+            IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository,
+            Lazy<PropertyEditorCollection> propertyEditors)
+            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, propertyEditors)
         {
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));

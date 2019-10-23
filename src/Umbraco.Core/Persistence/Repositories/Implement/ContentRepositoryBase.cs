@@ -31,20 +31,37 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     }
 
     internal abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
-        where TEntity : class, IUmbracoEntity
+        where TEntity : class, IContentBase
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILanguageRepository languageRepository, ILogger logger)
+        private readonly Lazy<PropertyEditorCollection> _propertyEditors;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scopeAccessor"></param>
+        /// <param name="cache"></param>
+        /// <param name="logger"></param>
+        /// <param name="languageRepository"></param>
+        /// <param name="propertyEditors">
+        ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
+        /// </param>
+        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
+            ILanguageRepository languageRepository, IRelationRepository relationRepository,
+            Lazy<PropertyEditorCollection> propertyEditors)
             : base(scopeAccessor, cache, logger)
         {
             LanguageRepository = languageRepository;
+            RelationRepository = relationRepository;
+            _propertyEditors = propertyEditors;
         }
 
         protected abstract TRepository This { get; }
 
         protected ILanguageRepository LanguageRepository { get; }
+        protected IRelationRepository RelationRepository { get; }
 
-        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // TODO: inject ... this causes circular refs, not sure which refs they are though
+        protected PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
 
         #region Versions
 
@@ -798,5 +815,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         #endregion
+
+        protected void PersistRelations(TEntity entity)
+        {
+            //foreach(var p in entity.)
+        }
     }
 }

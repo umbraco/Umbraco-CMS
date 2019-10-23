@@ -28,24 +28,26 @@ namespace Umbraco.Web.PropertyEditors
         private IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
+        private readonly RichTextEditorPastedImages _pastedImages;
 
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser)
+        public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages)
             : base(logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _imageSourceParser = imageSourceParser;
             _localLinkParser = localLinkParser;
+            _pastedImages = pastedImages;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser, _localLinkParser);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser, _localLinkParser, _pastedImages);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
@@ -59,13 +61,15 @@ namespace Umbraco.Web.PropertyEditors
             private IUmbracoContextAccessor _umbracoContextAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;
             private readonly HtmlLocalLinkParser _localLinkParser;
+            private readonly RichTextEditorPastedImages _pastedImages;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages)
                 : base(attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;
                 _localLinkParser = localLinkParser;
+                _pastedImages = pastedImages;
             }
 
             /// <inheritdoc />
@@ -119,7 +123,7 @@ namespace Umbraco.Web.PropertyEditors
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                var parseAndSavedTempImages = _imageSourceParser.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId);
+                var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId);
                 var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 

@@ -3166,7 +3166,10 @@ namespace Umbraco.Tests.Services
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
             var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository);
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, propertyEditors);
             return repository;
         }
 

@@ -12,6 +12,7 @@ using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
+
     /// <summary>
     /// Represents a grid property and parameter editor.
     /// </summary>
@@ -27,12 +28,14 @@ namespace Umbraco.Web.PropertyEditors
     {
         private IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly HtmlImageSourceParser _imageSourceParser;
+        private readonly RichTextEditorPastedImages _pastedImages;
 
-        public GridPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser)
+        public GridPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, RichTextEditorPastedImages pastedImages)
             : base(logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _imageSourceParser = imageSourceParser;
+            _pastedImages = pastedImages;
         }
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
@@ -41,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser, _pastedImages);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
@@ -49,12 +52,14 @@ namespace Umbraco.Web.PropertyEditors
         {
             private IUmbracoContextAccessor _umbracoContextAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;
+            private readonly RichTextEditorPastedImages _pastedImages;
 
-            public GridPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser)
+            public GridPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, RichTextEditorPastedImages pastedImages)
                 : base(attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;
+                _pastedImages = pastedImages;
             }
 
             /// <summary>
@@ -89,7 +94,7 @@ namespace Umbraco.Web.PropertyEditors
                     // Parse the HTML
                     var html = rte.Value?.ToString();
 
-                    var parseAndSavedTempImages = _imageSourceParser.FindAndPersistPastedTempImages(html, mediaParentId, userId);
+                    var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(html, mediaParentId, userId);
                     var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
 
                     rte.Value = editorValueWithMediaUrlsRemoved;
