@@ -15,10 +15,10 @@ using File = System.IO.File;
 namespace Umbraco.Web.Templates
 {
 
-    [Obsolete("This class is obsolete, all methods have been moved to other classes: HtmlLocalLinkParser, HtmlUrlParser and HtmlImageSourceParser")]
+    [Obsolete("This class is obsolete, all methods have been moved to other classes: " + nameof(HtmlLocalLinkParser) + ", " + nameof(HtmlUrlParser) + " and " + nameof(HtmlImageSourceParser))]
     public static class TemplateUtilities
     {
-        [Obsolete("Inject and use an instance of HtmlLocalLinkParser instead")]
+        [Obsolete("Inject and use an instance of " + nameof(HtmlLocalLinkParser) + " instead")]
         internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
         {
             using (umbracoContext.ForcedPreview(preview)) // force for url provider
@@ -29,27 +29,27 @@ namespace Umbraco.Web.Templates
             return text;
         }
 
-        [Obsolete("Inject and use an instance of HtmlLocalLinkParser instead")]
+        [Obsolete("Inject and use an instance of " + nameof(HtmlLocalLinkParser) + " instead")]
         public static string ParseInternalLinks(string text, UrlProvider urlProvider)
             => Current.Factory.GetInstance<HtmlLocalLinkParser>().EnsureInternalLinks(text);
 
-        [Obsolete("Inject and use an instance of HtmlUrlParser")]
+        [Obsolete("Inject and use an instance of " + nameof(HtmlUrlParser))]
         public static string ResolveUrlsFromTextString(string text)
             => Current.Factory.GetInstance<HtmlUrlParser>().EnsureUrls(text);
 
-        [Obsolete("Use StringExtensions.CleanForXss instead")]
+        [Obsolete("Use " + nameof(StringExtensions) + "." + nameof(StringExtensions.CleanForXss) + " instead")]
         public static string CleanForXss(string text, params char[] ignoreFromClean)
             => text.CleanForXss(ignoreFromClean);
 
-        [Obsolete("Use HtmlImageSourceParser.EnsureImageSources instead")]
+        [Obsolete("Use " + nameof(HtmlImageSourceParser) + "." + nameof(HtmlImageSourceParser.EnsureImageSources) + " instead")]
         public static string ResolveMediaFromTextString(string text)
             => Current.Factory.GetInstance<HtmlImageSourceParser>().EnsureImageSources(text);
         
-        [Obsolete("Use HtmlImageSourceParser.RemoveImageSources instead")]
+        [Obsolete("Use " + nameof(HtmlImageSourceParser) + "." + nameof(HtmlImageSourceParser.RemoveImageSources) + " instead")]
         internal static string RemoveMediaUrlsFromTextString(string text)
             => Current.Factory.GetInstance<HtmlImageSourceParser>().RemoveImageSources(text);
 
-        [Obsolete("Use HtmlImageSourceParser.FindAndPersistPastedTempImages instead")]
+        [Obsolete("Use " + nameof(HtmlImageSourceParser) + "." + nameof(HtmlImageSourceParser.FindAndPersistPastedTempImages) + " instead")]
         internal static string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ILogger logger)
             => Current.Factory.GetInstance<HtmlImageSourceParser>().FindAndPersistPastedTempImages(html, mediaParentFolder, userId);
     }
