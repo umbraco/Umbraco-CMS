@@ -24,6 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal sealed class ContentRepositoryBase
     {
         /// <summary>
+        /// 
         /// This is used for unit tests ONLY
         /// </summary>
         public static bool ThrowOnWarning = false;
@@ -43,7 +44,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected ILanguageRepository LanguageRepository { get; }
 
-        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // TODO: inject
+        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // TODO: inject ... this causes circular refs, not sure which refs they are though
 
         #region Versions
 

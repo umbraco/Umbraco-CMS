@@ -25,18 +25,14 @@ namespace Umbraco.Web.PropertyEditors
         Group = Constants.PropertyEditors.Groups.RichContent)]
     public class GridPropertyEditor : DataEditor
     {
-        private IMediaService _mediaService;
-        private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private IUmbracoContextAccessor _umbracoContextAccessor;
-        private ILogger _logger;
+        private readonly HtmlImageSourceParser _imageSourceParser;
 
-        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
+        public GridPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser)
             : base(logger)
         {
-            _mediaService = mediaService;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
-            _logger = logger;
+            _imageSourceParser = imageSourceParser;
         }
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
@@ -45,24 +41,20 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
         internal class GridPropertyValueEditor : DataValueEditor
         {
-            private IMediaService _mediaService;
-            private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
             private IUmbracoContextAccessor _umbracoContextAccessor;
-            private ILogger _logger;
+            private readonly HtmlImageSourceParser _imageSourceParser;
 
-            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
+            public GridPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser)
                 : base(attribute)
             {
-                _mediaService = mediaService;
-                _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
                 _umbracoContextAccessor = umbracoContextAccessor;
-                _logger = logger;
+                _imageSourceParser = imageSourceParser;
             }
 
             /// <summary>
@@ -97,8 +89,8 @@ namespace Umbraco.Web.PropertyEditors
                     // Parse the HTML
                     var html = rte.Value?.ToString();
 
-                    var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
-                    var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(parseAndSavedTempImages);
+                    var parseAndSavedTempImages = _imageSourceParser.FindAndPersistPastedTempImages(html, mediaParentId, userId);
+                    var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
 
                     rte.Value = editorValueWithMediaUrlsRemoved;
                 }
@@ -127,7 +119,7 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     var html = rte.Value?.ToString();
 
-                    var propertyValueWithMediaResolved = TemplateUtilities.ResolveMediaFromTextString(html);
+                    var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(html);
                     rte.Value = propertyValueWithMediaResolved;
                 }
 

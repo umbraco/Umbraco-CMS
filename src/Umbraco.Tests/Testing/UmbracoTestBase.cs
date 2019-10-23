@@ -41,6 +41,7 @@ using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Tests.Testing
 {
@@ -229,6 +230,10 @@ namespace Umbraco.Tests.Testing
                 .Append<FormsSection>()
                 .Append<TranslationSection>();
             Composition.RegisterUnique<ISectionService, SectionService>();
+
+            Composition.RegisterUnique<HtmlLocalLinkParser>();
+            Composition.RegisterUnique<HtmlUrlParser>();
+            Composition.RegisterUnique<HtmlImageSourceParser>();
 
         }
 
