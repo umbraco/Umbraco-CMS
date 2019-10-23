@@ -218,14 +218,10 @@ namespace Umbraco.Core
         {
             OnSignal("environment"); // will run once
 
-            // The web app is stopping, dispose eagerly
+            // The web app is stopping, need to wind down
             Dispose(true);
 
-            if (immediate)
-            {
-                //only unregister when it's the final call, else we won't be notified of the final call
-                HostingEnvironment.UnregisterObject(this);
-            }
+            HostingEnvironment.UnregisterObject(this);
         }
 
         #region IDisposable Support
