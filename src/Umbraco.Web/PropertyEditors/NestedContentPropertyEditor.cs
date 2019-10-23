@@ -122,6 +122,11 @@ namespace Umbraco.Web.PropertyEditors
                             {
                                 // convert the value, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                                if (propEditor == null)
+                                {
+                                    propValues[propAlias] = null;
+                                    continue;
+                                }
                                 var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
                                 var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
@@ -259,7 +264,7 @@ namespace Umbraco.Web.PropertyEditors
                             var contentPropData = new ContentPropertyData(propValues[propKey], propConfiguration);
 
                             // Get the property editor to do it's conversion
-                            var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, propValues[propKey]);
+                            var newValue = propEditor?.GetValueEditor().FromEditor(contentPropData, propValues[propKey]);
 
                             // Store the value back
                             propValues[propKey] = (newValue == null) ? null : JToken.FromObject(newValue);
@@ -310,6 +315,11 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             var config = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                             var propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
+
+                            if (propertyEditor == null)
+                            {
+                                continue;
+                            }
 
                             foreach (var validator in propertyEditor.GetValueEditor().Validators)
                             {
