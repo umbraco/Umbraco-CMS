@@ -28,10 +28,8 @@
 
                 <hr />
 
-                <label class="checkbox">
-                	<input type="checkbox" ng-model="confirmed" />
-                    <localize key="contentTypeEditor_yesDelete">Yes, delete</localize> {{currentNode.name}} <localize key="contentTypeEditor_andAllDocuments">and all documents using this type</localize>
-                </label>
+                <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}">
+                </umb-checkbox>
 
                 <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel">
                 </umb-confirm>

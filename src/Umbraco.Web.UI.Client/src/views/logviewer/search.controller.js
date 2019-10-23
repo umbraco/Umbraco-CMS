@@ -88,7 +88,6 @@
         vm.deleteSavedSearch = deleteSavedSearch;
         vm.back = back;
 
-
         function init() {
 
             //If we have a Querystring set for lq (log query)

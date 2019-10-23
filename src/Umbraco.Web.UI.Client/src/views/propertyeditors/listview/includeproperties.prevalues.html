@@ -18,6 +18,7 @@
                     <td></td>
                     <th>Alias</th>
                     <th>Header</th>
+                    <th><localize key="template_template">Template</localize></th>
                     <td></td>
                 </tr>
             </thead>
@@ -36,14 +37,19 @@
                     <td>
                         <ng-form name="headerForm" ng-if="!val.isSystem">
                             <input type="text" name="header" ng-model="val.header" required />
-                            <span ng-messages="headerForm.header.$error" show-validation-on-submit >
+                            <span ng-messages="headerForm.header.$error" show-validation-on-submit>
                                 <span class="help-inline" ng-message="required">Required</span>
                             </span>
                         </ng-form>
-                        
+
                         <span ng-if="val.isSystem">
                             <localize key="{{getLocalizedKey(val.alias)}}">{{val.alias}}</localize>
                         </span>
+                    </td>
+                    <td>
+                        <ng-form name="templateForm" ng-if="!val.isSystem">
+                            <input type="text" name="template" ng-model="val.nameTemplate" />
+                        </ng-form>
                     </td>
                     <td>
                         <button type="button" class="btn-icon icon-trash" ng-click="removeField(val)" aria-label="Remove"></button>

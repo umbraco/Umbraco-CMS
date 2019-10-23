@@ -62,6 +62,11 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse("Macro with this alias already exists");
             }
 
+            if (name == null || name.Length > 255)
+            {
+                return this.ReturnErrorResponse("Name cannnot be more than 255 characters in length.");
+            }
+
             try
             {
                 var macro = new Macro
@@ -149,6 +154,11 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse($"No macro data found in request");
             }
 
+            if (macroDisplay.Name == null || macroDisplay.Name.Length > 255)
+            {
+                return this.ReturnErrorResponse("Name cannnot be more than 255 characters in length.");
+            }
+
             var macro = _macroService.GetById(int.Parse(macroDisplay.Id.ToString()));
 
             if (macro == null)
@@ -217,6 +227,39 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage GetParameterEditors()
         {
             return this.Request.CreateResponse(HttpStatusCode.OK, Current.ParameterEditors);
+        }
+
+        /// <summary>
+        /// Gets the available parameter editors grouped by their group.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="HttpResponseMessage"/>.
+        /// </returns>
+        public HttpResponseMessage GetGroupedParameterEditors()
+        {
+            var parameterEditors = Current.ParameterEditors.ToArray();
+
+            var grouped = parameterEditors
+                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
+                .OrderBy(x => x.Key)
+                .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, grouped);
+        }
+
+        /// <summary>
+        /// Get parameter editor by alias.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="HttpResponseMessage"/>.
+        /// </returns>
+        public HttpResponseMessage GetParameterEditorByAlias(string alias)
+        {
+            var parameterEditors = Current.ParameterEditors.ToArray();
+
+            var parameterEditor = parameterEditors.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, parameterEditor);
         }
 
         /// <summary>

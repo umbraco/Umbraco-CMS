@@ -109,10 +109,10 @@
 									<input type="number" ng-switch-when="int" style="width:90px; margin-bottom: 0;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
 
 									<span ng-switch-when="datetime">
-										<umb-flatpickr
+										<umb-date-time-picker
 											options="vm.datePickerConfig"
 											on-change="vm.datePickerChange(dateStr, filter)">
-										</umb-flatpickr>
+										</umb-date-time-picker>
 									</span>
 
 								</span>

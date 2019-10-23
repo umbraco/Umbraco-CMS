@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Tests.Testing
 {
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Testing
             var methodName = test.MethodName;
             var type = Type.GetType(typeName, true);
             if (type == null)
-                throw new Exception("panic"); // makes no sense
+                throw new PanicException($"Could not resolve the type from type name {typeName}"); // makes no sense
             var methodInfo = type.GetMethod(methodName); // what about overloads?
             var options = GetTestOptions<TOptions>(methodInfo);
             return options;
@@ -53,7 +54,7 @@ namespace Umbraco.Tests.Testing
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
             if (!(Merge((TestOptionAttributeBase) other) is TOptions merged))
-                throw new Exception("panic");
+                throw new PanicException("Could not merge test options");
             return merged;
         }
 

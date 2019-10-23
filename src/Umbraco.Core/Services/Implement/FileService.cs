@@ -358,6 +358,11 @@ namespace Umbraco.Core.Services.Implement
                 { "ContentTypeAlias", contentTypeAlias },
             };
 
+            if (contentTypeAlias != null && contentTypeAlias.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
             // check that the template hasn't been created on disk before creating the content type
             // if it exists, set the new template content to the existing file content
             string content = GetViewContent(contentTypeAlias);
@@ -365,7 +370,10 @@ namespace Umbraco.Core.Services.Implement
             {
                 template.Content = content;
             }
+
             
+
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData);

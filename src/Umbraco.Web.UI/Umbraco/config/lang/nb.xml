@@ -234,7 +234,6 @@
     <key alias="linkinternal">Intern link:</key>
     <key alias="linklocaltip">Ved lokal link, sett inn "#" foran link</key>
     <key alias="linknewwindow">Åpne i nytt vindu?</key>
-    <key alias="macroContainerSettings">Makroinnstillinger</key>
     <key alias="macroDoesNotHaveProperties">Denne makroen har ingen egenskaper du kan endre</key>
     <key alias="paste">Lim inn</key>
     <key alias="permissionsEdit">Endre rettigheter for</key>
