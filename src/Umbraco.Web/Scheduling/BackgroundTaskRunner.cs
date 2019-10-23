@@ -338,14 +338,18 @@ namespace Umbraco.Web.Scheduling
                 if (_isRunning == false) return; // done already
             }
 
+            var hasTasks = _tasks.Count > 0;
+
+            if (!force && hasTasks)
+                _logger.Info<BackgroundTaskRunner>("{LogPrefix} Waiting for tasks to complete", _logPrefix);
+
             // complete the queue
             // will stop waiting on the queue or on a latch
             _tasks.Complete();
 
-            if (force)
+            if (!hasTasks || force)
             {
-                // we must bring everything down, now
-                Thread.Sleep(100); // give time to Complete()
+                // we must bring everything down, now                
                 lock (_locker)
                 {
                     // was Complete() enough?
@@ -354,13 +358,13 @@ namespace Umbraco.Web.Scheduling
                 // try to cancel running async tasks (cannot do much about sync tasks)
                 // break latched tasks
                 // stop processing the queue
-                _shutdownTokenSource.Cancel(false); // false is the default
-                _shutdownTokenSource.Dispose();
+                _shutdownTokenSource?.Cancel(false); // false is the default
+                _shutdownTokenSource?.Dispose();
                 _shutdownTokenSource = null;
             }
 
             // tasks in the queue will be executed...
-            if (wait == false) return;
+            if (!wait) return;
 
             _runningTask?.Wait(CancellationToken.None); // wait for whatever is running to end...
         }
@@ -503,7 +507,7 @@ namespace Umbraco.Web.Scheduling
             // returns the task that completed
             // - latched.Latch completes when the latch releases
             // - _tasks.Completion completes when the runner completes
-            // -  tokenTaskSource.Task completes when this task, or the whole runner, is cancelled
+            // -  tokenTaskSource.Task completes when this task, or the whole runner is cancelled
             var task = await Task.WhenAny(latched.Latch, _tasks.Completion, tokenTaskSource.Task);
 
             // ok to run now
@@ -693,13 +697,11 @@ namespace Umbraco.Web.Scheduling
             if (onTerminating)
                 OnEvent(Terminating, "Terminating");
 
-            if (immediate == false)
+            if (!immediate)
             {
-                // The Stop method is first called with the immediate parameter set to false. The object can either complete
-                // processing, call the UnregisterObject method, and then return or it can return immediately and complete
-                // processing asynchronously before calling the UnregisterObject method.
-
-                _logger.Info<BackgroundTaskRunner>("{LogPrefix} Waiting for tasks to complete", _logPrefix);
+                // immediate == false when the app is trying to wind down, immediate == true will be called either:
+                // after a call with immediate == false or if the app is not trying to wind down and needs to immediately stop.
+                // So Stop may be called twice or sometimes only once.
 
                 try
                 {
@@ -716,24 +718,32 @@ namespace Umbraco.Web.Scheduling
                             Terminate(false);
                     }
                 }
-                
+
+                // If we are called with immediate == false, wind down above and then shutdown within 2 seconds,
+                // we want to shut down the app as quick as possible, if we wait until immediate == true, this can
+                // take a very long time since immediate will only be true when a new request is received on the new
+                // appdomain (or another iis timeout occurs ... which can take soeme time).
+                Task.Delay(2000, _shutdownToken).ContinueWith(_ => StopImmediate());
+
             }
             else
             {
-                // If the registered object does not complete processing before the application manager's time-out
-                // period expires, the Stop method is called again with the immediate parameter set to true. When the
-                // immediate parameter is true, the registered object must call the UnregisterObject method before returning;
-                // otherwise, its registration will be removed by the application manager.
+                // If we are called with immediate == true - cancel and shut down now.
 
-                _logger.Info<BackgroundTaskRunner>("{LogPrefix} Canceling tasks", _logPrefix);
-                try
-                {
-                    Shutdown(true, true); // cancel all tasks, wait for the current one to end
-                }
-                finally
-                {
-                    Terminate(true);
-                }
+                StopImmediate();
+            }
+        }
+
+        private void StopImmediate()
+        {
+            _logger.Info<BackgroundTaskRunner>("{LogPrefix} Canceling tasks", _logPrefix);
+            try
+            {
+                Shutdown(true, true); // cancel all tasks, wait for the current one to end
+            }
+            finally
+            {
+                Terminate(true);
             }
         }
 
