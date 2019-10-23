@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -6,6 +7,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     // represents a content "node" ie a pair of draft + published versions
     // internal, never exposed, to be accessed from ContentStore (only!)
+    [DebuggerDisplay("Id: {Id}, Path: {Path}")]
     internal class ContentNode
     {
         // special ctor for root pseudo node
