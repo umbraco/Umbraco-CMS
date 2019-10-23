@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -88,7 +89,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 // of course this should never happen, but when it happens, better detect it
                 // else we end up with weird nullrefs everywhere
                 if (uniqueTypes.Contains(typeModel.ClrName))
-                    throw new Exception($"Panic: duplicate type ClrName \"{typeModel.ClrName}\".");
+                    throw new PanicException($"Panic: duplicate type ClrName \"{typeModel.ClrName}\".");
                 uniqueTypes.Add(typeModel.ClrName);
 
                 var publishedContentType = _publishedContentTypeFactory.CreateContentType(contentType);
@@ -128,7 +129,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                     var publishedPropertyType = publishedContentType.GetPropertyType(propertyType.Alias);
                     if (publishedPropertyType == null)
-                        throw new Exception($"Panic: could not get published property type {contentType.Alias}.{propertyType.Alias}.");
+                        throw new PanicException($"Panic: could not get published property type {contentType.Alias}.{propertyType.Alias}.");
 
                     propertyModel.ModelClrType = publishedPropertyType.ModelClrType;
 
@@ -150,7 +151,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             foreach (var contentType in contentTypes)
             {
                 var typeModel = typeModels.SingleOrDefault(x => x.Id == contentType.Id);
-                if (typeModel == null) throw new Exception("Panic: no type model matching content type.");
+                if (typeModel == null) throw new PanicException("Panic: no type model matching content type.");
 
                 IEnumerable<IContentTypeComposition> compositionTypes;
                 var contentTypeAsMedia = contentType as IMediaType;
@@ -159,12 +160,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 if (contentTypeAsMedia != null) compositionTypes = contentTypeAsMedia.ContentTypeComposition;
                 else if (contentTypeAsContent != null) compositionTypes = contentTypeAsContent.ContentTypeComposition;
                 else if (contentTypeAsMember != null) compositionTypes = contentTypeAsMember.ContentTypeComposition;
-                else throw new Exception(string.Format("Panic: unsupported type \"{0}\".", contentType.GetType().FullName));
+                else throw new PanicException(string.Format("Panic: unsupported type \"{0}\".", contentType.GetType().FullName));
 
                 foreach (var compositionType in compositionTypes)
                 {
                     var compositionModel = typeModels.SingleOrDefault(x => x.Id == compositionType.Id);
-                    if (compositionModel == null) throw new Exception("Panic: composition type does not exist.");
+                    if (compositionModel == null) throw new PanicException("Panic: composition type does not exist.");
 
                     if (compositionType.Id == contentType.ParentId) continue;
 

@@ -186,11 +186,11 @@ namespace Umbraco.ModelsBuilder.Building
             foreach (var typeModel in _typeModels.Where(x => x.IsElement))
             {
                 if (typeModel.BaseType != null && !typeModel.BaseType.IsElement)
-                    throw new Exception($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but its parent type '{typeModel.BaseType.Alias}' is not.");
+                    throw new InvalidOperationException($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but its parent type '{typeModel.BaseType.Alias}' is not.");
 
                 var errs = typeModel.MixinTypes.Where(x => !x.IsElement).ToList();
                 if (errs.Count > 0)
-                    throw new Exception($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but it is composed of {string.Join(", ", errs.Select(x => "'" + x.Alias + "'"))} which {(errs.Count == 1 ? "is" : "are")} not.");
+                    throw new InvalidOperationException($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but it is composed of {string.Join(", ", errs.Select(x => "'" + x.Alias + "'"))} which {(errs.Count == 1 ? "is" : "are")} not.");
             }
         }
 

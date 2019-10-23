@@ -56,17 +56,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
             ServerVariablesParser.Parsing += (sender, serverVars) =>
             {
                 if (!serverVars.ContainsKey("umbracoUrls"))
-                    throw new Exception("Missing umbracoUrls.");
+                    throw new ArgumentException("Missing umbracoUrls.");
                 var umbracoUrlsObject = serverVars["umbracoUrls"];
                 if (umbracoUrlsObject == null)
-                    throw new Exception("Null umbracoUrls");
+                    throw new ArgumentException("Null umbracoUrls");
                 if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
-                    throw new Exception("Invalid umbracoUrls");
+                    throw new ArgumentException("Invalid umbracoUrls");
 
                 if (!serverVars.ContainsKey("umbracoPlugins"))
-                    throw new Exception("Missing umbracoPlugins.");
+                    throw new ArgumentException("Missing umbracoPlugins.");
                 if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
-                    throw new Exception("Invalid umbracoPlugins");
+                    throw new ArgumentException("Invalid umbracoPlugins");
 
                 if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
                 var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
