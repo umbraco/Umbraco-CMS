@@ -97,7 +97,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             return new Dashboard
             {
-                Enable = _config.Enable,
+                Enable = true,
                 Text = BuilderDashboardHelper.Text(),
                 CanGenerate = BuilderDashboardHelper.CanGenerate(),
                 OutOfDateModels = BuilderDashboardHelper.AreModelsOutOfDate(),

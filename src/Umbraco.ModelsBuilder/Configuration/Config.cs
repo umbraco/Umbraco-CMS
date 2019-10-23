@@ -22,19 +22,12 @@ namespace Umbraco.ModelsBuilder.Configuration
         {
             const string prefix = "Umbraco.ModelsBuilder.";
 
-            // giant kill switch, default: false
-            // must be explicitely set to true for anything else to happen
-            Enable = ConfigurationManager.AppSettings[prefix + "Enable"] == "true";
-
             // ensure defaults are initialized for tests
             ModelsNamespace = DefaultModelsNamespace;
             ModelsDirectory = HostingEnvironment.IsHosted
                 ? HostingEnvironment.MapPath(DefaultModelsDirectory)
                 : DefaultModelsDirectory.TrimStart("~/");
             DebugLevel = 0;
-
-            // stop here, everything is false
-            if (!Enable) return;
 
             // mode
             var modelsMode = ConfigurationManager.AppSettings[prefix + "ModelsMode"];
@@ -105,7 +98,6 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// Initializes a new instance of the <see cref="Config"/> class.
         /// </summary>
         public Config(
-            bool enable = false,
             ModelsMode modelsMode = ModelsMode.Nothing,
             string modelsNamespace = null,
             bool enableFactory = true,
@@ -114,7 +106,6 @@ namespace Umbraco.ModelsBuilder.Configuration
             bool acceptUnsafeModelsDirectory = false,
             int debugLevel = 0)
         {
-            Enable = enable;
             ModelsMode = modelsMode;
 
             ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
@@ -155,15 +146,6 @@ namespace Umbraco.ModelsBuilder.Configuration
 
             throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
         }
-
-        /// <summary>
-        /// Gets a value indicating whether the whole models experience is enabled.
-        /// </summary>
-        /// <remarks>
-        ///     <para>If this is false then absolutely nothing happens.</para>
-        ///     <para>Default value is <c>false</c> which means that unless we have this setting, nothing happens.</para>
-        /// </remarks>
-        public bool Enable { get; }
 
         /// <summary>
         /// Gets the models mode.

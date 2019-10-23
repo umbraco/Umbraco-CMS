@@ -39,32 +39,28 @@ namespace Umbraco.ModelsBuilder.Validation
 
         protected override IEnumerable<ValidationResult> Validate(TModel model)
         {
-            //don't do anything if we're not enabled
-            if (Config.Enable)
+            var properties = model.Groups.SelectMany(x => x.Properties)
+                .Where(x => x.Inherited == false)
+                .ToArray();
+
+            foreach (var prop in properties)
             {
-                var properties = model.Groups.SelectMany(x => x.Properties)
-                    .Where(x => x.Inherited == false)
-                    .ToArray();
+                var propertyGroup = model.Groups.Single(x => x.Properties.Contains(prop));
 
-                foreach (var prop in properties)
-                {
-                    var propertyGroup = model.Groups.Single(x => x.Properties.Contains(prop));
-
-                    if (model.Alias.ToLowerInvariant() == prop.Alias.ToLowerInvariant())
-                        yield return new ValidationResult(string.Format("With Models Builder enabled, you can't have a property with a the alias \"{0}\" when the content type alias is also \"{0}\".", prop.Alias), new[]
+                if (model.Alias.ToLowerInvariant() == prop.Alias.ToLowerInvariant())
+                    yield return new ValidationResult(string.Format("With Models Builder enabled, you can't have a property with a the alias \"{0}\" when the content type alias is also \"{0}\".", prop.Alias), new[]
                     {
                         string.Format("Groups[{0}].Properties[{1}].Alias", model.Groups.IndexOf(propertyGroup), propertyGroup.Properties.IndexOf(prop))
                     });
 
-                    //we need to return the field name with an index so it's wired up correctly
-                    var groupIndex = model.Groups.IndexOf(propertyGroup);
-                    var propertyIndex = propertyGroup.Properties.IndexOf(prop);
+                //we need to return the field name with an index so it's wired up correctly
+                var groupIndex = model.Groups.IndexOf(propertyGroup);
+                var propertyIndex = propertyGroup.Properties.IndexOf(prop);
 
-                    var validationResult = ValidateProperty(prop, groupIndex, propertyIndex);
-                    if (validationResult != null)
-                    {
-                        yield return validationResult;
-                    }
+                var validationResult = ValidateProperty(prop, groupIndex, propertyIndex);
+                if (validationResult != null)
+                {
+                    yield return validationResult;
                 }
             }
         }

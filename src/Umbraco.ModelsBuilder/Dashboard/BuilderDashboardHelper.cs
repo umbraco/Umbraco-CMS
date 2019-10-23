@@ -28,9 +28,6 @@ namespace Umbraco.ModelsBuilder.Dashboard
         {
             var config = Config;
 
-            if (!config.Enable)
-                return "Version: " + Api.ApiVersion.Current.Version + "<br />&nbsp;<br />ModelsBuilder is disabled<br />(the .Enable key is missing, or its value is not 'true').";
-
             var sb = new StringBuilder();
 
             sb.Append("Version: ");

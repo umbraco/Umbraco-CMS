@@ -35,8 +35,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
-            if (_config.Enable)
-                FileService.SavingTemplate += FileService_SavingTemplate;
+            FileService.SavingTemplate += FileService_SavingTemplate;
 
             // fixme LiveModelsProvider should not be static
             if (_config.ModelsMode.IsLiveNotPure())
@@ -80,7 +79,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             var settings = new Dictionary<string, object>
             {
-                {"enabled", _config.Enable}
+                {"enabled", true}
             };
 
             return settings;
