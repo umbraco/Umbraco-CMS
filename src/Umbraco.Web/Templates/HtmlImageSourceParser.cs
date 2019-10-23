@@ -14,9 +14,9 @@ using Umbraco.Web.Routing;
 namespace Umbraco.Web.Templates
 {
 
-    public sealed class ImageSourceParser
+    public sealed class HtmlImageSourceParser
     {
-        public ImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
@@ -99,10 +99,17 @@ namespace Umbraco.Web.Templates
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        internal string RemoveImageSources(string text)
+        public string RemoveImageSources(string text)
             // see comment in ResolveMediaFromTextString for group reference
             => ResolveImgPattern.Replace(text, "$1$3$4$5");
 
+        /// <summary>
+        /// Used by the RTE (and grid RTE) for drag/drop/persisting images
+        /// </summary>
+        /// <param name="html"></param>
+        /// <param name="mediaParentFolder"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         internal string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId)
         {
             // Find all img's that has data-tmpimg attribute
@@ -199,7 +206,7 @@ namespace Umbraco.Web.Templates
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error(typeof(ImageSourceParser), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+                        _logger.Error(typeof(HtmlImageSourceParser), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
                     }
                 }
             }

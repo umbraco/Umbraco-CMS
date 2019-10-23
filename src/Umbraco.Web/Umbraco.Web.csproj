@@ -247,9 +247,9 @@
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
-    <Compile Include="Templates\LocalLinkParser.cs" />
-    <Compile Include="Templates\ImageSourceParser.cs" />
-    <Compile Include="Templates\UrlParser.cs" />
+    <Compile Include="Templates\HtmlLocalLinkParser.cs" />
+    <Compile Include="Templates\HtmlImageSourceParser.cs" />
+    <Compile Include="Templates\HtmlUrlParser.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="UmbracoContextReference.cs" />
     <Compile Include="ViewDataExtensions.cs" />

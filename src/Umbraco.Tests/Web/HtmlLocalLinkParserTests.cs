@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Web
 {
 
     [TestFixture]
-    public class InternalLinkParserTests
+    public class HtmlLocalLinkParserTests
     {
         [TestCase("", "")]
         [TestCase("hello href=\"{localLink:1234}\" world ", "hello href=\"/my-test-url\" world ")]
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Web
                 mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
                 mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
-                var linkParser = new LocalLinkParser(umbracoContextAccessor);
+                var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
 
                 var output = linkParser.EnsureInternalLinks(input);
 

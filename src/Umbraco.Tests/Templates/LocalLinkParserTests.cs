@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Templates
 </p>";
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
-            var parser = new LocalLinkParser(umbracoContextAccessor);
+            var parser = new HtmlLocalLinkParser(umbracoContextAccessor);
 
             var result = parser.FindUdisFromLocalLinks(input).ToList();
 

@@ -26,18 +26,18 @@ namespace Umbraco.Web.PropertyEditors
     public class RichTextPropertyEditor : DataEditor
     {
         private IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly ImageSourceParser _mediaParser;
-        private readonly LocalLinkParser _localLinkParser;
+        private readonly HtmlImageSourceParser _imageSourceParser;
+        private readonly HtmlLocalLinkParser _localLinkParser;
 
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ImageSourceParser mediaParser, LocalLinkParser localLinkParser)
+        public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser)
             : base(logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
-            _mediaParser = mediaParser;
+            _imageSourceParser = imageSourceParser;
             _localLinkParser = localLinkParser;
         }
 
@@ -45,7 +45,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, _mediaParser, _localLinkParser);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser, _localLinkParser);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
@@ -57,14 +57,14 @@ namespace Umbraco.Web.PropertyEditors
         internal class RichTextPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private IUmbracoContextAccessor _umbracoContextAccessor;
-            private readonly ImageSourceParser _mediaParser;
-            private readonly LocalLinkParser _localLinkParser;
+            private readonly HtmlImageSourceParser _imageSourceParser;
+            private readonly HtmlLocalLinkParser _localLinkParser;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, ImageSourceParser mediaParser, LocalLinkParser localLinkParser)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser)
                 : base(attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
-                _mediaParser = mediaParser;
+                _imageSourceParser = imageSourceParser;
                 _localLinkParser = localLinkParser;
             }
 
@@ -97,7 +97,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (val == null)
                     return null;
 
-                var propertyValueWithMediaResolved = _mediaParser.EnsureImageSources(val.ToString());
+                var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(val.ToString());
                 var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(propertyValueWithMediaResolved, new Dictionary<string, string>());
                 return parsed;
             }
@@ -119,8 +119,8 @@ namespace Umbraco.Web.PropertyEditors
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                var parseAndSavedTempImages = _mediaParser.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId);
-                var editorValueWithMediaUrlsRemoved = _mediaParser.RemoveImageSources(parseAndSavedTempImages);
+                var parseAndSavedTempImages = _imageSourceParser.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId);
+                var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 
                 return parsed;
@@ -135,7 +135,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-                foreach (var udi in _mediaParser.FindUdisFromDataAttributes(asString))
+                foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString))
                     yield return udi;
 
                 foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))

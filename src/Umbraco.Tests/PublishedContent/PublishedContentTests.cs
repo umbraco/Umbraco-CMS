@@ -46,13 +46,13 @@ namespace Umbraco.Tests.PublishedContent
             var mediaService = Mock.Of<IMediaService>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
-            var mediaParser = new ImageSourceParser(umbracoContextAccessor, logger, mediaService, contentTypeBaseServiceProvider);
-            var localLinkParser = new LocalLinkParser(umbracoContextAccessor);
+            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor, logger, mediaService, contentTypeBaseServiceProvider);
+            var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(logger)) { Id = 1 },
                 new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger, umbracoContextAccessor, mediaParser, localLinkParser)) { Id = 1002 },
+                new DataType(new RichTextPropertyEditor(logger, umbracoContextAccessor, imageSourceParser, linkParser)) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(logger)) { Id = 1005 });

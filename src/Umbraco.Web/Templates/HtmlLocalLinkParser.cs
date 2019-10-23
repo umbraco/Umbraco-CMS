@@ -11,7 +11,7 @@ namespace Umbraco.Web.Templates
     /// <summary>
     /// Utility class used to parse internal links
     /// </summary>
-    public sealed class LocalLinkParser
+    public sealed class HtmlLocalLinkParser
     {
 
         private static readonly Regex LocalLinkPattern = new Regex(@"href=""[/]?(?:\{|\%7B)localLink:([a-zA-Z0-9-://]+)(?:\}|\%7D)",
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Templates
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public LocalLinkParser(IUmbracoContextAccessor umbracoContextAccessor)
+        public HtmlLocalLinkParser(IUmbracoContextAccessor umbracoContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }

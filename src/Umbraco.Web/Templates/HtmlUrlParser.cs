@@ -5,7 +5,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Templates
 {
-    public sealed class UrlParser
+    public sealed class HtmlUrlParser
     {
         private readonly IContentSection _contentSection;
         private readonly IProfilingLogger _logger;
@@ -13,7 +13,7 @@ namespace Umbraco.Web.Templates
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public UrlParser(IContentSection contentSection, IProfilingLogger logger)
+        public HtmlUrlParser(IContentSection contentSection, IProfilingLogger logger)
         {
             _contentSection = contentSection;
             _logger = logger;
