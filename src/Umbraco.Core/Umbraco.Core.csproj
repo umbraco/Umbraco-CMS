@@ -984,7 +984,6 @@
     <Compile Include="Persistence\DatabaseModelDefinitions\ModificationType.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\SystemMethods.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\TableDefinition.cs" />
-    <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
     <Compile Include="Persistence\DbCommandExtensions.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />

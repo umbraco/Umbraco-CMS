@@ -130,7 +130,7 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
             // navigation
             vm.labels.settings = values[0];
             vm.labels.parameters = values[1];
-
+            
             vm.page.navigation = [
                 {
                     "name": vm.labels.settings,
