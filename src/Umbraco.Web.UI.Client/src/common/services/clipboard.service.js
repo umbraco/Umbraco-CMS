@@ -71,26 +71,27 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @methodOf umbraco.services.clipboardService
     *
     * @param {string} type A string defining the type of data to storing, example: 'elementType', 'contentNode'
-    * @param {string} alias A string defining the alias of the data to store, example: 'product' or ['banana', 'apple']
-    * @param {object} data A object containing the properties to be saved.
+    * @param {string} alias A string defining the alias of the data to store, example: 'product'
+    * @param {object} entry A object containing the properties to be saved, this could be the object of a ElementType, ContentNode, ...
+    * @param {string} displayLabel (optional) A string swetting the label to display when showing paste entries.
     *
     * @description
     * Saves a single JS-object with a type and alias to the clipboard.
     */
-    service.copy = function(type, alias, entryData) {
+    service.copy = function(type, alias, entry, displayLabel) {
         
         var storage = retriveStorage();
 
-        var key = entryData.key || entryData.$$hashKey || console.error("missing unique key for this content");
+        var uniqueKey = entry.key || entry.$$hashKey || console.error("missing unique key for this content");
         
         // remove previous copies of this entry:
         storage.entries = storage.entries.filter(
             (entry) => {
-                return entry.unique !== key;
+                return entry.unique !== uniqueKey;
             }
         );
         
-        var entry = {unique:key, type:type, alias:alias, data:prepareEntryForStorage(entryData)};
+        var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(entry), label:displayLabel || entry.name};
         storage.entries.push(entry);
         
         if (saveStorage(storage) === true) {
@@ -108,15 +109,16 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @methodOf umbraco.services.clipboardService
     *
     * @param {string} type A string defining the type of data to storing, example: 'elementTypeArray', 'contentNodeArray'
-    * @param {string} aliases An array of strings defining the alias of the data to store, example: 'product' or ['banana', 'apple']
-    * @param {object} entries An array of objects of objects containing the properties to be saved.
-    * @param {string} displayLabel A string or array of string defining the alias of the data to store, example: 'product' or ['banana', 'apple']
+    * @param {string} aliases An array of strings defining the alias of the data to store, example: ['banana', 'apple']
+    * @param {object} entries An array of objects of objects containing the properties to be saved, example: [ElementType, ElementType, ...]
+    * @param {string} displayLabel A string setting the label to display when showing paste entries.
+    * @param {string} uniqueKey A string prodiving an identifier for this entry, existing entries with this key will be removed to ensure that you only have the latest copy of this data.
     *
     * @description
     * Saves a single JS-object with a type and alias to the clipboard.
     */
-   service.copyArray = function(type, aliases, entries, displayLabel, key) {
-        
+   service.copyArray = function(type, aliases, entries, displayLabel, displayIcon, uniqueKey) {
+    
     var storage = retriveStorage();
     
     // Clean up each entry
@@ -126,7 +128,14 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         }
     );
     
-    var entry = {unique:key, type:type, aliases:aliases, data:copiedEntries};
+    // remove previous copies of this entry:
+    storage.entries = storage.entries.filter(
+        (entry) => {
+            return entry.unique !== uniqueKey;
+        }
+    );
+    
+    var entry = {unique:uniqueKey, type:type, aliases:aliases, data:copiedEntries, label:displayLabel, icon:displayIcon};
     storage.entries.push(entry);
     
     if (saveStorage(storage) === true) {

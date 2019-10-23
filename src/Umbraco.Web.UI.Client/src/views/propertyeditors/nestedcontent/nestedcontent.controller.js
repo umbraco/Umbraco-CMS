@@ -209,13 +209,22 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.overlayMenu.size = $scope.overlayMenu.availableItems.length > 6 ? "medium" : "small";
             
             $scope.overlayMenu.pasteItems = [];
-            var availableNodesForPaste = clipboardService.retriveDataOfType("elementType", contentTypeAliases);
-            _.each(availableNodesForPaste, function (node) {
+
+            var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", contentTypeAliases);
+            _.each(singleEntriesForPaste, function (entry) {
                 $scope.overlayMenu.pasteItems.push({
-                    alias: node.contentTypeAlias,
-                    name: node.name, //contentTypeName
-                    data: node,
-                    icon: iconHelper.convertFromLegacyIcon(node.icon)
+                    name: entry.label,
+                    data: entry.data,
+                    icon: iconHelper.convertFromLegacyIcon(entry.data.icon)
+                });
+            });
+            
+            var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", contentTypeAliases);
+            _.each(arrayEntriesForPaste, function (entry) {
+                $scope.overlayMenu.pasteItems.push({
+                    name: entry.label,
+                    data: entry.data,
+                    icon: entry.icon
                 });
             });
             
@@ -390,7 +399,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $event.stopPropagation();
         }
         
-        var copyAllEntries = function() {
+        var copyAllEntries = function($event) {
             
             syncCurrentNode();
             
@@ -398,7 +407,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return node.contentTypeAlias;
             });
             
-            clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes);
+            console.log("Potential ID:", $scope.model);
+
+            clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes, "All from ...", "1234", "documents");
             $event.stopPropagation();
         }
         
