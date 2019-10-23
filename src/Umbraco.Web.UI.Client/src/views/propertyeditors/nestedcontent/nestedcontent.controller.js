@@ -175,7 +175,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 view: "itempicker",
                 event: $event,
                 clickPasteItem: function(item) {
-                    $scope.pasteFromClipboard(item.data);
+                    if (item.type === "elementTypeArray") {
+                        _.each(item.data, function (entry) {
+                            $scope.pasteFromClipboard(entry);
+                        });
+                    } else {
+                        $scope.pasteFromClipboard(item.data);
+                    }
                     $scope.overlayMenu.show = false;
                     $scope.overlayMenu = null;
                 },
@@ -213,15 +219,18 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", contentTypeAliases);
             _.each(singleEntriesForPaste, function (entry) {
                 $scope.overlayMenu.pasteItems.push({
+                    type: "elementType",
                     name: entry.label,
                     data: entry.data,
-                    icon: iconHelper.convertFromLegacyIcon(entry.data.icon)
+                    icon: entry.icon
                 });
             });
             
             var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", contentTypeAliases);
+            console.log(arrayEntriesForPaste);
             _.each(arrayEntriesForPaste, function (entry) {
                 $scope.overlayMenu.pasteItems.push({
+                    type: "elementTypeArray",
                     name: entry.label,
                     data: entry.data,
                     icon: entry.icon
@@ -234,6 +243,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 $event.stopPropagation();
                 $event.preventDefault();
                 clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
+                clipboardService.clearEntriesOfType("elementTypeArray", contentTypeAliases);
                 $scope.overlayMenu.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
             };
             
@@ -407,9 +417,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return node.contentTypeAlias;
             });
             
-            console.log("Potential ID:", $scope.model);
-
-            clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes, "All from ...", "1234", "documents");
+            clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes, "All from ...", "documents", $scope.model.id);
             $event.stopPropagation();
         }
         
@@ -430,7 +438,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
         
         function checkAbilityToPasteContent() {
-            $scope.showPaste = clipboardService.hasEntriesOfType("elementType", contentTypeAliases);
+            $scope.showPaste = clipboardService.hasEntriesOfType("elementType", contentTypeAliases) || clipboardService.hasEntriesOfType("elementTypeArray", contentTypeAliases);
         }
         
         eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);

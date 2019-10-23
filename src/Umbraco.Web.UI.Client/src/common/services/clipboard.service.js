@@ -10,7 +10,7 @@
  * The service has a set way for defining a data-set by a entryType and alias, which later will be used to retrive the posible entries for a paste scenario.
  *
  */
-function clipboardService(notificationsService, eventsService, localStorageService) {
+function clipboardService(notificationsService, eventsService, localStorageService, iconHelper) {
     
     
     var STORAGE_KEY = "umbClipboardService";
@@ -78,11 +78,11 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @description
     * Saves a single JS-object with a type and alias to the clipboard.
     */
-    service.copy = function(type, alias, entry, displayLabel) {
+    service.copy = function(type, alias, data, displayLabel) {
         
         var storage = retriveStorage();
 
-        var uniqueKey = entry.key || entry.$$hashKey || console.error("missing unique key for this content");
+        var uniqueKey = data.key || data.$$hashKey || console.error("missing unique key for this content");
         
         // remove previous copies of this entry:
         storage.entries = storage.entries.filter(
@@ -91,7 +91,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
             }
         );
         
-        var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(entry), label:displayLabel || entry.name};
+        var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(data), label:displayLabel || data.name, icon:iconHelper.convertFromLegacyIcon(data.icon)};
         storage.entries.push(entry);
         
         if (saveStorage(storage) === true) {
@@ -110,21 +110,22 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     *
     * @param {string} type A string defining the type of data to storing, example: 'elementTypeArray', 'contentNodeArray'
     * @param {string} aliases An array of strings defining the alias of the data to store, example: ['banana', 'apple']
-    * @param {object} entries An array of objects of objects containing the properties to be saved, example: [ElementType, ElementType, ...]
+    * @param {object} datas An array of objects containing the properties to be saved, example: [ElementType, ElementType, ...]
     * @param {string} displayLabel A string setting the label to display when showing paste entries.
+    * @param {string} displayIcon A string setting the icon to display when showing paste entries.
     * @param {string} uniqueKey A string prodiving an identifier for this entry, existing entries with this key will be removed to ensure that you only have the latest copy of this data.
     *
     * @description
     * Saves a single JS-object with a type and alias to the clipboard.
     */
-   service.copyArray = function(type, aliases, entries, displayLabel, displayIcon, uniqueKey) {
+   service.copyArray = function(type, aliases, datas, displayLabel, displayIcon, uniqueKey) {
     
     var storage = retriveStorage();
     
     // Clean up each entry
-    var copiedEntries = entries.filter(
-        (entry) => {
-            return prepareEntryForStorage(entry);
+    var copiedDatas = datas.filter(
+        (data) => {
+            return prepareEntryForStorage(data);
         }
     );
     
@@ -135,7 +136,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         }
     );
     
-    var entry = {unique:uniqueKey, type:type, aliases:aliases, data:copiedEntries, label:displayLabel, icon:displayIcon};
+    var entry = {unique:uniqueKey, type:type, aliases:aliases, data:copiedDatas, label:displayLabel, icon:displayIcon};
     storage.entries.push(entry);
     
     if (saveStorage(storage) === true) {
