@@ -36,7 +36,7 @@
                     view: 'views/components/umb-list-view-settings-overlay.html',
                     hideDescription: true,
                     hideIcon: true,
-                    size: 'small',
+                    size: 'medium',
                     dataType: scope.dataType,
                     title: 'List view settings',
                     submit: model => {
