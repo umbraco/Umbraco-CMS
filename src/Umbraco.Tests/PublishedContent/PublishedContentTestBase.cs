@@ -39,11 +39,13 @@ namespace Umbraco.Tests.PublishedContent
             base.Initialize();
 
             var converters = Factory.GetInstance<PropertyValueConverterCollection>();
-            var umbracoCtxAccessor = Mock.Of<IUmbracoContextAccessor>();
+            var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var logger = Mock.Of<ILogger>();
 
+            var imageSourceParser = new ImageSourceParser(umbracoContextAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
+            var localLinkParser = new LocalLinkParser(umbracoContextAccessor);
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new RichTextPropertyEditor(logger, umbracoCtxAccessor, new ImageSourceParser(umbracoCtxAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>()))) { Id = 1 });
+                new DataType(new RichTextPropertyEditor(logger, umbracoContextAccessor, imageSourceParser, localLinkParser)) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 
