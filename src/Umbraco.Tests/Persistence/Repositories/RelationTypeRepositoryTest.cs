@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(relationTypes, Is.Not.Null);
                 Assert.That(relationTypes.Any(), Is.True);
                 Assert.That(relationTypes.Any(x => x == null), Is.False);
-                Assert.That(relationTypes.Count(), Is.EqualTo(5));
+                Assert.That(relationTypes.Count(), Is.EqualTo(7));
             }
         }
 
