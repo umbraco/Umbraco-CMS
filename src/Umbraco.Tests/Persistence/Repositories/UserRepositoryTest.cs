@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
             var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
-            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, propertyEditors);
+            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors);
             return repository;
         }
 
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
             var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
-            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, propertyEditors);
+            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors);
             return repository;
         }
 

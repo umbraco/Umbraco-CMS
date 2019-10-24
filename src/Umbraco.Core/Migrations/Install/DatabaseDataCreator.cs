@@ -318,6 +318,16 @@ namespace Umbraco.Core.Migrations.Install
             relationType = new RelationTypeDto { Id = 3, Alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias, ChildObjectType = Constants.ObjectTypes.Media, ParentObjectType = Constants.ObjectTypes.Media, Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName };
             relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
+
+            //TODO: We need to decide if we are going to change the relations APIs since it's pretty crappy that we have to explicitly define all relation type object type combinations...
+
+            relationType = new RelationTypeDto { Id = 4, Alias = Constants.Conventions.RelationTypes.RelatedMediaAlias, ChildObjectType = Constants.ObjectTypes.Media, ParentObjectType = Constants.ObjectTypes.Document, Dual = false, Name = Constants.Conventions.RelationTypes.RelatedMediaName };
+            relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
+            _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
+
+            relationType = new RelationTypeDto { Id = 4, Alias = Constants.Conventions.RelationTypes.RelatedDocumentAlias, ChildObjectType = Constants.ObjectTypes.Document, ParentObjectType = Constants.ObjectTypes.Document, Dual = false, Name = Constants.Conventions.RelationTypes.RelatedDocumentName };
+            relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
+            _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
         }
 
         private void CreateKeyValueData()

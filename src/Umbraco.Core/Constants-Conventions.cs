@@ -309,32 +309,52 @@ namespace Umbraco.Core
             public static class RelationTypes
             {
                 /// <summary>
-                /// ContentType name for default relation type "Relate Document On Copy".
+                /// Name for default relation type "Related Media".
+                /// </summary>
+                public const string RelatedMediaName = "Related Media";
+
+                /// <summary>
+                /// Alias for default relation type "Related Media"
+                /// </summary>
+                public const string RelatedMediaAlias = "umbMedia";
+
+                /// <summary>
+                /// Name for default relation type "Related Document".
+                /// </summary>
+                public const string RelatedDocumentName = "Related Document";
+
+                /// <summary>
+                /// Alias for default relation type "Related Document"
+                /// </summary>
+                public const string RelatedDocumentAlias = "umbDocument";
+
+                /// <summary>
+                /// Name for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyName = "Relate Document On Copy";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Document On Copy".
+                /// Alias for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyAlias = "relateDocumentOnCopy";
 
                 /// <summary>
-                /// ContentType name for default relation type "Relate Parent Document On Delete".
+                /// Name for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteName = "Relate Parent Document On Delete";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Parent Document On Delete".
+                /// Alias for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
 
                 /// <summary>
-                /// ContentType name for default relation type "Relate Parent Media Folder On Delete".
+                /// Name for default relation type "Relate Parent Media Folder On Delete".
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteName = "Relate Parent Media Folder On Delete";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Parent Media Folder On Delete".
+                /// Alias for default relation type "Relate Parent Media Folder On Delete".
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
             }

@@ -368,7 +368,7 @@ namespace Umbraco.Core
             return (udi1 == udi2) == false;
         }
 
-        private class UnknownTypeUdi : Udi
+        internal class UnknownTypeUdi : Udi
         {
             private UnknownTypeUdi()
                 : base("unknown", "umb://unknown/")

@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Services
             var relationTypeRepository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, Logger);
             var relationRepository = new RelationRepository((IScopeAccessor)provider, Logger, relationTypeRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
-            var repository = new DocumentRepository((IScopeAccessor)provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository, relationRepository, propertyEditors);
+            var repository = new DocumentRepository((IScopeAccessor)provider, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository, relationRepository, relationTypeRepository, propertyEditors);
             return repository;
         }
 

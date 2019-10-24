@@ -96,7 +96,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="relationType"><see cref="RelationType"/> to retrieve Relations for</param>
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
-        public IEnumerable<IRelation> GetAllRelationsByRelationType(RelationType relationType)
+        public IEnumerable<IRelation> GetAllRelationsByRelationType(IRelationType relationType)
         {
             return GetAllRelationsByRelationType(relationType.Id);
         }
@@ -641,6 +641,8 @@ namespace Umbraco.Core.Services.Implement
             {
                 var query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
                 relations.AddRange(_relationRepository.Get(query).ToList());
+
+                //TODO: N+1, we should be able to do this in a single call
 
                 foreach (var relation in relations)
                     _relationRepository.Delete(relation);

@@ -23,5 +23,7 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual(rt.Name, "repeatedEventOccurence");
         }
+
+        //TODO: Create a relation for entities of the wrong Entity Type (GUID) based on the Relation Type's defined parent/child object types
     }
 }

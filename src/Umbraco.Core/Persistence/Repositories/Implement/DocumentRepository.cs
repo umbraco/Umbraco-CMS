@@ -45,9 +45,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
         /// </param>
         public DocumentRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger,
-            IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository,
+            IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
             Lazy<PropertyEditorCollection> propertyEditors)
-            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, propertyEditors)
+            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));

@@ -47,7 +47,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="relationType"><see cref="RelationType"/> to retrieve Relations for</param>
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
-        IEnumerable<IRelation> GetAllRelationsByRelationType(RelationType relationType);
+        IEnumerable<IRelation> GetAllRelationsByRelationType(IRelationType relationType);
 
         /// <summary>
         /// Gets all <see cref="Relation"/> objects by their <see cref="RelationType"/>'s Id

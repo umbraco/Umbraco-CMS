@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
@@ -135,15 +136,15 @@ namespace Umbraco.Web.PropertyEditors
             /// </summary>
             /// <param name="value"></param>
             /// <returns></returns>
-            public IEnumerable<Udi> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
             {
                 var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
 
                 foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString))
-                    yield return udi;
+                    yield return new UmbracoEntityReference(udi, Constants.Conventions.RelationTypes.RelatedMediaAlias);
 
                 foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
-                    yield return udi;
+                    yield return new UmbracoEntityReference(udi, Constants.Conventions.RelationTypes.RelatedMediaAlias);
 
                 //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
             }
