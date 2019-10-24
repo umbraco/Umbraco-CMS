@@ -735,9 +735,9 @@ namespace Umbraco.Web.Scheduling
                 lock (_locker)
                 {
                     if (_runningTask != null)
-                        _runningTask.ContinueWith(_ => Terminate(false));
+                        _runningTask.ContinueWith(_ => StopImmediate());
                     else
-                        Terminate(false);
+                        StopImmediate();
                 }
             }
 
