@@ -122,6 +122,10 @@ namespace Umbraco.Web.PropertyEditors
                             {
                                 // convert the value, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                                if (propEditor == null)
+                                {
+                                    continue;
+                                }
                                 var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
                                 var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
@@ -185,6 +189,11 @@ namespace Umbraco.Web.PropertyEditors
 
                                 // convert that temp property, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                                if(propEditor == null)
+                                {
+                                    propValues[propAlias] = tempProp.GetValue()?.ToString();
+                                    continue;
+                                }
                                 var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
                                 var convValue = valEditor.ToEditor(tempProp, dataTypeService);
@@ -249,6 +258,10 @@ namespace Umbraco.Web.PropertyEditors
 
                             // Lookup the property editor
                             var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                            if (propEditor == null)
+                            {
+                                continue;
+                            }
 
                             // Create a fake content property data object
                             var contentPropData = new ContentPropertyData(propValues[propKey], propConfiguration);
@@ -305,6 +318,11 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             var config = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                             var propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
+
+                            if (propertyEditor == null)
+                            {
+                                continue;
+                            }
 
                             foreach (var validator in propertyEditor.GetValueEditor().Validators)
                             {
