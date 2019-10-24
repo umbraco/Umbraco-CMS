@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.UnpublishController as vm">
 
-    <!-- 1 language -->
+    <!-- Single language -->
     <div ng-if="vm.variants.length === 1">
         <p><localize key="prompt_confirmUnpublish"></localize></p>
     </div>
@@ -15,7 +15,7 @@
     
             <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.publishedVariantFilter">
                 <ng-form name="unpublishVariantSelectorForm">
-                    <div class="flex">
+                    <div>
 
                         <umb-checkbox
                             input-id="{{variant.htmlId}}"
@@ -23,17 +23,15 @@
                             model="variant.save"
                             on-change="vm.changeSelection(variant)"
                             disabled="variant.disabled"
-                            server-validation-field="{{variant.htmlId}}"/>
+                            server-validation-field="{{variant.htmlId}}"
+                            text="{{ variant.language.name }}"
+                        />
 
                         <div>
-                            <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
-                                <span>{{ variant.language.name }}</span>
-
-                                <span class="db umb-list-item__description">
-                                    <umb-variant-state variant="variant"></umb-variant-state>
-                                    <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                                </span>
-                            </label>    
+                            <span class="db umb-list-item__description umb-list-item__description--checkbox">
+                                <umb-variant-state variant="variant"></umb-variant-state>
+                                <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                            </span>
                         </div>
                     </div>
     
@@ -43,7 +41,7 @@
         </div>
             
         <div class="umb-list umb-list--condensed" ng-if="!vm.loading && (vm.variants | filter:vm.unpublishedVariantFilter).length > 0">
-            <div style="margin-bottom: 15px; font-weight: bold;">
+            <div class="bold mb3">
                 <p><localize key="content_unpublishedLanguages"></localize></p>
             </div>
     

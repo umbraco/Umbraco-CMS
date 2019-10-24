@@ -4,7 +4,7 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, overlayService, $location, localStorageService) {
+        editorState, $http, eventsService, overlayService, $location, localStorageService, treeService) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -201,6 +201,12 @@
                 $scope.page.buttonGroupState = "success";
             }));
 
+            evts.push(eventsService.on("rte.shortcut.save", function(){
+                if ($scope.page.showSaveButton) {
+                    $scope.save();
+                }
+            }));
+
             evts.push(eventsService.on("content.saved", function(){
                 // Clear out localstorage keys that start with tinymce__
                 // When we save/perist a content node
@@ -305,7 +311,7 @@
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
-        function syncTreeNode(content, path, initialLoad) {
+        function syncTreeNode(content, path, initialLoad, reloadChildren) {
 
             if (infiniteMode || !path) {
                 return;
@@ -315,6 +321,9 @@
                 navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true })
                     .then(function (syncArgs) {
                         $scope.page.menu.currentNode = syncArgs.node;
+                        if (reloadChildren && syncArgs.node.expanded) {
+                            treeService.loadNodeChildren({node: syncArgs.node});
+                        }
                     }, function () {
                         //handle the rejection
                         console.log("A problem occurred syncing the tree! A path is probably incorrect.")
@@ -446,7 +455,7 @@
                 //needs to be manually set for infinite editing mode
                 $scope.page.isNew = false;
 
-                syncTreeNode($scope.content, data.path);
+                syncTreeNode($scope.content, data.path, false, args.reloadChildren);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
 
@@ -766,16 +775,6 @@
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
-
-                //used to track the original values so if the user doesn't save the schedule and they close the dialog we reset the dates back to what they were.
-                let origDates = [];
-                for (let i = 0; i < $scope.content.variants.length; i++) {
-                    origDates.push({
-                        releaseDate: $scope.content.variants[i].releaseDate,
-                        expireDate: $scope.content.variants[i].expireDate
-                    });
-                }
-
                 if (!isContentCultureVariant()) {
                     //ensure the flags are set
                     $scope.content.variants[0].save = true;
@@ -784,10 +783,17 @@
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/schedule.html",
-                    variants: $scope.content.variants, //set a model property for the dialog
+                    variants:  angular.copy($scope.content.variants), //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                     submitButtonLabelKey: "buttons_schedulePublish",
                     submit: function (model) {
+                        for (let i = 0; i < $scope.content.variants.length; i++) {
+                            $scope.content.variants[i].releaseDate = model.variants[i].releaseDate;
+                            $scope.content.variants[i].expireDate = model.variants[i].expireDate;
+                            $scope.content.variants[i].releaseDateFormatted = model.variants[i].releaseDateFormatted;
+                            $scope.content.variants[i].expireDateFormatted = model.variants[i].expireDateFormatted;
+                        }
+
                         model.submitButtonState = "busy";
                         clearNotifications($scope.content);
 
@@ -810,7 +816,7 @@
                             }
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = $scope.content.variants;
+                            dialog.variants = angular.copy($scope.content.variants);
                             //don't reject, we've handled the error
                             return $q.when(err);
                         });
@@ -818,11 +824,6 @@
                     },
                     close: function () {
                         overlayService.close();
-                        //restore the dates
-                        for (let i = 0; i < $scope.content.variants.length; i++) {
-                            $scope.content.variants[i].releaseDate = origDates[i].releaseDate;
-                            $scope.content.variants[i].expireDate = origDates[i].expireDate;
-                        }
                     }
                 };
                 overlayService.open(dialog);
@@ -859,7 +860,8 @@
                                 return contentResource.publishWithDescendants(content, create, model.includeUnpublished, files, showNotifications);
                             },
                             action: "publishDescendants",
-                            showNotifications: false
+                            showNotifications: false,
+                            reloadChildren: model.includeUnpublished
                         }).then(function (data) {
                             //show all notifications manually here since we disabled showing them automatically in the save method
                             formHelper.showNotifications(data);
