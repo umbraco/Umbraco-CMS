@@ -124,7 +124,6 @@ namespace Umbraco.Web.PropertyEditors
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
                                 if (propEditor == null)
                                 {
-                                    propValues[propAlias] = null;
                                     continue;
                                 }
                                 var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
@@ -259,12 +258,16 @@ namespace Umbraco.Web.PropertyEditors
 
                             // Lookup the property editor
                             var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                            if (propEditor == null)
+                            {
+                                continue;
+                            }
 
                             // Create a fake content property data object
                             var contentPropData = new ContentPropertyData(propValues[propKey], propConfiguration);
 
                             // Get the property editor to do it's conversion
-                            var newValue = propEditor?.GetValueEditor().FromEditor(contentPropData, propValues[propKey]);
+                            var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, propValues[propKey]);
 
                             // Store the value back
                             propValues[propKey] = (newValue == null) ? null : JToken.FromObject(newValue);
