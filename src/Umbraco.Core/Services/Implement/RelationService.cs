@@ -288,7 +288,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         public IUmbracoEntity GetChildEntityFromRelation(IRelation relation)
         {
-            var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
+            var objectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);
             return _entityService.Get(relation.ChildId, objectType);
         }
 
@@ -299,7 +299,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         public IUmbracoEntity GetParentEntityFromRelation(IRelation relation)
         {
-            var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
+            var objectType = ObjectTypes.GetUmbracoObjectType(relation.ParentObjectType);
             return _entityService.Get(relation.ParentId, objectType);
         }
 
@@ -310,8 +310,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>Returns a Tuple with Parent (item1) and Child (item2)</returns>
         public Tuple<IUmbracoEntity, IUmbracoEntity> GetEntitiesFromRelation(IRelation relation)
         {
-            var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
-            var parentObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
+            var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);
+            var parentObjectType = ObjectTypes.GetUmbracoObjectType(relation.ParentObjectType);
 
             var child = _entityService.Get(relation.ChildId, childObjectType);
             var parent = _entityService.Get(relation.ParentId, parentObjectType);
@@ -328,7 +328,7 @@ namespace Umbraco.Core.Services.Implement
         {
             foreach (var relation in relations)
             {
-                var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
+                var objectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);
                 yield return _entityService.Get(relation.ChildId, objectType);
             }
         }
@@ -342,7 +342,7 @@ namespace Umbraco.Core.Services.Implement
         {
             foreach (var relation in relations)
             {
-                var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
+                var objectType = ObjectTypes.GetUmbracoObjectType(relation.ParentObjectType);
                 yield return _entityService.Get(relation.ParentId, objectType);
             }
         }
@@ -356,8 +356,8 @@ namespace Umbraco.Core.Services.Implement
         {
             foreach (var relation in relations)
             {
-                var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
-                var parentObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
+                var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);
+                var parentObjectType = ObjectTypes.GetUmbracoObjectType(relation.ParentObjectType);
 
                 var child = _entityService.Get(relation.ChildId, childObjectType);
                 var parent = _entityService.Get(relation.ParentId, parentObjectType);
@@ -378,6 +378,8 @@ namespace Umbraco.Core.Services.Implement
             // Ensure that the RelationType has an identity before using it to relate two entities
             if (relationType.HasIdentity == false)
                 Save(relationType);
+
+            //TODO: We don't check if this exists first, it will throw some sort of data integrity exception if it already exists, is that ok?
 
             var relation = new Relation(parentId, childId, relationType);
 

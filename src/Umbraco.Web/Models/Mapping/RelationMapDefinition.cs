@@ -29,8 +29,8 @@ namespace Umbraco.Web.Models.Mapping
             target.Path = "-1," + source.Id;
 
             // Set the "friendly" names for the parent and child object types
-            target.ParentObjectTypeName = ObjectTypes.GetUmbracoObjectType(source.ParentObjectType).GetFriendlyName();
-            target.ChildObjectTypeName = ObjectTypes.GetUmbracoObjectType(source.ChildObjectType).GetFriendlyName();
+            target.ParentObjectTypeName = source.ParentObjectType.HasValue ? ObjectTypes.GetUmbracoObjectType(source.ParentObjectType.Value).GetFriendlyName() : string.Empty;
+            target.ChildObjectTypeName = source.ChildObjectType.HasValue ? ObjectTypes.GetUmbracoObjectType(source.ChildObjectType.Value).GetFriendlyName() : string.Empty;
         }
 
         // Umbraco.Code.MapAll -ParentName -ChildName

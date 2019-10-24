@@ -325,7 +325,7 @@ namespace Umbraco.Core.Migrations.Install
             relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
 
-            relationType = new RelationTypeDto { Id = 4, Alias = Constants.Conventions.RelationTypes.RelatedDocumentAlias, ChildObjectType = Constants.ObjectTypes.Document, ParentObjectType = Constants.ObjectTypes.Document, Dual = false, Name = Constants.Conventions.RelationTypes.RelatedDocumentName };
+            relationType = new RelationTypeDto { Id = 5, Alias = Constants.Conventions.RelationTypes.RelatedDocumentAlias, ChildObjectType = Constants.ObjectTypes.Document, ParentObjectType = Constants.ObjectTypes.Document, Dual = false, Name = Constants.Conventions.RelationTypes.RelatedDocumentName };
             relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
         }

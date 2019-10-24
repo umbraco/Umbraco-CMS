@@ -1778,7 +1778,7 @@ namespace Umbraco.Tests.Services
             admin.StartContentIds = new[] {content1.Id};
             ServiceContext.UserService.Save(admin);
 
-            ServiceContext.RelationService.Save(new RelationType(Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, "test"));
+            ServiceContext.RelationService.Save(new RelationType("test", "test", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document));
             Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
 
             ServiceContext.PublicAccessService.Save(new PublicAccessEntry(content1, content2, content2, new List<PublicAccessRule>

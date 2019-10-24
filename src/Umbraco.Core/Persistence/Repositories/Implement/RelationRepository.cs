@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -40,10 +41,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var relationType = _relationTypeRepository.Get(dto.RelationType);
             if (relationType == null)
-                throw new Exception(string.Format("RelationType with Id: {0} doesn't exist", dto.RelationType));
+                throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist", dto.RelationType));
 
-            var factory = new RelationFactory(relationType);
-            return DtoToEntity(dto, factory);
+            return DtoToEntity(dto, relationType);
         }
 
         protected override IEnumerable<IRelation> PerformGetAll(params int[] ids)
@@ -68,26 +68,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<IRelation> DtosToEntities(IEnumerable<RelationDto> dtos)
         {
-            // in most cases, the relation type will be the same for all of them,
-            // plus we've ordered the relations by type, so try to allocate as few
-            // factories as possible - bearing in mind that relation types are cached
-            RelationFactory factory = null;
-            var relationTypeId = -1;
+            //NOTE: This is N+1, BUT ALL relation types are cached so shouldn't matter
 
-            return dtos.Select(x =>
-            {
-                if (relationTypeId != x.RelationType)
-                    factory = new RelationFactory(_relationTypeRepository.Get(relationTypeId = x.RelationType));
-                return DtoToEntity(x, factory);
-            }).ToList();
+            return dtos.Select(x => DtoToEntity(x, _relationTypeRepository.Get(x.RelationType))).ToList();
         }
 
-        private static IRelation DtoToEntity(RelationDto dto, RelationFactory factory)
+        private static IRelation DtoToEntity(RelationDto dto, IRelationType relationType)
         {
-            var entity = factory.BuildEntity(dto);
+            var entity = RelationFactory.BuildEntity(dto, relationType);
 
             // reset dirty initial properties (U4-1946)
-            ((BeingDirtyBase)entity).ResetDirtyProperties(false);
+            entity.ResetDirtyProperties(false);
 
             return entity;
         }
@@ -98,14 +89,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = Sql();
+            if (isCount)
+            {
+                return Sql().SelectCount().From<RelationDto>();
+            }
 
-            sql = isCount
-                ? sql.SelectCount()
-                : sql.Select<RelationDto>();
+            var sql = Sql().Select<RelationDto>()
+                .AndSelect<NodeDto>("uchild", x => Alias(x.NodeObjectType, "childObjectType"))
+                .AndSelect<NodeDto>("uparent", x => Alias(x.NodeObjectType, "parentObjectType"))
+                .From<RelationDto>()
+                .InnerJoin<NodeDto>("uchild").On<RelationDto, NodeDto>((rel, node) => rel.ChildId == node.NodeId, aliasRight: "uchild")
+                .InnerJoin<NodeDto>("uparent").On<RelationDto, NodeDto>((rel, node) => rel.ParentId == node.NodeId, aliasRight: "uparent");
 
-            sql
-               .From<RelationDto>();
 
             return sql;
         }
@@ -137,11 +132,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             entity.AddingEntity();
 
-            var factory = new RelationFactory(entity.RelationType);
-            var dto = factory.BuildDto(entity);
+            var dto = RelationFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
+
             entity.Id = id;
+            PopulateObjectTypes(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -150,9 +146,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             entity.UpdatingEntity();
 
-            var factory = new RelationFactory(entity.RelationType);
-            var dto = factory.BuildDto(entity);
+            var dto = RelationFactory.BuildDto(entity);
             Database.Update(dto);
+
+            PopulateObjectTypes(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -172,6 +169,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             Database.Execute(Sql().Delete<RelationDto>().WhereIn<RelationDto>(x => x.Id, subQuery));
+        }
+
+        private void PopulateObjectTypes(IRelation entity)
+        {
+            var nodes = Database.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == entity.ChildId || x.NodeId == entity.ParentId))
+                .ToDictionary(x => x.NodeId, x => x.NodeObjectType);
+            entity.ParentObjectType = nodes[entity.ParentId].Value;
+            entity.ChildObjectType = nodes[entity.ChildId].Value;
         }
     }
 }
