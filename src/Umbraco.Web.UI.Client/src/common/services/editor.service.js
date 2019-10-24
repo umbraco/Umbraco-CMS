@@ -251,7 +251,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @param {Object} editor rendering options
          * @param {String} editor.view Path to view
-         * @param {String} editor.size Sets the size of the editor ("small"). If nothing is set it will use full width.
+         * @param {String} editor.size Sets the size of the editor ("small" || "medium"). If nothing is set it will use full width.
          */
         function open(editor) {
 
@@ -567,6 +567,7 @@ When building a custom infinite editor view you can use the same components as a
          * @param {Boolean} editor.multiPicker Pick one or multiple items
          * @param {Boolean} editor.onlyImages Only display files that have an image file-extension
          * @param {Boolean} editor.disableFolderSelect Disable folder selection
+         * @param {Boolean} editor.disableFocalPoint Disable focal point editor for selected media
          * @param {Array} editor.updatedMediaNodes A list of ids for media items that have been updated through the media picker
          * @param {Callback} editor.submit Submits the editor
          * @param {Callback} editor.close Closes the editor

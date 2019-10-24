@@ -22,6 +22,7 @@
 </pre>
 
 @param {boolean} model Set to <code>true</code> or <code>false</code> to set the radiobutton to checked or unchecked.
+@param {string} inputId Set the <code>id</code> of the radiobutton.
 @param {string} value Set the value of the radiobutton.
 @param {string} name Set the name of the radiobutton.
 @param {string} text Set the text for the radiobutton label.
@@ -55,6 +56,7 @@
         controllerAs: 'vm',
         bindings: {
             model: "=",
+            inputId: "@",
             value: "@",
             name: "@",
             text: "@",
