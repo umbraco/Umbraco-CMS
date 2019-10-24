@@ -75,6 +75,11 @@
     .tabbing-active &.umb-form-check--checkbox &__input:checked:focus ~ .umb-form-check__state .umb-form-check__check {
         border-color: white;
     }
+    
+    // add spacing between when flexed/inline, equal to the width of the input
+    .flex & + & {
+        margin-left:@checkboxWidth;
+    } 
 
     &__state {
         display: flex;

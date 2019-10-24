@@ -177,8 +177,12 @@ namespace Umbraco.Web.Editors
             var indexName = index.Name;
 
             if (!(index is IIndexDiagnostics indexDiag))
-                indexDiag = new GenericIndexDiagnostics(index);
-
+            {
+                if (index is LuceneIndex luceneIndex)
+                    indexDiag = new LuceneIndexDiagnostics(luceneIndex, Logger);
+                else
+                    indexDiag = new GenericIndexDiagnostics(index);
+            }
 
             var isHealth = indexDiag.IsHealthy();
             var properties = new Dictionary<string, object>

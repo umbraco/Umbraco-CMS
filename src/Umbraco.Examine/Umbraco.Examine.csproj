@@ -64,14 +64,17 @@
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="IContentValueSetBuilder.cs" />
     <Compile Include="IContentValueSetValidator.cs" />
+    <Compile Include="IUmbracoIndexConfig.cs" />
     <Compile Include="IIndexCreator.cs" />
     <Compile Include="IIndexDiagnostics.cs" />
     <Compile Include="IIndexPopulator.cs" />
+    <Compile Include="UmbracoIndexConfig.cs" />
     <Compile Include="IndexPopulator.cs" />
     <Compile Include="IndexRebuilder.cs" />
     <Compile Include="IPublishedContentValueSetBuilder.cs" />
     <Compile Include="IUmbracoIndex.cs" />
     <Compile Include="IValueSetBuilder.cs" />
+    <Compile Include="LuceneIndexDiagnostics.cs" />
     <Compile Include="MediaIndexPopulator.cs" />
     <Compile Include="MediaValueSetBuilder.cs" />
     <Compile Include="MemberIndexPopulator.cs" />
