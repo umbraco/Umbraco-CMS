@@ -279,6 +279,8 @@
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
+    <key alias="nestedContentAddElementType">Add element type</key>
+    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>	
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -572,6 +574,8 @@
     <key alias="selectFolder">Select the folder to move</key>
     <key alias="inTheTree">to in the tree structure below</key>
     <key alias="wasMoved">was moved underneath</key>
+    <key alias="hasReferencesDeleteConsequence"><![CDATA[Deleting <strong>%0%</strong> will delete the properties and their data from the following items]]></key>
+    <key alias="acceptDeleteConsequence">I understand this action will delete the properties and data based on this Data Type</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Your data has been saved, but before you can publish this page there are some errors you need to fix first:</key>
@@ -2170,5 +2174,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
+  </area>
+  <area alias="references">
+    <key alias="tabName">References</key>
+    <key alias="DataTypeNoReferences">This Data Type has no references.</key>
+    <key alias="labelUsedByDocumentTypes">Used in Document Types</key>
+    <key alias="noDocumentTypes">No references to Document Types.</key>
+    <key alias="labelUsedByMediaTypes">Used in Media Types</key>
+    <key alias="noMediaTypes">No references to Media Types.</key>
+    <key alias="labelUsedByMemberTypes">Used in  Member Types</key>
+    <key alias="noMemberTypes">No references to Member Types.</key>
+    <key alias="usedByProperties">Used by</key>
   </area>
 </language>

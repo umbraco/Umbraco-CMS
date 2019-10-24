@@ -252,12 +252,12 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IEnumerable<TItem> GetAll(params Guid[] ids)
+        public IEnumerable<TItem> GetAll(IEnumerable<Guid> ids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
-                return Repository.GetMany(ids);
+                return Repository.GetMany(ids.ToArray());
             }
         }
 
