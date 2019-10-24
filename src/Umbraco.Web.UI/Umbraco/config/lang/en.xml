@@ -411,6 +411,7 @@
     <key alias="cut">Cut</key>
     <key alias="editdictionary">Edit Dictionary Item</key>
     <key alias="editlanguage">Edit Language</key>
+    <key alias="editSelectedMedia">Edit selected media</key>
     <key alias="insertAnchor">Insert local link</key>
     <key alias="insertCharacter">Insert character</key>
     <key alias="insertgraphicheadline">Insert graphic headline</key>
@@ -646,6 +647,7 @@
     <key alias="field">Field</key>
     <key alias="findDocument">Find</key>
     <key alias="first">First</key>
+    <key alias="focalPoint">Focal point</key>
     <key alias="general">General</key>
     <key alias="groups">Groups</key>
     <key alias="group">Group</key>

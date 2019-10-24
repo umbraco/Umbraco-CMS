@@ -408,6 +408,7 @@
     <key alias="cut">Klip</key>
     <key alias="editdictionary">Rediger ordbogsnøgle</key>
     <key alias="editlanguage">Rediger sprog</key>
+    <key alias="editSelectedMedia">Rediger det valgte medie</key>
     <key alias="insertAnchor">Indsæt lokalt link</key>
     <key alias="insertCharacter">Indsæt tegn</key>
     <key alias="insertgraphicheadline">Indsæt grafisk overskrift</key>
@@ -643,6 +644,7 @@
     <key alias="field">Felt</key>
     <key alias="findDocument">Find</key>
     <key alias="first">Første</key>
+    <key alias="focalPoint">Fokuspunkt</key>
     <key alias="general">Generelt</key>
     <key alias="groups">Grupper</key>
     <key alias="group">Gruppe</key>

@@ -123,14 +123,40 @@
                 </div>
 
                 <umb-overlay ng-if="vm.mediaPickerDetailsOverlay.show" model="vm.mediaPickerDetailsOverlay" position="right">
+                
+                <div class="umb-control-group" ng-if="!target.id">
+                    <h5>
+                        <localize key="@general_url"></localize>
+                    </h5>
+                    <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url" />
+                </div>
 
                     <div class="umb-control-group">
+                    <h5>
+                        <localize key="@content_altTextOptional"></localize>
+                    </h5>
+                    <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
+                </div>
+
+                <div class="umb-control-group">
+
+                    <div ng-if="vm.mediaPickerDetailsOverlay.disableFocalPoint && target.thumbnail">
+                        <h5>
+                            <localize key="general_preview">Preview</localize>
+                        </h5>
+
+                        <img ng-src="{{target.thumbnail}}" alt="{{target.name}}" />
+                    </div>
+
+                    <div ng-if="!vm.mediaPickerDetailsOverlay.disableFocalPoint">
+                        <h5>
+                            <localize key="@general_focalPoint">Focal point</localize>
+                        </h5>
 
                         <div ng-if="target.url">
-                            <umb-image-gravity
-                                src="target.url"
-                                center="target.focalPoint"
-                                on-value-changed="vm.focalPointChanged(left, top)">
+                            <umb-image-gravity src="target.url"
+                            center="target.focalPoint"
+							on-value-changed="vm.focalPointChanged(left, top)">
                             </umb-image-gravity>
                         </div>
 
@@ -148,24 +174,9 @@
                             </umb-image-thumbnail>
 
                         </div>
-
                     </div>
 
-                    <div class="umb-control-group">
-                        <label>
-                            <localize key="@general_url"></localize>
-                        </label>
-                        <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url"
-                            ng-disabled="target.id" />
                     </div>
-
-                    <div class="umb-control-group">
-                        <label>
-                            <localize key="@content_altTextOptional"></localize>
-                        </label>
-                        <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
-                    </div>
-
 
                 </umb-overlay>
 
