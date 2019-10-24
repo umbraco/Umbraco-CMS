@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Filters;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
@@ -41,28 +40,30 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (_incomingModel)
             {
-                if (actionExecutedContext.ActionContext.ActionArguments.Any())
+                foreach (var haveUploadedFiles in actionExecutedContext.ActionContext.ActionArguments.Values.OfType<IHaveUploadedFiles>())
                 {
-                    if (actionExecutedContext.ActionContext.ActionArguments.First().Value is IHaveUploadedFiles contentItem)
+                    if (haveUploadedFiles.UploadedFiles == null)
                     {
-                        // Cleanup any files associated
-                        foreach (var f in contentItem.UploadedFiles)
-                        {
-                            // Track all temp folders, so we can remove old files afterwards
-                            var dir = Path.GetDirectoryName(f.TempFilePath);
-                            if (tempFolders.Contains(dir) == false)
-                            {
-                                tempFolders.Add(dir);
-                            }
+                        continue;
+                    }
 
-                            try
-                            {
-                                File.Delete(f.TempFilePath);
-                            }
-                            catch (Exception ex)
-                            {
-                                Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", f.TempFilePath);
-                            }
+                    // Cleanup any files associated
+                    foreach (var uploadedFile in haveUploadedFiles.UploadedFiles)
+                    {
+                        // Track all temp folders, so we can remove old files afterwards
+                        var dir = Path.GetDirectoryName(uploadedFile.TempFilePath);
+                        if (tempFolders.Contains(dir) == false)
+                        {
+                            tempFolders.Add(dir);
+                        }
+
+                        try
+                        {
+                            File.Delete(uploadedFile.TempFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", uploadedFile.TempFilePath);
                         }
                     }
                 }
@@ -72,15 +73,15 @@ namespace Umbraco.Web.WebApi.Filters
                 haveUploadedFiles.UploadedFiles is var uploadedFiles && uploadedFiles != null)
             {
                 // Cleanup any files associated
-                foreach (var f in uploadedFiles)
+                foreach (var uploadedFile in uploadedFiles)
                 {
-                    if (string.IsNullOrWhiteSpace(f.TempFilePath))
+                    if (string.IsNullOrWhiteSpace(uploadedFile.TempFilePath))
                     {
                         continue;
                     }
 
                     // Track all temp folders, so we can remove old files afterwards
-                    var dir = Path.GetDirectoryName(f.TempFilePath);
+                    var dir = Path.GetDirectoryName(uploadedFile.TempFilePath);
                     if (tempFolders.Contains(dir) == false)
                     {
                         tempFolders.Add(dir);
@@ -88,15 +89,15 @@ namespace Umbraco.Web.WebApi.Filters
 
                     try
                     {
-                        File.Delete(f.TempFilePath);
+                        File.Delete(uploadedFile.TempFilePath);
                     }
                     catch (Exception ex)
                     {
-                        Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", f.TempFilePath);
+                        Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", uploadedFile.TempFilePath);
                     }
 
                     // Clear out the temp path, so it's not returned in the response
-                    f.TempFilePath = null;
+                    uploadedFile.TempFilePath = null;
                 }
             }
         }
