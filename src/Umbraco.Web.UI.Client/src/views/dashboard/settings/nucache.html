@@ -16,10 +16,10 @@
                 <div class="umb-panel-group__details-status">
                     <div class="umb-panel-group__details-status-content">
                         <div class="umb-panel-group__details-status-text">
-                            <p ng-show="!vm.working">{{vm.status}}</p>
+                            <p class="umb-panel-group__details-status-action" ng-show="!vm.working">{{vm.status}}</p>
                         </div>
                         <div class="umb-panel-group__details-status-actions">
-                            <div class="umb-panel-group__details-status-action no-background">
+                            <div class="umb-panel-group__details-status-action no-background no-left-padding">
                                 <button type="button" ng-click="vm.verify($event)" class="btn btn-danger">Refresh status</button>
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                     </div>
 
                     <div class="umb-panel-group__details-status-actions">
-                        <div class="umb-panel-group__details-status-action no-background">
+                        <div class="umb-panel-group__details-status-action no-background no-left-padding">
                             <button type="button" ng-click="vm.reload($event)" class="btn btn-danger">Reload</button>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                         properly generated&mdash;which would indicate some critical Umbraco issue.
                     </div>
                     <div class="umb-panel-group__details-status-actions">
-                        <div class="umb-panel-group__details-status-action no-background">
+                        <div class="umb-panel-group__details-status-action no-background no-left-padding">
                             <button type="button" ng-click="vm.rebuild($event)" class="btn btn-danger">Rebuild</button>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                         Unless you know what that means, you probably do <em>not</em> need to use it.
                     </div>
                     <div class="umb-panel-group__details-status-actions">
-                        <div class="umb-panel-group__details-status-action no-background">
+                        <div class="umb-panel-group__details-status-action no-background no-left-padding">
                             <button type="button" ng-click="vm.collect($event)" class="btn btn-danger">Collect</button>
                         </div>
                     </div>
