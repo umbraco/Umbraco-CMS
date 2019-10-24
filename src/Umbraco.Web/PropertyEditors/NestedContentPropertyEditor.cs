@@ -40,14 +40,6 @@ namespace Umbraco.Web.PropertyEditors
         // has to be lazy else circular dep in ctor
         private PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
 
-        private static IContentType GetElementType(JObject item)
-        {
-            var contentTypeAlias = item[ContentTypeAliasPropertyKey]?.ToObject<string>();
-            return string.IsNullOrEmpty(contentTypeAlias)
-                ? null
-                : Current.Services.ContentTypeService.Get(contentTypeAlias);
-        }
-
         #region Pre Value Editor
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor();
@@ -62,11 +54,22 @@ namespace Umbraco.Web.PropertyEditors
         {
             private readonly PropertyEditorCollection _propertyEditors;
 
+            private readonly Lazy<Dictionary<string, IContentType>> _contentTypes = new Lazy<Dictionary<string, IContentType>>(() =>
+                    Current.Services.ContentTypeService.GetAll().ToDictionary(c => c.Alias)
+            );
+
             public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
-                Validators.Add(new NestedContentValidator(propertyEditors));
+                Validators.Add(new NestedContentValidator(propertyEditors, GetElementType));
+            }
+
+
+            private IContentType GetElementType(JObject item)
+            {
+                var contentTypeAlias = item[ContentTypeAliasPropertyKey]?.ToObject<string>() ?? string.Empty;
+                return _contentTypes.Value.ContainsKey(contentTypeAlias) ? _contentTypes.Value[contentTypeAlias] : null;
             }
 
             internal ServiceContext Services => Current.Services;
@@ -272,10 +275,12 @@ namespace Umbraco.Web.PropertyEditors
         internal class NestedContentValidator : IValueValidator
         {
             private readonly PropertyEditorCollection _propertyEditors;
+            private readonly Func<JObject, IContentType> _getElementType;
 
-            public NestedContentValidator(PropertyEditorCollection propertyEditors)
+            public NestedContentValidator(PropertyEditorCollection propertyEditors, Func<JObject, IContentType> getElementType)
             {
                 _propertyEditors = propertyEditors;
+                _getElementType = getElementType;
             }
 
             public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
@@ -293,7 +298,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = (JObject) o;
 
-                    var contentType = GetElementType(propValues);
+                    var contentType = _getElementType(propValues);
                     if (contentType == null) continue;
 
                     var propValueKeys = propValues.Properties().Select(x => x.Name).ToArray();
