@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Filters;
@@ -36,8 +34,6 @@ namespace Umbraco.Web.WebApi.Filters
         {
             base.OnActionExecuted(actionExecutedContext);
 
-            var tempFolders = new List<string>();
-
             if (_incomingModel)
             {
                 foreach (var haveUploadedFiles in actionExecutedContext.ActionContext.ActionArguments.Values.OfType<IHaveUploadedFiles>())
@@ -50,13 +46,6 @@ namespace Umbraco.Web.WebApi.Filters
                     // Cleanup any files associated
                     foreach (var uploadedFile in haveUploadedFiles.UploadedFiles)
                     {
-                        // Track all temp folders, so we can remove old files afterwards
-                        var dir = Path.GetDirectoryName(uploadedFile.TempFilePath);
-                        if (tempFolders.Contains(dir) == false)
-                        {
-                            tempFolders.Add(dir);
-                        }
-
                         try
                         {
                             File.Delete(uploadedFile.TempFilePath);
@@ -78,13 +67,6 @@ namespace Umbraco.Web.WebApi.Filters
                     if (string.IsNullOrWhiteSpace(uploadedFile.TempFilePath))
                     {
                         continue;
-                    }
-
-                    // Track all temp folders, so we can remove old files afterwards
-                    var dir = Path.GetDirectoryName(uploadedFile.TempFilePath);
-                    if (tempFolders.Contains(dir) == false)
-                    {
-                        tempFolders.Add(dir);
                     }
 
                     try
