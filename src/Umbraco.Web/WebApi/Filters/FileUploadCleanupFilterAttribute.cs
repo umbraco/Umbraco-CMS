@@ -13,7 +13,7 @@ using File = System.IO.File;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// Checks if the parameter is IHaveUploadedFiles and then deletes any temporary saved files from file uploads associated with the request.
+    /// Checks if the parameter is IHaveUploadedFiles and then deletes any temporary saved files from file uploads associated with the Response.
     /// </summary>
     /// <seealso cref="System.Web.Http.Filters.ActionFilterAttribute" />
     internal sealed class FileUploadCleanupFilterAttribute : ActionFilterAttribute
@@ -67,55 +67,15 @@ namespace Umbraco.Web.WebApi.Filters
                     }
                 }
             }
-            else
+            else if (actionExecutedContext.Response?.Content is ObjectContent objectContent &&
+                objectContent.Value is IHaveUploadedFiles haveUploadedFiles &&
+                haveUploadedFiles.UploadedFiles is var uploadedFiles && uploadedFiles != null)
             {
-                if (actionExecutedContext.Request == null)
-                {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request is null!!??");
-                    return;
-                }
-
-                if (actionExecutedContext.Request.Content == null)
-                {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is null!!??");
-                    return;
-                }
-
-                ObjectContent objectContent;
-                try
-                {
-                    objectContent = actionExecutedContext.Request.Content as ObjectContent;
-                }
-                catch (Exception ex)
-                {
-                    Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not acquire actionExecutedContext.Request.Content");
-                    return;
-                }
-
-                if (objectContent == null)
-                {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is {RequestObjectType}", actionExecutedContext.Request.Content.GetType());
-                }
-
-                var uploadedFiles = objectContent.Value as IHaveUploadedFiles;
-                if (uploadedFiles == null)
-                {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is {ObjectType}", objectContent.Value.GetType());
-                    return;
-                }
-
-                if (uploadedFiles.UploadedFiles == null)
-                {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The uploadedFiles.UploadedFiles is null!!??");
-                    return;
-                }
-
                 // Cleanup any files associated
-                foreach (var f in uploadedFiles.UploadedFiles)
+                foreach (var f in uploadedFiles)
                 {
-                    if (f.TempFilePath.IsNullOrWhiteSpace())
+                    if (string.IsNullOrWhiteSpace(f.TempFilePath))
                     {
-                        Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The f.TempFilePath is null or whitespace!!??");
                         continue;
                     }
 
@@ -126,8 +86,6 @@ namespace Umbraco.Web.WebApi.Filters
                         tempFolders.Add(dir);
                     }
 
-                    Current.Logger.Debug<FileUploadCleanupFilterAttribute>("Removing temp file {FileName}", f.TempFilePath);
-
                     try
                     {
                         File.Delete(f.TempFilePath);
@@ -137,8 +95,8 @@ namespace Umbraco.Web.WebApi.Filters
                         Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", f.TempFilePath);
                     }
 
-                    // Clear out the temp path so it's not returned in the response
-                    f.TempFilePath = "";
+                    // Clear out the temp path, so it's not returned in the response
+                    f.TempFilePath = null;
                 }
             }
         }
