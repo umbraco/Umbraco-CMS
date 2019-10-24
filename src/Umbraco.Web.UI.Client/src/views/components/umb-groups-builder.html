@@ -49,7 +49,7 @@
             </a>
 
             <!-- TAB ACTIVE OR INACTIVE STATE -->
-            <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" ng-click="activateGroup(tab)" ng-focus="activateGroup(tab)">
+            <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" tabindex="0" ng-focus="activateGroup(tab)">
 
                 <div class="umb-group-builder__group-title-wrapper">
 
