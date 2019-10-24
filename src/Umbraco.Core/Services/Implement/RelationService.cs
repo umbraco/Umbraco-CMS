@@ -326,6 +326,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/></returns>
         public IEnumerable<IUmbracoEntity> GetChildEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
+            //TODO: Argh! N+1 
+
             foreach (var relation in relations)
             {
                 var objectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);
@@ -340,6 +342,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/></returns>
         public IEnumerable<IUmbracoEntity> GetParentEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
+            //TODO: Argh! N+1 
+
             foreach (var relation in relations)
             {
                 var objectType = ObjectTypes.GetUmbracoObjectType(relation.ParentObjectType);
@@ -354,6 +358,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>An enumerable list of <see cref="Tuple"/> with <see cref="IUmbracoEntity"/></returns>
         public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
+            //TODO: Argh! N+1 
+
             foreach (var relation in relations)
             {
                 var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);

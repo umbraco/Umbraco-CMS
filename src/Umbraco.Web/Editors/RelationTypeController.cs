@@ -45,11 +45,8 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var relations = Services.RelationService.GetByRelationTypeId(relationType.Id);
-
             var display = Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
-            display.Relations = Mapper.MapEnumerable<IRelation, RelationDisplay>(relations);
-
+            
             return display;
         }
 
