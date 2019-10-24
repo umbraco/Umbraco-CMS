@@ -2167,5 +2167,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noMemberTypes">No references to Member Types.</key>
     <key alias="usedByProperties">Used by</key>
   </area>
-
+  <area alias="clipboard">
+    <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
+  </area>
 </language>

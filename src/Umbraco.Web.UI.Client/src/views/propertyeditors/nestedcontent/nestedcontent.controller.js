@@ -108,6 +108,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "clipboardService",
     "eventsService",
     "overlayService",
+    "$routeParams",
+    "editorState",
     
     function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState) {
         
@@ -227,7 +229,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             });
             
             var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", contentTypeAliases);
-            console.log(arrayEntriesForPaste);
             _.each(arrayEntriesForPaste, function (entry) {
                 $scope.overlayMenu.pasteItems.push({
                     type: "elementTypeArray",
@@ -412,12 +413,24 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         var copyAllEntries = function($event) {
             
             syncCurrentNode();
-            
-            var aliases = _.reduce($scope.nodes, function (node) {
-                return node.contentTypeAlias;
+
+            // list aliases
+            var aliases = $scope.nodes.map((node) => node.contentTypeAlias);
+
+            // remove dublicates
+            aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
+
+            // Retrive variant name
+            var culture = $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
+            var activeVariant = _.find(editorState.current.variants, function (v) {
+                return !v.language || v.language.culture === culture;
             });
+
+            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [$scope.model.label, activeVariant.name]).then(function(data) {
+                clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes, data, "icon-thumbnail-list", $scope.model.id);
+            });
+
             
-            clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes, "All from ...", "documents", $scope.model.id);
             $event.stopPropagation();
         }
         

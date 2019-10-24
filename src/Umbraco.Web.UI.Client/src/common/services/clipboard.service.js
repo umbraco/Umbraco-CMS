@@ -118,34 +118,33 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @description
     * Saves a single JS-object with a type and alias to the clipboard.
     */
-   service.copyArray = function(type, aliases, datas, displayLabel, displayIcon, uniqueKey) {
-    
-    var storage = retriveStorage();
-    
-    // Clean up each entry
-    var copiedDatas = datas.filter(
-        (data) => {
-            return prepareEntryForStorage(data);
+    service.copyArray = function(type, aliases, datas, displayLabel, displayIcon, uniqueKey) {
+        
+        var storage = retriveStorage();
+        
+        // Clean up each entry
+        var copiedDatas = datas.map(data => prepareEntryForStorage(data));
+        
+        // remove previous copies of this entry:
+        storage.entries = storage.entries.filter(
+            (entry) => {
+                return entry.unique !== uniqueKey;
+            }
+        );
+        
+        var entry = {unique:uniqueKey, type:type, aliases:aliases, data:copiedDatas, label:displayLabel, icon:displayIcon};
+
+        console.log(entry);
+
+        storage.entries.push(entry);
+        
+        if (saveStorage(storage) === true) {
+            notificationsService.success("Clipboard", "Copied to clipboard.");
+        } else {
+            notificationsService.success("Clipboard", "Couldnt copy this data to clipboard.");
         }
-    );
-    
-    // remove previous copies of this entry:
-    storage.entries = storage.entries.filter(
-        (entry) => {
-            return entry.unique !== uniqueKey;
-        }
-    );
-    
-    var entry = {unique:uniqueKey, type:type, aliases:aliases, data:copiedDatas, label:displayLabel, icon:displayIcon};
-    storage.entries.push(entry);
-    
-    if (saveStorage(storage) === true) {
-        notificationsService.success("Clipboard", "Copied to clipboard.");
-    } else {
-        notificationsService.success("Clipboard", "Couldnt copy this data to clipboard.");
-    }
-    
-};
+        
+    };
     
     
     /**
@@ -201,9 +200,11 @@ function clipboardService(notificationsService, eventsService, localStorageServi
                 return (
                     entry.type === type
                     && 
-                    (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
-                    || 
-                    (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length > 0)
+                    (
+                        (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
+                        || 
+                        (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length > 0)
+                    )
                 );
             }
         );
@@ -237,25 +238,31 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @description
     * Removes entries matching the given type and one of the provided aliases.
     */
-    service.clearEntriesOfType = function(type, aliases) {
+    service.clearEntriesOfType = function(type, allowedAliases) {
         
         var storage = retriveStorage();
         
+        console.log("BEFORE: ", storage.entries)
+
         // Find entries that are NOT fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
                 return !(
                     entry.type === type
                     && 
-                    (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
-                    || 
-                    (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length > 0)
+                    (
+                        (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
+                        || 
+                        (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length > 0)
+                    )
                 );
             }
         );
         
         storage.entries = filteretEntries;
         
+        console.log("AFTER: ", storage.entries)
+
         saveStorage(storage);
     };
     
