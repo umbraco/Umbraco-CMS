@@ -1360,6 +1360,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.</key>
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
     <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
+    <key alias="compositionRemoveWarning">Når du fjerner en komposition vil alle associerede indholdsdata blive slettet. Når først dokumenttypen er gemt, er der ingen vej tilbage.</key>
     <key alias="availableEditors">Tilgængelige editors</key>
     <key alias="reuse">Genbrug</key>
     <key alias="editorSettings">Editor indstillinger</key>
