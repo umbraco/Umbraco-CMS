@@ -697,43 +697,69 @@ namespace Umbraco.Web.Scheduling
             if (onTerminating)
                 OnEvent(Terminating, "Terminating");
 
+            // Run the Stop commands on another thread since IRegisteredObject.Stop calls are called sequentially
+            // with a single aspnet thread during shutdown and we don't want to delay other calls to IRegisteredObject.Stop.
             if (!immediate)
             {
-                // immediate == false when the app is trying to wind down, immediate == true will be called either:
-                // after a call with immediate == false or if the app is not trying to wind down and needs to immediately stop.
-                // So Stop may be called twice or sometimes only once.
-
-                try
-                {
-                    Shutdown(false, false); // do not accept any more tasks, flush the queue, do not wait
-                }
-                finally
-                {
-                    // raise the completed event only after the running threading task has completed
-                    lock (_locker)
-                    {
-                        if (_runningTask != null)
-                            _runningTask.ContinueWith(_ => Terminate(false));
-                        else
-                            Terminate(false);
-                    }
-                }
-
-                // If we are called with immediate == false, wind down above and then shutdown within 2 seconds,
-                // we want to shut down the app as quick as possible, if we wait until immediate == true, this can
-                // take a very long time since immediate will only be true when a new request is received on the new
-                // appdomain (or another iis timeout occurs ... which can take soeme time).
-                Task.Delay(2000, _shutdownToken).ContinueWith(_ => StopImmediate());
-
+                Task.Run(StopInitial, CancellationToken.None);
             }
             else
             {
-                // If we are called with immediate == true - cancel and shut down now.
+                lock(_locker)
+                {
+                    if (_terminated) return;
+                    Task.Run(StopImmediate, CancellationToken.None);
+                }
+            }
+        }
 
+        /// <summary>
+        /// Called when immediate == false for IRegisteredObject.Stop(bool immediate)
+        /// </summary>
+        /// <remarks>
+        /// Called on a threadpool thread
+        /// </remarks>
+        private void StopInitial()
+        {
+            // immediate == false when the app is trying to wind down, immediate == true will be called either:
+            // after a call with immediate == false or if the app is not trying to wind down and needs to immediately stop.
+            // So Stop may be called twice or sometimes only once.
+
+            try
+            {
+                Shutdown(false, false); // do not accept any more tasks, flush the queue, do not wait
+            }
+            finally
+            {
+                // raise the completed event only after the running threading task has completed
+                lock (_locker)
+                {
+                    if (_runningTask != null)
+                        _runningTask.ContinueWith(_ => Terminate(false));
+                    else
+                        Terminate(false);
+                }
+            }
+
+            // If the shutdown token was not canceled in the Shutdown call above, it means there was still tasks
+            // being processed, in which case we'll give it a couple seconds
+            if (!_shutdownToken.IsCancellationRequested)
+            {
+                // If we are called with immediate == false, wind down above and then shutdown within 2 seconds,
+                // we want to shut down the app as quick as possible, if we wait until immediate == true, this can
+                // take a very long time since immediate will only be true when a new request is received on the new
+                // appdomain (or another iis timeout occurs ... which can take some time).
+                Thread.Sleep(2000); //we are already on a threadpool thread
                 StopImmediate();
             }
         }
 
+        /// <summary>
+        /// Called when immediate == true for IRegisteredObject.Stop(bool immediate)
+        /// </summary>
+        /// <remarks>
+        /// Called on a threadpool thread
+        /// </remarks>
         private void StopImmediate()
         {
             _logger.Info<BackgroundTaskRunner>("{LogPrefix} Canceling tasks", _logPrefix);
