@@ -77,7 +77,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query)
         {
             var sqlClause = GetBaseQuery(false)
-                .Where<LogDto>(x => x.Header == type.ToString());
+                .Where("(logHeader=@0)", type.ToString());
+
             var translator = new SqlTranslator<IAuditItem>(sqlClause, query);
             var sql = translator.Translate();
 

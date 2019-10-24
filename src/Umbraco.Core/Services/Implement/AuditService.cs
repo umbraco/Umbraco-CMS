@@ -142,6 +142,7 @@ namespace Umbraco.Core.Services.Implement
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
+            //TODO: Why not -1? This would mean that we're not showing the admin-users changes..?
             if (userId < 0)
             {
                 totalRecords = 0;
