@@ -475,6 +475,23 @@
 
       /* ---------- PROPERTIES ---------- */
 
+      scope.addPropertyToActiveGroup = function () {
+        var group = _.find(scope.model.groups, group => group.tabState === "active");
+        if (!group && scope.model.groups.length) {
+          group = scope.model.groups[0];
+        }
+
+        if (!group || !group.name) {
+          return;
+        }
+
+        var property = _.find(group.properties, property => property.propertyState === "init");
+        if (!property) {
+          return;
+        }
+        scope.addProperty(property, group);
+      }
+
       scope.addProperty = function(property, group) {
 
         // set property sort order
