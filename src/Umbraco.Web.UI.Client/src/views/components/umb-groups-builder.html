@@ -135,7 +135,7 @@
                                 <ng-form name="propertyTypeForm">
                                     <div class="control-group -no-margin" ng-if="!sortingMode">
 
-                                        <div class="umb-group-builder__property-meta-alias" ng-if="property.inherited || property.locked">{{ property.alias }}</div>
+                                        <div class="umb-group-builder__property-meta-alias umb-locked-field__text cursor-not-allowed" style="padding-left: 1px" ng-if="property.inherited || property.locked">{{ property.alias }}</div>
                                         <umb-locked-field
                                             ng-if="!property.inherited && !property.locked"
                                             locked="locked"
