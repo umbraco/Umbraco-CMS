@@ -12,9 +12,7 @@
         vm.isOpen = false;
 
         function initDropDown() {
-            keyboardService.bind("esc", function() {
-                navigationService.hideNavigation();
-            });
+            keyboardService.bind("esc", vm.close);
         }
         function destroyDropDown() {
             keyboardService.unbind("esc");
@@ -38,6 +36,7 @@
 
         vm.executeAction = function(action) {
             action.method();
+            vm.close();
         }
 
         vm.$onDestroy = function () {

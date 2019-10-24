@@ -3,9 +3,9 @@
 
     <ul class="umb-actions dropdown-menu" role="menu" on-outside-click="vm.close()" ng-if="vm.isOpen" on-close="vm.close()" deep-blur="vm.close()">
         <li role="menuitem" lass="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in vm.actions">
-            <button type="button" ng-click="action.method($event)">
+            <button type="button" ng-click="vm.executeAction(action)">
                 <i class="icon icon-{{action.icon}}" aria-hidden="true"></i>
-                <span class="menu-label"><localize key="{{::action.labelKey}}"></localize></span>
+                <span class="menu-label"><localize key="{{::action.labelKey}}" tokens={{action.labelTokens}}></localize></span>
             </button>
         </li>
     </ul>

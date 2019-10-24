@@ -1731,6 +1731,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="usedByProperties">Brugt af</key>
   </area>
   <area alias="clipboard">
+    <key alias="labelForCopyAllEntries">Kopier %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
   </area>
 </language>

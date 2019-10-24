@@ -623,6 +623,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.propertyActions = [
             {
                 labelKey: 'actions_copy',
+                labelTokens: [$scope.model.label],
                 icon: 'documents',
                 method: copyAllEntries
             }
