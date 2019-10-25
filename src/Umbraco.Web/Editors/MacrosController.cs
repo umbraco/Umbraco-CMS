@@ -114,18 +114,15 @@ namespace Umbraco.Web.Editors
 
             var macroDisplay = Mapper.Map<IMacro, MacroDisplay>(macro);
 
-            var parameters = new List<MacroParameterDisplay>();
-
-            foreach (var param in macro.Properties.Values.OrderBy(x => x.SortOrder))
-            {
-                parameters.Add(new MacroParameterDisplay
-                {
-                    Editor = param.EditorAlias,
-                    Key = param.Alias,
-                    Label = param.Name,
-                    Id = param.Id
-                });
-            }
+            var parameters = macro.Properties.Values
+                                .OrderBy(x => x.SortOrder)
+                                .Select(x => new MacroParameterDisplay()
+                                {
+                                    Editor = x.EditorAlias,
+                                    Key = x.Alias,
+                                    Label = x.Name,
+                                    Id = x.Id
+                                });
 
             macroDisplay.Parameters = parameters;
 
@@ -144,18 +141,15 @@ namespace Umbraco.Web.Editors
 
             var macroDisplay = Mapper.Map<IMacro, MacroDisplay>(macro);
 
-            var parameters = new List<MacroParameterDisplay>();
-
-            foreach (var param in macro.Properties.Values.OrderBy(x => x.SortOrder))
-            {
-                parameters.Add(new MacroParameterDisplay
-                {
-                    Editor = param.EditorAlias,
-                    Key = param.Alias,
-                    Label = param.Name,
-                    Id = param.Id
-                });
-            }
+            var parameters = macro.Properties.Values
+                                .OrderBy(x => x.SortOrder)
+                                .Select(x => new MacroParameterDisplay()
+                                {
+                                    Editor = x.EditorAlias,
+                                    Key = x.Alias,
+                                    Label = x.Name,
+                                    Id = x.Id
+                                });
 
             macroDisplay.Parameters = parameters;
 
@@ -177,18 +171,15 @@ namespace Umbraco.Web.Editors
 
             var macroDisplay = Mapper.Map<IMacro, MacroDisplay>(macro);
 
-            var parameters = new List<MacroParameterDisplay>();
-
-            foreach (var param in macro.Properties.Values.OrderBy(x => x.SortOrder))
-            {
-                parameters.Add(new MacroParameterDisplay
-                {
-                    Editor = param.EditorAlias,
-                    Key = param.Alias,
-                    Label = param.Name,
-                    Id = param.Id
-                });
-            }
+            var parameters = macro.Properties.Values
+                                .OrderBy(x => x.SortOrder)
+                                .Select(x => new MacroParameterDisplay()
+                                {
+                                    Editor = x.EditorAlias,
+                                    Key = x.Alias,
+                                    Label = x.Name,
+                                    Id = x.Id
+                                });
 
             macroDisplay.Parameters = parameters;
 
