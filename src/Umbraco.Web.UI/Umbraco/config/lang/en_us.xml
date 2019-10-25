@@ -2189,4 +2189,32 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noMemberTypes">No references to Member Types.</key>
     <key alias="usedByProperties">Used by</key>
   </area>
+  <area alias="logViewer">
+      <key alias="logLevels">Log Levels</key>
+      <key alias="savedSearches">Saved Searches</key>
+      <key alias="totalItems">Total Items</key>
+      <key alias="timestamp">Timestamp</key>
+      <key alias="level">Level</key>
+      <key alias="machine">Machine</key>
+      <key alias="message">Message</key>
+      <key alias="exception">Exception</key>
+      <key alias="properties">Properties</key>
+      <key alias="searchWithGoogle">Search With Google</key>
+      <key alias="searchThisMessageWithGoogle">Search this message with Google</key>
+      <key alias="searchWithBing">Search With Bing</key>
+      <key alias="searchThisMessageWithBing">Search this message with Bing</key>
+      <key alias="searchOurUmbraco">Search Our Umbraco</key>
+      <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Search this message on Our Umbraco forums and docs</key>
+      <key alias="searchOurUmbracoWithGoogle">Search Our Umbraco with Google</key>
+      <key alias="searchOurUmbracoForumsUsingGoogle">Search Our Umbraco forums using Google</key>
+      <key alias="searchUmbracoSource">Search Umbraco Source</key>
+      <key alias="searchWithinUmbracoSourceCodeOnGithub">Search within Umbraco source code on Github</key>
+      <key alias="searchUmbracoIssues">Search Umbraco Issues</key>
+      <key alias="searchUmbracoIssuesOnGithub">Search Umbraco Issues on Github</key>
+      <key alias="deleteThisSearch">Delete this search</key>
+      <key alias="findLogsWithRequestId">Find Logs with Request ID</key>
+      <key alias="findLogsWithNamespace">Find Logs with Namespace</key>
+      <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
+      <key alias="open">Open</key>
+  </area>
 </language>

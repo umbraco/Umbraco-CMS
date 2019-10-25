@@ -1734,5 +1734,32 @@ Mange hilsner fra Umbraco robotten
     <key alias="noMemberTypes">Ingen referencer til Medlems Typer.</key>
     <key alias="usedByProperties">Brugt af</key>
   </area>
-
+  <area alias="logViewer">
+    <key alias="logLevels">Log type</key>
+    <key alias="savedSearches">Gemte søgninger</key>
+    <key alias="totalItems">Samlet resultat</key>
+    <key alias="timestamp">Dato</key>
+    <key alias="level">Type</key>
+    <key alias="machine">Maskine</key>
+    <key alias="message">Besked</key>
+    <key alias="exception">Exception</key>
+    <key alias="properties">Egenskaber</key>
+    <key alias="searchWithGoogle">Søg med Google</key>
+    <key alias="searchThisMessageWithGoogle">Søg efter denne besked på Google</key>
+    <key alias="searchWithBing">Søg med Bing</key>
+    <key alias="searchThisMessageWithBing">Søg efter denne besked på Bing</key>
+    <key alias="searchOurUmbraco">Søg på Our Umbraco</key>
+    <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Søg efter denne besked på Our Umbraco forum og dokumentation</key>
+    <key alias="searchOurUmbracoWithGoogle">Søg på Our Umbraco med Google</key>
+    <key alias="searchOurUmbracoForumsUsingGoogle">Søg på Our Umbraco forum med Google</key>
+    <key alias="searchUmbracoSource">Søg i Umbraco kildekoden</key>
+    <key alias="searchWithinUmbracoSourceCodeOnGithub">Søg i Umbraco kildekoden på Github</key>
+    <key alias="searchUmbracoIssues">Søg i Umbraco issues</key>
+    <key alias="searchUmbracoIssuesOnGithub">Søg i Umbraco issues på Github</key>
+    <key alias="deleteThisSearch">Slet denne søgning</key>
+    <key alias="findLogsWithRequestId">Find logs med request Id</key>
+    <key alias="findLogsWithNamespace">Find logs med Namespace</key>
+    <key alias="findLogsWithMachineName">Find logs med maskin navn</key>
+    <key alias="open">Åben</key>
+  </area>
 </language>
