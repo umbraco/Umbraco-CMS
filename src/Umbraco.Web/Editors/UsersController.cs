@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -105,7 +106,7 @@ namespace Umbraco.Web.Editors
             if (Current.Configs.Settings().Content.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
-                user.Avatar = "UserAvatars/" + (user.Id + safeFileName).ToSHA1() + "." + ext;
+                user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
@@ -543,7 +544,7 @@ namespace Umbraco.Web.Editors
                 hasErrors = true;
             }
 
-            // if the found user has his email for username, we want to keep this synced when changing the email.
+            // if the found user has their email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
             if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
