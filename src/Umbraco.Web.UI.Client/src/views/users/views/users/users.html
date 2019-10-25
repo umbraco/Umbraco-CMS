@@ -359,6 +359,8 @@
                                 <localize key="general_add">Add</localize>
                             </a>
 
+                            <input type="hidden" ng-model="vm.newUser.userGroupsValidation" ng-required="!vm.newUser.userGroups.length" />
+
                         </umb-control-group>
 
                         <umb-control-group label="@general_message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message" required="true">

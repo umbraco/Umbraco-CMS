@@ -37,6 +37,8 @@
         <localize key="contentTypeEditor_noGroups"></localize>
     </div>
 
+    <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>    
+
     <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
 
         <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{tab.name}}">
@@ -47,7 +49,7 @@
             </a>
 
             <!-- TAB ACTIVE OR INACTIVE STATE -->
-            <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" ng-click="activateGroup(tab)">
+            <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" tabindex="0" ng-focus="activateGroup(tab)">
 
                 <div class="umb-group-builder__group-title-wrapper">
 
@@ -119,8 +121,6 @@
                             data-element="property-add"
                             class="umb-group-builder__group-add-property"
                             ng-if="property.propertyState=='init' && !sortingMode"
-                            hotkey="alt+shift+p"
-                            hotkey-when="{{tab.tabState === 'active' && property.propertyState=='init'}}"
                             ng-click="addProperty(property, tab)"
                             ng-focus="activateGroup(tab)"
                             focus-when="{{property.focus}}">
@@ -135,7 +135,7 @@
                                 <ng-form name="propertyTypeForm">
                                     <div class="control-group -no-margin" ng-if="!sortingMode">
 
-                                        <div class="umb-group-builder__property-meta-alias" ng-if="property.inherited || property.locked">{{ property.alias }}</div>
+                                        <div class="umb-group-builder__property-meta-alias umb-locked-field__text cursor-not-allowed" style="padding-left: 1px" ng-if="property.inherited || property.locked">{{ property.alias }}</div>
                                         <umb-locked-field
                                             ng-if="!property.inherited && !property.locked"
                                             locked="locked"
