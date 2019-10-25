@@ -67,6 +67,12 @@ namespace Umbraco.Core.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "active")]
         public bool Active { get; set; }
+
+        /// <summary>
+        /// Gets or sets the content app badge.
+        /// </summary>
+        [DataMember(Name = "badge")]
+        public ContentAppBadge Badge { get; set; }
     }
 }
 
