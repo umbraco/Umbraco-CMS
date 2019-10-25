@@ -2176,6 +2176,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
+    <key alias="createNewFolder">Create new folder</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
