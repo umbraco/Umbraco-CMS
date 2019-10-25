@@ -71,6 +71,40 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets the datatype json for the datatype guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DataTypeDisplay GetById(Guid id)
+        {
+            var dataType = Services.DataTypeService.GetDataType(id);
+            if (dataType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+        }
+
+        /// <summary>
+        /// Gets the datatype json for the datatype udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DataTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var dataType = Services.DataTypeService.GetDataType(guidUdi.Guid);
+            if (dataType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+        }
+
+        /// <summary>
         /// Deletes a data type with a given ID
         /// </summary>
         /// <param name="id"></param>
