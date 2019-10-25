@@ -91,7 +91,7 @@ namespace Umbraco.Core.PropertyEditors
         /// simple enough for now.</para>
         /// </remarks>
         // TODO: point of that one? shouldn't we always configure?
-        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? (_nonConfigured ?? (_nonConfigured= CreateValueEditor()));
+        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? (_nonConfigured ?? (_nonConfigured = CreateValueEditor()));
 
         /// <inheritdoc />
         /// <remarks>
@@ -114,7 +114,7 @@ namespace Umbraco.Core.PropertyEditors
                 return ExplicitValueEditor;
 
             var editor = CreateValueEditor();
-            ((DataValueEditor) editor).Configuration = configuration; // TODO: casting is bad
+            ((DataValueEditor)editor).Configuration = configuration; // TODO: casting is bad
             return editor;
         }
 
@@ -164,7 +164,7 @@ namespace Umbraco.Core.PropertyEditors
         protected virtual IDataValueEditor CreateValueEditor()
         {
             if (Attribute == null)
-                throw new InvalidOperationException("The editor does not specify a view.");
+                throw new InvalidOperationException($"The editor is not attributed with {nameof(DataEditorAttribute)}");
 
             return new DataValueEditor(Attribute);
         }
@@ -176,7 +176,7 @@ namespace Umbraco.Core.PropertyEditors
         {
             var editor = new ConfigurationEditor();
             // pass the default configuration if this is not a property value editor
-            if((Type & EditorType.PropertyValue) == 0)
+            if ((Type & EditorType.PropertyValue) == 0)
             {
                 editor.DefaultConfiguration = _defaultConfiguration;
             }
