@@ -1,26 +1,44 @@
-﻿using System;
+﻿using Moq;
+using NUnit.Framework;
+using System;
 using System.Linq;
 using System.Web;
-using Moq;
-using NUnit.Framework;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 
-namespace Umbraco.Tests.Web
+namespace Umbraco.Tests.Templates
 {
-
     [TestFixture]
     public class HtmlLocalLinkParserTests
     {
+        [Test]
+        public void Returns_Udis_From_LocalLinks()
+        {
+            var input = @"<p>
+    <div>
+        <img src='/media/12312.jpg' data-udi='umb://media/D4B18427A1544721B09AC7692F35C264' />
+        <a href=""{locallink:umb://document/C093961595094900AAF9170DDE6AD442}"">hello</a>
+    </div>
+</p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" />
+<a href=""{locallink:umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2}"">hello</a>
+</p>";
+
+            var umbracoContextAccessor = new TestUmbracoContextAccessor();
+            var parser = new HtmlLocalLinkParser(umbracoContextAccessor);
+
+            var result = parser.FindUdisFromLocalLinks(input).ToList();
+
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(Udi.Parse("umb://document/C093961595094900AAF9170DDE6AD442"), result[0]);
+            Assert.AreEqual(Udi.Parse("umb://document-type/2D692FCB070B4CDA92FB6883FDBFD6E2"), result[1]);
+        }
+
         [TestCase("", "")]
         [TestCase("hello href=\"{localLink:1234}\" world ", "hello href=\"/my-test-url\" world ")]
         [TestCase("hello href=\"{localLink:umb://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ")]
@@ -40,7 +58,7 @@ namespace Umbraco.Tests.Web
             var publishedContent = new Mock<IPublishedContent>();
             publishedContent.Setup(x => x.Id).Returns(1234);
             publishedContent.Setup(x => x.ContentType).Returns(contentType);
-            
+
             var mediaType = new PublishedContentType(777, "image", PublishedItemType.Media, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var media = new Mock<IPublishedContent>();
             media.Setup(x => x.ContentType).Returns(mediaType);

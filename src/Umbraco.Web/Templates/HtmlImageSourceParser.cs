@@ -20,7 +20,7 @@ namespace Umbraco.Web.Templates
             RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
         /// <summary>
-        /// Parses out UDIs from an html string based on 'data-udi' html attributes
+        /// Parses out media UDIs from an html string based on 'data-udi' html attributes
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>

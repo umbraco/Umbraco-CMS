@@ -1522,7 +1522,7 @@
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />
-    <Compile Include="UdiEntityType.cs" />
+    <Compile Include="Contants-UdiEntityType.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiType.cs" />

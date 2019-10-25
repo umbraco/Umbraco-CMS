@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Templates
 
 
     [TestFixture]
-    public class ImageSourceParserTests
+    public class HtmlImageSourceParserTests
     {
         [Test]
         public void Returns_Udis_From_Data_Udi_Html_Attributes()
