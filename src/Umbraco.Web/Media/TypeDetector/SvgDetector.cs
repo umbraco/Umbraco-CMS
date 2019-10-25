@@ -13,7 +13,7 @@ namespace Umbraco.Web.Media.TypeDetector
             {
                 document = XDocument.Load(fileStream);
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 return false;
             }
