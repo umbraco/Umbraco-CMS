@@ -55,10 +55,12 @@
                                     <localize key="templateEditor_recursive">Recursive</localize>
                                 </label>
                                 <div class="flex">
-                                    <umb-checkbox input-id="recursive" name="recursive" model="vm.recursive" disabled="!vm.field" />
-                                    <label for="recursive" ng-class="{ 'muted cursor-not-allowed': !vm.field }">
-                                        <localize key="templateEditor_recursiveDescr">Yes, make it recursive</localize>
-                                    </label>
+                                    <umb-checkbox name="recursive"
+                                                  disabled="!vm.field"
+                                                  model="vm.recursive"
+                                                  text="Yes, make it recursive"
+                                                  label-key="templateEditor_recursiveDescr">
+                                    </umb-checkbox>
                                 </div>
                             </div>
                         </div>
