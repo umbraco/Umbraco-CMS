@@ -837,11 +837,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 trackedRelations.AddRange(refs);
             }
 
-            if (trackedRelations.Count == 0) return;
+            //First delete all auto-relations for this entity
+            RelationRepository.DeleteByParent(entity.Id, Constants.Conventions.RelationTypes.AutomaticRelationTypes);
 
-            //First delete all relations for this entity
-            var relationTypes = trackedRelations.Select(x => x.RelationTypeAlias).ToArray();
-            RelationRepository.DeleteByParent(entity.Id, relationTypes);
+            if (trackedRelations.Count == 0) return;
 
             var udiToGuids = trackedRelations.Select(x => x.Udi as GuidUdi)
                 .ToDictionary(x => (Udi)x, x => x.Guid);

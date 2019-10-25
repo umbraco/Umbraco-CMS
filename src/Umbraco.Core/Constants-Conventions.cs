@@ -358,6 +358,15 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
 
+                /// <summary>
+                /// Returns the types of relations that are automatically tracked
+                /// </summary>
+                /// <remarks>
+                /// Developers should not manually use these relation types since they will all be cleared whenever an entity
+                /// (content, media or member) is saved since they are auto-populated based on property values.
+                /// </remarks>
+                public static string[] AutomaticRelationTypes = new[] { RelatedMediaAlias, RelatedDocumentAlias };
+
                 //TODO: return a list of built in types so we can use that to prevent deletion in the uI
             }
         }

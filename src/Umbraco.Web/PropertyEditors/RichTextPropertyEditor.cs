@@ -144,7 +144,7 @@ namespace Umbraco.Web.PropertyEditors
                     yield return new UmbracoEntityReference(udi, Constants.Conventions.RelationTypes.RelatedMediaAlias);
 
                 foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
-                    yield return new UmbracoEntityReference(udi, Constants.Conventions.RelationTypes.RelatedMediaAlias);
+                    yield return new UmbracoEntityReference(udi, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
 
                 //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
             }
