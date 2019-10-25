@@ -112,20 +112,7 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse($"Macro with id {id} does not exist");
             }
 
-            var macroDisplay = new MacroDisplay
-            {
-                Alias = macro.Alias,
-                Id = macro.Id,
-                Key = macro.Key,
-                Name = macro.Name,
-                CacheByPage = macro.CacheByPage,
-                CacheByUser = macro.CacheByMember,
-                CachePeriod = macro.CacheDuration,
-                View = macro.MacroSource,
-                RenderInEditor = !macro.DontRender,
-                UseInEditor = macro.UseInEditor,
-                Path = $"-1,{macro.Id}"
-            };
+            var macroDisplay = Mapper.Map<IMacro, MacroDisplay>(macro);
 
             var parameters = new List<MacroParameterDisplay>();
 
@@ -141,9 +128,6 @@ namespace Umbraco.Web.Editors
             }
 
             macroDisplay.Parameters = parameters;
-
-            // TODO: Should probably map to MacroDisplay as for datatypes
-            //return Mapper.Map<IMacro, MacroDisplay>(macro);
 
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
         }
@@ -158,20 +142,7 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse($"Macro with id {id} does not exist");
             }
 
-            var macroDisplay = new MacroDisplay
-            {
-                Alias = macro.Alias,
-                Id = macro.Id,
-                Key = macro.Key,
-                Name = macro.Name,
-                CacheByPage = macro.CacheByPage,
-                CacheByUser = macro.CacheByMember,
-                CachePeriod = macro.CacheDuration,
-                View = macro.MacroSource,
-                RenderInEditor = !macro.DontRender,
-                UseInEditor = macro.UseInEditor,
-                Path = $"-1,{macro.Id}"
-            };
+            var macroDisplay = Mapper.Map<IMacro, MacroDisplay>(macro);
 
             var parameters = new List<MacroParameterDisplay>();
 
@@ -187,9 +158,6 @@ namespace Umbraco.Web.Editors
             }
 
             macroDisplay.Parameters = parameters;
-
-            // TODO: Should probably map to MacroDisplay as for datatypes
-            //return Mapper.Map<IMacro, MacroDisplay>(macro);
 
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
         }
@@ -207,20 +175,7 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse($"Macro with id {id} does not exist");
             }
 
-            var macroDisplay = new MacroDisplay
-            {
-                Alias = macro.Alias,
-                Id = macro.Id,
-                Key = macro.Key,
-                Name = macro.Name,
-                CacheByPage = macro.CacheByPage,
-                CacheByUser = macro.CacheByMember,
-                CachePeriod = macro.CacheDuration,
-                View = macro.MacroSource,
-                RenderInEditor = !macro.DontRender,
-                UseInEditor = macro.UseInEditor,
-                Path = $"-1,{macro.Id}"
-            };
+            var macroDisplay = Mapper.Map<IMacro, MacroDisplay>(macro);
 
             var parameters = new List<MacroParameterDisplay>();
 
@@ -236,9 +191,6 @@ namespace Umbraco.Web.Editors
             }
 
             macroDisplay.Parameters = parameters;
-
-            // TODO: Should probably map to MacroDisplay as for datatypes
-            //return Mapper.Map<IMacro, MacroDisplay>(macro);
 
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
         }
