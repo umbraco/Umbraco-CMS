@@ -662,7 +662,6 @@ angular.module("umbraco")
                 return ((spans / $scope.model.config.items.columns) * 100).toFixed(8);
             };
 
-
             $scope.clearPrompt = function (scopedObject, e) {
                 scopedObject.deletePrompt = false;
                 e.preventDefault();
@@ -685,7 +684,6 @@ angular.module("umbraco")
                 if (control.editor.nameExp) return control.editor.nameExp(control)
                 return control.editor.name;
             }
-
 
             // *********************************************
             // Initialization
