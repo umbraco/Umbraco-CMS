@@ -182,7 +182,7 @@
                                                               <div class="umb-control-click-overlay" ng-show="control !== active && !sortMode"></div>
 
                                                               <div class="umb-control-collapsed umb-control-handle" ng-show="sortMode">
-                                                                  {{control.editor.name}}
+                                                                  {{ getTemplateName(control) }}
                                                               </div>
 
                                                               <div class="umb-control-inner" ng-hide="sortMode">
@@ -190,7 +190,7 @@
                                                                   <div class="umb-control-bar umb-control-handle">
 
                                                                       <div class="umb-control-title" ng-if="control === active">
-                                                                          {{control.editor.name}}
+                                                                          {{ getTemplateName(control) }}
                                                                       </div>
 
                                                                       <div class="umb-tools" ng-if="control === active">
