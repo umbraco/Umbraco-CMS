@@ -20,6 +20,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using System.Web.Http.Controllers;
 
 namespace Umbraco.Web.Editors
 {
@@ -42,6 +43,19 @@ namespace Umbraco.Web.Editors
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors;
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class DataTypeControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
         }
 
         /// <summary>
