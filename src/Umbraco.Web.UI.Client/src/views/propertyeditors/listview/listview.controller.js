@@ -403,6 +403,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         const dialog = {
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
+            isTrashed: $scope.isTrashed,
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
             submitButtonStyle: "danger",
             submit: function (model) {
