@@ -20,14 +20,19 @@
 
                 <umb-editor-sub-header>
                     <umb-editor-sub-header-content-left class="flex-auto flex-wrap">
-
                         <!-- Log Level filter -->
-                        <div class="flex" style="position: relative;">
-                            <a class="btn btn-link dropdown-toggle flex mb2" href="" ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter">
-                                <span>Log Levels:</span>
-                                <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.logLevels) }}</span>
-                                <span class="caret"></span>
-                            </a>
+                        <div class="flex log-viewer-filter" style="position: relative;" deep-blur="vm.page.showLevelFilter = !vm.page.showLevelFilter">
+                            <button 
+                                type="button" 
+                                class="btn-link dropdown-toggle flex mb2 filter-toggle" 
+                                ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter"
+                                aria-haspopup="true" 
+                                aria-expanded="{{vm.page.showLevelFilter === undefined ? false : vm.page.showLevelFilter}}"
+                                >
+                                <span class="filter-toggle__text">Log Levels:</span>
+                                <span class="filter-toggle__level truncate">{{ vm.getFilterName(vm.logLevels) }}</span>
+                                <span class="filter-toggle__icon caret" aria-hidden="true"></span>
+                            </button>
                             <umb-dropdown class="pull-left" ng-if="vm.page.showLevelFilter" on-close="vm.page.showLevelFilter = false;">
                                 <umb-dropdown-item ng-repeat="level in vm.logLevels" style="padding: 8px 20px 8px 16px;">
                                     <div class="flex items-center">
@@ -43,7 +48,7 @@
                         <div class="flex" style="width:100%;">
                             <div class="flex-auto" style="position:relative;">
                                 <!-- Search/expression filter -->
-                                <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%; padding-right: 160px;" placeholder="Search logs&hellip;" />
+                                <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%; padding-right: 160px;" placeholder="Search logs..." />
 
                                 <!-- Save Search & Clear Search icon buttons -->
                                 <ins class="icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="position: absolute; top: 0; line-height: 32px; right: 140px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
