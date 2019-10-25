@@ -129,23 +129,30 @@ h5.-black {
 }
 
 .umb-control-group.-no-border {
-  &::after {
-    content: none;
-  }
+    &::after {
+        margin-top: 0px;
+        height: 0;
+        background-color: transparent;
+    }
 }
 
 .umb-property:last-of-type .umb-control-group {
-  &::after {
-    content: none;
-  }
-  margin-bottom: 0 !important;
-  padding-bottom: 0;
+    &::after {
+        margin-top: 0px;
+        height: 0;
+        background-color: transparent;
+    }
+    margin-bottom: 0 !important;
 }
 
 /* BLOCK MODE */
 .block-form .umb-control-group {
-  border-bottom: none;
-  padding-bottom: 0;
+    margin-top: 0px;
+    &::after {
+        margin-top: 0px;
+        height: 0;
+        background-color: transparent;
+    }
 }
 
 .block-form .umb-control-group label .help-block,
