@@ -357,6 +357,8 @@ namespace Umbraco.Core
                 /// Alias for default relation type "Relate Parent Media Folder On Delete".
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
+
+                //TODO: return a list of built in types so we can use that to prevent deletion in the uI
             }
         }
     }

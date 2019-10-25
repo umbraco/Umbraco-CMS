@@ -2,6 +2,7 @@
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_5_0
 {
+
     public class UpdateRelationTypeTable : MigrationBase
     {
         public UpdateRelationTypeTable(IMigrationContext context)

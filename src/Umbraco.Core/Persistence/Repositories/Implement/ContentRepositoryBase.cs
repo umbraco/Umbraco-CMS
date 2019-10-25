@@ -826,7 +826,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var p in entity.Properties)
             {
                 if (!PropertyEditors.TryGet(p.PropertyType.PropertyEditorAlias, out var editor)) continue;
-                if (!(editor is IDataValueReference reference)) continue;
+                var valueEditor = editor.GetValueEditor();
+                if (!(valueEditor is IDataValueReference reference)) continue;
 
                 //TODO: Support variants/segments! This is not required for this initial prototype which is why there is a check here
                 if (!p.PropertyType.VariesByNothing()) continue;

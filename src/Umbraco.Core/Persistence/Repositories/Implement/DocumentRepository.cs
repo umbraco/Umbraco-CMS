@@ -484,6 +484,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ClearEntityTags(entity, _tagRepository);
             }
 
+            PersistRelations(entity);
+
             entity.ResetDirtyProperties();
 
             // troubleshooting
@@ -686,6 +688,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 ClearEntityTags(entity, _tagRepository);
             }
+
+            PersistRelations(entity);
 
             // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
 

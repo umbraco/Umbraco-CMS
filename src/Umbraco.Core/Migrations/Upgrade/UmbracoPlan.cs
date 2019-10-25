@@ -185,6 +185,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.5.0...
             To<UpdateRelationTypeTable>("{4759A294-9860-46BC-99F9-B4C975CAE580}");
+            To<AddNewRelationTypes>("{0BC866BC-0665-487A-9913-0290BD0169AD}");
 
             //FINAL
         }

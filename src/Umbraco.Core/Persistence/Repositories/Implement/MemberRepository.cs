@@ -324,6 +324,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             SetEntityTags(entity, _tagRepository);
 
+            PersistRelations(entity);
+
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
             entity.ResetDirtyProperties();
@@ -388,6 +390,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Insert(propertyDataDto);
 
             SetEntityTags(entity, _tagRepository);
+
+            PersistRelations(entity);
 
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
