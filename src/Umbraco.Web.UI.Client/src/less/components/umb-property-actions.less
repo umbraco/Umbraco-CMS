@@ -1,4 +1,9 @@
-.umb-property-actions__toggle {
+.umb-property-actions {
+    display: inline;
+}
+
+.umb-property-actions__toggle,
+.umb-property-actions__menu-open-toggle {
     position: relative;
     display: flex;
     flex: 0 0 auto;
@@ -21,16 +26,39 @@
             margin: 0;
         }
     }
-
+}
+.umb-property-actions__toggle {
     &:hover {
         i {
             background: @ui-action-type-hover;
         }
     }
 }
+.umb-property-actions__menu-open-toggle {
+    position: absolute;
+    z-index:1;
+    outline: none;// this is not acceccible by keyboard, since we use the .umb-property-actions__toggle for that.
 
+    top: -15px;
+    border-radius: 3px 3px 0 0;
+    
+    border-top: 1px solid @dropdownBorder;
+    border-left: 1px solid @dropdownBorder;
+    border-right: 1px solid @dropdownBorder;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+
+    .box-shadow(0 5px 20px rgba(0,0,0,.3));
+
+    background-color: white;
+    
+}
+
+.umb-property .umb-property-actions {
+    float: left;
+}
 .umb-property .umb-property-actions__toggle {
-    margin-top: 10px;
+    margin-top: 2px;
     opacity: 0;
     transition: opacity 120ms;
 }
@@ -39,7 +67,53 @@
     opacity: 1;
 }
 
-.umb-property-actions .dropdown-menu {
-    left: auto;
-    top: auto;
+.umb-property-actions__menu {
+    
+    display: block;
+    border-radius: 3px;
+    
+    position: absolute;
+    z-index: 1000;
+
+    float: left;
+    min-width: 160px;
+    list-style: none;
+
+    ul > {
+
+        border: 1px solid @dropdownBorder;
+
+        border-top-right-radius: 3px;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+
+        overflow: hidden;
+
+        .box-shadow(0 5px 20px rgba(0,0,0,.3));
+    }
+
+    ul > li > button {
+        
+        position: relative;
+        z-index:2;// need to stay on top of menu-toggle-open shadow.
+
+        display: block;
+        font-weight: normal;
+        line-height: @baseLineHeight;
+        white-space: nowrap;
+        cursor:pointer;
+
+        background: @ui-option;
+        border: 0;
+        padding: 8px 20px;
+        color: @ui-option-type;
+        width: 100%;
+        text-align: left;
+        
+        &:hover {
+            text-decoration: none;
+            color: @ui-option-type-hover;
+            background: @ui-option-hover;
+        }
+    }
 }

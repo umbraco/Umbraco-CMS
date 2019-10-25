@@ -33,12 +33,16 @@ angular.module("umbraco.directives")
                     $scope.property.propertyErrorMessage = errorMsg;
                 };
 
-                $scope.$on("ExposePropertyEditorAPI", function(event, api) {
-
+                var unsubscribe = $scope.$on("ExposePropertyEditorAPI", function(event, api) {
+                    
                     //avoid eventual parent properties to capture this.
                     event.stopPropagation();
                     
                     $scope.propertyActions = api.propertyActions;
+                });
+
+                $scope.$on("$destroy", function () {
+                    unsubscribe();
                 });
 
             }

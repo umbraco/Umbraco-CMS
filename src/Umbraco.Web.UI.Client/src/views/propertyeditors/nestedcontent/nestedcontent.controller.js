@@ -110,8 +110,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "overlayService",
     "$routeParams",
     "editorState",
+    "propertyEditorService",
     
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState) {
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState, propertyEditorService) {
         
         var contentTypeAliases = [];
         _.each($scope.model.config.contentTypes, function (contentType) {
@@ -410,7 +411,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $event.stopPropagation();
         }
         
-        var copyAllEntries = function($event) {
+        var copyAllEntries = function() {
             
             syncCurrentNode();
 
@@ -429,9 +430,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [$scope.model.label, activeVariant.name]).then(function(data) {
                 clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes, data, "icon-thumbnail-list", $scope.model.id);
             });
-
-            
-            $event.stopPropagation();
         }
         
         $scope.pasteFromClipboard = function(newNode) {
@@ -622,15 +620,15 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         
         $scope.propertyActions = [
             {
-                labelKey: 'actions_copy',
+                labelKey: 'clipboard_labelForCopyAllEntries',
                 labelTokens: [$scope.model.label],
                 icon: 'documents',
                 method: copyAllEntries
             }
         ];
 
-        $scope.$emit("ExposePropertyEditorAPI", $scope);// must be executed at a state where the API is set.
-
+        //$scope.$emit("ExposePropertyEditorAPI", $scope);// must be executed at a state where the API is set.
+        propertyEditorService.exposeAPI($scope);// must be executed at a state where the API is set.
 
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
             updateModel();

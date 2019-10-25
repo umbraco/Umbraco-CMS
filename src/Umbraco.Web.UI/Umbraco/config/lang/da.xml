@@ -1734,4 +1734,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="labelForCopyAllEntries">Kopier %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
   </area>
+  <area alias="propertyActions">
+    <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>
+  </area>
 </language>
