@@ -140,6 +140,14 @@
                     {{currentVariant.createDateFormatted}}
                 </umb-control-group>
 
+                <umb-control-group ng-show="node.id !== 0 && currentVariant.releaseDateFormatted" data-element="node-info-publish-date" label="@content_releaseDate">
+                    {{currentVariant.releaseDateFormatted}}
+                </umb-control-group>
+
+                <umb-control-group ng-show="node.id !== 0 && currentVariant.expireDateFormatted" data-element="node-info-expire-date" label="@content_expireDate">
+                    {{currentVariant.expireDateFormatted}}
+                </umb-control-group>
+
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">
                     <umb-node-preview
                         style="min-width: 100%; margin-bottom: 0;"

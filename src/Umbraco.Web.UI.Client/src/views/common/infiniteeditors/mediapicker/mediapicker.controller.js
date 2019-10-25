@@ -28,6 +28,7 @@ angular.module("umbraco")
             var dialogOptions = $scope.model;
             
             $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
+            $scope.disableFocalPoint = (dialogOptions.disableFocalPoint && dialogOptions.disableFocalPoint !== "0") ? true : false;
             $scope.onlyImages = (dialogOptions.onlyImages && dialogOptions.onlyImages !== "0") ? true : false;
             $scope.onlyFolders = (dialogOptions.onlyFolders && dialogOptions.onlyFolders !== "0") ? true : false;
             $scope.showDetails = (dialogOptions.showDetails && dialogOptions.showDetails !== "0") ? true : false;
@@ -37,7 +38,7 @@ angular.module("umbraco")
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
             $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
-
+            
             var userStartNodes = [];
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -137,7 +138,8 @@ angular.module("umbraco")
                             $scope.target = node;
                             if (ensureWithinStartNode(node)) {
                                 selectMedia(node);
-                                $scope.target.url = mediaHelper.resolveFile(node);
+                                $scope.target.url = mediaHelper.resolveFileFromEntity(node);
+                                $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
                                 $scope.target.altText = altText;
                                 openDetailsDialog();
                             }
@@ -226,7 +228,7 @@ angular.module("umbraco")
             }
 
             function clickHandler(media, event, index) {
-                
+
                 if (media.isFolder) {
                     if ($scope.disableFolderSelect) {
                         gotoFolder(media);
@@ -333,22 +335,26 @@ angular.module("umbraco")
             }
 
             function openDetailsDialog() {
+                localizationService.localize("defaultdialogs_editSelectedMedia").then(function (data) {
+                    vm.mediaPickerDetailsOverlay = {
+                        show: true,
+                        title: data,
+                        disableFocalPoint: $scope.disableFocalPoint,
+                        submit: function (model) {
+                            $scope.model.selection.push($scope.target);
+                            $scope.model.submit($scope.model);
 
-                vm.mediaPickerDetailsOverlay = {
-                    show: true,
-                    submit: function (model) {
+                            vm.mediaPickerDetailsOverlay.show = false;
+                            vm.mediaPickerDetailsOverlay = null;
+                        },
+                        close: function (oldModel) {
+                            vm.mediaPickerDetailsOverlay.show = false;
+                            vm.mediaPickerDetailsOverlay = null;
 
-                        $scope.model.selection.push($scope.target);
-                        $scope.model.submit($scope.model);
-
-                        vm.mediaPickerDetailsOverlay.show = false;
-                        vm.mediaPickerDetailsOverlay = null;
-                    },
-                    close: function (oldModel) {
-                        vm.mediaPickerDetailsOverlay.show = false;
-                        vm.mediaPickerDetailsOverlay = null;
-                    }
-                };
+                            close();
+                        }
+                    };
+                });
             };
 
             var debounceSearchMedia = _.debounce(function () {
@@ -453,21 +459,25 @@ angular.module("umbraco")
             function getChildren(id) {
                 vm.loading = true;
                 return entityResource.getChildren(id, "Media", vm.searchOptions).then(function (data) {
-                        
-                        for (var i = 0; i < data.length; i++) {
-                            if (data[i].metaData.MediaPath !== null) {
-                                data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
-                                data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
-                            }
+
+                    var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
+
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].metaData.MediaPath !== null) {
+                            data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
+                            data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
                         }
 
-                        vm.searchOptions.filter = "";
-                        $scope.images = data ? data : [];
+                        data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
+                    }
 
-                        // set already selected medias to selected
-                        preSelectMedia();
-                        vm.loading = false;
-                    });
+                    vm.searchOptions.filter = "";
+                    $scope.images = data ? data : [];
+
+                    // set already selected medias to selected
+                    preSelectMedia();
+                    vm.loading = false;
+                });
             }
 
             function preSelectMedia() {

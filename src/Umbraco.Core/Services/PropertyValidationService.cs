@@ -131,6 +131,12 @@ namespace Umbraco.Core.Services
         private bool IsPropertyValueValid(PropertyType propertyType, object value)
         {
             var editor = _propertyEditors[propertyType.PropertyEditorAlias];
+            if (editor == null)
+            {
+                // nothing much we can do validation wise if the property editor has been removed.
+                // the property will be displayed as a label, so flagging it as invalid would be pointless.
+                return true;
+            }
             var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).Configuration;
             var valueEditor = editor.GetValueEditor(configuration);
             return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp).Any();
