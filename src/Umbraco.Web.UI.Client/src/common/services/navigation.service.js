@@ -463,6 +463,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 throw "section cannot be null";
             }
 
+            appState.setMenuState("currentNode", node);
+
             if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
                 //first check if the menu item simply navigates to a route
                 var parts = action.metaData["actionRoute"].split("?");
