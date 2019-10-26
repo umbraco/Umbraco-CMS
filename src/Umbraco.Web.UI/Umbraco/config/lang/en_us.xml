@@ -1646,6 +1646,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noFallbackLanguageOption">No fall back language</key>
     <key alias="fallbackLanguageDescription">To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.</key>
     <key alias="fallbackLanguage">Fall back language</key>
+    <key alias="none">none</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>
