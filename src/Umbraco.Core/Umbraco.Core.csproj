@@ -262,6 +262,7 @@
     <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\Entities\IMediaEntitySlim.cs" />
     <Compile Include="Models\Entities\MediaEntitySlim.cs" />
+    <Compile Include="Models\PagedResult.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
@@ -834,7 +835,7 @@
     <Compile Include="Models\Packaging\InstallationSummary.cs" />
     <Compile Include="Models\Packaging\PackageAction.cs" />
     <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
-    <Compile Include="Models\PagedResult.cs" />
+    <Compile Include="Models\PagedResultOfT.cs" />
     <Compile Include="Models\PartialView.cs" />
     <Compile Include="Models\PartialViewType.cs" />
     <Compile Include="Models\Property.cs" />
