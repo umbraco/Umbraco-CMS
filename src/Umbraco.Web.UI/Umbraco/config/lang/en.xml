@@ -38,6 +38,7 @@
     <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="wasMovedTo">was moved to</key>
     <key alias="wasCopiedTo">was copied to</key>
+    <key alias="wasDeleted">was deleted</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -149,6 +150,7 @@
     <key alias="deleteTag">Delete tag</key>
     <key alias="confirmActionCancel">Cancel</key>
     <key alias="confirmActionConfirm">Confirm</key>
+	<key alias="morePublishingOptions">More publishing options</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -273,6 +275,8 @@
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
+    <key alias="nestedContentAddElementType">Add element type</key>
+    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>	
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -317,6 +321,7 @@
     <key alias="copyFailed">Failed to copy media</key>
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -330,8 +335,11 @@
     <key alias="enterFolderName">Enter a folder name</key>
     <key alias="updateData">Choose a type and a title</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[There are no document types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.]]></key>
     <key alias="noDocumentTypesWithNoSettingsAccess">The selected page in the content tree doesn't allow for any pages to be created below it.</key>
     <key alias="noDocumentTypesEditPermissions">Edit permissions for this document type</key>
+    <key alias="noDocumentTypesCreateNew">Create a new document type</key>
+    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
     <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>
@@ -403,6 +411,7 @@
     <key alias="cut">Cut</key>
     <key alias="editdictionary">Edit Dictionary Item</key>
     <key alias="editlanguage">Edit Language</key>
+    <key alias="editSelectedMedia">Edit selected media</key>
     <key alias="insertAnchor">Insert local link</key>
     <key alias="insertCharacter">Insert character</key>
     <key alias="insertgraphicheadline">Insert graphic headline</key>
@@ -411,12 +420,12 @@
     <key alias="insertMacro">Click to add a Macro</key>
     <key alias="inserttable">Insert table</key>
     <key alias="languagedeletewarning">This will delete the language</key>
+    <key alias="languageChangeWarning">Changing the culture for a language may be an expensive operation and will result in the content cache and indexes being rebuilt</key>
     <key alias="lastEdited">Last Edited</key>
     <key alias="link">Link</key>
     <key alias="linkinternal">Internal link:</key>
     <key alias="linklocaltip">When using local links, insert "#" in front of link</key>
     <key alias="linknewwindow">Open in new window?</key>
-    <key alias="macroContainerSettings">Macro Settings</key>
     <key alias="macroDoesNotHaveProperties">This macro does not contain any properties you can edit</key>
     <key alias="paste">Paste</key>
     <key alias="permissionsEdit">Edit permissions for</key>
@@ -446,6 +455,7 @@
     <key alias="linkToMedia">Link to media</key>
     <key alias="selectContentStartNode">Select content start node</key>
     <key alias="selectMedia">Select media</key>
+    <key alias="selectMediaType">Select media type</key>
     <key alias="selectIcon">Select icon</key>
     <key alias="selectItem">Select item</key>
     <key alias="selectLink">Select link</key>
@@ -455,6 +465,7 @@
     <key alias="selectMediaStartNode">Select media start node</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
+    <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
     <key alias="selectSections">Select sections</key>
     <key alias="selectUsers">Select users</key>
@@ -470,7 +481,7 @@
     <key alias="account">account</key>
     <key alias="selectEditor">Select editor</key>
     <key alias="selectSnippet">Select snippet</key>
-    <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</key>
+    <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
@@ -507,6 +518,7 @@
     <key alias="searchDescription">Search the index and view the results</key>
     <key alias="tools">Tools</key>
     <key alias="toolsDescription">Tools to manage the index</key>
+    <key alias="fields">fields</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -527,6 +539,9 @@
     <key alias="anchor">#value or ?key=value</key>
         <key alias="enterAlias">Enter alias...</key>
         <key alias="generatingAlias">Generating alias...</key>
+        <key alias="a11yCreateItem">Create item</key>
+        <key alias="a11yEdit">Edit</key>
+        <key alias="a11yName">Name</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
@@ -586,6 +601,7 @@
     <key alias="stylesNoStylesOnPage">No active styles available</key>
     <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
+    <key alias="propertyHasErrors">This property is invalid</key>
   </area>
   <area alias="general">
     <key alias="about">About</key>
@@ -631,6 +647,7 @@
     <key alias="field">Field</key>
     <key alias="findDocument">Find</key>
     <key alias="first">First</key>
+    <key alias="focalPoint">Focal point</key>
     <key alias="general">General</key>
     <key alias="groups">Groups</key>
     <key alias="group">Group</key>
@@ -1130,7 +1147,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
-    
+
     <key alias="pathToFile">Path to file</key>
     <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
@@ -1259,6 +1276,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
   </area>
   <area alias="mediaPicker">
+    <key alias="deletedItem">Deleted item</key>
     <key alias="pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</key>
     <key alias="trashed">Trashed</key>
@@ -1558,13 +1576,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="allowedTemplatesHeading">Allowed Templates</key>
     <key alias="allowedTemplatesDescription">Choose which templates editors are allowed to use on content of this type</key>
     <key alias="allowAsRootHeading">Allow as root</key>
-    <key alias="allowAsRootDescription">Allow editors to create content of this type in the root of the content tree</key>
+    <key alias="allowAsRootDescription">Allow editors to create content of this type in the root of the content tree.</key>
     <key alias="childNodesHeading">Allowed child node types</key>
-    <key alias="childNodesDescription">Allow content of the specified types to be created underneath content of this type</key>
+    <key alias="childNodesDescription">Allow content of the specified types to be created underneath content of this type.</key>
     <key alias="chooseChildNode">Choose child node</key>
     <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
     <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
     <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
+    <key alias="compositionRemoveWarning">Removing a composition will delete all the associated property data. Once you save the document type there's no way back.</key>
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
@@ -1594,11 +1613,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="compositionUsageHeading">Where is this composition used?</key>
     <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
     <key alias="variantsHeading">Allow varying by culture</key>
-    <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
+    <key alias="variantsDescription">Allow editors to create content of this type in different languages.</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
     <key alias="elementType">Element type</key>
     <key alias="elementHeading">Is an Element type</key>
-    <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
+    <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree.</key>
     <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
   </area>
@@ -2124,5 +2143,35 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
-  </area>>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Go back</key>
+    <key alias="activeListLayout">Active layout:</key>
+    <key alias="jumpTo">Jump to</key>
+    <key alias="group">group</key>
+    <key alias="passed">passed</key>
+    <key alias="warning">warning</key>
+    <key alias="failed">failed</key>
+    <key alias="suggestion">suggestion</key>
+    <key alias="checkPassed">Check passed</key>
+    <key alias="checkFailed">Check failed</key>
+    <key alias="openBackofficeSearch">Open backoffice search</key>
+    <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
+    <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
+    <key alias="currentLanguage">Current language</key>
+    <key alias="switchLanguage">Switch language to</key>
+    <key alias="createNewFolder">Create new folder</key>
+  </area>
+  <area alias="references">
+    <key alias="tabName">References</key>
+    <key alias="DataTypeNoReferences">This Data Type has no references.</key>
+    <key alias="labelUsedByDocumentTypes">Used in Document Types</key>
+    <key alias="noDocumentTypes">No references to Document Types.</key>
+    <key alias="labelUsedByMediaTypes">Used in Media Types</key>
+    <key alias="noMediaTypes">No references to Media Types.</key>
+    <key alias="labelUsedByMemberTypes">Used in Member Types</key>
+    <key alias="noMemberTypes">No references to Member Types.</key>
+    <key alias="usedByProperties">Used by</key>
+  </area>
+
 </language>

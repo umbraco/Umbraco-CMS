@@ -2,6 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -13,7 +14,13 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a multiple text string property editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.MultipleTextstring, "Repeatable textstrings", "multipletextbox", ValueType = ValueTypes.Text, Icon="icon-ordered-list", Group="lists")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.MultipleTextstring,
+        "Repeatable textstrings",
+        "multipletextbox",
+        ValueType = ValueTypes.Text,
+        Group = Constants.PropertyEditors.Groups.Lists,
+        Icon = "icon-ordered-list")]
     public class MultipleTextStringPropertyEditor : DataEditor
     {
         /// <summary>
@@ -56,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 if (!(editorValue.DataTypeConfiguration is MultipleTextStringConfiguration config))
-                    throw new Exception("panic");
+                    throw new PanicException($"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
                 var max = config.Maximum;
 
                 //The legacy property editor saved this data as new line delimited! strange but we have to maintain that.

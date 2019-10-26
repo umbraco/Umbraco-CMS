@@ -1,72 +1,64 @@
 <div ng-controller="Umbraco.Overlays.PublishDescendantsController as vm">
 
     <div ng-if="vm.variants.length === 1">
-        <div style="margin-bottom: 15px;">
+        <div class="mb3">
             <p><localize key="{{vm.labels.help.key}}" tokens="vm.labels.help.tokens"></localize></p>
         </div>
 
-        <div style="margin-bottom: 15px;">
-            <label>
-                <input type="checkbox"
-                       ng-model="model.includeUnpublished"
-                       style="margin-right: 8px;" />
-                <localize key="content_includeUnpublished"></localize>
-            </label>
+        <div class="flex mb3">
+            <umb-checkbox
+                model="model.includeUnpublished"
+                text="Include drafts: also publish unpublished content items."
+                label-key="content_includeUnpublished"
+            />
         </div>
 
     </div>
 
     <div ng-if="vm.variants.length > 1">
 
-        <div style="margin-bottom: 15px;">
+        <div class="mb3">
             <p><localize key="content_publishDescendantsWithVariantsHelp"></localize></p>
         </div>
 
-        <div style="margin-bottom: 15px;" class="flex">
-
+        <div class="flex mb3">
             <umb-checkbox
-                input-id="includeUnpublishedSelector"
-                model="model.includeUnpublished" />
-
-            <label for="includeUnpublishedSelector">
-                <localize key="content_includeUnpublished"></localize>
-            </label>
+                model="model.includeUnpublished"
+                text="Include drafts: also publish unpublished content items."
+                label-key="content_includeUnpublished"
+            />
         </div>
 
-        <div class="bold" style="margin-bottom: 5px;">
+        <div class="bold mb1">
             <localize key="treeHeaders_languages"></localize>
         </div>
 
         <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list-item umb-list--condensed"
-                 ng-repeat="variant in vm.variants">
+            <div class="umb-list-item umb-list--condensed" ng-repeat="variant in vm.variants">
                 <ng-form name="publishVariantSelectorForm">
-                    <div class="flex" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
+                    <div ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
 
                         <umb-checkbox
-                            input-id="{{variant.htmlId}}"
                             name="publishVariantSelector"
                             model="variant.publish"
                             on-change="vm.changeSelection(variant)"
-                            server-validation-field="{{variant.htmlId}}"/>
+                            server-validation-field="{{variant.htmlId}}"
+                            text="{{variant.language.name}}"/>
 
                         <div>
-                            <label for="{{variant.htmlId}}" style="margin-bottom: 0;">
-                                <span>{{ variant.language.name }}</span>
-
+                            <span class="db umb-list-item__description umb-list-item__description--checkbox" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                 <span class="db umb-list-item__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                     <umb-variant-state variant="variant"></umb-variant-state>
                                     <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                                 </span>
 
                                 <span class="db" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
-                                    <span class="db umb-list-item__description text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
+                                    <span class="db umb-list-item__description umb-list-item__description--checkbox text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
                                 </span>
 
                                 <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
-
-                            </label>
+                            </span>
                         </div>
                     </div>
 

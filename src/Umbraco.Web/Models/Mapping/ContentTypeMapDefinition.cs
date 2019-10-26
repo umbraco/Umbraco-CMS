@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -577,7 +578,7 @@ namespace Umbraco.Web.Models.Mapping
                     udiType = Constants.UdiEntityType.DocumentType;
                     break;
                 default:
-                    throw new Exception("panic");
+                    throw new PanicException($"Source is of type {source.GetType()} which isn't supported here");
             }
 
             return Udi.Create(udiType, source.Key);

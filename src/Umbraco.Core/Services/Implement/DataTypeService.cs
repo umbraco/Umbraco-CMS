@@ -349,6 +349,11 @@ namespace Umbraco.Core.Services.Implement
                     throw new ArgumentException("Cannot save datatype with empty name.");
                 }
 
+                if (dataType.Name != null && dataType.Name.Length > 255)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
+
                 _dataTypeRepository.Save(dataType);
 
                 saveEventArgs.CanCancel = false;
@@ -458,6 +463,14 @@ namespace Umbraco.Core.Services.Implement
                 Audit(AuditType.Delete, userId, dataType.Id);
 
                 scope.Complete();
+            }
+        }
+
+        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete:true))
+            {
+                return _dataTypeRepository.FindUsages(id);
             }
         }
 

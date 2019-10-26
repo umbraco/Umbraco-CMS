@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -29,6 +31,7 @@ namespace Umbraco.Web.Scheduling
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
         private BackgroundTaskRunner<IBackgroundTask> _tasksRunner;
         private BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _fileCleanupRunner;
         private BackgroundTaskRunner<IBackgroundTask> _healthCheckRunner;
 
         private bool _started;
@@ -58,6 +61,7 @@ namespace Umbraco.Web.Scheduling
             _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger);
             _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", _logger);
             _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger);
+            _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", _logger);
             _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger);
 
             // we will start the whole process when a successful request is made
@@ -93,6 +97,7 @@ namespace Umbraco.Web.Scheduling
                 tasks.Add(RegisterKeepAlive());
                 tasks.Add(RegisterScheduledPublishing());
                 tasks.Add(RegisterLogScrubber(settings));
+                tasks.Add(RegisterTempFileCleanup());
 
                 var healthCheckConfig = Current.Configs.HealthChecks();
                 if (healthCheckConfig.NotificationSettings.Enabled)
@@ -151,6 +156,18 @@ namespace Umbraco.Web.Scheduling
             // log scrubbing
             // install on all, will only run on non-replica servers
             var task = new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _scopeProvider, _logger);
+            _scrubberRunner.TryAdd(task);
+            return task;
+        }
+
+        private IBackgroundTask RegisterTempFileCleanup()
+        {
+            // temp file cleanup, will run on all servers - even though file upload should only be handled on the master, this will
+            // ensure that in the case it happes on replicas that they are cleaned up.
+            var task = new TempFileCleanup(_fileCleanupRunner, 60000, 3600000 /* 1 hr */,
+                new[] { new DirectoryInfo(IOHelper.MapPath(SystemDirectories.TempFileUploads)) },
+                TimeSpan.FromDays(1), //files that are over a day old
+                _runtime, _logger);
             _scrubberRunner.TryAdd(task);
             return task;
         }

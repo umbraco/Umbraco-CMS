@@ -3,7 +3,7 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th/>
+                    <th />
                     <th>
                         <localize key="contentTypeEditor_elementType">Element Type</localize>
                     </th>
@@ -22,42 +22,50 @@
                         <i class="icon icon-navigation handle"></i>
                     </td>
                     <td>
-                        <select id="{{model.alias}}_doctype_select"
-                            ng-options="dt.alias as dt.name for dt in selectableDocTypesFor(config) | orderBy: 'name'"
-                            ng-model="config.ncAlias" required></select>
+                        {{ph = placeholder(config);""}}
+                        <div class="umb-nested-content__placeholder" ng-class="{'umb-nested-content__placeholder--selected':ph}" ng-click="openElemTypeModal($event, config)">
+                            <span class="umb-nested-content__placeholder-icon-holder" ng-if="ph">
+                                <i class="umb-nested-content__placeholder-icon {{ ph.icon }}"></i>
+                            </span>
+                            <span class="umb-nested-content__placeholder-name" ng-if="ph">
+                                {{ ph.name }}
+                            </span>
+                            <localize key="content_nestedContentAddElementType" ng-if="!ph">Add element type</localize>
+                        </div>
+
                     </td>
                     <td>
                         <select id="{{model.alias}}_tab_select"
-                            ng-options="t for t in docTypeTabs[config.ncAlias]"
-                            ng-model="config.ncTabAlias" required></select>
+                                ng-options="t for t in elemTypeTabs[config.ncAlias]"
+                                ng-model="config.ncTabAlias" required></select>
                     </td>
                     <td>
                         <input type="text" ng-model="config.nameTemplate" />
                     </td>
                     <td>
-                        <a class="btn btn-danger" ng-click="remove($index)">
+                        <button type="button" class="btn btn-danger" ng-click="remove($index)">
                             <localize key="general_delete">Delete</localize>
-                        </a>
+                        </button>
                     </td>
                 </tr>
             </tbody>
         </table>
         <div>
-            <a class="btn" ng-click="add()">
+            <button type="button" class="btn" ng-click="add()" ng-disabled="!canAdd()">
                 <localize key="general_add">Add</localize>
-            </a>
+            </button>
             <i class="icon icon-help-alt medium umb-nested-content__help-icon" ng-click="showHelpText = !showHelpText"></i>
         </div>
     </div>
-    <br/>
+    <br />
     <div class="umb-nested-content__help-text" ng-show="showHelpText">
         <p>
-            <b><localize key="general_group">Group</localize>:</b><br/>
+            <b><localize key="general_group">Group</localize>:</b><br />
             Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.
         </p>
         <p>
-            <b><localize key="template_template">Template</localize>:</b><br/>
-            Enter an angular expression to evaluate against each item for its name. Use <code ng-non-bindable>{{$index}}</code> to display the item index  
+            <b><localize key="template_template">Template</localize>:</b><br />
+            Enter an angular expression to evaluate against each item for its name. Use <code ng-non-bindable>{{$index}}</code> to display the item index
         </p>
     </div>
 </div>

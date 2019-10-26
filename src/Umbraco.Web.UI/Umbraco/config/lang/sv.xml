@@ -282,7 +282,6 @@
     <key alias="linkinternal">Intern länk:</key>
     <key alias="linklocaltip">När du använder lokala länkar, lägg till "#" framför länken</key>
     <key alias="linknewwindow">Öppna i nytt fönster?</key>
-    <key alias="macroContainerSettings">Makroinställningar</key>
     <key alias="macroDoesNotHaveProperties">Detta makro innehåller inga egenskaper som du kan redigera</key>
     <key alias="paste">Klistra in</key>
     <key alias="permissionsEdit">Redigera rättigheter för</key>

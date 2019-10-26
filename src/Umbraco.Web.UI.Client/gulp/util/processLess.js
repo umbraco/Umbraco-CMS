@@ -15,16 +15,13 @@ module.exports = function(files, out) {
         autoprefixer,
         cssnano({zindex: false})
     ];
-
+    
+    console.log("LESS: ", files, " -> ", config.root + config.targets.js + out)
+    
     var task = gulp.src(files)
-        .pipe(less());
-    
-    
-    if (global.isProd === true) {
-        task = task.pipe(cleanCss());
-    }
-    
-    task = task.pipe(postcss(processors))
+        .pipe(less())
+        .pipe(cleanCss())
+        .pipe(postcss(processors))
         .pipe(rename(out))
         .pipe(gulp.dest(config.root + config.targets.css));
     
