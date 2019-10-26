@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [DataContract(Name = "pagedCollection", Namespace = "")]
-    public class PagedResult
+    public abstract class PagedResult
     {
         public PagedResult(long totalItems, long pageNumber, long pageSize)
         {
