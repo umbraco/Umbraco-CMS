@@ -83,20 +83,20 @@
                     <label for="collectionName" class="control-label">Name of the Parent Document Type</label>
                     <input type="text" name="collectionName" id="collectionName" ng-model="model.collectionName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
 
-                    <div ng-if="model.disableTemplates === false" class="flex">
-                        <umb-checkbox input-id="collectionCreateTemplate" name="collectionCreateTemplate" model="model.collectionCreateTemplate" />
-                        <label for="collectionCreateTemplate" class="mb0">Create template for the Parent Document Type</label>
-                    </div>
+                    <umb-checkbox ng-if="model.disableTemplates === false"
+                                  name="collectionCreateTemplate"
+                                  model="model.collectionCreateTemplate"
+                                  text="Create template for the Parent Document Type" />
                 </umb-control-group>
 
                 <umb-control-group>
                     <label for="collectionItemName" class="control-label">Name of the Item Document Type</label>
                     <input type="text" name="collectionItemName" id="collectionItemName" ng-model="model.collectionItemName" class="umb-textstring textstring input-block-level" required />
 
-                    <div ng-if="model.disableTemplates === false" class="flex">
-                        <umb-checkbox input-id="collectionItemCreateTemplate" name="collectionItemCreateTemplate" model="model.collectionItemCreateTemplate" />
-                        <label for="collectionItemCreateTemplate" class="mb0">Create template for the Item Document Type</label>
-                    </div>
+                    <umb-checkbox ng-if="model.disableTemplates === false"
+                                  name="collectionItemCreateTemplate"
+                                  model="model.collectionItemCreateTemplate"
+                                  text="Create template for the Item Document Type" />
                 </umb-control-group>
 
                 <div class="mt3">
