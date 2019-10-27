@@ -10,7 +10,7 @@ Remember, we're a friendly bunch and are happy with whatever contribution you mi
 
 **Code of conduct**
 
-This project and everyone participating in it is governed by the [our Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [Sebastiaan Janssen - sj@umbraco.dk](mailto:sj@umbraco.dk).
+This project and everyone participating in it are governed by the [our Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [Sebastiaan Janssen - sj@umbraco.dk](mailto:sj@umbraco.dk).
 
 **Table of contents**
 
@@ -34,11 +34,11 @@ This project and everyone participating in it is governed by the [our Code of Co
 
 ## Contributing code changes
 
-This document gives you a quick overview on how to get started.
+This document gives you a quick overview of how to get started.
 
 ### Guidelines for contributions we welcome
 
-Not all changes are wanted, so on occasion we might close a PR without merging it. We will give you feedback why we can't accept your changes and we'll be nice about it, thanking you for spending your valuable time.
+Not all changes are wanted, so on occasion, we might close a PR without merging it. We will give you feedback on why we can't accept your changes and we'll be nice about it, thanking you for spending your valuable time.
 
 We have [documented what we consider small and large changes](CONTRIBUTION_GUIDELINES.md). Make sure to talk to us before making large changes, so we can ensure that you don't put all your hard work into something we would not be able to merge.
 
@@ -62,21 +62,21 @@ Great question! The short version goes like this:
 
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
   * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](#questions)
-  * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `v8/dev`, create a new branch first.
+  * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case, `12345`. When you have a branch, commit your changes. Don't commit to `v8/dev`, create a new branch first.
   * **Push** - great, now you can push the changes up to your fork on GitHub
   * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress - you can now make use of GitHub's draft pull request status, detailed [here] (https://github.blog/2019-02-14-introducing-draft-pull-requests/)). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 
   ![Create a pull request](img/createpullrequest.png)
 
 ### Pull requests
-The most successful pull requests usually look a like this:
+The most successful pull requests usually look-alike this:
 
   * Fill in the required template, linking your pull request to an issue on the [issue tracker,](https://github.com/umbraco/Umbraco-CMS/issues) if applicable.
   * Include screenshots and animated GIFs in your pull request whenever possible.
   * Unit tests, while optional, are awesome. Thank you!
   * New code is commented with documentation from which [the reference documentation](https://our.umbraco.com/documentation/Reference/) is generated.
 
-Again, these are guidelines, not strict requirements. However, the more information that you give to us, the more we have to work with when considering your contributions. Good documentation of a pull request can really speed up the time it takes to review and merge your work!
+Again, these are guidelines, not strict requirements. However, the more information that you give to us, the more we have to work with when considering your contributions. Good documentation of a pull request can speed up the time it takes to review and merge your work!
 
 ## Reviews
 
@@ -93,24 +93,24 @@ We have [a process in place which you can read all about](REVIEW_PROCESS.md). Th
 
 ### Styleguides
 
-To be honest, we don't like rules very much. We trust you have the best of intentions and we encourage you to create working code. If it doesn't look perfect then we'll happily help clean it up.
+To be honest, we don't like the rules very much. We trust you have the best of intentions and we encourage you to create working code. If it doesn't look perfect then we'll happily help clean it up.
 
 That said, the Umbraco development team likes to follow the hints that ReSharper gives us (no problem if you don't have this installed) and we've added a `.editorconfig` file so that Visual Studio knows what to do with whitespace, line endings, etc.
 
 ### The PR team
 
-The pull request team consists of one member of Umbraco HQ, [Sebastiaan](https://github.com/nul800sebastiaan), who gets assistance from the following community members who have comitted to volunteering their free time:
+The pull request team consists of one member of Umbraco HQ, [Sebastiaan](https://github.com/nul800sebastiaan), who gets assistance from the following community members who have committed to volunteering their free time:
 
 - [Anders Bjerner](https://github.com/abjerner)
 - [Dave Woestenborghs](https://github.com/dawoe)
 - [Emma Burstow](https://github.com/emmaburstow)
 - [Poornima Nayar](https://github.com/poornimanayar)
 
-These wonderful people aim to provide you with a first reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. Hq will have final sign-off and will check the work again before it is merged. 
+These wonderful people aim to provide you with the first reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. Hq will have final sign-off and will check the work again before it is merged. 
 
 ### Questions?
 
-You can get in touch with [the PR team](#the-pr-team) in multiple ways; we love open conversations and we are a friendly bunch. No question you have is stupid. Any question you have usually helps out multiple people with the same question. Ask away:
+You can get in touch with [the PR team](#the-pr-team) in multiple ways; we love open conversations and we are a friendly bunch. No question you have is stupid. Any question you have usually helped out multiple people with the same question. Ask away:
 
 - If there's an existing issue on the issue tracker then that's a good place to leave questions and discuss how to start or move forward.
 - Unsure where to start? Did something not work as expected? Try leaving a note in the ["Contributing to Umbraco"](https://our.umbraco.com/forum/contributing-to-umbraco-cms/) forum. The team monitors that one closely, so one of us will be on hand and ready to point you in the right direction.
@@ -119,7 +119,7 @@ You can get in touch with [the PR team](#the-pr-team) in multiple ways; we love 
 
 ### Building Umbraco from source code
 
-In order to build the Umbraco source code locally, first make sure you have the following installed.
+To build the Umbraco source code locally, first, make sure you have the following installed.
 
   * Visual Studio 2017 v15.9.7+
   * Node v10+
@@ -131,7 +131,7 @@ Alternatively, you can run `build.ps1` from the Powershell command line, which w
 
 ![Gulp build in Visual Studio](img/gulpbuild.png)
 
-After this build completes, you should be able to hit `F5` in Visual Studio to build and run the project. A IISExpress webserver will start and the Umbraco installer will pop up in your browser. Follow the directions there to get a working Umbraco install up and running.
+After this build completes, you should be able to hit `F5` in Visual Studio to build and run the project. An IISExpress webserver will start and the Umbraco installer will pop up in your browser. Follow the directions there to get a working Umbraco to install up and running.
 
 ### Working with the source code
 
@@ -139,7 +139,7 @@ Some parts of our source code are over 10 years old now. And when we say "old", 
 
 There are two big areas that you should know about:
 
-  1. The Umbraco backoffice is a extensible AngularJS app and requires you to run a `gulp dev` command while you're working with it, so changes are copied over to the appropriate directories and you can refresh your browser to view the results of your changes.
+  1. The Umbraco backoffice is an extensible AngularJS app and requires you to run a `gulp dev` command while you're working with it, so changes are copied over to the appropriate directories and you can refresh your browser to view the results of your changes.
   You may need to run the following commands to set up gulp properly:
   ```
   npm cache clean --force
@@ -173,7 +173,7 @@ We recommend you sync with our repository before you submit your pull request. T
 
 Also, if you submitted a pull request three weeks ago and want to work on something new, you'll want to get the latest code to build against of course.
 
-To sync your fork with this original one, you'll have to add the upstream url. You only have to do this once:
+To sync your fork with this original one, you'll have to add the upstream URL. You only have to do this once:
 
 ```
 git remote add upstream https://github.com/umbraco/Umbraco-CMS.git
@@ -186,7 +186,7 @@ git fetch upstream
 git rebase upstream/v8/dev
 ```
 
-In this command we're syncing with the `v8/dev` branch, but you can of course choose another one if needed.
+In this command, we're syncing with the `v8/dev` branch, but you can, of course, choose another one if needed.
 
 (More info on how this works: [http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated](http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated))
 
