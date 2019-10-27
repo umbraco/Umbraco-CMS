@@ -15,6 +15,8 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Editors
 {
@@ -26,6 +28,12 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+
+        public PackageController(IUmbracoSettingsSection umbracoSettingsSection)
+        {
+            _umbracoSettingsSection = umbracoSettingsSection;
+        }
         public IEnumerable<PackageDefinition> GetCreatedPackages()
         {
             return Services.PackagingService.GetAllCreatedPackages();
@@ -42,7 +50,23 @@ namespace Umbraco.Web.Editors
 
         public PackageDefinition GetEmpty()
         {
-            return new PackageDefinition();
+            var definition = new PackageDefinition();
+            var applicationUrl = _umbracoSettingsSection.WebRouting.UmbracoApplicationUrl;
+            if (applicationUrl.IsNullOrWhiteSpace())
+            {
+                applicationUrl = HttpContext.Current.Request.Url.AbsoluteUri;
+            }
+
+            if (applicationUrl.Contains("/umbraco"))
+            {
+                applicationUrl = applicationUrl.Substring(0, applicationUrl.IndexOf("/umbraco"));
+            }
+
+            definition.Url = applicationUrl;
+            definition.AuthorUrl = applicationUrl;
+            definition.Author = UmbracoContext.Security.CurrentUser.Name;
+
+            return definition;
         }
 
         /// <summary>
