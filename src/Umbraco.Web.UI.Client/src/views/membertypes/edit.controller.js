@@ -13,8 +13,12 @@
 
         var evts = [];
         var vm = this;
+        var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var memberTypeId = infiniteMode ? $scope.model.id : $routeParams.id;
+        var create = infiniteMode ? $scope.model.create : $routeParams.create;
 
         vm.save = save;
+        vm.close = close;
 
         vm.currentNode = null;
         vm.contentType = {};
@@ -83,7 +87,7 @@
                 vm.page.defaultButton = {
                     hotKey: "ctrl+s",
                     hotKeyWhenHidden: true,
-                    labelKey: "buttons_save",
+                    labelKey: infiniteMode ? "buttons_saveAndClose" : "buttons_save",
                     letter: "S",
                     type: "submit",
                     handler: function () { vm.save(); }
@@ -91,7 +95,7 @@
                 vm.page.subButtons = [{
                     hotKey: "ctrl+g",
                     hotKeyWhenHidden: true,
-                    labelKey: "buttons_saveAndGenerateModels",
+                    labelKey: infiniteMode ? "buttons_generateModelsAndClose" : "buttons_saveAndGenerateModels",
                     letter: "G",
                     handler: function () {
 
@@ -144,12 +148,12 @@
             }
         });
 
-        if ($routeParams.create) {
+        if (create) {
 
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
-            memberTypeResource.getScaffold($routeParams.id)
+            memberTypeResource.getScaffold(memberTypeId)
 				.then(function (dt) {
 				    init(dt);
 
@@ -160,10 +164,12 @@
 
             vm.page.loading = true;
 
-            memberTypeResource.getById($routeParams.id).then(function (dt) {
+            memberTypeResource.getById(memberTypeId).then(function (dt) {
                 init(dt);
 
-                syncTreeNode(vm.contentType, dt.path, true);
+                if(!infiniteMode) {
+                    syncTreeNode(vm.contentType, dt.path, true);
+                }
 
                 vm.page.loading = false;
             });
@@ -216,9 +222,15 @@
                     }
                 }).then(function (data) {
                     //success
-                    syncTreeNode(vm.contentType, data.path);
+                    if(!infiniteMode) {
+                        syncTreeNode(vm.contentType, data.path);
+                    }
 
                     vm.page.saveButtonState = "success";
+
+                    if(infiniteMode && $scope.model.submit) {
+                        $scope.model.submit();
+                    }
 
                     deferred.resolve(data);
                 }, function (err) {
@@ -303,6 +315,12 @@
                 vm.currentNode = syncArgs.node;
             });
 
+        }
+        
+        function close() {
+            if(infiniteMode && $scope.model.close) {
+                $scope.model.close();
+            }
         }
 
         evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
