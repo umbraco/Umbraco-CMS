@@ -26,6 +26,7 @@
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.labels = {};
+        vm.saveButtonKey = infiniteMode ? "buttons_saveAndClose" : "buttons_save";
 
         var labelKeys = [
             "general_design",
@@ -87,7 +88,7 @@
                 vm.page.defaultButton = {
                     hotKey: "ctrl+s",
                     hotKeyWhenHidden: true,
-                    labelKey: infiniteMode ? "buttons_saveAndClose" : "buttons_save",
+                    labelKey: vm.saveButtonKey,
                     letter: "S",
                     type: "submit",
                     handler: function () { vm.save(); }
