@@ -10,6 +10,7 @@
 
         vm.isSelected = isSelected;
         vm.openContentType = openContentType;
+        vm.selectCompositeContentType = selectCompositeContentType;
         vm.submit = submit;
         vm.close = close;
 
@@ -50,6 +51,23 @@
         function openContentType(contentType, section) {
             var url = (section === "documentType" ? "/settings/documenttypes/edit/" : "/settings/mediaTypes/edit/") + contentType.id;
             $location.path(url);
+        }
+
+        function selectCompositeContentType(contentType) {  
+
+            console.log("selectCompositeContentType", contentType);
+            console.log("$scope.model.contentType.compositeContentTypes", $scope.model.contentType.compositeContentTypes);
+
+            // Check if the template is already selected.
+            var index = $scope.model.contentType.compositeContentTypes.indexOf(contentType.alias);
+
+            if (index === -1) {
+                $scope.model.contentType.compositeContentTypes.push(contentType.alias);
+            } else {
+                $scope.model.contentType.compositeContentTypes.splice(index, 1);
+            }
+
+            $scope.model.selectCompositeContentType(contentType);
         }
 
         function submit() {

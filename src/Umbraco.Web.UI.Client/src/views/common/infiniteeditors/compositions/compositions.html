@@ -72,6 +72,13 @@
 
                                 <div class="umb-checkbox-list__item-checkbox"
                                      ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.contentType.alias)+1 }">
+                                    <umb-checkbox
+                                        input-id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
+                                        model="compositeContentType.selected"
+                                        on-change="vm.selectCompositeContentType(compositeContentType.contentType)"
+                                        disabled="!compositeContentType.allowed || compositeContentType.inherited">
+                                    </umb-checkbox>
+
                                     <input type="checkbox"
                                            id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
                                            checklist-model="model.compositeContentTypes"
