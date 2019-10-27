@@ -70,21 +70,21 @@
                    <ul class="umb-actions umb-actions-child">
 
                        <li ng-repeat="blueprint in docType.blueprints track by blueprint.id | orderBy:'name':false">
-                           <a ng-click="createFromBlueprint(blueprint.id)">
+                           <button type="button" ng-click="createFromBlueprint(blueprint.id)">
                                <i class="large {{docType.icon}}" aria-hidden="true"></i>
                                <span class="menu-label">
                                    {{blueprint.name}}&nbsp;
                                </span>
-                           </a>
+                            </button>
                        </li>
 
                        <li class="sep" ng-show="allowBlank">
-                           <a ng-click="createBlank(docType)">
+                           <button type="button" ng-click="createBlank(docType)">
                                <i class="large {{docType.icon}}" aria-hidden="true"></i>
                                <span class="menu-label">
                                    <localize key="blueprints_blankBlueprint">Blank</localize>
                                </span>
-                           </a>
+                            </button>
                        </li>
 
                    </ul>
