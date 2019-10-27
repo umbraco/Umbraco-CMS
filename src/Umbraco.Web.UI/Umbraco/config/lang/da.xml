@@ -1722,6 +1722,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="currentLanguage">Aktivt sprog</key>
     <key alias="switchLanguage">Skift sprog til</key>
     <key alias="createNewFolder">Opret ny mappe</key>
+    <key alias="listviewSearchLabel">Søg i listview</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>

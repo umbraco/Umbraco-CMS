@@ -2161,6 +2161,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
     <key alias="createNewFolder">Create new folder</key>
+    <key alias="listviewSearchLabel">Search the listview</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
